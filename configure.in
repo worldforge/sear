@@ -237,7 +237,7 @@ else
   if test $found_cal3d == yes; then
 	LIBS="$LIBS -lcal3d"
   else
-	AC_MSG_ERROR(Error could not find Atlas)
+	AC_MSG_ERROR(Error could not find Cal3D)
   fi
 
   AC_CHECK_HEADER(SDL/SDL_image.h,
