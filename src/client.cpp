@@ -26,6 +26,7 @@
 #include "Character.h"
 #include "EventHandler.h"
 #include "Event.h"
+#include "Lobby.h"
 #include "Render.h"
 #include "ModelHandler.h"
 #include "Model.h"
@@ -56,7 +57,8 @@ Client::Client(System *system, const std::string &client_name) :
   _player(NULL),
   _lobby(NULL),
   _status(CLIENT_STATUS_DISCONNECTED),
-  _client_name(client_name)
+  _client_name(client_name),
+  the_lobby(NULL)
 {
 }
 
@@ -80,6 +82,7 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
+  if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
   if (_connection) delete _connection;
   // TODO clean up factory
@@ -259,6 +262,12 @@ void Client::NetConnected() {
     _lobby = Eris::Lobby::instance();
     _lobby->LoggedIn.connect(SigC::slot(*this, &Client::LoggedIn));
     _lobby->SightPerson.connect(SigC::slot(*this, &Client::SightPerson));
+    if (the_lobby) {
+      delete the_lobby;
+    }
+    the_lobby = new Lobby();
+    the_lobby->init(_lobby);
+    the_lobby->registerCommands(System::instance()->getConsole());
   } catch (Eris::InvalidOperation io) {
     Log::writeLog("Invalid Operation: "  + io._msg, Log::LOG_ERROR);
   }

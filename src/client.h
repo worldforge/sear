@@ -50,6 +50,7 @@ namespace Sear {
 
 class WorldEntity;
 class Console;
+class Lobby;
 class System;
 
 class Client :public SigC::Object, public ConsoleObject {
@@ -120,6 +121,8 @@ protected:
   Eris::Player* _player;
   Eris::Lobby* _lobby;
 
+  Lobby *the_lobby;
+  
   int _status;
   std::string _client_name;
 private:

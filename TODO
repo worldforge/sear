@@ -56,3 +56,7 @@
  * Colour cursors
    Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors can be easily implemented by rendering the cursor as a texture and hiding the real one. The trick is to get mouse position.
   SDL offers two ways. one is to use SDL_GetMouseState and the second is to store the position on every MOUSEMOTION event. However both of these methods do not offer sufficient update intervals to be of real use. We require either another way or need to increase the rate of updates.
+
+
+ * Improve Sound/Music System
+ Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org

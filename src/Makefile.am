@@ -45,6 +45,8 @@ libSear_a_SOURCES = \
 	Factory.h \
 	Graphics.cpp \
 	Graphics.h \
+	Lobby.cpp \
+	Lobby.h \
 	main.cpp \
 	Model.h \
 	ObjectLoader.h \
