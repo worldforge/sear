@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.6 2003-03-08 14:13:14 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.7 2003-03-08 14:32:23 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -224,6 +224,11 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
           std::string texture = (std::string)config.getItem(section, key);
 	  std::cout << texture << std::endl;
           unsigned int textureId = loadTexture(path + texture);
+	  if (material->getMapCount() < i) {
+            if (!material->setMap(i, CalCoreMaterial::Map())) {
+              std::cerr << "Error setting map data" << std::endl;
+            }
+	  }
           if (!material->setMapUserData(i, (Cal::UserData)textureId)) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
@@ -232,9 +237,6 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 	  std::cout << texture << std::endl;
 	  if (texture.empty()) continue;
           unsigned int textureId = loadTexture(path + texture);
-	  if (!material->setMap(i, CalCoreMaterial::Map())) {
-            std::cerr << "Error setting map data" << std::endl;
-	  }
           if (!material->setMapUserData(i, (Cal::UserData)textureId)) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
