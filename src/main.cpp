@@ -9,7 +9,6 @@
 #include "conf.h"
 #include "System.h"
 
-
 int main(int argc, char** argv) {
   bool exit_program = false;
   Sear::System *sys = NULL;
@@ -75,10 +74,11 @@ under certain conditions; type `show c' for details.
 }
 
 #if defined(_WIN32)
-
 #include <windows.h>
 
+// If we are compiling for Win32 we need this. 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {
+  // Convert szCmdLine into argc and argv format	
   char *argvp[128];
   int i = 1;
   char *p = strtok(szCmdLine, " ");
@@ -86,11 +86,12 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw) {
     argvp[i++] = p;
     p = strtok(NULL, " ");
   }
-
+  // Set first arg as execuatable name
   argvp[0] = "sear.exe";
-
+  
+  // Pass arguments to the main function
   main(i, argvp); 
-
+  
   return 0;
 }
 #endif

@@ -17,14 +17,14 @@ public:
   virtual bool init() { return false; }
   virtual void shutdown() {}
   
-  virtual const int getNumPoints() const { return 0; }  
-  virtual const float *getVertexData() const { return NULL; }
-  virtual const float *getTextureData() const { return NULL; }
-  virtual const float *getNormalData() const { return NULL; }
+  virtual const int getNumPoints() { return 0; }  
+  virtual const float *getVertexData() { return NULL; }
+  virtual const float *getTextureData() { return NULL; }
+  virtual const float *getNormalData() { return NULL; }
 
-  virtual const bool hasVertexData() const { return false; }
-  virtual const bool hasTextureData() const { return false; }
-  virtual const bool hasNormalData() const { return false; }
+  virtual const bool hasVertexData() { return false; }
+  virtual const bool hasTextureData() { return false; }
+  virtual const bool hasNormalData() { return false; }
 
   typedef enum {
     INVALID = 0,
@@ -37,10 +37,10 @@ public:
     QUAD_STRIP
   } Type;
 
-  virtual const Type getType() const { return INVALID; }
+  virtual const Type getType() { return INVALID; }
   
-private:
 };
 
 } /* namespace Sear */
+
 #endif /* _MODELS_H_ */

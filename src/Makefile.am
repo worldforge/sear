@@ -41,6 +41,7 @@ sear_SOURCES = \
 	model.cpp \
 	model.h \
 	Models.h \
+	MultiModels.h \
 	ObjectLoader.h \
 	ObjectLoader.cpp \
 	Patch.cpp \
@@ -58,3 +59,7 @@ sear_SOURCES = \
 	WireFrame.h \
 	WorldEntity.cpp \
 	WorldEntity.h \
+	3ds.cpp \
+	3ds.h \
+	3dsMesh.cpp \
+	3dsMesh.h \

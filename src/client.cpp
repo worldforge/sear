@@ -235,7 +235,6 @@ int Client::login(const std::string &username, const std::string &password) {
 void Client::poll() {
 //  try {
 //    if (_connection != NULL) _connection->poll();
-            
     Eris::PollDefault::poll();   
 //  } catch (...) {
   //  Log::writeLog("Caught some error - ignoring");
@@ -443,7 +442,7 @@ void Client::Entered(Eris::Entity* e){
 }
 
 void Client::Appearance(Eris::Entity *e){
-  Log::writeLog("Appearance: " + e->getName(), Log::INFO);
+  Log::writeLog(std::string("Appearance: ") + e->getName(), Log::INFO);
   ((WorldEntity *)e)->handleMove();
   _system->getRenderer()->setModelInUse(e->getID(), true);
 }

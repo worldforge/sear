@@ -23,7 +23,7 @@ MetaServer::~MetaServer() {
 
 bool MetaServer::init(const std::string &meta_server) {
   // Update variables to constsants!!
-  _meta = new Eris::Meta("Sear", meta_server, 10);
+  _meta = new Eris::Meta("", meta_server, 10);
   _meta->ReceivedServerInfo.connect(SigC::slot(*this, &MetaServer::ReceivedServerInfo));
   _meta->GotServerCount.connect(SigC::slot(*this, &MetaServer::GotServerCount));
   _meta->CompletedServerList.connect(SigC::slot(*this, &MetaServer::CompletedServerList));

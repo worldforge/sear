@@ -31,6 +31,8 @@
 #include "Impostor.h"
 #include <unistd.h>
 
+#include "MultiModels.h"
+#include "3ds.h"
 #include "Log.h"
 
 #include "conf.h"
@@ -631,6 +633,7 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
       glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
       drawBBoardQueue(select_mode);
       drawImpostorQueue(select_mode);
+      drawModelsQueue(select_mode);
       glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
       if (!select_mode) nextState(BILLBOARD_TO_FONT);
       drawMessageQueue(select_mode);
@@ -728,6 +731,7 @@ void GL_Render::buildQueues(WorldEntity *we, int depth) {
         else if (model_type == "wire_frame") wireframe_queue[type].push_back(we);
         else if (model_type == "billboard") billboard_queue[type].push_back(we);
       	else if (model_type == "imposter") imposter_queue[type].push_back(we); 
+      	else if (model_type == "model3ds") model3ds_queue[type].push_back(we); 
         else model_queue[type].push_back(we);
       }
       if (op->draw_members) {
@@ -770,6 +774,7 @@ void GL_Render::drawModelQueue(bool select_mode) {
           if (model) delete model;
 	  model = NULL;
 	}
+	ms->multi = NULL;
         ms->model = model;
 	ms->models = NULL;
       }
@@ -918,6 +923,7 @@ void GL_Render::drawRenderQueue(bool select_mode) {
           strncpy(op->model_type, "wireframe\0", 10);
           continue;
         }
+	ms->multi = NULL;
         ms->model = NULL;
         ms->models = boundbox;
       }
@@ -1252,25 +1258,6 @@ WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox) {
   else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());
 }
 
-void GL_Render::drawBBox(BoundBox *bbox) {
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
-  glVertexPointer(3, GL_FLOAT, 0, bbox->getVertexData());
-  glEnableClientState(GL_VERTEX_ARRAY);
-  if (textures) {
-    glTexCoordPointer(2, GL_FLOAT, 0, bbox->getTextureData());
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-  if (lighting) {
-    glNormalPointer(GL_FLOAT, 0, bbox->getNormalData());
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  glDrawArrays(GL_QUADS, 0, bbox->getNumPoints());
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (lighting) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-}
-
 void GL_Render::CheckError() {
   GLenum err = glGetError();
   std::string msg;
@@ -1300,6 +1287,7 @@ void GL_Render::processObjectProperties(ObjectProperties *op) {
 }
 
 void GL_Render::checkModelStatus(const std::string &id) {
+	return;
   ModelStruct *ms = _entity_models[id];
   if (ms) {
     if (!ms->in_use) {
@@ -1325,26 +1313,6 @@ void GL_Render::checkModelStatus(const std::string &id) {
 void GL_Render::setModelInUse(const std::string &id, bool use) {
   ModelStruct *ms = _entity_models[id];
   if (ms) ms->in_use = use;
-}
-
-void GL_Render::drawBillBoard(BillBoard *billboard) {
-/*  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, billboard->getVertexData());
-  if (textures) {
-    glTexCoordPointer(2, GL_FLOAT, 0, billboard->getTextureData());
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-  if (lighting) {
-    glNormalPointer(GL_FLOAT, 0, billboard->getNormalData());
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  glDrawArrays(GL_QUADS, 0, billboard->getNumPoints());
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (lighting) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  */
 }
 
 void GL_Render::drawBBoardQueue(bool select_mode) {
@@ -1391,6 +1359,7 @@ void GL_Render::drawBBoardQueue(bool select_mode) {
         strncpy(op->model_type, "bbox\0", 5);
         continue;
       }
+      ms->multi = NULL;
       ms->model = NULL;
       ms->models = billboard;
     }
@@ -1512,6 +1481,7 @@ void GL_Render::drawImpostorQueue(bool select_mode) {
         strncpy(op->model_type, "bbox\0", 5);
         continue;
       }
+      ms->multi = NULL;
       ms->model = NULL;
       ms->models = impostor;
     }
@@ -1550,26 +1520,6 @@ void GL_Render::drawImpostorQueue(bool select_mode) {
       glPopMatrix();
     }
   }
-}
-
-void GL_Render::drawImpostor(Impostor *impostor) {
-/*  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, impostor->getVertexData());
-  if (textures) {
-    glTexCoordPointer(2, GL_FLOAT, 0, impostor->getTextureData());
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-  if (lighting) {
-    glNormalPointer(GL_FLOAT, 0, impostor->getNormalData());
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  glDrawArrays(GL_QUADS, 0, impostor->getNumPoints());
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (lighting) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  */
 }
 
 void GL_Render::readConfig() {
@@ -1969,6 +1919,7 @@ void GL_Render::drawWireFrameQueue(bool select_mode) {
           wireframe = NULL;
 	  // CANNOT DRAW ENTITY
         }
+	ms->multi = NULL;
         ms->model = NULL;
         ms->models = wireframe;
       }
@@ -1995,101 +1946,19 @@ void GL_Render::drawWireFrameQueue(bool select_mode) {
   }
 }
 
-void GL_Render::drawWireFrame(WorldEntity *we) {
-  WFMath::AxisBox<3> bbox = we->getBBox();
-  if (!we->hasBBox()) {
-    WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-    bbox = WFMath::AxisBox<3>(lc, hc);
-  }
-  bbox = bboxCheck(bbox);
-  glBegin(GL_LINES);
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      //Top
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-
-      //Verticals
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-
-      
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
- 
-
-      
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-     
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-     
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-     
-      glVertex3f(bbox.lowCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.highCorner().y(), bbox.lowCorner().z());
-
-
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.highCorner().z());
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-
-      glVertex3f(bbox.highCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      glVertex3f(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
-      
-  glEnd();
-}
-
-
-
 void GL_Render::drawModel(Models *model) {
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
-  if (!model->hasVertexData()) return; //Error
+  if (!model) {
+    Log::writeLog("No model!", Log::ERROR);
+    return;
+  }
+  if (!model->hasVertexData()) { 
+    Log::writeLog("Model has no data", Log::ERROR);
+    throw 1;
+    return; //Error
+  }
+//   if(model->getVertexData() == NULL){ Log::writeLog("Model has no data", Log::ERROR); return; }
   glVertexPointer(3, GL_FLOAT, 0, model->getVertexData());
   glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && model->hasTextureData()) {
@@ -2101,20 +1970,126 @@ void GL_Render::drawModel(Models *model) {
     glEnableClientState(GL_NORMAL_ARRAY);
   }
   switch (model->getType()) {
-    case (Models::INVALID): break;
+    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
+    case (Models::POINT): glDrawArrays(GL_POINT, 0, model->getNumPoints()); break;
     case (Models::LINES): glDrawArrays(GL_LINES, 0, model->getNumPoints()); break;
+    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, 0, model->getNumPoints()); break;
     case (Models::QUADS): glDrawArrays(GL_QUADS, 0, model->getNumPoints()); break;
+    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, 0, model->getNumPoints()); break;
+    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, 0, model->getNumPoints()); break;
+    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, 0, model->getNumPoints()); break;
+    default: Log::writeLog("Unknown type", Log::ERROR); break;
   }
   glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && model->hasNormalData()) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && model->hasTextureData()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-
-
 void GL_Render::readComponentConfig() {
   if (camera) camera->readConfig();
-  if (terrain)terrain->readConfig();
+  if (terrain) terrain->readConfig();
+}
+
+void GL_Render::drawMultiModel(MultiModels *multimodel) {
+	glPushMatrix();
+  if (!multimodel) {
+    Log::writeLog("MultiModel is NULL", Log::ERROR);
+    return;
+//    throw Exception("NULL pointer");
+  }
+//  Log::writeLog(string_fmt(multimodel->getNumModels()),Log::INFO);
+  for (unsigned int i = 0; i < multimodel->getNumModels(); i++) {
+    Models *m = multimodel->getModel(i);
+    if (m) drawModel(m);
+  }
+  glPopMatrix();
+}
+
+
+void GL_Render::drawModelsQueue(bool select_mode) {
+  std::string type, parent, id;
+  for (std::map<std::string, Queue>::const_iterator I = model3ds_queue.begin(); I != model3ds_queue.end(); I++) {
+    WorldEntity *we = (WorldEntity *)*(I->second.begin());
+    type = we->getType()->getName();
+    parent = *we->getType()->getParentsAsSet().begin();
+    id = we->getID();
+    ObjectLoader *ol = _system->getObjectLoader();
+    ObjectProperties *op = NULL;
+    if (!type.empty()) op = ol->getObjectProperties(type);
+    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
+    if (op == NULL) op = ol->getObjectProperties("default");
+    std::string model_type = std::string(op->model_type);
+    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
+      WorldEntity *we = (WorldEntity*)*J;
+      id = we->getID();
+      ModelStruct *ms;
+      ms = _entity_models[type];
+      if (ms) {
+        //Do nothing
+      } else {
+        Log::writeLog("BUilding new 3ds model",Log::INFO);
+        Model_3ds *model = new Model_3ds();
+        ms = new ModelStruct();
+        ms->model_name = model_type;
+        ms->in_use = true;
+	Log::writeLog(System::instance()->getModel()->getAttribute(type),Log::INFO);
+        if ((model) && model->init() && model->loadModel(System::instance()->getModel()->getAttribute(type))) {
+        _entity_models[type] = ms;
+	} else {
+          if (model) delete model;
+	  model = NULL;
+	}
+        ms->multi = model;
+	ms->model = NULL;
+	ms->models = NULL;
+      }
+      if (select_mode) nextColour(we->getID());
+      else glColor4fv(white);
+      glPushMatrix();
+      WFMath::Point<3> pos = we->getAbsPos();
+      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+//      WFMath::Quaternion q = we->getAbsOrient();
+//      float o[4][4];
+//      QuatToMatrix(q, o);
+//      glMultMatrixf(&o[0][0]);
+      if (ms->multi) {
+        if (!select_mode && we->getID() == activeID) {
+/*	active_name = we->getName();
+	  stateChange(HALO);
+	  if (checkState(RENDER_STENCIL)) {
+            glEnable(GL_STENCIL_TEST);
+  	    glStencilFunc(GL_ALWAYS, -1, 1);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glPushMatrix();
+            drawMultiModel(ms->multi);
+	    glPopMatrix();
+	    glStencilFunc(GL_NOTEQUAL, -1, 1);
+            glColor4fv(_halo_blend_colour);
+	    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	    drawMultiModel(ms->multi);
+	    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glDisable(GL_STENCIL_TEST);
+            glColor4fv(white);
+	  } else {
+	    glColor4fv(_halo_blend_colour);
+	    drawMultiModel(ms->multi);
+	    glColor4fv(white);
+	  }
+	 stateChange(CHARACTERS); 
+	 */
+	} else {
+//	  ((Model_3ds*)ms->multi)->render()
+          drawMultiModel(ms->multi);
+//	    drawMultiModel(ms->multi);
+	}
+      } else {
+        // Else downgrade model type
+        strncpy(op->model_type,"bbox\0", 5);
+	continue;
+      }
+      glPopMatrix();
+    }
+  }
 }
 
 } /* namespace Sear */

@@ -17,12 +17,12 @@ public:
   bool init(const unsigned int h_res, const unsigned int v_res);
   void shutdown();
   
-  const unsigned int getNumLayers() const { return num_layers; }
-  const Model *getLayer(const unsigned int layer) const { return layers[layer]; }
+  const unsigned int getNumLayers() const { return _num_layers; }
+  const Model *getLayer(const unsigned int layer) const { return _layers[layer]; }
   
 protected:
-  unsigned int num_layers;
-  Models *layers;
+  unsigned int _num_layers;
+  Models *_layers;
 };
 
 }

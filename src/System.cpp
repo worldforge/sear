@@ -193,7 +193,13 @@ void System::shutdown() {
 
 bool System::initVideo() {
   Log::writeLog("Initialising Video", Log::INFO);
+#ifdef DEBUG
+  // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
+  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0 ) {
+#else
+  // We want release versions to die quietly
   if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+#endif
     Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::ERROR);
     return false;
   } 
@@ -340,7 +346,8 @@ void System::handleEvents(const SDL_Event &event) {
 	  }
         command = "";
 	break;
-      } 
+      }
+     // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
 	if ((event.key.keysym.sym == SDLK_F1) ||
 	  (event.key.keysym.sym == SDLK_F2) ||
@@ -397,7 +404,7 @@ void System::setCaption(const std::string &title, const std::string &icon) {
 void System::toggleFullscreen() {
   fullscreen = ! fullscreen;
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
-  if (!SDL_WM_ToggleFullScreen(screen))  createWindow(fullscreen);
+  if (!SDL_WM_ToggleFullScreen(screen)) createWindow(fullscreen);
 }
 
 

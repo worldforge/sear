@@ -18,16 +18,16 @@ public:
   bool init();
   void shutdown();
   
-  const int getNumPoints() const { return _num_points; }  
-  const float *getVertexData() const { return &_vertex_data[0][0]; }
-  const float *getTextureData() const { return NULL; }
-  const float *getNormalData() const { return NULL; }
+  const int getNumPoints() { return _num_points; }  
+  const float *getVertexData() { return &_vertex_data[0][0]; }
+  const float *getTextureData() { return NULL; }
+  const float *getNormalData() { return NULL; }
 
-  const bool hasVertexData() const { return true; }
-  const bool hasTextureData() const { return false; }
-  const bool hasNormalData() const { return false; }
+  const bool hasVertexData() { return true; }
+  const bool hasTextureData() { return false; }
+  const bool hasNormalData() { return false; }
   
-  const Type getType() const { return LINES; }
+  const Type getType() { return LINES; }
   
 private:
   static const int _num_points = 32;

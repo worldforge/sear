@@ -2,7 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-
 #ifndef _METASERVER_H_
 #define _METASERVER_H_ 1
 

@@ -108,4 +108,4 @@ void Console::toggleConsole() {
   showConsole = !showConsole;
 }
 
-}
+} /* namespace Sear */

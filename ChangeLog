@@ -1,3 +1,7 @@
+3rd July 2002, Simon Goodall
+ * Removed some redundant rendering code
+ * Added base for 3ds model loader - currently only loads mesh
+
 2nd July 2002, Al Riddoch
  * ISO C++ compliance fixes.
 

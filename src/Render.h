@@ -87,9 +87,6 @@ typedef enum {
   virtual unsigned int getTextureID(int texture_id) { return 0;}
   virtual void drawScene(const std::string &,bool) {}
   virtual void drawTextRect(int, int, int, int, int) {}
-  virtual void drawBBox(BoundBox *) {}
-  virtual void drawBillBoard(BillBoard*) {}
-  virtual void drawImpost0r(Impostor*) {}
   virtual void stateChange(State) {}
   virtual void setColour(float red, float blue , float green, float alpha) {}
 	  

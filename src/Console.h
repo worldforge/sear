@@ -59,7 +59,7 @@ public:
   void draw(const std::string &);
   void toggleConsole();
   bool consoleStatus() { return showConsole; }
-	  
+
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
 

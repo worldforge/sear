@@ -25,7 +25,7 @@ void Log::writeLog(const std::string &msg, LogLevel level) {
     case ERIS: type = "Eris"; break;		
     case INFO: type = "Info"; break;
   }
-  std::cout << "TIMESTAMP - " << type << ": " << msg << std::endl;
+  std::cout << "TIMESTAMP - " << type << ": " << msg << std::endl << std::flush;
 }
 
 } /* namespace Sear */

@@ -31,6 +31,7 @@ class BillBoard;
 class Impostor;
 class WireFrame;
 class Models;
+class MultiModels;
 
 class GL_Render : public Render {
 
@@ -64,12 +65,9 @@ public:
   static GL_Render *instance() { return _instance; }
  void buildColourSet();
   void drawScene(const std::string &,bool);
-  void drawBBox(BoundBox*);
   void drawModel(Models*);
+  void drawMultiModel(MultiModels*);
   void drawTextRect(int, int, int, int, int);
-  void drawBillBoard(BillBoard *);
-  void drawImpostor(Impostor*);
-  void drawWireFrame(WorldEntity *);
   void stateChange(State);
   void extractFrustum();
   int CubeInFrustum(WorldEntity *);
@@ -146,6 +144,7 @@ protected:
   std::map<std::string, Queue> billboard_queue;
   std::map<std::string, Queue> imposter_queue;
   std::map<std::string, Queue> wireframe_queue;
+  std::map<std::string, Queue> model3ds_queue;
 
   void buildQueues(WorldEntity*, int);
   void drawModelQueue(bool);
@@ -154,6 +153,7 @@ protected:
   void drawImpostorQueue(bool);
   void drawMessageQueue(bool);
   void drawWireFrameQueue(bool);
+  void drawModelsQueue(bool);
   
   float frame_rate;
   float model_detail;
@@ -166,7 +166,9 @@ protected:
     bool in_use;
     Model *model;
     Models *models;
+    MultiModels *multi;
   } ModelStruct;
+
   std::map<std::string, ModelStruct*> _entity_models;
 
   typedef struct {
