@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.19 2005-03-15 17:33:58 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.20 2005-04-04 10:20:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -155,14 +155,33 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         static int meshFaces[50000][3];
         int faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
         bool multitexture = false;
+        // TODO handle missing MapData more sensibly.
         // set the vertex and normal buffers
         if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           if (pCalRenderer->getMapCount() == 1) {
-            RenderSystem::getInstance().switchTexture((int)pCalRenderer->getMapUserData(0));
+            MapData *md = reinterpret_cast<MapData*>
+                                          (pCalRenderer->getMapUserData(0));
+            if (md) {
+              RenderSystem::getInstance().switchTexture(md->textureID);
+            } else {
+              RenderSystem::getInstance().switchTexture(0);
+            }
 	  } else {
 	    multitexture = true;
-            RenderSystem::getInstance().switchTexture(0, (int)pCalRenderer->getMapUserData(0));
-            RenderSystem::getInstance().switchTexture(1, (int)pCalRenderer->getMapUserData(1));
+            MapData *md = reinterpret_cast<MapData*>
+                                          (pCalRenderer->getMapUserData(0));
+            if (md) {
+              RenderSystem::getInstance().switchTexture(md->textureID);
+            } else {
+              RenderSystem::getInstance().switchTexture(0);
+            }
+
+            md = reinterpret_cast<MapData*>(pCalRenderer->getMapUserData(1));
+            if (md) {
+              RenderSystem::getInstance().switchTexture(md->textureID);
+            } else {
+              RenderSystem::getInstance().switchTexture(0);
+            }
 	  }
           m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
 	} else {

@@ -210,15 +210,17 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
 }
 
 void SkyDome::invalidate() {
-  if (glIsBufferARB(m_vb_verts)) {
-    glDeleteBuffersARB(1, &m_vb_verts);
-    m_vb_verts = 0;
-  }
-  if (glIsBufferARB(m_vb_texCoords)) {
-    glDeleteBuffersARB(1, &m_vb_texCoords);
-    m_vb_texCoords = 0;
-  }
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (glIsBufferARB(m_vb_verts)) {
+      glDeleteBuffersARB(1, &m_vb_verts);
+      m_vb_verts = 0;
+    }
 
+    if (glIsBufferARB(m_vb_texCoords)) {
+      glDeleteBuffersARB(1, &m_vb_texCoords);
+      m_vb_texCoords = 0;
+    }
+  }
   domeInit(m_radius, m_levels, m_segments);
 }
 

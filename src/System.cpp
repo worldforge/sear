@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.111 2005-03-15 17:55:05 simon Exp $
+// $Id: System.cpp,v 1.112 2005-04-04 10:20:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -291,9 +291,9 @@ bool System::init(int argc, char *argv[]) {
   CacheManager::getInstance().init();
 
   // Register StaticObject with CacheManager
-  StaticObject *so = new StaticObject();
-  CacheManager::getInstance().addType(so);
-  delete so;
+//  StaticObject *so = new StaticObject();
+//  CacheManager::getInstance().addType(so);
+//  delete so;
   
  
   Environment::getInstance().init();

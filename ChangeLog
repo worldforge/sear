@@ -1,3 +1,15 @@
+2005-04-04  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/SkyDome.cpp, environment/TerrainRenderer.h,
+	  loaders/3ds.cpp: Add check for VBO extension before calling VBO
+	  functions.
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h,
+	  loaders/cal3d/Cal3dModel.cpp: Use a custom struct to store texture
+	  data instead of casting an int to void* as it is not safe on non
+	  32-bit machines.
+	* src/System.cpp: Remove addition of StaticObject to CacheManager here
+	  as it can cause segfaults later on.
+
 2005-03-22  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/CameraSystem.cpp, renderers/CameraSystem.h: Remove const

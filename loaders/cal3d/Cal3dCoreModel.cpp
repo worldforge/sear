@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.26 2005-03-22 14:52:58 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.27 2005-04-04 10:20:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -88,15 +88,25 @@ int Cal3dCoreModel::init(const std::string &filename) {
  // std::cerr << "done reading config" << std::endl << std::flush;
 
   m_initialised = true;
-
   return 0;
 }
 
 int Cal3dCoreModel::shutdown() {
   assert(m_initialised == true);
 //  if (m_core_model) {
-  delete m_core_model;
-  m_core_model = NULL;
+    // Clean up user data
+    // Loop through each material
+    for (int i = 0; i < m_core_model->getCoreMaterialCount(); ++i) {
+      CalCoreMaterial *m = m_core_model->getCoreMaterial(i);
+      MapData *md;
+      // Loop through each map
+      for (int j = 0; j < m->getMapCount(); ++j) {
+        md = reinterpret_cast<MapData*>(m->getMapUserData(j));
+        if (md) delete md;
+      }
+    }
+    delete m_core_model;
+    m_core_model = NULL;
 //  }
   m_initialised = false;
   return 0;
@@ -243,6 +253,8 @@ printf("Rotate %f\n", m_rotate);
         material->setShininess((double)config.getItem(section, KEY_shininess));
       }
       // Load textures
+      // TODO this limit should not be hardcoded!
+      // Need to query object
       for (int i = 0; i < 2; ++i) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
@@ -255,14 +267,18 @@ printf("Rotate %f\n", m_rotate);
               std::cerr << "Error setting map data" << std::endl;
             }
 	  }
-          if (!material->setMapUserData(i, (Cal::UserData)textureId)) {
+          MapData *md = new MapData();
+          md->textureID = textureId;
+          if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
         } else { // Use default texture
           std::string texture = material->getMapFilename(i);
 	  if (texture.empty()) continue;
           unsigned int textureId = loadTexture(texture);
-          if (!material->setMapUserData(i, (Cal::UserData)textureId)) {
+          MapData *md = new MapData();
+          md->textureID = textureId;
+          if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
 	}

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.36 2005-03-15 17:33:58 simon Exp $
+// $Id: 3ds.cpp,v 1.37 2005-04-04 10:20:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -145,17 +145,19 @@ void ThreeDS::invalidate() {
                                                 ++I) {
     RenderObject *ro = *I;
     if (ro) {
-      if (glIsBufferARB(ro->vb_vertex_data)) {
-        glDeleteBuffersARB(1, &ro->vb_vertex_data);
-        ro->vb_vertex_data = 0;
-      }
-      if (glIsBufferARB(ro->vb_texCoords_data)) {
-        glDeleteBuffersARB(1, &ro->vb_texCoords_data);
-        ro->vb_texCoords_data = 0;
-      }
-      if (glIsBufferARB(ro->vb_normal_data)) {
-        glDeleteBuffersARB(1, &ro->vb_normal_data);
-        ro->vb_normal_data = 0;
+      if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+        if (glIsBufferARB(ro->vb_vertex_data)) {
+          glDeleteBuffersARB(1, &ro->vb_vertex_data);
+          ro->vb_vertex_data = 0;
+        }
+        if (glIsBufferARB(ro->vb_texCoords_data)) {
+          glDeleteBuffersARB(1, &ro->vb_texCoords_data);
+          ro->vb_texCoords_data = 0;
+        }
+        if (glIsBufferARB(ro->vb_normal_data)) {
+          glDeleteBuffersARB(1, &ro->vb_normal_data);
+          ro->vb_normal_data = 0;
+        }
       }
     }
   }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.7 2005-03-15 17:55:04 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.8 2005-04-04 10:20:03 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -25,6 +25,10 @@ namespace Sear {
 
 // Forward declarations
 class Cal3dModel;
+
+typedef struct {
+  int textureID;
+} MapData;
 	
 class Cal3dCoreModel : public SigC::Object {
 public:
