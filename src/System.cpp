@@ -108,13 +108,13 @@ bool System::init() {
   _textures = new varconf::Config();
   _models = new varconf::Config();
 
-  _general->sigsv.connect(SigC::slot(this, &System::varconf_callback));
-  _textures->sigsv.connect(SigC::slot(this, &System::varconf_callback));
-  _models->sigsv.connect(SigC::slot(this, &System::varconf_callback));
+  _general->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _textures->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _models->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
-  _general->sige.connect(SigC::slot(this, &System::varconf_error_callback));
-  _textures->sige.connect(SigC::slot(this, &System::varconf_error_callback));
-  _models->sige.connect(SigC::slot(this, &System::varconf_error_callback));
+  _general->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _textures->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _models->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
   

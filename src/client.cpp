@@ -65,15 +65,15 @@ bool Client::init() {
     Log::writeLog("Client - Connection is NULL", Log::LOG_ERROR);
     throw ClientException("Connection is NULL", ClientException::BAD_CONNECTION);
   }
-  _connection->Failure.connect(SigC::slot(this, &Client::NetFailure));
-  _connection->Connected.connect(SigC::slot(this, &Client::NetConnected));
-  _connection->Disconnected.connect(SigC::slot(this, &Client::NetDisconnected));
-  _connection->Disconnecting.connect(SigC::slot(this, &Client::NetDisconnecting));
-  _connection->Timeout.connect(SigC::slot(this, &Client::Timeout));
-  _connection->StatusChanged.connect(SigC::slot(this, &Client::StatusChanged));
+  _connection->Failure.connect(SigC::slot(*this, &Client::NetFailure));
+  _connection->Connected.connect(SigC::slot(*this, &Client::NetConnected));
+  _connection->Disconnected.connect(SigC::slot(*this, &Client::NetDisconnected));
+  _connection->Disconnecting.connect(SigC::slot(*this, &Client::NetDisconnecting));
+  _connection->Timeout.connect(SigC::slot(*this, &Client::Timeout));
+  _connection->StatusChanged.connect(SigC::slot(*this, &Client::StatusChanged));
 
   Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
-  Eris::Logged.connect(SigC::slot(this, &Client::Log));
+  Eris::Logged.connect(SigC::slot(*this, &Client::Log));
   return true;
   
 }
@@ -173,11 +173,11 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   Log::writeLog("Client::createAccount: Creating player", Log::LOG_INFO);
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
-    _player->LoginFailure.connect(SigC::slot(this, &Client::LoginFailure));
-    _player->LoginSuccess.connect(SigC::slot(this, &Client::LoginSuccess));
-    _player->LogoutComplete.connect(SigC::slot(this, &Client::LogoutComplete));
-    _player->GotAllCharacters.connect(SigC::slot(this, &Client::GotAllCharacters));
-    _player->GotCharacterInfo.connect(SigC::slot(this, &Client::GotCharacterInfo));
+    _player->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
+    _player->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
+    _player->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
+    _player->GotAllCharacters.connect(SigC::slot(*this, &Client::GotAllCharacters));
+    _player->GotCharacterInfo.connect(SigC::slot(*this, &Client::GotCharacterInfo));
 
   }
   try {
@@ -211,11 +211,11 @@ int Client::login(const std::string &username, const std::string &password) {
   
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
-    _player->LoginFailure.connect(SigC::slot(this, &Client::LoginFailure));
-    _player->LoginSuccess.connect(SigC::slot(this, &Client::LoginSuccess));
-    _player->LogoutComplete.connect(SigC::slot(this, &Client::LogoutComplete));
-    _player->GotAllCharacters.connect(SigC::slot(this, &Client::GotAllCharacters));
-    _player->GotCharacterInfo.connect(SigC::slot(this, &Client::GotCharacterInfo));
+    _player->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
+    _player->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
+    _player->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
+    _player->GotAllCharacters.connect(SigC::slot(*this, &Client::GotAllCharacters));
+    _player->GotCharacterInfo.connect(SigC::slot(*this, &Client::GotCharacterInfo));
   }
   try {
     _player->login(username, password);
@@ -255,8 +255,8 @@ void Client::NetConnected() {
   _status = CLIENT_STATUS_CONNECTED;
   try {
     _lobby = Eris::Lobby::instance();
-    _lobby->LoggedIn.connect(SigC::slot(this, &Client::LoggedIn));
-    _lobby->SightPerson.connect(SigC::slot(this, &Client::SightPerson));
+    _lobby->LoggedIn.connect(SigC::slot(*this, &Client::LoggedIn));
+    _lobby->SightPerson.connect(SigC::slot(*this, &Client::SightPerson));
   } catch (Eris::InvalidOperation io) {
     Log::writeLog("Invalid Operation: "  + io._msg, Log::LOG_ERROR);
   }
@@ -320,11 +320,11 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
     throw Exception("Bad creation");
   }
   Log::writeLog("Client::createCharacter: Setting up callbacks", Log::LOG_INFO);
-  world->Entered.connect(SigC::slot(this, &Client::Entered));
-  world->EntityCreate.connect(SigC::slot(this, &Client::EntityCreate));
-  world->EntityDelete.connect(SigC::slot(this, &Client::EntityDelete));
-  world->Appearance.connect(SigC::slot(this, &Client::Appearance));
-  world->Disappearance.connect(SigC::slot(this, &Client::Disappearance));
+  world->Entered.connect(SigC::slot(*this, &Client::Entered));
+  world->EntityCreate.connect(SigC::slot(*this, &Client::EntityCreate));
+  world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
+  world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
+  world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
   world->registerFactory(new Factory());
   return 0;
 }
@@ -354,11 +354,11 @@ int Client::takeCharacter(const std::string &id) {
     throw Exception ("Bad take");
   }
   Log::writeLog("Client::takeCharacter: Setting up callbacks", Log::LOG_INFO);
-  world->Entered.connect(SigC::slot(this, &Client::Entered));  
-  world->EntityCreate.connect(SigC::slot(this, &Client::EntityCreate));
-  world->EntityDelete.connect(SigC::slot(this, &Client::EntityDelete));
-  world->Appearance.connect(SigC::slot(this, &Client::Appearance));
-  world->Disappearance.connect(SigC::slot(this, &Client::Disappearance));
+  world->Entered.connect(SigC::slot(*this, &Client::Entered));  
+  world->EntityCreate.connect(SigC::slot(*this, &Client::EntityCreate));
+  world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
+  world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
+  world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
   world->registerFactory(new Factory());
   return 0;
 }

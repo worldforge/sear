@@ -1,3 +1,6 @@
+18th AUGUST 2002, Al Riddoch
+ * Added configure check, and fixes so that the code builds with sigc++ 1.2
+
 17th AUGUST 2002, Simon Goodall
  * Intorduced ModelStruct to encapsulate all data required to produce a model.
  * Some more internal changes made to get the model_viewer code working in tools dir

@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include <unistd.h>
-#include <iostream.h>
+#include <iostream>
 #include <string>
 
 #include "config.h"
