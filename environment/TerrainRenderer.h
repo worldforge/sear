@@ -25,7 +25,7 @@ class TerrainRenderer
     DisplayListStore m_displayLists;
     int m_numLineIndeces;
     unsigned short * const m_lineIndeces;
-    GLuint m_textures[8];
+    int m_textures[8];
     GLuint m_alphaTextures[8];
     GLuint m_landscapeList;
     bool m_haveTerrain;

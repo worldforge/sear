@@ -1,3 +1,7 @@
+2nd April 2004, Simon Goodall
+ * Fixed texture loading and switching in terrain
+ * Fixed terrain state record 
+
 1st April 2004, Simon Goodall
  * More changes for Mercator integration. commpiles, but not tested.
 

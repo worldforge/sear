@@ -41,7 +41,6 @@ void TerrainRenderer::enableRendererState()
     static const float specular[] = { 0.f, 0.f, 0.f, 1.0f };
     static const float emission[] = { 0.f, 0.f, 0.f, 1.0f };
     static const float shininess[] = { 0.0f };
-    glEnable(GL_NORMALIZE);
     glColor4f(1.f, 1.f, 1.f, 1.f);
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
@@ -91,7 +90,7 @@ void TerrainRenderer::disableRendererState()
     glDisable(GL_TEXTURE_GEN_T);
 
     glDisableClientState(GL_NORMAL_ARRAY);
-    glDisable(GL_NORMALIZE);
+    //glDisable(GL_NORMALIZE);
 }
 
 void TerrainRenderer::generateAlphaTextures(Mercator::Segment * map)
@@ -158,8 +157,9 @@ void TerrainRenderer::drawRegion(Mercator::Segment * map)
         }
 
         // Set up the first texture unit with the ground texture
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_textures[texNo]);
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D, m_textures[texNo]);
+System::instance()->getGraphics()->getRender()->switchTexture(0, m_textures[texNo]);
 
         // Set up the second texture unit with the alpha texture
         // This is not required for the first pass, as the first pass
@@ -304,10 +304,10 @@ m_terrain(Terrain::SHADED),
 {
 
 m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("granite.png");
-m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("sand.png");
-m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("rabbithill_grass_hh.png");
-m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("dark.png");
-m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("snow.png");
+m_textures[1] = System::instance()->getGraphics()->getRender()->requestTexture("sand.png");
+m_textures[2] = System::instance()->getGraphics()->getRender()->requestTexture("rabbithill_grass_hh.png");
+m_textures[3] = System::instance()->getGraphics()->getRender()->requestTexture("dark.png");
+m_textures[4] = System::instance()->getGraphics()->getRender()->requestTexture("snow.png");
 //    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);
