@@ -1,3 +1,7 @@
+8th September 2002, Simon Goodall
+ * Removed uneccessary code from Utility class
+ * Added test to configure to detect buggy stringstream and apply workaround
+
 7th September 2002, Simon Goodall
  * Added initialation check to all objects with init/shutdown methods
  * added cvs tag Id: to all source files

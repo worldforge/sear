@@ -70,6 +70,29 @@ if test $found_string_stream == no ; then
     AC_MSG_ERROR(Couldn't find C++ string <-> stream conversion method.)
 fi
 
+AC_TRY_RUN([
+#include <string>
+#include <sstream>
+
+int main(int argc, char**argv) {
+  std::stringstream ss;
+  std::string test_string = "1.05";
+  float f = 0.0f;
+  ss << test_string;
+  ss >> f;
+  if (f != 1.05f) return 0;
+  return 1;
+} 
+], [
+  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 1)
+  AC_MSG_WARN(Using sstream workaround.)
+],[
+  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 0)
+  AC_MSG_WARN(Not using sstream workaround.)
+],[
+  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 0)
+  AC_MSG_WARN(Not using sstream workaround.)
+])
 dnl Check Atlas
 
 ATLAS_VERSION=0.4.5
