@@ -250,6 +250,7 @@ void SkyDome::render()
     glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT,&i);
     glFogfv(GL_FOG_COLOR,i);
     delay = 0;
+    glClear(GL_COLOR_BUFFER_BIT);
   }
 
   // Set the dome vetices

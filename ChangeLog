@@ -1,8 +1,15 @@
+2004-06-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/GL.cpp: Remove pointless call to glClear.
+
+	* environment/SkyDome.cpp: Clear screen after reading back fog
+	  colour which eliminates flickering sky, and makes stars twinkle.
+
 2004-06-07  James Turner  <james@worldforge.org>
 
 	* Fix linux compilation of stars code. Thank goodness
 	  I have a Loonix box these days.
-	  
+
 2004-06-07  James Turner  <james@worldforge.org>
 
 	* Add star rendering to the environment code. Very simple while the
