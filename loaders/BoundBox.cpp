@@ -19,6 +19,70 @@ BoundBox::~BoundBox() {}
   
 bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wrap) {
   _type = type;
+  /*
+  float min_x = _bbox.lowCorner().x();
+  float max_x = _bbox.highCorner().x();
+  float min_y = _bbox.lowCorner().y();
+  float max_y = _bbox.highCorner().y();
+  float min_z = _bbox.lowCorner().z();
+  float max_z = _bbox.highCorner().z();
+
+  if (detail < 0.0f) detail = 1.0f;
+
+  float x_length = abs(max_x - min_x) / detail;
+  float y_length = abs(max_y - min_y) / detail;
+  float z_length = abs(max_z - min_z) / detail;
+  
+  unsigned int x, y, z;
+  unsigned int vertex_counter = 0;
+  unsigned int normal_counter = 0;
+  unsigned int texture_counter = 0;
+  
+  // Top plane
+  z = max_z;
+  for (x = min_x; x < max_x; x += x_length) {
+    for (y = min_y; y < max_y; y += y_length) {
+      _vertex_data[vertex_counter++] = x;
+      _vertex_data[vertex_counter++] = y;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x + x_length;
+      _vertex_data[vertex_counter++] = y;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x + x_length;
+      _vertex_data[vertex_counter++] = y + y_length;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x;
+      _vertex_data[vertex_counter++] = y + y_length;
+      _vertex_data[vertex_counter++] = z;
+      _texture_data[texture_counter++] = x / (max_x - min_x);
+      _texture_data[texture_counter++] = y / (max_y - min_y);
+      _texture_data[texture_counter++] = (x + x_length) / (max_x - min_x);
+      _texture_data[texture_counter++] = y / (max_y - min_y);
+      _texture_data[texture_counter++] = (x + x_length) / (max_x - min_x);
+      _texture_data[texture_counter++] = (y + y_length) / (max_y - min_y);
+      _texture_data[texture_counter++] = x / (max_x - min_x);
+      _texture_data[texture_counter++] = (y + y_length) / (max_y - min_y);
+    }
+  }
+  // Bottom plane
+  z = min_z;
+  for (x = min_x; x < max_x; x += x_length) {
+    for (y = min_y; y < max_y; y += y_length) {
+      _vertex_data[vertex_counter++] = x;
+      _vertex_data[vertex_counter++] = y;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x + x_length;
+      _vertex_data[vertex_counter++] = y;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x + x_length;
+      _vertex_data[vertex_counter++] = y + y_length;
+      _vertex_data[vertex_counter++] = z;
+      _vertex_data[vertex_counter++] = x;
+      _vertex_data[vertex_counter++] = y + y_length;
+      _vertex_data[vertex_counter++] = z;
+    }
+  }
+  */
   _vertex_data[0][0] = _bbox.lowCorner().x(); _vertex_data[0][1] = _bbox.highCorner().y(); _vertex_data[0][2] = _bbox.lowCorner().z();
   _vertex_data[1][0] = _bbox.lowCorner().x(); _vertex_data[1][1] = _bbox.lowCorner().y(); _vertex_data[1][2] = _bbox.lowCorner().z();
   _vertex_data[2][0] = _bbox.highCorner().x(); _vertex_data[2][1] = _bbox.lowCorner().y(); _vertex_data[2][2] = _bbox.lowCorner().z();

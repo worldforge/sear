@@ -39,7 +39,10 @@ public:
   std::map<std::string, StateProperties*> getMap() { return _state_properties; }
 
   StateProperties *readRecord(FILE *);
-  StateProperties *getStateProperties(const std::string &state) { return _state_properties[state]; }
+  StateProperties *getStateProperties(const std::string &state) {
+    StateProperties *sp = _state_properties[state];
+    return ((sp) ? (sp) : (_state_properties["default"]));
+  }
 
 protected:
   std::map<std::string, StateProperties*> _state_properties;

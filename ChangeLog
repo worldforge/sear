@@ -1,3 +1,8 @@
+1st September 2002, Simon Goodall
+ * Updated stateloader to use the default state before emitting an error message
+ * Updated 3DS code to load a wider range of models.
+ * Updated 3DS code to load in textures assigned in the second texture, bump and reflection slot as well as the initial texture slot. The texture used will be the first one found.
+
 31th August 2002, Simon Goodall
  * Fixed bug where "Cannot SAY..." was displayed even if connected to game world
 

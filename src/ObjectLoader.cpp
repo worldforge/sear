@@ -27,6 +27,7 @@ void ObjectLoader::init() {
   op->draw_members = true;
   strcat(op->state, "default\0");
   strcat(op->select_state, "select\0");
+  op->detail = 1.0f;
   op->width = 1.0f;
   op->height = 1.0f;
   op->num_planes = 1;
@@ -181,6 +182,9 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     }
     else if (tag == "scale") {
       sscanf(str, "%*s = %f", &op->scale);
+    }
+    else if (tag == "detail") {
+      sscanf(str, "%*s = %f", &op->detail);
     }
     else if (tag == "offset_x") {
       sscanf(str, "%*s = %f %f %f", &op->offset[0], &op->offset[1], &op->offset[2]);

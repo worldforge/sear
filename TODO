@@ -38,8 +38,6 @@
    - First step is to add a gui_queue for rendering. This starts with the splash screen, then with anything else such as entity text
    - Finally render console.
 
- * Add Meta Server support
-
  * Add collision detection
    - This can be as an addition to the BSP tree or equivalent code
 

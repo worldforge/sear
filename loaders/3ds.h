@@ -58,6 +58,8 @@ protected:
   } Material;
   
   void render_node(Lib3dsNode * node, Lib3dsFile * file);
+  void render_mesh(Lib3dsMesh * mesh, Lib3dsFile * file);
+  void render_file(Lib3dsFile * file);
   
   Lib3dsFile* _model;
 

@@ -64,9 +64,9 @@ void reshape(int width, int height) {
   //Check for divide by 0
   if (height == 0) height = 1;
   glViewport(0, 0, width, height);
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
+//  glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // Colour used to clear window
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
-  glClear(GL_DEPTH_BUFFER_BIT);
+  glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
@@ -158,6 +158,7 @@ void display() {
 //  glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
 
   render->beginFrame();
+//  glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // Colour used to clear window
   glClear(GL_COLOR_BUFFER_BIT);
   WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
   orient /= WFMath::Quaternion(WFMath::Vector<3>(1.0f, 0.0f, 0.0f), _camera->getElevation());
