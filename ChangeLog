@@ -1,4 +1,8 @@
 23rd April 2004, Simon Goodall
+ * Further work on texture invalidation code
+ * Added console command to call invalidate
+
+23rd April 2004, Simon Goodall
  * /take now uses the first character returned by getCharacters if no id is specified.
 
 22nd April 2004, Simon Goodall

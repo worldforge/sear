@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.40 2004-04-22 21:38:24 simon Exp $
+// $Id: Graphics.cpp,v 1.41 2004-04-23 10:33:02 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -379,9 +379,11 @@ void Graphics::updateDetailLevels(float frame_rate) {
 }
 
 void Graphics::registerCommands(Console * console) {
+  console->registerCommand("invalidate", this);
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
+  if (command == "invalidate") RenderSystem::getInstance().invalidate();
 }
 
 void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.16 2004-04-22 16:03:54 simon Exp $
+// $Id: TextureManager.cpp,v 1.17 2004-04-23 10:33:02 simon Exp $
 
 #include "TextureManager.h"
 
@@ -647,8 +647,21 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
 }
 
 void TextureManager::invalidate() {
+  // TODO unload textures first.
   for (unsigned int i = 0; i < _textures.size(); _textures[i++] = 0);
   setupGLExtensions();
+  // Backup texture counter
+  int texCount = _texture_counter;
+  // reset so default textures are assigned correctly
+  _texture_counter = 1;
+  _default_texture = createDefaultTexture();
+  if (_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
+  TextureID _default_font = createDefaultFont();
+  
+  if (_default_font == -1) std::cerr << "Error building default font" << std::endl;
+  // restore texture counter
+  _texture_counter = texCount;
+ 
 }
 
 } /* namespace Sear */
