@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.25 2003-07-15 11:11:22 simon Exp $
+// $Id: Character.cpp,v 1.26 2003-07-17 16:46:44 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -487,9 +487,11 @@ void Character::runCommand(const std::string &command, const std::string &args) 
 }
 void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
   assert ((_initialised == true) && "Character not initialised");	
-  std::cout << "Recontainered" << std::endl;
-  if (entity1) std::cout << "Entity1: " << entity1->getType()->getName() << std::endl;
-  if (entity2) std::cout << "Entity2: " << entity2->getType()->getName() << std::endl;
+  if (debug) {
+    std::cout << "Recontainered" << std::endl;
+    if (entity1) std::cout << "Entity1: " << entity1->getType()->getName() << std::endl;
+    if (entity2) std::cout << "Entity2: " << entity2->getType()->getName() << std::endl;
+  }
   if (entity2) {
     System::instance()->getActionHandler()->handleAction(std::string("entering_") + entity2->getType()->getName(), NULL);
   }
