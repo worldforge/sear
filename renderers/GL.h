@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.18 2002-09-26 21:16:38 simon Exp $
+// $Id: GL.h,v 1.19 2002-09-27 15:46:42 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -98,8 +98,8 @@ public:
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
-  void drawQueue(QueueMap queue, bool select_mode, float time_elapsed);
-  void drawMessageQueue(QueueMap queue);
+  void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
+  void drawMessageQueue(MessageList &list);
   void drawOutline(ModelRecord *);
  
   inline void store();

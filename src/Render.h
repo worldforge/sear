@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.19 2002-09-26 18:56:16 simon Exp $
+// $Id: Render.h,v 1.20 2002-09-27 15:46:43 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -56,6 +56,7 @@ typedef std::pair<ObjectRecord*, std::string> QueueItem;
 //typedef std::pair<std::string, std::string> QueueItem;
 typedef std::list<QueueItem> Queue;
 typedef std::map<std::string, Queue> QueueMap;
+typedef std::list<WorldEntity*> MessageList;
 
   Render() {
   }
@@ -125,8 +126,9 @@ typedef std::map<std::string, Queue> QueueMap;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) =0;
   virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
-  virtual void drawQueue(QueueMap queue, bool select_mode, float time_elapsed) =0;
-  virtual void drawMessageQueue(QueueMap queue) =0;
+  virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
+//  virtual void drawMessageQueue(QueueMap queue) =0;
+  virtual void drawMessageQueue(MessageList &list) =0;
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.12 2002-09-26 18:56:16 simon Exp $
+// $Id: WorldEntity.h,v 1.13 2002-09-27 15:46:43 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -33,6 +33,7 @@ public:
   void rotateAbsOrient(WFMath::Quaternion);
   WFMath::Quaternion getAbsOrient();
   WFMath::Point<3> getAbsPos();
+  bool hasMessages();
   void renderMessages();
   void displayInfo();
 

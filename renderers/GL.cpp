@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.35 2002-09-26 21:16:38 simon Exp $
+// $Id: GL.cpp,v 1.36 2002-09-27 15:46:42 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -1027,7 +1027,7 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
   return texture;
 }
 
-void GL::drawQueue(QueueMap queue, bool select_mode, float time_elapsed) {
+void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
   static StateLoader *state_loader = System::instance()->getStateLoader();
 //  static ModelHandler *model_handler = _system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
@@ -1085,27 +1085,23 @@ void GL::drawQueue(QueueMap queue, bool select_mode, float time_elapsed) {
   }
 }
 
-void GL::drawMessageQueue(QueueMap queue) {
-#if(0)
+void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
   stateChange("font");
-  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
-      WorldEntity *we = (WorldEntity*)*J;
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-     glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= _graphics->getCameraOrientation(); 
-      applyQuaternion(orient2);
-      glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-      glScalef(0.025f, 0.025f, 0.025f);
-      glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
-      we->renderMessages();
-      glPopMatrix();
-    }
+  for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
+    WorldEntity *we = (WorldEntity*)*I;
+    glPushMatrix();
+    WFMath::Point<3> pos = we->getAbsPos();
+    glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+    WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+    orient2 /= _graphics->getCameraOrientation(); 
+    applyQuaternion(orient2);
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glScalef(0.025f, 0.025f, 0.025f);
+    glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
+    we->renderMessages();
+    glPopMatrix();
   }
-#endif
 }
  
 inline float GL::distFromNear(float x, float y, float z) {

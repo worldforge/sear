@@ -5,7 +5,7 @@
 
  * Allow general varconf object to parse command line.
 
- * Convert Object Loader and State Loader to use varconf. Requires being able to specify an array in the config file. File format will use the state or object name as the section heading.
+ * Convert State Loader to use varconf. See ObjectHandler code as a base.
 
  * Add support for OpenGL extensions
  
@@ -13,13 +13,7 @@
   - 3ds normals are wonky.
   - Check  whole system lighting model.
   
- * Add ability to specify search paths for default file locations 
-  - This should be done by config files and/or command line args
-
  * Add ability to tokenise on quotes, not just spaces
-
- * Determine why some models are not properly rotated 
-  - Might be how they come from the server so need to check this data
 
  * Allow line editing in console
 
@@ -54,7 +48,6 @@
  * Colour cursors
    Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors can be easily implemented by rendering the cursor as a texture and hiding the real one. The trick is to get mouse position.
   SDL offers two ways. one is to use SDL_GetMouseState and the second is to store the position on every MOUSEMOTION event. However both of these methods do not offer sufficient update intervals to be of real use. We require either another way or need to increase the rate of updates.
-
 
  * Improve Sound/Music System
  Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.5 2002-09-26 18:56:16 simon Exp $
+// $Id: Graphics.h,v 1.6 2002-09-27 15:46:43 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -15,7 +15,7 @@
 #include <wfmath/quaternion.h>
 
 #include "Render.h"
-//#include "ObjectLoader.h"
+#include "src/ConsoleObject.h"
 
 namespace Sear {
 
@@ -30,7 +30,10 @@ class Terrain;
 class WorldEntity;
 class System;
 class Character;
-class Graphics {
+class Console;
+
+
+class Graphics :public ConsoleObject{
 
 public:
 
@@ -64,8 +67,15 @@ typedef enum {
   void shutdown();
 
   float getLightLevel();
-  void buildQueues(WorldEntity *we, int depth, bool select_mode); 
+  void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &list); 
   void drawScene(const std::string &command ,bool, float);
+  void drawSplash(const std::string &command ,bool, float);
+  void drawServer(const std::string &command ,bool, float);
+  void drawAccount(const std::string &command ,bool, float);
+  void drawLobby(const std::string &command ,bool, float);
+  void drawCharacter(const std::string &command ,bool, float);
+  void drawInventory(const std::string &command ,bool, float);
+  void drawWorld(const std::string &command ,bool, float);
   void updateDetailLevels(float);
   
   std::string getActiveID();
@@ -85,7 +95,21 @@ typedef enum {
 
   WFMath::Quaternion getCameraOrientation() { return orient; }
 
+  void registerCommands(Console *console);
+  void runCommand(const std::string &command, const std::string &args);
+
 protected:
+  typedef enum {
+    SPLASH = 0,
+    SERVER,
+    ACCOUNT,
+    LOBBY,
+    CHARACTER,
+    INVENTORY,
+    WORLD
+  } RenderMode;
+  RenderMode render_mode;
+
   System *_system;
   Render *_renderer;
   Character *_character;
@@ -97,6 +121,7 @@ protected:
   WFMath::Quaternion orient;
 
   Render::QueueMap _render_queue;
+  Render::MessageList _message_list;
   
   int _num_frames;
   float _frame_time;
@@ -128,6 +153,9 @@ private:
 
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;
+ 
+  static const char * const SWITCH_MODE = "switch_mode";
+  
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.38 2002-09-26 20:23:03 simon Exp $
+// $Id: System.cpp,v 1.39 2002-09-27 15:46:43 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -368,6 +368,7 @@ void System::createWindow(bool fullscreen) {
     _graphics->init();
  //   renderer = new GL(this);
     _console->init();
+    _graphics->registerCommands(_console);
 //    renderer->init();
     _graphics->getRender()->initWindow(_width, _height);
     renderer = _graphics->getRender();

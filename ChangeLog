@@ -1,3 +1,9 @@
+27th September 2002, Simon Goodall 
+ * Re-implemented above character speech
+ * Changed render queue passing to by-reference instead ob by val
+ * Started code for a gui
+ * Added multiple screens to Sear for gui stuff. Once you have taken or created a character, you need to type "/switch_mode world" to see the game world.
+
 26th September 2002, Simon Goodall 
  * Fixed bug with NPlane loader where back faces got confused
  * Removed billboard and impostor loaders. NPlane loader provides there functionality.

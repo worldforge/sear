@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.14 2002-09-26 20:23:03 simon Exp $
+// $Id: Graphics.cpp,v 1.15 2002-09-27 15:46:42 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -46,7 +46,10 @@ Graphics::Graphics(System * system) :
   _num_frames(0),
   _frame_time(0),
   _initialised(false)
-{}
+{
+render_mode = SPLASH;
+
+}
 
 Graphics::~Graphics() {
   if (_initialised) shutdown();
@@ -105,7 +108,91 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   if (_camera) _camera->updateCameraPos(time_elapsed);
 
   _renderer->beginFrame();
-  
+  switch(render_mode) {
+    case (SPLASH): drawSplash(command, select_mode, time_elapsed); break;
+    case (SERVER): drawServer(command, select_mode, time_elapsed); break;
+    case (ACCOUNT): drawAccount(command, select_mode, time_elapsed); break;
+    case (LOBBY): drawLobby(command, select_mode, time_elapsed); break;
+    case (CHARACTER): drawCharacter(command, select_mode, time_elapsed); break;
+    case (INVENTORY): drawInventory(command, select_mode, time_elapsed); break;
+    case (WORLD): drawWorld(command, select_mode, time_elapsed); break;
+    default: drawSplash(command, select_mode, time_elapsed); break;
+  }
+
+  if (!select_mode) {
+    Console *con = _system->getConsole();
+    if (con) con->draw(command);
+    else throw Exception("Error no Console object");
+  }
+
+  if (!select_mode) {
+    // Only update on a viewable frame
+    _frame_time += time_elapsed;
+    _frame_rate = (float)_num_frames++ /_frame_time;
+    if (_renderer->checkState(Render::RENDER_FPS))  _renderer->drawFPS(_frame_rate);
+    if (_frame_time > 1.0f) {
+      _num_frames = 0;
+      _frame_time = 0;
+    }
+  }
+  updateDetailLevels(_frame_rate);
+  if (!select_mode) _renderer->renderActiveName();
+  _renderer->endFrame(select_mode);
+}
+
+void Graphics::drawSplash(const std::string& command, bool select_mode, float time_elapsed){
+  _renderer->drawSplashScreen();
+}
+
+void Graphics::drawServer(const std::string &command ,bool, float) {
+  _renderer->drawSplashScreen();
+  _renderer->stateChange("font");
+  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+  _renderer->print(20, 50, "Server Screen", 0);
+#if(0)
+  render background
+  render connect button
+  render disconnect button
+  render reconnect button
+  render scroller table of servers
+  render current server details
+
+#endif
+}
+
+void Graphics::drawAccount(const std::string &command ,bool, float) {
+  _renderer->drawSplashScreen();
+  _renderer->stateChange("font");
+  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+  _renderer->print(20, 50, "Account Screen", 0);
+  _renderer->print(20, 400, "Username: ", 0);
+  _renderer->print(20, 380, "Password: ", 0);
+  _renderer->print(20, 360, "Fullname: ", 0);
+
+}
+
+void Graphics::drawLobby(const std::string &command ,bool, float) {
+  _renderer->drawSplashScreen();
+  _renderer->stateChange("font");
+  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+  _renderer->print(20, 50, "Lobby Screen", 0);
+}
+
+void Graphics::drawCharacter(const std::string &command ,bool, float) {
+  _renderer->drawSplashScreen();
+  _renderer->stateChange("font");
+  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+  _renderer->print(20, 50, "Character Screen", 0);
+}
+
+void Graphics::drawInventory(const std::string &command ,bool, float) {
+  _renderer->drawSplashScreen();
+  _renderer->stateChange("font");
+  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+  _renderer->print(20, 50, "Inventory Screen", 0);
+}
+
+void Graphics::drawWorld(const std::string& command, bool select_mode, float time_elapsed) {
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
@@ -158,52 +245,26 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
     if ((root = (WorldEntity *)world->getRootEntity())) {
       if (_character) _character->updateLocals(false);
       _render_queue = Render::QueueMap();
-      buildQueues(root, 0, select_mode);
+      _message_list = Render::MessageList();
+      buildQueues(root, 0, select_mode, _render_queue, _message_list);
       _renderer->drawQueue(_render_queue, select_mode, time_elapsed);
-      if (!select_mode) _renderer->drawMessageQueue(_render_queue);
+      if (!select_mode) _renderer->drawMessageQueue(_message_list);
     }
   } else {
     _renderer->drawSplashScreen();
+    _renderer->stateChange("font");
+    _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+    _renderer->print(20, 50, "World Screen", 0);
   }
- 
-  if (!select_mode) {
-    Console *con = _system->getConsole();
-    if (con) con->draw(command);
-    else throw Exception("Error no Console object");
-  }
-
-  if (!select_mode) {
-    // Only update on a viewable frame
-    _frame_time += time_elapsed;
-    _frame_rate = (float)_num_frames++ /_frame_time;
-    if (_renderer->checkState(Render::RENDER_FPS))  _renderer->drawFPS(_frame_rate);
-    if (_frame_time > 1.0f) {
-      _num_frames = 0;
-      _frame_time = 0;
-    }
-  }
-  updateDetailLevels(_frame_rate);
-  if (!select_mode) _renderer->renderActiveName();
-  _renderer->endFrame(select_mode);
 }
 
-void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
+
+void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list) {
   _model_handler = _system->getModelHandler();
   we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
-      // Get assinged object prop	    
-  //    ObjectProperties *op = we->getObjectProperties();
-//      if (!op) { // No op? then the model hasn't been created yet so create it
-//        _model_handler->getModel(_renderer, ); // Allocates a model and an ObjectProperties
-//        op = we->getObjectProperties(); // Obtain newly assigned op
-//      }
-      // Seems that sometimes the models don't get an op
-      // TODO something about this
-//      if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
-//      if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->select_state].push_back(we);
-//      if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->state].push_back(we);
-//      if (op->draw_self && select_mode) _render_queue[op->select_state].push_back(we);
+      // TODO there must be a better way of doing this - after the first time round for each object, it should only require one call
       ObjectHandler *object_handler = _system->getObjectHandler();
       ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
       if (object_record && object_record->type.empty()) object_record->type = we->getID();
@@ -231,27 +292,32 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
       }
       object_record->name = we->getName();
       object_record->id = we->getID();
+
       if (we->hasBBox()) {
         object_record->bbox = we->getBBox();
       } else {
-        WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-        WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-        object_record->bbox = WFMath::AxisBox<3>(lc, hc);
+//        WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+//        WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
+//        object_record->bbox = WFMath::AxisBox<3>(lc, hc);
       }
-
+      // Hmm, might be better to explicity link to object.
+      // calls only required if Pos, or orientation changes - how can we tell?
       object_record->position = we->getAbsPos();
       object_record->orient = we->getAbsOrient();
       // TODO determine what model queue to use.
       // TODO if queue is empty switch to another
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
-          if (!select_mode) _render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
-          else _render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
+          if (!select_mode) {
+	    render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
+	    if (we->hasMessages()) message_list.push_back(we);
+	  }
+          else render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
 	}
       }
       if (object_record->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); ++i) {
-          buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode);
+          buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode, render_queue, message_list);
         }
       }
     }
@@ -303,6 +369,7 @@ void Graphics::writeComponentConfig() {
 }
 
 void Graphics::updateDetailLevels(float frame_rate) {
+// TODO re-implement this
 //  ModelHandler *model_handler = _system->getModelHandler();	
 //  if (frame_rate < _lower_frame_rate_bound) {
 //    if (model_handler) model_handler->lowerDetail();
@@ -311,6 +378,22 @@ void Graphics::updateDetailLevels(float frame_rate) {
 //    if (model_handler) model_handler->raiseDetail();
 //    if (_terrain) _terrain->raiseDetail();
 //  }
+}
+
+void Graphics::registerCommands(Console * console) {
+  console->registerCommand(SWITCH_MODE, this);
+}
+
+void Graphics::runCommand(const std::string &command, const std::string &args) {
+  if (command == SWITCH_MODE) {
+    if (args == "splash") render_mode = SPLASH;
+    else if (args == "server") render_mode = SERVER;
+    else if (args == "account") render_mode = ACCOUNT;
+    else if (args == "lobby") render_mode = LOBBY;
+    else if (args == "character") render_mode = CHARACTER;
+    else if (args == "inventory") render_mode = INVENTORY;
+    else if (args == "world") render_mode = WORLD;
+  }
 }
 
 } /* namespace Sear */

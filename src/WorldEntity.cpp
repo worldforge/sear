@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.20 2002-09-26 18:56:16 simon Exp $
+// $Id: WorldEntity.cpp,v 1.21 2002-09-27 15:46:43 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -56,6 +56,10 @@ void WorldEntity::handleTalk(const std::string &msg) {
 
   if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
   messages.push_back(message(msg, System::instance()->getTime() + message_life));  
+}
+
+bool WorldEntity::hasMessages() {
+  return !messages.empty();
 }
 
 void WorldEntity::renderMessages() {

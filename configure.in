@@ -286,6 +286,7 @@ AC_OUTPUT([
 	renderers/Makefile
 	terrain/Makefile
 	sky/Makefile
+	gui/Makefile
 	sear.spec
 	sear-media.spec
 	data/bindings.cfg
