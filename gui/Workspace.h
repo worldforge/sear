@@ -10,15 +10,17 @@
 namespace Sear {
 
 class RootWindow;
+class System;
 
 class Workspace : public Widget {
 protected:
+  System * m_system;
   RootWindow * m_rootWindow;
 public:
-  Workspace();
+  Workspace(System *);
   virtual ~Workspace();
 
-  void render();
+  void draw();
 };
 
 } // namespace Sear

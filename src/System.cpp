@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.89 2004-05-20 10:57:20 simon Exp $
+// $Id: System.cpp,v 1.90 2004-05-28 15:08:19 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,8 @@
 #include "WorldEntity.h"
 #include "renderers/RenderSystem.h"
 #include "environment/Environment.h"
+
+#include "gui/Workspace.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -203,6 +205,9 @@ bool System::init(int argc, char *argv[]) {
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
+
+  _workspace = new Workspace(this);
+  // _workspace->registerCommands(_console);
 
   int sticks = SDL_NumJoysticks();
   if (sticks > 0) {

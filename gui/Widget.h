@@ -23,8 +23,6 @@ public:
   virtual ~Widget();
 
   void setParent(Widget * );
-
-  virtual void render() = 0;
 };
 
 } // namespace Sear

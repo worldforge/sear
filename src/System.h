@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.44 2004-05-23 13:32:29 jmt Exp $
+// $Id: System.h,v 1.45 2004-05-28 15:08:19 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -36,6 +36,7 @@ class ObjectHandler;
 class ScriptEngine;
 //class StateLoader;
 class Console;
+class Workspace;
 class Character;
 class Graphics;
 class Sound;
@@ -185,6 +186,7 @@ public:
   Calendar *getCalendar() const { return _calendar; }
   
   Console *getConsole() { return _console; }
+  Workspace *getWorkspace() { return _workspace; }
   Character *getCharacter() { return _character; }
   void setCharacter(Character *);
   
@@ -241,6 +243,7 @@ protected:
   
   SDL_Joystick *_controller;
   Console *_console;
+  Workspace *_workspace;
   Character *_character;
  
   static SDL_Cursor *buildCursor(const char *image[]);

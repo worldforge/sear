@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.48 2004-05-23 21:28:35 jmt Exp $
+// $Id: Graphics.cpp,v 1.49 2004-05-28 15:08:19 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 
 #include "renderers/RenderSystem.h"
 #include "gui/Compass.h"
+#include "gui/Workspace.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -138,6 +139,10 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   drawWorld(command, select_mode, time_elapsed);
 
   if (!select_mode) {
+    Workspace *ws = _system->getWorkspace();
+    if (ws) ws->draw();
+    else throw Exception("Error no Workspace object");
+
     Console *con = _system->getConsole();
     if (con) con->draw(command);
     else throw Exception("Error no Console object");
