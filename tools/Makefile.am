@@ -17,4 +17,4 @@ model_viewer_LDADD = \
 	../loaders/libLoaderWireFrame.a 
 
 model_viewer_SOURCES = \
-	model_viewer.cpp \
+	model_viewer.cpp
