@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.24 2004-05-20 10:57:20 simon Exp $
+// $Id: ModelLoader.h,v 1.25 2004-06-21 12:20:31 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -116,6 +116,9 @@ public:
     else if (rotation_style == "halo") model_record->rotation_style = Graphics::ROS_HALO;
     if (model_config.findItem(model_id, ModelRecord::DATA_FILE_ID)) {
       model_record->data_file_id = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
+    }
+    if (model_config.findItem(model_id, "scale_height")) {
+      model_record->scaleByHeight = (bool)model_config.getItem(model_id, "scale_height");
     }
     return model_record;
   }

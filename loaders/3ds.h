@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.11 2004-04-26 15:45:20 simon Exp $
+// $Id: 3ds.h,v 1.12 2004-06-21 12:20:31 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -46,6 +46,7 @@ public:
   void render(bool);
 
   void invalidate();
+  void setHeight(float height) { m_height = height; }
 
 protected:
   typedef struct {
@@ -73,6 +74,7 @@ protected:
   bool _initialised;
   unsigned int _list;
   unsigned int _list_select;
+  float m_height;
 };
 
 } /* namespace Sear */

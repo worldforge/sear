@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.14 2004-05-19 17:52:19 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.15 2004-06-21 12:20:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -54,7 +54,12 @@ ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, con
     delete model;
     return NULL;
   }
-  
+  if (model_record->scaleByHeight) {
+    float height = 1.0f;
+    height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
+    model->setHeight(height);
+  }
+ 
   model->setInUse(true);
   model_record->model = model;
   return model_record;

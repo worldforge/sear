@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.10 2004-05-19 17:52:19 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.11 2004-06-21 12:20:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -62,10 +62,12 @@ try {
     return NULL;
   }
 //  std::cerr << "Assigning height" << std::endl << std::flush;
-  // Set model height    
-  float height = 1.0f;
-  height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
-  model->setHeight(height);
+  // Set model height
+  if (model_record->scaleByHeight) {
+    float height = 1.0f;
+    height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
+    model->setHeight(height);
+  }
 
 //  std::cerr << "Assigning texture set" << std::endl << std::flush;
   // Set model default texture set

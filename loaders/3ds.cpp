@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.30 2004-06-20 18:28:31 alriddoch Exp $
+// $Id: 3ds.cpp,v 1.31 2004-06-21 12:20:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -49,7 +49,8 @@ namespace Sear {
 ThreeDS::ThreeDS(Render *render) : Model(render),
   _initialised(false),
   _list(0),
-  _list_select(0)
+  _list_select(0),
+  m_height(1.0f)
 {
 
 }
@@ -123,6 +124,7 @@ void ThreeDS::invalidate() {
 void ThreeDS::render(bool select_mode) {
   int current_texture = -2;
   std::string current_material = "";
+  _render->scaleObject(m_height);
   if (select_mode) {
 //    if (_list_select) {
 //      _render->playList(_list_select);
