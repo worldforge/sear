@@ -18,12 +18,11 @@ dist-hook:
 	cp -f data/*.png $(distdir)/data
 	cp -f scripts/*.script.in $(distdir)/scripts
 
-##manuall copy game data to target dir
+##manual copy game data to target dir
 ##and spit out some infos
 install-data-local:
 	mkdir -p $(DESTDIR)$(datadir)/sear
 	mkdir -p $(DESTDIR)$(datadir)/sear/data
-	mkdir -p $(DESTDIR)$(datadir)/sear/textures
 	mkdir -p $(DESTDIR)$(datadir)/sear/scripts
 	cp -f data/*.bmp $(DESTDIR)$(datadir)/sear/data
 	cp -f data/*.png $(DESTDIR)$(datadir)/sear/data

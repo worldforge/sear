@@ -2,13 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.41 2002-10-21 22:24:29 simon Exp $
+// $Id: GL.cpp,v 1.42 2002-10-29 18:00:07 simon Exp $
 
 /*TODO
  * Allow texture unloading
  * Allow priority textures
  */ 
 
+
+#include <SDL/SDL_image.h>
 
 #include <unistd.h>
 #include <GL/glu.h>
@@ -1167,7 +1169,7 @@ void GL::createDefaults() {
   //Create Default Texture
   if (debug) Log::writeLog("Building Default Texture", Log::LOG_INFO);
   unsigned int texture_id = 0;
-  unsigned int width, height;
+//  unsigned int width, height;
   glGenTextures(1, &texture_id);
 
   if (texture_id == 0) {
@@ -1175,17 +1177,23 @@ void GL::createDefaults() {
     return;
   }
 
-  unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
-  
+//  unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
+  SDL_Surface *surface = IMG_ReadXPMFromArray(default_image_xpm);
+
   glBindTexture(GL_TEXTURE_2D, texture_id);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-  free (data);
+  glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+  SDL_FreeSurface(surface);
+  surface = NULL;
+
+  //free(data);
   textureList.push_back(texture_id);
   texture_map["defaultdefault"] = next_id++;
   
@@ -1200,8 +1208,10 @@ void GL::createDefaults() {
   }
 
   //data = xpm_to_image(default_font, default_font_width, default_font_height);
-  data = xpm_to_image((const char**)default_font_xpm, width, height);
+  //data = xpm_to_image((const char**)default_font_xpm, width, height);
   
+  surface = IMG_ReadXPMFromArray(default_font_xpm);
+
   glBindTexture(GL_TEXTURE_2D, texture_id);
   
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -1209,9 +1219,13 @@ void GL::createDefaults() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+ // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-  free (data);
+  glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+  SDL_FreeSurface(surface);
+  surface = NULL;
+  //free (data);
   textureList.push_back(texture_id);
   texture_map["defaultdefault_font"] = next_id++;
 }

@@ -1,3 +1,6 @@
+29th October 2002, Simon Goodall
+ * Sear now uses XPM loader from SDL_image, instead of own version.
+
 21st October 2002, Simon Goodall
  * Fixed clean up code for Cal3D models and  modelhandler so they remove all instances they create
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.43 2002-10-21 20:09:59 simon Exp $
+// $Id: System.cpp,v 1.44 2002-10-29 18:00:07 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -99,6 +99,9 @@ System::System() :
   _seconds_per_minute(60.0f),
   _minutes_per_hour(60.0f),
   _hours_per_day(24.0f),
+  _cursor_default(NULL),
+  _cursor_pickup(NULL),
+  _cursor_touch(NULL),
   _mouse_move_select(false),
   _current_time(0.0f),
   _seconds(0.0f),

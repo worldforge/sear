@@ -5,5 +5,5 @@ INCLUDES = -I..
 libCommon_a_SOURCES = \
 	Log.cpp Log.h \
 	Utility.cpp Utility.h \
-	mmgr.cpp mmgr.h 
+#	mmgr.cpp mmgr.h 
 	

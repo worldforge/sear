@@ -10,7 +10,7 @@ echo aclocal...
 
 libtoolize --force --copy
 
-aclocal -I /usr/local/share/aclocal $ACLOCAL_FLAGS
+aclocal $ACLOCAL_FLAGS
 
 echo autoheader...
 (autoheader --version) < /dev/null > /dev/null 2>&1 || {

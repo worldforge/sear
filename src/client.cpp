@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.35 2002-10-21 22:24:29 simon Exp $
+// $Id: client.cpp,v 1.36 2002-10-29 18:00:07 simon Exp $
 
 #include "System.h"
 
@@ -117,12 +117,27 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
-  if (the_lobby) delete the_lobby;	
-  if (_player) delete _player;
-//  if (_connection) delete _connection;
-  if (_factory) delete _factory;
-  if (_meta) delete _meta;
-  if (&Eris::PollDefault::instance()) delete &Eris::PollDefault::instance();
+  if (the_lobby) {
+    delete the_lobby;
+    the_lobby = NULL;
+  }
+  if (_player) {
+    delete _player;
+    _player = NULL;
+  }
+  if (_connection) {
+    delete _connection;
+    _connection = NULL;
+  }
+  if (_factory) {
+    delete _factory;
+    _factory = NULL;
+  }
+  if (_meta) {
+    delete _meta;
+    _meta = NULL;
+  }
+//  if (&Eris::PollDefault::instance()) delete &Eris::PollDefault::instance();
   _initialised = false;
 }
 
