@@ -1,3 +1,7 @@
+2004-06-25  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* src/ModelLoader.h: Fix cut and paste error where offset_x was ignored
+
 2004-06-24  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* Add a Z rotation option to model records to rotate odd objects
