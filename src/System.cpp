@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.66 2003-12-06 22:29:53 simon Exp $
+// $Id: System.cpp,v 1.67 2003-12-08 17:06:37 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -358,7 +358,7 @@ void System::shutdown() {
 bool System::initVideo() {
   if (debug) Log::writeLog("Initialising Video", Log::LOG_INFO);
 #ifdef DEBUG
-#warning "PARACHUTE IS DISABLED"
+//#warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
   if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else

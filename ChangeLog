@@ -1,3 +1,6 @@
+8th December 2003, Simon Goodall
+ * Removed warning messages to get a green light
+
 6th December 2003, Simon Goodall
  * Removed warning from configure to get a green light
  * Removed /cd and /cd_this_dir console commands and replaced with a variable expansion. E.g. ${SEAR_MEDIA} is the root of the media files for sear. (THIS BREAKS COMPAT WITH EXISTING MEDIA)
