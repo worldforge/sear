@@ -1,3 +1,6 @@
+29th April 2003, Simon Goodall
+ * Updated ModelLoader to assign state ids to models
+
 26th April 2003, Simon Goodall
  * Now send out refnos with Atlas ops
 

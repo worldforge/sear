@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.15 2002-12-11 22:19:26 simon Exp $
+// $Id: ModelLoader.h,v 1.16 2003-04-29 20:00:13 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -36,8 +36,10 @@ public:
     ModelRecord * model_record = new ModelRecord();
     model_record->id = model_id;
     model_record->scale = (double)model_config.getItem(model_id, ModelRecord::SCALE);
-    model_record->state = model_config.getItem(model_id, ModelRecord::STATE);
-    model_record->select_state = model_config.getItem(model_id, ModelRecord::SELECT_STATE);
+    model_record->state_name = model_config.getItem(model_id, ModelRecord::STATE);
+    model_record->select_state_name = model_config.getItem(model_id, ModelRecord::SELECT_STATE);
+    model_record->state = System::instance()->getGraphics()->getRender()->getStateID(model_record->state_name);
+    model_record->select_state = System::instance()->getGraphics()->getRender()->getStateID(model_record->select_state_name);
     model_record->model_by_type = model_config.getItem(model_id, ModelRecord::MODEL_BY_TYPE);
     model_record->outline =  model_config.getItem(model_id, ModelRecord::OUTLINE);
     model_record->default_skin = model_config.getItem(model_id, ModelRecord::DEFAULT_SKIN);
