@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.35 2004-04-26 20:26:50 simon Exp $
+// $Id: Render.h,v 1.36 2004-04-28 14:06:03 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -69,7 +69,6 @@ typedef std::list<WorldEntity*> MessageList;
  
   virtual void beginFrame() =0;
   virtual void endFrame(bool select_mode) =0; 
-  virtual void drawFPS(float fps) =0;
   virtual void drawSplashScreen() =0;
   virtual void applyQuaternion(WFMath::Quaternion quaternion) =0;
   virtual void applyLighting() =0;

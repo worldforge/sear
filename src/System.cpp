@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.79 2004-04-27 12:57:35 simon Exp $
+// $Id: System.cpp,v 1.80 2004-04-28 14:06:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -411,7 +411,7 @@ void System::mainLoop() {
       // poll network
       _client->poll();
       // draw scene
-      _graphics->drawScene(command, false, time_elapsed);
+      _graphics->drawScene(m_command, false, time_elapsed);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
@@ -498,22 +498,22 @@ void System::handleEvents(const SDL_Event &event) {
         if (!repeat) {
           SDL_EnableKeyRepeat(1000,500);
           //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-          command = "";
+          m_command = "";
           repeat = true;
         }
         if (event.key.keysym.sym == SDLK_UP) {
           // Previous command
           if (_command_history_iterator != _command_history.begin()) {
             _command_history_iterator--;
-            command = (*_command_history_iterator);
+            m_command = (*_command_history_iterator);
           }
         }
         else if (event.key.keysym.sym == SDLK_DOWN) {
           // next command
           if (_command_history_iterator != _command_history.end()) {
             _command_history_iterator++;
-            if (_command_history_iterator != _command_history.end()) command = (*_command_history_iterator);
-            else command = "";
+            if (_command_history_iterator != _command_history.end()) m_command = (*_command_history_iterator);
+            else m_command = "";
           }
         }
         else if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
@@ -536,22 +536,22 @@ void System::handleEvents(const SDL_Event &event) {
         {
           runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
         } else if (event.key.keysym.sym == SDLK_RETURN) {
-          if (command.empty()) break;
-          runCommand(command);
-          _command_history.push_back(command);
+          if (m_command.empty()) break;
+          runCommand(m_command);
+          _command_history.push_back(m_command);
           _command_history_iterator = _command_history.end();
-          command = "";
+          m_command = "";
         } else if (event.key.keysym.sym == SDLK_DELETE || event.key.keysym.sym == SDLK_BACKSPACE) {
-          if (command.length() > 0) {
-            command = command.substr(0, command.length() - 1); 
+          if (m_command.length() > 0) {
+            m_command = m_command.substr(0, m_command.length() - 1); 
           }
         } else if (event.key.keysym.unicode < 0x80 && event.key.keysym.unicode > 0) {
-          command = command + (char)event.key.keysym.unicode;
+          m_command = m_command + (char)event.key.keysym.unicode;
         }
       } else {
         if (repeat) {
           SDL_EnableKeyRepeat(0, 0);
-          command = "";
+          m_command = "";
           repeat = false;
         }
         runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
@@ -969,6 +969,13 @@ void System::varconf_error_callback(const char *error) {
 }
 
 void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  // TODO this should be specific to the model loader config only.
+  if (key == "state") {
+    config.setItem(section, "state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
+  }
+  if (key == "select_state") {
+    config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
+  }
   if (_process_records && _script_engine->prefixEnabled()) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.15 2004-04-27 15:07:02 simon Exp $
+// $Id: StateManager.cpp,v 1.16 2004-04-28 14:06:03 simon Exp $
 
 /*
  * TODO
@@ -283,7 +283,7 @@ StateID StateManager::getState(const std::string &state_name) const {
     std::cerr << "state " << state_name << " is unknown" << std::endl;
     return 1;
   }
-    
+  assert(S->second > 0); 
   return S->second;
 }
   
@@ -321,6 +321,7 @@ void StateManager::stateChange(StateID state) {
   if (_current_state == state) return; // No need to do anything
   StateProperties *sp = _states[state];
   // If state doesn't exist, take first one
+  assert(sp);
   if (!sp) {
     std::cout << "bad state found - " << state <<  std::endl;
     sp = _states[1];

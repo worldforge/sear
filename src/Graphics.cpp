@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.44 2004-04-27 15:07:02 simon Exp $
+// $Id: Graphics.cpp,v 1.45 2004-04-28 14:06:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,8 @@
 #include "Render.h"
 #include "System.h"
 #include "WorldEntity.h"
+
+#include "renderers/RenderSystem.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -315,6 +317,9 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position)) {
           if (!select_mode) {
             // Add to queue by state, then model record
+assert(_system->getModelRecords().findItem(*I, "state_num"));
+int number = _system->getModelRecords().getItem(*I, "state_num");
+assert(number > 0);
 	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }

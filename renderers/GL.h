@@ -23,9 +23,6 @@
 #include "src/Light.h"
 #include "src/Render.h"
 
-
-#include "StateManager.h"
-
 namespace Sear {
 
 class System;
@@ -53,9 +50,9 @@ public:GL();
 
 private:
 
+  bool m_fontInitialised;
   unsigned int m_width, m_height;
   bool m_fullscreen;
-  bool m_windowExists;
   SDL_Surface *m_screen;
 
   static void checkError();
@@ -112,7 +109,6 @@ public:
   inline void restore();
   void beginFrame();
   void endFrame(bool select_mode);
-  void drawFPS(float fps);
   void drawSplashScreen();
   void applyQuaternion(WFMath::Quaternion quaternion);
   void applyLighting();
@@ -134,7 +130,6 @@ protected:
   const float near_clip;
   float _far_clip_dist;
 
-  int next_id;
   GLuint base;
 
   int font_id;
@@ -163,13 +158,9 @@ protected:
   float _speech_offset_y;
   float _speech_offset_z;
 
-  void stateDisplayList(GLuint &, StateProperties *previous_state, StateProperties *next_state);
-
   float _fog_start;
   float _fog_end;
   float _light_level;
-
-  std::map<std::string, GLuint> _state_map;
 
   static const unsigned int NUM_COLOURS = 512;
   GLubyte colourArray[NUM_COLOURS][3];
@@ -191,7 +182,6 @@ protected:
   bool use_sgis_generate_mipmap;
   bool _multi_texture_mode;
   bool m_initialised;
-  bool m_fontInitialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 };

@@ -1,4 +1,10 @@
 28th April 2004, Simon Goodall
+ * Fix the "bad state - 0" messages. Caused by trying to render a model before the states had been assigned.
+ * Some variable init stuff added to GL
+ * Removal of some unused functions and variables.
+ * Rename member var command in System to m_command for clarity
+
+28th April 2004, Simon Goodall
  * Do not try and render acitveName string if its empty
 
 28th April 2004, Simon Goodall

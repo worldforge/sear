@@ -167,9 +167,6 @@ static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 #ifdef DEBUG
 static const bool debug = true;
 #else
@@ -183,7 +180,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   // Destroy the existing window
   if (m_screen != NULL) destroyWindow();
   
-  if (debug) std::cout << "Creating Window" << std::endl;
+  if (debug) std::cout << "GL: Creating Window" << std::endl;
 
   // Set new window size etc..
   m_width = width;
@@ -415,15 +412,28 @@ GL::GL() :
   m_fullscreen(false),
   m_screen(NULL),
   _system(System::instance()),
+  _graphics(NULL),
   fov(RENDER_FOV),
   near_clip(RENDER_NEAR_CLIP),
-  next_id(1), // was 0 error?
+  _far_clip_dist(100.0f),
   base(0),
+  font_id(-1),
   splash_id(-1),
   activeEntity(NULL),
+  x_pos(0), y_pos(0),
+  _speech_offset_x(0.0f),
+  _speech_offset_y(0.0f),
+  _speech_offset_z(0.0f),
   _fog_start(100.0f),
   _fog_end(150.0f),
   _light_level(1.0f),
+  colour_index(0),
+  redBits(0), greenBits(0), blueBits(0),
+  redMask(0), greenMask(0), blueMask(0),
+  redShift(0), greenShift(0), blueShift(0),
+  use_ext_texture_filter_anisotropic(false),
+  use_sgis_generate_mipmap(false),
+  _multi_texture_mode(false),
   m_initialised(false)
 {
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -539,12 +549,6 @@ void GL::print(int x, int y, const char * string, int set) {
 void GL::print3D(const char *string, int set) {
   if (!m_fontInitialised) initFont();
   if (set > 1) set = 1;
-//  int texture = requestTexture(font_id);
-//  if (!glIsTexture(texture)) {
-//    static int default_id = requestTexture( DEFAULT_FONT);
-//    texture = default_id;
-//  }
-//  glBindTexture(GL_TEXTURE_2D, texture);
   RenderSystem::getInstance().switchTexture(font_id);
   glPushMatrix();
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
@@ -1055,12 +1059,6 @@ inline void GL::endFrame(bool select_mode) {
   glFlush();
   if (!select_mode) SDL_GL_SwapBuffers();
   if (debug) checkError();
-}
-  
-inline void GL::drawFPS(float fps) {
-  std::string frame_rate_string = string_fmt(fps).substr(0, 4);
-  glColor4fv(red);
-  print(10, 100, frame_rate_string.c_str(), 0);
 }
   
 void GL::drawSplashScreen() {

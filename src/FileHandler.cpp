@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.7 2004-04-27 15:07:02 simon Exp $
+// $Id: FileHandler.cpp,v 1.8 2004-04-28 14:06:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -10,6 +10,7 @@
 #include <algorithm>
 
 #include <stdio.h>
+#include <iostream>
 
 #include "FileHandler.h"
 #include "Console.h"
@@ -63,6 +64,7 @@ FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filena
   for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string path = *I;
     std::string file = path + "/" + filename;
+    if (debug) std::cout << "Looking for: " << file << std::endl;
     FILE *f = fopen(file.c_str(), "r");
     if (f) {
       fclose(f);
