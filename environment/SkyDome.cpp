@@ -181,7 +181,7 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
-static counter = 0;
+static int counter = 0;
 
 void SkyDome::render()
 {
