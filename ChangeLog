@@ -1,3 +1,6 @@
+7th August 2003, Simon Goodall
+ * Changed configure.in so it throws an error if lib3ds in not found
+
 5th August 2003, Simon Goodall
  * Fixed some use of variables uninitialised
 
