@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.9 2002-11-13 19:39:27 simon Exp $
+// $Id: Camera.h,v 1.10 2003-01-13 17:09:07 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -104,14 +104,15 @@ protected:
   static const char * const ELEVATE_DOWN = "+camera_elevate_down";
   static const char * const ELEVATE_STOP_UP = "-camera_elevate_up";
   static const char * const ELEVATE_STOP_DOWN = "-camera_elevate_down";
-  
+ 
   float _distance;  // distance from focus
+  // Angles are stored in radians 
   float _rotation;  // horizontal rotation
   float _elevation; // vertical rotation
   
   int _zoom_dir;      // Direction / rate of zoom
   int _rotation_dir;  // Direction / rate of rotation
-  int _elevation_dir; // Direction / rate of elevation
+  int _elevation_dir; // Direction / rate of elevation - negative values point downwards
 
   float _zoom_speed;
   float _rotation_speed;
