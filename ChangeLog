@@ -1,4 +1,7 @@
 18th August 2002, Simon Goodall
+ * Changes to states file which fixes some lighting problems when using mouse_move_select
+
+18th August 2002, Simon Goodall
  * Possible fix to Win32 Fullscreen bug
  * Minor changes so code uses pointers passed to them in the constructor instead of getting it from elsewhere everytime it is required.
 
