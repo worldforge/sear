@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.68 2004-01-26 14:08:49 alriddoch Exp $
+// $Id: System.cpp,v 1.69 2004-04-05 13:39:38 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -125,6 +125,7 @@ System::System() :
   _action_handler(NULL),
   _object_handler(NULL),
   _calendar(NULL),
+  _controller(NULL),
   _console(NULL),
   _character(NULL),
   _cursor_default(NULL),
@@ -238,6 +239,18 @@ bool System::init() {
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
+
+  int sticks = SDL_NumJoysticks();
+  if (sticks > 0) {
+    _controller = SDL_JoystickOpen(0);
+    int axes = SDL_JoystickNumAxes(_controller);
+    if (axes < 4) {
+      std::cout << "Joystick has less than 4 axis" << std::endl << std::flush;
+    }
+    int buttons = SDL_JoystickNumButtons(_controller);
+    std::cout << "Got a joystick with " << axes << " axes, and " <<
+              buttons << " buttons." << std::endl << std::flush;
+  }
 
   try { 
     sound = new Sound();
@@ -360,10 +373,10 @@ bool System::initVideo() {
 #ifdef DEBUG
 //#warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
-  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0 ) {
+  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else
   // We want release versions to die quietly
-  if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
+  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0 ) {
 #endif
     Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
     return false;
@@ -463,6 +476,8 @@ void System::mainLoop() {
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
+      // Handle mouse and joystick
+      handleAnalogueControllers();
       // Update Calendar
       _calendar->update(time_elapsed);
       // Poll event handler
@@ -600,6 +615,35 @@ void System::handleEvents(const SDL_Event &event) {
       _system_running = false;
       break;
     }
+}
+
+void System::handleAnalogueControllers() {
+  if (_controller != NULL) {
+    Graphics * g = getGraphics();
+    if (g != NULL) {
+      Camera * c = g->getCamera();
+      if (c != NULL) {
+        int rot = SDL_JoystickGetAxis(_controller, 4);
+        if (abs(rot) > 3200) {
+          c->rotate((rot < 0) ? 1 : -1);
+        }
+
+        int elev = SDL_JoystickGetAxis(_controller, 5);
+        if (abs(elev) > 3200) {
+          c->elevate((elev < 0) ? 1 : -1);
+        }
+      }
+    }
+    std::cout << "Upd "
+              << SDL_JoystickGetAxis(_controller, 0) << ":"
+              << SDL_JoystickGetAxis(_controller, 1) << ":"
+              << SDL_JoystickGetAxis(_controller, 2) << ":"
+              << SDL_JoystickGetAxis(_controller, 3) << ":"
+              << SDL_JoystickGetAxis(_controller, 4) << ":"
+              << SDL_JoystickGetAxis(_controller, 5) << ":"
+              << SDL_JoystickGetAxis(_controller, 6) << ":"
+              << std::endl << std::flush;
+  }
 }
 
 void System::setCaption(const std::string &title, const std::string &icon) {

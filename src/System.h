@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.32 2004-03-30 11:36:47 simon Exp $
+// $Id: System.h,v 1.33 2004-04-05 13:39:38 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -229,6 +229,7 @@ protected:
   bool initVideo();
   
   void handleEvents(const SDL_Event &);
+  void handleAnalogueControllers();
 
   bool fullscreen;
   SDL_Surface *screen;
@@ -267,6 +268,7 @@ protected:
   varconf::Config _model_records;
   varconf::Config _object_records;
   
+  SDL_Joystick *_controller;
   Console *_console;
   Character *_character;
  
