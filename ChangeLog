@@ -1,3 +1,6 @@
+22nd July 2002, Al Riddoch
+ * src/Utility.cpp: ISO C++ fixes.
+
 22nd July 2002, Simon Goodall
  * Fixed bug where state changes were created in a display list, but the display list was not actually used!
 
