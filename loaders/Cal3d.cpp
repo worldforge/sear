@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.21 2002-09-21 14:20:30 simon Exp $
+// $Id: Cal3d.cpp,v 1.22 2002-09-21 15:42:00 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -216,8 +216,6 @@ bool Cal3d::init(const std::string& strFilename, float height) {
     std::string::size_type pos = strFilename.find_last_of("/");
     if (pos == std::string::npos) pos = strFilename.find_last_of("\\");
     if (pos != std::string::npos) strPath = strFilename.substr(0, pos) + "/";
-
-    cout << "PATH: " << strPath << endl;
 
     // initialize the animation count
     int animationCount;
@@ -629,7 +627,6 @@ void Cal3d::setState(int state, float delay)
 }
 
 void Cal3d::action(const std::string &action) {
-  std::cout << action << endl;
   if (action == "standing") {
     if (grip) {
       m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.0f);
@@ -673,12 +670,12 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 10) == "animation_") {
     std::string anim = action.substr(10);
-    cout << "Animation: " << anim << endl;
+    std::cout << "Animation: " << anim << std::endl;
     m_calModel.getMixer()->executeAction(map->animation_map[anim], 0.3f, 0.3f);
   }
   else if (action.substr(0, 7) == "switch_") {
     std::string anim = action.substr(7);
-    cout << "Switch: " << anim << endl;
+    std::cout << "Switch: " << anim << std::endl;
     for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
       const int code = I->second;
       std::string a = I->first;
@@ -688,7 +685,7 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 6) == "blend_") {
     std::string anim = action.substr(6);
-    cout << "Blend: " << anim << endl;
+    std::cout << "Blend: " << anim << std::endl;
     for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
       const int code = I->second;
       std::string a = I->first;
@@ -698,12 +695,12 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 9) == "add_mesh_") {
     std::string mesh = action.substr(9);
-    cout << "Add: " << mesh << endl;
+    std::cout << "Add: " << mesh << std::endl;
     m_calModel.attachMesh(map->mesh_map[mesh]);
   }
   else if (action.substr(0, 12) == "remove_mesh_") {
     std::string mesh = action.substr(12);
-    cout << "Remove: " << mesh << endl;
+    std::cout << "Remove: " << mesh << std::endl;
     m_calModel.detachMesh(map->mesh_map[mesh]);
   }
   else if (action.substr(0, 10) == "set_equip_") {
