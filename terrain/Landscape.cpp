@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
+// $Id: Landscape.cpp,v 1.9 2002-11-26 15:20:11 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -136,7 +136,7 @@ void Landscape::render() {
   Patch *patch = &(m_Patches[0][0]);
   // Scale the terrain by the terrain scale specified at compile time.
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
-  _renderer->translateObject(-100.0f, -100.0f, 0.0f);
+  _renderer->translateObject(_terrain->getMapWidth() >> 1, _getMapHeight() >> 1, 0.0f);
 
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
 
@@ -169,13 +169,13 @@ void Landscape::render() {
 
 float Landscape::getHeight(float x, float y) {
   float height;
-  float mod_x = x + 100.0f;
-  float mod_y = y + 100.0f;
-  if (mod_x < 0 || mod_x >= 200 || mod_y < 0 || mod_y >= 200) return 0.0f;
-  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * 200];
-  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * 200];
-  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * 200];
-  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * 200];
+  float mod_x = x + _terrain->getMapHeight() >> 1;
+  float mod_y = y + _terrain->getMapWidth() >> 1;
+  if (mod_x < 0 || mod_x >= _terrain->getMapWidth() || mod_y < 0 || mod_y >= _terrain->getMapHeight()) return 0.0f;
+  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * _terrain->getMapHeight()];
+  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * _terrain->getMapHeight()];
+  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * _terrain->getMapHeight()];
+  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * _terrain->getMapHeight()];
   float x_m = (float)x - (float)((int)x);
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
