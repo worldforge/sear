@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.9 2004-04-28 22:02:44 jmt Exp $
+// $Id: FileHandler.cpp,v 1.10 2004-04-29 07:04:15 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -100,7 +100,7 @@ FileHandler::FileHandler() {
     if (!exists(getUserDataPath())) {
         std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
 #ifdef __WIN32__
-        _mkdir(getUserDataPath().c_str(), 
+        _mkdir(getUserDataPath().c_str()); 
 #else
         mkdir(getUserDataPath().c_str(), 0755);
 #endif
@@ -113,8 +113,10 @@ std::string FileHandler::getInstallBasePath() const
 {
 #ifdef __APPLE__
     return getBundleResourceDirPath();
+#elif __WIN32__
+    return std::string(".");
 #else
-    return str::string(INSTALLDIR) + std::string("/share/sear/");
+    return std::string(INSTALLDIR) + std::string("/share/sear");
 #endif
 }
 
