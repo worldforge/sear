@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.44 2004-06-23 08:00:58 alriddoch Exp $
+// $Id: Character.cpp,v 1.45 2004-06-25 14:09:56 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -336,7 +336,7 @@ void Character::say(const std::string &msg) {
   _avatar->say(msg);
 }
 
-void Character::make(const std::string &arg) {
+void Character::make(const std::string &type, const std::string &name) {
   assert ((_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Create c;
   c.setFrom(_self->getID());
@@ -344,7 +344,8 @@ void Character::make(const std::string &arg) {
   msg["loc"] = _self->getContainer()->getID();
   WFMath::Point<3> pos = _self->getPosition() + WFMath::Vector<3>(2,0,0);
   msg["pos"] = pos.toAtlas();
-  msg["parents"] = Atlas::Message::Element::ListType(1, arg);
+  msg["name"] = name;
+  msg["parents"] = Atlas::Message::Element::ListType(1, type);
   c.setArgs(Atlas::Message::Element::ListType(1, msg));
   _avatar->getWorld()->getConnection()->send(c);
 }
@@ -475,7 +476,11 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == PICKUP) System::instance()->setAction(ACTION_PICKUP);
    else if (command == TOUCH) System::instance()->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
-   else if (command == MAKE) make(args);
+   else if (command == MAKE) {
+     std::string type = tokeniser.nextToken();
+     std::string name = tokeniser.remainingTokens();
+     make(type, name);
+   }
    else if (command == "clear_app") clearApp();
     else if (command == "set_height") {
      std::string hStr = tokeniser.nextToken();
