@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.29 2004-05-30 21:06:20 jmt Exp $
+// $Id: TextureManager.cpp,v 1.30 2004-05-30 21:30:51 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -398,11 +398,14 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
             to break if level zero isn't defined. So we shift all the mipmaps
             down if baseMipmapLevel > 0 */
             glTexImage2D(GL_TEXTURE_2D, level - m_baseMipmapLevel, fmt, mip->w, mip->h, 0, format, GL_UNSIGNED_BYTE, mip->pixels);
-            if (glGetError() != 0) {
-                std::cerr << "texture " << texture_name << " failed to load at level "
-                    << level << " with GL error " << glGetError() << std::endl;
-                break;
+            GLenum er;
+            if ((er = glGetError()) != 0) {
+                std::cerr << "Texture \"" << texture_name
+                          << "\" failed to load with error: "
+                          << gluErrorString(er)
+                          << std::endl << std::flush;
             }
+
         }
     } // of mipmap generation loop
     

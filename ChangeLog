@@ -1,3 +1,10 @@
+2004-05-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/TextureManager.cpp: Fix texture load error detection,
+	  and make output a little more useful.
+
+	* renderers/ImageUtils.h: Add newline to end of file.
+
 2004-05-30  James Turner  <james@worldforge.org>
 
 	* Change an assert() on texture load errors to something less
