@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.8 2003-06-11 23:07:57 simon Exp $
+// $Id: TextureManager.cpp,v 1.9 2003-06-12 20:34:53 simon Exp $
 
 #include "TextureManager.h"
 
@@ -59,7 +59,7 @@ static const std::string KEY_mag_filter = "mag_filter";
 // config defaults
 static const bool DEFAULT_clamp = false;
 static const bool DEFAULT_mipmap = true;
-static const bool mask = false;
+static const bool DEFAULT_mask = false;
 static const unsigned int DEFAULT_min_filter = GL_LINEAR;
 static const unsigned int DEFAULT_mag_filter = GL_NEAREST;
 
@@ -152,6 +152,14 @@ void TextureManager::readTextureConfig(const std::string &filename) {
 TextureObject TextureManager::loadTexture(const std::string &texture_name) {
   assert((_initialised == true) && "TextureManager not initialised");
   std::string clean_name = std::string(texture_name);
+  
+  bool mask = false;
+//  std::cout << clean_name << " - " << clean_name.substr(0,5) << " - " << clean_name.substr(5) <<  std::endl;
+  if (clean_name.substr(0, 5) == "mask_") {
+    mask = true;
+    clean_name = clean_name.substr(5);
+  }
+ 
   _texture_config.clean(clean_name);
   if (!_texture_config.find(clean_name)) {
     std::cerr << "Texture " << texture_name << " not defined." << std::endl;
@@ -163,6 +171,7 @@ TextureObject TextureManager::loadTexture(const std::string &texture_name) {
     return 0;
   }
   std::string filename = (std::string)_texture_config.getItem(clean_name, KEY_filename);
+   
   std::string path = (std::string)_texture_config.getItem(clean_name, KEY_path);
   if (!path.empty()) {
     filename = path + "/" + filename;
@@ -174,7 +183,7 @@ TextureObject TextureManager::loadTexture(const std::string &texture_name) {
     std::cerr << "Error loading texture: " << filename << std::endl;
     return 0;
   }
-  TextureObject texture_id = loadTexture(clean_name, surface);
+  TextureObject texture_id = loadTexture(clean_name, surface, mask);
   // Free image
   SDL_FreeSurface(surface);
   // store into texture array
@@ -185,13 +194,13 @@ return texture_id;
 //  return _texture_counter++;
 }
 
-TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *surface) {
+TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *surface, bool mask) {
   std::string texture_name(name);
   _texture_config.clean(texture_name);
   // If we have requested a mask, filter pixels
 /*  bool mask = (bool)_texture_config.getItem(texture_name, KEY_mask);
   mask = false;
-  if (mask) {
+*/  if (mask) {
     // Set all pixels to white. We let the alpha channel do the clipping
     // TODO perhaps define a transparent pixel or threshold to do this
     if (surface->format->BytesPerPixel == 4) {
@@ -208,7 +217,7 @@ TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *
       }
     }
   }
- */ 
+// */ 
   // Create open gl texture
   GLuint texture_id;
   glGenTextures(1, &texture_id);
@@ -300,7 +309,7 @@ void TextureManager::switchTexture(TextureID texture_id) {
     _texture_config.clean(_names[texture_id]);
     to = loadTexture(_names[texture_id]);
     if (to == 0) {
-      std::cerr << "Cannot find " << _names[texture_id] << std::endl;
+      std::cerr << "Cannot find " << _names[texture_id] << " id " << texture_id <<  std::endl;
       to = _textures[_default_texture];
     }
     _textures[texture_id] = to;
@@ -507,7 +516,7 @@ TextureID TextureManager::createDefaultTexture() {
   SDL_FreeSurface(surface);
   */
   unsigned int width, height;
-TextureObject texture;
+  TextureObject texture;
   glGenTextures(1, &texture);
   unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
 

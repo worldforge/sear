@@ -1,4 +1,7 @@
 12th June 2003, Simon Goodall
+ * Fixed object selection on imposters
+
+12th June 2003, Simon Goodall
  * Fixed segfault caused by bad array indexing in NPlane loader
 
 12th June 2003, Simon Goodall

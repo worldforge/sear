@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.59 2003-06-11 23:07:57 simon Exp $
+// $Id: System.cpp,v 1.60 2003-06-12 20:34:53 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -388,7 +388,7 @@ void System::createWindow(bool fullscreen) {
 
   //Is this the correct way to free a window?
   if (screen) SDL_FreeSurface(screen);
-  screen = SDL_SetVideoMode(_width, _height, 0, flags);
+  screen = SDL_SetVideoMode(_width, _height, bpp, flags);
   if (screen == NULL ) {
     Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
     _system_running = false;

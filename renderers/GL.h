@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.32 2003-04-23 20:28:27 simon Exp $
+// $Id: GL.h,v 1.33 2003-06-12 20:34:53 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -58,9 +58,14 @@ public:
 
   TextureID requestTexture(const std::string &texture_name) {
     assert(_texture_manager != NULL);
-    return _texture_manager->requestTextureID(texture_name);
+    return _texture_manager->requestTextureID(texture_name, false);
   }
-  
+ 
+  TextureID requestTextureMask(const std::string &texture_name) {
+    assert(_texture_manager != NULL);
+    return _texture_manager->requestTextureID(texture_name, true);
+  }
+ 
   static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);

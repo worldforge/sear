@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.5 2003-06-12 15:32:17 nowhere Exp $
+// $Id: TextureManager.h,v 1.6 2003-06-12 20:34:53 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -94,13 +94,14 @@ public:
    */ 
   void readTextureConfig(const std::string &filename);
 
-//  TextureID requestTextureID(const std::string &texture_name) {
-  TextureID requestTextureID(std::string texture_name) {
-	  assert(_initialised != false);
-    TextureID id = _texture_map[texture_name];
+  TextureID requestTextureID(const std::string &texture_name, bool mask) {
+//  TextureID requestTextureID(std::string texture_name) {
+    assert(_initialised != false);
+    std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
+    TextureID id = _texture_map[name];
     if (id == 0) {
-      _texture_map[texture_name] = _texture_counter;
-      _names[_texture_counter] = texture_name;
+      _texture_map[name] = _texture_counter;
+      _names[_texture_counter] = name;
       id = _texture_counter++;
     }
     return id;
@@ -191,8 +192,8 @@ private:
    * This function is used to setup the required OpenGL texture extensions
    */ 
   void setupGLExtensions();
-  TextureObject loadTexture(const std::string &texture_name, SDL_Surface *surface);
-  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);	  
+  TextureObject loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);  
   void varconf_error_callback(const char *message);
 
   TextureID createDefaultTexture();

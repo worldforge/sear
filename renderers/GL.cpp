@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.66 2003-06-11 23:07:57 simon Exp $
+// $Id: GL.cpp,v 1.67 2003-06-12 20:34:53 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -253,6 +253,7 @@ GL::GL(System *system, Graphics *graphics) :
   near_clip(RENDER_NEAR_CLIP),
   next_id(1),
   base(0),
+  splash_id(-1),
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
@@ -322,7 +323,7 @@ void GL::initWindow(int width, int height) {
   setupExtensions();
   _texture_manager->init();
   _state_manager->init();
-  splash_id = requestTexture(TEXTURE_splash_texture);
+  //splash_id = requestTexture(TEXTURE_splash_texture);
   initFont();
 
 }
@@ -895,13 +896,10 @@ void GL::drawMessageQueue(MessageList &list) {
 }
  
 inline float GL::distFromNear(float x, float y, float z) {
-//	return 1.0f;
-	
   return Frustum::distFromNear(frustum, x, y, z);
 }
 	
 inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
-//	return 1;
   return Frustum::patchInFrustum(frustum, bbox);
 }
 
@@ -976,7 +974,9 @@ void GL::drawSplashScreen() {
   setViewMode(ORTHOGRAPHIC);
   
   glColor4fv(white);
+//  std::cout << splash_id << std::endl;
   if (splash_id == -1) splash_id = requestTexture(TEXTURE_splash_texture);
+//  std::cout << splash_id << std::endl;
   switchTexture(splash_id);
   // TODO into vertex array?
   glBegin(GL_QUADS); 

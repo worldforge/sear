@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.29 2003-04-23 20:28:27 simon Exp $
+// $Id: Render.h,v 1.30 2003-06-12 20:34:53 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -86,6 +86,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual float getLightLevel() =0;
   
   virtual int requestTexture(const std::string &texture_name) =0;
+  virtual int requestTextureMask(const std::string &texture_name) =0;
   virtual void buildColourSet() =0;
 //  virtual unsigned int getTextureID(unsigned int texture_id)=0;
 //  virtual void drawScene(const std::string &,bool, float) =0;
