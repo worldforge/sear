@@ -1,3 +1,8 @@
+2004-10-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/TextEntry.cpp, gui/TextEntry.h: Handle text differently
+	  so that the widget works more sanely.
+
 2004-10-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Button.cpp, gui/Button.h, gui/Window.cpp, gui/Window.h,

@@ -11,6 +11,8 @@
 
 #include <SDL/SDL.h>
 
+#include <string>
+
 namespace Sear {
 
 class String;
@@ -28,16 +30,19 @@ protected:
   Frame * m_frame;
   String * m_text;
   Caret * m_caret;
-  int m_size;
+  std::string m_input;
+  unsigned int m_textOffset;
+  unsigned int m_size;
   unsigned int m_border;
   unsigned int m_caretPos;
 
+  void setText();
 public:
   explicit TextEntry(int size, const std::string & text);
   virtual ~TextEntry();
 
-  virtual void show();
   virtual void map(Window * win, int x, int y, int & w, int & h);
+  virtual void show() { }
 
   void onKeyPress(SDLKey, Uint16);
   void onPressed();

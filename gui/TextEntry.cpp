@@ -12,24 +12,34 @@
 #include <sigc++/object_slot.h>
 
 #include <iostream>
+#include <algorithm>
 
 namespace Sear {
 
 TextEntry::TextEntry(int size, const std::string & text) :
-           m_frame(new Frame()), m_text(new String(text)),
-           m_caret(new Caret(16)), m_size(size), m_border(4)
+           m_frame(new Frame()), m_text(new String("")),
+           m_caret(new Caret(16)), m_input(text),
+           m_textOffset(0), m_size(size), m_border(4)
 {
   m_frame->down();
-  m_caretPos = m_text->content().size();
+  m_caretPos = m_input.size();
+  setText();
 }
 
 TextEntry::~TextEntry()
 {
 }
 
-void TextEntry::show()
+void TextEntry::setText()
 {
-  // Map the required widget sizes
+  if (m_caretPos > (m_size + m_textOffset)) {
+    m_textOffset = m_caretPos - m_size;
+  }
+  if (m_caretPos < m_textOffset) {
+    m_textOffset = m_caretPos ;
+  }
+  m_text->content() = m_input.substr(m_textOffset, std::min(m_size, m_input.size() - m_textOffset));
+  m_caret->setPos((m_caretPos - m_textOffset) * 10 + m_border + 4, m_border);
 }
 
 void TextEntry::map(Window * win, int x, int y, int & w, int & h)
@@ -54,7 +64,7 @@ void TextEntry::onKeyPress(SDLKey ks, Uint16 ch)
 {
   if (ks == SDLK_BACKSPACE) {
     if(m_caretPos > 0) {
-      m_text->content() = m_text->content().erase(m_caretPos - 1, 1);
+      m_text->content() = m_input.erase(m_caretPos - 1, 1);
       --m_caretPos;
     }
   } else if (ks == SDLK_LEFT) {
@@ -62,17 +72,17 @@ void TextEntry::onKeyPress(SDLKey ks, Uint16 ch)
       --m_caretPos;
     }
   } else if (ks == SDLK_RIGHT) {
-    if(m_caretPos < m_text->content().length()) {
+    if(m_caretPos < m_input.size()) {
       ++m_caretPos;
     }
   } else if (ks == SDLK_RETURN || ks == SDLK_ESCAPE) {
     // nothing
   } else if (ch > 0 && ch < 0x80) {
     std::cout << "Key press" << std::endl << std::flush;
-    m_text->content().insert(m_caretPos, 1, ch);
+    m_input.insert(m_caretPos, 1, ch);
     ++m_caretPos;
   }
-  m_caret->setPos(m_caretPos * 10 + m_border + 4, m_border);
+  setText();
 }
 
 void TextEntry::onPressed()
