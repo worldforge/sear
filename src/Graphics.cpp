@@ -230,13 +230,14 @@ void Graphics::writeConfig() {
 void Graphics::readComponentConfig() {
   if (_renderer) _renderer->readConfig();
   if (_camera) _camera->readConfig();
+  if (_camera) _camera->writeConfig();
   if (_terrain) _terrain->readConfig();
   if (_sky) _sky->readConfig();
 }
 
 void Graphics::writeComponentConfig() {
   if (_renderer) _renderer->writeConfig();
-  if (_camera) _camera->writeConfig();
+//  if (_camera) _camera->writeConfig();
   if (_terrain) _terrain->writeConfig();
   if (_sky) _sky->writeConfig();
 }

@@ -59,7 +59,6 @@ void ROAM::loadHeightMap() {
   int i, x, y;
   hMap = NULL;
   SDL_Surface *terrain = NULL;
-  std::string hmap = _system->getGeneral()->getItem("terrain", KEY_height_map);
   
   terrain = IMG_Load(hmap.c_str());
   if (terrain == NULL) {
@@ -111,6 +110,9 @@ void ROAM::readConfig() {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
   }
+  
+  hmap = _system->getGeneral()->getItem("terrain", KEY_height_map);
+    
   temp = general->getItem("terrain", KEY_height);
   _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
 
@@ -131,6 +133,8 @@ void ROAM::writeConfig() {
   general->setItem("terrain", KEY_height, _height);
   general->setItem("terrain", KEY_water_level, _water_level);
   general->setItem("terrain", KEY_terrain_scale, _terrain_scale);
+  general->setItem("terrain", KEY_height_map, hmap);
+  
 }
 
 void ROAM::lowerDetail() { 

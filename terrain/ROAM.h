@@ -74,6 +74,7 @@ protected:
 
   int _height;
   int hMapWidth, hMapHeight;
+  std::string hmap;
   unsigned char *hMap;
   float last_time;
   Landscape *gLand;

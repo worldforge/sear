@@ -1,3 +1,9 @@
+12th August 2002, Simon Goodall
+ * Fixed bug where  height map location was blanked unless explicitly added to home dir general.
+ * Fixed bug where camera position was stored in config files
+ * Updated configure.in to produce better debug infomation
+ * Added callback to varconf error signal in System
+
 7th August 2002, Simon Goodall
  * Updated makefile.am's to be able to create a distribution
  * Updated configure.in to point the user to web locations for missing libraries

@@ -111,6 +111,10 @@ bool System::init() {
   _textures->sigsv.connect(SigC::slot(this, &System::varconf_callback));
   _models->sigsv.connect(SigC::slot(this, &System::varconf_callback));
   
+  _general->sige.connect(SigC::slot(this, &System::varconf_error_callback));
+  _textures->sige.connect(SigC::slot(this, &System::varconf_error_callback));
+  _models->sige.connect(SigC::slot(this, &System::varconf_error_callback));
+  
   Bindings::init();
   
   _console = new Console(this);
@@ -743,6 +747,7 @@ void System::registerCommands(Console *console) {
 }
 
 void System::runCommand(const std::string &command) {
+  Log::writeLog(command, Log::LOG_INFO);
   try {
     _console->runCommand(command);
   } catch (Exception e) {
@@ -753,7 +758,6 @@ void System::runCommand(const std::string &command) {
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {
-  Log::writeLog(command, Log::LOG_DEFAULT);
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(args);
   if (command == EXIT || command == QUIT) _system_running = false;
@@ -856,6 +860,10 @@ void System::runCommand(const std::string &command, const std::string &args) {
     if (we) we->displayInfo();  
   }
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
+}
+
+void System::varconf_error_callback(const char *error) {
+  Log::writeLog(std::string("Varconf Error: ") + error, Log::LOG_ERROR);
 }
 
 void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {

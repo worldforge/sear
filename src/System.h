@@ -228,6 +228,7 @@ protected:
   void processRecords();
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
+  void varconf_error_callback(const char *);
   
 private:
   bool _systemState[SYS_LAST_STATE];
