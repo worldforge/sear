@@ -27,6 +27,7 @@ sear_LDADD = \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderNPlane.a \
+	../gui/libGui.a \
 	$(CAL3D_LIBS) \
 	$(LIB3DS_LIBS) \
 	$(SEAR_RC_O)

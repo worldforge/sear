@@ -2,12 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 Alistair Riddoch
 
-#include "gui/Workspace.h"
+#include "gui/Widget.h"
 
-#include "gui/RootWindow.h"
-
-Workspace::Workspace() : m_rootWindow(new RootWindow()) {
+Widget::Widget() : m_parent(0) {
 }
 
-Workspace::~Workspace() {
+Widget::~Widget() {
 }

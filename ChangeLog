@@ -1,4 +1,7 @@
 26th April 2004, Al Riddoch
+ * More progress on base classes for gui code
+
+26th April 2004, Simon Goodall
  * Removed old sky and terrain code
  * Removed slice loader code as it isn't used
 

@@ -5,11 +5,13 @@
 #ifndef SEAR_GUI_WORKSPACE_H
 #define SEAR_GUI_WORKSPACE_H
 
-#include "gui/Window.h"
+#include "gui/Widget.h"
 
-/// This defines the gui level background of the window the game is running
-/// in, similar to the desktop in a conventional windowing system.
-class Workspace : public Window {
+class RootWindow;
+
+class Workspace : public Widget {
+protected:
+  RootWindow * m_rootWindow;
 public:
   Workspace();
   virtual ~Workspace();
