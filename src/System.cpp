@@ -28,6 +28,7 @@
 
 #include "Exception.h"
 #include "Log.h"
+#include <Eris/Types.h>
 
 namespace Sear {
 
@@ -305,7 +306,7 @@ void System::createWindow(bool fullscreen) {
 void System::mainLoop() {
   SDL_Event event;
   while (_system_running) {
-//    try {
+    try {
       _seconds = (float)SDL_GetTicks() / 1000.0f;
       _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
       while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
@@ -324,9 +325,17 @@ void System::mainLoop() {
       _event_handler->poll();
       _client->poll();
       renderer->drawScene(command, false);
-//    } catch (...) {
-//      Log::writeLog("Caught Something", Log::ERROR);
-//    }
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+    } catch (Eris::InvalidOperation io) {
+      Log::writeLog(io._msg, Log::ERROR);
+    } catch (Eris::BaseException be) {
+      Log::writeLog(be._msg, Log::ERROR);
+    } catch (...) {
+      Log::writeLog("Caught Something", Log::ERROR);
+    }
   }
 }
 

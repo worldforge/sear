@@ -192,7 +192,7 @@ void Bindings::saveBindings(const std::string &file_name) {
 
 void Bindings::bind(std::string key, std::string command) {
   if (key.empty()) return; // Check we were sent a key
-  if (command.empty()) command = "{UNBOUND}"; // If command is empty we are unbinding the key. Need some text to avoid empty string
+//  if (command.empty()) command = "{UNBOUND}"; // If command is empty we are unbinding the key. Need some text to avoid empty string
   if (_bindings) _bindings->setAttribute(key, command); // Store new binding
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
@@ -202,16 +202,17 @@ std::string Bindings::idToString(int key) {
   return keymap[key];
 }
 
-std::string Bindings::getBinding(std::string key) {
+std::string Bindings::getBinding(const std::string &key) {
   // Check if bindings object has been created
   if (!_bindings) {
     Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
     return "";
   }
+  if (key.empty()) return "";
   // Retrive current binding
   std::string cmd = _bindings->getAttribute(key);
   if (cmd.empty()) { // Retrieved command should not be the empty string
-    _bindings->setAttribute(key, "{UNBOUND}");
+//    _bindings->setAttribute(key, "{UNBOUND}");
     return "";
   }
   return cmd; // Return retrieved binding

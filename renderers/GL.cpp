@@ -106,6 +106,7 @@ int nextColour(std::string id) {
   unsigned int ic;
   
   if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
+  else Log::writeLog("Out of colours, please increase number available", Log::ERROR);
   colour_mapped[ic] = id;
   
   GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);

@@ -54,7 +54,7 @@ public:
   /*
    * Returns the string bound to the given key id
    */ 
-  static std::string getBinding(std::string key_id);
+  static std::string getBinding(const std::string &key_id);
 
 protected:
   /*

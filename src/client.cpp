@@ -73,7 +73,7 @@ bool Client::init() {
   _connection->Timeout.connect(SigC::slot(this, &Client::Timeout));
   _connection->StatusChanged.connect(SigC::slot(this, &Client::StatusChanged));
 
-  Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
+  Eris::setLogLevel((Eris::LogLevel) 4);//ERIS_LOG_LEVEL);
   Eris::Logged.connect(SigC::slot(this, &Client::Log));
   return true;
   

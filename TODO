@@ -1,3 +1,4 @@
+ * More error information outputed to console
  * re-implement on screen speech
  * Add weather effects
  * Move render type def from Models to renderer

@@ -28,8 +28,11 @@ void Config::loadConfig(const std::string &file_name, bool prefix_cwd) {
   _last_file_name = file_name;
   while(!feof(configfile)) {
     str = (char*)malloc(MAX_SIZE);
+    memset(str, '\0', MAX_SIZE);
     fgets(str, MAX_SIZE, configfile);
     char key[MAX_SIZE], value[MAX_SIZE];
+    memset(key, '\0', MAX_SIZE);
+    memset(value, '\0', MAX_SIZE);
     sscanf(str, FORMAT,  &key[0], &value[0]);
     if (prefix_cwd) {
       char cwd[256];
@@ -57,8 +60,10 @@ void Config::saveConfig(const std::string &file_name) {
     return;
   }
   for (std::map<std::string, std::string>::const_iterator I = _attributes.begin(); I != _attributes.end(); I++) {
-    if (!(I->first).empty() && !(I->second).empty()) {
-      std::string str = (std::string)(I->first) + " = " + (std::string)(I->second) + "\n";
+    std::string key = I->first;
+    std::string value = I->second;
+    if (!key.empty() && !value.empty()) {
+      std::string str = key + " = " + value + "\n\0";
       fwrite(str.c_str(), str.size(), 1, configfile);
     }
   }
