@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.40 2004-06-21 10:18:34 simon Exp $
+// $Id: WorldEntity.cpp,v 1.41 2004-09-24 21:25:02 jmt Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -53,9 +53,8 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
    Eris::Entity(ge, world),
-   time(0),
+   m_lastMoveTime(0),
    abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
-   abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
    messages(std::list<message>())
 {
   Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
@@ -67,8 +66,11 @@ WorldEntity::~WorldEntity() {
   }
 }
 
-void WorldEntity::handleMove() {
-  SetVelocity();
+void WorldEntity::handleMove()
+{
+    // record the time this data was updated, so we can interpolate pos
+    m_lastMoveTime = System::instance()->getTime();
+    
   WorldEntity *we = (WorldEntity*)getContainer();
   if (we != NULL) {
     translateAbsPos(we->getAbsPos());
@@ -135,22 +137,8 @@ void WorldEntity::renderMessages() {
   }
 }
 
-void WorldEntity::SetVelocity() {
-  time = System::instance()->getTime();
-}
-
-WFMath::Point<3> WorldEntity::GetPos() {
-  unsigned int ui = System::instance()->getTime() - time;
-  float tme = (float)ui / 1000.0f; // Convert into seconds
-
-  float newx = (tme * _velocity.x()) + _position.x();
-  float newy = (tme * _velocity.y()) + _position.y();
-  float newz = (tme * _velocity.z()) + _position.z();
-  return WFMath::Point<3>(newx, newy, newz); 
-}
-
 void WorldEntity::translateAbsPos(const WFMath::Point<3> & p) {
-  abs_pos = p;
+
   WFMath::Point<3> pos = _position;
   WFMath::Point<3> child_pos = WFMath::Point<3>(p.x() + pos.x(), p.y() + pos.y(), p.z() + pos.z());
   for (unsigned int i = 0; i < getNumMembers(); ++i)
@@ -169,34 +157,35 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
   return new_orient;
 }
 
-const WFMath::Point<3> WorldEntity::getAbsPos() {
-  WFMath::Point<3> pos = GetPos();
-  WFMath::Point<3> new_pos = WFMath::Point<3>(abs_pos.x() + pos.x(), abs_pos.y() + pos.y(), abs_pos.z() + pos.z());
-
+const WFMath::Point<3> WorldEntity::getAbsPos()
+{
+    WorldEntity* loc = static_cast<WorldEntity*>(getContainer());
+    if (!loc) return getPosition(); // nothing below makes sense for the world.
+    
+    WFMath::Point<3> absPos = loc->getAbsPos() + 
+        getInterpolatedPos().rotate(loc->getAbsOrient());
+    
   // Set Z coord to terrain height if required
-  {
-    if (hasProperty(MODE)) {
-      std::string mode = getProperty(MODE).asString();
-      if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
-        new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
-        WorldEntity *loc = (WorldEntity*)getContainer(); // getLocation();
-        if (loc && loc->type() == "jetty") {
+
+  if (hasProperty(MODE)) {
+    std::string mode = getProperty(MODE).asString();
+    if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
+        absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+        
+        if (loc->type() == "jetty") {
           float jetty_z = loc->getAbsPos().z();
-          if (new_pos.z() < jetty_z) new_pos.z() = jetty_z;
+          if (absPos.z() < jetty_z) absPos.z() = jetty_z;
         }
       } else if (mode == "floating") {
         // Do nothing, use server Z
       } else if (mode == "swimming") {
         // Do nothing, use server Z
       }
-    } else {
-      Eris::Entity *loc = getContainer(); // getLocation();
-      if (loc && loc->hasProperty("terrain")) {  
-        new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
-      }
+    } else if (loc->hasProperty("terrain")) {  
+        absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
     }
-  }
-  return new_pos;
+
+  return absPos;
 }
 
 void WorldEntity::displayInfo() {
@@ -205,10 +194,11 @@ void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Entity Name: ") + getName(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Type: ") + type(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
-  WFMath::Point<3> pos = GetPos();
+  WFMath::Vector<3> pos = getInterpolatedPos();
   Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
-  pos = getAbsPos();
-  Log::writeLog(std::string("ABS - X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
+  
+  WFMath::Point<3> abspos = getAbsPos();
+  Log::writeLog(std::string("ABS - X: ") + string_fmt(abspos.x()) + std::string(" Y: ") + string_fmt(abspos.y()) + std::string(" Z: ") + string_fmt(abspos.z()), Log::LOG_DEFAULT);
   Eris::Entity *e = getContainer();
   Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::LOG_DEFAULT);
@@ -341,6 +331,12 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q) {
   for (int i = 0; i < LAST_POSITION; ++i) {
     m_orientBBox.points[i] = m_orientBBox.points[i].rotate(q);
   }
+}
+  
+WFMath::Vector<3> WorldEntity::getInterpolatedPos() const
+{
+    double dt = (System::instance()->getTime() - m_lastMoveTime) / 1000.0;
+    return (getPosition() + (getVelocity() * dt)) - WFMath::Point<3>(0,0,0);
 }
 
 } /* namespace Sear */
