@@ -56,9 +56,10 @@ float y_angle = 0.0f;
 
 Sear::ObjectProperties *op = NULL;
 
-float camera_x = 0.0f;
-float camera_y = 5.0f;
-float camera_z = 0.0f;
+float model_x = 0.0f;
+float model_y = 0.0f;
+float model_z = 0.0f;
+int move_dir = 0;
 
 void reshape(int width, int height) {
   //Check for divide by 0
@@ -78,20 +79,31 @@ void reshape(int width, int height) {
   glMatrixMode(GL_MODELVIEW);
 
 }
+void updateMove(float time) {
+  model_z += time * (float)move_dir;
+}
 
 void idle() {
   static unsigned int last_time = 0;
   float time = (((float)(sys->getTime() - last_time)) / 1000.0f);
   model->update(time);
   _camera->updateCameraPos(time);
+  updateMove(time);
   last_time = sys->getTime();
 }
+
+void move(int i) {
+  move_dir += i;
+}
+
 
 void handleEvents(const SDL_Event &event) {
   static bool mouse_down = false;
   switch (event.type) {
     case SDL_KEYDOWN: {
       if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) exit(0);
+      else if (event.key.keysym.sym == SDLK_EQUALS) move(1);
+      else if (event.key.keysym.sym == SDLK_MINUS) move(-1);
       else if (event.key.keysym.sym == SDLK_LEFT) _camera->rotate(-1);
       else if (event.key.keysym.sym == SDLK_RIGHT) _camera->rotate(1);
       else if (event.key.keysym.sym == SDLK_PAGEUP) _camera->elevate(1);
@@ -105,7 +117,9 @@ void handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_KEYUP: {
-      if (event.key.keysym.sym == SDLK_LEFT) _camera->rotate(1);
+      if (event.key.keysym.sym == SDLK_EQUALS) move(-1);
+      else if (event.key.keysym.sym == SDLK_MINUS) move(1);
+      else if (event.key.keysym.sym == SDLK_LEFT) _camera->rotate(1);
       else if (event.key.keysym.sym == SDLK_RIGHT) _camera->rotate(-1);
       else if (event.key.keysym.sym == SDLK_PAGEUP) _camera->elevate(-1);
       else if (event.key.keysym.sym == SDLK_PAGEDOWN) _camera->elevate(1);
@@ -163,6 +177,7 @@ void display() {
 //     float rotation_matrix[4][4];
 //     Sear::QuatToMatrix(q, rotation_matrix); //Get the rotation matrix for base rotation
 //     glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+  glTranslatef(model_x, model_y, model_z);
   glPushMatrix();
   
   if(op && op->scale) glScalef(op->scale, op->scale, op->scale); 

@@ -1,4 +1,7 @@
 19th August 2002, Simon Goodall
+ * Added +/- keys to allows vertical repositioning of model in model viewer
+
+19th August 2002, Simon Goodall
  * Improved camera control. Now same as in Sear
 
 19th August 2002, Simon Goodall
