@@ -24,28 +24,31 @@ written by Simon Goodall <sear@simongoodall.co.uk>
 
 %prep
 rm -rf ${RPM_BUILD_ROOT}
-
 %setup -q 
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix}  --localstatedir=%{_localstatedir}
+CXXFLAGS="$RPM_OPT_FLAGS" %configure
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install prefix=$RPM_BUILD_ROOT/%{prefix} localstatedir=$RPM_BUILD_ROOT/%{_localstatedir}
+%makeinstall
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{prefix}/%{datadir}/%{name}/*
-%{prefix}/%{bindir}/sear
-%{prefix}/%{bindir}/model_viewer
+%{_datadir}/%{name}/*
+%{_bindir}/sear
+%{_bindir}/runSear
+
 %doc README COPYING AUTHORS
 
 %ChangeLog
+* Tue Jul 13 2004 Simon Goodall <simon@simongoodall.co.uk>
+- Updates to work with Sear 0.5.0 release
+
 * Sun Jan 12 2003 Simon Goodall <simon@simongoodall.co.uk>
 - Added Dependancies
 - Changed group to Amusements/Games instead of just Games

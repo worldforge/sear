@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.14 2004-06-11 00:53:13 alriddoch Exp $
+// $Id: Utility.h,v 1.15 2004-07-14 10:10:30 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -77,16 +77,6 @@ template <> struct Sine<R, iMaxTerms > {
 
 */
 
-template<int N, int I>
-class Sine {
-public:
-    static inline float sin()
-    {
-        return (I*2*M_PI/N) * SineSeries<N,I,10,0>::accumulate();
-    }
-};
-
-
 // Compute J terms in the series expansion.  K is the loop variable.
 template<int N, int I, int J, int K>
 class SineSeries {
@@ -102,10 +92,20 @@ public:
 
 
 // Specialization to terminate loop
+template<>
 class SineSeries<0,0,0,0> {
 public:
     static inline float accumulate()
     { return 1; }
+};
+
+template<int N, int I>
+class Sine {
+public:
+    static inline float sin()
+    {
+        return (I*2*M_PI/N) * SineSeries<N,I,10,0>::accumulate();
+    }
 };
 
 #define SineT(n) Sine<n, 10>::sin()

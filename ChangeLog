@@ -1,3 +1,12 @@
+2004-07-14  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* sear-media.spec.in: Initial version of spec file to generate media rpm
+	  using WFUT.
+	* sear.spec.in: Updated for current sear state
+	* common/Utility.h: gcc 3.4 fixes
+	* renderers/TextureManager.cpp: Fix warning
+	* src/Graphics.cpp: Disable GUI rendering in prep for release
+
 2004-06-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp: Use old style Atlas Message typedefs to keep

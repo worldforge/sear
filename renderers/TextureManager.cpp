@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.30 2004-05-30 21:30:51 alriddoch Exp $
+// $Id: TextureManager.cpp,v 1.31 2004-07-14 10:10:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -370,6 +370,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
         case 8:     fmt = GL_ALPHA; break; // GL_LUMINANCE?
         default:
             std::cerr << "unsupported image depth" << std::endl;
+            fmt = GL_RGB5_A1; break; // Set default
         }
     }
   
