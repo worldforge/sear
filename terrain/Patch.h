@@ -82,7 +82,7 @@ public:
 
 //  static const int n = (const int)(log(25)/log(2));
 //  static const int rdepth = 2*n -1;
-  static const int array_size = 3 * 2 * SQR(((int)(200.0f / 8.0f)));
+  static const int array_size = 3 * 2 * (int)((200.0f / 8.0f) * (200.0f / 8.0f));
   int v_counter, n_counter, t_counter;
   float vertex_data[array_size][3];
   float normal_data[array_size][3];
