@@ -22,5 +22,6 @@ mkinstalldirs
 *.spec
 stamp-h
 stamp-h1
+stamp-h.in
 build
 .DS_Store

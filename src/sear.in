@@ -4,6 +4,9 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
+datadir=@datadir@
+homedata=$HOME/.sear
+
 WFUT_JAR=WFUT.jar
 
 # Determine if java executable exists in path
@@ -11,32 +14,32 @@ JAVA=`which java`
 if [ -x $JAVA ] ; then
 
   # See if Updater exists in home dir
-  if [ ! -e $HOME/.sear/$WFUT_JAR ] ; then
+  if [ ! -e $homedata/$WFUT_JAR ] ; then
     # Check to see if its in the install dir
-    if [ -e $prefix/share/sear/$WFUT_JAR ] ; then
+    if [ -e $datadir/sear/$WFUT_JAR ] ; then
       # Install into home dir 
       echo "Installing Updater"
 
       # Create dir if required 
-      if [ ! -d $HOME/.sear ] ; then
-        mkdir $HOME/.sear
+      if [ ! -d $homedata ] ; then
+        mkdir $homedata
       fi
 
       # Copy WFUT to home dir
-      cp $prefix/share/sear/$WFUT_JAR $HOME/.sear/
+      cp $datadir/sear/$WFUT_JAR $homedata
 
       # Create startup.script
-      echo "/setvar SEAR_MEDIA $HOME/.sear/sear-media/" > $HOME/.sear/startup.script
-      echo "/setvar SEAR_INSTALL $prefix/share/sear/" >> $HOME/.sear/startup.script
+      echo "/setvar SEAR_MEDIA $homedata/sear-media/" > $homedata/startup.script
+      echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
     fi
   fi
 
   # Run Updater if it exists
-  if [ -e $HOME/.sear/$WFUT_JAR ] ; then
+  if [ -e $homedata/$WFUT_JAR ] ; then
     # Store Current dir
     CUR_DIR=`pwd`
     # We need to change here so updater knows where to find / store data
-    cd $HOME/.sear/
+    cd $homedata
     # Update
     $JAVA -jar $WFUT_JAR update sear-media
     # Restore dir

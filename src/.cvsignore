@@ -5,3 +5,5 @@ Makefile
 Makefile.in
 .deps
 .libs
+sear
+sear-bin
