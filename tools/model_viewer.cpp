@@ -6,8 +6,6 @@
 /*
  * This is the model viewer for Sear
  *
- * TODO
- * - Improve the UI it is *VERY* bad.
  * - Currently the design of Sear means we need the entire program to make this work!!!
  */ 
 
@@ -50,6 +48,7 @@ Sear::Render *render = NULL;
 Sear::System *sys = NULL;
 Sear::Camera *_camera = NULL;
 
+bool show_axis = true;
 bool _system_running = true;
 float x_angle = 0.0f;
 float y_angle = 0.0f;
@@ -114,6 +113,7 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_2) model->action("run");
       else if (event.key.keysym.sym == SDLK_3) model->action("wave");
       else if (event.key.keysym.sym == SDLK_4) model->action("funky");
+      else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       break;
     }
     case SDL_KEYUP: {
@@ -154,17 +154,19 @@ void display() {
 //  glTranslatef(camera_x, camera_y, camera_z);
 
   render->stateChange("default");
-  glBegin(GL_LINES);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(-10.0f, 0.0f, 0.0f);
-    glVertex3f(10.0f, 0.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, -10.0f, 0.0f);
-    glVertex3f(0.0f, 10.0f, 0.0f);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3f(0.0f, 0.0f, -10.0f);
-    glVertex3f(0.0f, 0.0f, 10.0f);
-  glEnd();
+  if (show_axis) {
+    glBegin(GL_LINES);
+      glColor3f(1.0f, 0.0f, 0.0f);
+      glVertex3f(-10.0f, 0.0f, 0.0f);
+      glVertex3f(10.0f, 0.0f, 0.0f);
+      glColor3f(0.0f, 1.0f, 0.0f);
+      glVertex3f(0.0f, -10.0f, 0.0f);
+      glVertex3f(0.0f, 10.0f, 0.0f);
+      glColor3f(0.0f, 0.0f, 1.0f);
+      glVertex3f(0.0f, 0.0f, -10.0f);
+      glVertex3f(0.0f, 0.0f, 10.0f);
+    glEnd();
+  }
   
   render->stateChange(op->state);
   // Don't want any fog or lighitng effects

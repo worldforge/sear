@@ -1,4 +1,7 @@
 23rd August 2002, Simon Goodall
+ * Added additional command to modelviewer. pressing "g" willnow toggle the visibility of the axis
+
+23rd August 2002, Simon Goodall
  * Billboards, Impostors and NPlanes now "clamp" textures to avoid visual defects
 
 23rd August 2002, Simon Goodall
