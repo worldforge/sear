@@ -1,5 +1,10 @@
 2004-05-30  James Turner  <james@worldforge.org>
 
+	* Change an assert() on texture load errors to something less
+	  violent, just print an error and stop generating mip-maps.
+
+2004-05-30  James Turner  <james@worldforge.org>
+
 	* Refactor texture ID generation, to avoid manual resizing of the
 	  STL containers (they behave smartly anyway). As a result, got
 	  rid of m_texture_counter completely (use m_names.size() instead)
