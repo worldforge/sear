@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.21 2002-11-12 23:59:22 simon Exp $
+// $Id: GL.h,v 1.22 2002-12-19 23:11:30 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -189,15 +189,19 @@ protected:
 
   std::map<std::string, GLuint> _state_map;
 
-  std::set<int> colourSet;
-  std::set<int>::const_iterator colourSetIterator;
+  static const unsigned int NUM_COLOURS = 500;
+//  int colourArray[NUM_COLOURS];
+//  WorldEntity *entityArray[NUM_COLOURS];
+  unsigned int colour_index;
+//  std::set<int> colourSet;
+//  std::set<int>::const_iterator colourSetIterator;
   std::map<unsigned int, std::string> colour_mapped;
   
   GLint redBits, greenBits, blueBits;
   GLuint redMask, greenMask, blueMask;
   int redShift, greenShift, blueShift;
   
-  inline static  GLuint makeMask(GLint bits);
+  inline static  GLuint makeMask(GLuint bits);
   inline void resetColours();
   inline std::string getSelectedID(unsigned int i);
   void nextColour(const std::string &id);

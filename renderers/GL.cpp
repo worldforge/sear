@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.47 2002-12-10 19:45:59 simon Exp $
+// $Id: GL.cpp,v 1.48 2002-12-19 23:11:30 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -80,37 +80,46 @@ static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
 static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
-inline GLuint GL::makeMask(GLint bits) {
+inline GLuint GL::makeMask(GLuint bits) {
   return (0xFF >> (8 - bits));
+//  return ((GLuint)1 << bits);
 }
 
 inline std::string GL::getSelectedID(unsigned int i) {
+  std::cout << "Colour: " << i << std::endl;
   return colour_mapped[i];
 }
 
 void GL::nextColour(const std::string &id) {
   unsigned int ic;
+  ic = colour_index++;
   
-  if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
-  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
+//  if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
+//  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
 
   colour_mapped[ic] = id;
+  
   
   GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
   GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
   GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
+  std::cout << "Select Colour: " << ic << " - " << (int)red << "," << (int)green << "," << (int)blue << std::endl;
+//  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
+//  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
+//  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
   
   glColor3ub(red, green, blue);
 }
 
 inline void GL::resetColours(){
   colour_mapped = std::map<unsigned int, std::string>();
-  colourSetIterator = colourSet.begin();
-  *colourSetIterator++;
+  colour_index = 1;
+//  colourSetIterator = colourSet.begin();
+//  *colourSetIterator++;
 }
 
 void GL::buildColourSet() {
-  unsigned int numPrims = 500;
+//  unsigned int numPrims = 500;
   glGetIntegerv (GL_RED_BITS, &redBits);
   glGetIntegerv (GL_GREEN_BITS, &greenBits);
   glGetIntegerv (GL_BLUE_BITS, &blueBits);
@@ -120,18 +129,19 @@ void GL::buildColourSet() {
   blueMask = makeMask(blueBits);
   redShift =   greenBits + blueBits;
   greenShift =  blueBits;
-  blueShift =  0;
-  unsigned long indx;
-  colourSet = std::set<int>();
+  blueShift = 0;
+//  unsigned long indx;
+//  colourSet = std::set<int>();
   
-  for (indx = 0; indx < numPrims; ++indx) {
-    int ic = 0;
-    ic += indx & (redMask << redShift);
-    ic += indx & (greenMask << greenShift);
-    ic += indx & (blueMask << blueShift);
-    colourSet.insert(ic);
-  }
-  if (debug) Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_INFO);
+//  for (indx = 0; indx < numPrims; ++indx) {
+//    int ic = 0;
+//    ic += indx & (redMask << redShift);
+//    ic += indx & (greenMask << greenShift);
+//    ic += indx & (blueMask << blueShift);
+//    colourSet.insert(ic);
+//    colourSet.insert(indx);
+//  }
+//  if (debug) Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_INFO);
 }
 
 
