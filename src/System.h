@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.25 2002-12-24 14:56:25 simon Exp $
+// $Id: System.h,v 1.26 2002-12-24 18:08:17 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -24,7 +24,7 @@
 namespace Sear {
 class ActionHandler;
 class Render;
-class Calender;
+class Calendar;
 class Client;
 class EventHandler;
 class FileHandler;
@@ -102,6 +102,7 @@ public:
   ActionHandler *getActionHandler() const { return _action_handler; }
   FileHandler *getFileHandler() const { return _file_handler; }
   ObjectHandler *getObjectHandler() const { return _object_handler; }
+  Calendar *getCalendar() const { return _calendar; }
   
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
@@ -114,22 +115,9 @@ public:
   void switchCursor(int);
   void setAction(int);
  
-  typedef enum {
-    DAWN = 0,
-    DAY,
-    DUSK,
-    NIGHT
-  } TimeArea;
-  
  void setTimeOfDay(float time) { _current_time = time; }
  float getTimeOfDay() { return _current_time; }
- TimeArea getTimeArea() { return _time_area; }
 
- float getDawnTime() { return _dawn_time; }
- float getDayTime() { return _day_time; }
- float getDuskTime() { return _dusk_time; }
- float getNightTime() { return _night_time; }
- 
   static const int MESSAGE_LIFE = 5000;
 
   void registerCommands(Console *);
@@ -142,8 +130,6 @@ protected:
   
   void handleEvents(const SDL_Event &);
 
-  int window_width;
-  int window_height;
   bool fullscreen;
   SDL_Surface *screen;
   Graphics *_graphics;
@@ -154,10 +140,8 @@ protected:
   std::string _icon_file;
   SDL_Surface *_icon;
   
-  bool button_down;
   int _width;
   int _height;
-  int area;
 
   ScriptEngine *_script_engine;
   EventHandler *_event_handler;
@@ -166,7 +150,7 @@ protected:
   StateLoader *_state_loader;
   ActionHandler *_action_handler;
   ObjectHandler *_object_handler;
-  Calender *_calender;
+  Calendar *_calendar;
 
   std::list<std::string> additional_paths;
   
@@ -199,11 +183,6 @@ protected:
   static const char * const KEY_icon_file = "iconfile";
   static const char * const KEY_mouse_move_select = "mouse_move_select";
   
-  static const char * const KEY_dawn_time = "dawn_time";
-  static const char * const KEY_day_time = "day_time";
-  static const char * const KEY_dusk_time = "dusk_time";
-  static const char * const KEY_night_time = "night_time";
-
   static const char * const KEY_render_use_stencil = "render_use_stencil";
 
   static const char * const KEY_window_width = "width";
@@ -214,11 +193,6 @@ protected:
   
   static const bool DEFAULT_mouse_move_select = true;
 
-  static const float DEFAULT_dawn_time = 6.0f;
-  static const float DEFAULT_day_time = 9.0f;
-  static const float DEFAULT_dusk_time = 18.0f;
-  static const float DEFAULT_night_time = 21.0f;
-  
   float _seconds_per_day;
   float _seconds_per_minute;
   float _minutes_per_hour;
@@ -237,12 +211,6 @@ protected:
 
   float _current_time;
   float _seconds;
-
-  float _dawn_time;
-  float _day_time;
-  float _dusk_time;
-  float _night_time;
-  TimeArea _time_area;
 
   typedef struct {
     std::string section;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.51 2002-12-22 14:19:12 simon Exp $
+// $Id: GL.cpp,v 1.52 2002-12-24 18:08:17 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -24,6 +24,7 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "src/Calendar.h"
 #include "src/Camera.h"
 #include "src/Console.h"
 #include "src/Exception.h"
@@ -238,18 +239,18 @@ void GL::initLighting() {
   glLightfv(GL_LIGHT0, GL_AMBIENT, lights[LIGHT_CHARACTER].ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, lights[LIGHT_CHARACTER].diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
-  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lights[LIGHT_CHARACTER].kc);
-  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, lights[LIGHT_CHARACTER].kl);
-  glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lights[LIGHT_CHARACTER].kq);
+  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_constant);
+  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_linear);
+  glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_quadratic);
 //  glEnable(GL_LIGHT0);
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, blackLight);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, blackLight);
   glLightfv(GL_LIGHT1, GL_SPECULAR, blackLight);
   
-  glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].kc);
-  glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].kl);
-  glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, lights[LIGHT_SUN].kq);
+  glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].attenuation_constant);
+  glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].attenuation_linear);
+  glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, lights[LIGHT_SUN].attenuation_quadratic);
   glEnable(GL_LIGHT1);
 }
 
@@ -678,11 +679,11 @@ void GL::readConfig() {
 
   // Setup character light source
   temp = general.getItem(RENDER, KEY_character_light_kc);
-  lights[LIGHT_CHARACTER].kc = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+  lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
   temp = general.getItem(RENDER, KEY_character_light_kl);
-  lights[LIGHT_CHARACTER].kl = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+  lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
   temp = general.getItem(RENDER, KEY_character_light_kq);
-  lights[LIGHT_CHARACTER].kq = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+  lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
   
   temp = general.getItem(RENDER, KEY_character_light_ambient_red);
   lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
@@ -712,11 +713,11 @@ void GL::readConfig() {
   lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
   //Setup Sun light source
   temp = general.getItem(RENDER, KEY_sun_light_kc);
-  lights[LIGHT_SUN].kc = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+  lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
   temp = general.getItem(RENDER, KEY_sun_light_kl);
-  lights[LIGHT_SUN].kl = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+  lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
   temp = general.getItem(RENDER, KEY_sun_light_kq);
-  lights[LIGHT_SUN].kq = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+  lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
 
   // Setup render states
   temp = general.getItem(RENDER, KEY_use_textures);
@@ -753,9 +754,9 @@ void GL::writeConfig() {
 //  }
   
   // Save character light source
-  general.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].kc);
-  general.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].kl);
-  general.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].kq);
+  general.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].attenuation_constant);
+  general.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].attenuation_linear);
+  general.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].attenuation_quadratic);
 
   general.setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
   general.setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
@@ -773,9 +774,9 @@ void GL::writeConfig() {
   general.setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
   
   // Save Sun light source
-  general.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].kc);
-  general.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].kl);
-  general.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].kq);
+  general.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].attenuation_constant);
+  general.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].attenuation_linear);
+  general.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].attenuation_quadratic);
 
   // Save render states
   general.setItem(RENDER, KEY_use_textures, checkState(RENDER_TEXTURES));
@@ -1296,33 +1297,37 @@ void GL::applyCharacterLighting(float x, float y, float z) {
 
 
 void GL::applyLighting() {
-  float tim = _system->getTimeOfDay();
-  float dawn_time = _system->getDawnTime();
-  float day_time = _system->getDayTime();
-  float dusk_time = _system->getDuskTime();
-  float night_time = _system->getNightTime();
-     
+  Calendar *calendar = System::instance()->getCalendar();
+  float tim = calendar->getTimeInArea();
+  float dawn_time = calendar->getDawnStart();
+  float day_time = calendar->getDayStart();
+  float dusk_time = calendar->getDuskStart();
+  float night_time = calendar->getNightStart();
+  
+  float modifier = calendar->getSecondsPerMinute() * calendar->getMinutesPerHour();
+  
   static GLfloat fog_colour[4];// = {0.50f, 0.50f, 0.50f, 0.50f};
-  switch (_system->getTimeArea()) {
-    case System::DAWN: {
-      _light_level = (tim - dawn_time) / (day_time - dawn_time);
-      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+  switch (calendar->getTimeArea()) {
+    case Calendar::INVALID: break;
+    case Calendar::DAWN: {
+      _light_level = tim / ((day_time - dawn_time) * modifier);
+      float pos_mod = tim / ((night_time - dawn_time) * modifier);
+      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
-    case System::DAY: {
+    case Calendar::DAY: {
       _light_level = 1.0f;
-      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+      float pos_mod = tim / ((night_time - dawn_time) * modifier);
+      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
-    case System::DUSK: {
-      _light_level = 1.0f - ((tim - dusk_time) / (night_time - dusk_time));
-      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+    case Calendar::DUSK: {
+      _light_level = 1.0f - (tim / ((night_time - dusk_time) * modifier));
+      float pos_mod = tim / ((night_time - dawn_time) * modifier);
+      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
-    case System::NIGHT: {
+    case Calendar::NIGHT: {
       _light_level = 0.0f;
       break;
     }
@@ -1330,7 +1335,7 @@ void GL::applyLighting() {
    
   fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
   glFogfv(GL_FOG_COLOR, fog_colour);
-  float sun_pos[] = {lights[LIGHT_SUN].x_pos, 0.0f, 100.0f, 1.0f};
+  float sun_pos[] = {lights[LIGHT_SUN].position[0], 0.0f, 100.0f, 1.0f};
   lights[LIGHT_SUN].ambient[0] = lights[LIGHT_SUN].ambient[1] = lights[LIGHT_SUN].ambient[2] = _light_level * 0.5f;
   lights[LIGHT_SUN].diffuse[0] = lights[LIGHT_SUN].diffuse[1] = lights[LIGHT_SUN].diffuse[2] = _light_level;
   glLightfv(GL_LIGHT1,GL_POSITION,sun_pos);
@@ -1397,15 +1402,15 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
   if (section == RENDER) {
     if (key == KEY_character_light_kc) {
       temp = config.getItem(RENDER, KEY_character_light_kc);
-      lights[LIGHT_CHARACTER].kc = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+      lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
     }
     else if (key ==  KEY_character_light_kl) {
       temp = config.getItem(RENDER, KEY_character_light_kl);
-      lights[LIGHT_CHARACTER].kl = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+      lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
     }
     else if (key == KEY_character_light_kq) {
       temp = config.getItem(RENDER, KEY_character_light_kq);
-      lights[LIGHT_CHARACTER].kq = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+      lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
     }
     else if (key == KEY_character_light_ambient_red) {
       temp = config.getItem(RENDER, KEY_character_light_ambient_red);
@@ -1458,15 +1463,15 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
     //Setup Sun light source
     else if (key == KEY_sun_light_kc) {
       temp = config.getItem(RENDER, KEY_sun_light_kc);
-      lights[LIGHT_SUN].kc = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+      lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
     }
     else if (key == KEY_sun_light_kl) {
       temp = config.getItem(RENDER, KEY_sun_light_kl);
-      lights[LIGHT_SUN].kl = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+      lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
     }
     else if (key == KEY_sun_light_kq) {
       temp = config.getItem(RENDER, KEY_sun_light_kq);
-      lights[LIGHT_SUN].kq = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+      lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
     }
     // Setup render states
     else if (key == KEY_use_textures) {

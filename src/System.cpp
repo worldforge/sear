@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.51 2002-12-24 14:56:25 simon Exp $
+// $Id: System.cpp,v 1.52 2002-12-24 18:08:17 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,7 +25,7 @@
 
 #include "ActionHandler.h"
 #include "Bindings.h"
-#include "Calender.h"
+#include "Calendar.h"
 #include "Camera.h"
 #include "Character.h"
 #include "client.h"
@@ -61,31 +61,22 @@ static const std::string SYSTEM = "system";
 namespace Sear {
 
 System *System::_instance = NULL;
-const std::string System::SCRIPTS_DIR = "scripts";
-const std::string System::STARTUP_SCRIPT = "startup.script";
-const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
 
-static std::string DAWN_STR  = "dawn";
-static std::string DAY_STR   = "day";
-static std::string DUSK_STR  = "dusk";
-static std::string NIGHT_STR = "night";
-
+ const std::string System::SCRIPTS_DIR = "scripts";
+ const std::string System::STARTUP_SCRIPT = "startup.script";
+ const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
 
 System::System() :
   repeat(false),
   action(ACTION_DEFAULT),
-  window_width(0),
-  window_height(0),
   fullscreen(0),
   screen(NULL),
   _graphics(NULL),
   renderer(NULL),
   _client(NULL),
   _icon(NULL),
-  button_down(false),
   _width(0),
   _height(0),
-  area(0),
   _script_engine(NULL),
   _event_handler(NULL),
   _file_handler(NULL),
@@ -93,7 +84,7 @@ System::System() :
   _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
-  _calender(NULL),
+  _calendar(NULL),
   _console(NULL),
   _character(NULL),
   _seconds_per_day(60.0f * 60.0f * 24.0f),
@@ -106,11 +97,6 @@ System::System() :
   _mouse_move_select(false),
   _current_time(0.0f),
   _seconds(0.0f),
-  _dawn_time(6.0f),
-  _day_time(9.0f),
-  _dusk_time(18.0f),
-  _night_time(21.0f),
-  _time_area(NIGHT),
   _process_records(false),
   sound(NULL),
   _system_running(false),
@@ -184,8 +170,8 @@ bool System::init() {
   _object_handler = new ObjectHandler();
   _object_handler->init();
  
-  _calender = new Calender();
-  _calender->init();
+  _calendar = new Calendar();
+  _calendar->init();
   
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _textures.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
@@ -209,7 +195,7 @@ bool System::init() {
   _action_handler->registerCommands(_console);
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
-  _calender->registerCommands(_console);
+  _calendar->registerCommands(_console);
 
   try { 
     sound = new Sound();
@@ -267,10 +253,10 @@ void System::shutdown() {
     _graphics = NULL;
   }
 
-  if (_calender) {
-    _calender->shutdown();
-    delete _calender;
-    _calender = NULL;
+  if (_calendar) {
+    _calendar->shutdown();
+    delete _calendar;
+    _calendar = NULL;
   }
   writeConfig();
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
@@ -417,7 +403,8 @@ void System::createWindow(bool fullscreen) {
   renderer = _graphics->getRender();
   pushMessage("Loading, Please wait...", 2, 100);
 
-  _graphics->drawScene("", false, 0); // Render scene one before producing colour set
+  // Don't think we need this anymore
+//  _graphics->drawScene("", false, 0); // Render scene one before producing colour set
   renderer->buildColourSet();
 }
 
@@ -436,29 +423,12 @@ void System::mainLoop() {
       last_time = _seconds;
       while (_current_time > _hours_per_day) _current_time -= _hours_per_day;
       //_current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
-      if (checkState(SYS_IN_WORLD)) {
-        TimeArea ta = _time_area;
-        if (_current_time < _dawn_time) _time_area = NIGHT;
-        else if (_current_time < _day_time) _time_area = DAWN;
-        else if (_current_time < _dusk_time) _time_area = DAY;
-        else if (_current_time < _night_time) _time_area = DUSK;
-        else if (_current_time < _hours_per_day) _time_area = NIGHT;
-      
-        if (ta != _time_area) {
-          switch(_time_area) {
-            case NIGHT: _action_handler->handleAction(NIGHT_STR, NULL); break;
-            case DAWN: _action_handler->handleAction(DAWN_STR, NULL); break;
-            case DAY: _action_handler->handleAction(DAY_STR, NULL); break;
-            case DUSK: _action_handler->handleAction(DUSK_STR, NULL); break;
-          }
-        }
-      }
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
-      _calender->update(time_elapsed);
+      _calendar->update(time_elapsed);
       _event_handler->poll();
       _client->poll();
       _graphics->drawScene(command, false, time_elapsed);
@@ -712,14 +682,6 @@ void System::setCharacter(Character *character) {
 
 void System::readConfig() {
   varconf::Variable temp;
-  temp = _general.getItem(SYSTEM, KEY_dawn_time);
-  _dawn_time = (!temp.is_double()) ? (DEFAULT_dawn_time) : ((double)temp);
-  temp = _general.getItem(SYSTEM, KEY_day_time);
-  _day_time = (!temp.is_double()) ? (DEFAULT_day_time) : ((double)temp);
-  temp = _general.getItem(SYSTEM, KEY_dusk_time);
-  _dusk_time = (!temp.is_double()) ? (DEFAULT_dusk_time) : ((double)temp);
-  temp = _general.getItem(SYSTEM, KEY_night_time);
-  _night_time = (!temp.is_double()) ? (DEFAULT_night_time) : ((double)temp);
 
   temp = _general.getItem(SYSTEM, KEY_seconds_per_minute);
   _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
@@ -742,11 +704,6 @@ void System::readConfig() {
 }
 
 void System::writeConfig() {
-  _general.setItem(SYSTEM, KEY_dawn_time, _dawn_time);
-  _general.setItem(SYSTEM, KEY_day_time, _day_time);
-  _general.setItem(SYSTEM, KEY_dusk_time, _dusk_time);
-  _general.setItem(SYSTEM, KEY_night_time, _night_time);
-  
   _general.setItem(SYSTEM, KEY_seconds_per_minute, _seconds_per_minute);
   _general.setItem(SYSTEM, KEY_minutes_per_hour, _minutes_per_hour);
   _general.setItem(SYSTEM, KEY_hours_per_day, _hours_per_day);
@@ -827,8 +784,6 @@ void System::registerCommands(Console *console) {
   console->registerCommand(TOGGLE_FULLSCREEN, this);
   console->registerCommand(ADD_EVENT, this);
   console->registerCommand(IDENTIFY_ENTITY, this);
-  console->registerCommand(SET_TIME, this);
-  console->registerCommand(GET_TIME, this);
   console->registerCommand("normalise_on", this);
   console->registerCommand("normalise_off", this);
 }
@@ -936,16 +891,6 @@ void System::runCommand(const std::string &command, const std::string &args) {
     WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
     if (we) we->displayInfo();  
   }
-  else if (command == SET_TIME) {
-    float new_time;
-    std::string nt = tokeniser.nextToken();
-    cast_stream(nt, new_time);
-    _current_time = new_time;
-  }
-  else if (command == GET_TIME) {
-    std::string time = string_fmt(_current_time);
-    pushMessage(std::string("Time: ") + time, CONSOLE_MESSAGE);
-  }
 
   else if (command == "normalise_on") glEnable(GL_NORMALIZE);
   else if (command == "normalise_off") glDisable(GL_NORMALIZE);
@@ -994,23 +939,7 @@ void System::addSearchPaths(std::list<std::string> l) {
 void System::varconf_general_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   varconf::Variable temp;
   if (section == SYSTEM) {
-    if (key == KEY_dawn_time) {
-      temp = config.getItem(SYSTEM, KEY_dawn_time);
-      _dawn_time = (!temp.is_double()) ? (DEFAULT_dawn_time) : ((double)temp);
-    }
-    else if (key == KEY_day_time) {
-      temp = config.getItem(SYSTEM, KEY_day_time);
-      _day_time = (!temp.is_double()) ? (DEFAULT_day_time) : ((double)temp);
-    }
-    else if (key == KEY_dusk_time) {
-      temp = config.getItem(SYSTEM, KEY_dusk_time);
-      _dusk_time = (!temp.is_double()) ? (DEFAULT_dusk_time) : ((double)temp);
-    }
-    else if (key == KEY_night_time) {
-      temp = config.getItem(SYSTEM, KEY_night_time);
-      _night_time = (!temp.is_double()) ? (DEFAULT_night_time) : ((double)temp);
-    }
-    else if (key == KEY_seconds_per_minute) {
+    if (key == KEY_seconds_per_minute) {
       temp = config.getItem(SYSTEM, KEY_seconds_per_minute);
       _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
       _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;

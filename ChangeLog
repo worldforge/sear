@@ -1,4 +1,8 @@
 24th December 2002, Simon Goodall
+ * Converted render to use new light object
+ * Moved time area functionality to Calendar
+
+24th December 2002, Simon Goodall
  * Intoduction of a light management class
 
 24th December 2002, Simon Goodall

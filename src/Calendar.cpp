@@ -2,14 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Calender.cpp,v 1.2 2002-12-24 16:15:34 simon Exp $
+// $Id: Calendar.cpp,v 1.1 2002-12-24 18:08:17 simon Exp $
 
-#include "Calender.h"
+// TODO
+// * Check all values are correctly updated on SET_ commands
+
+#include "Calendar.h"
 #include "common/Utility.h"
 
+#include "src/ActionHandler.h"
 #include "src/Console.h"
 #include "src/System.h"
-
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -19,7 +22,7 @@
 #endif
 
 // Config section name
-static const std::string CALENDER = "calender";
+static const std::string CALENDER = "calendar";
 
 // Config Key names
 static const std::string KEY_SECONDS_PER_MINUTE = "seconds_per_minute";
@@ -28,6 +31,11 @@ static const std::string KEY_HOURS_PER_DAY = "hours_per_day";
 static const std::string KEY_DAYS_PER_WEEK = "days_per_week";
 static const std::string KEY_WEEKS_PER_MONTH = "weeks_per_month";
 static const std::string KEY_MONTHS_PER_YEAR = "months_per_year";
+
+static const std::string KEY_DAWN_START = "dawn_starts";
+static const std::string KEY_DAY_START = "day_starts";
+static const std::string KEY_DUSK_START = "dusk_starts";
+static const std::string KEY_NIGHT_START = "night_starts";
 
 // Config Key prefix's for day and month names
 static const std::string KEY_DAY_NAME = "day_name_";
@@ -41,6 +49,11 @@ static const unsigned int DEFAULT_DAYS_PER_WEEK = 7;
 static const unsigned int DEFAULT_WEEKS_PER_MONTH = 4;
 static const unsigned int DEFAULT_MONTHS_PER_YEAR = 12;
 
+static const unsigned int DEFAULT_DAWN_START = 6;
+static const unsigned int DEFAULT_DAY_START = 9;
+static const unsigned int DEFAULT_DUSK_START = 18;
+static const unsigned int DEFAULT_NIGHT_START = 21;
+
 // Console Commands
 static const std::string GET_TIME = "get_time";
 static const std::string SET_SECONDS = "set_seconds";
@@ -51,9 +64,15 @@ static const std::string SET_WEEKS = "set_weeks";
 static const std::string SET_MONTHS = "set_months";
 static const std::string SET_YEARS =  "set_years";
 
+// Action handler strings
+static const std::string ACTION_DAWN  = "dawn";
+static const std::string ACTION_DAY   = "day";
+static const std::string ACTION_DUSK  = "dusk";
+static const std::string ACTION_NIGHT = "night";
+
 namespace Sear {
 
-Calender::Calender() :
+Calendar::Calendar() :
   _initialised(false),
   _seconds_per_minute(DEFAULT_SECONDS_PER_MINUTE),
   _minutes_per_hour(DEFAULT_MINUTES_PER_HOUR),
@@ -66,24 +85,30 @@ Calender::Calender() :
   _hours(12), // Default start time is noon
   _days(0),
   _months(0),
-  _years(0)
+  _years(0),
+  _time_area(DAY),
+  _dawn_start(DEFAULT_DAWN_START),
+  _day_start(DEFAULT_DAY_START),
+  _dusk_start(DEFAULT_DUSK_START),
+  _night_start(DEFAULT_NIGHT_START),
+  _time_in_area(0.0f)
 {}
 	
-Calender::~Calender() {
+Calendar::~Calendar() {
   if (_initialised) shutdown();
 }
 
-void Calender::init() {
+void Calendar::init() {
   if (_initialised) shutdown(); // shutdown first if we are already initialised
   // Read in initial config
   readConfig();
   // Bind signal to config for further updates
-  _config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calender::config_update));
+  _config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
   
   _initialised = true;
 }
 
-void Calender::shutdown() {
+void Calendar::shutdown() {
   // Save config
   writeConfig();
   // Remove update signal
@@ -91,8 +116,9 @@ void Calender::shutdown() {
   _initialised = false;
 }
 
-void Calender::update(float time_elapsed) {
+void Calendar::update(float time_elapsed) {
   _seconds += time_elapsed;
+  _seconds_counter += time_elapsed;
   // Check for seconds overflow  
   if (_seconds >= _seconds_per_minute) {
     ++_minutes;
@@ -103,6 +129,39 @@ void Calender::update(float time_elapsed) {
     ++_hours;
     _minutes -= _minutes_per_hour;
   }
+  // Update Time Area
+  TimeArea ta = _time_area; // Store current time area
+  // Set new time area
+  if (_hours < _dawn_start) _time_area = NIGHT;
+  else if (_hours < _day_start) _time_area = DAWN;
+  else if (_hours < _dusk_start) _time_area = DAY;
+  else if (_hours < _night_start) _time_area = DUSK;
+  else if (_hours < _hours_per_day) _time_area = NIGHT;
+
+  if (ta != _time_area) {
+    unsigned int time_1 = 0;
+    switch(_time_area) {
+      case INVALID:
+      case NIGHT: break;
+      case DAWN: time_1 = _dawn_start; break;
+      case DAY: time_1 = _day_start; break;
+      case DUSK: time_1 = _dusk_start; break;
+    }
+    _time_in_area = _seconds_counter - (time_1 * _seconds_per_minute * _minutes_per_hour);
+    // Emit an action event
+    ActionHandler *action_handler = System::instance()->getActionHandler();
+    switch(_time_area) {
+      case INVALID: break;
+      case NIGHT: action_handler->handleAction(ACTION_NIGHT, NULL); break;
+      case DAWN:  action_handler->handleAction(ACTION_DAWN,  NULL); break;
+      case DAY:   action_handler->handleAction(ACTION_DAY,   NULL); break;
+      case DUSK:  action_handler->handleAction(ACTION_DUSK,  NULL); break;
+    }
+  } else {
+    // Update _time_in_area
+    _time_in_area += time_elapsed;
+  }
+  
   // Check for hours overflow
   if (_hours >= _hours_per_day) {
     ++_days;
@@ -114,6 +173,7 @@ void Calender::update(float time_elapsed) {
   if (_days >= _days_per_week) {
     ++_weeks;
     _days -= _days_per_week;
+    _seconds_counter -= _seconds_per_minute * _minutes_per_hour * _hours_per_day;
     // Update day name
     _current_day_name = _day_names[_days];
   }
@@ -133,7 +193,7 @@ void Calender::update(float time_elapsed) {
   }
 }
 
-void Calender::readConfig() {
+void Calendar::readConfig() {
   varconf::Config &config = System::instance()->getGeneral();
   varconf::Variable temp;
 
@@ -150,6 +210,15 @@ void Calender::readConfig() {
   temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
   _months_per_year = (!temp.is_int()) ? (DEFAULT_MONTHS_PER_YEAR) : ((int)temp);
 
+  temp = config.getItem(CALENDER, KEY_DAWN_START);
+  _dawn_start = (!temp.is_int()) ? (DEFAULT_DAWN_START) : ((int)temp);
+  temp = config.getItem(CALENDER, KEY_DAY_START);
+  _day_start = (!temp.is_int()) ? (DEFAULT_DAY_START) : ((int)temp);
+  temp = config.getItem(CALENDER, KEY_DUSK_START);
+  _dusk_start = (!temp.is_int()) ? (DEFAULT_DUSK_START) : ((int)temp);
+  temp = config.getItem(CALENDER, KEY_NIGHT_START);
+  _night_start = (!temp.is_int()) ? (DEFAULT_NIGHT_START) : ((int)temp);
+  
   for (unsigned int i = 0; i < _days_per_week; ++i) {
     std::string key = KEY_DAY_NAME + string_fmt(i);
     temp = config.getItem(CALENDER, key);
@@ -165,7 +234,7 @@ void Calender::readConfig() {
   _current_month_name = _month_names[_months];
 }
 
-void Calender::writeConfig() {
+void Calendar::writeConfig() {
   varconf::Config &config = System::instance()->getGeneral();
   config.setItem(CALENDER, KEY_SECONDS_PER_MINUTE, (int)_seconds_per_minute);
   config.setItem(CALENDER, KEY_MINUTES_PER_HOUR, (int)_minutes_per_hour);
@@ -174,6 +243,11 @@ void Calender::writeConfig() {
   config.setItem(CALENDER, KEY_WEEKS_PER_MONTH, (int)_weeks_per_month);
   config.setItem(CALENDER, KEY_MONTHS_PER_YEAR, (int)_months_per_year);
 
+  config.setItem(CALENDER, KEY_DAWN_START, (int)_dawn_start);
+  config.setItem(CALENDER, KEY_DAY_START, (int)_day_start);
+  config.setItem(CALENDER, KEY_DUSK_START, (int)_dusk_start);
+  config.setItem(CALENDER, KEY_NIGHT_START, (int)_night_start);
+  
   for (unsigned int i = 0; i < _days_per_week; ++i) {
     std::string key = KEY_DAY_NAME + string_fmt(i);
     config.setItem(CALENDER, key, _day_names[i]);
@@ -186,7 +260,7 @@ void Calender::writeConfig() {
 
 }
 
-void Calender::config_update(const std::string &section, const std::string &key, varconf::Config &config) {
+void Calendar::config_update(const std::string &section, const std::string &key, varconf::Config &config) {
   if (section == CALENDER) {
     varconf::Variable temp;
     if (key == KEY_SECONDS_PER_MINUTE) {
@@ -213,6 +287,23 @@ void Calender::config_update(const std::string &section, const std::string &key,
       temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
       if (temp.is_int()) _months_per_year = ((int)temp);
     }
+    else if (key == KEY_DAWN_START) {
+      temp = config.getItem(CALENDER, KEY_DAWN_START);
+      if (temp.is_int()) _dawn_start = ((int)temp);
+    }
+    else if (key == KEY_DAY_START) {
+      temp = config.getItem(CALENDER, KEY_DAY_START);
+      if (temp.is_int()) _day_start = ((int)temp);
+    }
+    else if (key == KEY_DUSK_START) {
+      temp = config.getItem(CALENDER, KEY_DUSK_START);
+      if (temp.is_int()) _dusk_start = ((int)temp);
+    }
+    else if (key == KEY_NIGHT_START) {
+      temp = config.getItem(CALENDER, KEY_NIGHT_START);
+      if (temp.is_int()) _night_start = ((int)temp);
+    }
+
     else if (key.substr(0, KEY_DAY_NAME.length()) == KEY_DAY_NAME) {
       temp = config.getItem(CALENDER, key);
       unsigned int index;
@@ -230,7 +321,7 @@ void Calender::config_update(const std::string &section, const std::string &key,
   _current_month_name = _month_names[_months];
 }
  
-void Calender::registerCommands(Console *console) {
+void Calendar::registerCommands(Console *console) {
   console->registerCommand(GET_TIME, this);
   console->registerCommand(SET_SECONDS, this);
   console->registerCommand(SET_MINUTES, this);
@@ -241,19 +332,32 @@ void Calender::registerCommands(Console *console) {
   console->registerCommand(SET_YEARS, this);
 }
 
-void Calender::runCommand(const std::string &command, const std::string &args) {
+void Calendar::runCommand(const std::string &command, const std::string &args) {
   if (command == GET_TIME) {
     std::string message = string_fmt(_hours) + ":" + string_fmt(_minutes) + ":" + string_fmt((int)_seconds) + " " + getDayName() + " " + string_fmt(_days + _weeks * _days_per_week + 1) + " of " + getMonthName() + " " + string_fmt(_years);
     System::instance()->pushMessage(message, 0x1);
   }
   else if (command == SET_SECONDS) {
     cast_stream(args, _seconds);
+    // Calculate new seconds_counter value
+    _seconds_counter = (_minutes_per_hour * _hours + _minutes) * _seconds_per_minute + _seconds;
+    // Force update of time area
+    _time_area = INVALID;
+    
   }
   else if (command == SET_MINUTES) {
     cast_stream(args, _minutes);
+    // Calculate new seconds_counter value
+    _seconds_counter = (_minutes_per_hour * _hours + _minutes) * _seconds_per_minute + _seconds;
+    // Force update of time area
+    _time_area = INVALID;
   }
   else if (command == SET_HOURS) {
     cast_stream(args, _hours);
+    // Calculate new seconds_counter value
+    _seconds_counter = (_minutes_per_hour * _hours + _minutes) * _seconds_per_minute + _seconds;
+    // Force update of time area
+    _time_area = INVALID;
   }
   else if (command == SET_DAYS) {
     cast_stream(args, _days);

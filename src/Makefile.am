@@ -80,8 +80,8 @@ libSear_a_SOURCES = \
 	ObjectHandler.cpp \
 	ScriptEngine.cpp \
 	ScriptEngine.h \
-	Calender.cpp \
-	Calender.h \
+	Calendar.cpp \
+	Calendar.h \
 	Light.h \
 	LightManager.h \
 	LightManager.cpp

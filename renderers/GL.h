@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.23 2002-12-20 00:37:14 simon Exp $
+// $Id: GL.h,v 1.24 2002-12-24 18:08:17 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -20,6 +20,7 @@
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 
+#include "src/Light.h"
 #include "src/StateLoader.h"
 #include "src/Render.h"
 
@@ -150,29 +151,13 @@ protected:
   
   void buildQueues(WorldEntity*, int, bool);
 
-  typedef struct {
-//    light id;
-    float kc;
-    float kl;
-    float kq;
-    float x_pos;
-    float y_pos;
-    float z_pos;
-    float w_pos;
-    float ambient[4];
-    float diffuse[4];
-    float specular[4];
-//    colour;
-//    spotlight stuff;
-  } lightStruct;
-
   typedef enum {
     LIGHT_CHARACTER = 0,
     LIGHT_SUN,
     LIGHT_LAST
   } lightSources;
 
-  lightStruct lights[LIGHT_LAST];
+  Light lights[LIGHT_LAST];
 
   float _speech_offset_x;
   float _speech_offset_y;

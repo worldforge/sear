@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.24 2002-10-21 20:09:59 simon Exp $
+// $Id: WorldEntity.cpp,v 1.25 2002-12-24 18:08:17 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -217,8 +217,6 @@ void WorldEntity::checkActions() {
   } else {
     last_mode == "";
   }
-  
 }
-
 
 } /* namespace Sear */
