@@ -1,3 +1,7 @@
+9th September 2002, Simon Goodall
+ * Fixed states file so Slice models now blend with lighting enabled.
+ * Added check so if sound doesn't initialise, Sear still runs
+
 8th September 2002, Simon Goodall
  * Fixed bug in model loaders where the model was still used even if it failed its init call
 

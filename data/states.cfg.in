@@ -219,3 +219,16 @@ cull_face_cw = false
 stencil = false
 fog = false
 end_of_state
+state = slice
+alpha_test = true
+blend = true
+lighting = true
+two_sided_lighting = true
+textures = true
+colour_material = true
+depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = fog
+end_of_state

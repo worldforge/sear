@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.33 2002-09-08 13:08:21 simon Exp $
+// $Id: System.cpp,v 1.34 2002-09-09 12:16:29 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -147,10 +147,13 @@ bool System::init() {
   _client->registerCommands(_console);
   _action_handler->registerCommands(_console);
   _file_handler->registerCommands(_console);
-  
-  sound = new Sound();
-  sound->init();
-  sound->registerCommands(_console);
+  try { 
+    sound = new Sound();
+    sound->init();
+    sound->registerCommands(_console);
+  } catch (Exception &e) {
+    Log::writeLog(e.getMessage(), Log::LOG_ERROR);
+  }
   
   Log::writeLog("Running startup scripts", Log::LOG_INFO);
 
