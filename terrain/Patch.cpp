@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.16 2003-03-06 23:50:38 simon Exp $
+// $Id: Patch.cpp,v 1.17 2003-03-07 12:50:51 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -137,7 +137,7 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     WFMath::Point<3> v = focus->getAbsPos();
 //    cout << _landscape->offset_x << endl;
 //    cout << _landscape->offset_y << endl;
-    float x = v.x() - (centerX + _landscape->offset_x);
+    float x = v.x() - (centerX  + _landscape->offset_x);
     float y = v.y() - (centerY + _landscape->offset_y);
 //    float z = v.z() - _terrain->getHeight(centerX, centerY);
     assert ((centerX >= 0 && centerX <= 200) && "centerX out of bounds");

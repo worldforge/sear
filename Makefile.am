@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 ## For top-level sear directory
 
-SUBDIRS = data scripts common loaders renderers terrain sky gui src tools
+SUBDIRS = data scripts common loaders renderers terrain sky gui src #  tools
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \
-	autogen.sh sear.spec sear.rc make_win.sh
+	autogen.sh sear.spec
 
 ##manual copy game data to target dir
 ##and spit out some infos

@@ -1,6 +1,8 @@
 SUBDIRS = cal3d
 
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a libLoaderSlice.a libLoader3ds.a
+LIB3DS_LIBS = libLoader3ds.a
+
+noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a libLoaderSlice.a $(LIB3DS_LIBS)
 
 INCLUDES = -I..
 

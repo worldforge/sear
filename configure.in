@@ -22,6 +22,10 @@ dnl Need libtool
 AM_PROG_LIBTOOL
 dnl AC_PROG_LIBTOOL
 
+AC_CHECK_TOOL(WINDRES, windres)
+AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
+AC_MSG_WARN("$ac_cv_prog_WINDRES")
+
 if test $cross_compiling == no; then
   dnl FLAGS='-Wall -ansi -I/usr/X11R6/include -I/usr/include'
   CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"

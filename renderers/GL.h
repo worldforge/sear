@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.28 2003-03-06 23:50:38 simon Exp $
+// $Id: GL.h,v 1.29 2003-03-07 12:50:51 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -103,7 +103,6 @@ public:
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
-  void renderInterleaved(unsigned int type, unsigned int number_of_points, int *faces_data, point *array_data, bool multitexture);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
   void drawMessageQueue(MessageList &list);

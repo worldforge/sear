@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.26 2003-03-06 23:50:38 simon Exp $
+// $Id: Render.h,v 1.27 2003-03-07 12:50:51 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -14,7 +14,7 @@
 #include <utility>
 
 #include <wfmath/axisbox.h>
-#include "common/data.h"
+//#include "common/types.h"
 //
 //#include "ObjectLoader.h"
 
@@ -131,7 +131,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
-  virtual void renderInterleaved(unsigned int type, unsigned int number_of_points, int *faces_data, point *array_data,bool) =0;
   virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
 //  virtual void drawMessageQueue(QueueMap queue) =0;

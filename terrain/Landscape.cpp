@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.20 2003-03-06 21:31:02 simon Exp $
+// $Id: Landscape.cpp,v 1.21 2003-03-07 12:50:51 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -220,8 +220,8 @@ void Landscape::render() {
 
 void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
   if (min_height == DEF_VAL) {
-    for (int x = 0; x < map_size; ++x) {
-      for (int y = 0; y < map_size; ++y) {
+    for (unsigned int x = 0; x < map_size; ++x) {
+      for (unsigned int y = 0; y < map_size; ++y) {
         float h = getHeight(x,y);
 	if (h < min_height) min_height = h;
 	if (h > max_height) max_height = h;

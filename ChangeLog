@@ -1,3 +1,7 @@
+7th March 2002, Simon Goodall
+ * RC file is now built as part of autoconf
+ * Merged some minors diffs between some sear versions
+
 6th March 2002, Simon Goodall
  * added file defining basic geometric types (vertex, normal, texel etc)
  * added enable-mmgr flag to configure

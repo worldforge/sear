@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.58 2003-03-06 23:50:38 simon Exp $
+// $Id: GL.cpp,v 1.59 2003-03-07 12:50:51 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -1190,58 +1190,6 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     }
 }
 
-void GL::renderInterleaved(unsigned int type, unsigned int number_of_points, int *faces_data, point *array_data, bool multitexture) {
-  if (!use_multitexturing) multitexture = false;
-  // TODO: Reduce ClientState switches
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
- 
-//  if (!vertex_data) return; //throw Exception(""); 
-  glVertexPointer(3, GL_FLOAT, 0, array_data + 5);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  if (textures) {
-     if (multitexture) {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, 0, array_data);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, 0, array_data);
-    } else {	    
-      glTexCoordPointer(2, GL_FLOAT, 0, array_data);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-  }
-  if (lighting) {
-    glNormalPointer(GL_FLOAT, 0, array_data + 2);
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  if (use_ext_compiled_vertex_array) glLockArraysEXT(0, number_of_points);
-  switch (type) {
-//    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-//    case (Graphics::RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-//    case (Graphics::RES_LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-//    case (Graphics::RES_TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_TRIANGLES): glInterleavedArrays(GL_T2F_N3F_V3F, 0, array_data); break;
-//    case (Graphics::RES_QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-//    case (Graphics::RES_TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-//    case (Graphics::RES_TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-//    case (Graphics::RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
-  }
-  if (use_ext_compiled_vertex_array) glUnlockArraysEXT();
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (lighting) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures) {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    } else {
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-
-}
 unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
   unsigned int texture = 0;
   glGenTextures(1, &texture);
