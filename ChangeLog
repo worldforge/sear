@@ -1,3 +1,10 @@
+2004-09-24  James Turner  <james@worldforge.org>
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: change how absolute entity
+	  position is calculated, so the interpolated position is always
+	  applied in location coordinates. Also remove the deeply confusing
+	  'SetVelocity' method that actually just set a time.
+
 2004-07-29  Simon Goodall  <simon@simongoodall.co.uk>
 
         * common/Utility.cpp, common.Utility.h, renderer/GL.cpp, src/.cvsignore,
