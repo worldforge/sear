@@ -1,4 +1,8 @@
 21st August 2002, Simon Goodall
+ * Sound now uses Log class instead of cerr or printf
+ * Character actionhandler events are now type based
+
+21st August 2002, Simon Goodall
  * Fixed bug where two_sided_lighting was never enabled even if requested
  * Defined default material properties for most objects instead of using whatever the last set properties were
 

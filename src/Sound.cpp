@@ -1,18 +1,19 @@
 #include "Sound.h"
 #include "Exception.h"
 #include "Console.h"
+#include "common/Log.h"
 
 namespace Sear {
 
 void Sound::init() {
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
-    std::cerr << SDL_GetError() << std::endl << std::flush;
+    Log::writeLog(std::string("Error init SDL_AUDIO: ") + SDL_GetError(), Log::LOG_ERROR);
     throw Exception("Error initialising SDL Sound Subsystem!");
   }
 #define MONO (1)
 #define STEREO (2)
  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, STEREO, 4096) != 0) {
-    std::cerr << Mix_GetError() << std::endl << std::flush;
+    Log::writeLog(std::string("Error init SDL_mixer: ") + MIX_GetError(), Log::LOG_ERROR);
     throw Exception("Error initialising SDL_mixer!");
   }
 }
@@ -41,7 +42,7 @@ Mix_Chunk *Sound::getSample(const std::string &file_name) {
     sound_map[file_name] = sample;
     return sample;
   }
-  printf("Mix_LoadWAV: %s\n", Mix_GetError());
+  Log::writeLog(std::string("Mix_LoadWAV: ") + MIX_GetError(), Log::LOG_ERROR);
   return NULL;
 }
 
@@ -54,7 +55,7 @@ Mix_Music *Sound::getMusic(const std::string &file_name) {
     music_map[file_name] = music;
     return music;
   }
-  printf("Mix_LoadMUS: %s\n", Mix_GetError());
+  Log::writeLog(std::string("Mix_LoadMUS: ") + MIX_GetError(), Log::LOG_ERROR);
   return NULL;
 }
 

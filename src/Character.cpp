@@ -109,13 +109,14 @@ void Character::updateLocals(bool send_to_server) {
   static ActionHandler *ac = System::instance()->getActionHandler();
   static float old_speed = _speed;
   static bool old_run = _run_modifier;
+  static std::string type = _self->type();
   if (old_speed != _speed || old_run != _run_modifier) {
     if (_speed ==  0.0f) {
-      ac->handleAction("stopped", NULL);
+      ac->handleAction(std::string("stopped_") + type, NULL);
     } else if (_run_modifier) {
-      ac->handleAction("running", NULL);
+      ac->handleAction(std::string("running_") + type, NULL);
     } else {
-      ac->handleAction("walking", NULL);
+      ac->handleAction(std::string("walking_") + type, NULL);
     }
     old_speed = _speed;
     old_run = _run_modifier;
