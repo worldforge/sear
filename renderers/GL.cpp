@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.56 2003-02-26 14:47:37 simon Exp $
+// $Id: GL.cpp,v 1.57 2003-03-05 13:33:12 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -61,7 +61,7 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 
 #include "GL.h"
 #define GL_GLEXT_PROTOTYPES 1
-#include "glext.h"
+#include <GL/glext.h>
 
 // GL EXTENSIONS DEF
 #define GENERATE_MIPMAP_SGIS            0x8191
