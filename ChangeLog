@@ -1,3 +1,6 @@
+4th August 2002, Simon Goodall
+ * Further improvements on 3ds support. Now uses vertex arrays to improve performance and fixed a bug where the texture was loaded many times per object per frame which had a huge performance hit.
+
 3rd August 2002, Simon Goodall
  * Improved 3ds support and allow use of textures
 

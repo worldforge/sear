@@ -4,4 +4,6 @@ BUGS
 
  * Fix font length problems
    - The font in many cases will not clip to the screen and go onto the next line. This is a problem on the console fonts, but no so much for the floating character speech
- * Add weather effects
+ 
+ * 3Ds loader does not work on all models. e.g. jarnosun's bugbear/lizardman and drow models seem to be defined differently to other 3ds models and so currently will not work 
+

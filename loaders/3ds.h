@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string>
 
+#include <lib3ds/file.h>
 #include "src/Model.h"
 /*
  * This class represents a 3D Studio model. It makes use of the lib3ds library
@@ -48,6 +49,7 @@ public:
 protected:
 //  unsigned int _num_models; // Number of models currently held
 //  ThreeDSMesh **_models;  // The models
+  Lib3dsFile* model;
 };
 
 } /* namespace Sear */

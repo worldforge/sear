@@ -1,6 +1,9 @@
+ * Allow custom offset and scaling of 3ds models.
+ * Allow 3ds models to be selected 
+ 
  * Fix lighting
   
-* Add ability to specify search paths for default file locations 
+ * Add ability to specify search paths for default file locations 
 
  * Add ability to tokenise on quotes, not just spaces
 
