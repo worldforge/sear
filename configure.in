@@ -160,7 +160,7 @@ AM_PATH_ERIS($ERIS_VERSION, [
 
 
 dnl Check varconf
-VARCONF_VERSION=0.5.3
+VARCONF_VERSION=0.5.4
 AM_PATH_VARCONF($VARCONF_VERSION, [
   CFLAGS="$CFLAGS $VARCONF_CFLAGS"
   CPPFLAGS="$CPPFLAGS $VARCONF_CFLAGS"
@@ -168,7 +168,7 @@ AM_PATH_VARCONF($VARCONF_VERSION, [
   LIBS="$LIBS $VARCONF_LIBS"
 ],
 [
-  AC_MSG_ERROR(Couldn't find varconf or insufficent version found. Please get the latest version from WorldForge CVS.)
+  AC_MSG_ERROR(Couldn't find VarConf or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/varconf and get at least version $VARCONF_VERSION)
 ])
 
 dnl Check Lib 3ds
