@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.5 2003-04-23 19:41:57 simon Exp $
+// $Id: TextureManager.cpp,v 1.6 2003-04-26 14:20:08 simon Exp $
 
 #include "TextureManager.h"
 
@@ -211,9 +211,17 @@ TextureObject TextureManager::loadTexture(const std::string &texture_name, SDL_S
   glBindTexture(GL_TEXTURE_2D, texture_id);
   // Set texture filters
   std::string min_filter = (std::string)_texture_config.getItem(texture_name, KEY_min_filter);
+  if (min_filter.empty()) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DEFAULT_min_filter);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilter(min_filter));
+  }
   std::string mag_filter = (std::string)_texture_config.getItem(texture_name, KEY_mag_filter);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilter(mag_filter));
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilter(min_filter));
+  if (mag_filter.empty()) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DEFAULT_mag_filter);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilter(mag_filter));
+  }
   // Set clamp or repeat
   bool clamp = (bool)_texture_config.getItem(texture_name, KEY_clamp);
   if (clamp) {
