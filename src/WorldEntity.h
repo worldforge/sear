@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.15 2004-06-13 18:21:01 simon Exp $
+// $Id: WorldEntity.h,v 1.16 2004-06-20 18:43:35 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -14,6 +14,7 @@
 #include <Eris/Entity.h>
 #include <Eris/Types.h>
 #include <Eris/World.h>
+#include "common/types.h"
 
 //#include "ObjectLoader.h"
 
@@ -32,8 +33,10 @@ public:
 
   void translateAbsPos(const WFMath::Point<3> &);
   void rotateAbsOrient(const WFMath::Quaternion &);
-  WFMath::Quaternion getAbsOrient();
-  WFMath::Point<3> getAbsPos();
+  const WFMath::Quaternion getAbsOrient();
+  const WFMath::Point<3> getAbsPos();
+
+  const OrientBBox &getOrientBBox() const { return m_orientBBox; }
   bool hasMessages();
   void renderMessages();
   void displayInfo();
@@ -44,7 +47,7 @@ public:
 //  ObjectProperties *getObjectProperties() { return _op; }
  // void setObjectProperties(ObjectProperties *op) { _op = op; }
   void checkActions();
-  
+  void rotateBBox(const WFMath::Quaternion &q);  
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
   unsigned int time;
@@ -60,6 +63,8 @@ protected:
   
   void sigChanged(const Eris::StringSet &ss);
 friend class Character;
+
+  OrientBBox m_orientBBox;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.20 2004-06-15 01:09:35 alriddoch Exp $
+// $Id: Character.h,v 1.21 2004-06-20 18:43:35 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -101,6 +101,7 @@ public:
   void setAppearance(const std::string &, const std::string &, const std::string &);
   void setApp();
   void clearApp();
+  void setHeight(float);
 private:
   WorldEntity *_self;
   Eris::Avatar *_avatar;

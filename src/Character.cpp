@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.40 2004-06-15 13:25:36 alriddoch Exp $
+// $Id: Character.cpp,v 1.41 2004-06-20 18:43:35 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -106,6 +106,7 @@ static const std::string WALKING = "walking_";
 static const std::string RUNNING = "running_";
 
 static const std::string GUISE = "guise";
+static const std::string HEIGHT = "height";
 
 Character::Character(Eris::Avatar *avatar) :
   _avatar(avatar),
@@ -432,6 +433,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand("set_app", this);
   console->registerCommand("clear_app", this);
   console->registerCommand("read_app", this);
+  console->registerCommand("set_height", this);
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
@@ -475,6 +477,12 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == DISPLAY_INVENTORY) displayInventory();
    else if (command == MAKE) make(args);
    else if (command == "clear_app") clearApp();
+    else if (command == "set_height") {
+     std::string hStr = tokeniser.nextToken();
+     float h;
+     cast_stream(hStr, h);
+     setHeight(h);
+    }
    else if (command == "set_app") {
      std::string map = tokeniser.nextToken();
      std::string name = tokeniser.nextToken();
@@ -587,6 +595,20 @@ void Character::setApp() {
 //  set.sendFrom(_self->getID());
   msg["id"] = _self->getID();
   msg[GUISE] = mt;
+
+  set.setArgs(Atlas::Message::Element::ListType(1, msg));
+  _avatar->getWorld()->getConnection()->send(set);
+}
+
+
+void Character::setHeight(float height) {
+  assert ((_initialised == true) && "Character not initialised");
+  Atlas::Objects::Operation::Set set;
+  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
+
+  Atlas::Message::Element::MapType msg;
+  msg["id"] = _self->getID();
+  msg[HEIGHT] = height;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
   _avatar->getWorld()->getConnection()->send(set);

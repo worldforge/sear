@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.15 2004-06-10 21:04:14 alriddoch Exp $
+// $Id: Frustum.cpp,v 1.16 2004-06-20 18:43:35 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -200,6 +200,29 @@ bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbo
       return false;
     return true;
 }
+
+int Frustum::orientBBoxInFrustum(float frustum[6][4], const OrientBBox &orient, const WFMath::Point<3> &pos) {  
+  int c;
+  int c2 = 0;
+  //Translate BBox to correct position
+  OrientBBox n;
+  for (int i = 0; i < LAST_POSITION; ++i) {
+    WFMath::Point<3> p = orient.points[i] + pos;
+    n.points[i] = WFMath::Vector<3>(p.x(), p.y(), p.z());
+  }
+
+  for(int p = 0; p < 6; ++p) {
+    c = 0;
+    for (int i = 0; i < LAST_POSITION; ++i) {
+      if(frustum[p][0] * (n.points[i].x()) + frustum[p][1] * (n.points[i].y()) + frustum[p][2] * (n.points[i].z()) + frustum[p][3] > 0 ) c++;
+    }
+    if(c == 0) return 0;
+    if(c == 8) c2++;
+  }
+  return (c2 == 6) ? 2 : 1;
+}
+
+
 
 
 } /* namespace Sear */

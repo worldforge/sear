@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.37 2004-06-13 18:21:01 simon Exp $
+// $Id: WorldEntity.cpp,v 1.38 2004-06-20 18:43:35 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -10,6 +10,9 @@
 #include <Atlas/Message/Element.h>
 
 #include <wfmath/axisbox.h>
+#include <wfmath/quaternion.h>
+#include <wfmath/vector.h>
+
 #include <Eris/Types.h>
 #include <Eris/TypeInfo.h>
 
@@ -73,6 +76,7 @@ void WorldEntity::handleMove() {
     translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
   }
+  rotateBBox(getAbsOrient());
 }
 
 void WorldEntity::handleTalk(const std::string &msg) {
@@ -159,12 +163,12 @@ void WorldEntity::rotateAbsOrient(const WFMath::Quaternion & q) {
     ((WorldEntity*)getMember(i))->rotateAbsOrient(child_orient);
 }
 
-WFMath::Quaternion WorldEntity::getAbsOrient() {
+const WFMath::Quaternion WorldEntity::getAbsOrient() {
   WFMath::Quaternion new_orient =  abs_orient / getOrientation();
   return new_orient;
 }
 
-WFMath::Point<3> WorldEntity::getAbsPos() {
+const WFMath::Point<3> WorldEntity::getAbsPos() {
   WFMath::Point<3> pos = GetPos();
   WFMath::Point<3> new_pos = WFMath::Point<3>(abs_pos.x() + pos.x(), abs_pos.y() + pos.y(), abs_pos.z() + pos.z());
 
@@ -248,6 +252,7 @@ void WorldEntity::checkActions() {
   
   if (hasProperty(ACTION)) {
     std::string action = getProperty(ACTION).asString();
+std::cout << "Action: " << action << std::endl;
     if (action != last_action) {
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -260,6 +265,7 @@ void WorldEntity::checkActions() {
 	 
   if (hasProperty(MODE)) {
     std::string mode = getProperty(MODE).asString();
+std::cout << "Mode: " << mode << std::endl;
     if (mode != last_mode) {
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -277,6 +283,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
     std::string str = *I;
     if (str == MODE) {
       const std::string mode = getProperty(MODE).asString();
+std::cout << "Mode: " << mode << std::endl;
       if (mode != last_mode) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -285,6 +292,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
       }
     } else if (str == ACTION) {
       const std::string action = getProperty(ACTION).asString();
+std::cout << "Action: " << action << std::endl;
       if (action != last_action) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -297,9 +305,28 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
       if (object_handler) record = object_handler->getObjectRecord(getID());
       if (record) record->setAppearance(mt);
     }
-
   }
+}
 
+void WorldEntity::rotateBBox(const WFMath::Quaternion &q) {
+  WFMath::AxisBox<3> bbox = getBBox();
+
+  WFMath::Point<3> high = bbox.highCorner();
+  WFMath::Point<3> low = bbox.lowCorner();
+
+  m_orientBBox.points[UPPER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), high.z());
+  m_orientBBox.points[UPPER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), high.z());
+  m_orientBBox.points[UPPER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), high.z());
+  m_orientBBox.points[UPPER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), high.z());
+
+  m_orientBBox.points[LOWER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), low.z());
+  m_orientBBox.points[LOWER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), low.z());
+  m_orientBBox.points[LOWER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), low.z());
+  m_orientBBox.points[LOWER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), low.z());
+
+  for (int i = 0; i < LAST_POSITION; ++i) {
+    m_orientBBox.points[i] = m_orientBBox.points[i].rotate(q);
+  }
 }
 
 } /* namespace Sear */

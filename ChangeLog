@@ -1,3 +1,8 @@
+2004-06-20  Simon Goodall  <simon@simongoodall.co.uk>
+	* src/Graphics.cpp: Add missing check for draw_self from object_records;
+	* src/Character.cpp, src/Character.h: Add /set_height command to change character height. Model height is not updated dynamically yet.
+	* common/types.h, src/Frustum.h, src.Frustum.cpp, src/Graphics.cpp, src/WorldEntity.h, src/WorldEntity.h: Added code to orientate the bounding box to the quaternion of the entity. Add frustum check for this. Not enabled by default. Need to change method near the "Change method here" comment in src/Graphics.cpp
+
 2004-06-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/3ds.cpp: Add in a scale transform when rendering 3ds

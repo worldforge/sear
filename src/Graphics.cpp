@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.52 2004-06-15 20:37:05 simon Exp $
+// $Id: Graphics.cpp,v 1.53 2004-06-20 18:43:35 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -330,19 +330,23 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       // TODO if queue is empty switch to another
 //      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
       // Loop through all models in list
-      for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
-        // Check we;re visible
-        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position)) {
-          if (!select_mode) {
-            // Add to queue by state, then model record
-            assert(_system->getModelRecords().findItem(*I, "state_num"));
-            int number = _system->getModelRecords().getItem(*I, "state_num");
-            assert(number > 0);
-	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
-	    if (we->hasMessages()) message_list.push_back(we);
-	  }
-          else render_queue[_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
-	}
+      if (object_record->draw_self) {
+        for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
+          // Check if we're visible
+          // Change method here
+          if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position)) {
+          //if (Frustum::orientBBoxInFrustum(frustum, we->getOrientBBox(), object_record->position)) {
+            if (!select_mode) {
+               // Add to queue by state, then model record
+               assert(_system->getModelRecords().findItem(*I, "state_num"));
+               int number = _system->getModelRecords().getItem(*I, "state_num");
+               assert(number > 0);
+               render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
+              if (we->hasMessages()) message_list.push_back(we);
+            }
+            else render_queue[_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
+          }
+        }
       }
       if (object_record->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); ++i) {

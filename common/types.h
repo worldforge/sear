@@ -1,11 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: types.h,v 1.5 2004-06-07 22:15:10 jmt Exp $
+// $Id: types.h,v 1.6 2004-06-20 18:43:35 simon Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1
+
+#include <wfmath/vector.h>
 
 namespace Sear {
 
@@ -73,6 +75,22 @@ typedef struct {
   TextureObject texture_1;
   unsigned int disp_list;
 } Mesh;
+
+typedef struct {
+  WFMath::Vector<3> points[8];
+} OrientBBox;
+
+typedef enum {
+  UPPER_LEFT_FRONT = 0,
+  UPPER_LEFT_BACK,
+  UPPER_RIGHT_FRONT,
+  UPPER_RIGHT_BACK,
+  LOWER_LEFT_FRONT,
+  LOWER_LEFT_BACK,
+  LOWER_RIGHT_FRONT,
+  LOWER_RIGHT_BACK,
+  LAST_POSITION
+} BBoxPosition;
 
 } /* namespace Sear */
 
