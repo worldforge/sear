@@ -379,6 +379,30 @@ int GL::requestTextureMask(const std::string &section, const std::string &textur
   return next_id++;
 }
 
+int GL::requestMipMapMask(const std::string &section, const std::string &texture, bool clamp) {
+  static varconf::Config *texture_config = _system->getTexture();
+  std::string texture_name = std::string(texture);
+  texture_config->clean(texture_name);
+  SDL_Surface *tmp = NULL;
+  unsigned int texture_id = 0;
+  int id = texture_map[section + texture_name + "_mask"];
+  if (id != 0) return id;
+  glGenTextures(1, &texture_id);
+  if (texture_id == 0) return -1;
+  std::string file_name = texture_config->getItem(section, texture_name);
+  if (file_name.empty()) return -1;
+  tmp = System::loadImage(file_name);
+  if (!tmp) {
+    Log::writeLog("Error loading texture", Log::LOG_ERROR);
+    return -1;
+  }
+  createMipMapMask(tmp, texture_id, clamp);
+  free (tmp);
+  textureList.push_back(texture_id);
+  texture_map[section + texture_name + "_mask"] = next_id;
+  return next_id++;
+}
+
 void GL::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -404,7 +428,7 @@ void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
   }
-  gluBuild2DMipmaps(GL_TEXTURE_2D, 3, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+  gluBuild2DMipmaps(GL_TEXTURE_2D, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 }
 
 void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clamp) {
@@ -425,14 +449,43 @@ void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clam
       ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
   } else {
     for (i = 0; i < surface->w * surface->h * 3; i += 3) {
       ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+  }
+}
+
+void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp)  {
+  int i;
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  if (clamp) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
+  }
+  if (surface->format->BytesPerPixel == 4) {
+    for (i = 0; i < surface->w * surface->h * 4; i += 4) {
+      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
+      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
+      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
+    }
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, surface->w, surface->h, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+  } else {
+    for (i = 0; i < surface->w * surface->h * 3; i += 3) {
+      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
+      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
+      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
+    }
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
   }
 }
 

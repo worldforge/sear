@@ -5,6 +5,7 @@
 #include "common/Utility.h"
 #include "common/Log.h"
 
+#include "Bindings.h"
 #include "Console.h"
 #include "ConsoleObject.h"
 #include "System.h"
@@ -34,6 +35,8 @@ bool Console::init() {
   // Register console commands
   registerCommand(TOGGLE_CONSOLE, this);
   registerCommand(LIST_CONSOLE_COMMANDS, this);
+  //Makes sure at least one key is bound to the console
+  Bindings::bind("backquote", "/" + std::string(TOGGLE_CONSOLE));
   return true;
 }
 

@@ -104,7 +104,7 @@ typedef std::list<WorldEntity*> Queue;
   virtual void writeConfig() =0;
 
   virtual int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
-  virtual void createTextureMask(SDL_Surface*, unsigned int, bool) =0;
+  virtual int requestMipMapMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
   
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotateObject(WorldEntity *we, int type) =0;

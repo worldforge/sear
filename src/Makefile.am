@@ -67,5 +67,7 @@ libSear_a_SOURCES = \
 	StateLoader.h \
 	Frustum.cpp \
 	Frustum.h \
+	FileHandler.cpp \
+	FileHandler.h \
 	default_image.xpm \
 	default_font.xpm 

@@ -2,10 +2,6 @@ BUGS
  * Fix font length problems
    - The font in many cases will not clip to the screen and go onto the next line. This is a problem on the console fonts, but no so much for the floating character speech
  
- * 3Ds loader does not work on all models. e.g. jarnosun's bugbear/lizardman and drow models seem to be defined differently to other 3ds models and so currently will not work 
-
- * Segfaults when running cyclient the same time as logged into the world. Probably an Eris bug as it segs when calling Eris::TypeInfo::getParentsAsSet
-
  * WIN32 Segfault after initLighting is called. Problem caused with certain sets of data in the general.cfg file. Below is an example that will cause a problem:
 
 [general]

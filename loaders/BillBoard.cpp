@@ -49,9 +49,9 @@ void BillBoard::render(bool select_mode) {
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   if (select_mode) {	
-    _render->switchTexture(_render->requestTextureMask("billboard", _type, true));
+    _render->switchTexture(_render->requestMipMapMask("billboard", _type, true));
   } else {
-    _render->switchTexture(_render->requestTexture("billboard", _type, true));
+    _render->switchTexture(_render->requestMipMap("billboard", _type, true));
   }
   _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
 }

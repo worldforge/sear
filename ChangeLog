@@ -1,3 +1,9 @@
+3rd September 2002, Simon Goodall
+ * Added new class called FileHandler. Currently this allows you to add or remove search paths. It also allows searching for the first or every occurance of teh file name in the search paths. The main aim is to search for the startup and shutdown scripts. An extra command line argument has been providied to allow extra search paths for the startup scripts.
+
+2nd September 2002, Simon Goodall
+ * Fixed bug in rendering code when using mipmaps with alpha blending caused corrupted graphics to be displayed. Caused by not checking whether image was RGB or RGBA
+
 1st September 2002, Simon Goodall
  * Updated stateloader to use the default state before emitting an error message
  * Updated 3DS code to load a wider range of models.

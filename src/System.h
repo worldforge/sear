@@ -22,6 +22,7 @@ class ActionHandler;
 class Render;
 class Client;
 class EventHandler;
+class FileHandler;
 class ModelHandler;
 class ObjectLoader;
 class StateLoader;
@@ -67,6 +68,8 @@ public:
   bool fileExists(const std::string &);
   std::string processHome(const std::string &);
 
+  void addSearchPaths(std::list<std::string> l);
+  
   unsigned int getTime() const { return SDL_GetTicks(); }
 
   void setState(SystemState ss, bool state) { _systemState[ss] = state; }
@@ -88,6 +91,7 @@ public:
   EventHandler *getEventHandler() { return _event_handler; }
   ModelHandler *getModelHandler() { return _model_handler; }
   ActionHandler *getActionHandler() { return _action_handler; }
+  FileHandler *getFileHandler() { return _file_handler; }
   
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
@@ -146,11 +150,14 @@ protected:
   int area;
 
   EventHandler *_event_handler;
+  FileHandler *_file_handler;
   ModelHandler *_model_handler;
   ObjectLoader *_ol;
   StateLoader *_sl;
   ActionHandler *_action_handler;
 
+  std::list<std::string> additional_paths;
+  
   std::string home_path;
 
   static const std::string SCRIPTS_DIR;

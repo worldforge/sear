@@ -1,5 +1,3 @@
- * Update cally code to reuse core models 
-
 * Allow console to be opened even if not key bindings have been loaded
 
  * Setup system to update values as varconf values update

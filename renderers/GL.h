@@ -51,9 +51,11 @@ public:
   int requestTexture(const std::string &section, const std::string &texture, bool clamp = false);
   int requestMipMap(const std::string &section, const std::string &texture, bool clamp = false);
   int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false);
+  int requestMipMapMask(const std::string &section, const std::string &texture, bool clamp = false);
   void createTexture(SDL_Surface*, unsigned int, bool);
   void createMipMap(SDL_Surface*, unsigned int, bool);
   void createTextureMask(SDL_Surface*, unsigned int, bool);
+  void createMipMapMask(SDL_Surface*, unsigned int, bool);
   
   GLuint getTextureID(int texture_id);
   static GL *instance() { return _instance; }

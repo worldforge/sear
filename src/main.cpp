@@ -15,7 +15,7 @@
 int main(int argc, char** argv) {
   bool exit_program = false;
   Sear::System *sys = NULL;
-  std::string install_dir = "";
+  std::list<std::string> path_list;
   sys = NULL;
   
   if (argc > 1) {
@@ -30,22 +30,21 @@ int main(int argc, char** argv) {
         std::cout << "Sear version: " << VERSION << std::endl;
 	exit_program = true;
       }
-/*      else if (arg == "-I" || arg == "--install-dir") {
+      else if (arg == "-a" || arg == "--add-search-path") {
 	if (argc < 1) {
-          std::cerr << "No path supllied!" << std::endl;
+          std::cerr << "No path supplied!" << std::endl;
           exit_program = true;
 	} else {
-          install_dir = std::string((char *)argv[0]);
+	  path_list.push_back(std::string((char *)argv[0]));
           argv++;
           argc--;
 	}
-      }
-  */    
+      }    
       else if (arg == "-h" || arg == "--help") {
         std::cout << invoked << " {options}" << std::endl;
 	std::cout << "-h, --help    - display this message" << std::endl;
 	std::cout << "-v, --version - display version info" << std::endl;
-//	std::cout << "-I, --install-dir - directory where sear was installed. e.g. " << INSTALLDIR << "/share/sear" << std::endl;
+	std::cout << "-a, --add-search-path - Adds a search path" << std::endl;
 	exit_program = true;
       }
       else {
@@ -63,6 +62,7 @@ under certain conditions; type `show c' for details.
   
   sys = new Sear::System();
 //  sys->setInstallDir(std::string(INSTALLDIR) + std::string("/share/sear"));
+  sys->addSearchPaths(path_list);
   if (!sys->init()) {
     std::cerr << "Error initialising Sear!" << std::endl;
     exit (1);
@@ -70,7 +70,6 @@ under certain conditions; type `show c' for details.
   try {
     sys->createWindow(false);
     sys->setCaption(CLIENT_NAME, CLIENT_NAME);
-  //  sys->setInstallDir(install_dir);
     sys->mainLoop();
   } catch (Sear::Exception e) {
     std::cerr << "Exception: " << e.getMessage() << std::endl;

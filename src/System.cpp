@@ -25,6 +25,7 @@
 #include "cursors.h"
 #include "EventHandler.h"
 #include "Exception.h"
+#include "FileHandler.h"
 #include "Graphics.h"
 #include "ModelHandler.h"
 #include "ObjectLoader.h"
@@ -51,6 +52,7 @@ System::System() :
   _client(NULL),
   _icon(NULL),
   _event_handler(NULL),
+  _file_handler(NULL),
   _ol(NULL),
   _console(NULL),
   _character(NULL),
@@ -102,7 +104,17 @@ bool System::init() {
  
   _action_handler = new ActionHandler(this);
   _action_handler->init();
-	 
+
+  _file_handler = new FileHandler();
+  _file_handler->addSearchPath(install_path);
+  _file_handler->addSearchPath(install_path + "/scripts");
+  _file_handler->addSearchPath(home_path);
+  _file_handler->addSearchPath(".");
+
+  for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); I++) {
+    _file_handler->addSearchPath(*I);
+  }
+  
   _ol = new ObjectLoader();
   _ol->init();
 
@@ -128,30 +140,17 @@ bool System::init() {
   registerCommands(_console);
   _client->registerCommands(_console);
   _action_handler->registerCommands(_console);
+  _file_handler->registerCommands(_console);
   
   sound = new Sound();
   sound->init();
   sound->registerCommands(_console);
   
   Log::writeLog("Running startup scripts", Log::LOG_INFO);
-  std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + STARTUP_SCRIPT;
-  std::string home_location = home_path + "/" + STARTUP_SCRIPT;
-  std::string current_location = "./" + STARTUP_SCRIPT;
 
-  if (fileExists(install_location)) {
-    runScript(install_location);
-  } else {
-//    No install
-  }
-  if (fileExists(home_location)) {
-    runScript(home_location);
-  } else {
-//   No home
-  }
-  if (fileExists(current_location)) {
-    runScript(current_location);
-  } else {
-// No current
+  std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
+  for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); I++) {
+    runScript(*I);
   }
   readConfig();
   _system_running = true;
@@ -194,14 +193,10 @@ void System::shutdown() {
 
   writeConfig();
   Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
-  std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + SHUTDOWN_SCRIPT;
-  std::string home_location = home_path + "/" + SHUTDOWN_SCRIPT;
-  std::string current_location = "./" + SHUTDOWN_SCRIPT;
-  if (fileExists(current_location)) runScript(current_location);
-  if (fileExists(home_location)) runScript(home_location);
-  if (fileExists(install_location)) runScript(install_location);
-
-  
+  std::list<std::string> shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
+  for (std::list<std::string>::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); I++) {
+    runScript(*I);
+  }
   Bindings::shutdown();
 
   if (_general) {
@@ -952,4 +947,10 @@ void System::processRecords() {
   }
 }
 
+void System::addSearchPaths(std::list<std::string> l) {
+  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); I++) {	
+    additional_paths.push_back(*I);
+  }
+}
+	
 } /* namespace Sear */
