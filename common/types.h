@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: types.h,v 1.1 2003-03-06 23:50:37 simon Exp $
+// $Id: types.h,v 1.2 2004-01-26 22:07:35 simon Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1
@@ -55,8 +55,11 @@ typedef struct {
 
 typedef struct {
   Vertex_3 *vertex_array;
+  unsigned int vertex_vbo;
   Normal *normal_array;
+  unsigned int normal_vbo;
   Texel *tex_coord_array;
+  unsigned int tex_vbo;
   unsigned int number_of_points;
   DataType data_type;
   Material material;
