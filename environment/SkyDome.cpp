@@ -80,7 +80,7 @@ SkyDome::SkyDome(float radius, int levels, int segments) :
     m_verts(NULL), m_texCoords(NULL),
     m_vb_verts(0), m_vb_texCoords(0)
 {
-    m_size = segments * levels;
+    m_size = segments * (levels + 1); // extra level for the skirt
     // disable for now
     sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
     domeInit(radius, levels, segments);
@@ -92,17 +92,10 @@ SkyDome::~SkyDome()
     delete [] m_texCoords;
 }
 
-float *SkyDome::genVerts(float radius, int levels, int segments)
+float* SkyDome::genLevelVerts(float a2, float a22, float radius, int segments, float* verts)
 {
-
-  int vert_counter = -1;
-  float *verts = new float[m_size * 3 * 4];
-  float levelInc = M_PI / (float)levels / 2.0f;
-  float segmentInc = (2.0f * M_PI) / (float)segments;
-  for (int i = 0; i < levels; ++i) {
-    float a2 = ((float)i * levelInc);
-    float a22 = ((float)(i + 1) * levelInc);
-
+    float segmentInc = (2.0f * M_PI) / segments;
+    
     for (int j = 0; j < segments; ++j) {
       float a1 = ((float)j * segmentInc);
       float a11 = ((float)(j + 1) * segmentInc);
@@ -113,35 +106,51 @@ float *SkyDome::genVerts(float radius, int levels, int segments)
       y = cos(a1) * sin(a2) * SQR(radius);
       z = cos(a2) * radius;
 
-      verts[++vert_counter] = x;
-      verts[++vert_counter] = y;
-      verts[++vert_counter] = z;
+      (*verts++) = x;
+      (*verts++) = y;
+      (*verts++) = z;
       
       x = sin(a11) * sin(a2) * SQR(radius);
       y = cos(a11) * sin(a2) * SQR(radius);
       z = cos(a2) * radius;
 
-      verts[++vert_counter] = x;
-      verts[++vert_counter] = y;
-      verts[++vert_counter] = z;
+      (*verts++) = x;
+      (*verts++) = y;
+      (*verts++) = z;
       
       x = sin(a11) * sin(a22) * SQR(radius);
       y = cos(a11) * sin(a22) * SQR(radius);
       z = cos(a22) * radius;
 
-      verts[++vert_counter] = x;
-      verts[++vert_counter] = y;
-      verts[++vert_counter] = z;
+      (*verts++) = x;
+      (*verts++) = y;
+      (*verts++) = z;
       
       x = sin(a1) * sin(a22) * SQR(radius);
       y = cos(a1) * sin(a22) * SQR(radius);
       z = cos(a22) * radius;
 
-      verts[++vert_counter] = x;
-      verts[++vert_counter] = y;
-      verts[++vert_counter] = z;
+      (*verts++) = x;
+      (*verts++) = y;
+      (*verts++) = z;
     }
+    
+    return verts;
+}
+
+float *SkyDome::genVerts(float radius, int levels, int segments)
+{
+  float *verts = new float[m_size * 3 * 4];
+  float levelInc = M_PI / (float)levels / 2.0f;
+    
+  float* vptr = genLevelVerts((M_PI * 3) / 4, M_PI / 2, radius, segments, verts);
+
+  for (int i = 0; i < levels; ++i) {
+    float a2 = ((float)i * levelInc);
+    float a22 = ((float)(i + 1) * levelInc);
+    vptr = genLevelVerts(a2, a22, radius, segments, vptr);
   }
+  
   return verts;
 }
  
@@ -149,6 +158,11 @@ float *SkyDome::genTexCoords(float radius, int levels, int segments)
 {
   float *tex = new float[m_size * 2 * 4];
   int tex_counter = -1;
+
+ // tex coords for the skirt
+  for (int k = 0; k < (segments * 8); ++k) {
+    tex[++tex_counter] = 0.0f;
+  }
 
   for (int i = 0; i < levels; ++i) {
 
@@ -235,7 +249,6 @@ void SkyDome::render()
     GLfloat i[4];
     glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT,&i);
     glFogfv(GL_FOG_COLOR,i);
-    glClearColor(i[0], i[1], i[2], i[3]); // Colour used to clear window
     delay = 0;
   }
 
@@ -245,6 +258,8 @@ void SkyDome::render()
   }
   glVertexPointer(3, GL_FLOAT, 0, m_verts);
 
+glEnable(GL_BLEND);
+
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   // Setup dome texture coords
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
@@ -253,6 +268,8 @@ void SkyDome::render()
   glTexCoordPointer(2, GL_FLOAT, 0, m_texCoords);
   // Renderdome
   glDrawArrays(GL_QUADS, 0, m_size * 4);
+
+glDisable(GL_BLEND);
 
   // Render Cloud layer one
   glEnable(GL_BLEND);

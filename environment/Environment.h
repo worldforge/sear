@@ -14,6 +14,7 @@ namespace Sear {
 
 class TerrainRenderer;
 class SkyDome;
+class Stars;
 
 class Environment {
   Environment() :
@@ -49,7 +50,7 @@ private:
   static Environment instance;
   TerrainRenderer *m_terrain;
   SkyDome *m_skyDome;
-
+  Stars* m_stars;
 };
 
 } // namespace Sear

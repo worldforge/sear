@@ -1,3 +1,17 @@
+2004-06-07  James Turner  <james@worldforge.org>
+
+	* Add star rendering to the environment code. Very simple while the
+	  renderer integration issues are sorted out; in the future, will use
+	  point sprites and colors. 
+	  
+	* Add a stars state to states.cfg
+	
+	* Add an unsigned 8-bit RGBA color to common/types.h
+	
+	* Add a long 'skirt' to the sky dome, and hence always use pure
+	  black as the glClear color. We still need the glReadPixel hack for
+	  getting the fog color, will address that in a future change.
+
 2004-06-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Workspace.cpp, gui/Workspace.h, src/System.cpp: Pass

@@ -21,6 +21,8 @@
 		};
 		C42B56B5063C666200EF8361 = {
 			children = (
+				C4A1C1FD0673A025005A6D40,
+				C4A1C1FE0673A025005A6D40,
 				C46B3EA10664EDC60096C26A,
 				C46B3EA20664EDC60096C26A,
 				C48C8C2E0664E60E0065C287,
@@ -135,12 +137,14 @@
 		};
 		C43B5B63063848F800DD4161 = {
 			children = (
+				C448D289066FCD6600E53100,
 				C43B5B64063848F800DD4161,
 				C43B5B65063848F800DD4161,
 				C43B5B67063848F800DD4161,
 				C43B5B68063848F800DD4161,
 				C43B5B69063848F800DD4161,
 				C43B5B6A063848F800DD4161,
+				C448D286066FC45200E53100,
 			);
 			isa = PBXGroup;
 			path = environment;
@@ -255,6 +259,35 @@
 		};
 		C43B5B7506384AC900DD4161 = {
 			fileRef = C43B5B7306384AC900DD4161;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		C448D286066FC45200E53100 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = Stars.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C448D287066FC45200E53100 = {
+			fileRef = C448D286066FC45200E53100;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		C448D289066FCD6600E53100 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = Stars.h;
+			path = environment/Stars.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		C448D28A066FCD6600E53100 = {
+			fileRef = C448D289066FCD6600E53100;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -889,6 +922,8 @@
 				C48C8C430664E61C0065C287,
 				C46B3EA40664EDC60096C26A,
 				C44D98930669D4F50006A176,
+				C448D28A066FCD6600E53100,
+				C4A1C2000673A025005A6D40,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -954,6 +989,8 @@
 				C48C8C400664E60E0065C287,
 				C46B3EA30664EDC60096C26A,
 				C44D98950669D6310006A176,
+				C448D287066FC45200E53100,
+				C4A1C1FF0673A025005A6D40,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2706,6 +2743,34 @@
 		};
 		C4939DF4057BBCC9000CAC07 = {
 			fileRef = C4939DF2057BBCC9000CAC07;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		C4A1C1FD0673A025005A6D40 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = Toplevel.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C4A1C1FE0673A025005A6D40 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = Toplevel.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C4A1C1FF0673A025005A6D40 = {
+			fileRef = C4A1C1FD0673A025005A6D40;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		C4A1C2000673A025005A6D40 = {
+			fileRef = C4A1C1FE0673A025005A6D40;
 			isa = PBXBuildFile;
 			settings = {
 			};

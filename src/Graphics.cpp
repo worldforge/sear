@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.49 2004-05-28 15:08:19 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.50 2004-06-07 22:05:25 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -208,7 +208,6 @@ Compare D^2 to choose what detail level to use
       if (!select_mode) {
 	_renderer->store();
         _renderer->applyQuaternion(orient);
-        RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("sky_0"));
         Environment::getInstance().renderSky();
 	_renderer->restore();
       }

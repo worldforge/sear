@@ -20,7 +20,9 @@ public:
   void invalidate() {}
     
 private:
-    float *genVerts(float radius, int levels, int segments);
+    float* genVerts(float radius, int levels, int segments);
+    float* genLevelVerts(float a2, float a22, float radius, int segments, float* verts);
+    
   float *genTexCoords(float radius, int levels, int segments);
 
   void domeInit(float radius, int levels, int segments);

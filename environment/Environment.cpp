@@ -10,7 +10,7 @@
 
 #include "TerrainRenderer.h"
 #include "SkyDome.h"
-
+#include "Stars.h"
                                                                                 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -24,6 +24,8 @@ void Environment::init() {
   assert(!m_initialised);
   m_terrain = new TerrainRenderer();
   m_skyDome = new SkyDome(1.0f, 20, 20);
+  m_stars = new Stars();
+  
   m_initialised = true;
 }
 
@@ -36,6 +38,9 @@ void Environment::shutdown() {
   delete m_skyDome;
   m_skyDome = NULL;
 
+  delete m_stars;
+  m_stars = NULL;
+  
   m_initialised = false;
 }
 
@@ -54,7 +59,12 @@ void Environment::setBasePoint(int x, int y, float z) {
   } 
 }
 
-void Environment::renderSky() {
+void Environment::renderSky()
+{
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("stars"));
+  m_stars->render();
+  
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("sky_0"));
   m_skyDome->render();
 }
 
