@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "System.h"
 #include <wfmath/axisbox.h>
 #include <Eris/TypeInfo.h>
 
@@ -15,7 +16,6 @@
 #include "ModelHandler.h"
 #include "Model.h"
 #include "Render.h"
-#include "System.h"
 #include "WorldEntity.h"
 
 #include <set>

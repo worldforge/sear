@@ -2,10 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+#include "src/System.h"
 #include <string>
 
 #include "src/WorldEntity.h"
-#include "src/System.h"
 #include "src/Render.h"
 #include "src/ObjectLoader.h"
 #include "src/ModelHandler.h"

@@ -5,9 +5,10 @@
 #ifndef _OBJECTLOADER_H_
 #define _OBJECTLOADER_H_ 1
 
-#include <stdio.h>
+#include "System.h"
 #include <string>
 #include <map>
+#include <stdio.h>
 
 
 namespace Sear {

@@ -2,12 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "System.h"
 #include <string>
 #include <Eris/World.h>
 
 #include "common/Log.h"
 
-#include "System.h"
 #include "Event.h"
 #include "WorldEntity.h"
 #include "ModelHandler.h"

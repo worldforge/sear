@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "System.h"
 #include <set>
 
 #include <varconf/Config.h>
@@ -23,7 +24,6 @@
 #include "ModelLoader.h"
 #include "ObjectLoader.h"
 #include "StateLoader.h"
-#include "System.h"
 #include "WorldEntity.h"
 
 

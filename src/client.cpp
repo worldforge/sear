@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "System.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
@@ -18,8 +19,6 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
-#include "System.h"
-#include "WorldEntity.h"
 #include "client.h"
 #include "Console.h"
 #include "Factory.h"
@@ -30,6 +29,7 @@
 #include "ModelHandler.h"
 #include "Model.h"
 #include "Exception.h"
+#include "WorldEntity.h"
 
 #ifdef DEBUG
   #define DEBUG_ERIS 1

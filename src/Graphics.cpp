@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "System.h"
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
@@ -25,7 +26,6 @@
 #include "ObjectLoader.h"
 #include "Render.h"
 #include "Sky.h"
-#include "System.h"
 #include "Terrain.h"
 #include "WorldEntity.h"
 

@@ -4,6 +4,7 @@
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
+#include "src/System.h"
 #include <math.h>
 
 #include <Eris/World.h>
@@ -11,7 +12,6 @@
 
 #include "common/Utility.h"
 
-#include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Camera.h"
 #include "src/Render.h"

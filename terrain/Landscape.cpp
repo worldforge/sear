@@ -4,15 +4,15 @@
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
+#include "src/System.h"
 #include <math.h>
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 
-#include "../src/Camera.h"
-#include "../src/System.h"
-#include "../src/Render.h"
-#include "../src/ObjectLoader.h"
+#include "src/Camera.h"
+#include "src/Render.h"
+#include "src/ObjectLoader.h"
 
 #include "Landscape.h"
 #include "ROAM.h"

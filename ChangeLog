@@ -1,3 +1,6 @@
+14th August 2002, Simon Goodall
+ * Updates for cross-compiling
+
 13th August 2002, Simon Goodall
  * Fixed potential seg faults on 3ds loader
   - Fault 1 caused by no material name
