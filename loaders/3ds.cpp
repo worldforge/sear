@@ -2,13 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.22 2003-07-15 11:11:20 simon Exp $
+// $Id: 3ds.cpp,v 1.23 2003-12-03 11:08:17 simon Exp $
 
 
 #include <iostream>
 #include <list>
 #include <map>
-#include <GL/gl.h>
+#include <sage/GL.h>
 
 #include <lib3ds/mesh.h>
 #include <lib3ds/node.h>

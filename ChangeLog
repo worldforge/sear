@@ -1,3 +1,7 @@
+3rd December 2003, Simon Goodall
+ * Changed GL includes to use sage ones.
+ * Fixed other build warnings
+
 2nd December 2003, Simon Goodall
  * Fixed some build warnings
 

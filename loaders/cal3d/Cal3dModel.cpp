@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.6 2003-07-15 11:11:22 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.7 2003-12-03 11:08:18 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -55,27 +55,13 @@ Cal3dModel::Cal3dModel(Render *render) :
   _initialised(false),
   _core_model(NULL)
 {
-  m_state = STATE_IDLE;
-  m_motionBlend[0] = 0.6f;
-  m_motionBlend[1] = 0.1f;
-  m_motionBlend[2] = 0.3f;
-//  m_animationCount = 0;
-//  m_meshCount = 0;
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
-//  _use_textures = false;
-//  grip = false;
   _height = 1.0f;
 }
 
 Cal3dModel::~Cal3dModel() {
   if (_initialised) shutdown();
-}
-
-void Cal3dModel::getMotionBlend(float *pMotionBlend) {
-  pMotionBlend[0] = m_motionBlend[0];
-  pMotionBlend[1] = m_motionBlend[1];
-  pMotionBlend[2] = m_motionBlend[2];
 }
 
 bool Cal3dModel::init(Cal3dCoreModel *core_model) {
@@ -97,7 +83,6 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
   m_calModel.setMaterialSet(0);
 
   // set initial animation state
-  m_state = STATE_IDLE;
   m_calModel.getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
 
   m_renderScale = _core_model->getScale();
@@ -208,55 +193,6 @@ void Cal3dModel::setLodLevel(float lodLevel) {
   m_lodLevel = lodLevel;
   // set the new lod level in the cal model renderer
   m_calModel.setLodLevel(m_lodLevel);
-}
-
-void Cal3dModel::setMotionBlend(float *pMotionBlend, float delay) {
-  m_motionBlend[0] = pMotionBlend[0];
-  m_motionBlend[1] = pMotionBlend[1];
-  m_motionBlend[2] = pMotionBlend[2];
-
-  Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
-  
-  m_calModel.getMixer()->clearCycle(animations["idle"], delay);
-  m_calModel.getMixer()->clearCycle(animations["funky"], delay);
-  m_calModel.getMixer()->blendCycle(animations["strut"], m_motionBlend[0], delay);
-  m_calModel.getMixer()->blendCycle(animations["walk"], m_motionBlend[1], delay);
-  m_calModel.getMixer()->blendCycle(animations["run"], m_motionBlend[2], delay);
-
-  m_state = STATE_MOTION;
-}
-
-void Cal3dModel::setState(int state, float delay) {
-  // check if this is really a new state
-  if(state != m_state) {
-    Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
-    if(state == STATE_IDLE) {
-      m_calModel.getMixer()->blendCycle(animations["idle"], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(animations["funky"], delay);
-      m_calModel.getMixer()->clearCycle(animations["strut"], delay);
-      m_calModel.getMixer()->clearCycle(animations["walk"], delay);
-      m_calModel.getMixer()->clearCycle(animations["run"], delay);
-      m_state = STATE_IDLE;
-    }
-    else if(state == STATE_FANCY)
-    {
-      m_calModel.getMixer()->clearCycle(animations["idle"], delay);
-      m_calModel.getMixer()->blendCycle(animations["funky"], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(animations["strut"], delay);
-      m_calModel.getMixer()->clearCycle(animations["walk"], delay);
-      m_calModel.getMixer()->clearCycle(animations["run"], delay);
-      m_state = STATE_FANCY;
-    }
-    else if(state == STATE_MOTION)
-    {
-      m_calModel.getMixer()->clearCycle(animations["idle"], delay);
-      m_calModel.getMixer()->clearCycle(animations["funky"], delay);
-      m_calModel.getMixer()->blendCycle(animations["strut"], m_motionBlend[0], delay);
-      m_calModel.getMixer()->blendCycle(animations["walk"], m_motionBlend[1], delay);
-      m_calModel.getMixer()->blendCycle(animations["run"], m_motionBlend[2], delay);
-      m_state = STATE_MOTION;
-    }
-  }
 }
 
 void Cal3dModel::action(const std::string &action) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.13 2003-12-02 16:05:38 simon Exp $
+// $Id: Slice.cpp,v 1.14 2003-12-03 11:08:17 simon Exp $
 
 #include "common/Utility.h"
 
@@ -138,7 +138,7 @@ void Slice::render(bool select_mode) {
   while (camera_angle < 0.0f) camera_angle += WFMath::Pi * 2;
   while (camera_angle > WFMath::Pi * 2) camera_angle -= WFMath::Pi * 2;
   
-  int index_1, index_2;
+  unsigned int index_1, index_2;
   index_1 = index_2 = 0;
   float angle = WFMath::Pi / _num_slicings;
   float transparency = 1.0f;
@@ -151,7 +151,7 @@ void Slice::render(bool select_mode) {
   }
   while (index_1 >= _num_slicings) index_1 -= _num_slicings;
   while (index_2 >= _num_slicings) index_2 -= _num_slicings;
-  int index;
+  unsigned int index;
   int i;
   // Render secondary slice
   if (transparency != 1.0f) { // If transparency will be zero don't render

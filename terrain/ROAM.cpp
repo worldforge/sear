@@ -17,7 +17,7 @@
 #include "ROAM.h"
 #include "Landscape.h"
 
-#include <GL/gl.h>
+#include <sage/GL.h>
 
 #ifdef HAVE_CONFIG
   #include "config.h"

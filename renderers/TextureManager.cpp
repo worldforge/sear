@@ -2,14 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.10 2003-07-15 11:11:22 simon Exp $
+// $Id: TextureManager.cpp,v 1.11 2003-12-03 11:08:18 simon Exp $
 
 #include "TextureManager.h"
 
 #include <sage/sage.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <sage/GL.h>
+#include <sage/GLU.h>
 
 #include "SDL.h"
 

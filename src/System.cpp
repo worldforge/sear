@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.63 2003-09-16 11:01:39 simon Exp $
+// $Id: System.cpp,v 1.64 2003-12-03 11:08:18 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sigc++/slot.h>
-#include <GL/gl.h>
+#include <sage/GL.h>
 #include <varconf/varconf.h>
 #include <Eris/Types.h>
 

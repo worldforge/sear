@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.7 2003-07-03 10:25:36 simon Exp $
+// $Id: StateManager.cpp,v 1.8 2003-12-03 11:08:18 simon Exp $
 
 /*
  * TODO
@@ -11,7 +11,7 @@
  * */
 
 #include <sage/sage.h>
-#include <GL/gl.h>
+#include <sage/GL.h>
 
 #include "StateManager.h"
 

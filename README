@@ -3,7 +3,7 @@ Sear
 Dependancies
 ------------
 
-Atlas 0.4.6
+Atlas 0.4.90
 ftp://ftp.worldforge.org/pub/worldforge/libs/Atlas-C++
 
 Eris 0.9.8
@@ -15,7 +15,7 @@ ftp://ftp.worldforge.org/pub/worldforge/libs/varconf
 WFmath 0.2.11
 ftp://ftp.worldforge.org/pub/worldforge/libs/wfmath
 
-Skstream2 0.2.5
+Skstream2 0.3
 ftp://ftp.worldforge.org/pub/worldforge/libs/skstream
 
 SDL 1.2.2 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.3 2003-03-14 11:02:42 simon Exp $
+// $Id: Cal3dModel.h,v 1.4 2003-12-03 11:08:18 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -29,16 +29,12 @@ public:
   bool init(Cal3dCoreModel *);
   void shutdown();
   float getLodLevel() const { return m_lodLevel; }
-  void getMotionBlend(float *pMotionBlend);
   float getScale() const { return m_renderScale; }
-  int getState() const { return m_state; }
   void render(bool select_mode) { render(true, true, select_mode); }
   void render(bool, bool, bool);
   void update(float elapsedSeconds);
   void setDetailLevel(float level) { setLodLevel(level); }
   void setLodLevel(float lodLevel);
-  void setMotionBlend(float *pMotionBlend, float delay);
-  void setState(int state, float delay);
 
   void action(const std::string &action);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
@@ -69,9 +65,7 @@ private:
   bool _initialised;
 
   Cal3dCoreModel *_core_model;
-  float m_motionBlend[3]; 
   float _height;
-  int m_state;
   CalModel m_calModel;
   float m_lodLevel;
   float m_renderScale;

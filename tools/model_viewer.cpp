@@ -22,8 +22,8 @@
 #include <string>
 
 #include <SDL/SDL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <sage/GL.h>
+#include <sage/GLU.h>
 
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.6 2003-07-03 10:25:36 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.7 2003-12-03 11:08:18 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -111,7 +111,8 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
     record->draw_self = true;
     record->draw_members = true;
     _object_records[section] = record;
-    if (debug) Log::writeLog(std::string("Adding ObjectRecord: ") + section, Log::LOG_INFO);
+//    if (debug) 
+std::cout << "Adding ObjectRecord: " << section << std::endl;
   }
   if (key == "draw_self") record->draw_self = (bool)config.getItem(section, key);
   else if (key == "draw_members") record->draw_members = (bool)config.getItem(section, key);

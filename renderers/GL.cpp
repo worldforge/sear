@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.69 2003-08-05 14:31:33 simon Exp $
+// $Id: GL.cpp,v 1.70 2003-12-03 11:08:18 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -10,8 +10,8 @@
 
 #include <sage/sage.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include <sage/GL.h>
+#include <sage/GLU.h>
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
