@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.100 2004-07-19 11:22:14 simon Exp $
+// $Id: System.cpp,v 1.101 2004-07-29 18:27:02 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -111,6 +111,8 @@ namespace Sear {
   static const std::string KEY_MOVE_AXIS = "move_axis";
   static const std::string KEY_PAN_AXIS = "pan_axis";
   static const std::string KEY_ELEVATION_AXIS = "elevation_axis";
+  static const std::string KEY_key_repeat_delay = "key_repeat_delay";
+  static const std::string KEY_key_repeat_rate = "key_repeat_rate";
   
   //Config default values
   static const int DEFAULT_window_width = 640;
@@ -119,11 +121,12 @@ namespace Sear {
   static const double DEFAULT_max_click_time = 0.3;
   static const int DEFAULT_joystick_touch_button = 1;
   static const int DEFAULT_joystick_pickup_button = 2;
+  static const int DEFAULT_key_repeat_delay = 1000;
+  static const int DEFAULT_key_repeat_rate = 500;
   
 System *System::_instance = NULL;
 
 System::System() :
-  repeat(false),
   action(ACTION_DEFAULT),
   mouseLook(0),
   screen(NULL),
@@ -133,6 +136,8 @@ System::System() :
   _icon(NULL),
    m_width(0),
    m_height(0),
+   m_KeyRepeatDelay(DEFAULT_key_repeat_delay),
+   m_KeyRepeatRate(DEFAULT_key_repeat_rate),
   _click_on(false),
   _click_x(0),
   _click_y(0),
@@ -297,7 +302,6 @@ bool System::init(int argc, char *argv[]) {
   _graphics->readConfig();
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
-  _command_history_iterator = _command_history.begin();
   // Try and create the window
   bool success;
   if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, false))) {
@@ -448,7 +452,7 @@ void System::mainLoop() {
       // poll network
       _client->poll();
       // draw scene
-      _graphics->drawScene(m_command, false, time_elapsed);
+      _graphics->drawScene(false, time_elapsed);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
@@ -531,68 +535,31 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     } 
     case SDL_KEYDOWN: {
-     // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
-        if (!repeat) {
-          // TODO place these values in a config file
-          SDL_EnableKeyRepeat(1000,500);
-          //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-          m_command = "";
-          repeat = true;
-        }
-        if (event.key.keysym.sym == SDLK_UP) {
-          // Previous command
-          if (_command_history_iterator != _command_history.begin()) {
-            _command_history_iterator--;
-            m_command = (*_command_history_iterator);
-          }
-        }
-        else if (event.key.keysym.sym == SDLK_DOWN) {
-          // next command
-          if (_command_history_iterator != _command_history.end()) {
-            _command_history_iterator++;
-            if (_command_history_iterator != _command_history.end()) m_command = (*_command_history_iterator);
-            else m_command = "";
-          }
-        }
-        else if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
-          (event.key.keysym.sym == SDLK_F1) ||
-          (event.key.keysym.sym == SDLK_F2) ||
-          (event.key.keysym.sym == SDLK_F3) ||
-          (event.key.keysym.sym == SDLK_F4) ||
-          (event.key.keysym.sym == SDLK_F5) ||
-          (event.key.keysym.sym == SDLK_F6) ||
-          (event.key.keysym.sym == SDLK_F7) ||
-          (event.key.keysym.sym == SDLK_F8) ||
-          (event.key.keysym.sym == SDLK_F9) ||
-          (event.key.keysym.sym == SDLK_F10) ||
-          (event.key.keysym.sym == SDLK_F11) ||
-          (event.key.keysym.sym == SDLK_F12) ||
-          (event.key.keysym.sym == SDLK_F13) ||
-          (event.key.keysym.sym == SDLK_F14) ||
-          (event.key.keysym.sym == SDLK_F15) ||
-          (event.key.keysym.sym == SDLK_ESCAPE))
+        // Keys that still execute bindings with console open 
+        if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
+            (event.key.keysym.sym == SDLK_F1) ||
+            (event.key.keysym.sym == SDLK_F2) ||
+            (event.key.keysym.sym == SDLK_F3) ||
+            (event.key.keysym.sym == SDLK_F4) ||
+            (event.key.keysym.sym == SDLK_F5) ||
+            (event.key.keysym.sym == SDLK_F6) ||
+            (event.key.keysym.sym == SDLK_F7) ||
+            (event.key.keysym.sym == SDLK_F8) ||
+            (event.key.keysym.sym == SDLK_F9) ||
+            (event.key.keysym.sym == SDLK_F10) ||
+            (event.key.keysym.sym == SDLK_F11) ||
+            (event.key.keysym.sym == SDLK_F12) ||
+            (event.key.keysym.sym == SDLK_F13) ||
+            (event.key.keysym.sym == SDLK_F14) ||
+            (event.key.keysym.sym == SDLK_F15) ||
+            (event.key.keysym.sym == SDLK_ESCAPE))
         {
           runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
-        } else if (event.key.keysym.sym == SDLK_RETURN) {
-          if (m_command.empty()) break;
-          runCommand(m_command);
-          _command_history.push_back(m_command);
-          _command_history_iterator = _command_history.end();
-          m_command = "";
-        } else if (event.key.keysym.sym == SDLK_DELETE || event.key.keysym.sym == SDLK_BACKSPACE) {
-          if (m_command.length() > 0) {
-            m_command = m_command.substr(0, m_command.length() - 1); 
-          }
-        } else if (event.key.keysym.unicode < 0x80 && event.key.keysym.unicode > 0) {
-          m_command = m_command + (char)event.key.keysym.unicode;
+        } else {
+          _console->vHandleInput(event.key.keysym.sym, event.key.keysym.unicode);
         }
       } else {
-        if (repeat) {
-          SDL_EnableKeyRepeat(0, 0);
-          m_command = "";
-          repeat = false;
-        }
         runCommand(Bindings::getBindingForKeysym(event.key.keysym));
       }
       break;
@@ -790,13 +757,30 @@ void System::readConfig() {
   } else {
     m_height = DEFAULT_window_height;
   }
+  if(m_general.findItem(SECTION_INPUT, KEY_key_repeat_delay)) {
+    temp = m_general.getItem(SECTION_INPUT, KEY_key_repeat_delay);
+    m_KeyRepeatDelay = (temp.is_int() == true) ? ((int)(temp)) : (DEFAULT_key_repeat_delay);
+  }
+  if(m_general.findItem(SECTION_INPUT, KEY_key_repeat_rate)) {
+    temp = m_general.getItem(SECTION_INPUT, KEY_key_repeat_rate);
+    m_KeyRepeatRate = (temp.is_int() == true) ? ((int)(temp)) : (DEFAULT_key_repeat_rate);
+  }
 }
 
 void System::writeConfig() {
   m_general.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select);
-
   m_general.setItem(SYSTEM, KEY_window_width, m_width);
   m_general.setItem(SYSTEM, KEY_window_height, m_height);
+  m_general.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay);
+  m_general.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
+}
+
+void System::vEnableKeyRepeat(bool bEnable) {
+  if(bEnable == true) {
+    SDL_EnableKeyRepeat(m_KeyRepeatDelay, m_KeyRepeatRate);
+  } else {
+    SDL_EnableKeyRepeat(0, 0);
+  }
 }
 
 SDL_Cursor *System::buildCursor(const char *image[]) {

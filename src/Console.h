@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.h,v 1.13 2004-04-17 15:55:45 simon Exp $
+// $Id: Console.h,v 1.14 2004-07-29 18:27:02 simon Exp $
 
 #ifndef SEAR_CONSOLE_H
 #define SEAR_CONSOLE_H 1
@@ -10,6 +10,8 @@
 #include <string>
 #include <list>
 #include <map>
+// Note: I don't like this very much, but it is needed for the KeySyms
+#include <SDL/SDL.h>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -24,6 +26,7 @@
 #define CONSOLE_HEIGHT (100)
 
 #define CONSOLE_PROMPT_STRING "> "
+#define CONSOLE_PROMPT_LENGTH 2
 #define CONSOLE_CURSOR_STRING "_"
 
 #define CONSOLE_MESSAGE 0x1
@@ -54,9 +57,8 @@ public:
   void pushMessage(const std::string &message, int type, int duration);
   /**
    * This method renders the console.
-   * command is the current command string
    */ 
-  void draw(const std::string &command);
+  void draw(void);
   /**
    * Toggles whether the console is visible or not
    */ 
@@ -65,7 +67,12 @@ public:
    * Returns whether the console is visible or not
    */ 
   bool consoleStatus() { return showConsole; }
-
+  
+  /**
+   * This function will change the content of the console according to the key that was  pressed.
+   **/
+  void vHandleInput(const SDLKey &KeySym, const Uint16 &UnicodeCharacter);
+  
   /**
    * Registers a command with the console
    * command is the command to register
@@ -84,16 +91,14 @@ public:
    * args is the commands arguments
    */ 
   void runCommand(const std::string &command, const std::string &args);
-
 protected:
   // Pair used to assign a duration to the screen message
   typedef std::pair<std::string, unsigned int> screenMessage;
 
   /**
    *  This render the console messges plus the current command string
-   *  command is the current command string
    */ 
-  void renderConsoleMessages(const std::string &command);
+  void renderConsoleMessages(void);
   /**
    * This renders the screen messages
    */ 
@@ -109,6 +114,22 @@ protected:
 
   // Mapping of registered commands to assoicated object
   std::map<std::string, ConsoleObject*> _registered_commands;
+  
+  /// Storage of the least recent commands in reverse order
+  std::list< std::string > m_CommandHistory;
+  std::list< std::string >::iterator m_CommandHistoryIterator;
+  
+  /// Command currently being edited in the console
+  std::string m_Command;
+  
+  /// The current caret position, 0-based.
+  unsigned int m_CaretPosition;
+  
+  /// A map identifying valid token starts and referencing those
+  std::multimap< std::string, std::string > m_CommandStarts;
+  
+  /// Whether the tab key was the last key pressed once.
+  bool m_bTabOnce;
  
   bool _initialised;
   

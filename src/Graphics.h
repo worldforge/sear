@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.16 2004-06-26 07:02:36 simon Exp $
+// $Id: Graphics.h,v 1.17 2004-07-29 18:27:02 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -74,8 +74,8 @@ typedef enum {
 
   float getLightLevel();
   void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &list); 
-  void drawScene(const std::string &command ,bool, float);
-  void drawWorld(const std::string &command ,bool, float);
+  void drawScene(bool, float);
+  void drawWorld(bool, float);
   void updateDetailLevels(float);
   
   std::string getActiveID();

@@ -583,7 +583,7 @@ void GL::procEvent(int x, int y) {
   if (!_system->checkState(SYS_IN_WORLD)) return;
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
-  System::instance()->getGraphics()->drawScene("", true, 0);
+  System::instance()->getGraphics()->drawScene(true, 0);
   x_pos = x;
   y = m_height - y;
   y_pos = y;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.57 2004-07-14 10:10:31 simon Exp $
+// $Id: Graphics.cpp,v 1.58 2004-07-29 18:27:02 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -166,7 +166,7 @@ void Graphics::shutdown() {
   _initialised = false;
 }
 
-void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {
+void Graphics::drawScene(bool select_mode, float time_elapsed) {
   if (!_renderer) {
     std::cerr << "No Render object to render with!" << std::endl;
     return;
@@ -175,7 +175,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   if (_camera) _camera->updateCameraPos(time_elapsed);
 
   _renderer->beginFrame();
-  drawWorld(command, select_mode, time_elapsed);
+  drawWorld(select_mode, time_elapsed);
 
   if (!select_mode) {
 /* Removed for release
@@ -185,7 +185,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
     else throw Exception("Error no Workspace object");
 */
     Console *con = _system->getConsole();
-    if (con) con->draw(command);
+    if (con) con->draw();
     else throw Exception("Error no Console object");
   }
 
@@ -206,7 +206,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   _renderer->endFrame(select_mode);
 }
 
-void Graphics::drawWorld(const std::string& command, bool select_mode, float time_elapsed) {
+void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
 /*

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.8 2004-06-11 00:53:13 alriddoch Exp $
+// $Id: Utility.cpp,v 1.9 2004-07-29 18:27:01 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -27,8 +27,6 @@
   static const bool debug = false;
 #endif
 namespace Sear {
-
-const std::string Tokeniser::delimeters = " ";
 
 void ReduceToUnit(float vector[3]) {
   float length;
@@ -125,25 +123,47 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
  else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
 }
 
-void Tokeniser::initTokens(const std::string &tokens) {
-  token_string = tokens;
-  last_pos = token_string.find_first_not_of(delimeters, 0);
-  pos = token_string.find_first_of(delimeters, last_pos);
+void Tokeniser::initTokens(const std::string &String) {
+  m_String = String;
+  m_Begin = 0;
+  m_End = 0;
 }
 
 std::string Tokeniser::nextToken() {
-  if (last_pos == std::string::npos) return "";
-  std::string token = token_string.substr(last_pos, pos - last_pos);
-  last_pos = token_string.find_first_not_of(delimeters, pos);
-  pos = token_string.find_first_of(delimeters, last_pos);
-  return token;
+  std::string sReturn = "";
+  bool bInString = false;
+  bool bIsEscaped = false;
+  
+  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == ' '); ++m_Begin);
+  if(m_Begin == m_String.length()) {
+    m_End = m_Begin;
+    
+    return "";
+  }
+  for(m_End = m_Begin; m_End < m_String.length(); ++m_End) {
+    if((m_String[m_End] == '\\') && (bIsEscaped == false)) {
+      bIsEscaped = true;
+    } else {
+      if((m_String[m_End] == ' ') && (bInString == false) && (bIsEscaped == false)) {
+        break;
+      } else if((m_String[m_End] == '"') && (bIsEscaped == false)) {
+        bInString = (bInString == false);
+      } else {
+        sReturn += m_String[m_End];
+      }
+      bIsEscaped = false;
+    }
+  }
+  
+  return sReturn;
 }
 
 std::string Tokeniser::remainingTokens() {
-  if (last_pos == std::string::npos) return "";
-  return token_string.substr(last_pos, token_string.size() - last_pos);
-}                                
-  
+  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == ' '); ++m_Begin);
+    
+  return m_String.substr(m_Begin);
+}
+
 unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned int &height) {
   unsigned int i, row, col;
   unsigned int num_colours = 0;

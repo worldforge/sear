@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.49 2004-06-24 14:58:35 jmt Exp $
+// $Id: System.h,v 1.50 2004-07-29 18:27:02 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -170,6 +170,12 @@ public:
    * @return Reference to ObjectRecords config object
    */ 
   varconf::Config &getObjectRecords() { return _object_records; }
+  
+  /**
+   * Enable or disable key repeating.
+   * @param bEnable The state of the key repeating.
+   **/
+  void vEnableKeyRepeat(bool bEnable = true);
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
   EventHandler *getEventHandler() const { return _event_handler; }
@@ -195,7 +201,6 @@ public:
   void runCommand(const std::string &command, const std::string &args);
   Client *getClient() { return _client; }
 protected:
-  bool repeat; 
   int action;
   bool initVideo();
   
@@ -209,12 +214,13 @@ protected:
   Render *renderer;
   Client *_client;
   static System *_instance;
-  std::string m_command;
   std::string _icon_file;
   SDL_Surface *_icon;
   
   int m_width;
   int m_height;
+  int m_KeyRepeatDelay;
+  int m_KeyRepeatRate;
 
   bool _click_on;
   int _click_x;
@@ -283,9 +289,6 @@ public:
 private:
   bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
-
-  std::list<std::string> _command_history;
-  std::list<std::string>::iterator _command_history_iterator;
 
   bool _initialised; ///< Initialisation state of System
 };

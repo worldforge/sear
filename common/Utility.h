@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.15 2004-07-14 10:10:30 simon Exp $
+// $Id: Utility.h,v 1.16 2004-07-29 18:27:01 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -125,19 +125,19 @@ unsigned char *xpm_to_image(const char * image[], unsigned int &width, unsigned 
 
 class Tokeniser {
 public:
-  Tokeniser() {}
-  ~Tokeniser() {}
-
-  void initTokens(const std::string &tokens);
+  Tokeniser(const std::string &String = "") : m_String(String), m_Begin(0), m_End(0) {
+  }
+  
+  ~Tokeniser() {
+  }
+  
+  void initTokens(const std::string &String);
   std::string nextToken();
   std::string remainingTokens();
-  
 protected:
-  std::string::size_type pos, last_pos;
-  std::string token_string;
-  static const std::string delimeters;
-  static const std::string quotes;
-  bool quoted;
+  std::string m_String;
+  std::string::size_type m_Begin;
+  std::string::size_type m_End;
 };
   
 } /* namespace Sear */
