@@ -1,3 +1,7 @@
+29th November 2002, Simon Goodall
+ * Fixed an out by one error on the getHeight code in terrain
+ * Fixd code terrain code so it will go to much greater detail than before
+
 27th November 2002, Simon Goodall
  * ROAM engine can now handle multiple height maps
  * Fixed bug in sky box where one texture would not be displayed

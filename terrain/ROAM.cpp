@@ -196,8 +196,8 @@ float ROAM::getHeight(float x, float y) {
   if (x < -half_x || x > half_x) return 0.0f; 
   if (y < -half_y || y > half_y) return 0.0f; 
   
-  x -= half_x;  
-  y -= half_y;
+  x += half_x;  
+  y += half_y;
   int index_x = 0;
   int index_y = 0;
   while (x > map_size) {
@@ -208,7 +208,7 @@ float ROAM::getHeight(float x, float y) {
     ++index_y;
     y -= map_size;
   }
-  return _height_maps[index_x + index_y * _num_x_landscapes][(int)x + (int)y * map_size] * _terrain_scale;
+  return _height_maps[index_x + index_y * _num_x_landscapes][(int)x + (int)y * (map_size+1)] * _terrain_scale;
   
   
   //TODO FIX ME	

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.7 2002-11-27 00:38:47 simon Exp $
+// $Id: Patch.cpp,v 1.8 2002-11-29 10:26:39 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -285,7 +285,7 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
 
   // Since we're after speed and not perfect representations,
   //    only calculate variance down to an 8x8 block
-  if ( (abs(leftX - rightX) >= 8) ||  (abs(leftY - rightY) >= 8) ) {
+  if ( (abs(leftX - rightX) >= 2) ||  (abs(leftY - rightY) >= 2) ) {
     // Final Variance for this node is the max of it's own variance and that of it's children.
     unsigned char a = RecursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 );
     myVariance = MAX(myVariance, a);
