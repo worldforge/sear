@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.33 2004-04-19 13:14:02 simon Exp $
+// $Id: WorldEntity.cpp,v 1.34 2004-04-22 10:51:33 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -170,6 +170,11 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
       std::string mode = getProperty(MODE).asString();
       if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
         new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
+        WorldEntity *loc = (WorldEntity*)getContainer(); // getLocation();
+        if (loc && loc->type() == "jetty") {
+          float jetty_z = loc->getAbsPos().z();
+          if (new_pos.z() < jetty_z) new_pos.z() = jetty_z;
+        }
       } else if (mode == "floating") {
       // Do nothing, use server Z
       }
@@ -202,9 +207,15 @@ void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::LOG_DEFAULT);
+  if (hasProperty("mass")) {
+
+    double mass = getProperty("mass").asNum();
+  Log::writeLog(std::string("Mass: ") + string_fmt(mass), Log::LOG_DEFAULT);
+  System::instance()->pushMessage(std::string(getName()) + std::string(" - Mass: ") + std::string(string_fmt(mass)), CONSOLE_MESSAGE | SCREEN_MESSAGE);
+  }
   if (hasProperty(MODE)) {
     std::string mode = getProperty(MODE).asString();
-  Log::writeLog(std::string("Mode: ") + mode, Log::LOG_DEFAULT);
+    Log::writeLog(std::string("Mode: ") + mode, Log::LOG_DEFAULT);
 }
 }
 

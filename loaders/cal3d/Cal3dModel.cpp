@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.8 2004-04-17 15:55:45 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.9 2004-04-22 10:51:32 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -55,7 +55,8 @@ static const std::string ANIM_default = "default";
 Cal3dModel::Cal3dModel(Render *render) :
   Model(render),
   _initialised(false),
-  _core_model(NULL)
+  _core_model(NULL),
+  m_rotate(90.0f)
 {
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
@@ -88,6 +89,8 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
   m_calModel.getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
 
   m_renderScale = _core_model->getScale();
+
+  m_rotate = _core_model->getRotate();
   _initialised = true;
   return true;
 }
@@ -175,7 +178,7 @@ void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
     float scale = _height * getScale();
     _render->scaleObject(scale);
-    _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
+    _render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
   }
 }

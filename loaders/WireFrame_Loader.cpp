@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.13 2003-03-06 23:50:38 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.14 2004-04-22 10:51:32 simon Exp $
 
 #include <string>
 
@@ -48,7 +48,8 @@ ModelRecord *WireFrame_Loader::loadModel(Render *render, ObjectRecord *record, c
   WireFrame *model = new WireFrame(render);
 
   WFMath::AxisBox<3> bbox = record->bbox;
-  if (!model->init(bboxCheck(bbox))) {
+  if (!model->init(bbox)) {
+  //if (!model->init(bboxCheck(bbox))) {
     model->shutdown();
     delete model;
     return NULL;

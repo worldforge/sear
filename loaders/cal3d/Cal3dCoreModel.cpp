@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.17 2004-04-19 19:50:19 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.18 2004-04-22 10:51:32 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -63,9 +63,11 @@ static const std::string KEY_specular_blue = "specular_blue";
 static const std::string KEY_specular_alpha = "specular_alpha";
 static const std::string KEY_shininess = "shininess";
 static const std::string KEY_texture_map = "texture_map";
+static const std::string KEY_rotate = "rotate";
 	
 Cal3dCoreModel::Cal3dCoreModel() :
-  _initialised(false)
+  _initialised(false),
+  m_rotate(90.0f)
 {}
 
 Cal3dCoreModel::~Cal3dCoreModel() {
@@ -122,6 +124,10 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   }
   // Get scale
   _scale = (double)config.getItem(SECTION_model, KEY_scale);
+  if (config.findItem(SECTION_model, KEY_rotate)) {
+    m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
+printf("Rotate %f\n", m_rotate);
+  }
   // Load all meshes 
   for (MeshMap::const_iterator I = _meshes.begin(); I != _meshes.end(); ++I) {
     std::string mesh_name = I->first;

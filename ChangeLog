@@ -1,3 +1,16 @@
+22nd April 2004, Simon Goodall
+ * Added normals to water to fix lighting problems
+ * Disabled face culling on water so it is visible from both above and below
+ * Fixed texture problem on 3ds models
+ * Fixed some bugs in bounding box loader not sizing entities correctly when bbox coords where not in the expected orientation
+ * Added arbitary rotation to cal3d objects, with a default 90.0f rotation for existing models
+ * Added individual s and t texture clamping to fix skydome texturing
+ * Changed default entity drop position to +1 X to avoid collision problems with server
+ * Initialisation now prints available video modes
+ * /identify now displays the mass of an object
+ * Reduced default internal texture format to RGB5 and Alpha 1 (bits per pixel)
+ 
+
 19th April 2004, Simon Goodall
  * Fixed blue / green mix up in cal3d loader
 

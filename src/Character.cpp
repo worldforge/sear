@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.33 2004-04-19 09:25:48 alriddoch Exp $
+// $Id: Character.cpp,v 1.34 2004-04-22 10:51:32 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -270,7 +270,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
     WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
     if (we->getName() == name) {
-      _avatar->drop(we);
+      _avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
       quantity--;
     }
   }

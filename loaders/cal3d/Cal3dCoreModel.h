@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.5 2003-03-14 11:02:42 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.6 2004-04-22 10:51:32 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H 1
@@ -78,6 +78,8 @@ public:
    * @return Scale to render model at
    */ 
   float getScale() const { return _scale; }
+
+  float getRotate() const  { return m_rotate; }
   
 private:
   /**
@@ -121,6 +123,7 @@ private:
   MaterialsMap _materials; ///< Mapping between material part and set to id
   PartMap _parts; ///< Mapping between part name and id
   SetMap _sets; ///< mapping between set name and id  
+  float m_rotate;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.2 2004-01-28 19:52:59 simon Exp $
+// $Id: ModelRecord.cpp,v 1.3 2004-04-22 10:51:33 simon Exp $
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -27,5 +27,6 @@ namespace Sear {
   const std::string ModelRecord::ROTATION_STYLE = "rotation_style";
   const std::string ModelRecord::DATA_FILE_ID = "data_file_id";
   const std::string ModelRecord::DEFAULT_SKIN = "default_skin";
+
 } /* namespace Sear */
 

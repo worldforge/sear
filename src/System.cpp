@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.74 2004-04-19 09:25:48 alriddoch Exp $
+// $Id: System.cpp,v 1.75 2004-04-22 10:51:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -402,6 +402,23 @@ void System::createWindow(bool fullscreen) {
   if (!info) {
     Log::writeLog("Error quering video", Log::LOG_DEFAULT);
   }
+
+SDL_Rect **videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+                                                                                
+    /* Check is there are any modes available */
+    if(videoModes == 0){
+        printf("No modes available!\n");
+    } else if (videoModes == (SDL_Rect **)-1) {
+        printf("All resolutions available.\n");     } else{
+        /* Print valid modes */         printf("Available Modes\n");
+        for(int i=0; videoModes[i]; ++i) {
+float aspect = (float)videoModes[i]->w / (float)videoModes[i]->h;
+             printf("  %d x %d -- %f\n", videoModes[i]->w, videoModes[i]->h, aspect);
+        }     }
+    fflush(stdout);
+
+
+
   //Create Window
   int flags = SDL_OPENGL;
   int bpp = info->vfmt->BitsPerPixel;

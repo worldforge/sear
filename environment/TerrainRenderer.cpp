@@ -272,9 +272,11 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
     const Terrain::Segmentstore & segs = t.getTerrain();
 
     Terrain::Segmentstore::const_iterator I = segs.begin();
+glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
 glDisable(GL_TEXTURE_2D);
             glColor4f(0.8f, 0.8f, 1.f, 0.6f);
+glNormal3f(0.0f,0.0f,1.0f);
 glEnable(GL_COLOR_MATERIAL);
     for (; I != segs.end(); ++I) {
         const Terrain::Segmentcolumn & col = I->second;
@@ -291,6 +293,7 @@ glEnable(GL_COLOR_MATERIAL);
             glPopMatrix();
         }
     }
+glEnable(GL_CULL_FACE);
 glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);

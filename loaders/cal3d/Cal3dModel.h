@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.4 2003-12-03 11:08:18 simon Exp $
+// $Id: Cal3dModel.h,v 1.5 2004-04-22 10:51:32 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -58,6 +58,8 @@ public:
  
   std::list<std::string> getMeshNames();
   std::list<std::string> getMaterialNames();
+
+  void setRotate(float r) { m_rotate = r; }
   
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
@@ -72,6 +74,7 @@ private:
 //  static float _walk_blend[];
 //  static float _run_blend[];
 //  static float _strut_blend[];
+  float m_rotate;
 
 };
 

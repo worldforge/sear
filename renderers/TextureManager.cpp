@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.14 2004-04-17 15:55:45 simon Exp $
+// $Id: TextureManager.cpp,v 1.15 2004-04-22 10:51:32 simon Exp $
 
 #include "TextureManager.h"
 
@@ -51,6 +51,8 @@ static const std::string SECTION_render = "render";
 static const std::string KEY_filename = "filename";
 static const std::string KEY_path = "path";
 static const std::string KEY_clamp = "clamp";
+static const std::string KEY_clamp_s = "clamp_s";
+static const std::string KEY_clamp_t = "clamp_t";
 static const std::string KEY_mipmap = "mipmap";
 static const std::string KEY_type = "type";
 static const std::string KEY_priority = "priority";
@@ -60,6 +62,8 @@ static const std::string KEY_mag_filter = "mag_filter";
 
 // config defaults
 static const bool DEFAULT_clamp = false;
+static const bool DEFAULT_clamp_s = DEFAULT_clamp;
+static const bool DEFAULT_clamp_t = DEFAULT_clamp;
 static const bool DEFAULT_mipmap = true;
 static const bool DEFAULT_mask = false;
 static const unsigned int DEFAULT_min_filter = GL_LINEAR;
@@ -240,17 +244,36 @@ TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilter(mag_filter));
   }
   // Set clamp or repeat
-  bool clamp = (bool)_texture_config.getItem(texture_name, KEY_clamp);
-  if (clamp) {
+  bool clamp = DEFAULT_clamp;
+  bool clamp_s = DEFAULT_clamp_s;
+  bool clamp_t = DEFAULT_clamp_t;
+  if (_texture_config.findItem(texture_name, KEY_clamp)) {
+    clamp_s = clamp_t = clamp = (bool)_texture_config.getItem(texture_name, KEY_clamp);
+  }
+  if (_texture_config.findItem(texture_name, KEY_clamp_s)) {
+    clamp_s = (bool)_texture_config.getItem(texture_name, KEY_clamp_s);
+  }
+  if (_texture_config.findItem(texture_name, KEY_clamp_t)) {
+    clamp_t = (bool)_texture_config.getItem(texture_name, KEY_clamp_t);
+  }
+
+  if (clamp_s) {
     if (use_arb_texture_border_clamp) {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);    
     } else {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     }
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  }
+
+  if (clamp_t) {
+    if (use_arb_texture_border_clamp) {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);    
+    } else {
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
+  } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
   // Check to see if anisotropic filtering is available
@@ -274,8 +297,8 @@ TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *
     } else {
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }
-    fmt = (bpp == 24) ? 3 : 4;
-
+//    fmt = (bpp == 24) ? 3 : 4;
+    fmt = (bpp == 24) ? GL_RGB5 : GL_RGB5_A1;
 /*
   // TODO make this support more texture formats
 //  int type = (int)_texture_config.getItem(texture_name, KEY_type);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.24 2004-04-17 15:55:45 simon Exp $
+// $Id: 3ds.cpp,v 1.25 2004-04-22 10:51:32 simon Exp $
 
 
 #include <iostream>
@@ -105,29 +105,29 @@ void ThreeDS::shutdown() {
 }
 
 void ThreeDS::render(bool select_mode) {
-  int current_texture = 0;
+  int current_texture = -2;
   std::string current_material = "";
   if (select_mode) {
-    if (_list_select) {
-      _render->playList(_list_select);
-    } else {
-      _list_select = _render->getNewList();
-      _render->beginRecordList(_list_select);
+//    if (_list_select) {
+//      _render->playList(_list_select);
+//    } else {
+//      _list_select = _render->getNewList();
+//      _render->beginRecordList(_list_select);
       for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
         RenderObject *ro = *I;
         if (ro) {
           _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data, false);
         }
-      }
-      _render->endRecordList();
+//      }
+//      _render->endRecordList();
     }
   } else {
-    if (_list) {
-      _render->playList(_list);
-    } else {
-      _list = _render->getNewList();
-      _render->beginRecordList(_list);
-      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
+//    if (_list) {
+//      _render->playList(_list);
+//    } else {
+//      _list = _render->getNewList();
+//      _render->beginRecordList(_list);
+      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
         RenderObject *ro = *I;
         if (ro) {
           if (!ro->material_name.empty() && ro->material_name != current_material) {
@@ -138,14 +138,19 @@ void ThreeDS::render(bool select_mode) {
             }	    
           }
           if (current_texture != ro->texture_id) {
-            if (ro->texture_data) RenderSystem::getInstance().switchTexture(ro->texture_id);
-            current_texture = ro->texture_id;
+            if (ro->texture_data) {
+              RenderSystem::getInstance().switchTexture(ro->texture_id);
+              current_texture = ro->texture_id;
+            } else {
+              RenderSystem::getInstance().switchTexture(0);
+              current_texture = 0;
+            }
           }
           _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
         }
       }
-      _render->endRecordList();
-    }
+//      _render->endRecordList();
+//    }
   }
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.20 2003-03-06 23:50:38 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.21 2004-04-22 10:51:32 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -70,7 +70,8 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
 //  }
  
   std::string type = record->type;
-  if (!model->init(bboxCheck(bbox), type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
+  if (!model->init(bbox, type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
+  //if (!model->init(bboxCheck(bbox), type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
     std::cerr<< "error initing model" << std::endl;
     model->shutdown();
     delete model;
