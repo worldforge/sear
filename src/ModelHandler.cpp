@@ -178,7 +178,6 @@ Model *ModelHandler::getModel(Render *render, const std::string &object_type, Ob
     ms->hasBBox = false;
     ms->bbox = WFMath::AxisBox<3>();
     ms->multi_textures = op->multi_textures;
-    if (ms->multi_textures) cout << ms->type << endl;
     std::string data_source = model_config->getItem(op->model_type, object_type);
     ms->file_name = data_source.c_str();
     if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(render, *ms);

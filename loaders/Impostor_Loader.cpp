@@ -26,29 +26,23 @@ Model *Impostor_Loader::loadModel(Render *render, ModelStruct &ms) {
   std::string type = ms.type;
   bool multi_textures = ms.multi_textures;
   if (multi_textures) {
-      std::cout << "Multi_texturing enabled" << std::endl;
-    int id = render->requestTexture("impostor_front", type);
-    cout << "ID1: " << id << endl;
-    id = render->requestTexture("impostor_side", type);
-    cout << "ID2: " << id << endl;
+    int id = render->requestTexture("impostor_front", type, true);
+    id = render->requestTexture("impostor_side", type, true);
     if (id == -1 && ms.parent) {
       type = ms.parent;
-      id = render->requestTexture("impostor_front", type);
-    cout << "ID3: " << id << endl;
-      id = render->requestTexture("impostor_side", type);
-    cout << "ID4: " << id << endl;
+      id = render->requestTexture("impostor_front", type, true);
+      id = render->requestTexture("impostor_side", type, true);
     }
     if (id == -1) {
       // If nothing, then try a single texture version
       multi_textures = false;
-      std::cout << "Multi_texturing disabled" << std::endl;
     }
   } 
   if (!multi_textures) {
-    int id = render->requestTexture("impostor", type);
+    int id = render->requestTexture("impostor", type, true);
     if (id == -1 && ms.parent) {
       type = ms.parent;
-      id = render->requestTexture("impostor", type);
+      id = render->requestTexture("impostor", type, true);
     }
     if (id == -1) {
       // TODO: what happens if we still cannot find a texture?

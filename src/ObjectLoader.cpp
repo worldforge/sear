@@ -162,7 +162,6 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     else if (tag == "multi_textures") {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       op->multi_textures = (std::string(string_data) == "true") ? (true) : (false);
-      if (op->multi_textures) cout << op->object_type << " multitextures" << endl;
     }
     else if (tag == "outline") {
       sscanf(str, "%*s = %s\n", &string_data[0]);  

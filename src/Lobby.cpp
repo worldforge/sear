@@ -62,7 +62,7 @@ void Lobby::Disappearance(Eris::Room* room, const std::string&str) {
 void Lobby::Changed(const Eris::StringSet &ss) {
   std::cout << "Changed" << std::endl;
   for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); I++) {
-    cout << *I << endl;
+    std::cout << *I << std::endl;
   }
 }
 
@@ -81,9 +81,9 @@ void Lobby::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == LIST_ROOMS) {
     Eris::StringList sl = _lobby->getRooms();
-    cout << "listing room"<< endl;
+    std::cout << "listing room"<< std::endl;
     for (Eris::StringList::const_iterator I = sl.begin(); I != sl.end(); I++) {
-      cout << *I << endl;
+      std::cout << *I << std::endl;
     }
   }
   else if (command == TALK) {
