@@ -22,7 +22,8 @@ sear_LDADD = \
 	$(LIB3DS_LIBS) 
 
 sear_SOURCES = \
-	main.cpp
+	main.cpp \
+	sear.rc
 
 libSear_a_SOURCES = \
 	ActionHandler.cpp \

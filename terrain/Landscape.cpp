@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.18 2003-02-25 22:34:25 simon Exp $
+// $Id: Landscape.cpp,v 1.19 2003-03-04 18:56:24 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -35,7 +35,7 @@
 namespace Sear {
 
 static const std::string TERRAIN = "terrain";
-static const std::string GRASS = "grass";
+static const std::string DETAIL = "detail";
 static const std::string WATER = "water";
 
 #define DEF_VAL 9999.0f
@@ -77,7 +77,7 @@ void Landscape::Init(float *hMap, int size, int offsetx, int offsety) {
   Patch *patch;
   int X, Y;
   texture_name_id = "landscape_" + string_fmt(offsetx) + "_" + string_fmt(offsety);
-  std::cout << "Texture Name - " << texture_name_id << std::endl;
+//  std::cout << "Texture Name - " << texture_name_id << std::endl;
 //  texture_id = _renderer->requestMipMap(texture_name_id);
   // Store the Height Field array
   m_HeightMap = hMap;
@@ -190,7 +190,7 @@ void Landscape::render() {
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
 //    _renderer->switchTexture(_renderer->requestMipMap(TERRAIN, texture_name_id));
 //    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id),0);
-    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id), _renderer->requestMipMap(TERRAIN, GRASS, false));
+    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id, true), _renderer->requestMipMap(TERRAIN, DETAIL, false));
   } else {
     // Do Nothing
   }
@@ -199,10 +199,10 @@ void Landscape::render() {
 
   patch = &(m_Patches[0][0]);
   
-//  _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
+  _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
   _renderer->stateChange(WATER);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchMultiTexture(_renderer->requestMipMap(WATER, WATER), _renderer->requestMipMap(TERRAIN, GRASS, false));
+    _renderer->switchMultiTexture(_renderer->requestMipMap(WATER, WATER), _renderer->requestMipMap(TERRAIN, DETAIL, false));
   } else {
 //    //Do Nothing
   }
