@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.14 2004-03-02 17:11:09 simon Exp $
+// $Id: main.cpp,v 1.15 2004-03-02 18:03:33 simon Exp $
 
 #include <unistd.h>
 #include <iostream>
@@ -27,7 +27,12 @@
 #else
   static const bool debug = false;
 #endif
+#if defined(_WIN32)
 int SDL_main(int argc, char** argv) {
+#else
+
+int main(int argc, char** argv) {
+#endif
   bool exit_program = false;
   Sear::System *sys = NULL;
   std::list<std::string> path_list;
