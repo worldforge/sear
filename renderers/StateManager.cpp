@@ -1,10 +1,19 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateLoader.cpp,v 1.1 2003-03-15 15:23:08 simon Exp $
+// $Id: StateManager.cpp,v 1.1 2003-03-15 17:18:49 simon Exp $
 
-#include "StateLoader.h"
+/*
+ * TODO
+ * Allow states flushing
+ * custom of default settings
+ * */
+
+#include <sage/sage.h>
+#include <GL/gl.h>
+
+#include "StateManager.h"
 
 #include <varconf/varconf.h>
 
@@ -67,18 +76,20 @@ static const std::string BLEND_constant_alpha_ext = "constant_alpha_ext";
 static const std::string BLEND_one_minus_constant_alpha_ext = "one_minus_constant_alpha_ext";
 static const std::string BLEND_src_alpha_saturate = "src_alpha_saturate";
 
-StateLoader::StateLoader() :
-  _initialised(false)
+StateManager::StateManager() :
+  _initialised(false),
+  _current_state(-1),
+  _state_counter(0)
 {}
 
-StateLoader::~StateLoader() {
+StateManager::~StateManager() {
   if (_initialised) shutdown();
 }
 
-void StateLoader::init() {
+void StateManager::init() {
   if (_initialised) shutdown();
-  if (debug) Log::writeLog("State Loader: Initialising.", Log::LOG_DEFAULT);
-  _state_properties = std::map<std::string, StateProperties*>();
+  if (debug) std::cout << "State Loader: Initialising." << std::endl;
+
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
   // Create a default record
@@ -98,8 +109,12 @@ void StateLoader::init() {
   default_state->alpha_function = GL_GREATER;
   default_state->alpha_value = 0.1f;
   default_state->blend_src_function = GL_SRC_ALPHA;
-  default_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
-
+  default_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
+  _states[_state_counter] = default_state;
+  _state_name_map[default_state->state] = _state_counter;
+  _name_state_vector[_state_counter] = default_state->state;
+  ++_state_counter;
+  
   //Create a font state so we can still see text
   //even if no files have been loaded into Sear
   font_state->state = "font";
@@ -118,32 +133,34 @@ void StateLoader::init() {
   default_state->alpha_function = GL_GREATER;
   default_state->alpha_value = 0.1f;
   default_state->blend_src_function = GL_SRC_ALPHA;
-  default_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
+  default_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
+  _states[_state_counter] = font_state;
+  _state_name_map[font_state->state] = _state_counter;
+  _name_state_vector[_state_counter] = font_state->state;
+  ++_state_counter;
 
-  _state_properties["default"] = default_state;
-  _state_properties["font"] = font_state;
   _initialised = true;
 }
 
 
-void StateLoader::shutdown() {
-  if (debug) Log::writeLog("State Loader: Shutting Down", Log::LOG_DEFAULT);
-  while (!_state_properties.empty()) {
-    if (_state_properties.begin()->second) delete(_state_properties.begin()->second);
-    _state_properties.erase(_state_properties.begin());
+void StateManager::shutdown() {
+  if (debug) std::cout << "State Loader: Shutting Down" << std::endl;
+  while (!_states.empty()) {
+    if (*_states.begin()) delete(*_states.begin());
+    _states.erase(_states.begin());
   }
   _initialised = false;
 }
 
-void StateLoader::readFiles(const std::string &file_name) {
+void StateManager::readFiles(const std::string &file_name) {
   varconf::Config config;
-  config.sigsv.connect(SigC::slot(*this, &StateLoader::varconf_callback));
-  config.sige.connect(SigC::slot(*this, &StateLoader::varconf_error_callback));
+  config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
+  config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
   config.readFromFile(file_name);
 }
 
-void StateLoader::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  StateProperties *record = _state_properties[section];
+void StateManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  StateProperties *record = _states[_state_name_map[section]];
   // If record does not exist, create it.
   if (!record) {
       record = new StateProperties();
@@ -161,12 +178,16 @@ void StateLoader::varconf_callback(const std::string &section, const std::string
       record->stencil = false;
       record->fog = false;
       record->rescale_normals = false;
-      record_state->alpha_function = GL_GREATER;
-      record_state->alpha_value = 0.1f;
-      record_state->blend_src_function = GL_SRC_ALPHA;
-      record_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
-      _state_properties[section] = record;
-      if (debug) Log::writeLog(std::string("Adding State: ") + section, Log::LOG_INFO);
+      record->alpha_function = GL_GREATER;
+      record->alpha_value = 0.1f;
+      record->blend_src_function = GL_SRC_ALPHA;
+      record->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
+  
+      _states[_state_counter] = record;
+      _state_name_map[record->state] = _state_counter;
+      _name_state_vector[_state_counter] = record->state;
+      ++_state_counter;
+      if (debug)std::cout << "Adding State: " << section << std::endl;
   }
 
   if (key == ALPHA_TEST) record->alpha_test = (bool)config.getItem(section, key);
@@ -187,22 +208,22 @@ void StateLoader::varconf_callback(const std::string &section, const std::string
   else if (key == BLEND_DEST_FUNCTION) record->blend_dest_function = getBlendFunction((std::string)config.getItem(section, key));
 }
 
-void StateLoader::varconf_error_callback(const char *message) {
+void StateManager::varconf_error_callback(const char *message) {
   Log::writeLog(message, Log::LOG_ERROR);
 }
 
-unsigned int StateLoader::getAlphaFunction(const std::string &alpha_function) {
+unsigned int StateManager::getAlphaFunction(const std::string &alpha_function) {
   if (alpha_function == ALPHA_greater) return GL_GREATER;
   if (alpha_function == ALPHA_less) return GL_LESS;
   if (alpha_function == ALPHA_equal) return GL_EQUAL;
-  if (alpha_function == ALPHA_notequal) return GL_NOTEQUA:;
+  if (alpha_function == ALPHA_notequal) return GL_NOTEQUAL;
   if (alpha_function == ALPHA_gequal) return GL_GEQUAL;
   if (alpha_function == ALPHA_lequal) return GL_LEQUAL;
   if (alpha_function == ALPHA_always) return GL_ALWAYS;
   if (alpha_function == ALPHA_never) return GL_NEVER;
 }
 
-unsigned int StateLoader::getBlendFunction(const std::string &blend_function) {
+unsigned int StateManager::getBlendFunction(const std::string &blend_function) {
   if (blend_function == BLEND_zero) return GL_ZERO;
   if (blend_function == BLEND_one) return GL_ONE;
   if (blend_function == BLEND_dst_color) return GL_DST_COLOR;
@@ -216,6 +237,114 @@ unsigned int StateLoader::getBlendFunction(const std::string &blend_function) {
   if (blend_function == BLEND_constant_alpha_ext) return GL_CONSTANT_ALPHA_EXT;
   if (blend_function == BLEND_one_minus_constant_alpha_ext) return GL_ONE_MINUS_CONSTANT_ALPHA_EXT;
   if (blend_function == BLEND_src_alpha_saturate) return GL_SRC_ALPHA_SATURATE;
+}
+
+void StateManager::stateChange(StateID state) {
+  assert(_initialised == true);
+  if (_current_state == state) return; // No need to do anything
+  StateProperties *sp = _states[state];
+  if (!sp) {
+    sp = _states[0];
+    state = 0;
+  }
+  // First time round, we have no states
+  if (_current_state != -1) {
+//    std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
+    GLuint list = _state_change_vector[_current_state][state];
+    if (!glIsList(list)) {
+      list = glGenLists(1);
+      buildStateChange(list, _states[_current_state], sp);
+      _state_change_vector[_current_state][state] = list;
+    }
+    glCallList(list);
+  } else {
+    // We can't build up a transition, so we just go ahead directly	  
+    if (sp->alpha_test) glEnable(GL_ALPHA_TEST);
+    else glDisable(GL_ALPHA_TEST);
+    if (sp->blend) glEnable(GL_BLEND);
+    else glDisable(GL_BLEND);
+    if (sp->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
+    else glDisable(GL_LIGHTING);
+    if (sp->two_sided_lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+    if (sp->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
+    else glDisable(GL_TEXTURE_2D);
+    if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
+    else glDisable(GL_COLOR_MATERIAL);
+    if (sp->depth_test) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+    if (sp->cull_face) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+    if (sp->cull_face_cw) glFrontFace(GL_CW);
+    else glFrontFace(GL_CCW);
+    if (sp->stencil) glEnable(GL_STENCIL_TEST);
+    else glDisable(GL_STENCIL_TEST);
+    if (sp->fog) glEnable(GL_FOG);
+    else glDisable(GL_FOG);
+    if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
+    else glDisable(GL_RESCALE_NORMAL);
+    glAlphaFunc(sp->alpha_function, sp->alpha_value);
+    glBlendFunc(sp->blend_src_function, sp->blend_dest_function);
+  }
+  _current_state = state;
+}
+
+void StateManager::buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state) {
+  assert (previous_state != NULL);
+  assert (next_state != NULL);
+  glNewList(list, GL_COMPILE);
+  if (previous_state->alpha_test != next_state->alpha_test) {
+    if (next_state->alpha_test) glEnable(GL_ALPHA_TEST);
+    else glDisable(GL_ALPHA_TEST);
+  }
+  if (previous_state->blend != next_state->blend) {
+    if (next_state->blend) glEnable(GL_BLEND);
+    else glDisable(GL_BLEND);
+  }
+  if (previous_state->lighting != next_state->lighting) {
+    if (next_state->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
+    else glDisable(GL_LIGHTING);
+  }
+  if (previous_state->two_sided_lighting != next_state->two_sided_lighting) {
+    if (next_state->lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
+  }
+  if (previous_state->textures != next_state->textures) {
+    if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
+    else glDisable(GL_TEXTURE_2D);
+  }
+  if (previous_state->colour_material != next_state->colour_material) {
+    if (next_state->colour_material) glEnable(GL_COLOR_MATERIAL);
+    else glDisable(GL_COLOR_MATERIAL);
+  }
+  if (previous_state->depth_test != next_state->depth_test) {
+    if (next_state->depth_test) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+  }
+  if (previous_state->cull_face != next_state->cull_face) {
+    if (next_state->cull_face) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+  }
+  if (previous_state->cull_face_cw != next_state->cull_face_cw) {
+    if (next_state->cull_face_cw) glFrontFace(GL_CW);
+    else glFrontFace(GL_CCW);
+  }
+  if (previous_state->stencil != next_state->stencil) {
+    if (next_state->stencil) glEnable(GL_STENCIL_TEST);
+    else glDisable(GL_STENCIL_TEST);
+  }
+  if (previous_state->fog != next_state->fog) {
+    if (next_state->fog) glEnable(GL_FOG);
+    else glDisable(GL_FOG);
+  }
+  if (previous_state->rescale_normals != next_state->rescale_normals) {
+    if (next_state->rescale_normals) glEnable(GL_RESCALE_NORMAL);
+    else glDisable(GL_RESCALE_NORMAL);
+  }
+  glAlphaFunc(next_state->alpha_function, next_state->alpha_value);
+  glBlendFunc(next_state->blend_src_function, next_state->blend_dest_function);
+  
+  glEndList();
 }
 
 } /* namespace Sear */

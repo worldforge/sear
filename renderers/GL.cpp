@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.59 2003-03-07 12:50:51 simon Exp $
+// $Id: GL.cpp,v 1.60 2003-03-15 17:18:49 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -13,21 +13,21 @@
 #include <SDL/SDL_image.h>
 
 #include <unistd.h>
-#ifndef __WIN32
-#define GL_GLEXT_PROTOTYPES 1
-#endif
+
+#include <sage/sage.h>
+
 #include <GL/gl.h>
 #include <GL/glu.h>
 //#ifndef __WIN32
 //typedef void (*PFNGLACTIVETEXTUREARBPROC) (GLenum texture);
 //typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
 //#endif
-#ifdef __WIN32
-PFNGLACTIVETEXTUREARBPROC glActiveTextureARB  = NULL;
-PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
-PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
-PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
-#endif
+//#ifdef __WIN32
+//PFNGLACTIVETEXTUREARBPROC glActiveTextureARB  = NULL;
+//PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
+//PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
+//PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
+//#endif
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
@@ -60,15 +60,15 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 #include "src/default_font.xpm"
 
 #include "GL.h"
-#define GL_GLEXT_PROTOTYPES 1
-#include <GL/glext.h>
+//#define GL_GLEXT_PROTOTYPES 1
+//#include <GL/glext.h>
 
 // GL EXTENSIONS DEF
-#define GENERATE_MIPMAP_SGIS            0x8191
-#define GENERATE_MIPMAP_HINT_SGIS       0x8192
+//#define GENERATE_MIPMAP_SGIS            0x8191
+//#define GENERATE_MIPMAP_HINT_SGIS       0x8192
 
-#define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
-#define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
+//#define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
+//#define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -579,8 +579,8 @@ void GL::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
   }
   if (use_ext_texture_filter_anisotropic) {
     GLfloat largest_supported_anisotropy;
-    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 }
@@ -598,8 +598,8 @@ void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
   }
   if (use_ext_texture_filter_anisotropic) {
     GLfloat largest_supported_anisotropy;
-    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   if (use_sgis_generate_mipmap) {
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
@@ -623,8 +623,8 @@ void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clam
   }
   if (use_ext_texture_filter_anisotropic) {
     GLfloat largest_supported_anisotropy;
-    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   if (surface->format->BytesPerPixel == 4) {
     for (i = 0; i < surface->w * surface->h * 4; i += 4) {
@@ -657,8 +657,8 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
   }
   if (use_ext_texture_filter_anisotropic) {
     GLfloat largest_supported_anisotropy;
-    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   if (surface->format->BytesPerPixel == 4) {
     for (i = 0; i < surface->w * surface->h * 4; i += 4) {
@@ -1206,8 +1206,8 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
   } 
   if (use_ext_texture_filter_anisotropic) {
     GLfloat largest_supported_anisotropy;
-    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
 //  if (use_sgis_generate_mipmap) {
 //    glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
@@ -1560,38 +1560,43 @@ inline void GL::getFrustum(float frust[6][4]) {
 }
 
 void GL::setupExtensions() {
-  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
-  if (extensions.find("GL_SGIS_generate_mipmap") != std::string::npos) {
-    use_sgis_generate_mipmap = true;
-    Log::writeLog("Using GL_SGIS_generate_mipmap Extension", Log::LOG_INFO);
-  } else {
-    use_sgis_generate_mipmap = false;
-  }
-  if (extensions.find("GL_EXT_texture_filter_anisotropic") != std::string::npos) {
-    use_ext_texture_filter_anisotropic = true;
-    Log::writeLog("Using GL_EXT_texture_filter_anisotropic Extension", Log::LOG_INFO);
-  } else {
-    use_ext_texture_filter_anisotropic = false;
-  }
-  use_multitexturing = true;
-#ifdef __WIN32
-  glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTextureARB");
-  glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
-  use_multitexturing = true;
-  if (!glActiveTextureARB){ use_multitexturing = false;  std::cerr << "no glActiveTextureARB" << std::endl << std::flush;}
-  if (!glClientActiveTextureARB) {use_multitexturing = false; std::cerr << "no glClientActiveTextureARB" << std::endl << std::flush;}
-   glLockArraysEXT = (PFNGLLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glLockArraysEXT");
-   glUnlockArraysEXT = (PFNGLUNLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glUnlockArraysEXT");
-//  use_ext_compiled_vertex_array = true;
-   if (!glLockArraysEXT) {
-     std::cerr << "No glLockArraysEXT" << std::endl;
-     use_ext_compiled_vertex_array = false;
-   }
-   if (!glUnlockArraysEXT) {
-     use_ext_compiled_vertex_array = false;
-     std::cerr << "No glUnlockArraysEXT" << std::endl;
-   }
-#endif
+  sage_init();
+//  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
+//  if (extensions.find("GL_SGIS_generate_mipmap") != std::string::npos) {
+//    use_sgis_generate_mipmap = true;
+//    Log::writeLog("Using GL_SGIS_generate_mipmap Extension", Log::LOG_INFO);
+//  } else {
+    use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
+///  }
+//  if (extensions.find("GL_EXT_texture_filter_anisotropic") != std::string::npos) {
+////    use_ext_texture_filter_anisotropic = true;
+//  /  Log::writeLog("Using GL_EXT_texture_filter_anisotropic Extension", Log::LOG_INFO);
+//  } else {
+//    use_ext_texture_filter_anisotropic = false;
+//  }
+  use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
+//#ifdef __WIN32
+//  glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTextureARB");
+//  glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
+//  use_multitexturing = true;
+//  if (!glActiveTextureARB){ use_multitexturing = false;  std::cerr << "no glActiveTextureARB" << std::endl << std::flush;}
+//  if (!glClientActiveTextureARB) {use_multitexturing = false; std::cerr << "no glClientActiveTextureARB" << std::endl << std::flush;}
+//   glLockArraysEXT = (PFNGLLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glLockArraysEXT");
+//   glUnlockArraysEXT = (PFNGLUNLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glUnlockArraysEXT");
+////  use_ext_compiled_vertex_array = true;
+//   if (!glLockArraysEXT) {
+//     std::cerr << "No glLockArraysEXT" << std::endl;
+    use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
+    if (use_ext_compiled_vertex_array) {
+      std::cout << "Using use_ext_compiled_vertex_array" << std::endl;
+      
+    }
+///   }
+//   if (!glUnlockArraysEXT) {
+//     use_ext_compiled_vertex_array = false;
+//     std::cerr << "No glUnlockArraysEXT" << std::endl;
+//   }
+//#endif
   /* Example use og getting a function
   
   typedef void (*GL_ActiveTextureARB_func)(unsigned int);
