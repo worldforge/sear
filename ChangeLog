@@ -1,4 +1,7 @@
 18th August 2002, Simon Goodall
+ * Model viewer now uses SDL instead of GLUT
+
+18th August 2002, Simon Goodall
  * Changes to states file which fixes some lighting problems when using mouse_move_select
 
 18th August 2002, Simon Goodall

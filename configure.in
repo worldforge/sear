@@ -176,7 +176,6 @@ if test $cross_compiling == no; then
 dnl  AC_CHECK_LIB(SDL_sound,Sound_Init)
   AC_CHECK_LIB(GL,glViewport)
   AC_CHECK_LIB(GLU,gluPerspective)
-  AC_CHECK_LIB(glut, glutSwapBuffers)
   AC_CHECK_LIB(cal3d,main, [], [
     AC_MSG_ERROR(Couldn't find Cal3D. Please goto http://sourceforge.net/projects/cal3d/)
 ])

@@ -21,8 +21,6 @@
  * Determine why some models are not properly rotated 
   - Might be how they come from the server so need to check this data
 
- * Add a stand alone option -> ModelViewer
-
  * Allow line editing in console
 
  * Check for OpenGL hardware -> ie if vendor == NONE report error

@@ -35,7 +35,6 @@ Model *NPlane_Loader::loadModel(Render *render, ModelStruct &ms) {
 
   }
   model->init(type, ms.num_planes, ms.width, ms.height);
-  model->setInUse(true);
   return model;
 }
 
