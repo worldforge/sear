@@ -29,8 +29,8 @@ dnl AC_PROG_LIBTOOL
 
 if test $cross_compiling == no; then
   dnl FLAGS='-Wall -ansi -I/usr/X11R6/include -I/usr/include'
-  CXXFLAGS='-Wall -I/usr/include -I/usr/X11R6/include -I/usr/include'
-  LIBS='-L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib'
+  CXXFLAGS="$CXXFLAGS -Wall -I/usr/X11R6/include"
+  LIBS="$LIBS -L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib"
 fi
 
 AC_HEADER_STDC
@@ -39,7 +39,7 @@ AC_ARG_ENABLE(debug,
   [  --enable-debug	enable debug information [default=no]],
   [
     if test "$enableval" = "yes"; then
-      CXXFLAGS="$CXXFLAGS -g -O -DDEBUG"
+      CXXFLAGS="$CXXFLAGS -ggdb -O0 -DDEBUG"
     else
       CXXFLAGS="$CXXFLAGS -O3 -DNDEBUG"
     fi
@@ -51,7 +51,7 @@ AC_ARG_ENABLE(debug,
 dnl CXXFLAGS="$CXXFLAGS -DCOLOUR_CURSOR_TEST"
 
 dnl Check SDL
-SDL_VERSION=1.2.4
+SDL_VERSION=1.2.2
 AM_PATH_SDL($SDL_VERSION, [
   CFLAGS="$CFLAGS $SDL_CFLAGS"
   CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
