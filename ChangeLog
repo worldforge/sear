@@ -1,3 +1,6 @@
+7th September 2002, Simon Goodall
+ * Changed order of configure library detection to follow dependancies
+
 6th September 2002, Simon Goodall
  * Changed model animations to be based upon mode and action fields in an entity instead of its velocity
  * Fixed bug in Cally code where animations were only asigned to the first model instance of a core type
