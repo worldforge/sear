@@ -1,4 +1,7 @@
 11th December 2002, Simon Goodall
+ * Cal3d options now allow specifying a particular material set on a per entity type basis
+
+11th December 2002, Simon Goodall
  * Scripting engine now works with dos file formats
  * '#' is now the comment character until end of line 
 

@@ -4,8 +4,6 @@
 /disable_dir_prefix
 /load_general general.cfg
 /load_bindings bindings.cfg
-/load_object_file object_file.cfg
-/load_object_file buildings.cfg
 /load_state_file states.cfg
 /load_general ~/general.cfg
 /load_bindings ~/bindings.cfg

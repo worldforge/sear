@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.h,v 1.16 2002-12-10 13:47:15 simon Exp $
+// $Id: Cal3d.h,v 1.17 2002-12-11 22:19:26 simon Exp $
 
 #ifndef SEAR_CAL3D_H
 #define SEAR_CAL3D_H 1
@@ -52,13 +52,14 @@ public:
   } Weapons;
 */
   class ModelAnimPair {
-public:	  
-    CalCoreModel *m_calCoreModel;
-    std::map<std::string ,int> animation_map;
-    std::map<std::string ,int> mesh_map;
-    std::map<std::string ,int> material_map;
-    std::map<std::string ,int> part_map;
-    float scale;
+    public:	  
+      CalCoreModel *m_calCoreModel;
+      std::map<std::string ,int> animation_map;
+      std::map<std::string ,int> mesh_map;
+      std::map<std::string ,int> material_map;
+      std::map<std::string ,int> part_map;
+      float scale;
+      std::string default_skin;
   };
   static const int STATE_IDLE;
   static const int STATE_FANCY;
@@ -106,7 +107,7 @@ public:
   void getMotionBlend(float *pMotionBlend);
   float getScale();
   int getState();
-  bool init(const std::string& strFilename, float);
+  bool init(const std::string& strFilename, float, const std::string &default_skin);
   void render(bool select_mode) { render(true, true, select_mode); }
   void render(bool, bool, bool);
   void shutdown();

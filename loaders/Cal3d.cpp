@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.27 2002-12-10 13:47:15 simon Exp $
+// $Id: Cal3d.cpp,v 1.28 2002-12-11 22:19:26 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -187,7 +187,7 @@ unsigned int Cal3d::loadTexture(const std::string& strFilename)
 // Initialize the model                                                       //
 //----------------------------------------------------------------------------//
 
-bool Cal3d::init(const std::string& strFilename, float height) {
+bool Cal3d::init(const std::string& strFilename, float height, const std::string &default_skin) {
   if (_initialised) shutdown();	
   _height = height;
   if (core_models[strFilename]) {
@@ -419,7 +419,9 @@ bool Cal3d::init(const std::string& strFilename, float height) {
   }
 
   // set the material set of the whole model
-  m_calModel.setMaterialSet(0);
+  int set = map->material_map[default_skin];
+  if (set != 0) m_calModel.setMaterialSet(set - 1);
+  else m_calModel.setMaterialSet(0); // Specified set does not exist, so use the first one found
 
   // set initial animation state
   m_state = STATE_IDLE;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.45 2002-11-12 23:59:22 simon Exp $
+// $Id: System.cpp,v 1.46 2002-12-11 22:19:26 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -214,7 +214,6 @@ bool System::init() {
   }
   
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
-
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     _script_engine->runScript(*I);
