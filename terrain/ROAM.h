@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.12 2002-12-07 14:13:41 simon Exp $
+// $Id: ROAM.h,v 1.13 2002-12-14 14:46:36 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -50,6 +50,7 @@ public:
   void lowerDetail();
   void raiseDetail();
   
+  static float _water_level_base;
   static float _water_level;
   void readConfig();
   void writeConfig();
@@ -74,12 +75,12 @@ protected:
   
   
   void render();
-  static int loadHeightMap(unsigned char **, const std::string&);
+  int loadHeightMap(float **, const std::string&);
  
 //  unsigned int num_landscapes;
   unsigned int _num_x_landscapes;
   unsigned int _num_y_landscapes;
-  unsigned char **_height_maps;
+  float **_height_maps;
   float last_time;
   Landscape **_landscapes;
   

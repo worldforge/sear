@@ -62,11 +62,11 @@ Source: "sear-media-@SEAR_VERSION@\objects\skeleton\*.*"; DestDir: "{app}\sear-m
 Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.worldforge.org/dev/eng/clients/sear"
 
 [Icons]
-Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; IconFilename: "{app}\data\sear_icon.bmp"
-Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\data\sear_icon.bmp"
+Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; IconFilename: "{app}\sear.exe"
+Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\sear.exe"
 Name: "{group}\Uninstall Sear"; Filename: "{app}\uninst"
-Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: desktopicon; IconFilename: "{app}\data\sear_icon.bmp"
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: quicklaunchicon; IconFilename:"{app}\data\sear_icon.bmp"
+Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: desktopicon; IconFilename: "{app}\sear.exe"
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: quicklaunchicon; IconFilename:"{app}\sear.exe"
 
 [UninstallDelete]
 Type: files; Name: "{app}\sear.url"

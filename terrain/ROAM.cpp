@@ -31,6 +31,7 @@ static const std::string TERRAIN = "terrain";
 namespace Sear {
 	
 float ROAM::_water_level = 0.0f;
+float ROAM::_water_level_base = 0.0f;
 
 ROAM::ROAM(System *system, Render *renderer) :
   _height_maps(NULL),
@@ -51,7 +52,8 @@ bool ROAM::init() {
   readConfig();
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &ROAM::varconf_callback));
   unsigned int num_landscapes = _num_x_landscapes * _num_y_landscapes;
-  _height_maps = (unsigned char **)malloc(num_landscapes * sizeof(unsigned char *));
+  //_height_maps = (unsigned char **)malloc(num_landscapes * sizeof(unsigned char *));
+  _height_maps = (float **)malloc(num_landscapes * sizeof(float *));
   _landscapes = (Landscape**)malloc(num_landscapes * sizeof (Landscape*));
   memset(_landscapes, 0, num_landscapes * sizeof (Landscape*));
   for (int x = _num_x_landscapes - 1; x >= 0; --x) {
@@ -136,18 +138,19 @@ void ROAM::render() {
   }
 }
 
-int ROAM::loadHeightMap(unsigned char **h_map, const std::string &heightmap) {
+int ROAM::loadHeightMap(float **h_map, const std::string &heightmap) {
   unsigned int i, x, y;
-  unsigned char *hMap = NULL;
+//  unsigned char *hMap = NULL;
+  float *hMap = NULL;
   SDL_Surface *terrain = NULL;
 
-  hMap = (unsigned char *)malloc((1+ map_size) * (1+map_size) * sizeof(unsigned char));
+  hMap = (float *)malloc((1+ map_size) * (1+map_size) * sizeof(float));
   if (!hMap) {
     Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::LOG_ERROR);
     return 0;
   } 
-  
-  memset(hMap, 0, (1+ map_size) * (1+map_size) * sizeof(unsigned char));
+  //This a good idea on floats?
+  memset(hMap, 0, (1+ map_size) * (1+map_size) * sizeof(float));
  
   terrain = System::loadImage(heightmap);
   
@@ -168,7 +171,7 @@ int ROAM::loadHeightMap(unsigned char **h_map, const std::string &heightmap) {
       for(y = 0; y < map_size; ++y) {
         for(x = 0; x < map_size; ++x) {
           //hMap[i++] = System::getPixel(terrain, x, map_size - 1 - y) & 0xFF;
-          hMap[i++] = System::getPixel(terrain, x, y) & 0xFF;
+          hMap[i++] = (float)(System::getPixel(terrain, x, y) & 0xFF) * _terrain_scale;
         }
         i++;
       }
@@ -212,7 +215,7 @@ float ROAM::getHeight(float x, float y) {
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
   float height = h1 + (h / 2.0f);
-  return height * _terrain_scale;
+  return height;// * _terrain_scale;
 }
 
 
@@ -226,11 +229,14 @@ void ROAM::readConfig() {
 //  _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
 
   temp = general.getItem(TERRAIN, KEY_water_level);
-  _water_level = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
+  _water_level_base = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
+  _water_level = _water_level_base * _terrain_scale;
 
   temp = general.getItem(TERRAIN, KEY_terrain_scale);
   _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
 
+  _water_level = _water_level_base * _terrain_scale;
+  
   temp = general.getItem(TERRAIN, KEY_num_x_landscapes);
   _num_x_landscapes = (!temp.is_int()) ? (1) : ((int)(temp));
 
@@ -243,7 +249,7 @@ void ROAM::writeConfig() {
   if (debug) Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
   varconf::Config &general = _system->getGeneral();
 //  general.setItem(TERRAIN, KEY_height, _height);
-  general.setItem(TERRAIN, KEY_water_level, _water_level);
+  general.setItem(TERRAIN, KEY_water_level, _water_level_base);
   general.setItem(TERRAIN, KEY_terrain_scale, _terrain_scale);
 //  general.setItem(TERRAIN, KEY_height_map, hmap);
 }
@@ -274,11 +280,13 @@ void ROAM::varconf_callback(const std::string &section, const std::string &key, 
 //    else
 	    if (key == KEY_water_level) {
       temp = config.getItem(TERRAIN, KEY_water_level);
-      _water_level = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
+      _water_level_base = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
+  _water_level = _water_level_base * _terrain_scale;
     }
     else if (key == KEY_terrain_scale) {
       temp = config.getItem(TERRAIN, KEY_terrain_scale);
       _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
+  _water_level = _water_level_base * _terrain_scale;
     }
   }
 }

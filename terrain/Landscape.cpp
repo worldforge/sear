@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.14 2002-12-07 17:34:53 simon Exp $
+// $Id: Landscape.cpp,v 1.15 2002-12-14 14:46:36 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -44,7 +44,7 @@ static const std::string WATER = "water";
 
 float Landscape::waterlevel = 0.0f;
 
-  unsigned char Landscape::getHeight(unsigned int x, unsigned int y)  {
+  float Landscape::getHeight(unsigned int x, unsigned int y)  {
     return m_HeightMap[x + y * (ROAM::map_size + 1)];
   }
 // ---------------------------------------------------------------------
@@ -65,7 +65,7 @@ TriTreeNode *Landscape::AllocateTri() {
 // ---------------------------------------------------------------------
 // Initialize all patches
 //
-void Landscape::Init(unsigned char *hMap, int size, int offsetx, int offsety) {
+void Landscape::Init(float *hMap, int size, int offsetx, int offsety) {
   Patch *patch;
   int X, Y;
   // Store the Height Field array
@@ -172,7 +172,7 @@ void Landscape::render() {
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
   _renderer->translateObject(offset_x, offset_y, 0.0f);
 
-  waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
+  waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f) * _terrain->_terrain_scale;
 
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange(TERRAIN);
@@ -216,8 +216,8 @@ void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, in
 	if (h > max_height) max_height = h;
       }
     }
-    min_height *= _terrain->_terrain_scale;
-    max_height *= _terrain->_terrain_scale;
+//    min_height *= _terrain->_terrain_scale;
+//    max_height *= _terrain->_terrain_scale;
   }
   WFMath::Point<3> corner1 = WFMath::Point<3>(offset_x, offset_y, min_height);
   WFMath::Point<3> corner2 = WFMath::Point<3>(offset_x + map_size, offset_y + map_size, max_height);

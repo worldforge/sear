@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.h,v 1.8 2002-12-07 17:34:53 simon Exp $
+// $Id: Patch.h,v 1.9 2002-12-14 14:46:36 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_PATCH_H
@@ -46,12 +46,12 @@ struct TriTreeNode {
 //typedef pair<TriTreeNode*, TriTreeNode*> diamond;
 class Patch {
 protected:
-  unsigned char *m_HeightMap;
+  float *m_HeightMap;
   int m_WorldX, m_WorldY; // World coordinate offset of this patch.
   
-  unsigned char m_VarianceLeft[1<<(VARIANCE_DEPTH)];	// Left variance tree
-  unsigned char m_VarianceRight[1<<(VARIANCE_DEPTH)];	// Right variance tree
-  unsigned char *m_CurrentVariance; // Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
+  float m_VarianceLeft[1<<(VARIANCE_DEPTH)];	// Left variance tree
+  float m_VarianceRight[1<<(VARIANCE_DEPTH)];	// Right variance tree
+  float *m_CurrentVariance; // Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
   unsigned char m_VarianceDirty; // Does the Varience Tree need to be recalculated for this Patch?
   unsigned char m_isVisible; // Is this patch visible in the current frame?
 
@@ -70,7 +70,7 @@ public:
   void SetVisibility();// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY );
 
   // The static half of the Patch Class
-  void Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap );
+  void Init( int heightX, int heightY, int worldX, int worldY, float *hMap );
   void Reset();
   void Tessellate();
   void render();
@@ -82,7 +82,7 @@ public:
   void RecursTessellate( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY, int node );
   void RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY );
   void RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY );
-  unsigned char RecursComputeVariance(	int leftX,  int leftY,  unsigned char leftZ, int rightX, int rightY, unsigned char rightZ, int apexX,  int apexY,  unsigned char apexZ, int node);
+  float RecursComputeVariance(int leftX,  int leftY, float leftZ, int rightX, int rightY, float rightZ, int apexX,  int apexY, float apexZ, int node);
 
 //priority_queue<TriTreeNode*> split_queue;// = priority_queue<TriTreeNode*>();
 //priority_queue<diamond> merge_queue;// = priority_queue<diamond>();

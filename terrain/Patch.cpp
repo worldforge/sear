@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.11 2002-12-07 17:34:53 simon Exp $
+// $Id: Patch.cpp,v 1.12 2002-12-14 14:46:36 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -134,7 +134,7 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     float x = v.x() - (centerX + _landscape->offset_x);
     float y = v.y() - (centerY + _landscape->offset_y);
 //    float z = v.z() - _terrain->getHeight(centerX, centerY);
-    float z = v.z() - _landscape->getHeight(centerX, centerY) * _terrain->_terrain_scale;
+    float z = v.z() - _landscape->getHeight(centerX, centerY);// * _terrain->_terrain_scale;
     
     x += System::instance()->getGraphics()->getCamera()->getXPos();
     y += System::instance()->getGraphics()->getCamera()->getYPos();
@@ -202,11 +202,11 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 //    rightZ -= (rightZ < 127.0f) ? (10.0f) : (0.0f);
 //    apexZ  -= (apexZ  < 127.0f) ? (10.0f) : (0.0f);
 
-    static float scale = _terrain->_terrain_scale;
+//    static float scale = _terrain->_terrain_scale;
     
-    leftZ *=  scale;
-    rightZ *=  scale;
-    apexZ *=  scale;
+//    leftZ *=  scale;
+//    rightZ *=  scale;
+//    apexZ *=  scale;
     // Perform polygon coloring based on a height sample
 
     if (_renderer->checkState(Render::RENDER_LIGHTING)) {
@@ -300,9 +300,9 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 // ---------------------------------------------------------------------
 // Computes Variance over the entire tree.  Does not examine node relationships.
 //
-unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned char leftZ,
-                        int rightX, int rightY, unsigned char rightZ,
-                      int apexX,  int apexY,  unsigned char apexZ,
+float Patch::RecursComputeVariance( int leftX,  int leftY, float leftZ,
+                        int rightX, int rightY, float rightZ,
+                      int apexX,  int apexY, float apexZ,
                       int node)
 {
   /*
@@ -314,20 +314,20 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
   */
   int centerX = (leftX + rightX) >>1;    // Compute X coordinate of center of Hypotenuse
   int centerY = (leftY + rightY) >>1;    // Compute Y coord...
-  unsigned char myVariance;
+  float myVariance;
 
   // Get the height value at the middle of the Hypotenuse
-  unsigned char centerZ  = m_HeightMap[(centerY * (_landscape->map_size+1)) + centerX];
+  float centerZ  = m_HeightMap[(centerY * (_landscape->map_size+1)) + centerX];
 
   // Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
   // Use values passed on the stack instead of re-accessing the Height Field.
-  myVariance = abs((int)centerZ - (((int)leftZ + (int)rightZ)>>1));
+  myVariance = fabs(centerZ - (leftZ + rightZ / 2));
 
   // Since we're after speed and not perfect representations,
   //    only calculate variance down to an 8x8 block
   if ( (abs(leftX - rightX) >= 2) ||  (abs(leftY - rightY) >= 2) ) {
     // Final Variance for this node is the max of it's own variance and that of it's children.
-    unsigned char a = RecursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 );
+    float a = RecursComputeVariance( apexX,   apexY,  apexZ, leftX, leftY, leftZ, centerX, centerY, centerZ,    node<<1 );
 
     myVariance = MAX(myVariance, a);
 
@@ -353,7 +353,7 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
 // ---------------------------------------------------------------------
 // Initialize a patch.
 //
-void Patch::Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap ) {
+void Patch::Init( int heightX, int heightY, int worldX, int worldY, float *hMap ) {
 //  _renderer = System::instance()->getGraphics()->getRender();
 //  _landscape = ((ROAM*)System::instance()->getGraphics()->getTerrain())->getLandscape();
   // Clear all the relationships
@@ -423,7 +423,7 @@ void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int ri
 	if (h < min_height) min_height = h;
       }
     }
-    min_height *= _terrain->_terrain_scale;
+//    min_height *= _terrain->_terrain_scale;
   }
   if (max_height == -DEF_VAL) {
     for (int x = this->m_WorldX; x < this->m_WorldX + _landscape->patch_size; x++) {
@@ -432,7 +432,7 @@ void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int ri
 	if (h > max_height) max_height = h;
       }
     }
-    max_height *= _terrain->_terrain_scale;
+//    max_height *= _terrain->_terrain_scale;
   }
 //  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _terrain->getHeight(m_WorldX, m_WorldY));
 //  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _terrain->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size));
@@ -505,10 +505,10 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
 
     // Perform polygon coloring based on a height sample
     if (leftZ <=  Landscape::waterlevel || rightZ <=  Landscape::waterlevel || apexZ <=  Landscape::waterlevel) {
-	    float scale = _terrain->_terrain_scale;
-      leftZ *=  scale;
-      rightZ *=  scale;
-      apexZ *=  scale;
+//	    float scale = _terrain->_terrain_scale;
+//      leftZ *=  scale;
+//      rightZ *=  scale;
+//      apexZ *=  scale;
             
       static float v[3][3];
       static float out[3];
@@ -577,7 +577,7 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
       texture_data[t_counter][0] = ax;
       texture_data[t_counter++][1] = ay;
 
-      float z = (float)Landscape::waterlevel * scale;
+      float z = (float)Landscape::waterlevel;
       vertex_data[v_counter][0] = leftX;
       vertex_data[v_counter][1] = leftY;
       vertex_data[v_counter++][2] = z;

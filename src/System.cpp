@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.48 2002-12-12 21:32:26 simon Exp $
+// $Id: System.cpp,v 1.49 2002-12-14 14:46:36 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -382,17 +382,8 @@ void System::createWindow(bool fullscreen) {
 
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
   if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
-  
-  // Not required on windows as icon gets compiled in
-  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);//loadImage(_icon_file);
-  
-  // Should set the icon transparency but it does not work.
-  if (_icon) {
-//    if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGBA(_icon->format, 0xFF, 0xFF, 0xFF, 0x0)) == -1) {
-      Log::writeLog("ERROR icon setting transparency", Log::LOG_ERROR);
- //   }
-   SDL_WM_SetIcon(_icon, NULL);
-  } 
+  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+  SDL_WM_SetIcon(_icon, NULL);
   if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
   if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
   if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);

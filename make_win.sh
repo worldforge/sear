@@ -13,6 +13,6 @@ STAT=" -lcal3d -lvarconf -leris -lsigc -l3ds -lAtlasNet -lAtlasFunky -lAtlasObje
 
 $WINDRES -i sear.rc -o sear_rc.o
 
-$GCC -o sear.exe src/*.o common/*.o loaders/*.o terrain/*.o sky/*.o renderers/*.o gui/*.o sear_rc.o $LIBS $STAT -lstdc++
+$GCC -o sear.exe src/*.o common/*.o loaders/*.o terrain/*.o sky/*.o renderers/*.o gui/*.o sear_rc.o $LIBS $STAT -lstdc++ $@
 
 $STRIP sear.exe
