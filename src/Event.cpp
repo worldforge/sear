@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.15 2004-04-27 15:07:02 simon Exp $
+// $Id: Event.cpp,v 1.16 2004-06-15 01:09:35 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -81,6 +81,10 @@ void Event::doEvent() {
     }
     case (EF_UPDATE_CHAR_ROTATE): {
       System::instance()->getCharacter()->rotate(Character::CMD_modifier);
+      break;      
+    }
+    case (EF_UPDATE_CHAR_SEND): {
+      System::instance()->getCharacter()->sendUpdate();
       break;      
     }
     case (EF_FREE_MODELS): {

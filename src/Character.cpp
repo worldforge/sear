@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.38 2004-06-13 18:21:01 simon Exp $
+// $Id: Character.cpp,v 1.39 2004-06-15 01:09:35 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -116,6 +116,8 @@ Character::Character(Eris::Avatar *avatar) :
   _rate(0.0f),
   _speed(0.0f),
   _strafe_speed(0.0f),
+  _lastUpdate(SDL_GetTicks()),
+  _updateScheduled(false),
   _orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
   _time(0),
   _run_modifier(false),
@@ -193,7 +195,21 @@ void Character::rotateImmediate(float rot)
   float angle = deg_to_rad(rot);
   _angle += angle;
   // FIXME This is performance suicide
+  bool send = ((SDL_GetTicks() - _lastUpdate) > 1000);
+  std::cout << _lastUpdate << ":" << SDL_GetTicks() << std::endl << std::flush;
+  updateLocals(send);
+  // If we don't send, we need to schedule an update.
+  if (!send && !_updateScheduled) {
+    System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_SEND, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+    _updateScheduled = true;
+  }
+}
+
+void Character::sendUpdate()
+{
+  std::cout << "Sending update event" << std::endl << std::flush;
   updateLocals(true);
+  _updateScheduled = false;
 }
 
 void Character::setMovementSpeed(float speed) {
@@ -258,7 +274,10 @@ void Character::updateLocals(bool send_to_server) {
   x += mod_speed * cos(_angle + PI_BY_2);
   _time = ticks;
   _orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -_angle);
-  if (send_to_server) updateMove(WFMath::Vector<3>(x, y, z), _orient);
+  if (send_to_server) {
+    updateMove(WFMath::Vector<3>(x, y, z), _orient);
+    _lastUpdate = ticks;
+  }
 }
 
 void Character::updateMove(const WFMath::Vector<3> & direction,

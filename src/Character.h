@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.19 2004-06-13 18:21:01 simon Exp $
+// $Id: Character.h,v 1.20 2004-06-15 01:09:35 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -69,6 +69,7 @@ public:
    * @param Angle in degrees of rotation
    */
   void rotateImmediate(float);
+  void sendUpdate();
 
   void setMovementSpeed(float);
   void setStrafeSpeed(float);
@@ -111,6 +112,9 @@ private:
   float _rate;
   float _speed;
   float _strafe_speed;
+
+  unsigned int _lastUpdate;
+  bool _updateScheduled;
 
   WFMath::Quaternion _orient;
 
