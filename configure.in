@@ -253,6 +253,5 @@ AC_OUTPUT([
 	scripts/Makefile
 	gui/Makefile
 	sear.spec
-	sear-media.spec
 	Sear.iss
 ])

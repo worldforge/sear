@@ -13,7 +13,6 @@ install-data-local:
 	mkdir -p $(DESTDIR)$(datadir)/sear
 	mkdir -p $(DESTDIR)$(datadir)/sear/data
 	mkdir -p $(DESTDIR)$(datadir)/sear/scripts
-	cp -f data/*.png $(DESTDIR)$(datadir)/sear/data
 	cp -f data/*.cfg $(DESTDIR)$(datadir)/sear/data
 	cp -f scripts/*.script $(DESTDIR)$(datadir)/sear/scripts
 
