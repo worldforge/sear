@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.29 2004-06-19 16:37:52 simon Exp $
+// $Id: 3ds.cpp,v 1.30 2004-06-20 18:28:31 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -277,6 +277,11 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
         for (i=0; i<3; ++i) {
 	  float out[3];
           lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
+
+          out[0] *= d->scl[0];
+          out[1] *= d->scl[1];
+          out[2] *= d->scl[2];
+
           out[0] -= d->pivot[0];
           out[1] -= d->pivot[1];
           out[2] -= d->pivot[2];

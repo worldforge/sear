@@ -1,9 +1,14 @@
+2004-06-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/3ds.cpp: Add in a scale transform when rendering 3ds
+	  files which some models seem to need.
+
 2004-06-20  Simon Goodall  <simon@simongoodall.co.uk>
 	* loaders/BoundBox.cpp: Fix incorrect texture bug when using display lists
 
 2004-06-15  Simon Goodall  <simon@simongoodall.co.uk>
 	* loaders/3ds.cpp: Fix segfault on models with no texture through using unitialised values;
- 
+
 2004-06-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* environment/TerrainRenderer.cpp: Re-arrange terrain shaders, for
