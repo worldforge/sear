@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.48 2002-12-19 23:11:30 simon Exp $
+// $Id: GL.cpp,v 1.49 2002-12-19 23:43:10 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -86,7 +86,6 @@ inline GLuint GL::makeMask(GLuint bits) {
 }
 
 inline std::string GL::getSelectedID(unsigned int i) {
-  std::cout << "Colour: " << i << std::endl;
   return colour_mapped[i];
 }
 
@@ -103,7 +102,6 @@ void GL::nextColour(const std::string &id) {
   GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
   GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
   GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
-  std::cout << "Select Colour: " << ic << " - " << (int)red << "," << (int)green << "," << (int)blue << std::endl;
 //  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
 //  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
 //  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
