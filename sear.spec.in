@@ -9,7 +9,7 @@ Release: %{release}
 Source: http://ftp.worldforge.org/pub/worldforge/clients/sear/sear-%{version}.tar.gz
 Source0: %{name}-%{version}.tar.gz
 URL: http://www.worldforge.org/dev/eng/clients/sear/
-Copyright: GPL
+License: GPL
 Group: Amusements/Games
 BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: %{_prefix}
