@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.1 2002-10-21 20:09:59 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.2 2002-12-11 14:50:30 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -13,6 +13,8 @@
 #include "src/Console.h"
 #include "src/FileHandler.h"
 #include "src/System.h"
+
+#include <fstream>
 
 #ifdef DEBUG
   #include "common/mmgr.h"
@@ -44,9 +46,10 @@ void ScriptEngine::shutdown() {
 }
   
 void ScriptEngine::runScript(const std::string &file_name) {
-  FILE *script_file = NULL;
+//  FILE *script_file = NULL;
   static const int MAX_LINE_SIZE = 256;
   char string_data[MAX_LINE_SIZE];
+//  std::string string_data;
   if (debug) Log::writeLog(std::string("System: Running script - ") + file_name, Log::LOG_DEFAULT);
   std::string old_file_dir = _file_dir;
   std::string::size_type pos = file_name.find_last_of("/");
@@ -62,7 +65,8 @@ void ScriptEngine::runScript(const std::string &file_name) {
       _file_dir += "/" + file_name.substr(0, pos); 
     }
   }
-  script_file = fopen(System::instance()->processHome(file_name).c_str(), "r");
+  std::ifstream script_file(System::instance()->processHome(file_name).c_str());
+//  script_file = fopen(System::instance()->processHome(file_name).c_str(), "r");
   char cur_dir[256];
   memset(cur_dir, '\0', 256);
   getcwd(cur_dir, 255);
@@ -73,21 +77,25 @@ void ScriptEngine::runScript(const std::string &file_name) {
     return;
   }
   try {
-    while (!feof(script_file)) {
-      fscanf(script_file, "%[^\n]\n", &string_data[0]);
+//    while (!feof(script_file)) {
+    while (!script_file.eof()) {
+//      fscanf(script_file, "%[^\n]\n", &string_data[0]);
+      script_file.getline(string_data, MAX_LINE_SIZE);
       System::instance()->getConsole()->runCommand(std::string(string_data));
     }
   } catch (...) {
     //Arg, caught something, lets clean up before re-throwing the error
     _prefix_enabled = pre_cwd;
     _file_dir = old_file_dir;
-    fclose(script_file);
+//    fclose(script_file);
+    script_file.close();
     throw;
   }
   chdir(cur_dir);
   _prefix_enabled = pre_cwd; // Restore setting
   _file_dir = old_file_dir;
-  fclose(script_file);
+//  fclose(script_file);
+    script_file.close();
 }
 
 void ScriptEngine::registerCommands(Console *console) {
