@@ -6,7 +6,9 @@ Dependancies
 Atlas 0.4.5
 ftp://ftp.worldforge.org/pub/worldforge/libs/Atlas-C++
 
-Eris 0.9.6
+Eris 0.9.7
+Use CVS
+Releases at;
 ftp://ftp.worldforge.org/pub/worldforge/libs/eris
 
 Varconf 0.5.4
