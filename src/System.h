@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.34 2004-04-12 15:28:50 alriddoch Exp $
+// $Id: System.h,v 1.35 2004-04-19 09:25:49 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -249,6 +249,12 @@ protected:
   
   int _width;
   int _height;
+
+  bool _click_on;
+  int _click_x;
+  int _click_y;
+  std::string _click_id;
+  float _click_seconds;
 
   ScriptEngine *_script_engine; ///< Pointer to scripting engine object
   EventHandler *_event_handler; ///< Pointer to event handler object

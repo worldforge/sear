@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.15 2004-04-12 15:28:50 alriddoch Exp $
+// $Id: Character.h,v 1.16 2004-04-19 09:25:48 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -63,6 +63,12 @@ public:
   void moveForward(float);
   void strafe(float);
   void rotate(float);
+
+  /**
+   * Rotate the character immediatly by a certain angle.
+   * @param Angle in degrees of rotation
+   */
+  void rotateImmediate(float);
 
   void setMovementSpeed(float);
   void setStrafeSpeed(float);

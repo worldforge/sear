@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.73 2004-04-17 15:55:45 simon Exp $
+// $Id: System.cpp,v 1.74 2004-04-19 09:25:48 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -100,6 +100,9 @@ namespace Sear {
   static const int DEFAULT_window_width = 640;
   static const int DEFAULT_window_height = 480;  
   static const bool DEFAULT_mouse_move_select = true;
+  static const float DEFAULT_max_click_time = 0.3;
+  static const int DEFAULT_joystick_touch_button = 1;
+  static const int DEFAULT_joystick_pickup_button = 2;
 
 System *System::_instance = NULL;
 
@@ -115,6 +118,9 @@ System::System() :
   _icon(NULL),
   _width(0),
   _height(0),
+  _click_on(false),
+  _click_x(0),
+  _click_y(0),
   _script_engine(NULL),
   _event_handler(NULL),
   _file_handler(NULL),
@@ -509,14 +515,19 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   { 
+          _click_on = true;
+          _click_x = event.button.x;
+          _click_y = event.button.y;
+          _click_seconds = _seconds;
           renderer->procEvent(event.button.x, event.button.y);
-          switch (action) {
-            case (ACTION_DEFAULT): break;
-            case (ACTION_PICKUP):  if (_character) _character->getEntity(renderer->getActiveID()); break;
-            case (ACTION_TOUCH): if (_character) _character->touchEntity(renderer->getActiveID()); break;
-          }
-          setAction(ACTION_DEFAULT);
+          _click_id = renderer->getActiveID();
           break;
+        }
+        break;
+        case (SDL_BUTTON_RIGHT):   { 
+          if (_character != NULL) {
+            _character->moveForward(1);
+          }
         }
         break;
       }
@@ -524,8 +535,33 @@ void System::handleEvents(const SDL_Event &event) {
     }
     case SDL_MOUSEBUTTONUP: {
       switch (event.button.button) {
-        case (SDL_BUTTON_LEFT):   { 
+        case (SDL_BUTTON_LEFT):   {
+          switch (action) {
+            case (ACTION_DEFAULT): {
+              float period = _seconds - _click_seconds;
+              if ((period > DEFAULT_max_click_time) &&
+                  ((event.button.x != _click_x) ||
+                   (event.button.y != _click_y))) {
+                  std::cout << "DRAG" << std::endl << std::flush;
+                  if (_character) _character->getEntity(_click_id);
+              } else {
+                  std::cout << "CLICK" << std::endl << std::flush;
+                  if (_character) _character->touchEntity(_click_id);
+              }
+            }
+            break;
+            case (ACTION_PICKUP):  if (_character) _character->getEntity(_click_id); break;
+            case (ACTION_TOUCH): if (_character) _character->touchEntity(_click_id); break;
+          }
+          setAction(ACTION_DEFAULT);
+          _click_on = false;
           break;
+        }
+        break;
+        case (SDL_BUTTON_RIGHT):   { 
+          if (_character != NULL) {
+            _character->moveForward(-1);
+          }
         }
         break;
       }
@@ -659,6 +695,17 @@ void System::handleEvents(const SDL_Event &event) {
       }
       break;
     }
+    case SDL_JOYBUTTONDOWN: {
+      if (event.jbutton.button == DEFAULT_joystick_touch_button) {
+        renderer->procEvent(_width / 2, _height / 2);
+        if (_character) _character->touchEntity(renderer->getActiveID());
+      }
+      if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
+        renderer->procEvent(_width / 2, _height / 2);
+        if (_character) _character->getEntity(renderer->getActiveID());
+      }
+      break;
+    }
     case SDL_QUIT: {
       _system_running = false;
       break;
@@ -675,22 +722,22 @@ void System::handleAnalogueControllers() {
     SDL_GetMouseState(&dx, &dy);
     dx -= mx;
     dy -= my;
-    Graphics * g = getGraphics();
-    Camera * c = NULL;
-    if (g != NULL) {
-      c = g->getCamera();
-    }
     if (dx != 0) {
       float rotation = dx / 4.f;
-      if (c != NULL) {
-        c->rotateImmediate(rotation);
+      if (_character != NULL) {
+        _character->rotateImmediate(rotation);
       }
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
       std::cout << "E: " << elevation << std::endl << std::flush;
-      if (c != NULL) {
-        c->elevateImmediate(elevation);
+      Graphics * g = getGraphics();
+      Camera * c = NULL;
+      if (g != NULL) {
+        c = g->getCamera();
+        if (c != NULL) {
+          c->elevateImmediate(elevation);
+        }
       }
     }
     

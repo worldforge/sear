@@ -1,3 +1,10 @@
+19th April 2004, Al Riddoch
+ * Add tracking of mouse clicks, for detection of dragging.
+ * Implement mouse rotation of character in mouse_look mode, rather
+   than just rotating camera.
+ * Tweak character position on screen for usability.
+ * Add code for handling joystick button presses.
+
 19th April 2004, Simon Goodall
  * More terrain tracking stuff
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.37 2004-04-17 15:55:45 simon Exp $
+// $Id: Graphics.cpp,v 1.38 2004-04-19 09:25:48 alriddoch Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -177,6 +177,7 @@ Compare D^2 to choose what detail level to use
 
 	
   WFMath::Point<3> pos(0,0,0); // Initial camera position
+#warning FIXME Should not be treating World as a singleton
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
@@ -209,7 +210,7 @@ Compare D^2 to choose what detail level to use
       }
 
       // Translate camera getDist() units away from the character. Allows closups or large views
-      _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
+      _renderer->translateObject(0.0f, _camera->getDistance(), -1.0f);
       _renderer->applyQuaternion(orient);
       
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);

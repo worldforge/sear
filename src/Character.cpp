@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.32 2004-04-12 15:28:50 alriddoch Exp $
+// $Id: Character.cpp,v 1.33 2004-04-19 09:25:48 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -159,7 +159,7 @@ void Character::strafe(float speed) {
 }
 
 void Character::rotate(float rate) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((_initialised == true) && "Character not initialised");
 //  if (!_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
@@ -169,6 +169,17 @@ void Character::rotate(float rate) {
   updateLocals(true);
   // FIXME 0.0f is not safe to test for.
   if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+}
+
+void Character::rotateImmediate(float rot)
+{
+  assert ((_initialised == true) && "Character not initialised");
+
+  std::cout << "Character::rotateImmediate" << std::endl << std::flush;
+  float angle = deg_to_rad(rot);
+  _angle += angle;
+  // FIXME This is performance suicide
+  updateLocals(true);
 }
 
 void Character::setMovementSpeed(float speed) {
@@ -232,7 +243,7 @@ void Character::updateLocals(bool send_to_server) {
   y += mod_speed * -sin(_angle + PI_BY_2);
   x += mod_speed * cos(_angle + PI_BY_2);
   _time = ticks;
-  _orient *= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -angle);
+  _orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -_angle);
   if (send_to_server) updateMove(x, y, z, _orient);
 }
 
