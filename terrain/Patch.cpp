@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.9 2002-12-03 22:10:55 simon Exp $
+// $Id: Patch.cpp,v 1.10 2002-12-06 21:14:03 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -128,7 +128,8 @@ void Patch::RecursTessellate( TriTreeNode *tri,
 //    cout << _landscape->offset_y << endl;
     float x = v.x() - (centerX + _landscape->offset_x);
     float y = v.y() - (centerY + _landscape->offset_y);
-    float z = v.z() - _terrain->getHeight(centerX, centerY);
+//    float z = v.z() - _terrain->getHeight(centerX, centerY);
+    float z = v.z() - _landscape->getHeight(centerX, centerY) * _terrain->_terrain_scale;
     
     x += System::instance()->getGraphics()->getCamera()->getXPos();
     y += System::instance()->getGraphics()->getCamera()->getYPos();
@@ -151,7 +152,7 @@ void Patch::RecursTessellate( TriTreeNode *tri,
 
     // Egads!  A division too?  What's this world coming to!
     // This should also be replaced with a faster operation.
-    TriVariance = ((float)m_CurrentVariance[node] * (float)_landscape->map_size * 2.0f)/distance;  // Take both distance and variance into consideration
+    TriVariance = ((float)m_CurrentVariance[node] * (float)ROAM::map_size * 2.0f)/distance;  // Take both distance and variance into consideration
   }
 //  cout << "T: " << TriVariance << endl;
 //  cout << "U: " << _landscape->gFrameVariance << endl;
@@ -407,8 +408,10 @@ void Patch::ComputeVariance() {
 void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
   int m_WorldX = this->m_WorldX + _landscape->offset_x;
   int m_WorldY = this->m_WorldY + _landscape->offset_y;
-  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _terrain->getHeight(m_WorldX, m_WorldY));
-  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _terrain->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size));
+//  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _terrain->getHeight(m_WorldX, m_WorldY));
+//  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _terrain->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size));
+  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _landscape->getHeight(m_WorldX, m_WorldY) * _terrain->_terrain_scale);
+  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _landscape->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size) * _terrain->_terrain_scale);
   int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
 
   if (i != 0) m_isVisible = 1;

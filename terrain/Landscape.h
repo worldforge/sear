@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.5 2002-12-03 22:10:55 simon Exp $
+// $Id: Landscape.h,v 1.6 2002-12-06 21:14:03 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -106,6 +106,7 @@ public:
   int offset_y;
   
 //  float getHeight(float x, float y);
+  unsigned char getHeight(unsigned int x, unsigned int y) ;
 
   void raiseDetail() {
      gDesiredTris += 50;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.12 2002-12-03 22:10:55 simon Exp $
+// $Id: Landscape.cpp,v 1.13 2002-12-06 21:14:03 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -42,6 +42,9 @@ static const std::string WATER = "water";
 
 float Landscape::waterlevel = 0.0f;
 
+  unsigned char Landscape::getHeight(unsigned int x, unsigned int y)  {
+    return m_HeightMap[x + y * (ROAM::map_size + 1)];
+  }
 // ---------------------------------------------------------------------
 // Allocate a TriTreeNode from the pool.
 //
@@ -191,17 +194,13 @@ void Landscape::render() {
 					
   // Check to see if we got close to the desired number of triangles.
   // Adjust the frame variance to a better value.
-//  cout << "A: " << GetNextTriNode() << " - " << gFrameVariance << endl;
   float change = 0.0f;
   if ( GetNextTriNode() != gDesiredTris ) change= ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
   if (change > 0.05f) change = 0.05f;
   gFrameVariance += change;
   //if ( GetNextTriNode() != gDesiredTris ) gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
-//  cout << "B: " << GetNextTriNode() << " - " << gFrameVariance << endl;
   // Bounds checking.
   if (gFrameVariance < 0 ) gFrameVariance = 0;
-//  if (gFrameVariance < 5 ) gFrameVariance = 5;
-//  cout << "NUM TRIS: " << GetNextTriNode() << " " << gNumTrisRendered << endl;
 }
 /*
 float Landscape::getHeight(float x, float y) {
