@@ -191,6 +191,8 @@ AC_OUTPUT([
 	src/Makefile
 	loaders/Makefile
 	renderers/Makefile
+	terrain/Makefile
+	sky/Makefile
 	sear.spec
 	data/bindings.cfg
 	data/general.cfg

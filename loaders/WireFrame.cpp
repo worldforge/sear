@@ -81,7 +81,7 @@ void WireFrame::shutdown() {
 
 void WireFrame::render(bool) {
   static Render *render = System::instance()->getRenderer();
-  render->renderArrays(Models::LINES, _num_points, &_vertex_data[0][0], NULL, NULL);
+  render->renderArrays(Models::LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
 }
 
 } /* namespace Sear */

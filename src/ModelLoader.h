@@ -15,7 +15,6 @@
 #include <string>
 
 //class ObjectProperties;
-#include <iostream>
 #include "ObjectLoader.h"
 namespace Sear {
 
@@ -33,7 +32,7 @@ public:
 
   // TODO: why did =0; suddenly stop working?
   // TODO: reduce  range of args
-  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) { cout << "WATCHA" << endl; return 0; }
+  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) = 0;
   
   
 };

@@ -45,6 +45,7 @@ typedef struct {
   bool draw_self;
   bool draw_members;
   bool outline;
+  bool model_by_type;
   char state[OBJECT_LOADER_MAX_SIZE];
   float width;
   float height;

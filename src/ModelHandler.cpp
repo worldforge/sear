@@ -45,10 +45,22 @@ void ModelHandler::init() {
 }
 
 void ModelHandler::shutdown() {
- //// Clear Up Models
-//  for (std::map<std::string, Models*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); I++) {
-////    if (I->second) ((Models*)*(I->second))->shutdown();
-//  }
+  // Clear up model loaders
+  for (std::map<std::string, ModelLoader*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); I++ ) {
+    if (I->second) {
+      I->second->shutdown();
+      delete I->second;
+      _model_loaders[I->first] = NULL;
+    }
+  } 
+ // Clear Up Models
+  for (std::map<std::string, Models*>::iterator I = _models.begin(); I != _models.end(); I++) {
+    if (I->second) {
+      I->second->shutdown();
+      delete I->second;
+      _models[I->first] = NULL;
+    }
+  }
 }
   
 Models *ModelHandler::getModel(WorldEntity *we) {
@@ -70,19 +82,31 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   std::string model_type = "";
   std::string object_type = "";
 
-  if (!type.empty()) {
+
+  if (!op && !type.empty()) {
     op = ol->getObjectProperties(type);
     object_type = type;
+    we->setObjectProperties(op);
   }
   if (op == NULL && !parent.empty()) {
     op = ol->getObjectProperties(parent);
     object_type = parent;
+    we->setObjectProperties(op);
   }
   if (op == NULL) {
      op = ol->getObjectProperties("default");
      object_type = "default";
+     we->setObjectProperties(op);
   }
+  
   model_type = op->model_type;		
+  
+  if (op->model_by_type) {
+    if (_models[object_type]) {
+      _models[id] = _models[object_type];
+      return _models[id];
+    }
+  }
   
   std::string data_source = System::instance()->getModel()->getAttribute(type);
   if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute(parent);
@@ -92,6 +116,10 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   // TODO: throw Exception instead
   else Log::writeLog("No ModelLoader available", Log::ERROR); 
   _models[id] = model;
+  if (op->model_by_type) {
+    model->setFlag("ModelByType", true);
+    _models[object_type] = model;
+  }
   
   return model; 
 }
@@ -105,6 +133,18 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
   if (_model_loaders[model_type]) throw Exception("Model loader already exists for this type!");
   // If all is well, assign loader
   _model_loaders[model_type] = model_loader;
+}
+
+void ModelHandler::checkModelTimeout(const std::string &id) {
+  Models *model = _models[id];
+  if (!model) return;
+  if (!model->getInUse()) {
+    if (model->getFlag("ModelByType")) return;
+    Log::writeLog(std::string("Unloading model for ") + id, Log::INFO);
+    model->shutdown();
+    delete model;
+    _models[id] = NULL;
+  }
 }
 
 

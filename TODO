@@ -1,29 +1,40 @@
- * Determine why some characters are not properly rotated 
- * Re-implement Model un-loading
- * Re-implement per type models
+ * re-implement on screen speech
+ * Add weather effects
+ * Move render type def from Models to renderer
+ * Add ability to specify search paths for default file locations 
+ * Add ability to tokenise on quotes, not just spaces
+ * Determine why some models are not properly rotated 
+  - Might be how they come from the server so need to check this data
  * Create a default built-in texture to use if others do not exist
+  - i.e. like ATITD has
+  - additionally set up ui to use solid colours + build in font
  * Re-implement model type conversion / downgrading
- * REMOVE GL_RENDER from loaders, should only be using the render interface
- * Move terrain and skybox code to separate dir's / libs
  * Add a stand alone option -> ModelViewer
- * Add a command history
+ * Allow line editing in console
  * Check for OpenGL hardware -> ie if vendor == NONE report error
  * In game menu for configuration
  * Improve memory usage
+   - Unload unused textures, models, and other data.
  * Add a BSP tree or equivalent
  * Update configure + autogen to provide better help. -> IE if not found, goto www...
  * Move OpenGL code into one object
  * Make OpenGL Render class a plugin
  * Add a better GUI
+   - First step is to add a gui_queue for rendering. This starts with the splash screen, then with anything else such as entity text
+   - Finally render console.
+
  * Add Meta Server support
- * Add collision etection
+ * Add collision detection
+   - This can be as an addition to the BSP tree or equivalent code
  * Improve terrain engine
+   - Include demetar?
+   - Look in gamedev/flipcode for the possible additions to current terrain engine
  * Allow mulitple terrains
+   - Allow us to load in new terrain settings on the fly
  * Add support to create custom font textures from say freetype
 
  * Add a sky dome
-   Use the new MultiModels interface to specify a sphere as a multimodel. Each layer of the sphere will be one model. The top and bottom layers of a sphere can be made using triangle fans, the intermediate layer can use triangle striping.
-   Remainder of code is to apply textures to a series of spheres.
+   - See flipcode skydome tutorial
 
  * Add Stage support
    Check format of Atlas messages. 

@@ -5,7 +5,7 @@
 #include "System.h"
 #include "Event.h"
 #include "WorldEntity.h"
-
+#include "ModelHandler.h"
 #include <Eris/World.h>
 #include <string>
 #include "Render.h"
@@ -62,7 +62,7 @@ void Event::doEvent() {
       break;      
     }
     case (EF_FREE_MODEL): {
-      System::instance()->getRenderer()->checkModelStatus(std::string((char *)_target));
+      System::instance()->getModelHandler()->checkModelTimeout(std::string((char *)_target));
       free(_target);
       break;
     }

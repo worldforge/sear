@@ -23,6 +23,7 @@ ThreeDS_Loader::~ThreeDS_Loader() {
 Models *ThreeDS_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
   ThreeDS *model = new ThreeDS();
   model->init(file_name);
+  model->setInUse(true);
   return model;
 }
 

@@ -32,6 +32,7 @@ Models *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
   model->init(bboxCheck(bbox));
+  model->setInUse(true);
   return model;
 }
 

@@ -22,7 +22,7 @@ namespace Sear {
 
 class Camera;
 class Terrain;
-class SkyBox;
+class Sky;
 class BoundBox;
 class BillBoard;
 class Impostor;
@@ -51,6 +51,10 @@ typedef enum {
 #define PANEL_TO_FONT           (8)
 #define LAST_CHANGE             (9)
 
+#define PERSPECTIVE (0)
+#define ORTHOGRAPHIC (1)
+#define ISOMETRIC (2)
+
 class Render {
 
 public:
@@ -74,73 +78,65 @@ typedef enum {
     for (i = 1; i < RENDER_LAST_STATE; _renderState[i++] = false);
   }
   virtual ~Render() {}
-  virtual void init() {}
-  virtual void initWindow(int width, int height) {}
-  virtual void shutdown() {};
+  virtual void init() =0;
+  virtual void initWindow(int width, int height) =0;
+  virtual void shutdown() =0;
 
-  virtual void print(int x, int y, const char*, int set) {}
-  virtual void print3D(const char*, int set) {}
-  virtual void newLine() {}
+  virtual void print(int x, int y, const char*, int set) =0;
+  virtual void print3D(const char*, int set) =0;
+  virtual void newLine() =0;
 
-  virtual float getLightLevel() { return 1.0f; }
+  virtual float getLightLevel() =0;
   
-  virtual int requestTexture(const std::string&, bool clamp = false) { return 0;}
-  virtual int requestMipMap(const std::string &, bool clamp = false) { return 0;}
-  virtual void buildColourSet() {}
-  virtual unsigned int getTextureID(int texture_id) { return 0;}
-  virtual void drawScene(const std::string &,bool) {}
-  virtual void drawTextRect(int, int, int, int, int) {}
-  virtual void stateChange(const std::string &state) {}
-  virtual void stateChange(State) {}
-  virtual void setColour(float red, float blue , float green, float alpha) {}
+  virtual int requestTexture(const std::string&, bool clamp = false) =0;
+  virtual int requestMipMap(const std::string &, bool clamp = false) =0;
+  virtual void buildColourSet() =0;
+  virtual unsigned int getTextureID(int texture_id)=0;
+  virtual void drawScene(const std::string &,bool) =0;
+  virtual void drawTextRect(int, int, int, int, int) =0;
+  virtual void stateChange(const std::string &state) =0;
+  virtual void setColour(float red, float blue , float green, float alpha) =0;
 	  
-  virtual void procEvent(int, int) {}
-  virtual int getWindowWidth() { return 0; }
-  virtual int getWindowHeight() { return 0; }
+  virtual void procEvent(int, int) =0;
+  virtual int getWindowWidth() =0;
+  virtual int getWindowHeight() =0;
 
-  virtual void switchTexture(int texture) {}
-  virtual void switchTextureID(unsigned int texture) {}
-  virtual std::string getActiveID() { return "";}
+  virtual void switchTexture(int texture) =0;
+  virtual void switchTextureID(unsigned int texture) =0;
+  virtual std::string getActiveID() =0;
 
-  virtual int patchInFrustum(WFMath::AxisBox<3>) { return 0;}
-  virtual float distFromNear(float,float,float) { return 0.0f;}
+  virtual int patchInFrustum(WFMath::AxisBox<3>) =0;
+  virtual float distFromNear(float,float,float) =0;
 
-  virtual void setCallyMotion(float, float, float) {}
-  virtual void setCallyState(int) {}
-  virtual void executeCallyAction(int) {}
-  virtual Camera* getCamera() { return NULL; }
-  virtual Terrain* getTerrain() { return NULL; }
-  virtual SkyBox* getSkyBox() { return NULL; }
-  virtual void pushMessage(const std::string &msg) {}
+  virtual Camera* getCamera() =0;
+  virtual Terrain* getTerrain() =0;
+  virtual Sky* getSkyBox() =0;
  
   void setState(RenderState rs, bool state) { _renderState[rs] = state; }
   bool checkState(RenderState rs) { return _renderState[rs]; }
 
-  virtual void processObjectProperties(ObjectProperties *){}
-  virtual void checkModelStatus(const std::string &) {}
-  virtual void setModelInUse(const std::string &, bool) {} 
-  virtual void setupStates() {}
-  virtual void readConfig() {}
-  virtual void writeConfig() {}
-  virtual void readComponentConfig() {}
-  virtual void writeComponentConfig() {}
+  virtual void setupStates() =0;
+  virtual void readConfig() =0;
+  virtual void writeConfig() =0;
+  virtual void readComponentConfig() =0;
+  virtual void writeComponentConfig() =0;
 protected:
   bool _renderState[RENDER_LAST_STATE];
 private:
   
 public:
 
-  virtual int requestTextureMask(const std::string&, bool clamp = false) { return 0;}
-  virtual void createTextureMask(SDL_Surface*, unsigned int, bool) {}
+  virtual int requestTextureMask(const std::string&, bool clamp = false) =0;
+  virtual void createTextureMask(SDL_Surface*, unsigned int, bool) =0;
   
-  virtual void translateObject(float x, float y, float z) {}
-  virtual void rotateObject(WorldEntity *we, int type) {}
-  virtual void setViewMode(int type) {}
-  virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {}
-  virtual void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {}
-  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {}
-  virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) { return 0;}
-  virtual void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {}
+  virtual void translateObject(float x, float y, float z) =0;
+  virtual void rotateObject(WorldEntity *we, int type) =0;
+  virtual void setViewMode(int type) =0;
+  virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
+  virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) =0;
+  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) =0;
+  virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
+  virtual void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) =0;
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
 

@@ -8,7 +8,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 #include <string>
-
+#include <list>
 #include "ConsoleObject.h"
 
 namespace Sear {
@@ -111,7 +111,7 @@ public:
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
 protected:
- 
+  bool repeat; 
   int action;
   bool initVideo();
   
@@ -210,6 +210,8 @@ private:
   bool _systemState[SYS_LAST_STATE];
   bool _system_running;
 
+  std::list<std::string> _command_history;
+  std::list<std::string>::iterator _command_history_iterator;
 
   static const char * const EXIT = "exit";
   static const char * const QUIT = "quit";

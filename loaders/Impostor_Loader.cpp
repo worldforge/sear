@@ -36,6 +36,7 @@ Models *Impostor_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
 
   }
   model->init(std::string("impostor_") + type, op->width, op->height);
+  model->setInUse(true);
   return model;
 }
 

@@ -20,7 +20,6 @@
 #include "System.h"
 #include "EventHandler.h"
 #include "Event.h"
-#include "cmd.h"
 #include "Config.h"
 #include "Utility.h"
 #include <string>

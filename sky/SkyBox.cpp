@@ -3,16 +3,16 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "SkyBox.h"
-#include "Config.h"
+#include "../src/Config.h"
 
-#include <GL/gl.h>
-#include "Log.h"
-
+#include "../src/Log.h"
+#include "../src/Render.h"
+#include "../src/Models.h"
 namespace Sear {
 
 // Setup static data items
 float SkyBox::vertex_coords[] = VERTEX_COORDS;
-int   SkyBox::texture_coords[] = TEXTURE_COORDS;
+float SkyBox::texture_coords[] = TEXTURE_COORDS;
 float SkyBox::normal_coords[] = NORMAL_COORDS;
 
 SkyBox::SkyBox(System *system, Render *renderer) :
@@ -51,48 +51,36 @@ void SkyBox::draw() {
 
 void SkyBox::render() {
   float val = 1.0f - _renderer->getLightLevel();
+  _renderer->stateChange("sky_0");
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
   renderTextureSet(0);
-  glEnable(GL_BLEND);
 //  float val = 1.0f - System::instance()->getNormalTime();
   _renderer->setColour(1.0f, 1.0f, 1.0f, val);
+  _renderer->stateChange("sky_1");
   renderTextureSet(1);
-  glDisable(GL_BLEND);
 }
 
 void SkyBox::renderTextureSet(int base) {
   base *= 6; //NUM OF CUBE SIDES
-  
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
-  
-  glVertexPointer(3, GL_FLOAT, 0, vertex_coords);
-  glTexCoordPointer(2, GL_INT, 0, texture_coords);
-  glNormalPointer(GL_FLOAT, 0, normal_coords);
- 
   //Top
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_TOP]);
-  glDrawArrays(GL_QUADS, 0, 4);
+  _renderer->renderArrays(Models::QUADS, 0, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //North
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_NORTH]);
-  glDrawArrays(GL_QUADS, 4, 4);
+  _renderer->renderArrays(Models::QUADS, 4, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //South
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_SOUTH]);
-  glDrawArrays(GL_QUADS, 8, 4);
+  _renderer->renderArrays(Models::QUADS, 8, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //East
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_EAST]);
-  glDrawArrays(GL_QUADS, 12, 4);
+  _renderer->renderArrays(Models::QUADS, 12, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //West
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_WEST]);
-  glDrawArrays(GL_QUADS, 16, 4);
+  _renderer->renderArrays(Models::QUADS, 16, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //Bottom
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_BOTTOM]);
-  glDrawArrays(GL_QUADS, 20, 4);
+  _renderer->renderArrays(Models::QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   
-  glDisableClientState(GL_VERTEX_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 } /* namespace Sear */

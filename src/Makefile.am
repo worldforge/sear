@@ -2,6 +2,8 @@ bin_PROGRAMS = sear
 
 sear_LDADD = \
 	../renderers/libRendererGL.a \
+	../terrain/libTerrainROAM.a \
+	../sky/libSkyBox.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderBillBoard.a \
@@ -18,7 +20,6 @@ sear_SOURCES = \
 	Character.h \
 	client.cpp \
 	client.h \
-	cmd.h \
 	Config.cpp \
 	conf.h \
 	Config.h \
@@ -31,23 +32,16 @@ sear_SOURCES = \
 	EventHandler.h \
 	Exception.h \
 	Factory.h \
-	Landscape.cpp \
-	Landscape.h \
 	Log.cpp \
 	Log.h \
 	main.cpp \
 	Models.h \
-	MultiModels.h \
 	ObjectLoader.h \
 	ObjectLoader.cpp \
-	Patch.cpp \
-	Patch.h \
 	Render.h \
-	SkyBox.cpp \
 	SkyBox.h \
 	System.cpp \
 	System.h \
-	Terrain.cpp \
 	Terrain.h \
 	Utility.cpp \
 	Utility.h \

@@ -1,3 +1,8 @@
+20th July 2002, Simon Goodall
+ * Added a command history
+ * Sky and Terrain code moved to sepatate dirs/libs
+ * Remove SkyBox reliance on OpenGL
+
 19th July 2002, Simon Goodall
  * Fixed console bug where only first argument was processed.
  * Removed extra refrences to the GL render code

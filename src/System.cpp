@@ -16,7 +16,6 @@
 #include "conf.h"
 #include "ObjectLoader.h"
 #include "StateLoader.h"
-#include "cmd.h"
 #include "Utility.h"
 #include "WorldEntity.h"
 #include <stdio.h>
@@ -38,6 +37,7 @@ const std::string System::STARTUP_SCRIPT = "startup.script";
 const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
 
 System::System() :
+  repeat(false),
   window_width(0),
   window_height(0),
   fullscreen(0),
@@ -134,6 +134,8 @@ bool System::init() {
   }
   readConfig();
   _system_running = true;
+
+  _command_history_iterator = _command_history.begin();
   return true;
 }
 
@@ -303,7 +305,7 @@ void System::createWindow(bool fullscreen) {
 void System::mainLoop() {
   SDL_Event event;
   while (_system_running) {
-    try {
+//    try {
       _seconds = (float)SDL_GetTicks() / 1000.0f;
       _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
       while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
@@ -322,9 +324,9 @@ void System::mainLoop() {
       _event_handler->poll();
       _client->poll();
       renderer->drawScene(command, false);
-    } catch (...) {
-      Log::writeLog("Caught Something", Log::ERROR);
-    }
+//    } catch (...) {
+//      Log::writeLog("Caught Something", Log::ERROR);
+//    }
   }
 }
 
@@ -351,19 +353,40 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     } 
     case SDL_KEYDOWN: {
-      if (Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)) == CMD_TOGGLE_CONSOLE) {
-        _console->toggleConsole();
-  	if (_console->consoleStatus()) {
-            SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	  }else {	  
-            SDL_EnableKeyRepeat(0, 0);
-	  }
-        command = "";
-	break;
-      }
+//      if (Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)) == CMD_TOGGLE_CONSOLE) {
+//        _console->toggleConsole();
+//  	if (_console->consoleStatus()) {
+//	  }else {	  
+//	  }
+//        command = "";
+//	break;
+//      }
      // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
-	if ((event.key.keysym.sym == SDLK_F1) ||
+        if (!repeat) {
+	  SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	  command = "";
+	  repeat = true;
+	}
+	if (event.key.keysym.sym == SDLK_UP) {
+          // Previous command
+//	  Log::writeLog("Previous Command", Log::INFO);
+	  if (_command_history_iterator != _command_history.begin()) {
+	    _command_history_iterator--;
+            command = (*_command_history_iterator);
+	  }
+	}
+	else if (event.key.keysym.sym == SDLK_DOWN) {
+//	  Log::writeLog("Next Command", Log::INFO);
+          // next command
+	  if (_command_history_iterator != _command_history.end()) {
+	    _command_history_iterator++;
+            if (_command_history_iterator != _command_history.end()) command = (*_command_history_iterator);
+	    else command = "";
+	  }
+	}
+	else if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
+	  (event.key.keysym.sym == SDLK_F1) ||
 	  (event.key.keysym.sym == SDLK_F2) ||
 	  (event.key.keysym.sym == SDLK_F3) ||
 	  (event.key.keysym.sym == SDLK_F4) ||
@@ -382,7 +405,10 @@ void System::handleEvents(const SDL_Event &event) {
 	{
           runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
 	} else if (event.key.keysym.sym == SDLK_RETURN) {
+	  if (command.empty()) break;
           runCommand(command);
+	  _command_history.push_back(command);
+	  _command_history_iterator = _command_history.end();
           command = "";
         } else if (event.key.keysym.sym == SDLK_DELETE || event.key.keysym.sym == SDLK_BACKSPACE) {
           if (command.length() > 0) {
@@ -392,6 +418,11 @@ void System::handleEvents(const SDL_Event &event) {
           command = command + (char)event.key.keysym.unicode;
 	}
       } else {
+        if (repeat) {
+          SDL_EnableKeyRepeat(0, 0);
+	  command = "";
+	  repeat = false;
+	}
         runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
       }
       break;
@@ -503,15 +534,15 @@ void System::runScript(const std::string &file_name) {
     Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::ERROR);
     return;
   }
-  try {
+//  try {
     while (!feof(script_file)) {
       fscanf(script_file, "%[^\n]\n", &string_data[0]);
       runCommand(std::string(string_data));
     }
-  } catch (...) {
+//  } catch (...) {
     // TODO be more discriminate on errors
-    Log::writeLog("Caught an Exception while running script. Script aborted", Log::ERROR);
-  }
+//    Log::writeLog("Caught an Exception while running script. Script aborted", Log::ERROR);
+//  }
   chdir(cur_dir);
   _prefix_cwd = pre_cwd; // Restore setting
   fclose(script_file);
@@ -684,9 +715,9 @@ void System::runCommand(const std::string &command) {
     _console->runCommand(command);
   } catch (Exception e) {
     Log::writeLog(e.getMessage(), Log::ERROR);
-  } catch (...) {
-    Log::writeLog("Caught Console Command Exception", Log::ERROR);
-  }
+  }// catch (...) {
+//    Log::writeLog("Caught Console Command Exception", Log::ERROR);
+//  }
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {

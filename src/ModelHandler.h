@@ -42,6 +42,8 @@ public:
    * Sets up a callback to use to load a model with model_type
    */ 
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
+
+  void checkModelTimeout(const std::string &);
   
 protected:
   unsigned int _number_of_models; //required?

@@ -2,19 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "Terrain.h"
-#include "Render.h"
-#include "System.h"
-#include "Config.h"
+#include "ROAM.h"
+#include "../src/Render.h"
+#include "../src/System.h"
+#include "../src/Config.h"
 #include <string>
-#include "Utility.h"
-#include "Log.h"
+#include "../src/Utility.h"
+#include "../src/Log.h"
 
 namespace Sear {
 
-float Terrain::_water_level = 0.0f;
+float ROAM::_water_level = 0.0f;
 
-bool Terrain::init() {
+bool ROAM::init() {
   readConfig();
   std::string groundTexture = System::instance()->getTexture()->getAttribute(KEY_ground_texture);
   ground_id = _renderer->requestMipMap(groundTexture);
@@ -25,17 +25,17 @@ bool Terrain::init() {
     gLand->Init(hMap, hMapWidth);
   }
   else {
-    Log::writeLog("Terrain: Error creating height map array", Log::ERROR);
+    Log::writeLog("ROAM: Error creating height map array", Log::ERROR);
     return false;
   }
   Landscape::waterlevel = _water_level;
   return true;
 }
 
-void Terrain::shutdown() {
-  Log::writeLog("Shutting down Terrain", Log::DEFAULT);
+void ROAM::shutdown() {
+  Log::writeLog("Shutting down ROAM", Log::DEFAULT);
   writeConfig();
-  Log::writeLog("Deleting Terrain", Log::DEFAULT);
+  Log::writeLog("Deleting ROAM", Log::DEFAULT);
   if (gLand) {
     delete gLand;
   }
@@ -43,18 +43,18 @@ void Terrain::shutdown() {
   if (hMap) free(hMap);
 }
 
-void Terrain::draw() {
+void ROAM::draw() {
 //  _renderer->stateChange(Render::TERRAIN);
   render();
 }
 
-void Terrain::render() {
+void ROAM::render() {
   gLand->Reset();
   gLand->Tessellate();
   gLand->render();
 }
 
-void Terrain::loadHeightMap() {
+void ROAM::loadHeightMap() {
   int i, x, y;
   hMap = NULL;
   SDL_Surface *terrain = NULL;
@@ -70,7 +70,7 @@ void Terrain::loadHeightMap() {
     if (hMap) {
       memset(hMap, DEFAULT_height, hMapHeight * hMapWidth * sizeof(unsigned char));
     } else {
-      Log::writeLog("Terrain: Error - Unable to allocate memory for height map array", Log::ERROR);
+      Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::ERROR);
     }
     return;
   }
@@ -80,7 +80,7 @@ void Terrain::loadHeightMap() {
   hMapHeight = terrain->h;
   hMap = (unsigned char *)malloc(hMapWidth * hMapHeight * sizeof(unsigned char));
   if (!hMap) {
-    Log::writeLog("Terrain: Error - Unable to allocate memory for height map array", Log::ERROR);
+    Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::ERROR);
     return;
   }
   i = 0;
@@ -93,21 +93,21 @@ void Terrain::loadHeightMap() {
   free(terrain);
 }
 
-void Terrain::update(float time_elapsed) {
+void ROAM::update(float time_elapsed) {
    last_time += time_elapsed;
 }
 
-float Terrain::getHeight(float x, float y) {
+float ROAM::getHeight(float x, float y) {
   if (gLand) return gLand->getHeight(x, y);
   else return 0.0f;
 }
 
 
-void Terrain::readConfig() {
+void ROAM::readConfig() {
   std::string temp;
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("Terrain: General config object not created!", Log::ERROR);
+    Log::writeLog("ROAM: General config object not created!", Log::ERROR);
     return;
   }
   temp = general->getAttribute(KEY_height);
@@ -120,11 +120,11 @@ void Terrain::readConfig() {
   _terrain_scale = (temp.empty()) ? (DEFAULT_terrain_scale) : (atof(temp.c_str()));
 }
 
-void Terrain::writeConfig() {
-  Log::writeLog("Writing Terrain Config", Log::DEFAULT);
+void ROAM::writeConfig() {
+  Log::writeLog("Writing ROAM Config", Log::DEFAULT);
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("Terrain: General config object not created!", Log::ERROR);
+    Log::writeLog("ROAM: General config object not created!", Log::ERROR);
     return;
   }
   general->setAttribute(KEY_height, string_fmt(_height));

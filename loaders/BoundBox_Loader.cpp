@@ -44,6 +44,7 @@ Models *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
 
   }
   model->init(bboxCheck(bbox), std::string("boundbox_") + type, op->wrap_texture);
+  model->setInUse(true);
   return model;
 }
 

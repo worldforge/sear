@@ -13,6 +13,11 @@
 
 namespace Sear {
 
+const std::string Tokeniser::delimeters = "\" ";
+const std::string Tokeniser::quotes = "\"";
+//const std::string Tokeniser::delimeters = "\" ";
+
+
 void ReduceToUnit(float vector[3]) {
   float length;
   
@@ -240,19 +245,15 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
 }
 
 
-void tokenise (std::deque<std::string> &tokens, const std::string &input) {
-   std::string buf;
-   SSTREAM ss(input);
-   while (ss>>buf) tokens.push_back(buf);
-}
-
-const std::string Tokeniser::delimeters = " ";
-
 void Tokeniser::initTokens(const std::string &tokens) {
-  token_string = std::string(tokens);
-  last_pos = token_string.find_first_not_of(delimeters, 0);
-//  if (last_pos != string::npos)
-	  pos = token_string.find_first_of(delimeters, last_pos);
+  token_string = tokens;
+  try {
+    last_pos = token_string.find_first_not_of(delimeters, 0);
+    pos = token_string.find_first_of(delimeters, last_pos);
+  } catch (...) {
+
+  }
+ 
 }
 
 std::string Tokeniser::nextToken() {
@@ -267,7 +268,7 @@ std::string Tokeniser::nextToken() {
 }
 
 std::string Tokeniser::remainingTokens() {
-  try {     	  
+  try {
     return token_string.substr(last_pos, token_string.size() - last_pos);
   } catch (...) {
     return "";

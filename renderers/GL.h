@@ -22,7 +22,7 @@ namespace Sear {
 
 class System;
 class Terrain;
-class SkyBox;
+class Sky;
 class Camera;
 class WorldEntity;
 class Client;
@@ -81,7 +81,7 @@ public:
   std::string getActiveID() { return activeID; }
   Camera* getCamera() { return camera; }
   Terrain* getTerrain() { return terrain; }
-  SkyBox* getSkyBox() { return skybox; }
+  Sky* getSkyBox() { return skybox; }
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
 
@@ -89,6 +89,7 @@ public:
   void writeConfig();
   void setupStates();
   void readComponentConfig();
+  void writeComponentConfig();
 
   float getLightLevel() { return _light_level; }
 
@@ -97,7 +98,7 @@ public:
   void rotateObject(WorldEntity *we, int type);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
-  void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
+  void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
@@ -135,7 +136,7 @@ protected:
   int y_pos;
   
   Terrain *terrain;
-  SkyBox *skybox;
+  Sky *skybox;
   Camera *camera;
   
   Client *client;
@@ -144,10 +145,6 @@ protected:
   int num_frames;
   float frame_time;
   std::map<std::string, Queue> render_queue;
-  std::map<std::string, Queue> model_queue;
-  std::map<std::string, Queue> billboard_queue;
-  std::map<std::string, Queue> imposter_queue;
-  std::map<std::string, Queue> wireframe_queue;
 
   void buildQueues(WorldEntity*, int);
   StateLoader *_state_loader; 
@@ -156,16 +153,6 @@ protected:
 
   WFMath::Quaternion orient;
  
-  typedef struct {
-    std::string model_name;
-    bool in_use;
-//    Model *model;
-    Models *models;
-//    MultiModels *multi;
-  } ModelStruct;
-
-  std::map<std::string, ModelStruct*> _entity_models;
-
   typedef struct {
 //    light id;
     float kc;
@@ -214,10 +201,6 @@ protected:
   float _light_level;
   bool _depth_buffer_flag;
 
-  std::map<std::string, Models*> _boundbox_cache;
-  std::map<std::string, BillBoard*> _billboard_cache;
-  std::map<std::string, Impostor*> _impostor_cache;
-  
   static float _halo_blend_colour[4];// = {0.0f, 0.0f, 1.0f, 0.4f};
   static float _halo_colour[3];// = {0.0f, 0.0f, 1.0f};
 

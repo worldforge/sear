@@ -25,7 +25,8 @@
 #include "EventHandler.h"
 #include "Event.h"
 #include "Render.h"
-
+#include "ModelHandler.h"
+#include "Models.h"
 #include "Log.h"
 #include "Exception.h"
 
@@ -444,14 +445,16 @@ void Client::Entered(Eris::Entity* e){
 void Client::Appearance(Eris::Entity *e){
   Log::writeLog(std::string("Appearance: ") + e->getName(), Log::INFO);
   ((WorldEntity *)e)->handleMove();
-  _system->getRenderer()->setModelInUse(e->getID(), true);
+  static ModelHandler *mh =  _system->getModelHandler();
+  mh->getModel((WorldEntity*)e)->setInUse(true);
 //  ((WorldEntity *)e)->displayInfo();
   
 }
 
 void Client::Disappearance(Eris::Entity *e){
   Log::writeLog("Disappearance: " + e->getName(), Log::INFO);
-  _system->getRenderer()->setModelInUse(e->getID(), false);
+  static ModelHandler *mh =  _system->getModelHandler();
+  mh->getModel((WorldEntity*)e)->setInUse(false);
   // Delete model after 1 minute
   _system->getEventHandler()->addEvent(Event(EF_FREE_MODEL, Event::stringToObject(e->getID()), EC_TIME, 60000 + System::instance()->getTime()));
 }

@@ -148,6 +148,10 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       op->draw_members = (std::string(string_data) == "true") ? (true) : (false);
     }
+    else if (tag == "model_by_type") {
+      sscanf(str, "%*s = %s\n", &string_data[0]);  
+      op->model_by_type = (std::string(string_data) == "true") ? (true) : (false);
+    }
     else if (tag == "outline") {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       op->outline = (std::string(string_data) == "true") ? (true) : (false);

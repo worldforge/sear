@@ -11,7 +11,9 @@ namespace Sear {
 
 class Models {
 public:
-  Models() {}
+  Models() :
+    _in_use(false)
+  {}
   virtual ~Models() {}
   virtual bool init() { return false; }
   virtual void shutdown() {}
@@ -25,6 +27,9 @@ public:
   virtual void setFlag(const std::string &flag, bool state) {}
   
   virtual bool getFlag(const std::string &flag) { return false; }
+
+  bool getInUse() { return _in_use;}
+  void setInUse(bool in_use) { _in_use = in_use; }
   
   typedef enum {
     NONE = 0,
@@ -46,6 +51,10 @@ public:
     TRIANGLE_STRIP,
     QUAD_STRIP
   } Type;
+
+private:
+  bool _in_use;
+  
 };
 
 } /* namespace Sear */

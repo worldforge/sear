@@ -101,6 +101,8 @@ protected:
   std::string::size_type pos, last_pos;
   std::string token_string;
   static const std::string delimeters;
+  static const std::string quotes;
+  bool quoted;
 };
 
   

@@ -5,8 +5,8 @@
 #ifndef _SKYBOX_H_
 #define _SKYBOX_H_ 1
 
-#include "System.h"
-#include "Render.h"
+#include "../src/System.h"
+//#include "../src/Render.h"
 
 #define NUM_SKY_TEXTURES 12
 
@@ -76,12 +76,12 @@
    1.0f, -1.0f, -1.0f }
 
 #define TEXTURE_COORDS {  \
-  0, 0, 0, 1, 1, 1, 1, 0, \
-  0, 0, 0, 1, 1, 1, 1, 0, \
-  0, 0, 0, 1, 1, 1, 1, 0, \
-  0, 0, 0, 1, 1, 1, 1, 0, \
-  0, 0, 0, 1, 1, 1, 1, 0, \
-  0, 0, 0, 1, 1, 1, 1, 0 }
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
+  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f }
 
 #define NORMAL_COORDS { \
    0.0f,  0.0f, -1.0f, \
@@ -91,11 +91,13 @@
    1.0f,  0.0f,  0.0f, \
    0.0f,  0.0f,  1.0f }
 
+#include "../src/Sky.h"
+   
 namespace Sear {
 // Forward Decls
 class Render;
   
-class SkyBox {
+class SkyBox : public Sky{
 public:
   SkyBox(System *, Render*);
   ~SkyBox();
@@ -113,7 +115,7 @@ protected:
   void renderTextureSet(int);
 
   static float vertex_coords[];
-  static int texture_coords[];
+  static float texture_coords[];
   static float normal_coords[];
  
   int texture_id[NUM_SKY_TEXTURES];

@@ -141,10 +141,10 @@ void BoundBox::shutdown() {
 void BoundBox::render(bool select_mode) {
   static Render *render = System::instance()->getRenderer();
   if (select_mode) {
-    render->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], NULL, NULL);
+    render->renderArrays(Models::QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
   } else {
     render->switchTexture(render->requestTexture(_type));
-    render->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    render->renderArrays(Models::QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   }
 }
 

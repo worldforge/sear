@@ -48,7 +48,7 @@ void BillBoard::render(bool select_mode) {
   } else {
     _render->switchTexture(_render->requestTexture(_type));
   }
-  _render->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
+  _render->renderArrays(Models::QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
 }
 
 } /* namespace Sear */

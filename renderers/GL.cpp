@@ -18,7 +18,7 @@
 #include "../src/System.h"
 #include "../src/Config.h"
 #include "../src/Terrain.h"
-#include "../src/SkyBox.h"
+#include "../src/Sky.h"
 #include "../src/Camera.h"
 #include "../src/WorldEntity.h"
 #include "../src/Console.h"
@@ -38,6 +38,9 @@
 #include "../src/ModelHandler.h"
 
 #include "../src/Log.h"
+
+#include "../terrain/ROAM.h"
+#include "../sky/SkyBox.h"
 
 namespace Sear {
 
@@ -180,21 +183,6 @@ GL::~GL() {
   writeConfig();
   shutdownFont();
 
-  // Clear out models
-  for (std::map<std::string, ModelStruct*>::iterator I = _entity_models.begin(); I != _entity_models.end(); I++) {
-    if (I->second) {
-      ModelStruct *ms = I->second;
-      if (ms->models) {
-        ms->models->shutdown();
-	delete ms->models;
-      }
-    }
-  }
-  while (!_entity_models.empty()) {
-    if (_entity_models.begin()->second) delete _entity_models.begin()->second;
-    _entity_models.erase(_entity_models.begin());
-  } 
-
   if (terrain) {
     terrain->shutdown();
 //    delete terrain;
@@ -221,32 +209,27 @@ void GL::initWindow(int width, int height) {
   //Check for divide by 0
   if (height == 0) height = 1;
 //  glLineWidth(2.0f); 
-  glViewport(0, 0, width, height);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
   glDisable(GL_DITHER); 
   
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity(); // Reset The Projection Matrix
-  
-  // Calculate The Aspect Ratio Of The Window
-  gluPerspective(fov,(GLfloat)width/(GLfloat)height, near_clip, _far_clip_dist);
-  glMatrixMode(GL_MODELVIEW);
-
   //Store window size
   window_width = width;
   window_height = height;
+
+  setViewMode(PERSPECTIVE);
 }
   
 void GL::init() {
+  // Most of this should be elsewhere
   readConfig();
   splash_id = requestTexture(splash_texture);
   initFont();
   // TODO: initialisation need to go into system
   Log::writeLog("Initialising Terrain", Log::DEFAULT);
-  terrain = new Terrain(_system, this);
+  terrain = new ROAM(_system, this);
   if (!terrain->init()) {
     Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::ERROR);
   }
@@ -543,7 +526,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
         glPushMatrix();
           glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
 //          nextState(FONT_TO_SKYBOX);
-	  stateChange("skybox");
+//	  stateChange("skybox");
           skybox->draw(); //Draw the sky box
         glPopMatrix();
       }
@@ -615,17 +598,13 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     if (!select_mode) {
       glPushMatrix();
 //        nextState(SKYBOX_TO_TERRAIN);
-	  stateChange("terrain");
+//	  stateChange("terrain");
         terrain->draw();
       glPopMatrix();
     }
 // Draw known entities
     WorldEntity *root = NULL; 
     if ((root = (WorldEntity *)world->getRootEntity())) {
-
-    for (std::map<std::string,ModelStruct*>::const_iterator I = _entity_models.begin(); I != _entity_models.end(); I++) {
-//      if (I->second) if (I->second->in_use) if (I->second->model) (I->second)->model->onUpdate(time_elapsed);
-    }
       if (_character) _character->updateLocals(false);
       render_queue = std::map<std::string, Queue>();
       buildQueues(root, 0);
@@ -635,18 +614,10 @@ void GL::drawScene(const std::string& command, bool select_mode) {
         if (frame_rate < _lower_frame_rate_bound) {
           model_detail -= 0.1f;
           if (model_detail < 0.0f) model_detail = 0.0f;
-  
-  	for (std::map<std::string, ModelStruct*>::const_iterator J = _entity_models.begin(); J != _entity_models.end(); J++) {
-//            if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
-  	}
           terrain->lowerDetail();
         } else if (frame_rate > _upper_frame_rate_bound) {
           model_detail += 0.05f;
           if (model_detail > 1.0f) model_detail = 1.0f;
-  
-  	for (std::map<std::string, ModelStruct*>::const_iterator J = _entity_models.begin(); J != _entity_models.end(); J++) {
-//           if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
-  	}
           terrain->raiseDetail();
         }
       }
@@ -1055,6 +1026,10 @@ void GL::readComponentConfig() {
   if (terrain) terrain->readConfig();
 }
 
+void GL::writeComponentConfig() {
+  if (camera) camera->writeConfig();
+  if (terrain) terrain->writeConfig();
+}
 void GL::translateObject(float x, float y, float z) {
   glTranslatef(x, y, z);
 }
@@ -1090,10 +1065,29 @@ void GL::rotateObject(WorldEntity *we, int type) {
 
 void GL::setViewMode(int type) {
 //  Perspective
-//  Isometric
-//  Othographic
-
-
+  glViewport(0, 0, window_width, window_height);
+  switch (type) {
+    case PERSPECTIVE: {
+      if (window_height == 0) window_height = 1;
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity(); // Reset The Projection Matrix
+  
+      // Calculate The Aspect Ratio Of The Window
+      gluPerspective(fov,(GLfloat)window_width/(GLfloat)window_height, near_clip, _far_clip_dist);
+      glMatrixMode(GL_MODELVIEW);
+      break;
+    }
+    case ORTHOGRAPHIC: {
+      glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
+      glLoadIdentity(); // Reset The Projection Matrix
+      glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
+      glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
+      break;
+    }			    
+    case ISOMETRIC: {
+      break;
+    }			    
+  }	
 }
 
 void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
@@ -1106,7 +1100,7 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
   else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
 }
 
-void GL::renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
+void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -1128,13 +1122,13 @@ void GL::renderArrays(unsigned int type, unsigned int number_of_points, float *v
 
   switch (type) {
     case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
-    case (Models::POINT): glDrawArrays(GL_POINT, 0, number_of_points); break;
-    case (Models::LINES): glDrawArrays(GL_LINES, 0, number_of_points); break;
-    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, 0, number_of_points); break;
-    case (Models::QUADS): glDrawArrays(GL_QUADS, 0, number_of_points); break;
-    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, 0, number_of_points); break;
-    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, 0, number_of_points); break;
-    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, 0, number_of_points); break;
+    case (Models::POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
+    case (Models::LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
+    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
+    case (Models::QUADS): glDrawArrays(GL_QUADS, offset, number_of_points); break;
+    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
+    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
+    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
     default: Log::writeLog("Unknown type", Log::ERROR); break;
   }
  
