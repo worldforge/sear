@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.15 2004-04-27 15:07:02 simon Exp $
+// $Id: Bindings.cpp,v 1.16 2004-06-24 14:58:35 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -227,5 +227,31 @@ std::string Bindings::getBinding(const std::string &key) {
   return cmd; // Return retrieved binding
 }
 
-
+std::string Bindings::getBindingForKeysym(const SDL_keysym& key) {
+  assert(_bindings);
+  
+  if (!keymap.count(key.sym)) return ""; // un-mapped basic keysym
+  std::string plainName = keymap[key.sym],
+    decoratedName = plainName;
+    
+  if (key.mod & KMOD_SHIFT)
+    decoratedName = "shift_" + decoratedName;    
+    
+  if (key.mod & KMOD_ALT)
+    decoratedName = "alt_" + decoratedName;
+    
+  if (key.mod & KMOD_CTRL)
+    decoratedName = "ctrl_" + decoratedName;
+    
+  _bindings->clean(decoratedName);
+  if (_bindings->findItem("key_bindings", decoratedName))
+    return _bindings->getItem("key_bindings", decoratedName);
+    
+  if (_bindings->findItem("key_bindings", plainName))
+    return _bindings->getItem("key_bindings", plainName);
+    
+  std::cout << "no binding specified for key " << decoratedName << std::endl;
+  return "";
+}
+  
 }

@@ -92,4 +92,6 @@ libSear_a_SOURCES = \
 	Calendar.h \
 	Light.h \
 	LightManager.h \
-	LightManager.cpp
+	LightManager.cpp \
+	Editor.cpp \
+	Editor.h

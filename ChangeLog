@@ -1,3 +1,15 @@
+2004-06-22  James Turner  <james@worldforge.org>
+
+	* Add support for world editing (via an admin account) using commands
+	  bound to keys. New functionality in Editor class, created by system,
+	  which will handle all the privileged commands.
+	
+	* Make the command binder handle modifier keys: preprend various magic
+	  strings based on the modifier state.
+	  
+	* Update standard bindings.cfg with some default bindings for the
+	  edit keys.
+
 2004-06-23  Simon Goodall  <simon@simongoodall.co.uk>
 	* loaders/3ds.cpp,loaders/3ds.h: Make use of "masking" function to allow alpha mapped textures during selection. Remove uneeded code.
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.48 2004-06-21 09:06:15 jmt Exp $
+// $Id: System.h,v 1.49 2004-06-24 14:58:35 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -201,7 +201,7 @@ protected:
   
   void handleEvents(const SDL_Event &);
   void handleAnalogueControllers();
-  void handleJoystickMotion(const SDL_Event& e);
+  void handleJoystickMotion(Uint8 axis, Sint16 value);
   
   bool mouseLook;
   SDL_Surface *screen;
@@ -272,7 +272,8 @@ protected:
     AXIS_ELEVATE
   } InputAxis;
   
-  std::map<int, InputAxis> m_axisBindings;
+  typedef std::map<int, InputAxis> AxisBindingMap;
+  AxisBindingMap m_axisBindings;
   
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.95 2004-06-21 09:06:15 jmt Exp $
+// $Id: System.cpp,v 1.96 2004-06-24 14:58:35 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,7 @@
 #include "WorldEntity.h"
 #include "renderers/RenderSystem.h"
 #include "environment/Environment.h"
+#include "Editor.h"
 
 #include "gui/Workspace.h"
 #include "gui/Toplevel.h"
@@ -218,6 +219,9 @@ bool System::init(int argc, char *argv[]) {
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
+
+    Editor* edit = new Editor();
+    edit->registerCommands(_console);
 
   _workspace = new Workspace(this);
   Toplevel * t = new Toplevel("Panel");
@@ -584,23 +588,25 @@ void System::handleEvents(const SDL_Event &event) {
           m_command = "";
           repeat = false;
         }
-        runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
+        runCommand(Bindings::getBindingForKeysym(event.key.keysym));
       }
       break;
     }
     case SDL_KEYUP: {
       if (!_console->consoleStatus()) {
-        char *binding = (char *) Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)).c_str();
+        char *binding = (char *) Bindings::getBindingForKeysym(event.key.keysym).c_str();
         if (binding[0] == '+') {
           runCommand("-" + std::string(++binding));
         }
       }
       break;
     }
+    
     case SDL_JOYAXISMOTION: {
-      handleJoystickMotion(event);
+      handleJoystickMotion(event.jaxis.axis, event.jaxis.value);
       break;
     }
+    
     case SDL_JOYBUTTONDOWN: {
       if (event.jbutton.button == DEFAULT_joystick_touch_button) {
         renderer->procEvent(m_width / 2, m_height / 2);
@@ -654,27 +660,14 @@ void System::handleAnalogueControllers() {
       SDL_WarpMouse(mx, my);
     }
   }
-#if 0
-  if (_controller != NULL) {
-    Graphics * g = getGraphics();
-    if (g != NULL) {
-      Camera * c = g->getCamera();
-      if (c != NULL) {
-        int rot = SDL_JoystickGetAxis(_controller, 4);
-        if (abs(rot) > 3200) {
-          c->setRotation(rot / -10000);
-        } else {
-          c->setRotation(0);
-        }
-
-        int elev = SDL_JoystickGetAxis(_controller, 5);
-        if (abs(elev) > 3200) {
-          c->setElevation(elev / -10000);
-        } else {
-          c->setElevation(0);
-        }
-      }
+  
+/*  if (_controller) {
+    for (AxisBindingMap::const_iterator B=m_axisBindings.begin(); B != m_axisBindings.end(); ++B) {
+        Sint16 av = SDL_JoystickGetAxis(_controller, B->second);
+        handleJoystickMotion(B->second, av);
     }
+  }
+    
     std::cout << "Upd "
               << SDL_JoystickGetAxis(_controller, 0) << ":"
               << SDL_JoystickGetAxis(_controller, 1) << ":"
@@ -684,19 +677,20 @@ void System::handleAnalogueControllers() {
               << SDL_JoystickGetAxis(_controller, 5) << ":"
               << SDL_JoystickGetAxis(_controller, 6) << ":"
               << std::endl << std::flush;
-  }
-#endif
+  } */
 }
 
-void System::handleJoystickMotion(const SDL_Event& event)
+void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 {
-    if (!m_axisBindings.count(event.jaxis.axis)) return;
+    if (!m_axisBindings.count(axis)) return;
     if (_character == NULL) return;
     
-    switch (m_axisBindings[event.jaxis.axis]) {
+    std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
+    
+    switch (m_axisBindings[axis]) {
     case AXIS_STRAFE: // Left right move
-        if (abs(event.jaxis.value) > 3200) {
-          _character->setStrafeSpeed(event.jaxis.value / 10000.f);
+        if (abs(value) > 3200) {
+          _character->setStrafeSpeed(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
           _character->setStrafeSpeed(0);
@@ -704,8 +698,8 @@ void System::handleJoystickMotion(const SDL_Event& event)
         break;
           
     case AXIS_MOVE: // For back move
-        if (abs(event.jaxis.value) > 3200) {
-          _character->setMovementSpeed(event.jaxis.value / -10000.f);
+        if (abs(value) > 3200) {
+          _character->setMovementSpeed(value / -10000.f);
         } else {
             std::cout << "Y too small" << std::endl << std::flush;
           _character->setMovementSpeed(0);
@@ -713,8 +707,8 @@ void System::handleJoystickMotion(const SDL_Event& event)
       break;
           
     case AXIS_PAN: // Left right view
-        if (abs(event.jaxis.value) > 3200) {
-          _character->setRotationRate(event.jaxis.value / 10000.f);
+        if (abs(value) > 3200) {
+          _character->setRotationRate(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
           _character->setRotationRate(0);
@@ -726,8 +720,8 @@ void System::handleJoystickMotion(const SDL_Event& event)
           if (g != NULL) {
             Camera * c = g->getCamera();
             if (c != NULL) {
-              if (abs(event.jaxis.value) > 3200) {
-                c->setElevationSpeed(event.jaxis.value / 10000.f);
+              if (abs(value) > 3200) {
+                c->setElevationSpeed(value / 10000.f);
               } else {
                 std::cout << "Y too small" << std::endl << std::flush;
                 c->setElevationSpeed(0);
