@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.27 2004-04-27 15:07:01 simon Exp $
+// $Id: 3ds.cpp,v 1.28 2004-06-16 12:39:49 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -69,10 +69,14 @@ bool ThreeDS::init(const std::string &file_name) {
   // Calculate initial positions
   lib3ds_file_eval(_model,1);
   Lib3dsNode *p = NULL;
-  render_file(_model);
-  for (p=_model->nodes; p!=0; p=p->next) {
-    if (debug) std::cout << "Rendering Node" << std::endl;
-    render_node(p, _model);
+  if (_model->nodes == 0) {
+    if (debug) std::cout << "Rendering Meshes direct" << std::endl;
+    render_file(_model);
+  } else {
+    for (p=_model->nodes; p!=0; p=p->next) {
+      if (debug) std::cout << "Rendering Node" << std::endl;
+      render_node(p, _model);
+    }
   }
   lib3ds_file_free(_model);
   _model = NULL;

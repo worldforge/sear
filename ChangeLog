@@ -1,3 +1,8 @@
+2004-06-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/3ds.cpp: Only render meshes directly if the 3ds file does
+	  not contain a node structure.
+
 2004-06-15  Simon Goodall  <simon@simongoodall.co.uk>
 	* Further appearance fixes. Now loads appearance at startup
 
