@@ -1,3 +1,6 @@
+09th October 2002, Al Riddoch
+ * std:: namespace fixes. 
+
 27th September 2002, Simon Goodall 
  * Re-implemented above character speech
  * Changed render queue passing to by-reference instead ob by val

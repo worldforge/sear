@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.15 2002-09-27 15:46:42 simon Exp $
+// $Id: Graphics.cpp,v 1.16 2002-10-09 17:13:39 alriddoch Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -287,7 +287,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         if (object_record) object_record->type = "default";
       }
       if (!object_record) {
-        std::cout << "No Record found" << endl;	      
+        std::cout << "No Record found" << std::endl;	      
         return;   
       }
       object_record->name = we->getName();

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.10 2002-09-26 22:11:39 simon Exp $
+// $Id: NPlane.cpp,v 1.11 2002-10-09 17:13:39 alriddoch Exp $
 
 #include "common/Utility.h"
 
@@ -10,6 +10,8 @@
 #include "src/Render.h"
 
 #include "NPlane.h"
+
+#include <iostream>
 
 namespace Sear {
 
@@ -39,7 +41,7 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
   for (unsigned int i = 0; i < num_planes; i++) {
     float x = width * cos ((float)i * rads_per_segment) / 2.0f;
     float y = width * sin ((float)i * rads_per_segment) / 2.0f;
-    cout << "Plane: " << i << " X: " << x << " Y: " << y <<endl;
+    std::cout << "Plane: " << i << " X: " << x << " Y: " << y <<std::endl;
     in[0][0] = _vertex_data[24 * i + 0] = x;
     in[0][1] = _vertex_data[24 * i + 1] = y;
     in[0][2] = _vertex_data[24 * i + 2] = 0.0f;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.24 2002-09-26 22:11:39 simon Exp $
+// $Id: ModelHandler.cpp,v 1.25 2002-10-09 17:13:39 alriddoch Exp $
 
 #include "System.h"
 #include <set>
@@ -99,11 +99,11 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     return _model_records[model_id];
   }
   if (!render) {
-    cerr << "renderer is null" << endl;	  
+    std::cerr << "renderer is null" << std::endl;	  
     return NULL;
   }
   if (!record) {
-    cerr << "record is NULL" << endl;
+    std::cerr << "record is NULL" << std::endl;
     return NULL;
   }
   ModelRecord *model = NULL;
@@ -112,7 +112,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   
   if (_model_loaders[model_loader]) model = _model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
   else {
-    cerr << "No loader found: " << model_loader << endl;
+    std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
   }
 
@@ -139,7 +139,7 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
 
 void ModelHandler::checkModelTimeouts() {
   // TODO what about records with no model?
-  cout << "Checking Timeouts" << endl;
+  std::cout << "Checking Timeouts" << std::endl;
   std::set<ModelRecord*> expired_set;
   for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
     ModelRecord *record = I->second;
@@ -168,7 +168,7 @@ void ModelHandler::checkModelTimeouts() {
   while (!expired_set.empty()) {
     ModelRecord *record = *expired_set.begin();
     if (record) {
-      cout << "Unloading: " << record->id << endl;
+      std::cout << "Unloading: " << record->id << std::endl;
       Model *model = record->model;
       if (model) delete model;
       delete record;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.13 2002-09-07 23:27:04 simon Exp $
+// $Id: 3ds.cpp,v 1.14 2002-10-09 17:13:38 alriddoch Exp $
 
 
 #include <iostream>
@@ -27,7 +27,7 @@
 
 #include "3ds.h"
 
-
+#include <iostream>
 
 namespace Sear {
 

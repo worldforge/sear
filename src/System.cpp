@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.39 2002-09-27 15:46:43 simon Exp $
+// $Id: System.cpp,v 1.40 2002-10-09 17:13:39 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -872,16 +872,16 @@ void System::runCommand(const std::string &command, const std::string &args) {
     }
   }
   else if (command == LOAD_MODEL_RECORDS) {
-	  cout << args << endl;
+    std::cout << args << std::endl;
     if (_model_records) {
       _process_records = _prefix_cwd;
-      cout << _model_records->readFromFile(processHome(args)) << endl;
+      std::cout << _model_records->readFromFile(processHome(args)) << std::endl;
       if (_process_records) {
 	_process_records = false;
         processRecords();
       }
     } else {
-      cerr << "no model records" << endl;
+      std::cerr << "no model records" << std::endl;
     }
   }
 /*  else if (command == LOAD_OBJECT_RECORDS) {
