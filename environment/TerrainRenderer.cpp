@@ -414,5 +414,4 @@ void TerrainRenderer::drawShadow(const WFMath::Point<2> & pos, float radius)
                                                                                 
 }
 
-
-}
+} /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.78 2004-04-26 20:26:51 simon Exp $
+// $Id: System.cpp,v 1.79 2004-04-27 12:57:35 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -279,6 +279,7 @@ bool System::init() {
   _command_history_iterator = _command_history.begin();
 
   RenderSystem::getInstance().createWindow(_width, _height, false);
+  RenderSystem::getInstance().initContext();
 
   _system_running = true;
   _initialised = true;
@@ -321,6 +322,8 @@ void System::shutdown() {
     delete _graphics;
     _graphics = NULL;
   }
+
+  RenderSystem::getInstance().shutdown();
 
   if (_calendar) {
     _calendar->shutdown();

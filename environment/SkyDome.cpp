@@ -1,3 +1,7 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 #include <math.h>
@@ -280,7 +284,4 @@ void SkyDome::render()
   }
 }
 
-
-
-
-}
+} /* namespace Sear */

@@ -279,7 +279,6 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     throw Exception("Error with OpenGL system");
   }
                                                                                 
-  RenderSystem::getInstance().initContext();
   //RenderSystem::getInstance().getStateManager()->initGL();
                                                                                 
   initLighting();
@@ -301,7 +300,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   setViewMode(PERSPECTIVE);
   setupExtensions();
 
-  initFont();
+//  initFont();
 
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
@@ -407,6 +406,7 @@ void GL::buildColourSet() {
 }
 
 GL::GL() :
+  m_fontInitialised(false),
   m_width(0), m_height(0),
   m_fullscreen(false),
   m_screen(NULL),
@@ -431,6 +431,9 @@ GL::~GL() {
 }
 
 void GL::shutdown() {
+  if (!m_initialised) return;
+  if (debug) std::cout << "GL: Shutdown" << std::endl;
+
   writeConfig();
   shutdownFont();
   m_initialised = false;
@@ -438,6 +441,7 @@ void GL::shutdown() {
 
 void GL::init() {
   if (m_initialised) shutdown();
+  if (debug) std::cout << "GL: Initialise" << std::endl;
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
 
@@ -1051,7 +1055,6 @@ inline void GL::endFrame(bool select_mode) {
   
 inline void GL::drawFPS(float fps) {
   std::string frame_rate_string = string_fmt(fps).substr(0, 4);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   glColor4fv(red);
   print(10, 100, frame_rate_string.c_str(), 0);
 }
@@ -1143,7 +1146,6 @@ inline void GL::resetSelection() {
 }
 
 inline void GL::renderActiveName() {
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   glColor4fv(activeNameColour);
   print(x_pos, y_pos, active_name.c_str(), 1);
 }

@@ -1,3 +1,7 @@
+26th April 2004, Simon Goodall
+ * Some fixes for texture manager
+ * Re-ordering of init to fix some texture issues
+
 26th April 2004, James Turner
  * Move SkyDome init path into it's constructor
  * Remove statics that stop SkyDome re-initing correctly

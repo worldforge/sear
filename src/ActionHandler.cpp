@@ -1,11 +1,16 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.11 2004-02-25 11:53:57 simon Exp $
+// $Id: ActionHandler.cpp,v 1.12 2004-04-27 12:57:35 simon Exp $
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
 
 #include "ActionHandler.h"
 
+#include <unistd.h>
 #include <varconf/varconf.h>
 
 #include "common/Log.h"
@@ -13,12 +18,6 @@
 #include "src/Console.h"
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"
-
-#include <unistd.h>
-
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

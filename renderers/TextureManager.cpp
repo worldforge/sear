@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.19 2004-04-26 20:26:50 simon Exp $
+// $Id: TextureManager.cpp,v 1.20 2004-04-27 12:57:35 simon Exp $
 
 #include "TextureManager.h"
 
@@ -123,6 +123,8 @@ void TextureManager::initGL() {
 
 void TextureManager::shutdown() {
   if (!m_initialised) return;
+  if (debug) std::cout << "TextureManager: Shutdown" << std::endl;
+
   // Unload all textures
   for (int i = 1; i < m_texture_counter; ++i) {
     unloadTexture(m_textures[i]);
@@ -160,7 +162,7 @@ void TextureManager::readTextureConfig(const std::string &filename) {
 
 GLuint TextureManager::loadTexture(const std::string &texture_name) {
   assert((m_initialised == true) && "TextureManager not initialised");
-std::cout << "Loading Texture: " << texture_name << std::endl;
+  std::cout << "Loading Texture: " << texture_name << std::endl;
   std::string clean_name = std::string(texture_name);
   
   bool mask = false;
@@ -358,9 +360,6 @@ void TextureManager::switchTexture(TextureID texture_id) {
       to = m_textures[m_default_texture];
     }
     m_textures[texture_id] = to;
-    if (to == 12 || to ==14) {
-std::cout << "Name: " <<  m_names[texture_id] << std::endl;
-   }
   }
   glBindTexture(GL_TEXTURE_2D, to);
   m_last_textures[0] = texture_id;  
@@ -371,7 +370,7 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
   if (texture_id == m_last_textures[texture_unit]) return;
 //  if (texture_id == -1) texture_id = m_default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
-  if (texture_unit >= m_texture_units) return; // Check we have enough texture units
+  if ((int)texture_unit >= m_texture_units) return; // Check we have enough texture units
   GLuint to = (texture_id == -1) ? (m_textures[m_default_texture]) : (m_textures[texture_id]);
   if (to == 0) {
     to = loadTexture(m_names[texture_id]);
@@ -518,7 +517,7 @@ TextureID TextureManager::createDefaultFont() {
   unsigned int width, height;
 
   unsigned char *data = xpm_to_image((const char**)default_font_xpm, width, height);
- glGenTextures(1, &texture);
+  glGenTextures(1, &texture);
 
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -567,7 +566,7 @@ void TextureManager::invalidate() {
     m_textures[i] = 0;
   }
 
-  for (unsigned int U = 0; U < m_texture_units; ++U){
+  for (int U = m_last_textures.size() - 1; U >= 0; --U){
     m_last_textures[U] = -1;
   }
   setupGLExtensions();

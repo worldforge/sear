@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.10 2004-04-26 20:26:50 simon Exp $
+// $Id: TextureManager.h,v 1.11 2004-04-27 12:57:35 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -106,9 +106,6 @@ public:
       m_texture_map[name] = m_texture_counter;
       m_names[m_texture_counter] = name;
       id = m_texture_counter++;
-if (id == 12 || id == 14) {
-std::cout << "texture_name: " << texture_name << std::endl;
-}
     }
     return id;
   }
@@ -157,7 +154,7 @@ std::cout << "texture_name: " << texture_name << std::endl;
   }
   void setScale(unsigned int texture_unit, float scale_x, float scale_y);
 
-  unsigned int getNumTextureUnits() const { return m_texture_units; }
+  int getNumTextureUnits() const { return m_texture_units; }
  
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &arguments);
@@ -173,7 +170,7 @@ private:
   NameVector m_names; 
   int m_texture_counter; ///< Keeps track of last allocated TextureID
   std::vector<TextureID> m_last_textures;
-  unsigned int m_texture_units;
+  int m_texture_units;
   TextureID m_default_texture;
   TextureID m_default_font;
 

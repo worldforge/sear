@@ -2,12 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.13 2004-04-26 20:26:50 simon Exp $
+// $Id: StateManager.cpp,v 1.14 2004-04-27 12:57:35 simon Exp $
 
 /*
  * TODO
  * custom of default settings
  * */
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -23,9 +27,6 @@
 #include "src/System.h"
 #include "src/FileHandler.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -93,6 +94,7 @@ StateManager::~StateManager() {
 }
 
 void StateManager::init() {
+  assert(_initialised == false);
   if (_initialised) shutdown();
   if (debug) std::cout << "State Loader: Initialising." << std::endl;
 
@@ -187,7 +189,8 @@ void StateManager::init() {
 }
 
 void StateManager::shutdown() {
-  if (debug) std::cout << "State Loader: Shutting Down" << std::endl;
+  assert(_initialised);
+  if (debug) std::cout << "State Loader: Shutdown" << std::endl;
   while (!_states.empty()) {
 //    if (*_states.begin()) {
       StateProperties *sp = *(_states.begin());
@@ -199,6 +202,7 @@ void StateManager::shutdown() {
 }
 
 void StateManager::readFiles(const std::string &file_name) {
+  assert(_initialised);
   varconf::Config config;
   config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
   config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
@@ -206,6 +210,7 @@ void StateManager::readFiles(const std::string &file_name) {
 }
 
 void StateManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  assert(_initialised);
   int in = _state_name_map[section];
   StateProperties *record = _states[_state_name_map[section]];
   // If record does not exist, create it.
@@ -272,6 +277,7 @@ void StateManager::varconf_error_callback(const char *message) {
 }
 
 StateID StateManager::getState(const std::string &state_name) const {
+  assert(_initialised);
   StateNameMap::const_iterator S = _state_name_map.find(state_name);
   if (S == _state_name_map.end()) {
     std::cerr << "state " << state_name << " is unknown" << std::endl;
@@ -375,6 +381,7 @@ void StateManager::stateChange(StateID state) {
 }
 
 void StateManager::buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state) {
+  assert(_initialised);
   assert (previous_state != NULL);
   assert (next_state != NULL);
   glNewList(list, GL_COMPILE);
@@ -440,10 +447,12 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
 }
 
 void StateManager::registerCommands(Console *console) {
+  assert(_initialised);
   console->registerCommand(CMD_LOAD_STATE_CONFIG, this);
 }
 
 void StateManager::runCommand(const std::string &command, const std::string &arguments) {
+  assert(_initialised);
   if (command == CMD_LOAD_STATE_CONFIG) {
     std::string a = arguments;
     System::instance()->getFileHandler()->expandString(a);
@@ -452,6 +461,7 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
 }
 
 void StateManager::invalidate() {
+  assert(_initialised);
   for (unsigned int i = 0; i < _state_change_vector.size(); ++i) {
     for (unsigned int j = 0; j < _state_change_vector[i].size(); ++j) {
       // Delete display list if its still valid
