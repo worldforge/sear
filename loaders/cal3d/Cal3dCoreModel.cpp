@@ -3,11 +3,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.2 2003-03-05 23:39:04 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.3 2003-03-06 12:52:08 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
 #include <string>
+
+#include <varconf/Config.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -294,9 +296,18 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   return textureId;
 }
 
-Cal3dModel *Cal3dCoreModel::instantiate() {
+Cal3dModel *Cal3dCoreModel::instantiate(float height, varconf::Config &config) {
   Cal3dModel *model = new Cal3dModel(System::instance()->getGraphics()->getRender());
   model->init(this);
+  model->setHeight(height);
+  if (config.findItem("model", "default_set")) {
+    varconf::Variable v = config.getItem("model", "height");
+    if (v.is_int()) {
+      model->setMaterialSet((int)v);
+    } else { // Assume we have a string
+      model->setMaterialSet((std::string)v);
+    }
+  }
   return model;
 }
 

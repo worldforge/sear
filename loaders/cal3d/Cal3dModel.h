@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.1 2003-03-05 23:39:04 simon Exp $
+// $Id: Cal3dModel.h,v 1.2 2003-03-06 12:52:08 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -11,7 +11,7 @@
 #include <string>
 
 #include <cal3d/cal3d.h>
-
+#include "Cal3dCoreModel.h"
 #include "src/Model.h"
 #include "src/Graphics.h"
 
@@ -19,9 +19,7 @@
 namespace Sear {
 
 class Render;
-
-
-class Cal3dCoreModel;
+//class Cal3dCoreModel;
 	
 class Cal3dModel : public Sear::Model {
 public:
@@ -30,7 +28,6 @@ public:
 
   bool init(Cal3dCoreModel *);
   void shutdown();
-  void executeAction(int action);
   float getLodLevel() const { return m_lodLevel; }
   void getMotionBlend(float *pMotionBlend);
   float getScale() const { return m_renderScale; }
@@ -45,6 +42,23 @@ public:
 
   void action(const std::string &action);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
+ 
+  void setHeight(float height) { _height = height; }
+  float getHeight() const { return _height; }
+
+  unsigned int getPartID(const std::string &part) { return _core_model->_parts[part]; }
+  unsigned int getSetID(const std::string &set) { return _core_model->_sets[set]; }
+  
+  void setMaterialSet(const std::string &set) {
+    setMaterialSet(_core_model->_sets[set]);
+  }
+  
+  void setMaterialSet(unsigned int set);
+  
+  void setMaterialPartSet(const std::string &part, const std::string &set) {
+    setMaterialPartSet(_core_model->_parts[part], _core_model->_sets[set]);
+  }
+  void setMaterialPartSet(unsigned int part, unsigned int set);
   
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
@@ -52,8 +66,8 @@ private:
   bool _initialised;
 
   Cal3dCoreModel *_core_model;
- float m_motionBlend[3]; 
-//  float _height;
+  float m_motionBlend[3]; 
+  float _height;
   int m_state;
   CalModel m_calModel;
   float m_lodLevel;

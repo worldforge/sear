@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.2 2003-03-05 23:39:04 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.3 2003-03-06 12:52:08 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H 1
@@ -16,11 +16,17 @@
 #include <varconf/Config.h>
 #include <cal3d/cal3d.h>
 
+namespace varconf {
+  class Config;
+}
+
 namespace Sear {
 class Cal3dModel;
 	
 class Cal3dCoreModel : public SigC::Object {
 public:
+  friend class Cal3dModel;
+	
   typedef std::map <std::string, unsigned int> MeshMap;
   typedef std::map <std::string, unsigned int> AnimationMap;
   typedef std::list <std::string> MaterialList;
@@ -36,7 +42,7 @@ public:
   void shutdown();
 
   CalCoreModel *getCalCoreModel() const { return _core_model; }
-  Cal3dModel *instantiate();  
+  Cal3dModel *instantiate(float height, varconf::Config &config);
  
   //Accessors
   float getScale() const { return _scale; }

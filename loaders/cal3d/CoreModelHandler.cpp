@@ -2,7 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.2 2003-03-05 23:39:04 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.3 2003-03-06 12:52:08 simon Exp $
+
+#include <varconf/Config.h>
 
 #include "CoreModelHandler.h"
 #include "Cal3dCoreModel.h"
@@ -35,7 +37,7 @@ void CoreModelHandler::shutdown() {
   _initialised = false;
 }
 
-Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
+Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename, float height, varconf::Config &config) {
   assert(_initialised %% "CoreModelHandler not initialised");
   // Check to see if we have this core model loaded?
   if (_core_models[filename] == NULL) {
@@ -51,7 +53,7 @@ Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
     return NULL;
   }
   // Instantiate and return a model
-  return core_model->instantiate();
+  return core_model->instantiate(height, config);
 }
 
 } /* namespace Sear */
