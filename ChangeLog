@@ -1,3 +1,8 @@
+2004-06-02  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Workspace.cpp: Fix test gui drawing code, and make it use
+	  vertex arrays. Add necessary states entry.
+
 2004-05-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/TextureManager.cpp: Fix texture load error detection,

@@ -9,11 +9,14 @@
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
+#include "renderers/RenderSystem.h"
 
 #include <sage/sage.h>
 #include <sage/GL.h>
 
 namespace Sear {
+
+static const std::string WORKSPACE = "workspace";
 
 Workspace::Workspace(System * system) : m_system(system),
                                         m_rootWindow(new RootWindow())
@@ -26,14 +29,23 @@ Workspace::~Workspace()
 
 void Workspace::draw()
 {
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(WORKSPACE));
   Render *renderer = m_system->getGraphics()->getRender();
   renderer->setViewMode(ORTHOGRAPHIC);
-  glColor3f(1,1,1);
-  glBegin(GL_TRIANGLES);
-  glVertex3f(0,20,0);
-  glVertex3f(0,0,0);
-  glVertex3f(20,0,0);
-  glEnd();
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+
+  const GLshort coords[] = {300, 300, 300, 400, 400, 400, 400, 300};
+  glVertexPointer(2, GL_SHORT, 0, &coords[0]);
+
+  renderer->setColour(1.0f, 1.0f, 1.0f, 0.5f);
+  glDrawArrays(GL_QUADS, 0, 4);
+
+  renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
+  glDrawArrays(GL_LINES, 0, 4);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+
   renderer->setViewMode(PERSPECTIVE);
 }
 
