@@ -28,7 +28,7 @@ public:
   Slice(Render*);
   ~Slice();
   
-  bool init(const std::string &, float width, float height);
+  bool init(const std::string &, float width, float height, Model *trunk_model);
   void shutdown();
   
   void render(bool); 
@@ -40,6 +40,7 @@ private:
   bool _use_textures;
   std::string _type;
   Slicing **slicings;
+  Model *_trunk_model;
 };
 
 } /* namespace Sear */ 

@@ -10,6 +10,16 @@
 
 #include "ConsoleObject.h"
 
+
+/*
+ * Currently returns file names from a list of search paths
+ * TODO
+ * This class will be used for all file handling issues.
+ * Aim is to link in a virtual file system for easy media packaging
+ * this could be from a zip file, or a custom format.
+ * It would also be good to be able to use file-memory mapping if possible/appropriate.
+ */ 
+
 namespace Sear {
 
 class Console;

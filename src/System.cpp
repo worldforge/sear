@@ -173,6 +173,7 @@ void System::shutdown() {
     delete _client;
     _client = NULL;
   }
+  
   if (_ol) {
     _ol->shutdown();
     delete _ol;

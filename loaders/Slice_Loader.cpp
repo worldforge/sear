@@ -34,7 +34,8 @@ Model *Slice_Loader::loadModel(Render *render, ModelStruct &ms) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, ms.width, ms.height);
+  Model *trunk_model = System::instance()->getModelHandler()->getModel(System::instance()->getGraphics()->getRender(), type + "_trunk", System::instance()->getObjectLoader()->getObjectProperties(type + "_trunk"));
+  model->init(type, ms.width, ms.height, trunk_model);
   return model;
 }
 

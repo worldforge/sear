@@ -45,7 +45,19 @@
 
 namespace Sear {
 
-static float _halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static GLfloat _halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
+static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
+//static GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+//static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
+static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
+//static GLfloat whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
+static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
+//static GLfloat ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
+//static GLfloat diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
+//static GLfloat specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
 inline GLuint GL::makeMask(GLint bits) {
   return (0xFF >> (8 - bits));
@@ -76,20 +88,6 @@ inline void GL::resetColours(){
   colourSetIterator = colourSet.begin();
   *colourSetIterator++;
 }
-
-static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
-
-static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
-//static GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-//static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
-static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
-//static GLfloat whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
-static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
-//static GLfloat ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
-//static GLfloat diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
-//static GLfloat specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
 void GL::buildColourSet() {
   unsigned int numPrims = 500;
@@ -740,7 +738,6 @@ void GL::writeConfig() {
 
 // THIS BUILDS A STATE TRANSITION LIST
 void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StateProperties *next_state) {
-  // TODO: if textures are disabled then disable them here too
   if (!previous_state || !next_state) return;
   glNewList(list, GL_COMPILE);
   if (previous_state->alpha_test != next_state->alpha_test) {
@@ -985,6 +982,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
 
       // Translate Model
       WFMath::Point<3> pos = we->getAbsPos();
+      // TODO remove terrain->getHeight when server handles its own z coords
       translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
      
       // Rotate Model

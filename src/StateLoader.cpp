@@ -71,6 +71,8 @@ StateProperties *StateLoader::readRecord(FILE *state_file) {
     fgets(str, MAX_STRING_SIZE, state_file);
     sscanf(str, "%s\n", &string_data[0]);
     std::string tag = std::string(string_data);
+    if (tag.empty()) continue;
+    if (tag.c_str()[0] == '#') continue;
     if (tag == "end_of_state") {
       // If no name was found, return NULL;	    
       if (!sp->state) {

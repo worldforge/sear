@@ -20,15 +20,17 @@ namespace Sear {
   
 Slice::Slice(Render *render) : Model(render),
   _use_textures(true),
-  slicings(NULL)
+  slicings(NULL),
+  _trunk_model(NULL)
 {}
 
 Slice::~Slice() {
 
 }
   
-bool Slice::init(const std::string &type, float width, float height) {
+bool Slice::init(const std::string &type, float width, float height, Model *trunk_model) {
   _type = type;
+  _trunk_model = trunk_model;
   slicings = (Slicing**)malloc(num_slicings * sizeof(Slicing*));
   memset(slicings, 0, num_slicings * sizeof(Slicing*));
   for (unsigned int i = 0; i < num_slicings; i++) {
@@ -88,23 +90,25 @@ void Slice::shutdown() {
 
 void Slice::render(bool select_mode) {
   if (!_render) return;
+  if (_trunk_model) _trunk_model->render(select_mode);
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-  //TODO, should we use one texture for the whole model, or one per plane?
-  if (select_mode) {
-    _render->switchTexture(_render->requestMipMapMask("slice", _type, true));
-  } else {
-    _render->switchTexture(_render->requestMipMap("slice", _type, true));
-  }
+//  if (select_mode) {
+//    _render->switchTexture(_render->requestMipMapMask("slice", _type, true));
+//  } else {
+//    _render->switchTexture(_render->requestMipMap("slice", _type, true));
+//  }
 //  WFMath::Quaternion q = System::instance()->getGraphics()->getCameraOrientation();
   float camera_angle = System::instance()->getGraphics()->getCamera()->getRotation();
   Character *c = System::instance()->getCharacter();
   if (c) camera_angle += c->getAngle();
   //camera_angle += WFMath::Pi / 2;
-  while (camera_angle <0.0f) camera_angle += WFMath::Pi * 2;
+  // Keeps camera angle with 0 -> 2 Pi range
+  while (camera_angle < 0.0f) camera_angle += WFMath::Pi * 2;
   while (camera_angle > WFMath::Pi * 2) camera_angle -= WFMath::Pi * 2;
+  
   unsigned int index_1, index_2;
   float angle = WFMath::Pi / num_slicings;
   float transparency = 1.0f;
@@ -118,7 +122,7 @@ void Slice::render(bool select_mode) {
   }
   while (index_1 >= num_slicings) index_1 -= num_slicings;
   while (index_2 >= num_slicings) index_2 -= num_slicings;
-//  cout << index_1 << " " << index_2 << " " << transparency << endl; 
+  //cout << index_1 << " " << index_2 << " " << transparency << endl; 
   glColor4f(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
   int i = 0;
   int index;
@@ -127,7 +131,11 @@ void Slice::render(bool select_mode) {
   index = index_1;
   for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
     ASlice *slice = *I;
-    _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    if (select_mode) {
+      _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    } else {
+      _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
   }
 //  if (transparency < 0.5) index = index_2;
@@ -137,7 +145,11 @@ void Slice::render(bool select_mode) {
   glColor4f(1.0f, 1.0f, 1.0f,  transparency);
   for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
     ASlice *slice = *I;
-    _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    if (select_mode) {
+      _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    } else {
+      _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+    }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
   }
 }

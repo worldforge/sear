@@ -115,6 +115,8 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     fgets(str, OBJECT_LOADER_MAX_SIZE, object_file);
     sscanf(str, "%s\n", &string_data[0]);
     std::string tag = std::string(string_data);
+    if (tag.empty()) continue;
+    if (tag.c_str()[0] == '#') continue;
     if (tag == "end_of_record") {
       op->material_properties = mp;
       if (op->use_lighting) {

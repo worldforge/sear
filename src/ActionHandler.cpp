@@ -51,6 +51,8 @@ void ActionHandler::loadConfiguration(const std::string &filename) {
       fgets(str, MAX_STRING_SIZE, file);
       sscanf(str, "%s\n", &string_data[0]);
       std::string tag = std::string(string_data);
+      if (tag.empty()) continue;
+      if (tag.c_str()[0] == '#') continue;
       if (tag == "end_of_action") {
         // If no name was found, return NULL;         
         if (!as->action) {

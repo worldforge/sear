@@ -1,3 +1,7 @@
+5th September 2002, Simon Goodall
+ * Fixed problems in Object/Stae/Action Loader code which caused an error message to be printed when the end of file was reached. Also now allows use of the # character in the first position in a line to denote a comment.
+ * Minor changes to Slice code
+
 3rd September 2002, Simon Goodall
  * Added first version of a slice loader. This will hopefully allow for trees as in A Tale in the Desert. Currently will load and blend in the foilage area. Trunk model not yet implemented.
 
