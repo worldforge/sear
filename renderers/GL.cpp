@@ -315,16 +315,16 @@ void GL::destroyWindow() {
 }
 
 void GL::toggleFullscreen() {
-//  m_fullscreen = !m_fullscreen;
+  m_fullscreen = !m_fullscreen;
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
-//  if (!SDL_WM_ToggleFullScreen(m_screen)) {
+  if (!SDL_WM_ToggleFullScreen(m_screen)) {
     destroyWindow();
     RenderSystem::getInstance().invalidate();
     Environment::getInstance().invalidate();
     createWindow(m_width, m_height, m_fullscreen);
     RenderSystem::getInstance().invalidate();
     Environment::getInstance().invalidate();
-//  }
+  }
 }
 void GL::checkError() {
   GLenum err = glGetError();

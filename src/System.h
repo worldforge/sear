@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.42 2004-05-14 12:17:21 simon Exp $
+// $Id: System.h,v 1.43 2004-05-17 10:39:28 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -161,7 +161,7 @@ public:
    * Get the General Config object
    * @return Reference to general config object
    */ 
-  varconf::Config &getGeneral() { return _general; }
+  varconf::Config &getGeneral() { return m_general; }
   /**
    * Get the Model Config object
    * @return Reference to model config object
@@ -218,8 +218,8 @@ protected:
   std::string _icon_file;
   SDL_Surface *_icon;
   
-  int _width;
-  int _height;
+  int m_width;
+  int m_height;
 
   bool _click_on;
   int _click_x;
@@ -235,7 +235,7 @@ protected:
   ObjectHandler *_object_handler; ///< Pointer to object handler object
   Calendar *_calendar; ///< Pointer to calender object
    
-  varconf::Config _general;
+  varconf::Config m_general;
   varconf::Config _models;
 
   varconf::Config _model_records;
@@ -254,7 +254,7 @@ protected:
   SDL_Cursor *_cursor_pickup;
   SDL_Cursor *_cursor_touch;
 
-  bool _mouse_move_select;
+  bool m_mouse_move_select;
 
   double _seconds;
 

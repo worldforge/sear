@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.13 2004-04-27 15:07:02 simon Exp $
+// $Id: ActionHandler.cpp,v 1.14 2004-05-17 10:39:28 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -96,12 +96,8 @@ void ActionHandler::varconf_callback(const std::string &section, const std::stri
   }
   // Set script file
   if (key == SCRIPT) {
-//    char cwd[256];
- //   memset(cwd, '\0', 256);
-  //  getcwd(cwd, 255);
     record->script = (std::string)config.getItem(section, key);
-
-}
+  }
   // Set entity based flag
   else if (key == ENTITY) record->entity_based = (bool)config.getItem(section, key);
 }

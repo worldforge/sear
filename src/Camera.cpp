@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.16 2004-04-27 15:07:02 simon Exp $
+// $Id: Camera.cpp,v 1.17 2004-05-17 10:39:28 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -160,27 +160,62 @@ void Camera::readConfig() {
   varconf::Variable temp;
   varconf::Config &general = System::instance()->getGeneral();
   
-  temp = general.getItem(CAMERA, KEY_camera_distance);
-  _distance = (!temp.is_double()) ? (DEFAULT_camera_distance) : ((double)(temp));
-  temp = general.getItem(CAMERA, KEY_camera_rotation);
-  _rotation = (!temp.is_double()) ? (DEFAULT_camera_rotation) : ((double)(temp));
-  temp = general.getItem(CAMERA, KEY_camera_elevation);
-  _elevation = (!temp.is_double()) ? (DEFAULT_camera_elevation) : ((double)(temp));
+  if (general.findItem(CAMERA, KEY_camera_distance)) {
+    temp = general.getItem(CAMERA, KEY_camera_distance);
+    _distance = (!temp.is_double()) ? (DEFAULT_camera_distance) : ((double)(temp));
+  } else {
+    _distance = DEFAULT_camera_distance;
+  }
+  if (general.findItem(CAMERA, KEY_camera_rotation)) {
+    temp = general.getItem(CAMERA, KEY_camera_rotation);
+    _rotation = (!temp.is_double()) ? (DEFAULT_camera_rotation) : ((double)(temp));
+  } else {
+    _rotation = DEFAULT_camera_rotation;
+  }
+  if (general.findItem(CAMERA, KEY_camera_elevation)) {
+    temp = general.getItem(CAMERA, KEY_camera_elevation);
+    _elevation = (!temp.is_double()) ? (DEFAULT_camera_elevation) : ((double)(temp));
+  } else {
+    _elevation = DEFAULT_camera_elevation;
+  }
   
+  if (general.findItem(CAMERA, KEY_camera_zoom_speed)) {
   temp = general.getItem(CAMERA, KEY_camera_zoom_speed);
   _zoom_speed = (!temp.is_double()) ? (DEFAULT_camera_zoom_speed) : ((double)(temp));
-  temp = general.getItem(CAMERA, KEY_camera_rotation_speed);
-  _rotation_speed = (!temp.is_double()) ? (DEFAULT_camera_rotation_speed) : ((double)(temp));
-  temp = general.getItem(CAMERA, KEY_camera_elevation_speed);
-  _elevation_speed = (!temp.is_double()) ? (DEFAULT_camera_elevation_speed) : ((double)(temp));
+  } else {
+  _zoom_speed = DEFAULT_camera_zoom_speed;
+  }
+  if (general.findItem(CAMERA, KEY_camera_rotation_speed)) {
+    temp = general.getItem(CAMERA, KEY_camera_rotation_speed);
+    _rotation_speed = (!temp.is_double()) ? (DEFAULT_camera_rotation_speed) : ((double)(temp));
+  } else {
+    _rotation_speed = DEFAULT_camera_rotation_speed;
+  }
+  if (general.findItem(CAMERA, KEY_camera_elevation_speed)) {
+    temp = general.getItem(CAMERA, KEY_camera_elevation_speed);
+    _elevation_speed = (!temp.is_double()) ? (DEFAULT_camera_elevation_speed) : ((double)(temp));
+  } else {
+    _elevation_speed = DEFAULT_camera_elevation_speed;
+  }
   
-  temp = general.getItem(CAMERA, KEY_camera_min_distance);
-  _min_distance = (!temp.is_double()) ? (DEFAULT_camera_min_distance) : ((double)(temp));
-  temp = general.getItem(CAMERA, KEY_camera_max_distance);
-  _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
-
-  temp = general.getItem(CAMERA, KEY_save_camera_position);
-  _save_camera_position = (!temp.is_bool()) ? (DEFAULT_save_camera_position) : ((bool)(temp));
+  if (general.findItem(CAMERA, KEY_camera_min_distance)) {
+    temp = general.getItem(CAMERA, KEY_camera_min_distance);
+    _min_distance = (!temp.is_double()) ? (DEFAULT_camera_min_distance) : ((double)(temp));
+  } else {
+    _min_distance = DEFAULT_camera_min_distance;
+  }
+  if (general.findItem(CAMERA, KEY_camera_max_distance)) {
+    temp = general.getItem(CAMERA, KEY_camera_max_distance);
+    _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
+  } else {
+    _max_distance = DEFAULT_camera_max_distance;
+  }
+  if (general.findItem(CAMERA, KEY_save_camera_position)) {
+    temp = general.getItem(CAMERA, KEY_save_camera_position);
+    _save_camera_position = (!temp.is_bool()) ? (DEFAULT_save_camera_position) : ((bool)(temp));
+  } else {
+    _save_camera_position = DEFAULT_save_camera_position;
+  }
 }
 
 void Camera::writeConfig() {

@@ -1,3 +1,6 @@
+17th May 2004, Simon Goodall
+ * Further varconf find / get item fixes
+
 14th May 2004, Simon Goodall
  * Add check on startup to see if we want to use the stencil buffer. Set general.cfg render_use_stencil to false to disable stencil buffer.
 

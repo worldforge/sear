@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.9 2004-05-14 12:43:15 simon Exp $
+// $Id: Calendar.cpp,v 1.10 2004-05-17 10:39:28 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -231,38 +231,86 @@ void Calendar::readConfig() {
   varconf::Config &config = System::instance()->getGeneral();
   varconf::Variable temp;
 
-  temp = config.getItem(CALENDER, KEY_SECONDS_PER_MINUTE);
-  _seconds_per_minute = (!temp.is_int()) ? (DEFAULT_SECONDS_PER_MINUTE) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_MINUTES_PER_HOUR);
-  _minutes_per_hour = (!temp.is_int()) ? (DEFAULT_MINUTES_PER_HOUR) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_HOURS_PER_DAY);
-  _hours_per_day = (!temp.is_int()) ? (DEFAULT_HOURS_PER_DAY) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_DAYS_PER_WEEK);
-  _days_per_week = (!temp.is_int()) ? (DEFAULT_DAYS_PER_WEEK) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_WEEKS_PER_MONTH);
-  _weeks_per_month = (!temp.is_int()) ? (DEFAULT_WEEKS_PER_MONTH) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
-  _months_per_year = (!temp.is_int()) ? (DEFAULT_MONTHS_PER_YEAR) : ((int)temp);
+  if (config.findItem(CALENDER, KEY_SECONDS_PER_MINUTE)) {
+    temp = config.getItem(CALENDER, KEY_SECONDS_PER_MINUTE);
+    _seconds_per_minute = (!temp.is_int()) ? (DEFAULT_SECONDS_PER_MINUTE) : ((int)temp);
+  } else {
+    _seconds_per_minute = DEFAULT_SECONDS_PER_MINUTE;
+  }
+  if (config.findItem(CALENDER, KEY_MINUTES_PER_HOUR)) {
+    temp = config.getItem(CALENDER, KEY_MINUTES_PER_HOUR);
+    _minutes_per_hour = (!temp.is_int()) ? (DEFAULT_MINUTES_PER_HOUR) : ((int)temp);
+  } else {
+    _minutes_per_hour = DEFAULT_MINUTES_PER_HOUR;
+  }
+  if (config.findItem(CALENDER, KEY_HOURS_PER_DAY)) {
+    temp = config.getItem(CALENDER, KEY_HOURS_PER_DAY);
+    _hours_per_day = (!temp.is_int()) ? (DEFAULT_HOURS_PER_DAY) : ((int)temp);
+  } else {
+    _hours_per_day = DEFAULT_HOURS_PER_DAY;
+  }
+  if (config.findItem(CALENDER, KEY_DAYS_PER_WEEK)) {
+    temp = config.getItem(CALENDER, KEY_DAYS_PER_WEEK);
+    _days_per_week = (!temp.is_int()) ? (DEFAULT_DAYS_PER_WEEK) : ((int)temp);
+  } else {
+    _days_per_week = DEFAULT_DAYS_PER_WEEK;
+  }
+  if (config.findItem(CALENDER, KEY_WEEKS_PER_MONTH)) {
+    temp = config.getItem(CALENDER, KEY_WEEKS_PER_MONTH);
+    _weeks_per_month = (!temp.is_int()) ? (DEFAULT_WEEKS_PER_MONTH) : ((int)temp);
+  } else {
+    _weeks_per_month = DEFAULT_WEEKS_PER_MONTH;
+  }
+  if (config.findItem(CALENDER, KEY_MONTHS_PER_YEAR)) {
+    temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
+    _months_per_year = (!temp.is_int()) ? (DEFAULT_MONTHS_PER_YEAR) : ((int)temp);
+  } else {
+    _months_per_year = DEFAULT_MONTHS_PER_YEAR;
+  }
 
-  temp = config.getItem(CALENDER, KEY_DAWN_START);
-  _dawn_start = (!temp.is_int()) ? (DEFAULT_DAWN_START) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_DAY_START);
-  _day_start = (!temp.is_int()) ? (DEFAULT_DAY_START) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_DUSK_START);
-  _dusk_start = (!temp.is_int()) ? (DEFAULT_DUSK_START) : ((int)temp);
-  temp = config.getItem(CALENDER, KEY_NIGHT_START);
-  _night_start = (!temp.is_int()) ? (DEFAULT_NIGHT_START) : ((int)temp);
+  if (config.findItem(CALENDER, KEY_DAWN_START)) {
+    temp = config.getItem(CALENDER, KEY_DAWN_START);
+    _dawn_start = (!temp.is_int()) ? (DEFAULT_DAWN_START) : ((int)temp);
+  } else {
+    _dawn_start = DEFAULT_DAWN_START;
+  }
+  if (config.findItem(CALENDER, KEY_DAY_START)) {
+    temp = config.getItem(CALENDER, KEY_DAY_START);
+    _day_start = (!temp.is_int()) ? (DEFAULT_DAY_START) : ((int)temp);
+  } else {
+    _day_start = DEFAULT_DAY_START;
+  }
+  if (config.findItem(CALENDER, KEY_DUSK_START)) {
+    temp = config.getItem(CALENDER, KEY_DUSK_START);
+    _dusk_start = (!temp.is_int()) ? (DEFAULT_DUSK_START) : ((int)temp);
+  } else {
+    _dusk_start = DEFAULT_DUSK_START;
+  }
+  if (config.findItem(CALENDER, KEY_NIGHT_START)) {
+    temp = config.getItem(CALENDER, KEY_NIGHT_START);
+    _night_start = (!temp.is_int()) ? (DEFAULT_NIGHT_START) : ((int)temp);
+  } else {
+    _night_start = DEFAULT_NIGHT_START;
+  }
   
   for (unsigned int i = 0; i < _days_per_week; ++i) {
     std::string key = KEY_DAY_NAME + string_fmt(i);
-    temp = config.getItem(CALENDER, key);
-    _day_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
+    if (config.findItem(CALENDER, key)) {
+      temp = config.getItem(CALENDER, key);
+      _day_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
+    } else {
+      _day_names[i] = key;
+    }
   }
   
   for (unsigned int i = 0; i < _months_per_year; ++i) {
     std::string key = KEY_MONTH_NAME + string_fmt(i);
-    temp = config.getItem(CALENDER, key);
-    _month_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
+    if (config.findItem(CALENDER, key)) {
+      temp = config.getItem(CALENDER, key);
+      _month_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
+    } else {
+      _month_names[i] = key;
+    }
   }
   _current_day_name = _day_names[_days];
   _current_month_name = _month_names[_months];

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.85 2004-05-14 12:17:21 simon Exp $
+// $Id: System.cpp,v 1.86 2004-05-17 10:39:28 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -115,8 +115,8 @@ System::System() :
   renderer(NULL),
   _client(NULL),
   _icon(NULL),
-  _width(0),
-  _height(0),
+   m_width(0),
+   m_height(0),
   _click_on(false),
   _click_x(0),
   _click_y(0),
@@ -132,7 +132,7 @@ System::System() :
   _cursor_default(NULL),
   _cursor_pickup(NULL),
   _cursor_touch(NULL),
-  _mouse_move_select(false),
+  m_mouse_move_select(false),
   _seconds(0.0),
   _process_records(false),
   sound(NULL),
@@ -180,12 +180,12 @@ bool System::init(int argc, char *argv[]) {
   _calendar->init();
  
   // Connect signals for record processing 
-  _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  m_general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
   // Connect signals for error messages
-  _general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
@@ -242,14 +242,14 @@ bool System::init(int argc, char *argv[]) {
  for (int i = 0; i < argc; ++i) {
 std::cout << argv[i] << std::endl;
 }
-  _general.getCmdline(argc, argv);
+  m_general.getCmdline(argc, argv);
   readConfig();
   RenderSystem::getInstance().readConfig();
-  _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
+  m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();
 
-  RenderSystem::getInstance().createWindow(_width, _height, false);
+  RenderSystem::getInstance().createWindow(m_width, m_height, false);
 
   if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
   SDL_WM_SetIcon(_icon, NULL);
@@ -467,7 +467,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_MOUSEMOTION: {
-      if (_mouse_move_select && !mouseLook) renderer->procEvent(event.button.x, event.button.y);
+      if (m_mouse_move_select && !mouseLook) renderer->procEvent(event.button.x, event.button.y);
       break;
     } 
     case SDL_KEYDOWN: {
@@ -596,11 +596,11 @@ void System::handleEvents(const SDL_Event &event) {
     }
     case SDL_JOYBUTTONDOWN: {
       if (event.jbutton.button == DEFAULT_joystick_touch_button) {
-        renderer->procEvent(_width / 2, _height / 2);
+        renderer->procEvent(m_width / 2, m_height / 2);
         if (_character) _character->touchEntity(renderer->getActiveID());
       }
       if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
-        renderer->procEvent(_width / 2, _height / 2);
+        renderer->procEvent(m_width / 2, m_height / 2);
         if (_character) _character->getEntity(renderer->getActiveID());
       }
       break;
@@ -615,8 +615,8 @@ void System::handleEvents(const SDL_Event &event) {
 void System::handleAnalogueControllers() {
   if (mouseLook) {
     // We should still be ok if the user wants to drag something
-    int mx = _width / 2,
-        my = _height / 2;
+    int mx = m_width / 2,
+        my = m_height / 2;
     int dx, dy;
     SDL_GetMouseState(&dx, &dy);
     dx -= mx;
@@ -688,7 +688,7 @@ void System::toggleMouselook() {
   mouseLook = ! mouseLook;
   if (mouseLook) {
     SDL_ShowCursor(SDL_DISABLE);
-    SDL_WarpMouse(_width / 2, _height / 2);
+    SDL_WarpMouse(m_width / 2, m_height / 2);
   } else {
     SDL_ShowCursor(SDL_ENABLE);
   }
@@ -712,21 +712,32 @@ void System::setCharacter(Character *character) {
 
 void System::readConfig() {
   varconf::Variable temp;
-
-  temp = _general.getItem(SYSTEM, KEY_mouse_move_select);
-  _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
-
-  temp = _general.getItem(SYSTEM, KEY_window_width);
-  _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
-  temp = _general.getItem(SYSTEM, KEY_window_height);
-  _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
+  
+  if (m_general.findItem(SYSTEM, KEY_mouse_move_select)) {
+    temp = m_general.getItem(SYSTEM, KEY_mouse_move_select);
+    m_mouse_move_select = (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
+  } else {
+    m_mouse_move_select = DEFAULT_mouse_move_select;
+  }
+  if (m_general.findItem(SYSTEM, KEY_window_width)) {
+    temp = m_general.getItem(SYSTEM, KEY_window_width);
+    m_width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
+  } else {
+    m_width = DEFAULT_window_width;
+  }
+  if (m_general.findItem(SYSTEM, KEY_window_height)) {
+    temp = m_general.getItem(SYSTEM, KEY_window_height);
+    m_height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
+  } else {
+    m_height = DEFAULT_window_height;
+  }
 }
 
 void System::writeConfig() {
-  _general.setItem(SYSTEM, KEY_mouse_move_select,  _mouse_move_select);
+  m_general.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select);
 
-  _general.setItem(SYSTEM, KEY_window_width, _width);
-  _general.setItem(SYSTEM, KEY_window_height, _height);
+  m_general.setItem(SYSTEM, KEY_window_width, m_width);
+  m_general.setItem(SYSTEM, KEY_window_height, m_height);
 }
 
 SDL_Cursor *System::buildCursor(const char *image[]) {
@@ -824,18 +835,18 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == GET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.remainingTokens();
-     pushMessage(_general.getItem(section, key), CONSOLE_MESSAGE);
+     pushMessage(m_general.getItem(section, key), CONSOLE_MESSAGE);
   }
   else if (command == SET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
-    _general.setItem(section, key, value);
+    m_general.setItem(section, key, value);
   }
   else if (command == LOAD_GENERAL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
-    _general.readFromFile(args);
+    m_general.readFromFile(args);
     if (_process_records) {
       _process_records = false;
       processRecords();
@@ -865,7 +876,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == SAVE_GENERAL_CONFIG) {
   System::instance()->getFileHandler()->expandString(args);
-    _general.writeToFile(args);
+    m_general.writeToFile(args);
   }
   else if (command == SAVE_KEY_BINDINGS) {
   System::instance()->getFileHandler()->expandString(args);
@@ -969,15 +980,15 @@ void System::varconf_general_callback(const std::string &section, const std::str
   if (section == SYSTEM) {
     if (key ==  KEY_mouse_move_select) {
       temp = config.getItem(SYSTEM, KEY_mouse_move_select);
-      _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
+      m_mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
     }
     else if (key == KEY_window_width) {
       temp = config.getItem(SYSTEM, KEY_window_width);
-      _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
+      m_width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
     }
     else if (key == KEY_window_height) {
       temp = config.getItem(SYSTEM, KEY_window_height);
-      _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
+      m_height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
     }
   }
 }
