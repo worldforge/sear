@@ -15,6 +15,7 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "ActionHandler.h"
 #include "Bindings.h"
 #include "Camera.h"
 #include "Character.h"
@@ -98,7 +99,10 @@ bool System::init() {
 #endif
   // This should not be hardcoded!!
   install_path = std::string(INSTALLDIR) + std::string("/share/sear");
-  
+ 
+  _action_handler = new ActionHandler(this);
+  _action_handler->init();
+	 
   _ol = new ObjectLoader();
   _ol->init();
 
@@ -123,7 +127,11 @@ bool System::init() {
 
   registerCommands(_console);
   _client->registerCommands(_console);
+  _action_handler->registerCommands(_console);
   
+  sound = new Sound();
+  sound->init();
+  sound->registerCommands(_console);
   
   Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + STARTUP_SCRIPT;
@@ -148,9 +156,6 @@ bool System::init() {
   readConfig();
   _system_running = true;
 
-  sound = new Sound();
-  sound->init();
-  sound->registerCommands(_console);
   
   _command_history_iterator = _command_history.begin();
   return true;
@@ -173,6 +178,11 @@ void System::shutdown() {
     _ol->shutdown();
     delete _ol;
     _ol = NULL;
+  }
+  if (_action_handler) {
+    _action_handler->shutdown();
+    delete _action_handler;
+    _action_handler = NULL;
   }
   if (_graphics) {
     _graphics->writeConfig();
@@ -347,6 +357,7 @@ void System::createWindow(bool fullscreen) {
 void System::mainLoop() {
   SDL_Event event;
   static float last_time = 0.0f;
+  _action_handler->handleAction("system_start", NULL);
   while (_system_running) {
     try {
       float time_elapsed;

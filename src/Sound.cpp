@@ -71,7 +71,9 @@ void Sound::playMusic(const std::string &file_name) {
 }
 
 void Sound::stopMusic() {
-  Mix_FadeOutMusic(500);
+  Mix_FadeOutMusic(100);
+  Mix_RewindMusic();
+  
 }
 void Sound::registerCommands(Console *console) {
   console->registerCommand(PLAY_SOUND, this);

@@ -1,4 +1,10 @@
 20th August 2002, Simon Goodall
+ * Added an actionhandler class. Aim is to notify the class of an event such as system start, or character walking and run an associated script file. Main use is to link in sound effects or even animations.
+ New console commands
+ "/load_action_config filename" loads the action config file
+ "/do_action action" perform an action
+
+20th August 2002, Simon Goodall
  * Added option to play and stop music. "/play_music file" plays the track. "/stop_music" stops the music
 
 20th August 2002, Simon Goodall

@@ -18,7 +18,7 @@ namespace varconf {
 }
 
 namespace Sear {
-
+class ActionHandler;
 class Render;
 class Client;
 class EventHandler;
@@ -148,6 +148,7 @@ protected:
   ModelHandler *_model_handler;
   ObjectLoader *_ol;
   StateLoader *_sl;
+  ActionHandler *_action_handler;
 
   std::string home_path;
 

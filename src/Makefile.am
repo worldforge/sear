@@ -22,6 +22,8 @@ sear_SOURCES = \
 	main.cpp
 
 libSear_a_SOURCES = \
+	ActionHandler.cpp \
+	ActionHandler.h \
 	Bindings.cpp \
 	Bindings.h \
 	Camera.cpp \
