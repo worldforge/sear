@@ -1,12 +1,14 @@
 object_type = default
 model_type = wireframe
 state = wireframe
+select_state = select
 draw_self = true
 draw_members = true
 end_of_record
 object_type = farmer
 model_type = cal3d
 state = character
+select_state = select
 draw_self = true
 draw_members = false
 outline = true
@@ -14,6 +16,7 @@ end_of_record
 object_type = settler
 model_type = cal3d
 state = character
+select_state = select
 draw_self = true
 draw_members = false
 outline = true
@@ -21,33 +24,35 @@ end_of_record
 object_type = character
 model_type = cal3d
 state = character_no_texture
+select_state = select
 draw_self = true
 draw_members = false
 outline = true
 end_of_record
 object_type = pig
-model_type = billboard
-state = billboard
+model_type = 3ds
+state = 3ds
 draw_self = true
 draw_members = false
-width = 3
-height = 3
 end_of_record
 object_type = sty
 model_type = wireframe
 state = wireframe
+select_state = select
 draw_self = true
 draw_members = true
 end_of_record
 object_type = structure
 model_type = wireframe
 state = wireframe
+select_state = select
 draw_self = true
 draw_members = true
 end_of_record
 object_type = apple
 model_type = billboard
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = false
 width = 1.0
@@ -57,6 +62,7 @@ end_of_record
 object_type = acorn
 model_type = billboard
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = false
 width = 0.2
@@ -66,6 +72,7 @@ end_of_record
 object_type = appletree
 model_type = impostor
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = true
 width = 10.0
@@ -75,6 +82,7 @@ end_of_record
 object_type = oak
 model_type = impostor
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = true
 width = 10.0
@@ -84,6 +92,7 @@ end_of_record
 object_type = birch_summer_1_us
 model_type = impostor
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = true
 width = 10.0
@@ -93,6 +102,7 @@ end_of_record
 object_type = poplar_summer_1_us
 model_type = impostor
 state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = true
 width = 10.0
