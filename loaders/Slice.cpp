@@ -13,9 +13,15 @@
 
 /**
  * TODO
+ * Clean up properly
+ * Render Secondary slice first
+ * Need to optimise textures.
+ * doubled sided polys?
  * Fix brightness balance due to blending
  * Check lighting is okay
  * Add option for a vertical slicing for viewing from above
+ * Camera angle in regards to model is very approximated
+ * Material settings
  */ 
 
 namespace Sear {
@@ -124,20 +130,46 @@ void Slice::render(bool select_mode) {
       index_1 = i;
       index_2 = i + 1;
       transparency = (camera_angle - (i * angle)) / angle;
-//      if (transparency < 0.5f) transparency = 1.0f - transparency;
     }
   }
   while (index_1 >= _num_slicings) index_1 -= _num_slicings;
   while (index_2 >= _num_slicings) index_2 -= _num_slicings;
-  while (index_1 < 0) index_1 += _num_slicings;
-  while (index_2 < 0) index_2 += _num_slicings;
   //cout << index_1 << " " << index_2 << " " << transparency << endl; 
-  _render->setColour(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
-  int i = 0;
   int index;
-//  if (transparency < 0.5) index = index_1;
-//  else index = index_2;
-  index = index_1;
+  int i;
+  // Render secondary slice
+  if (transparency != 1.0f) { // If transparency will be zero don't render
+      i = 0;
+      // Determine secondary slice index
+      if (transparency < 0.5) {
+	//index_2 is the secondary slice
+        _render->setColour(1.0f, 1.0f, 1.0f, transparency);    
+        index = index_2;
+      } else {
+	// index_1 is the secondary slice
+        _render->setColour(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
+        index = index_1;
+      }
+      for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
+        ASlice *slice = *I;
+        if (select_mode) {
+          _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+        } else {
+          _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+        }
+        _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
+      }
+  }
+  // Render primary Slice
+  // Determine primary slice index
+  if (transparency < 0.5) {
+    index = index_1;
+    _render->setColour(1.0f, 1.0f, 1.0f,  1.0f - transparency);
+  } else {
+    index = index_2;
+    _render->setColour(1.0f, 1.0f, 1.0f,  transparency);
+  }
+  i = 0;
   for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
     ASlice *slice = *I;
     if (select_mode) {
@@ -146,22 +178,6 @@ void Slice::render(bool select_mode) {
       _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
     }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
-  }
-//  if (transparency < 0.5) index = index_2;
-//  else index = index_1;
-  if (transparency != 0.0f) {
-    index = index_2;
-    i = 0;
-    _render->setColour(1.0f, 1.0f, 1.0f,  transparency);
-    for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
-      ASlice *slice = *I;
-      if (select_mode) {
-        _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
-      } else {
-        _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
-      }
-      _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
-    }
   }
 }
 

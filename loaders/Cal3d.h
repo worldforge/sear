@@ -21,6 +21,7 @@ class Cal3d : public Model {
 // misc
 public:
 
+	
   typedef enum {
     IDLE = 0,
     WALK,
@@ -40,6 +41,11 @@ public:
     NUM_WEAPONS
   } Weapons;
 
+  class ModelAnimPair {
+public:	  
+    CalCoreModel *m_calCoreModel;
+    int m_animationId[NUM_ANIMATIONS]; 
+  };
   static const int STATE_IDLE;
   static const int STATE_FANCY;
   static const int STATE_MOTION;
@@ -47,9 +53,9 @@ public:
 // member variables
 protected:
   int m_state;
-  CalCoreModel *m_calCoreModel;
+  ModelAnimPair *map;
+//  CalCoreModel *m_calCoreModel;
   CalModel m_calModel;
-  int m_animationId[NUM_ANIMATIONS];
   int m_weaponId[NUM_WEAPONS];
   int m_animationCount;
   int m_meshId[32];
@@ -98,7 +104,8 @@ protected:
   void renderMesh(bool bWireframe, bool bLight, bool);
 
   static int instance_count;
-  static std::map<std::string, CalCoreModel*> core_models;
+//  static std::map<std::string, CalCoreModel*> core_models;
+  static std::map<std::string, ModelAnimPair*> core_models;
 };
 
 } /* namespace Sear */

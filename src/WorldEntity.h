@@ -41,7 +41,8 @@ public:
 
   ObjectProperties *getObjectProperties() { return _op; }
   void setObjectProperties(ObjectProperties *op) { _op = op; }
-
+  void checkActions();
+  
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
   unsigned int time;
@@ -52,6 +53,8 @@ protected:
 
   static int message_life;
   static int string_size;
+  std::string last_action;
+  std::string last_mode;
 };
 
 } /* namespace Sear */

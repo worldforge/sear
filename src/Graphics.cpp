@@ -178,7 +178,8 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
 }
 
 void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
-  _model_handler = _system->getModelHandler();	
+  _model_handler = _system->getModelHandler();
+  we->checkActions();
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
       ObjectProperties *op = we->getObjectProperties();

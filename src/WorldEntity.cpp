@@ -41,21 +41,12 @@ WorldEntity::~WorldEntity() {}
 void WorldEntity::handleMove() {
   SetVelocity();
   WorldEntity *we = (WorldEntity*)getContainer();
-  static ModelHandler *model_handler = System::instance()->getModelHandler();
   if (we != NULL) {
     translateAbsPos(we->getAbsPos());
     rotateAbsOrient(we->getAbsOrient());
   } else {
     translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-  }
-  Model *model = NULL;
-  if (model_handler) model = model_handler->getModel(NULL, this);
-  if (model) {
-    float vel =  (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()));
-    if (vel >= 7.0f) model->action("run");
-    else if (vel == 0.0f) model->action("idle");
-    else model->action("walk");
   }
 }
 
@@ -203,5 +194,43 @@ std::string WorldEntity::parent() {
   }
   return "";
 }
+
+void WorldEntity::checkActions() {
+  ModelHandler *model_handler = System::instance()->getModelHandler();
+//  static std::string last_action;
+//  static std::string last_mode;
+
+  if (hasProperty("action")) {
+    std::string action = getProperty("action").AsString();
+    if (action != last_action) {
+      cout << getID() << " - action: " << action << endl;
+      Model *model = NULL;
+      if (model_handler) model = model_handler->getModel(NULL, this);
+      else cout << "NO MODEL_HANDLER" << endl;
+      if (model) model->action(action);
+      else cout << "NO MODEL" << endl;
+      last_action = action;
+    }
+  } else {
+    last_action == "";
+  }
+	 
+  if (hasProperty("mode")) {
+    std::string mode = getProperty("mode").AsString();
+    if (mode != last_mode) {
+      cout << getID() << " - mode: " << mode << endl;
+      Model *model = NULL;
+      if (model_handler) model = model_handler->getModel(NULL, this);
+      else cout << "NO MODEL_HANDLER" << endl;
+      if (model) model->action(mode);
+      else cout << "NO MODEL" << endl;
+      last_mode = mode;
+    }
+  } else {
+    last_mode == "";
+  }
+  
+}
+
 
 } /* namespace Sear */
