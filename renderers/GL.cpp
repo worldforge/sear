@@ -491,7 +491,7 @@ void GL::initLighting() {
   glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].attenuation_constant);
   glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].attenuation_linear);
   glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, lights[LIGHT_SUN].attenuation_quadratic);
-//  glEnable(GL_LIGHT1);
+  glEnable(GL_LIGHT1);
 }
 
 void GL::initFont() {
