@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.45 2005-02-18 16:39:06 simon Exp $
+// $Id: WorldEntity.cpp,v 1.46 2005-02-21 14:16:46 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -22,13 +22,11 @@
 
 #include "System.h"
 #include "Console.h"
-//#include "Event.h"
-//#include "EventHandler.h"
-#include "renderers/Graphics.h"
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
 #include "loaders/Model.h"
 #include "renderers/Render.h"
+#include "renderers/RenderSystem.h"
 #include "WorldEntity.h"
 #include "ActionHandler.h"
 
@@ -54,8 +52,8 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
-   messages(std::list<message>())
-//   m_lastMoveTime(0)
+   messages(std::list<message>()),
+   m_lastMoveTime(0)
 {
   Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
 }
@@ -66,10 +64,9 @@ WorldEntity::~WorldEntity() {
   }
 }
 
-void WorldEntity::onMove()
-{
-    // record the time this data was updated, so we can interpolate pos
-//    m_lastMoveTime = System::instance()->getTime();
+void WorldEntity::onMove() {
+  // record the time this data was updated, so we can interpolate pos
+  m_lastMoveTime = System::instance()->getTime();
     
   rotateBBox(getOrientation());
 }
@@ -107,7 +104,7 @@ void WorldEntity::renderMessages() {
      
   }
   // Render text strings
-  Render *renderer = System::instance()->getGraphics()->getRender();
+  Render *renderer = RenderSystem::getInstance().getRenderer();
   std::list<std::string>::iterator J;
   for (J = mesgs.begin(); J != mesgs.end(); ++J) { 
     std::string str = (*J);
@@ -129,16 +126,17 @@ void WorldEntity::renderMessages() {
   }
 }
 
-//const WFMath::Quaternion WorldEntity::getAbsOrient() 
-//{
-//    WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
-//    if (getContainer()) parentOrient = static_cast<WorldEntity*>(getContainer())->getAbsOrient();
-//    return parentOrient / getOrientation();
-//}
+const WFMath::Quaternion WorldEntity::getAbsOrient() 
+{
+    WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
+    WorldEntity *loc =  dynamic_cast<WorldEntity*>(getLocation());
+    if (loc) parentOrient = loc->getAbsOrient();
+    return parentOrient / getOrientation();
+}
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
-return getPredictedPos();
-#if (0)
+//return getPredictedPos();
+#if (1)
    // This function is still required to adjust the Z position of the entity
    // TODO Needs checking when terrain start working again
 
@@ -146,14 +144,14 @@ return getPredictedPos();
     WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
     if (!loc) return getPredictedPos(); // nothing below makes sense for the world.
 //    
-//    WFMath::Point<3> absPos(
-// loc->getPredictedPos().x() + getPredictedPos().x(),
-// loc->getPredictedPos().y() + getPredictedPos().y(),
-// loc->getPredictedPos().z() + getPredictedPos().z());
     WFMath::Point<3> absPos(
- getPredictedPos().x(),
- getPredictedPos().y(),
- getPredictedPos().z());
+ loc->getPredictedPos().x() + getPredictedPos().x(),
+ loc->getPredictedPos().y() + getPredictedPos().y(),
+ loc->getPredictedPos().z() + getPredictedPos().z());
+//    WFMath::Point<3> absPos(
+// getPredictedPos().x(),
+// getPredictedPos().y(),
+// getPredictedPos().z());
 //        getInterpolatedPos().rotate(loc->getAbsOrient().inverse());
     
   // Set Z coord to terrain height if required
@@ -312,10 +310,10 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
   m_orientBBox.rotate(q);
 }
   
-//WFMath::Vector<3> WorldEntity::getInterpolatedPos() const
-//{
-//    double dt = (System::instance()->getTime() - m_lastMoveTime) / 1000.0;
-//    return (getPosition() + (getVelocity() * dt)) - WFMath::Point<3>(0,0,0);
-//}
+WFMath::Vector<3> WorldEntity::getInterpolatedPos() const
+{
+    double dt = (System::instance()->getTime() - m_lastMoveTime) / 1000.0;
+    return (getPosition() + (getVelocity() * dt)) - WFMath::Point<3>(0,0,0);
+}
 
 } /* namespace Sear */

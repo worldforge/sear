@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.108 2005-02-18 16:39:06 simon Exp $
+// $Id: System.cpp,v 1.109 2005-02-21 14:16:46 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,7 +32,6 @@
 #include "client.h"
 #include "conf.h"
 #include "Console.h"
-#include "cursors.h"
 #include "EventHandler.h"
 #include "Exception.h"
 #include "FileHandler.h"
@@ -131,7 +130,6 @@ System::System() :
   action(ACTION_DEFAULT),
   mouseLook(0),
   screen(NULL),
-  _graphics(NULL),
   renderer(NULL),
   _client(NULL),
   _icon(NULL),
@@ -151,14 +149,12 @@ System::System() :
   _controller(NULL),
   _console(NULL),
   _character(NULL),
-  _cursor_default(NULL),
-  _cursor_pickup(NULL),
-  _cursor_touch(NULL),
   m_mouse_move_select(false),
   _seconds(0.0),
   _process_records(false),
   sound(NULL),
   _system_running(false),
+  m_editor(NULL),
   _initialised(false)
 {
   _instance = this;
@@ -228,8 +224,8 @@ bool System::init(int argc, char *argv[]) {
   _calendar->registerCommands(_console);
 
 // TODO this is leaked
-    Editor* edit = new Editor();
-    edit->registerCommands(_console);
+  m_editor = new Editor();
+  m_editor->registerCommands(_console);
 
   _workspace = new Workspace(this);
   // Toplevel * t = new Toplevel("Panel");
@@ -280,11 +276,8 @@ bool System::init(int argc, char *argv[]) {
   }
 
   RenderSystem::getInstance().init();
+  RenderSystem::getInstance().registerCommands(_console);
   renderer = RenderSystem::getInstance().getRenderer();
-  _graphics = new Graphics(this);
-  _graphics->init();
-  _graphics->registerCommands(_console);
-  _graphics->setRenderer(renderer);
  
   Environment::getInstance().init();
 
@@ -303,7 +296,6 @@ bool System::init(int argc, char *argv[]) {
   m_general.getCmdline(argc, argv);
   readConfig();
   RenderSystem::getInstance().readConfig();
-  _graphics->readConfig();
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
 
   // Try and create the window
@@ -321,9 +313,8 @@ bool System::init(int argc, char *argv[]) {
   // TODO:these are probably leaked, however freeing them often causes a segfault!
   if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
   SDL_WM_SetIcon(_icon, NULL);
-  if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
-  if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP);
-  if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
+  // Hide cursor
+  SDL_ShowCursor(0);
 
   RenderSystem::getInstance().initContext();
 
@@ -333,6 +324,7 @@ bool System::init(int argc, char *argv[]) {
 }
 
 void System::shutdown() {
+  std::cout << "System: Starting Shutdown" << std::endl;
   if (_character) {
     _character->shutdown();
     delete _character;
@@ -361,21 +353,18 @@ void System::shutdown() {
     _model_handler = NULL;
   }  
   
-  if (_graphics) {
-    _graphics->writeConfig();
-    _graphics->writeComponentConfig();
-    _graphics->shutdown();
-    delete _graphics;
-    _graphics = NULL;
-  }
-
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
 
- if (_workspace)  {
-   delete _workspace;
-   _workspace = NULL;
- }
+  if (m_editor) {
+    delete m_editor;
+    m_editor = NULL;
+  }
+
+  if (_workspace)  {
+    delete _workspace;
+    _workspace = NULL;
+  }
 
   if (_calendar) {
     _calendar->shutdown();
@@ -410,11 +399,6 @@ void System::shutdown() {
     _console = NULL;
   }
  
-  // Are these actually needed ? or does SDL clean then up too? 
-//  if (_icon) SDL_FreeSurface(_icon);
-//  if (_cursor_default) SDL_FreeCursor(_cursor_default);
-//  if (_cursor_pickup) SDL_FreeCursor(_cursor_pickup);
-//  if (_cursor_touch) SDL_FreeCursor(_cursor_touch);
   if (sound) {
     sound->shutdown();
     delete sound;
@@ -422,6 +406,7 @@ void System::shutdown() {
   }
   SDL_Quit();
   _initialised = false;
+  std::cout << "System: Finished Shutdown" << std::endl;
 }
 
 bool System::initVideo() {
@@ -466,7 +451,7 @@ void System::mainLoop() {
         _client->getAvatar()->getView()->update();
       }
       // draw scene
-      _graphics->drawScene(false, time_elapsed);
+      RenderSystem::getInstance().drawScene(false, time_elapsed);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
@@ -633,7 +618,7 @@ void System::handleAnalogueControllers() {
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
-      Graphics * g = getGraphics();
+      Graphics * g = RenderSystem::getInstance().getGraphics();
       Camera * c = NULL;
       if (g != NULL) {
         c = g->getCamera();
@@ -703,7 +688,7 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
         break;
           
     case AXIS_ELEVATE: // Up down view
-          Graphics * g = getGraphics();
+          Graphics * g = RenderSystem::getInstance().getGraphics();
           if (g != NULL) {
             Camera * c = g->getCamera();
             if (c != NULL) {
@@ -798,54 +783,17 @@ void System::vEnableKeyRepeat(bool bEnable) {
   }
 }
 
-SDL_Cursor *System::buildCursor(const char *image[]) {
-  int i, row, col;
-  Uint8 data[4*32];
-  Uint8 mask[4*32];
-  int hot_x, hot_y;
-
-  i = -1;
-  for ( row=0; row<32; ++row ) {
-    for ( col=0; col<32; ++col ) {
-      if ( col % 8 ) {
-        data[i] <<= 1;
-        mask[i] <<= 1;
-      } else {
-        ++i;
-        data[i] = mask[i] = 0;
-     }
-     switch (image[4+row][col]) {
-       case '.':
-         data[i] |= 0x01;
-         mask[i] |= 0x01;
-         break;
-       case 'X':
-         mask[i] |= 0x01;
-         break;
-       case ' ':
-         break;
-      }
-    }        
-  }
-  sscanf(image[4+row], "%d,%d", &hot_x, &hot_y);
-  return SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
-}
-
 void System::setAction(int new_action) {
   switch (new_action) {
-    case (ACTION_DEFAULT): switchCursor(0); break;
-    case (ACTION_PICKUP): switchCursor(1); break;
-    case (ACTION_TOUCH): switchCursor(2); break;
+    case (ACTION_DEFAULT): switchCursor(RenderSystem::CURSOR_DEFAULT); break;
+    case (ACTION_PICKUP): switchCursor(RenderSystem::CURSOR_PICKUP); break;
+    case (ACTION_TOUCH): switchCursor(RenderSystem::CURSOR_TOUCH); break;
   }
   action = new_action;
 }
 
 void System::switchCursor(int cursor) {
-  switch (cursor) {
-    case(0): SDL_SetCursor(_cursor_default); break;
-    case(1): SDL_SetCursor(_cursor_pickup); break;
-    case(2): SDL_SetCursor(_cursor_touch); break;
-  }
+  RenderSystem::getInstance().setMouseState(cursor);
 }
 
 void System::registerCommands(Console *console) {
@@ -942,13 +890,6 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == READ_CONFIG) {
     readConfig();
-    if (_graphics) {
-      _graphics->readConfig();
-      _graphics->readComponentConfig();
-    }
-    if (renderer) {
-      renderer->readConfig();
-    }
     if (_character)_character->readConfig();
   }
   else if (command == BIND_KEY) {
@@ -1031,7 +972,6 @@ void System::addSearchPaths(std::list<std::string> l) {
   }
 }
 
-
 void System::varconf_general_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   varconf::Variable temp;
   if (section == SYSTEM) {
@@ -1049,7 +989,6 @@ void System::varconf_general_callback(const std::string &section, const std::str
     }
   }
 }
-
 
 void System::updateTime(double time) {
   _calendar->serverUpdate(time);

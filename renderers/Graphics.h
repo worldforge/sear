@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: Graphics.h,v 1.2 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -26,18 +26,14 @@ class Config;
 }
 
 namespace Sear {
-class TerrainRenderer;
-class BillBoard;
-class BoundBox;
 class Camera;
-class Impostor;
-class Render;
 class WorldEntity;
 class System;
 class Character;
 class Console;
 class Compass;
 class LightManager;
+
 class Graphics : public ConsoleObject, public SigC::Object{
 
 public:
@@ -75,51 +71,46 @@ typedef enum {
   void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &list); 
   void drawScene(bool, float);
   void drawWorld(bool, float);
-  void updateDetailLevels(float);
   
   std::string getActiveID();
 
-  void setRenderer(Render *r) { _renderer = r; }
+  void setRenderer(Render *r) { m_renderer = r; }
   
-  Render *getRender() { return _renderer; }
-  Camera* getCamera() { return _camera; }
+  Render *getRender() { return m_renderer; }
+  Camera* getCamera() { return m_camera; }
   void setupStates();
   void readConfig();
   void writeConfig();
   void readComponentConfig();
   void writeComponentConfig();
 
-  WFMath::Quaternion getCameraOrientation() { return orient; }
+  WFMath::Quaternion getCameraOrientation() { return m_orient; }
 
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-  TerrainRenderer *getTerrainRenderer() const { return tr; }
 protected:
-  System *_system;
-  Render *_renderer;
-  Character *_character;
-  Camera *_camera;
+  System *m_system;
+  Render *m_renderer;
+  Character *m_character;
+  Camera *m_camera;
 
-  WFMath::Quaternion orient;
+  WFMath::Quaternion m_orient;
 
-  Render::QueueMap _render_queue;
-  Render::MessageList _message_list;
+  Render::QueueMap m_render_queue;
+  Render::MessageList m_message_list;
   
-  int _num_frames;
-  float _frame_time;
-  float _frame_rate;
-  float _lower_frame_rate_bound;
-  float _upper_frame_rate_bound;
+  int m_num_frames;
+  float m_frame_time;
+  float m_frame_rate;
 
-  float frustum[6][4];
-  bool _initialised;
+  float m_frustum[6][4];
+  bool m_initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
     Compass* m_compass;
   
- TerrainRenderer *tr;
   LightManager *m_lm;
 
   Light m_fire;

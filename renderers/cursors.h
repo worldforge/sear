@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: cursors.h,v 1.2 2002-09-08 00:24:53 simon Exp $
+// $Id: cursors.h,v 1.1 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_CURSORS_H
 #define SEAR_CURSORS_H 1

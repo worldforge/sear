@@ -8,9 +8,12 @@
 
 #include <SDL/SDL.h>
 
+#include "src/System.h"
+
 #include "RenderSystem.h"
 #include "TextureManager.h"
 #include "StateManager.h"
+#include "Graphics.h"
 
 #include "Render.h"
 #include "GL.h"
@@ -43,6 +46,14 @@ void RenderSystem::init() {
   m_textureManager = new TextureManager();
   m_textureManager->init();
 
+  m_graphics = new Graphics(System::instance());
+  m_graphics->init();
+  m_graphics->setRenderer(m_renderer);
+
+  m_mouseState[CURSOR_DEFAULT] = m_textureManager->requestTextureID("cursor_default",false);
+  m_mouseState[CURSOR_TOUCH] = m_textureManager->requestTextureID("cursor_touch", false);
+  m_mouseState[CURSOR_PICKUP] = m_textureManager->requestTextureID("cursor_pickup", false);
+
   m_initialised = true;
 }
 
@@ -51,6 +62,7 @@ void RenderSystem::registerCommands(Console *console) {
   dynamic_cast<GL*>(m_renderer)->registerCommands(console);
   m_textureManager->registerCommands(console);
   m_stateManager->registerCommands(console);
+  m_graphics->registerCommands(console);
 }
 
 void RenderSystem::initContext() {
@@ -62,6 +74,10 @@ void RenderSystem::shutdown() {
   assert (m_initialised);
   if (!m_initialised) return;
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
+
+  m_graphics->shutdown();
+  delete m_graphics;
+  m_graphics = NULL;
 
   m_textureManager->shutdown();
   delete m_textureManager;
@@ -130,11 +146,17 @@ void RenderSystem::toggleFullscreen() {
   dynamic_cast<GL*>(m_renderer)->toggleFullscreen();
 }
 
+void RenderSystem::drawScene(bool select_mode, float time_elapsed) {
+  m_graphics->drawScene(select_mode, time_elapsed);
+}
+
 void RenderSystem::readConfig() {
   assert (m_initialised);
   m_renderer->readConfig();
 //  m_textureManager->readConfig();
 //  m_stateManager->readConfig();
+  m_graphics->readConfig();
+  m_graphics->readComponentConfig();
 } 
 
 void RenderSystem::writeConfig() {

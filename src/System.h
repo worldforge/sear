@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.50 2004-07-29 18:27:02 simon Exp $
+// $Id: System.h,v 1.51 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -32,8 +32,9 @@ class ScriptEngine;
 class Console;
 class Workspace;
 class Character;
-class Graphics;
+//class Graphics;
 class Sound;
+class Editor;
 
 typedef enum {
   SYS_UNKNOWN = 0,
@@ -146,9 +147,9 @@ public:
    * @param ss System state to query
    * @return Value of query state
    */ 
-  bool checkState(SystemState ss) { return _systemState[ss]; }
+  bool checkState(SystemState ss) const { return _systemState[ss]; }
 
-  Graphics *getGraphics() const { return _graphics; }
+  //Graphics *getGraphics() const { return _graphics; }
   
   /**
    * Get the General Config object
@@ -199,7 +200,7 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-  Client *getClient() { return _client; }
+  Client *getClient() const { return _client; }
 protected:
   int action;
   bool initVideo();
@@ -210,7 +211,7 @@ protected:
   
   bool mouseLook;
   SDL_Surface *screen;
-  Graphics *_graphics;
+  //Graphics *_graphics;
   Render *renderer;
   Client *_client;
   static System *_instance;
@@ -247,14 +248,9 @@ protected:
   Workspace *_workspace;
   Character *_character;
  
-  static SDL_Cursor *buildCursor(const char *image[]);
-
   void readConfig();
   void writeConfig();
   std::string install_path;  
-  SDL_Cursor *_cursor_default;
-  SDL_Cursor *_cursor_pickup;
-  SDL_Cursor *_cursor_touch;
 
   bool m_mouse_move_select;
 
@@ -290,6 +286,7 @@ private:
   bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
 
+  Editor *m_editor;
   bool _initialised; ///< Initialisation state of System
 };
 

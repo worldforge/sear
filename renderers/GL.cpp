@@ -175,7 +175,7 @@ static const bool debug = false;
 namespace Sear {
 
 bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
-  _graphics = System::instance()->getGraphics();
+  _graphics = RenderSystem::getInstance().getGraphics();
   // Destroy the existing window
   if (m_screen != NULL) destroyWindow();
   
@@ -584,7 +584,7 @@ void GL::procEvent(int x, int y) {
   if (!_system->checkState(SYS_IN_WORLD)) return;
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
-  System::instance()->getGraphics()->drawScene(true, 0);
+  RenderSystem::getInstance().drawScene(true, 0);
   x_pos = x;
   y = m_height - y;
   y_pos = y;

@@ -1,3 +1,26 @@
+2005-02-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.in, loaders/Makefile.am, loaders/LibModelFile.cpp,
+	  loaders/LibModelFile.h, loaders/LibModelFile_Loader.cpp,
+	  loaders/LibModelFile_Loader.h, loaders/ModelHandler.cpp: Add 
+	  libmodelfile loader to Sear. Uses "md3" loader name
+	* data/states.cfg: Add state record for the cursor
+	* common/Log.cpp: Remove "TIMESTAMP - " text from output.
+	* gui/Workspace.cpp, renderers/GL.h, renderers/GL.cpp,
+	  renderers/Graphics.cpp, renderers/Render.h, renderers/RenderSystem.h,
+	  renderers/RenderSystem.cpp, renderers/TextureManager.cpp,
+	  renderers/cursors.h, src/Console.cpp, src/Editor.cpp, src/System.h,
+	  src/System.cpp, src/WorldEntity.cpp: Move Graphics initialisation and
+	  storage to RenderSystem class. Use mouse cursors created from a
+	  texture instead of SDL_createCursor.
+	* renderers/Graphics.cpp, renderers/Graphics.h: Change member variables
+	  prefix to m_. Remove frame limit variables and config items
+	* src/ActionHandler.cpp, src/ActionHandler.h, src/Bindings.h,
+	  src/Bindings.cpp: Change member variables prefix to m_
+	* renderers/Graphics.cpp src/Character.cpp, src/WorldEntity.cpp,
+	  src/WorldEntity.h: Re-add entity orientation code, and update 
+	  graphics to use these functions.
+
 2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Makefile.am, src/Factory.cpp, src/TerrainEntity.cpp,

@@ -4,27 +4,12 @@
   - Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
   - Needs models to query and check for updates from associated world entity's
 
- * Make greater use of vertex buffer objectsOD
+ * Make greater use of vertex buffer objects
  * Improve media efficiency 
   - run meshes through poly reductioner
   - Make textures smaller
 
-
 -------------------------------------------------------------------------------
-
- * Terrain engine improvements
-  - Allow paging of terrain segments
-  - Allow terrain to "wrap"
-  - Implement ROAM optimisations as on Flipcode and FractalScape
-  - Build terrain texture from several base textures and map data.
-  - Include Random Midpoint Generation (optional/separate engine?)
-
- * Implement a GUI system such as GLGooey
-  - Allow console line editing
-
- * Add ability to tokenise on quotes, not just spaces. This is a must. can only have one arg with spaces at the mo.
-
- * Allow varconf object to parse command line for general configuration.
 
  * Rendering Improvements
   - Support more OpenGL extensions.
@@ -49,13 +34,6 @@
 
  * Add support to create custom font textures from say freetype
 
- * Add a sky dome
-   - See flipcode skydome tutorial
-
- * Colour cursors
-   Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors can be easily implemented by rendering the cursor as a texture and hiding the real one. The trick is to get mouse position.
-  SDL offers two ways. one is to use SDL_GetMouseState and the second is to store the position on every MOUSEMOTION event. However both of these methods do not offer sufficient update intervals to be of real use. We require either another way or need to increase the rate of updates.
-
  * Improve Sound/Music System
  Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org
 
@@ -67,14 +45,12 @@
  * Create a texture handling class.
   - Loads and unloads textures as required
   - Can perform transformations on textures
-  - Provides aliases for textures (ie, 3ds models have texture names built in)
 
  * Create a file handling class
   - Allows memory mapping if appropriate
   - Allow file access from archives
   - transparent access bewtween file system and archives
 
- * Create a light management class
   - Store type/position/emissive info about each light source
   - Determines light priority order (render N most appropriate light sources)
  

@@ -36,7 +36,7 @@ Workspace::~Workspace()
 void Workspace::draw()
 {
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(WORKSPACE));
-  Render *renderer = m_system->getGraphics()->getRender();
+  Render *renderer = RenderSystem::getInstance().getRenderer();
   renderer->setViewMode(ORTHOGRAPHIC);
 
   glPushMatrix();

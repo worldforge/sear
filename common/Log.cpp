@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Log.cpp,v 1.7 2004-04-27 15:07:01 simon Exp $
+// $Id: Log.cpp,v 1.8 2005-02-21 14:16:45 simon Exp $
 
 #include "Log.h"
 #include <iostream>
@@ -38,7 +38,7 @@ void Log::writeLog(const std::string &msg, LogLevel level) {
     case LOG_ERIS: type = "Eris"; break;		
     case LOG_INFO: type = "Info"; break;
   }
-  std::cout << "TIMESTAMP - " << type << ": " << msg << std::endl << std::flush;
+  std::cout << type << ": " << msg << std::endl << std::flush;
 }
 
 } /* namespace Sear */

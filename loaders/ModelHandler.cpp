@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.3 2005-02-18 16:39:05 simon Exp $
+// $Id: ModelHandler.cpp,v 1.4 2005-02-21 14:16:46 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -33,6 +33,7 @@
 #include "BoundBox_Loader.h"
 #include "NPlane_Loader.h"
 #include "WireFrame_Loader.h"
+#include "LibModelFile_Loader.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -57,6 +58,7 @@ ModelHandler::ModelHandler() :
   new WireFrame_Loader(this);
   new NPlane_Loader(this);
   new ThreeDS_Loader(this);
+  new LibModelFile_Loader(this);
 }
 
 ModelHandler::~ModelHandler() {

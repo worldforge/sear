@@ -14,6 +14,8 @@ libModelLoader_a_SOURCES = \
 	NPlane.h NPlane_Loader.h \
 	3ds.cpp 3ds_Loader.cpp \
 	3ds.h 3ds_Loader.h \
+	LibModelFile.cpp LibModelFile.h \
+	LibModelFile_Loader.cpp LibModelFile_Loader.h \
 	ModelRecord.cpp ModelRecord.h \
 	ModelLoader.h \
 	Model.h \

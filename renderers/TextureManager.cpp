@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.32 2005-01-06 12:46:54 simon Exp $
+// $Id: TextureManager.cpp,v 1.33 2005-02-21 14:16:46 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,7 +35,7 @@ int ilogb(double x)
 // Default texture maps
 #include "default_image.xpm"
 #include "default_font.h"
-
+#include "cursors.h"
 
 #ifdef USE_MMGR
 #include "common/mmgr.h"
@@ -197,6 +197,10 @@ void TextureManager::initGL()
   // create default font
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
+
+  createCursorDefault();
+  createCursorTouch();
+  createCursorPickup();
 
   m_initGL = true;
 }
@@ -611,45 +615,9 @@ TextureID TextureManager::createDefaultTexture() {
 TextureID TextureManager::createDefaultFont() {
   assert((m_initialised == true) && "TextureManager not initialised");
   std::string texture_name = "default_font";
-/*
-  m_texture_config.setItem(texture_name, KEY_mask, false);
-  m_texture_config.setItem(texture_name, KEY_min_filter, FILTER_LINEAR);
-  m_texture_config.setItem(texture_name, KEY_mag_filter, FILTER_LINEAR);
-  m_texture_config.setItem(texture_name, KEY_clamp, true);
-  m_texture_config.setItem(texture_name, KEY_mipmap, false);
- 
-  // Load texture into memory
-  SDL_Surface *surface = IMG_ReadXPMFromArray(default_font_xpm);
-  if (!surface) {
-    std::cerr << "Error loading default font" << std::endl;
-    return -1;
-  }
-  TextureObject texture = loadTexture(texture_name, surface);
-  // Free image
-  SDL_FreeSurface(surface);
-
-*/
 
   GLuint texture;
-#if 0
 
-  unsigned int width, height;
-
-  unsigned char *data = xpm_to_image((const char**)default_font_xpm, width, height);
-  glGenTextures(1, &texture);
-
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-  GLfloat priority = 1.0f;
-  glPrioritizeTextures(1, &texture, &priority);
-  
-  delete [] data;
-#else
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -665,13 +633,101 @@ TextureID TextureManager::createDefaultFont() {
   GLfloat priority = 1.0f;
   glPrioritizeTextures(1, &texture, &priority);
 
-#endif
-
   TextureID texId = requestTextureID(texture_name, false);
   m_textures[texId] = texture;
   return texId;
 }
 
+TextureID TextureManager::createCursorDefault() {
+  assert((m_initialised == true) && "TextureManager not initialised");
+  std::string texture_name = "cursor_default";
+  unsigned int width, height;
+  GLuint texture;
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned char *data = xpm_to_image((const char**)arrow, width, height);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  delete [] data;
+
+  if (glGetError() != 0) {
+      std::cerr << "Failed to cursor default texture" << std::endl << std::flush;
+  }
+  GLfloat priority = 1.0f;
+  glPrioritizeTextures(1, &texture, &priority);
+
+  TextureID texId = requestTextureID(texture_name, false);
+  m_textures[texId] = texture;
+
+  return texId;
+}
+
+TextureID TextureManager::createCursorTouch() {
+  assert((m_initialised == true) && "TextureManager not initialised");
+  std::string texture_name = "cursor_touch";
+  unsigned int width, height;
+  GLuint texture;
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned char *data = xpm_to_image((const char**)touch, width, height);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  delete [] data;
+
+  if (glGetError() != 0) {
+      std::cerr << "Failed to cursor touch texture" << std::endl << std::flush;
+  }
+  GLfloat priority = 1.0f;
+  glPrioritizeTextures(1, &texture, &priority);
+
+  TextureID texId = requestTextureID(texture_name, false);
+  m_textures[texId] = texture;
+
+  return texId;
+}
+
+
+TextureID TextureManager::createCursorPickup() {
+  assert((m_initialised == true) && "TextureManager not initialised");
+  std::string texture_name = "cursor_pickup";
+  unsigned int width, height;
+  GLuint texture;
+
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned char *data = xpm_to_image((const char**)pickup, width, height);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  delete [] data;
+
+  if (glGetError() != 0) {
+      std::cerr << "Failed to cursor pickup texture" << std::endl << std::flush;
+  }
+  GLfloat priority = 1.0f;
+  glPrioritizeTextures(1, &texture, &priority);
+
+  TextureID texId = requestTextureID(texture_name, false);
+  m_textures[texId] = texture;
+
+  return texId;
+}
 
 void TextureManager::registerCommands(Console *console) {
   assert((m_initialised == true) && "TextureManager not initialised");
@@ -739,6 +795,10 @@ void TextureManager::invalidate()
   // create default font
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
+
+  createCursorDefault();
+  createCursorTouch();
+  createCursorPickup();
 }
 
 GLint TextureManager::getFormat(const std::string &fmt) {

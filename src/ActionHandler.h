@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.5 2003-03-23 19:51:49 simon Exp $
+// $Id: ActionHandler.h,v 1.6 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -46,7 +46,6 @@ private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
   
-  
   typedef struct {
     std::string action;
     std::string script;
@@ -55,9 +54,9 @@ private:
   
   std::map<std::string, ActionStruct*> action_map;
 
-  System *_system;
+  System *m_system;
 
-  bool _initialised;
+  bool m_initialised;
   
 };
   

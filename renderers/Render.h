@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: Render.h,v 1.2 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -71,9 +71,9 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void drawTextRect(int, int, int, int, int) =0;
   virtual void setColour(float red, float blue , float green, float alpha) =0;
 	  
-  virtual void procEvent(int, int) =0;
-  virtual int getWindowWidth() =0;
-  virtual int getWindowHeight() =0;
+  virtual void procEvent(int, int) = 0;
+  virtual int getWindowWidth() const = 0;
+  virtual int getWindowHeight() const = 0;
 
   virtual std::string getActiveID() =0;
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.52 2005-02-18 16:39:06 simon Exp $
+// $Id: Character.cpp,v 1.53 2005-02-21 14:16:46 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -30,8 +30,8 @@
 #include "System.h"
 #include "Character.h"
 #include "Console.h"
+#include "renderers/RenderSystem.h"
 #include "renderers/Render.h"
-#include "renderers/Graphics.h"
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
 
@@ -519,7 +519,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      std::string item = tokeniser.remainingTokens();
      int quantity = 0;
      cast_stream(quantity_str, quantity);
-     giveEntity(item, quantity, System::instance()->getGraphics()->getRender()->getActiveID());
+     giveEntity(item, quantity, RenderSystem::getInstance().getRenderer()->getActiveID());
    }
    else if (command == DROP) {
      std::string quantity_str = tokeniser.nextToken();
@@ -537,7 +537,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      make(type, name);
    }
    else if (command == USE) {
-     useToolOnEntity(System::instance()->getGraphics()->getRender()->getActiveID());
+     useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
    }
    else if (command == WIELD) {
      std::string name = tokeniser.nextToken();

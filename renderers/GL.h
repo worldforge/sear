@@ -80,8 +80,8 @@ public:
   int patchInFrustum(const WFMath::AxisBox<3> &);
   
   void procEvent(int, int);
-  int getWindowWidth() { return m_width; }
-  int getWindowHeight() { return m_height; }
+  int getWindowWidth() const { return m_width; }
+  int getWindowHeight() const { return m_height; }
 
   std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}

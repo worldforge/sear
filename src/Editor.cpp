@@ -1,7 +1,7 @@
 #include "Editor.h"
 #include "client.h"
 #include "System.h"
-#include "renderers/Graphics.h"
+#include "renderers/RenderSystem.h"
 #include "renderers/Render.h"
 
 #include <Eris/Entity.h>
@@ -41,7 +41,7 @@ void Editor::registerCommands(Console *console)
 
 void Editor::runCommand(const std::string &command, const std::string &args)
 {
-    std::string target = System::instance()->getGraphics()->getRender()->getActiveID();
+    std::string target = RenderSystem::getInstance().getRenderer()->getActiveID();
   
     if (command == EDIT_MOVE_X) {
         WFMath::Vector<3> delta(::strtod(args.c_str(), NULL),0,0);

@@ -16,6 +16,7 @@ class TextureManager;
 class StateManager;
 class Console;
 class Render;
+class Graphics;
 
 class RenderSystem {
 public:
@@ -28,7 +29,12 @@ public:
     RENDER_LAST_STATE
   } RenderState;
 
-
+  typedef enum {
+    CURSOR_DEFAULT = 0,
+    CURSOR_TOUCH,
+    CURSOR_PICKUP,
+    CURSOR_LAST_STATE
+  } CursorState;
 
   static RenderSystem &getInstance() { return m_instance; }
 
@@ -36,7 +42,9 @@ public:
     m_initialised(false),
     m_stateManager(NULL),
     m_textureManager(NULL),
-    m_renderer(NULL)
+    m_renderer(NULL),
+    m_graphics(NULL),
+    m_mouseCurState(0)
   { }
   virtual ~RenderSystem() {}
 
@@ -60,11 +68,14 @@ public:
   TextureManager *getTextureManager() const { return m_textureManager; }
   StateManager *getStateManager() const { return m_stateManager; }
   Render *getRenderer() const { return m_renderer; }
+  Graphics *getGraphics() const { return m_graphics; }
  
   // Renderer Functions
   bool createWindow(unsigned int width, unsigned int height, bool fullscreen);
   void destroyWindow();
   void toggleFullscreen();
+
+  void drawScene(bool select_mode, float time_elapsed);
 
   void registerCommands(Console *console);
   void runCommand(const std::string &command) {}
@@ -80,7 +91,9 @@ public:
   }
 
   void resize(int width, int height);
-
+  int getMouseState() const { return m_mouseCurState; } 
+  void setMouseState(int state) { m_mouseCurState = state; }
+  int getMouseCursor() const { return m_mouseState[m_mouseCurState]; }
 private:
   static RenderSystem m_instance;
 
@@ -89,7 +102,12 @@ private:
   StateManager *m_stateManager;
   TextureManager *m_textureManager;
   Render *m_renderer;
+  Graphics *m_graphics;
+
   bool  m_renderState[RENDER_LAST_STATE];
+
+  int m_mouseState[CURSOR_LAST_STATE];
+  int m_mouseCurState;
 };
 
 } // namespace Sear

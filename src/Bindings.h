@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Bindings.h,v 1.9 2004-06-24 14:58:35 jmt Exp $
+// $Id: Bindings.h,v 1.10 2005-02-21 14:16:46 simon Exp $
 
 #ifndef SEAR_BINDINGS_H
 #define SEAR_BINDINGS_H 1
@@ -86,8 +86,8 @@ protected:
    */ 
   static void initKeyMap();
   
-  static std::map<int, std::string> keymap; /**< Mapping storing associations between an SDL key id and a textual representation */
-  static varconf::Config* _bindings; /**< Config object storing bindings */
+  static std::map<int, std::string> m_keymap; /**< Mapping storing associations between an SDL key id and a textual representation */
+  static varconf::Config* m_bindings; /**< Config object storing bindings */
 };
 
 } /* namespace Sear */
