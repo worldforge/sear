@@ -19,6 +19,7 @@ Toplevel::Toplevel(const std::string & title, unsigned int border) :
                                                 m_contents(0),
                                                 m_frame(new Frame()),
                                                 m_title(title),
+                                                m_visible(true),
                                                 m_border(border)
 {
   m_frame->setSize(min_width, min_height);
@@ -26,6 +27,18 @@ Toplevel::Toplevel(const std::string & title, unsigned int border) :
 
 Toplevel::~Toplevel()
 {
+}
+
+void Toplevel::show()
+{
+  m_frame->show();
+  m_visible = true;
+}
+
+void Toplevel::hide()
+{
+  m_frame->hide();
+  m_visible = false;
 }
 
 void Toplevel::setContents(Widget * w)

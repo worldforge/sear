@@ -26,6 +26,7 @@ protected:
   unsigned int m_eventMask;
   short m_x, m_y;
   short m_w, m_h;
+  bool m_visible;
 
   Window();
 
@@ -54,6 +55,18 @@ public:
   
   short h() const {
     return m_h;
+  }
+
+  void show() {
+    m_visible = true;
+  }
+
+  void hide() {
+    m_visible = false;
+  }
+
+  bool visible() const {
+    return m_visible;
   }
   
   void addChild(Window *);

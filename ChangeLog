@@ -1,3 +1,31 @@
+2005-01-01  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Button.cpp, gui/Button.h: Virtualise mechanism for hooking
+	  up signals, so child classes can behave differently.
+
+	* gui/Dialogue.cpp: Leave VBox at its default spacing.
+
+	* gui/Frame.cpp: Adjust size of rendered box to match intended size.
+
+	* gui/TextEntry.h: Add accessor for the entered text.
+
+	* gui/Toplevel.cpp, gui/Toplevel.h: Add a flag to handle whether
+	  a top level widget is visible.
+
+	* gui/Window.cpp, gui/Window.h: Add a flag to handle whether a window
+	  is visible.
+
+	* gui/RootWindow.cpp: Don't render top level windows if they are
+	  marked as non-visible.
+
+	* gui/ToggleButton.cpp, gui/ToggleButton.h: New Button types
+	  that stays pressed.
+
+	* gui/Panel.cpp, gui/Panel.h: Panel to go on the side of the screen.
+
+	* gui/ConnectDialogue.cpp, gui/ConnectDialogue.h: Dialogue
+	  used to connect to the server.
+
 2004-12-31  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Box.cpp, gui/Box.h: Make the packing size a constructor

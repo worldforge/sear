@@ -8,7 +8,8 @@
 
 namespace Sear {
 
-Widget::Widget() : m_parent(0) {
+Widget::Widget() : m_parent(0)
+{
 }
 
 Widget::~Widget() {

@@ -35,14 +35,22 @@ void Button::map(Window * win, int x, int y, int & w, int & h)
   m_contents->map(m_frame, m_border, m_border, cw, ch);
   m_frame->setPos(x, y);
   m_frame->setSize(m_border * 2 + cw, m_border * 2 + ch);
-  m_frame->MouseDown.connect(SigC::slot(*this, &Button::onPressed));
-  m_frame->MouseUp.connect(SigC::slot(*this, &Button::onRelease));
-  m_frame->MouseLeave.connect(SigC::slot(*this, &Button::onLeave));
-  m_frame->setEvents(MOUSE_BUTTON_DOWN | MOUSE_BUTTON_UP | MOUSE_LEAVE);
+  if (m_pressed) {
+    m_frame->down();
+  }
+  connectSignals();
   win->addChild(m_frame);
   w = m_frame->w();
   h = m_frame->h();
   std::cout << "Button::map return " << w << "," << h << std::endl << std::flush;
+}
+
+void Button::connectSignals()
+{
+  m_frame->MouseDown.connect(SigC::slot(*this, &Button::onPressed));
+  m_frame->MouseUp.connect(SigC::slot(*this, &Button::onRelease));
+  m_frame->MouseLeave.connect(SigC::slot(*this, &Button::onLeave));
+  m_frame->setEvents(MOUSE_BUTTON_DOWN | MOUSE_BUTTON_UP | MOUSE_LEAVE);
 }
 
 void Button::onPressed()

@@ -27,9 +27,9 @@ void Frame::render(Render * renderer)
   static const GLushort line_down[] = {1, 2, 3};
 
   const GLshort coords[] = { m_x, m_y,
-                             m_x, m_y + m_h,
-                             m_x + m_w, m_y + m_h,
-                             m_x + m_w, m_y };
+                             m_x, m_y + m_h - 1,
+                             m_x + m_w - 1, m_y + m_h - 1,
+                             m_x + m_w - 1, m_y };
 
   glVertexPointer(2, GL_SHORT, 0, coords);
 

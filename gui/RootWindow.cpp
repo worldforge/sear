@@ -14,10 +14,12 @@ RootWindow::~RootWindow() {
 
 void RootWindow::render(Render * renderer)
 {
-    std::set<Window*>::const_iterator I = m_children.begin();
-    for(; I != m_children.end(); ++I) {
-        (*I)->render(renderer);
+  std::set<Window*>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    if ((*I)->visible()) {
+      (*I)->render(renderer);
     }
+  }
 }
 
 } // namespace Sear

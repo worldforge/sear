@@ -23,16 +23,18 @@ protected:
   Widget * m_contents;
   Window * m_frame;
   std::string m_title;
+  bool m_visible;
 
   const unsigned int m_border;
 public:
   explicit Toplevel(const std::string & title, unsigned int border = 4);
   virtual ~Toplevel();
 
-  Widget * getContents() const {
-    return m_contents;
-  }
+  Widget * getContents() const { return m_contents; }
+  bool visible() const { return m_visible; }
 
+  void show();
+  void hide();
   void setContents(Widget *);
   void setPos(int x, int y);
 

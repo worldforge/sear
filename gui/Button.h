@@ -34,6 +34,8 @@ public:
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
 
+  virtual void connectSignals();
+
   // Called by event callbacks
   void onPressed();
   void onRelease();

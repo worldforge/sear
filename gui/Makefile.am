@@ -13,7 +13,10 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    Workspace.cpp Workspace.h \
                    Toplevel.cpp Toplevel.h \
                    Dialogue.cpp Dialogue.h \
+                   Panel.cpp Panel.h \
+                   ConnectDialogue.cpp ConnectDialogue.h \
                    Button.cpp Button.h \
+                   ToggleButton.cpp ToggleButton.h \
                    Box.cpp Box.h \
                    TextEntry.cpp TextEntry.h \
                    Graphic.cpp Graphic.h \

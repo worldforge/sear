@@ -43,6 +43,8 @@ public:
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
 
+  const std::string & input() const { return m_input; }
+
   void onKeyPress(SDLKey, Uint16);
   void onPressed();
   void onFocus(Window *);

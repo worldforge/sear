@@ -8,7 +8,7 @@
 
 namespace Sear {
 
-Window::Window() : m_parent(0) {
+Window::Window() : m_parent(0), m_visible(true) {
 }
 
 Window::~Window() {
