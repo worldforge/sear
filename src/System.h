@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.23 2002-11-12 23:59:22 simon Exp $
+// $Id: System.h,v 1.24 2002-12-24 14:17:07 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -243,8 +243,8 @@ protected:
   TimeArea _time_area;
 
   typedef struct {
-    char *section;
-    char *key;
+    std::string section;
+    std::string key;
     varconf::Config *config;
   } VarconfRecord;
 

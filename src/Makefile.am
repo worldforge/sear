@@ -79,4 +79,6 @@ libSear_a_SOURCES = \
 	ObjectHandler.h \
 	ObjectHandler.cpp \
 	ScriptEngine.cpp \
-	ScriptEngine.h
+	ScriptEngine.h \
+	Calender.cpp \
+	Calender.h

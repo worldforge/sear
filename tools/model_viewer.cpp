@@ -18,7 +18,7 @@
  * */
 
 
-#include <iostream.h>
+#include <iostream>
 #include <string>
 
 #include <SDL/SDL.h>

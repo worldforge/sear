@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.49 2002-12-14 14:46:36 simon Exp $
+// $Id: System.cpp,v 1.50 2002-12-24 14:17:07 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -946,12 +946,9 @@ void System::varconf_callback(const std::string &section, const std::string &key
   if (_process_records && _script_engine->prefixEnabled()) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {
-      VarconfRecord *r = (VarconfRecord*)malloc(sizeof(VarconfRecord));
-      r->section = (char *)malloc(section.size() * sizeof(char) + 1);
-      strcpy((char*)r->section, section.c_str()); 
-      r->key = (char *)malloc(key.size() * sizeof(char) + 1);
-      strcpy((char*)r->key, key.c_str()); 
-//      r->key = key.c_str();
+      VarconfRecord *r = new VarconfRecord();//*)malloc(sizeof(VarconfRecord));
+      r->section = section;
+      r->key = key; 
       r->config = &config;
       record_list.push_back(r);
     }
@@ -967,9 +964,7 @@ void System::processRecords() {
     getcwd(cwd, 255);
     std::string val = std::string(cwd) + "/" + std::string(value);
     r->config->setItem(r->section, r->key, val);
-    free(r->key);
-    free(r->section);
-    free(r);
+    delete r;
     record_list.erase(record_list.begin());
   }
 }
