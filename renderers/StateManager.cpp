@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.11 2004-04-17 15:55:45 simon Exp $
+// $Id: StateManager.cpp,v 1.12 2004-04-26 17:37:51 simon Exp $
 
 /*
  * TODO
@@ -97,6 +97,9 @@ void StateManager::init() {
   if (_initialised) shutdown();
   if (debug) std::cout << "State Loader: Initialising." << std::endl;
 
+  _state_counter = 1;
+  _current_state = -1;
+
   _states.resize(256);
   _name_state_vector.resize(256);
   _state_change_vector.resize(256);
@@ -187,7 +190,10 @@ void StateManager::init() {
 void StateManager::shutdown() {
   if (debug) std::cout << "State Loader: Shutting Down" << std::endl;
   while (!_states.empty()) {
-    if (*_states.begin()) delete(*_states.begin());
+//    if (*_states.begin()) {
+      StateProperties *sp = *(_states.begin());
+      delete sp;
+  //  }
     _states.erase(_states.begin());
   }
   _initialised = false;
@@ -265,6 +271,18 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
 void StateManager::varconf_error_callback(const char *message) {
   Log::writeLog(message, Log::LOG_ERROR);
 }
+
+StateID StateManager::getState(const std::string &state_name) const {
+  StateNameMap::const_iterator S = _state_name_map.find(state_name);
+  if (S == _state_name_map.end()) {
+    std::cerr << "state " << state_name << " is unknown" << std::endl;
+    return 1;
+  }
+    
+  return S->second;
+}
+  
+
 
 int StateManager::getAlphaFunction(const std::string &alpha_function) {
   if (alpha_function == ALPHA_greater) return GL_GREATER;
@@ -419,7 +437,7 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
     else glDisable(GL_RESCALE_NORMAL);
   }
 //  if ((next_state->alpha_function != previous_state->alpha_function) || (next_state->alpha_value != previous_state->alpha_value)) 
-glAlphaFunc(next_state->alpha_function, next_state->alpha_value);
+  glAlphaFunc(next_state->alpha_function, next_state->alpha_value);
   glBlendFunc(next_state->blend_src_function, next_state->blend_dest_function);
   glEndList();
 }
@@ -437,11 +455,17 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
 }
 
 void StateManager::invalidate() {
-  for (unsigned int i = 0; i < 256; ++i) {
-    for (unsigned int j = 0; j < 256; ++j) {
+  for (unsigned int i = 0; i < _state_change_vector.size(); ++i) {
+    for (unsigned int j = 0; j < _state_change_vector[i].size(); ++j) {
+      // Delete display list if its still valid
+      if (glIsList(_state_change_vector[i][j])) {
+        glDeleteLists(_state_change_vector[i][j], 1);
+      }
+      // reset list value
       _state_change_vector[i][j] = 0; 
     }
   }
+  _current_state = -1;
 }
 
 } /* namespace Sear */
