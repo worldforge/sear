@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <map>
 
+#define OBJECT_LOADER_MAX_SIZE (128)
+
 namespace Sear {
 
 typedef struct {
@@ -34,7 +36,7 @@ typedef struct {
   float linear_attenuation;
   float quadratic_attenuation;
 } LightingProperties;
-#define OBJECT_LOADER_MAX_SIZE (128)
+
 typedef struct {
   char object_type[OBJECT_LOADER_MAX_SIZE];
   char model_type[OBJECT_LOADER_MAX_SIZE];

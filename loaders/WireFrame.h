@@ -5,33 +5,24 @@
 #ifndef _WIREFRAME_H_
 #define _WIREFRAME_H_ 1
 
-#include "Models.h"
+#include "../src/Models.h"
 #include <wfmath/axisbox.h>
 
 namespace Sear {
 
 class WireFrame : public Models{
 public:
-  WireFrame(WFMath::AxisBox<3>);
+  WireFrame();
   ~WireFrame();
   
-  bool init();
+  bool init(WFMath::AxisBox<3>);
   void shutdown();
   
-  const int getNumPoints() { return _num_points; }  
-  const float *getVertexData() { return &_vertex_data[0][0]; }
-  const float *getTextureData() { return NULL; }
-  const float *getNormalData() { return NULL; }
-
-  const bool hasVertexData() { return true; }
-  const bool hasTextureData() { return false; }
-  const bool hasNormalData() { return false; }
-  
-  const Type getType() { return LINES; }
+  void render(bool);
+  bool useTextures() { return false; }
   
 private:
   static const int _num_points = 32;
-  WFMath::AxisBox<3> _bbox;
   float _vertex_data[_num_points][3];
 };
 

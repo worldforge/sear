@@ -9,7 +9,6 @@
 #include <string>
 #include <list>
 #include <map>
-#include <iostream>
 
 #include "ObjectLoader.h"
 #include <wfmath/axisbox.h>
@@ -115,7 +114,7 @@ typedef enum {
   virtual void checkModelStatus(const std::string &) {}
   virtual void setModelInUse(const std::string &, bool) {} 
   virtual void buildDisplayLists() {}
-  virtual void nextState(int) { std::cout << "ARG - I've been Used!!!" << std::endl;}
+  virtual void nextState(int) {}
   virtual void setupStates() {}
   virtual void readConfig() {}
   virtual void writeConfig() {}

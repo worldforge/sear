@@ -5,27 +5,29 @@
 #ifndef _MODELS_H_
 #define _MODELS_H_ 1
 
-#include <stdlib.h>
-
 namespace Sear {
 
 class Models {
 public:
   Models() {}
   virtual ~Models() {}
-  
   virtual bool init() { return false; }
   virtual void shutdown() {}
+  virtual void update (float time_elapsed) {}
+  virtual float getScale() { return 1.0f; }
+  virtual void render(bool select_mode) {}
+
+  virtual bool useTextures() { return false; }
   
-  virtual const int getNumPoints() { return 0; }  
-  virtual const float *getVertexData() { return NULL; }
-  virtual const float *getTextureData() { return NULL; }
-  virtual const float *getNormalData() { return NULL; }
-
-  virtual const bool hasVertexData() { return false; }
-  virtual const bool hasTextureData() { return false; }
-  virtual const bool hasNormalData() { return false; }
-
+  typedef enum {
+    NONE = 0,
+    NORMAL,
+    BILLBOARD,
+    HALO
+  } RotationStyle;
+  virtual RotationStyle rotationStyle() { return NONE; }
+ 
+  
   typedef enum {
     INVALID = 0,
     POINT,
@@ -36,9 +38,6 @@ public:
     TRIANGLE_STRIP,
     QUAD_STRIP
   } Type;
-
-  virtual const Type getType() { return INVALID; }
-  
 };
 
 } /* namespace Sear */

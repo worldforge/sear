@@ -2,28 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//----------------------------------------------------------------------------//
-// model.cpp                                                                  //
-// Copyright (C) 2001 Bruno 'Beosil' Heidelberger                             //
-//----------------------------------------------------------------------------//
-// This program is free software; you can redistribute it and/or modify it    //
-// under the terms of the GNU General Public License as published by the Free //
-// Software Foundation; either version 2 of the License, or (at your option)  //
-// any later version.                                                         //
-//----------------------------------------------------------------------------//
 
-//----------------------------------------------------------------------------//
-// Includes                                                                   //
-//----------------------------------------------------------------------------//
-
-
-#include "model.h"
+#include "Cal3d.h"
 #include <GL/gl.h>
-#include "System.h"
+#include "../src/System.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include "Log.h"
-#include "Utility.h"
+#include "../src/Log.h"
+#include "../src/Utility.h"
+
+#include "../src/GL_Render.h"
 
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
@@ -31,15 +19,15 @@
 
 namespace Sear {
 
-const int Model::STATE_IDLE = 0;
-const int Model::STATE_FANCY = 1;
-const int Model::STATE_MOTION = 2;
+const int Cal3d::STATE_IDLE = 0;
+const int Cal3d::STATE_FANCY = 1;
+const int Cal3d::STATE_MOTION = 2;
 
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
 
-Model::Model()
+Cal3d::Cal3d()
 {
   m_state = STATE_IDLE;
   m_motionBlend[0] = 0.6f;
@@ -49,13 +37,14 @@ Model::Model()
   m_meshCount = 0;
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
+  _use_textures = false;
 }
 
 //----------------------------------------------------------------------------//
 // Destructor                                                                 //
 //----------------------------------------------------------------------------//
 
-Model::~Model()
+Cal3d::~Cal3d()
 {
 }
 
@@ -63,7 +52,7 @@ Model::~Model()
 // Execute an action of the model                                             //
 //----------------------------------------------------------------------------//
 
-void Model::executeAction(int action)
+void Cal3d::executeAction(int action)
 {
   switch(action)
   {
@@ -80,7 +69,7 @@ void Model::executeAction(int action)
 // Get the lod level of the model                                             //
 //----------------------------------------------------------------------------//
 
-float Model::getLodLevel()
+float Cal3d::getLodLevel()
 {
   return m_lodLevel;
 }
@@ -89,7 +78,7 @@ float Model::getLodLevel()
 // Get the motion blend factors state of the model                            //
 //----------------------------------------------------------------------------//
 
-void Model::getMotionBlend(float *pMotionBlend)
+void Cal3d::getMotionBlend(float *pMotionBlend)
 {
   pMotionBlend[0] = m_motionBlend[0];
   pMotionBlend[1] = m_motionBlend[1];
@@ -100,7 +89,7 @@ void Model::getMotionBlend(float *pMotionBlend)
 // Get the render scale of the model                                          //
 //----------------------------------------------------------------------------//
 
-float Model::getRenderScale()
+float Cal3d::getScale()
 {
   return m_renderScale;
 }
@@ -109,7 +98,7 @@ float Model::getRenderScale()
 // Get the animation state of the model                                       //
 //----------------------------------------------------------------------------//
 
-int Model::getState()
+int Cal3d::getState()
 {
   return m_state;
 }
@@ -118,7 +107,7 @@ int Model::getState()
 // Load and create a texture from a given file                                //
 //----------------------------------------------------------------------------//
 
-GLuint Model::loadTexture(const std::string& strFilename)
+GLuint Cal3d::loadTexture(const std::string& strFilename)
 {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   GLuint textureId;
@@ -126,6 +115,8 @@ GLuint Model::loadTexture(const std::string& strFilename)
   int height;
   int depth;
 
+  _use_textures = true;
+  
   if (strFilename.substr(strFilename.length() - 4) == ".raw") {
   // open the texture file
   std::ifstream file;
@@ -167,8 +158,6 @@ GLuint Model::loadTexture(const std::string& strFilename)
   glGenTextures(1, &textureId);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-
-  
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -179,6 +168,7 @@ GLuint Model::loadTexture(const std::string& strFilename)
   delete [] pBuffer;
   } else {
     //SDL IMAGE LOAD - NEEDS TESTING
+	Log::writeLog("Experimental Texture Loader being used", Log::INFO);
     SDL_Surface * image = System::loadImage(strFilename);
     width = image->w;
     height = image->h;
@@ -203,7 +193,7 @@ GLuint Model::loadTexture(const std::string& strFilename)
 // Initialize the model                                                       //
 //----------------------------------------------------------------------------//
 
-bool Model::onInit(const std::string& strFilename)
+bool Cal3d::init(const std::string& strFilename)
 {
   // open the model configuration file
   std::ifstream file;
@@ -410,78 +400,18 @@ bool Model::onInit(const std::string& strFilename)
 }
 
 //----------------------------------------------------------------------------//
-// Render the skeleton of the model                                           //
-//----------------------------------------------------------------------------//
-
-void Model::renderSkeleton()
-{
-  // draw the bone lines
-  float lines[1024][2][3];
-  int nrLines;
-  nrLines =  m_calModel.getSkeleton()->getBoneLines(&lines[0][0][0]);
-//  nrLines = m_calModel.getSkeleton()->getBoneLinesStatic(&lines[0][0][0]);
-
-  glLineWidth(3.0f);
-  glColor3f(1.0f, 1.0f, 1.0f);
-  glBegin(GL_LINES);
-    int currLine;
-    for(currLine = 0; currLine < nrLines; currLine++)
-    {
-      glVertex3f(lines[currLine][0][0], lines[currLine][0][1], lines[currLine][0][2]);
-      glVertex3f(lines[currLine][1][0], lines[currLine][1][1], lines[currLine][1][2]);
-    }
-  glEnd();
-  glLineWidth(1.0f);
-
-  // draw the bone points
-  float points[1024][3];
-  int nrPoints;
-  nrPoints =  m_calModel.getSkeleton()->getBonePoints(&points[0][0]);
-//  nrPoints = m_calModel.getSkeleton()->getBonePointsStatic(&points[0][0]);
-
-  glPointSize(4.0f);
-  glBegin(GL_POINTS);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    int currPoint;
-    for(currPoint = 0; currPoint < nrPoints; currPoint++)
-    {
-      glVertex3f(points[currPoint][0], points[currPoint][1], points[currPoint][2]);
-    }
-  glEnd();
-  glPointSize(1.0f);
-}
-
-//----------------------------------------------------------------------------//
 // Render the mesh of the model                                               //
 //----------------------------------------------------------------------------//
 
-void Model::renderMesh(bool useTextures, bool useLighting, bool select_mode)
+void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 {
+  GL_Render *renderer = GL_Render::instance();
   // get the renderer of the model
   CalRenderer *pCalRenderer;
   pCalRenderer = m_calModel.getRenderer();
 
   // begin the rendering loop
   if(!pCalRenderer->beginRendering()) return;
-  // set wireframe mode if necessary
-//  if(bWireframe)
-//  {
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//  }
-
-  // set the global OpenGL states
-//  glEnable(GL_DEPTH_TEST);
-  glShadeModel(GL_SMOOTH);
-  // set the lighting mode if necessary
-//  if(bLight)
-//  {
-//    glEnable(GL_LIGHTING);
-//    glEnable(GL_LIGHT0);
-//  }
-
-  // we will use vertex arrays, so enable them
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_NORMAL_ARRAY);
 
   // get the number of meshes
   int meshCount;
@@ -503,34 +433,23 @@ void Model::renderMesh(bool useTextures, bool useLighting, bool select_mode)
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
         unsigned char meshColor[4];
-        GLfloat materialColor[4];
-       if (!select_mode) {
-        // set the material ambient color
+        float ambient[4];
+        float diffuse[4];
+        float specular[4];
         pCalRenderer->getAmbientColor(&meshColor[0]);
-        materialColor[0] = meshColor[0] / 255.0f;  materialColor[1] = meshColor[1] / 255.0f; materialColor[2] = meshColor[2] / 255.0f; materialColor[3] = meshColor[3] / 255.0f;
-        glMaterialfv(GL_FRONT, GL_AMBIENT, materialColor);
+        ambient[0] = meshColor[0] / 255.0f;  ambient[1] = meshColor[1] / 255.0f; ambient[2] = meshColor[2] / 255.0f; ambient[3] = meshColor[3] / 255.0f;
 
         // set the material diffuse color
         pCalRenderer->getDiffuseColor(&meshColor[0]);
-        materialColor[0] = meshColor[0] / 255.0f;  materialColor[1] = meshColor[1] / 255.0f; materialColor[2] = meshColor[2] / 255.0f; materialColor[3] = meshColor[3] / 255.0f;
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, materialColor);
-
-        // set the vertex color if we have no lights
-//        if(!useLighting )//|| textureCoordinateCount == 0)
-        {
-          glColor4fv(materialColor);
-        }
+        diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = meshColor[3] / 255.0f;
 
         // set the material specular color
         pCalRenderer->getSpecularColor(&meshColor[0]);
-        materialColor[0] = meshColor[0] / 255.0f;  materialColor[1] = meshColor[1] / 255.0f; materialColor[2] = meshColor[2] / 255.0f; materialColor[3] = meshColor[3] / 255.0f;
-        glMaterialfv(GL_FRONT, GL_SPECULAR, materialColor);
+        specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
 
-        // set the material shininess factor
-        float shininess;
-        shininess = 50.0f; //TODO: pCalRenderer->getShininess();
-        glMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
-       }
+
+        renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+	
         // get the transformed vertices of the submesh
         static float meshVertices[30000][3];
         int vertexCount;
@@ -551,73 +470,17 @@ void Model::renderMesh(bool useTextures, bool useLighting, bool select_mode)
         faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
 
         // set the vertex and normal buffers
-        glVertexPointer(3, GL_FLOAT, 0, &meshVertices[0][0]);
-        glNormalPointer(GL_FLOAT, 0, &meshNormals[0][0]);
+        if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
+          renderer->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
+          renderer->renderElements(Models::TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
+	} else {
+          renderer->renderElements(Models::TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
+	}
 
-        // set the texture coordinate buffer and state if necessary
-        if(!select_mode && useTextures && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0))
-        {
-          glEnable(GL_TEXTURE_2D);
-          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-          glEnable(GL_COLOR_MATERIAL);
 
-          // set the texture id we stored in the map user data
-
-          glBindTexture(GL_TEXTURE_2D, (GLuint)pCalRenderer->getMapUserData(0));
-          // set the texture coordinate buffer
-          glTexCoordPointer(2, GL_FLOAT, 0, &meshTextureCoordinates[0][0]);
-          glColor3f(1.0f, 1.0f, 1.0f);
-        }
-
-        // draw the submesh
-        glDrawElements(GL_TRIANGLES, faceCount * 3, GL_UNSIGNED_INT, &meshFaces[0][0]);
-        // disable the texture coordinate state if necessary
-        if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0))
-        {
-          glDisable(GL_COLOR_MATERIAL);
-          glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-          if (!select_mode && useTextures)glDisable(GL_TEXTURE_2D);
-        }
-
-// DEBUG-CODE //////////////////////////////////////////////////////////////////
-/*
-glBegin(GL_LINES);
-glColor3f(1.0f, 1.0f, 1.0f);
-int vertexId;
-for(vertexId = 0; vertexId < vertexCount; vertexId++)
-{
-const float scale = 0.3f;
-  glVertex3f(meshVertices[vertexId][0], meshVertices[vertexId][1], meshVertices[vertexId][2]);
-  glVertex3f(meshVertices[vertexId][0] + meshNormals[vertexId][0] * scale, meshVertices[vertexId][1] + meshNormals[vertexId][1] * scale, meshVertices[vertexId][2] + meshNormals[vertexId][2] * scale);
-}
-glEnd();
-*/
-////////////////////////////////////////////////////////////////////////////////
       }
     }
   }
-
-  // clear vertex array state
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
-  // reset the lighting mode
-//  if(bLight)
-//  {
-//    glDisable(GL_LIGHTING);
-//    glDisable(GL_LIGHT0);
-//  }
-
-  // reset the global OpenGL states
-//  glDisable(GL_DEPTH_TEST);
-
-  // reset wireframe mode if necessary
-//  if(bWireframe)
-//  {
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-//  }
-
-  // end the rendering
   pCalRenderer->endRendering();
 }
 
@@ -625,47 +488,28 @@ glEnd();
 // Render the model                                                           //
 //----------------------------------------------------------------------------//
 
-void Model::onRender(bool useTextures, bool useLighting, bool select_mode)
+void Cal3d::render(bool useTextures, bool useLighting, bool select_mode)
 {
-  // set global OpenGL states
-//  glEnable(GL_DEPTH_TEST);
-//  glShadeModel(GL_SMOOTH);
-
-  // check if we need to render the skeleton
-/*  if(theMenu.isSkeleton())
-  {
-    renderSkeleton();
-  }
-*/
-  // check if we need to render the mesh
-//  if(!theMenu.isSkeleton() || theMenu.isWireframe())
-//  {
-//    glRotatef(180.0f,0.0f,0.0f,1.0f);
     glRotatef(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east
     
     renderMesh(useTextures, useLighting, select_mode);
-//theMenu.isWireframe(), theMenu.isLight());
-//  }
-
-  // clear global OpenGL states
-//  glDisable(GL_DEPTH_TEST);
 }
 
 //----------------------------------------------------------------------------//
 // Update the model                                                           //
 //----------------------------------------------------------------------------//
 
-void Model::onUpdate(float elapsedSeconds)
+void Cal3d::update(float time_elapsed)
 {
   // update the model
-  m_calModel.update(elapsedSeconds);
+  m_calModel.update(time_elapsed);
 }
 
 //----------------------------------------------------------------------------//
 // Shut the model down                                                        //
 //----------------------------------------------------------------------------//
 
-void Model::onShutdown()
+void Cal3d::shutdown()
 {
   // destroy the model instance
   m_calModel.destroy();
@@ -678,7 +522,7 @@ void Model::onShutdown()
 // Set the lod level of the model                                             //
 //----------------------------------------------------------------------------//
 
-void Model::setLodLevel(float lodLevel)
+void Cal3d::setLodLevel(float lodLevel)
 {
   m_lodLevel = lodLevel;
 
@@ -690,7 +534,7 @@ void Model::setLodLevel(float lodLevel)
 // Set the motion blend factors state of the model                            //
 //----------------------------------------------------------------------------//
 
-void Model::setMotionBlend(float *pMotionBlend, float delay)
+void Cal3d::setMotionBlend(float *pMotionBlend, float delay)
 {
   m_motionBlend[0] = pMotionBlend[0];
   m_motionBlend[1] = pMotionBlend[1];
@@ -709,7 +553,7 @@ void Model::setMotionBlend(float *pMotionBlend, float delay)
 // Set a new animation state within a given delay                             //
 //----------------------------------------------------------------------------//
 
-void Model::setState(int state, float delay)
+void Cal3d::setState(int state, float delay)
 {
   // check if this is really a new state
   if(state != m_state)

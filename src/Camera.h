@@ -5,6 +5,15 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_ 1
 
+/*
+ * This class represents the camera. Currently defined as a chase camera
+ * future development should allow for other styles, e.g. first person.
+ *
+ * In this class camera distance and zoom level are used interchangably
+ *  and really just represent the distance between the camera origin (~player
+ *  character's head) and the view plane
+ */ 
+
 namespace Sear {
 
 class Camera {
@@ -71,8 +80,8 @@ protected:
   float _rotation_speed;
   float _elevation_speed;
 
-  float _min_distance;
-  float _max_distance;
+  float _min_distance; // Minimum camera distance allowed
+  float _max_distance; // Maximum camera distance allowed
 };
 
 } /* namespace Sear */

@@ -445,6 +445,8 @@ void Client::Appearance(Eris::Entity *e){
   Log::writeLog(std::string("Appearance: ") + e->getName(), Log::INFO);
   ((WorldEntity *)e)->handleMove();
   _system->getRenderer()->setModelInUse(e->getID(), true);
+//  ((WorldEntity *)e)->displayInfo();
+  
 }
 
 void Client::Disappearance(Eris::Entity *e){

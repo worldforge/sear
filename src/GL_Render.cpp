@@ -17,22 +17,18 @@
 #include "Utility.h"
 #include <Eris/Entity.h>
 #include <Eris/World.h>
-#include <Eris/TypeInfo.h>
-#include "model.h"
+//#include <Eris/TypeInfo.h>
+//#include "model.h"
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include "Character.h"
 #include "ObjectLoader.h"
 
 #include "Models.h"
-#include "WireFrame.h"
-#include "BoundBox.h"
-#include "BillBoard.h"
-#include "Impostor.h"
 #include <unistd.h>
 
-#include "MultiModels.h"
-#include "3ds.h"
+#include "ModelHandler.h"
+
 #include "Log.h"
 
 #include "conf.h"
@@ -182,10 +178,10 @@ GL_Render::~GL_Render() {
   for (std::map<std::string, ModelStruct*>::iterator I = _entity_models.begin(); I != _entity_models.end(); I++) {
     if (I->second) {
       ModelStruct *ms = I->second;
-      if (ms->model) {
-        ms->model->onShutdown();
-	delete ms->model;
-      }
+//      if (ms->model) {
+//        ms->model->hutdown();
+//	delete ms->model;
+//      }
       if (ms->models) {
         ms->models->shutdown();
 	delete ms->models;
@@ -258,6 +254,7 @@ void GL_Render::init() {
   camera->init();
 //  CheckError();
   initLighting();
+  mh = new ModelHandler();
 }
 
 void GL_Render::initLighting() {
@@ -427,11 +424,7 @@ void GL_Render::createTexture(SDL_Surface *surface, unsigned int texture, bool c
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
-  if (surface->format->BytesPerPixel == 4) {
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-  } else {
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-  }
+  glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 }
  
 void GL_Render::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
@@ -490,8 +483,6 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
   active_name = "";
   // This clears the currently loaded texture
   if (select_mode) glBindTexture(GL_TEXTURE_2D, 0);
-//  if (!checkState(RENDER_TEXTURES)) glDisable(GL_TEXTURE_2D);
-//  if (!checkState(RENDER_LIGHTING)) glDisable(GL_LIGHTING);
   
   float time_elapsed =  (SDL_GetTicks() - this->time) / 1000.0f;
   this->time = SDL_GetTicks();
@@ -527,7 +518,6 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
       y = -pos.y();
       z = -pos.z();
       
-      
       // Apply camera rotations
       orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), camera->getElevation());
       orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), camera->getRotation());
@@ -556,9 +546,9 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
       float ps[] = {-x, -y, -z + 2.0f, 1.0f};
       glLightfv(GL_LIGHT0,GL_POSITION,ps);
 
-      if (_entity_models[id]) player_model = _entity_models[id]->model;
+//      if (_entity_models[id]) player_model = _entity_models[id]->model;
 
-      extractFrustum();
+//      extractFrustum();
     }
     // Setup Sun
     if (checkState(RENDER_LIGHTING)) {
@@ -614,7 +604,7 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
     if ((root = (WorldEntity *)world->getRootEntity())) {
 
     for (std::map<std::string,ModelStruct*>::const_iterator I = _entity_models.begin(); I != _entity_models.end(); I++) {
-      if (I->second) if (I->second->in_use) if (I->second->model) (I->second)->model->onUpdate(time_elapsed);
+//      if (I->second) if (I->second->in_use) if (I->second->model) (I->second)->model->onUpdate(time_elapsed);
     }
       if (_character) _character->updateLocals(false);
       render_queue = std::map<std::string, Queue>();
@@ -624,26 +614,28 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
       wireframe_queue = std::map<std::string, Queue>();
       buildQueues(root, 0);
       if (!select_mode) nextState(TERRAIN_TO_WIREFRAME);
-      drawWireFrameQueue(select_mode);
+//      drawWireFrameQueue(select_mode);
       if (!select_mode) nextState(WIREFRAME_TO_CHARACTERS);
-      drawModelQueue(select_mode);
+      drawQueue(model_queue, select_mode, time_elapsed);
+//      drawModelQueue(select_mode);
       if (!select_mode) nextState(CHARACTERS_TO_MODELS);
-      drawRenderQueue(select_mode);
+      drawQueue(render_queue, select_mode, time_elapsed);
+///      drawRenderQueue(select_mode);
       if (!select_mode) nextState(MODELS_TO_BILLBOARD);
       glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-      drawBBoardQueue(select_mode);
-      drawImpostorQueue(select_mode);
-      drawModelsQueue(select_mode);
+//      drawBBoardQueue(select_mode);
+//      drawImpostorQueue(select_mode);
+//      drawModelsQueue(select_mode);
       glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
       if (!select_mode) nextState(BILLBOARD_TO_FONT);
-      drawMessageQueue(select_mode);
+//      drawMessageQueue(select_mode);
       if (!select_mode) {
         if (frame_rate < _lower_frame_rate_bound) {
           model_detail -= 0.1f;
           if (model_detail < 0.0f) model_detail = 0.0f;
   
   	for (std::map<std::string, ModelStruct*>::const_iterator J = _entity_models.begin(); J != _entity_models.end(); J++) {
-            if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
+//            if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
   	}
           terrain->lowerDetail();
         } else if (frame_rate > _upper_frame_rate_bound) {
@@ -651,7 +643,7 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
           if (model_detail > 1.0f) model_detail = 1.0f;
   
   	for (std::map<std::string, ModelStruct*>::const_iterator J = _entity_models.begin(); J != _entity_models.end(); J++) {
-           if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
+//           if (J->second) if (J->second->model) (J->second)->model->setLodLevel(model_detail);
   	}
           terrain->raiseDetail();
         }
@@ -716,8 +708,8 @@ if (!select_mode) _system->getConsole()->draw(command);
 void GL_Render::buildQueues(WorldEntity *we, int depth) {
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
-      std::string type = we->getType()->getName();
-      std::string parent = *we->getType()->getParentsAsSet().begin();
+      std::string type = we->type();
+      std::string parent = we->parent();
       ObjectLoader *ol = _system->getObjectLoader();
       ObjectProperties *op = NULL;
       if (!type.empty()) op = ol->getObjectProperties(type);
@@ -726,238 +718,20 @@ void GL_Render::buildQueues(WorldEntity *we, int depth) {
       
       std::string model_type = std::string(op->model_type);
 
-      if (op->draw_self && SphereInFrustum(we)) { 
-        if (model_type == "bbox") render_queue[type].push_back(we);
-        else if (model_type == "wire_frame") wireframe_queue[type].push_back(we);
-        else if (model_type == "billboard") billboard_queue[type].push_back(we);
-      	else if (model_type == "imposter") imposter_queue[type].push_back(we); 
-      	else if (model_type == "model3ds") model3ds_queue[type].push_back(we); 
-        else model_queue[type].push_back(we);
+      if (op->draw_self) { 
+//        if (model_type == "boundbox") 
+	              render_queue[type].push_back(we);
+//        else if (model_type == "wire_frame") wireframe_queue[type].push_back(we);
+//        else if (model_type == "billboard") billboard_queue[type].push_back(we);
+//      	else if (model_type == "imposter") imposter_queue[type].push_back(we); 
+//      	else if (model_type == "model3ds") model3ds_queue[type].push_back(we); 
+//        else model_queue[type].push_back(we);
       }
       if (op->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); i++) {
           buildQueues((WorldEntity*)we->getMember(i), depth + 1);
         }
       }
-    }
-  }
-}
-
-void GL_Render::drawModelQueue(bool select_mode) {
-  std::string type, parent, id;
-  for (std::map<std::string, Queue>::const_iterator I = model_queue.begin(); I != model_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    id = we->getID();
-    ObjectLoader *ol = _system->getObjectLoader();
-    ObjectProperties *op = NULL;
-    if (!type.empty()) op = ol->getObjectProperties(type);
-    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-    if (op == NULL) op = ol->getObjectProperties("default");
-    std::string model_type = std::string(op->model_type);
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      id = we->getID();
-      ModelStruct *ms;
-      ms = _entity_models[id];
-      if (ms) {
-        //Do nothing
-      } else {
-        Model *model = new Model();
-        ms = new ModelStruct();
-        ms->model_name = model_type;
-        ms->in_use = true;
-        if ((model) && model->onInit(System::instance()->getModel()->getAttribute(model_type))) {
-        _entity_models[id] = ms;
-	} else {
-          if (model) delete model;
-	  model = NULL;
-	}
-	ms->multi = NULL;
-        ms->model = model;
-	ms->models = NULL;
-      }
-      if (select_mode) nextColour(we->getID());
-      else glColor3f(1.0f, 1.0f, 1.0f);
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      WFMath::Quaternion q = we->getAbsOrient();
-      float o[4][4];
-      QuatToMatrix(q, o);
-      glMultMatrixf(&o[0][0]);
-      if (ms->model) {
-        float scale = ms->model->getRenderScale();
-        glScalef(scale, scale, scale);
-
-        if (!select_mode && we->getID() == activeID) {
-	active_name = we->getName();
-	  stateChange(HALO);
-	  if (checkState(RENDER_STENCIL)) {
-            glEnable(GL_STENCIL_TEST);
-  	    glStencilFunc(GL_ALWAYS, -1, 1);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glPushMatrix();
-            ms->model->onRender(checkState(RENDER_TEXTURES), checkState(RENDER_LIGHTING), select_mode);
-	    glPopMatrix();
-	    glStencilFunc(GL_NOTEQUAL, -1, 1);
-            glColor4fv(_halo_blend_colour);
-	    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            ms->model->onRender(checkState(RENDER_TEXTURES), checkState(RENDER_LIGHTING), true);
-	    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDisable(GL_STENCIL_TEST);
-            glColor4fv(white);
-	  } else {
-	    glColor4fv(_halo_blend_colour);
-	    ms->model->onRender(checkState(RENDER_TEXTURES), checkState(RENDER_LIGHTING), true);
-	    glColor4fv(white);
-	  }
-	 stateChange(CHARACTERS); 
-	} else {
-          ms->model->onRender(checkState(RENDER_TEXTURES), checkState(RENDER_LIGHTING), select_mode);
-	}
-      } else {
-        // Else downgrade model type
-        strncpy(op->model_type,"bbox\0", 5);
-	continue;
-      }
-      glPopMatrix();
-    }
-  }
-}
-
-void GL_Render::drawMessageQueue(bool select_mode) {
-  if (select_mode) return;
-  std::string type, parent;
-  for (std::map<std::string, Queue>::const_iterator I = model_queue.begin(); I != model_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      glColor3f(1.0f, 1.0f, 1.0f);
-      WorldEntity *we = (WorldEntity*)*J;
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-
-      float rotation_matrix[4][4];
-      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= orient;
-      QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
-
-      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-      glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-      glScalef(0.025f, 0.025f, 0.025f);
-      glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
-      we->renderMessages();
-      glPopMatrix();
-    }
-  }
-}
-
-void GL_Render::drawRenderQueue(bool select_mode) {
-  ObjectLoader *ol = _system->getObjectLoader();
-  std::string type, parent;
-//  bool textures_enabled = true;
-  for (std::map<std::string, Queue>::const_iterator I = render_queue.begin(); I != render_queue.end(); I++) {
-    bool loaded = false;
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    
-    ObjectProperties *op = NULL;
-    if (!type.empty()) op = ol->getObjectProperties(type);
-    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-    if (op == NULL) op = ol->getObjectProperties("default"); 
-    int texture_id = -1;
-    if (!select_mode) {
-      texture_id = requestTexture("boundbox_" + type);
-      if (texture_id == -1) texture_id = requestTexture("boundbox_" + parent);
-      if (texture_id != -1) { 
-        loaded = true;
-        switchTexture(texture_id);
-      } else {
-	strncpy(op->model_type,"wire_frame\0", 11);
-	continue;
-      }
-    }
-  
-    processObjectProperties(op);
-    float texture_scale = op->texture_scale;
-    if (texture_scale != 1.0f) {
-      glMatrixMode(GL_TEXTURE);
-      glPushMatrix();
-      glScalef(op->texture_scale, op->texture_scale, 1.0f);
-      glMatrixMode(GL_MODELVIEW);
-    }
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      if (select_mode) nextColour(we->getID());
-      else glColor4fv(white);
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      Models *boundbox = NULL;
-      ModelStruct *ms;
-      ms = _entity_models[we->getID()];
-      if (ms) {
-        boundbox = (BoundBox*)ms->models;
-      } else {
-        WFMath::AxisBox<3> bbox = we->getBBox();
-        if (!we->hasBBox()) {
-          WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-          WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-          bbox = WFMath::AxisBox<3>(lc, hc);
-        } 
-        bbox = bboxCheck(bbox);
-        boundbox = new BoundBox(bbox, op->wrap_texture);
-        ms = new ModelStruct();
-        ms->model_name = "bbox";
-        ms->in_use = true;
-        if ((boundbox) && boundbox->init()) {
-          _entity_models[we->getID()] = ms;
-        } else {
-          if (boundbox) delete boundbox;
-          boundbox = NULL;
-          strncpy(op->model_type, "wireframe\0", 10);
-          continue;
-        }
-	ms->multi = NULL;
-        ms->model = NULL;
-        ms->models = boundbox;
-      }
-        if (!select_mode && we->getID() == activeID) {
-	active_name = we->getName();
-	  stateChange(HALO);
-	  if (checkState(RENDER_STENCIL)) {
-            glEnable(GL_STENCIL_TEST);
-            glStencilFunc(GL_ALWAYS, -1 ,1);
-  	    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	    if (stateProperties[MODELS].textures) glEnable(GL_TEXTURE_2D);
-	    drawModel(boundbox);
-	    if (stateProperties[MODELS].textures) glDisable(GL_TEXTURE_2D);
-	    glStencilFunc(GL_NOTEQUAL, -1, 1);
-	    glPolygonMode(GL_FRONT, GL_LINE);
-	    glColor4fv(_halo_blend_colour);
-	    drawModel(boundbox);
-	    glDisable(GL_STENCIL_TEST);
-	    glColor4fv(white);
-	    glPolygonMode(GL_FRONT, GL_FILL);
-	  } else {
-	    glColor4fv(_halo_blend_colour);
-	    drawModel(boundbox);
-	    glColor4fv(white);
-	  }
-	  stateChange(MODELS);
-	} else
-	  drawModel(boundbox);
-      glPopMatrix();
-    }
-    if (texture_scale != 1.0f) {
-      glMatrixMode(GL_TEXTURE);
-      glPopMatrix();
-      glMatrixMode(GL_MODELVIEW);
     }
   }
 }
@@ -1048,214 +822,40 @@ void GL_Render::procEvent(int x, int y) {
   stateChange(FONT);
 }
 
-void GL_Render::extractFrustum() {
-  float   proj[16];
-  float   modl[16];
-  float   clip[16];
-  float   t;
-
-  /* Get the current PROJECTION matrix from OpenGL */
-  glGetFloatv( GL_PROJECTION_MATRIX, proj );
-
-  /* Get the current MODELVIEW matrix from OpenGL */
-  glGetFloatv( GL_MODELVIEW_MATRIX, modl );
-
-  /* Combine the two matrices (multiply projection by modelview) */
-  clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
-  clip[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
-  clip[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
-  clip[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
-  clip[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
-  clip[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
-  clip[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
-  clip[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
-  clip[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
-  clip[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
-  clip[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
-  clip[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
-  clip[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
-  clip[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
-  clip[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
-  clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
-
-  /* Extract the numbers for the RIGHT plane */
-  frustum[0][0] = clip[ 3] - clip[ 0];
-  frustum[0][1] = clip[ 7] - clip[ 4];
-  frustum[0][2] = clip[11] - clip[ 8];
-  frustum[0][3] = clip[15] - clip[12];
-
-  /* Normalize the result */
-  t = sqrt( frustum[0][0] * frustum[0][0] + frustum[0][1] * frustum[0][1] + frustum[0][2] * frustum[0][2] );
-  frustum[0][0] /= t;
-  frustum[0][1] /= t;
-  frustum[0][2] /= t;
-  frustum[0][3] /= t;
-
-  /* Extract the numbers for the LEFT plane */
-  frustum[1][0] = clip[ 3] + clip[ 0];
-  frustum[1][1] = clip[ 7] + clip[ 4];
-  frustum[1][2] = clip[11] + clip[ 8];
-  frustum[1][3] = clip[15] + clip[12];
-
-  /* Normalize the result */
-  t = sqrt( frustum[1][0] * frustum[1][0] + frustum[1][1] * frustum[1][1] + frustum[1][2] * frustum[1][2] );
-  frustum[1][0] /= t;
-  frustum[1][1] /= t;
-  frustum[1][2] /= t;
-  frustum[1][3] /= t;
-
-  /* Extract the BOTTOM plane */
-  frustum[2][0] = clip[ 3] + clip[ 1];
-  frustum[2][1] = clip[ 7] + clip[ 5];
-  frustum[2][2] = clip[11] + clip[ 9];
-  frustum[2][3] = clip[15] + clip[13];
-
-  /* Normalize the result */
-  t = sqrt( frustum[2][0] * frustum[2][0] + frustum[2][1] * frustum[2][1] + frustum[2][2] * frustum[2][2] );
-  frustum[2][0] /= t;
-  frustum[2][1] /= t;
-  frustum[2][2] /= t;
-  frustum[2][3] /= t;
-
-  /* Extract the TOP plane */
-  frustum[3][0] = clip[ 3] - clip[ 1];
-  frustum[3][1] = clip[ 7] - clip[ 5];
-  frustum[3][2] = clip[11] - clip[ 9];
-  frustum[3][3] = clip[15] - clip[13];
-
-  /* Normalize the result */
-  t = sqrt( frustum[3][0] * frustum[3][0] + frustum[3][1] * frustum[3][1] + frustum[3][2] * frustum[3][2] );
-  frustum[3][0] /= t;
-  frustum[3][1] /= t;
-  frustum[3][2] /= t;
-  frustum[3][3] /= t;
-
-  /* Extract the FAR plane */
-  frustum[4][0] = clip[ 3] - clip[ 2];
-  frustum[4][1] = clip[ 7] - clip[ 6];
-  frustum[4][2] = clip[11] - clip[10];
-  frustum[4][3] = clip[15] - clip[14];
-
-  /* Normalize the result */
-  t = sqrt( frustum[4][0] * frustum[4][0] + frustum[4][1] * frustum[4][1] + frustum[4][2] * frustum[4][2] );
-  frustum[4][0] /= t;
-  frustum[4][1] /= t;
-  frustum[4][2] /= t;
-  frustum[4][3] /= t;
-
-  /* Extract the NEAR plane */
-  frustum[5][0] = clip[ 3] + clip[ 2];
-  frustum[5][1] = clip[ 7] + clip[ 6];
-  frustum[5][2] = clip[11] + clip[10];
-  frustum[5][3] = clip[15] + clip[14];
-
-   /* Normalize the result */
-   t = sqrt( frustum[5][0] * frustum[5][0] + frustum[5][1] * frustum[5][1] + frustum[5][2] * frustum[5][2] );
-   frustum[5][0] /= t;
-   frustum[5][1] /= t;
-   frustum[5][2] /= t;
-   frustum[5][3] /= t;
-}
-
-bool GL_Render::PointInFrustum( float x, float y, float z ) {
-  int p;
-  for( p = 0; p < 6; p++ )
-    if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ) return false;
-  return true;
-} 
-
-int GL_Render::CubeInFrustum( WorldEntity *we ) {  
-  int p;
-  int c;
-  int c2 = 0;
-  if (!we->hasBBox()) return true;
-  WFMath::AxisBox<3> entity_bbox = we->getBBox();
-  WFMath::Point<3> pos = we->getAbsPos();
-  //Translate BBox to correct position
-  WFMath::Point<3> lowCorner = WFMath::Point<3>(entity_bbox.lowCorner().x() + pos.x(), entity_bbox.lowCorner().y() + pos.y(), entity_bbox.lowCorner().z() + pos.z());
-  WFMath::Point<3> highCorner = WFMath::Point<3>(entity_bbox.highCorner().x() + pos.x(), entity_bbox.highCorner().y() + pos.y(), entity_bbox.highCorner().z() + pos.z());
-
-
-  WFMath::AxisBox<3> bbox = WFMath::AxisBox<3>(lowCorner, highCorner);
-
-  for( p = 0; p < 6; p++ ) {
-    c = 0;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( c == 0 ) return 0;
-    if( c == 8 ) c2++;
-  }
-  return (c2 == 6) ? 2 : 1;
-}
-
 
 int GL_Render::patchInFrustum(WFMath::AxisBox<3> bbox) {  
-  int p;
-  int c;
-  int c2 = 0;
-
-  for( p = 0; p < 6; p++ ) {
-    c = 0;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( c == 0 ) return 0;
-    if( c == 8 ) c2++;
-  }
-  return (c2 == 6) ? 2 : 1;
+  return true;
 }
 
 float GL_Render::distFromNear(float x, float y, float z) {
-  return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
+  return 1.0f;//(frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
 void GL_Render::setCallyState(int i) {
-  if (player_model) player_model->setState(i, 0.1f);	
 }
 
 void GL_Render::setCallyMotion(float f1, float f2, float f3) {
-  float f[3];
-  f[0] = f1;
-  f[1] = f2;
-  f[2] = f3;
-  if (player_model) player_model->setMotionBlend(f, 0.1f);
 }
 
 
 void GL_Render::executeCallyAction(int action) {
-  if (player_model) player_model->executeAction(action);
 }
 
 WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox) {
   int count = 0;
-  if (bbox.lowCorner().x()
-    + bbox.lowCorner().y() 
-    + bbox.lowCorner().z()
-    + bbox.highCorner().x()
-    + bbox.highCorner().y()
-    + bbox.highCorner().z()
-    == 0.0f) {
+  if (bbox.lowCorner().x() + bbox.lowCorner().y() + bbox.lowCorner().z() + bbox.highCorner().x() + bbox.highCorner().y() + bbox.highCorner().z()  == 0.0f) {
     // BBOX has no size!! or is equidistant sround origin!!!!!
     WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
     WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);
-  }
-  if (bbox.highCorner().x() > bbox.lowCorner().x()) count++;
-  if (bbox.highCorner().y() < bbox.lowCorner().y()) count++;
-  if (bbox.highCorner().z() < bbox.lowCorner().z()) count++;
-  if (count == 0 || count == 2) return bbox;
-  else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());
+ }
+ if (bbox.highCorner().x() > bbox.lowCorner().x()) count++;
+ if (bbox.highCorner().y() < bbox.lowCorner().y()) count++;
+ if (bbox.highCorner().z() < bbox.lowCorner().z()) count++;
+ 
+ if (count == 0 || count == 2) return bbox;
+ else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
+//  return bbox;
 }
 
 void GL_Render::CheckError() {
@@ -1272,138 +872,6 @@ void GL_Render::CheckError() {
     default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
   }
   Log::writeLog(msg, Log::ERROR);
-}
-
-void GL_Render::processObjectProperties(ObjectProperties *op) {
-  if (!op) {
-    Log::writeLog("No OP!", Log::ERROR);
-    return;
-  }
-  glMaterialfv (GL_FRONT, GL_AMBIENT,   op->material_properties->ambient);
-  glMaterialfv (GL_FRONT, GL_DIFFUSE,   op->material_properties->diffuse);
-  glMaterialfv (GL_FRONT, GL_SPECULAR,  op->material_properties->specular);
-  glMaterialf  (GL_FRONT, GL_SHININESS, op->material_properties->shininess);
-  glMaterialfv (GL_FRONT, GL_EMISSION,  op->material_properties->emission);
-}
-
-void GL_Render::checkModelStatus(const std::string &id) {
-	return;
-  ModelStruct *ms = _entity_models[id];
-  if (ms) {
-    if (!ms->in_use) {
-      Log::writeLog("Freeing entity data", Log::DEFAULT);
-      if (ms->model) { // Cal3D model
-        Log::writeLog("Deleting a model", Log::DEFAULT);
-        ms->model->onShutdown();
-	delete ms->model;
-	ms->model = NULL;
-      }
-      if (ms->models) {
-        Log::writeLog("Deleting a model", Log::DEFAULT);
-        ms->models->shutdown();
-	delete ms->models;
-	ms->models = NULL;
-      }
-      _entity_models[id] = NULL;
-      delete ms;
-    }
-  }
-}
-
-void GL_Render::setModelInUse(const std::string &id, bool use) {
-  ModelStruct *ms = _entity_models[id];
-  if (ms) ms->in_use = use;
-}
-
-void GL_Render::drawBBoardQueue(bool select_mode) {
-  std::string type, parent;
-  for (std::map<std::string, Queue>::const_iterator I = billboard_queue.begin(); I != billboard_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    bool loaded = false;
-    ObjectLoader *ol = _system->getObjectLoader();
-    ObjectProperties *op = NULL;
-    if (!type.empty()) op = ol->getObjectProperties(type);
-    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-    if (op == NULL) op = ol->getObjectProperties("default"); 
-    int texture_id ;
-    int texture_mask_id = -1;
-    texture_id = requestTexture("billboard_" + type, true);
-    if (texture_id == -1) texture_id = requestTexture("billboard_" + parent, true);
-    else texture_mask_id = requestTextureMask("billboard_" + type, true);
-    if (texture_id != -1) { 
-      loaded = true;
-      if (texture_mask_id == -1) texture_mask_id = requestTextureMask("billboard_" + parent, true);
-      if (select_mode) switchTexture(texture_mask_id);
-      else switchTexture(texture_id);
-    } else {
-      strncpy(op->model_type, "bbox\0", 5);
-      continue;
-    }
-    Models *billboard = NULL;
-    ModelStruct *ms;
-    ms = _entity_models[type];
-    if (ms) {
-      billboard = (BillBoard*)ms->models;
-    } else {
-      billboard = new BillBoard(op->width, op->height);
-      ms = new ModelStruct();
-      ms->model_name = "billboard";
-      ms->in_use = true;
-      if ((billboard) && billboard->init()) {
-        _entity_models[type] = ms;
-      } else {
-        if (billboard) delete billboard;
-        billboard = NULL;
-        strncpy(op->model_type, "bbox\0", 5);
-        continue;
-      }
-      ms->multi = NULL;
-      ms->model = NULL;
-      ms->models = billboard;
-    }
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      if (select_mode) nextColour(we->getID());
-      else glColor4fv(white);
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-
-      float rotation_matrix[4][4];
-      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= orient;
-      QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
-
-      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-      if (!select_mode && we->getID() == activeID) {
-	active_name = we->getName();
-        stateChange(HALO);
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_ALPHA_TEST);
-        glColor4fv(_halo_blend_colour);
-        if (checkState(RENDER_STENCIL)) {
-          glEnable(GL_STENCIL_TEST);
-          glStencilFunc(GL_ALWAYS, -1, 1);
-          glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-          drawModel(billboard);
-          glStencilFunc(GL_NOTEQUAL, -1, 1);
-          drawModel(billboard);
-          glDisable(GL_STENCIL_TEST);
-        } else {
-          switchTexture(texture_mask_id);
-	  drawModel(billboard);
-	  switchTexture(texture_id);
-      	}
-        glColor4fv(white);
-        stateChange(BILLBOARD);
-      } else {
-         drawModel(billboard);
-      }
-      glPopMatrix();
-    }
-  }
 }
 
 void GL_Render::buildDisplayLists() {
@@ -1434,91 +902,6 @@ void GL_Render::buildDisplayLists() {
       if (stateProperties[state].fog) glEnable(GL_FOG);
       else glDisable(GL_FOG);
     glEndList();
-  }
-}
-
-void GL_Render::drawImpostorQueue(bool select_mode) {
-  std::string type, parent;
-  for (std::map<std::string, Queue>::const_iterator I = imposter_queue.begin(); I != imposter_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    bool loaded = false;
-    ObjectLoader *ol = _system->getObjectLoader();
-    ObjectProperties *op = NULL;
-    if (!type.empty()) op = ol->getObjectProperties(type);
-    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-    if (op == NULL) op = ol->getObjectProperties("default"); 
-    int texture_id ;
-    int texture_mask_id = -1;
-    texture_id = requestTexture("impostor_" + type, true);
-    if (texture_id == -1) texture_id = requestTexture("impostor_" + parent, true);
-    else texture_mask_id = requestTextureMask("impostor_" + type, true);
-    if (texture_id != -1) { 
-      loaded = true;
-      if (texture_mask_id == -1) texture_mask_id = requestTextureMask("impostor_" + parent, true);
-      if (select_mode) switchTexture(texture_mask_id);
-      else switchTexture(texture_id);
-    } else {
-      strncpy(op->model_type, "bbox\0", 5);
-      continue;
-    }
-    Models *impostor = NULL;
-    ModelStruct *ms;
-    ms = _entity_models[type];
-    if (ms) {
-      impostor = (Impostor*)ms->models;
-    } else {
-      impostor = new Impostor(op->width, op->height);
-      ms = new ModelStruct();
-      ms->model_name = "impostor";
-      ms->in_use = true;
-      if ((impostor) && impostor->init()) {
-        _entity_models[type] = ms;
-      } else {
-        if (impostor) delete impostor;
-        impostor = NULL;
-        strncpy(op->model_type, "bbox\0", 5);
-        continue;
-      }
-      ms->multi = NULL;
-      ms->model = NULL;
-      ms->models = impostor;
-    }
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      if (select_mode) nextColour(we->getID());
-      else glColor3f(1.0f, 1.0f, 1.0f);
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
-      if (!select_mode && we->getID() == activeID) {
-	active_name = we->getName();
- 	stateChange(HALO);
-        glEnable(GL_ALPHA_TEST);
-        glEnable(GL_TEXTURE_2D);
-        glColor4fv(_halo_blend_colour);
-	if (checkState(RENDER_STENCIL)) {
-          glEnable(GL_STENCIL_TEST);
-	  glStencilFunc(GL_ALWAYS, -1, 1);
-	  glStencilOp(GL_REPLACE, GL_KEEP, GL_REPLACE);
-	  drawModel(impostor);
-	  glStencilFunc(GL_NOTEQUAL, -1, 1);
-          drawModel(impostor);
-          glDisable(GL_STENCIL_TEST);
-	} else {
-          switchTexture(texture_mask_id);
-          drawModel(impostor);
-          switchTexture(texture_id);
-	}
-      stateChange(BILLBOARD);
-      glColor4fv(white);
-      } else {
-        drawModel(impostor);
-      }
-      glPopMatrix();
-    }
   }
 }
 
@@ -1865,229 +1248,185 @@ void GL_Render::nextState(int desired_state) {
   } else glCallList(_states + _current_state);
 }
 
-bool GL_Render::SphereInFrustum( WorldEntity *we) {
-//  return true;	
-  int p;
-  float x, y, z, radius;
-  WFMath::AxisBox<3> bbox = bboxCheck(we->getBBox());
-  WFMath::Ball<3> b = bbox.boundingSphere();
-  x = b.getCenter().x() + we->getAbsPos().x();
-  y = b.getCenter().y() + we->getAbsPos().y();
-  z = b.getCenter().z() + we->getAbsPos().z() + terrain->getHeight(we->getAbsPos().x(), we->getAbsPos().y());
-  radius = b.radius();
-  for( p = 0; p < 6; p++ )
-    if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )
-      return false;
-    return true;
-}
-
-void GL_Render::drawWireFrameQueue(bool select_mode) {
-  for (std::map<std::string, Queue>::const_iterator I = wireframe_queue.begin(); I != wireframe_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    std::string type = we->getType()->getName();
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      if (select_mode) nextColour(we->getID());
-      else glColor3f(1.0f, 1.0f, 1.0f);
-      glPushMatrix();
-      WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      WFMath::Quaternion q = we->getAbsOrient();
-      float o[4][4];
-      QuatToMatrix(q, o);
-      Models *wireframe = NULL;
-      ModelStruct *ms;
-      ms = _entity_models[we->getID()];
-      if (ms) {
-        wireframe = (WireFrame*)ms->models;
-      } else {
-        WFMath::AxisBox<3> bbox = we->getBBox();
-        if (!we->hasBBox()) {
-          WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-          WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-          bbox = WFMath::AxisBox<3>(lc, hc);
-        }
-        bbox = bboxCheck(bbox);
-	wireframe = new WireFrame(bbox);
-        ms = new ModelStruct();
-        ms->model_name = "wireframe";
-        ms->in_use = true;
-        if ((wireframe) && wireframe->init()) {
-          _entity_models[we->getID()] = ms;
-        } else {
-          if (wireframe) delete wireframe;
-          wireframe = NULL;
-	  // CANNOT DRAW ENTITY
-        }
-	ms->multi = NULL;
-        ms->model = NULL;
-        ms->models = wireframe;
-      }
-      if (!select_mode && we->getID() == activeID) {
-	active_name = we->getName();
-	glColor4fv(_halo_blend_colour);
-	if (checkState(RENDER_STENCIL)) {
-          glEnable(GL_STENCIL_TEST);
-          glStencilFunc(GL_ALWAYS, -1,1);
-          glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-          drawModel(wireframe);
-          glStencilFunc(GL_NOTEQUAL, -1,1);
-          drawModel(wireframe);
-          glDisable(GL_STENCIL_TEST);
-	} else {
-          drawModel(wireframe);
-	  glColor4fv(white);
-	}
-      } else {
-        drawModel(wireframe);
-      }
-      glPopMatrix();
-    }
-  }
-}
-
-void GL_Render::drawModel(Models *model) {
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
-  if (!model) {
-    Log::writeLog("No model!", Log::ERROR);
-    return;
-  }
-  if (!model->hasVertexData()) { 
-    Log::writeLog("Model has no data", Log::ERROR);
-    throw 1;
-    return; //Error
-  }
-//   if(model->getVertexData() == NULL){ Log::writeLog("Model has no data", Log::ERROR); return; }
-  glVertexPointer(3, GL_FLOAT, 0, model->getVertexData());
-  glEnableClientState(GL_VERTEX_ARRAY);
-  if (textures && model->hasTextureData()) {
-    glTexCoordPointer(2, GL_FLOAT, 0, model->getTextureData());
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  }
-  if (lighting && model->hasNormalData()) {
-    glNormalPointer(GL_FLOAT, 0, model->getNormalData());
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  switch (model->getType()) {
-    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
-    case (Models::POINT): glDrawArrays(GL_POINT, 0, model->getNumPoints()); break;
-    case (Models::LINES): glDrawArrays(GL_LINES, 0, model->getNumPoints()); break;
-    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, 0, model->getNumPoints()); break;
-    case (Models::QUADS): glDrawArrays(GL_QUADS, 0, model->getNumPoints()); break;
-    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, 0, model->getNumPoints()); break;
-    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, 0, model->getNumPoints()); break;
-    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, 0, model->getNumPoints()); break;
-    default: Log::writeLog("Unknown type", Log::ERROR); break;
-  }
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (lighting && model->hasNormalData()) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures && model->hasTextureData()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-}
 
 void GL_Render::readComponentConfig() {
   if (camera) camera->readConfig();
   if (terrain) terrain->readConfig();
 }
 
-void GL_Render::drawMultiModel(MultiModels *multimodel) {
-	glPushMatrix();
-  if (!multimodel) {
-    Log::writeLog("MultiModel is NULL", Log::ERROR);
-    return;
-//    throw Exception("NULL pointer");
+void GL_Render::translateObject(float x, float y, float z) {
+  glTranslatef(x, y, z);
+}
+
+void GL_Render::rotateObject(WorldEntity *we, int type) {
+  if (!we) return; // THROW ERROR;
+  switch (type) {
+    case Models::NONE: return; break;
+    case Models::NORMAL: {
+      WFMath::Quaternion q = we->getAbsOrient();
+      float rotation_matrix[4][4];
+      QuatToMatrix(q, rotation_matrix);
+      glMultMatrixf(&rotation_matrix[0][0]);
+      break;
+    }
+    case Models::BILLBOARD: 
+    case Models::HALO: {
+      float rotation_matrix[4][4];
+      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+      orient2 /= orient;
+      QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
+      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+      break;
+    }
   }
-//  Log::writeLog(string_fmt(multimodel->getNumModels()),Log::INFO);
-  for (unsigned int i = 0; i < multimodel->getNumModels(); i++) {
-    Models *m = multimodel->getModel(i);
-    if (m) drawModel(m);
-  }
-  glPopMatrix();
 }
 
 
-void GL_Render::drawModelsQueue(bool select_mode) {
-  std::string type, parent, id;
-  for (std::map<std::string, Queue>::const_iterator I = model3ds_queue.begin(); I != model3ds_queue.end(); I++) {
-    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-    type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
-    id = we->getID();
-    ObjectLoader *ol = _system->getObjectLoader();
-    ObjectProperties *op = NULL;
-    if (!type.empty()) op = ol->getObjectProperties(type);
-    if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-    if (op == NULL) op = ol->getObjectProperties("default");
-    std::string model_type = std::string(op->model_type);
+void GL_Render::setViewMode(int type) {
+//  Perspective
+//  Isometric
+//  Othographic
+
+
+}
+
+void GL_Render::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
+	return;
+  if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   (float[4])ambient);
+  if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   (float[4])diffuse);
+  if (specular)          glMaterialfv (GL_FRONT, GL_SPECULAR,  (float[4])specular);
+  if (shininess >= 0.0f) glMaterialf  (GL_FRONT, GL_SHININESS, shininess);
+  if (emissive)          glMaterialfv (GL_FRONT, GL_EMISSION,  (float[4])emissive);
+  else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
+}
+
+void GL_Render::renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
+  // TODO: Reduce ClientState switches
+  bool textures = checkState(RENDER_TEXTURES);
+  bool lighting = checkState(RENDER_LIGHTING);
+ 
+  if (!vertex_data) {
+	  Log::writeLog("No Vertex Data", Log::ERROR);
+	  return; //throw Exception(""); 
+  }
+  glVertexPointer(3, GL_FLOAT, 0, vertex_data);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  if (textures && texture_data) {
+    glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+  if (lighting && normal_data) {
+    glNormalPointer(GL_FLOAT, 0, normal_data);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
+
+  switch (type) {
+    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
+    case (Models::POINT): glDrawArrays(GL_POINT, 0, number_of_points); break;
+    case (Models::LINES): glDrawArrays(GL_LINES, 0, number_of_points); break;
+    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, 0, number_of_points); break;
+    case (Models::QUADS): glDrawArrays(GL_QUADS, 0, number_of_points); break;
+    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, 0, number_of_points); break;
+    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, 0, number_of_points); break;
+    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, 0, number_of_points); break;
+    default: Log::writeLog("Unknown type", Log::ERROR); break;
+  }
+ 
+  glDisableClientState(GL_VERTEX_ARRAY);
+  if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
+  if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+void GL_Render::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {
+  // TODO: Reduce ClientState switches
+  bool textures = checkState(RENDER_TEXTURES);
+  bool lighting = checkState(RENDER_LIGHTING);
+ 
+  if (!vertex_data) return; //throw Exception(""); 
+  glVertexPointer(3, GL_FLOAT, 0, vertex_data);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  if (textures && texture_data) {
+    glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  }
+  if (lighting && normal_data) {
+    glNormalPointer(GL_FLOAT, 0, normal_data);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
+
+  switch (type) {
+    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
+    case (Models::POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Models::QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    default: Log::writeLog("Unknown type", Log::ERROR); break;
+  }
+ 
+  glDisableClientState(GL_VERTEX_ARRAY);
+  if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
+  if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+unsigned int GL_Render::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
+  unsigned int texture = 0;
+ glGenTextures(1, &texture);
+  // TODO: Check for valid texture generation and return error
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  if (clamp) {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  }
+  glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
+  return texture;
+}
+
+void GL_Render::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
+  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-      WorldEntity *we = (WorldEntity*)*J;
-      id = we->getID();
-      ModelStruct *ms;
-      ms = _entity_models[type];
-      if (ms) {
-        //Do nothing
-      } else {
-        Log::writeLog("BUilding new 3ds model",Log::INFO);
-        Model_3ds *model = new Model_3ds();
-        ms = new ModelStruct();
-        ms->model_name = model_type;
-        ms->in_use = true;
-	Log::writeLog(System::instance()->getModel()->getAttribute(type),Log::INFO);
-        if ((model) && model->init() && model->loadModel(System::instance()->getModel()->getAttribute(type))) {
-        _entity_models[type] = ms;
-	} else {
-          if (model) delete model;
-	  model = NULL;
-	}
-        ms->multi = model;
-	ms->model = NULL;
-	ms->models = NULL;
+
+      WorldEntity *we = (WorldEntity *)*J;
+      std::string type = we->type();
+      // Get model
+      Models *model = mh->getModel(we);
+      if (!model) {
+        // ERROR GETTING MODEL
+	Log::writeLog("Trying to render NULL model", Log::ERROR);
+        continue;
       }
-      if (select_mode) nextColour(we->getID());
-      else glColor4fv(white);
+      glEnable(GL_TEXTURE_2D);
+      if (!model->useTextures()) glDisable(GL_TEXTURE_2D);
       glPushMatrix();
+      // Translate Model
       WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-//      WFMath::Quaternion q = we->getAbsOrient();
-//      float o[4][4];
-//      QuatToMatrix(q, o);
-//      glMultMatrixf(&o[0][0]);
-      if (ms->multi) {
-        if (!select_mode && we->getID() == activeID) {
-/*	active_name = we->getName();
-	  stateChange(HALO);
-	  if (checkState(RENDER_STENCIL)) {
-            glEnable(GL_STENCIL_TEST);
-  	    glStencilFunc(GL_ALWAYS, -1, 1);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glPushMatrix();
-            drawMultiModel(ms->multi);
-	    glPopMatrix();
-	    glStencilFunc(GL_NOTEQUAL, -1, 1);
-            glColor4fv(_halo_blend_colour);
-	    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	    drawMultiModel(ms->multi);
-	    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glDisable(GL_STENCIL_TEST);
-            glColor4fv(white);
-	  } else {
-	    glColor4fv(_halo_blend_colour);
-	    drawMultiModel(ms->multi);
-	    glColor4fv(white);
-	  }
-	 stateChange(CHARACTERS); 
-	 */
-	} else {
-//	  ((Model_3ds*)ms->multi)->render()
-          drawMultiModel(ms->multi);
-//	    drawMultiModel(ms->multi);
-	}
-      } else {
-        // Else downgrade model type
-        strncpy(op->model_type,"bbox\0", 5);
-	continue;
-      }
+      translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+     
+      // Rotate Model
+      
+      // TODO: Is this broken or is it to do with the server?
+      if (model->rotationStyle()) rotateObject(we, model->rotationStyle());
+
+      // Scale Object
+      float scale = model->getScale();
+      glScalef(scale, scale, scale);
+      // Update Model
+      model->update(time_elapsed);
+
+      // Draw Model
+      // TODO: These needs to be done automatically
+      glDisable(GL_CULL_FACE);
+      glDisable(GL_LIGHTING);
+      model->render(select_mode);
       glPopMatrix();
+      if (!model->useTextures()) glEnable(GL_TEXTURE_2D);
     }
   }
 }

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "ModelLoader.h"
+
 #include "System.h"
 #include "cmd.h"
 #include "Console.h"

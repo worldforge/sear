@@ -13,16 +13,18 @@
 
 namespace Sear {
 
+// Static Declarations	
 std::map<int, std::string> Bindings::keymap = std::map<int, std::string>();
 Config *Bindings::_bindings = NULL;
 
 void Bindings::init() {
-  _bindings = new Config();
-  initKeyMap();
+  _bindings = new Config(); // Create a new config object to store data in
+  initKeyMap(); // Initilise key mappings
 }
 
 void Bindings::initKeyMap() {
-  keymap = std::map<int, std::string>();
+  keymap = std::map<int, std::string>(); // Create an empty mapping
+  // Assign keys to textual representation
   keymap[SDLK_BACKSPACE] = "{BACKSPACE}";
   keymap[SDLK_TAB] = "{TAB}";
   keymap[SDLK_CLEAR] = "{CLEAR}";
@@ -165,48 +167,54 @@ void Bindings::shutdown() {
     delete _bindings;
     _bindings = NULL;
   }
-  // Delete keymap
+  // Delete keymap - is this necessary?
   while (!keymap.empty()) {
     keymap.erase(keymap.begin());
   }
 }
 
 void Bindings::loadBindings(const std::string &file_name) {
+  // Merges key bindings file, file_name with existing contents
   if (_bindings) _bindings->loadConfig(file_name);
   else std::cerr << "Bindings: Error - bindings config object not created" << std::endl;
 }
 
 void Bindings::saveBindings() {
+  // Save current key bindings to last used file name
   if (_bindings) _bindings->saveConfig();
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 void Bindings::saveBindings(const std::string &file_name) {
+  // Save current key bindings to file_name
   if (_bindings) _bindings->saveConfig(file_name);
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 
 void Bindings::bind(std::string key, std::string command) {
-  if (key.empty()) return;
-  if (command.empty()) command = "{UNBOUND}";
-  if (_bindings) _bindings->setAttribute(key, command);
+  if (key.empty()) return; // Check we were sent a key
+  if (command.empty()) command = "{UNBOUND}"; // If command is empty we are unbinding the key. Need some text to avoid empty string
+  if (_bindings) _bindings->setAttribute(key, command); // Store new binding
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 
 std::string Bindings::idToString(int key) {
+  // Return the key mapping.
   return keymap[key];
 }
 
 std::string Bindings::getBinding(std::string key) {
+  // Check if bindings object has been created
   if (!_bindings) {
     Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
     return "";
   }
+  // Retrive current binding
   std::string cmd = _bindings->getAttribute(key);
-  if (cmd.empty()) {
+  if (cmd.empty()) { // Retrieved command should not be the empty string
     _bindings->setAttribute(key, "{UNBOUND}");
     return "";
   }
-  return cmd;
+  return cmd; // Return retrieved binding
 }
 
 

@@ -1,12 +1,15 @@
 bin_PROGRAMS = sear
 
+sear_LDADD = \
+	../loaders/libLoaderWireFrame.a \
+	../loaders/libLoaderBoundBox.a \
+	../loaders/libLoaderBillBoard.a \
+	../loaders/libLoaderImpostor.a \
+	../loaders/libLoaderCal3d.a 
+
 sear_SOURCES = \
-	BillBoard.cpp \
-	BillBoard.h \
 	Bindings.cpp \
 	Bindings.h \
-	BoundBox.cpp \
-	BoundBox.h \
 	Camera.cpp \
 	Camera.h \
 	Character.cpp \
@@ -21,8 +24,6 @@ sear_SOURCES = \
 	Console.cpp \
 	Console.h \
 	cursors.h \
-	Error.cpp \
-	Error.h \
 	Event.cpp \
 	Event.h \
 	EventHandler.cpp \
@@ -31,15 +32,11 @@ sear_SOURCES = \
 	Factory.h \
 	GL_Render.cpp \
 	GL_Render.h \
-	Impostor.cpp \
-	Impostor.h \
 	Landscape.cpp \
 	Landscape.h \
 	Log.cpp \
 	Log.h \
 	main.cpp \
-	model.cpp \
-	model.h \
 	Models.h \
 	MultiModels.h \
 	ObjectLoader.h \
@@ -55,11 +52,8 @@ sear_SOURCES = \
 	Terrain.h \
 	Utility.cpp \
 	Utility.h \
-	WireFrame.cpp \
-	WireFrame.h \
 	WorldEntity.cpp \
 	WorldEntity.h \
-	3ds.cpp \
-	3ds.h \
-	3dsMesh.cpp \
-	3dsMesh.h \
+	ModelHandler.cpp \
+	ModelHandler.h \
+	ModelLoader.h 

@@ -1,3 +1,8 @@
+5th July 2002, Simon Goodall
+ * Improved 3ds model loader - now adds in normal and texture data if possible. (CURRENTLY NOT IN NEW MODEL INTERFACE)
+ * Improved comments in some header files
+ * Introduced New model loading interface. Specific model type are in sear/loaders. Main code only knows about Models and ModelLoader interfaces. As such models currently do not load as required
+ 
 3rd July 2002, Simon Goodall
  * Removed some redundant rendering code
  * Added base for 3ds model loader - currently only loads mesh
@@ -6,7 +11,7 @@
  * ISO C++ compliance fixes.
 
 1st July 2002, Simon Goodall
- * Log applied to Bindings, Camerai, Character, Config, Console, Event, GL_Render, Model, Object Loader, SkyBox, System, Terrain and WorldEntity classes.
+ * Log applied to Bindings, Camera, Character, Config, Console, Event, GL_Render, Model, Object Loader, SkyBox, System, Terrain and WorldEntity classes.
  * debug.h removed as will be encapsulated in Log class
  * System re-order fixed.
  * Now use WFMath's Pi instead of system defined

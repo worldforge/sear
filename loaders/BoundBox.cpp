@@ -3,17 +3,21 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "BoundBox.h"
+#include "../src/GL_Render.h"
+
+#include <iostream>
 
 namespace Sear {
 
-BoundBox::BoundBox(WFMath::AxisBox<3> bbox, bool wrap) :
-  _bbox(bbox),
-  _wrap(wrap)
+BoundBox::BoundBox() :
+  _type("default"),
+  _use_textures(true)
 {}
 
 BoundBox::~BoundBox() {}
   
-bool BoundBox::init() {
+bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wrap) {
+  _type = type;
   _vertex_data[0][0] = _bbox.lowCorner().x(); _vertex_data[0][1] = _bbox.highCorner().y(); _vertex_data[0][2] = _bbox.lowCorner().z();
   _vertex_data[1][0] = _bbox.lowCorner().x(); _vertex_data[1][1] = _bbox.lowCorner().y(); _vertex_data[1][2] = _bbox.lowCorner().z();
   _vertex_data[2][0] = _bbox.highCorner().x(); _vertex_data[2][1] = _bbox.lowCorner().y(); _vertex_data[2][2] = _bbox.lowCorner().z();
@@ -135,4 +139,10 @@ void BoundBox::shutdown() {
 
 }
 
+void BoundBox::render(bool) {
+  GL_Render::instance()->switchTexture(GL_Render::instance()->requestTexture(_type));
+  GL_Render::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+
 }
+
+} /* namespace Sear */

@@ -5,25 +5,39 @@
 #ifndef _LOG_H_
 #define _LOG_H_ 1
 
+/*
+ * This class handles all text i/o
+ * Currently only a basic implementation, future
+ * work should build on this base and be able to 
+ * distinguish between Log types
+ */ 
+
 #include <string>
 
 namespace Sear {
-
 	
 class Log {
 public:
-typedef enum {
-  DEFAULT = 0,
-  ERROR,
-  WARNING,
-  METHOD_ENTRY,
-  METHOD_EXIT,
-  POSITION,
-  ERIS,
-  INFO
-} LogLevel;
+  /*
+   * This enumerates the different log entry types
+   */
+  typedef enum {
+    DEFAULT = 0,
+    ERROR,
+    WARNING,
+    METHOD_ENTRY,
+    METHOD_EXIT,
+    POSITION,
+    ERIS,
+    INFO
+  } LogLevel;
 
-  static void writeLog(const std::string &, LogLevel);
+  /*
+   * This method records an entry into the relevant log location
+   */ 
+  static void writeLog(const std::string &log_entry, LogLevel type);
+  
+  // TODO: add ability to redirect each Log type to a different file
   
 protected:
 };

@@ -40,6 +40,9 @@ public:
  void renderMessages();
  void displayInfo();
 
+ std::string type();
+ std::string parent();
+
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
   unsigned int time;

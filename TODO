@@ -1,10 +1,18 @@
+Convert 3ds code to new format
+Determine why some characters are not properly rotated 
+Re-implement Object Selected
+Re-implement Model un-loading
+Re-implement per type models
+Re-write Render.h based on new usage
+Create a default built-in texture to use if others do not exist
+Re-implement model type conversion / downgrading
+
+
  * Add a stand alone option
  * Add a command history
- * Add Model loader for 3D packages e.g. 3ds -> loader will return a model object
  * Check for OpenGL hardware -> ie if vendor == NONE report error
  * In game menu for configuration
  * Improve memory usage
- * Colour cursors
  * Add a BSP tree or equivalent
  * Set system to "register" console commands.
    - Have a map,  <std::string, void *> where arg 2 is a function pointer.
@@ -13,14 +21,27 @@
  * Update configure + autogen to provide better help. -> IE if not found, goto www...
  * Move OpenGL code into one object
  * Make OpenGL Render class a plugin
- * Add a sky dome
  * Add a better GUI
  * Add Meta Server support
  * Add model loading support - via plugins?
- * Add Stage support
  * Add collision etection
- * Add sound / music effects
  * Improve terrain engine
  * Allow mulitple terrains
  * Add support to create custom font textures from say freetype
 
+ * Build in an option in the render to make a model a billboard. IE take existing billboard code and put into a separate method.
+
+ * Add a sky dome
+   Use the new MultiModels interface to specify a sphere as a multimodel. Each layer of the sphere will be one model. The top and bottom layers of a sphere can be made using triangle fans, the intermediate layer can use triangle striping.
+   Remainder of code is to apply textures to a series of spheres.
+
+ * Add Stage support
+   Check format of Atlas messages. 
+
+ * Colour cursors
+   Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors could be implemented by telling SDL to hide the cursor and instead blitting a texture to the scene as the last object using OpenGL based cursor position. Cursor position may be easily obtainable from a method, or else you need to use the SDL MouseMove event to keep track of move mousements and store the cursor position somewhere.
+
+ * Add sound / music effects
+   SDL has built in sound effects, and addon libraries for additional support. Sound support should be added to the  System class and provide functions to play a specific sound, or music track. These should also be available through the console.
+
+ * Move BoundBox, BillBoard, Impostor and WireFrame data passed into constructor into init function. This way we no longer need to store data only required for init function.

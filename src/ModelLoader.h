@@ -14,6 +14,8 @@
 
 #include <string>
 
+class ObjectProperties;
+
 namespace Sear {
 
 // Forward Declarationa
@@ -28,7 +30,8 @@ public:
   virtual void init() {}
   virtual void shutdown() {}
   
-  virtual Models *loadModel(WorldEntity *we, const std::string &data_source) = 0;
+  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) { return 0; }
+  
   
 };
 

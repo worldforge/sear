@@ -3,17 +3,22 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "BillBoard.h"
+#include "../src/GL_Render.h"
 
 namespace Sear {
 
-BillBoard::BillBoard(float width, float height) :
-  _width(width),
-  _height(height)
+BillBoard::BillBoard() :
+	// TODO: Should be set to false UNLESS a texture can be loaded
+  _use_textures(true)
 {}
 
 BillBoard::~BillBoard() {}
   
-bool BillBoard::init() {
+bool BillBoard::init(const std::string &type, float _width, float _height) {
+  _type = type;
+  if (!_height) _height = 2.0f;
+  if (!_width) _width = 2.0f;
+  // Calculate billboard data
   float width_by_2 = _width / 2.0f;
   _vertex_data[0][0] = -width_by_2; _vertex_data[0][1] = 0.0f; _vertex_data[0][2] = 0.0f;
   _vertex_data[1][0] = -width_by_2; _vertex_data[1][1] = 0.0f; _vertex_data[1][2] = _height;
@@ -33,7 +38,12 @@ bool BillBoard::init() {
 }
 
 void BillBoard::shutdown() {
+}
+
+void BillBoard::render(bool) {
+  GL_Render::instance()->switchTexture(GL_Render::instance()->requestTexture(_type));
+  GL_Render::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
 }
 
-}
+} /* namespace Sear */

@@ -123,6 +123,7 @@ if test $cross_compiling == no; then
   AC_CHECK_LIB(SDL_image,IMG_Load)
   AC_CHECK_LIB(GL,glViewport)
   AC_CHECK_LIB(GLU,gluPerspective)
+  AC_CHECK_LIB(glut, glutSwapBuffers)
   AC_CHECK_LIB(cal3d,main)
 
 else 
@@ -188,6 +189,7 @@ dnl Generate files
 AC_OUTPUT([
 	Makefile
 	src/Makefile
+	loaders/Makefile
 	sear.spec
 	data/bindings.cfg
 	data/general.cfg
@@ -197,4 +199,5 @@ AC_OUTPUT([
 	scripts/startup.script
 	scripts/shutdown.script
 	Sear.iss
+	tools/Makefile
 ])

@@ -11,14 +11,27 @@
 #include "System.h"
 #include "Config.h"
 #include "ObjectLoader.h"
-#include <Eris/TypeInfo.h>
+
+#include "../loaders/Cal3d_Loader.h"
+#include "../loaders/BoundBox_Loader.h"
+#include "../loaders/BillBoard_Loader.h"
+#include "../loaders/WireFrame_Loader.h"
+#include "../loaders/Impostor_Loader.h"
 
 namespace Sear {
 
 ModelHandler::ModelHandler() :
   _model_loaders(std::map<std::string, ModelLoader*>()),
   _models(std::map<std::string, Models*>())	
-{}
+{
+  // TODO: this is not the place
+  new Cal3d_Loader(this);
+  new BoundBox_Loader(this);
+  new BillBoard_Loader(this);
+  new WireFrame_Loader(this);
+  new Impostor_Loader(this);
+
+}
 
 ModelHandler::~ModelHandler() {}
 
@@ -36,8 +49,8 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   
   // Get model details
   // TODO: find out whether typeinfo will ever be more than two layers
-  std::string type = we->getType()->getName();
-  std::string parent = *we->getType()->getParentsAsSet().begin();
+  std::string type = we->type();
+  std::string parent = we->parent();
   std::string id = we->getID();
 
   // If entity already has an associated model, return it.
@@ -64,8 +77,10 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   model_type = op->model_type;		
   
   std::string data_source = System::instance()->getModel()->getAttribute(type);
+  if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute(parent);
+  if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute("default");
   Models *model = NULL;
-  if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, data_source);
+  if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, op, data_source);
   else ; // Ignore error 
   _models[id] = model;
   

@@ -141,20 +141,28 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
 void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Entity ID: ") + getID(), Log::DEFAULT);
   Log::writeLog(std::string("Entity Name: ") + getName(), Log::DEFAULT);
-  std::string type = getType()->getName();
-  std::string parent_type = *this->getType()->getParentsAsSet().begin();
-  Log::writeLog(std::string("Type: ") + type, Log::DEFAULT);
-  Log::writeLog(std::string("Parent Type: ") + parent_type, Log::DEFAULT);
+  Log::writeLog(std::string("Type: ") + type(), Log::DEFAULT);
+  Log::writeLog(std::string("Parent Type: ") + parent(), Log::DEFAULT);
   WFMath::Point<3> pos = GetPos();
   Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::DEFAULT);
   Eris::Entity *e = getContainer();
   Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::DEFAULT);
   Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::DEFAULT);
+  Log::writeLog(std::string("Has Bounding Box: ") + string_fmt(hasBBox()), Log::DEFAULT);
   WFMath::AxisBox<3> bbox = getBBox();
   Log::writeLog(std::string("Ux: ") + string_fmt(bbox.lowCorner().x()) + std::string(" Uy: ") + string_fmt(bbox.lowCorner().y()) + std::string(" Uz: ") + string_fmt(bbox.lowCorner().z()), Log::DEFAULT);
   Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::DEFAULT);
   Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::DEFAULT);
   Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::DEFAULT);
+}
+
+std::string WorldEntity::type() {
+  return getType()->getName();
+  
+}
+
+std::string WorldEntity::parent() {
+  return *getType()->getParentsAsSet().begin();
 }
 
 } /* namespace Sear */

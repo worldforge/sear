@@ -24,14 +24,15 @@ class SkyBox;
 class Camera;
 class WorldEntity;
 class Client;
-class Model;
+//class Model;
 class Character;
 class BoundBox;
 class BillBoard;
 class Impostor;
 class WireFrame;
 class Models;
-class MultiModels;
+//class MultiModels;
+class ModelHandler;
 
 class GL_Render : public Render {
 
@@ -63,25 +64,23 @@ public:
   void initModels();
   GLuint getTextureID(int texture_id);
   static GL_Render *instance() { return _instance; }
- void buildColourSet();
+  void buildColourSet();
   void drawScene(const std::string &,bool);
-  void drawModel(Models*);
-  void drawMultiModel(MultiModels*);
   void drawTextRect(int, int, int, int, int);
   void stateChange(State);
-  void extractFrustum();
-  int CubeInFrustum(WorldEntity *);
-  bool SphereInFrustum(WorldEntity *);
-  int patchInFrustum(WFMath::AxisBox<3>);
   float distFromNear(float,float,float);  
-void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
-	  
-  bool PointInFrustum(float, float, float);
+  void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
+
+  int patchInFrustum(WFMath::AxisBox<3>);
+  
   void procEvent(int, int);
   int getWindowWidth() { return window_width; }
   int getWindowHeight() { return window_height; }
 
   void switchTexture(int texture) { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
+  void switchTextureID(unsigned int texture) { glBindTexture(GL_TEXTURE_2D, texture);}
+
+  
   std::string getActiveID() { return activeID; }
   void setCallyMotion(float, float, float);
   void setCallyState(int);
@@ -89,18 +88,31 @@ void setColour(float red, float green, float blue, float alpha) { glColor4f(red,
   Camera* getCamera() { return camera; }
   Terrain* getTerrain() { return terrain; }
   SkyBox* getSkyBox() { return skybox; }
-  void processObjectProperties(ObjectProperties *);
-  void checkModelStatus(const std::string &);
-  void setModelInUse(const std::string &, bool);
+  void checkModelStatus(const std::string &) {}
+  void setModelInUse(const std::string &, bool) {}
   void buildDisplayLists();
 
   void readConfig();
   void writeConfig();
   void nextState(int);
   void setupStates();
-void readComponentConfig();
+  void readComponentConfig();
 
   float getLightLevel() { return _light_level; }
+
+
+  void translateObject(float x, float y, float z);
+  void rotateObject(WorldEntity *we, int type);
+  void setViewMode(int type);
+  void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
+  void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
+  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
+  unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
+  void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
+
+  static WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox);
+
+  
 protected:
   System *_system;
   int window_width;
@@ -135,7 +147,7 @@ protected:
   Camera *camera;
   
   Client *client;
-  Model *player_model;
+  Models *player_model;
   
   int num_frames;
   float frame_time;
@@ -144,29 +156,20 @@ protected:
   std::map<std::string, Queue> billboard_queue;
   std::map<std::string, Queue> imposter_queue;
   std::map<std::string, Queue> wireframe_queue;
-  std::map<std::string, Queue> model3ds_queue;
 
   void buildQueues(WorldEntity*, int);
-  void drawModelQueue(bool);
-  void drawRenderQueue(bool);
-  void drawBBoardQueue(bool);
-  void drawImpostorQueue(bool);
-  void drawMessageQueue(bool);
-  void drawWireFrameQueue(bool);
-  void drawModelsQueue(bool);
   
   float frame_rate;
   float model_detail;
 
   WFMath::Quaternion orient;
-  WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox);
  
   typedef struct {
     std::string model_name;
     bool in_use;
-    Model *model;
+//    Model *model;
     Models *models;
-    MultiModels *multi;
+//    MultiModels *multi;
   } ModelStruct;
 
   std::map<std::string, ModelStruct*> _entity_models;
@@ -239,6 +242,9 @@ protected:
   
   static float _halo_blend_colour[4];// = {0.0f, 0.0f, 1.0f, 0.4f};
   static float _halo_colour[3];// = {0.0f, 0.0f, 1.0f};
+
+
+  ModelHandler *mh;
 private:
   // Consts
   static const int sleep_time = 5000;

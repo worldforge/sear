@@ -4,15 +4,15 @@
 
 #include "WireFrame.h"
 
+#include "../src/GL_Render.h"
+
 namespace Sear {
 
-WireFrame::WireFrame(WFMath::AxisBox<3> bbox) :
-  _bbox(bbox)
-{}
+WireFrame::WireFrame() {}
  
 WireFrame::~WireFrame() {}
   
-bool WireFrame::init() {
+bool WireFrame::init(WFMath::AxisBox<3> _bbox) {
   _vertex_data[0][0] = _bbox.lowCorner().x(); _vertex_data[0][1] = _bbox.highCorner().y(); _vertex_data[0][2] = _bbox.lowCorner().z();
   _vertex_data[1][0] = _bbox.lowCorner().x();_vertex_data[1][1] = _bbox.lowCorner().y(); _vertex_data[1][2] = _bbox.lowCorner().z();
 
@@ -76,7 +76,10 @@ bool WireFrame::init() {
 }
 
 void WireFrame::shutdown() {
+}
 
+void WireFrame::render(bool) {
+  GL_Render::instance()->renderArrays(Models::LINES, _num_points, &_vertex_data[0][0], NULL, NULL);
 }
 
 } /* namespace Sear */
