@@ -1,3 +1,5 @@
+memleaks.log
+memory.log
 Makefile
 Makefile.in
 Sear.iss
