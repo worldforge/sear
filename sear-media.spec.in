@@ -1,0 +1,47 @@
+%define name sear-media
+%define version @VERSION@
+%define release 1
+
+#define a default prefix??
+
+Summary: Sear Media Pack
+Name: %{name}
+Version: %{version}
+Release: %{release}
+Source0: %{name}-%{version}.tar.gz
+URL: http://www.worldforge.org/dev/eng/clients/sear/
+Copyright: GPL
+Group: Games
+BuildRoot: /var/tmp/%{name}-buildroot
+Prefix: %{_prefix}
+
+%description
+Sear is a client for MMORPGs using the Worldforge system.
+This is the media pack for sear
+
+written by Simon Goodall <sear@simongoodall.co.uk>
+
+%prep
+rm -rf ${RPM_BUILD_ROOT}
+
+%setup -q 
+
+%build
+
+%install
+cd ..
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT%{prefix}/share/$PACKAGE@
+cp -R media.script %{name}-%{version} $RPM_BUILD_ROOT%{prefix}/share/@PACKAGE@
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+%{prefix}/share/@PACKAGE@/media.script
+%{prefix}/share/@PACKAGE@/%{name}-%{version}/*
+%doc README GPL_License.txt GFDL_License.txt 
+
+
+# end of file
