@@ -2,10 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Lobby.cpp,v 1.7 2002-10-21 20:09:59 simon Exp $
+// $Id: Lobby.cpp,v 1.8 2002-12-23 17:29:35 simon Exp $
 
 #include "Lobby.h"
-#include <iostream.h>
+#include <iostream>
 #include "Console.h"
 
 #ifdef DEBUG
@@ -59,7 +59,7 @@ void Lobby::render() {
 
 
 void Lobby::privateChat(const std::string &src, const std::string &msg) {
-  std::cout << src << ": " << msg << endl;
+  std::cout << src << ": " << msg << std::endl;
 }
 
 void Lobby::Entered(Eris::Room *room) {
@@ -67,19 +67,19 @@ void Lobby::Entered(Eris::Room *room) {
 }
 
 void Lobby::Talk(Eris::Room *room, const std::string &who, const std::string &speech) {
-  std::cout << "Talk: " << room->getName() << ": " << who << ": " << speech << endl;
+  std::cout << "Talk: " << room->getName() << ": " << who << ": " << speech << std::endl;
 }
 
 void Lobby::Emote(Eris::Room *room, const std::string&who, const std::string&emote) {
-  std::cout << "Emote: " << room->getName() << ": " << who << ": " << emote << endl;
+  std::cout << "Emote: " << room->getName() << ": " << who << ": " << emote << std::endl;
 }
 
 void Lobby::Appearance(Eris::Room*room, const std::string&str) {
-  std::cout << "Appearance: " << room->getName() << ": " << str <<  endl;
+  std::cout << "Appearance: " << room->getName() << ": " << str <<  std::endl;
 }
 
 void Lobby::Disappearance(Eris::Room* room, const std::string&str) {
-  std::cout << "Disappearance: " << room->getName() << ": " << str <<  endl;
+  std::cout << "Disappearance: " << room->getName() << ": " << str <<  std::endl;
 }
 
 void Lobby::Changed(const Eris::StringSet &ss) {

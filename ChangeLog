@@ -1,4 +1,7 @@
 22nd December 2002, Simon Goodall
+ * fixes for ISO c++
+
+22nd December 2002, Simon Goodall
  * configure.in changes to remove warnings on newer autoconf versions
  * acconfig.h no longer required
 
