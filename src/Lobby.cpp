@@ -1,10 +1,26 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2002 Simon Goodall
+
+// $Id: Lobby.cpp,v 1.5 2002-09-08 00:24:53 simon Exp $
+
 #include "Lobby.h"
 #include <iostream.h>
 #include "Console.h"
 
 namespace Sear {
 
+Lobby::Lobby() :
+  _lobby(NULL),
+  _initialised(false)
+{}
+
+Lobby::~Lobby() {
+  if (_initialised) shutdown();
+}
+	
 void Lobby::init(Eris::Lobby *lobby) {
+  if (_initialised) shutdown();
   _lobby = lobby;
   _lobby->PrivateTalk.connect(SigC::slot(*this, &Lobby::privateChat));
   _lobby->Entered.connect(SigC::slot(*this, &Lobby::Entered));
@@ -13,6 +29,7 @@ void Lobby::init(Eris::Lobby *lobby) {
   _lobby->Appearance.connect(SigC::slot(*this, &Lobby::Appearance));
   _lobby->Disappearance.connect(SigC::slot(*this, &Lobby::Disappearance));
   _lobby->Changed.connect(SigC::slot(*this, &Lobby::Changed));
+  _initialised = true;
 }
 
 void Lobby::say(const std::string &speech) {
@@ -20,18 +37,14 @@ void Lobby::say(const std::string &speech) {
 }
 
 void Lobby::emote(const std::string &speech) {
-	try {
   _lobby->emote(speech);
-	} catch (...) {
-  cerr << "BUGGER" << endl;
-	}
 }
 void Lobby::sayPrivate(const std::string &speech, const std::string &to) {
   
 }
 
 void Lobby::shutdown() {
-
+  _initialised = false;
 }
 
 void Lobby::render() {

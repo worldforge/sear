@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $id: $
+
 #include <string>
 #include <stdlib.h>
 
@@ -24,17 +26,16 @@ ROAM::ROAM(System *system, Render *renderer) :
   last_time(0.0f),
   gLand(NULL),
   _system(system),
-  _renderer(renderer)
+  _renderer(renderer),
+  _initialised(false)
 {}
 
 ROAM::~ROAM() {
-  if (hMap) {
-    free(hMap);
-    hMap = NULL;
-  }
+  if (_initialised) shutdown();
 }
 
 bool ROAM::init() {
+  if (_initialised) shutdown();
   readConfig();
   loadHeightMap();
   gLand = new Landscape(_renderer, this);
@@ -47,6 +48,7 @@ bool ROAM::init() {
     return false;
   }
   Landscape::waterlevel = _water_level;
+  _initialised = true;
   return true;
 }
 
@@ -63,6 +65,7 @@ void ROAM::shutdown() {
     free(hMap);
     hMap = NULL;
   }
+  _initialised = false;
 }
 
 void ROAM::draw() {

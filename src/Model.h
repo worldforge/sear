@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _MODEL_H_
-#define _MODEL_H_ 1
+//$Id: Model.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_MODEL_H
+#define SEAR_MODEL_H 1
 
 #include <map>
 #include <string>
@@ -53,4 +55,4 @@ private:
 
 } /* namespace Sear */
 
-#endif /* _MODEL_H_ */
+#endif /* SEAR_MODEL_H */

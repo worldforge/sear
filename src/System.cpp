@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: System.cpp,v 1.32 2002-09-08 00:24:53 simon Exp $
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -57,7 +59,8 @@ System::System() :
   _console(NULL),
   _character(NULL),
   _prefix_cwd(false),
-  _system_running(false)
+  _system_running(false),
+  _initialised(false)
 {
   int i;
   _instance = this;
@@ -66,9 +69,12 @@ System::System() :
 }
 
 System::~System() {
+  if (_initialised) shutdown();
 }
 
+
 bool System::init() {
+  if (_initialised) shutdown();
   if (!initVideo()) return false;
   _event_handler = new EventHandler(this);
   _model_handler = new ModelHandler();
@@ -157,6 +163,7 @@ bool System::init() {
 
   
   _command_history_iterator = _command_history.begin();
+  _initialised = true;
   return true;
 }
 
@@ -230,6 +237,7 @@ void System::shutdown() {
     delete sound;
   }
   SDL_Quit();
+  _initialised = false;
 }
 
 bool System::initVideo() {

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _GRAPHICS_H_
-#define _GRAPHICS_H_ 1
+// $Id: Graphics.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_GRAPHICS_H
+#define SEAR_GRAPHICS_H 1
 
 #include <string>
 #include <list>
@@ -103,6 +105,7 @@ protected:
   float _upper_frame_rate_bound;
 
   float frustum[6][4];
+  bool _initialised;
   
 private:
   // Consts
@@ -129,4 +132,4 @@ private:
 
 } /* namespace Sear */
 
-#endif /* _GRAPHICS_H_ */
+#endif /* SEAR_GRAPHICS_H */

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _STATELOADER_H_
-#define _STATELOADER_H_ 1
+// $Id: StateLoader.h,v 1.5 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_STATELOADER_H
+#define SEAR_STATELOADER_H 1
 
 #include <string>
 #include <stdio.h>
@@ -30,8 +32,8 @@ typedef struct {
 
 class StateLoader {
 public:
-  StateLoader() {}
-  ~StateLoader() {}
+  StateLoader();
+  ~StateLoader();
 
   void init();
   void shutdown();
@@ -46,8 +48,9 @@ public:
 
 protected:
   std::map<std::string, StateProperties*> _state_properties;
+  bool _initialised;
 
 };
 
 } /* namespace Sear */
-#endif /* _STATELOADER_H_ */
+#endif /* SEAR_STATELOADER_H */

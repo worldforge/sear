@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Landscape.cpp,v 1.5 2002-09-08 00:24:54 simon Exp $
+
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
 #include "src/System.h"

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _MODELLOADER_H_
-#define _MODELLOADER_H_ 1
+// $Id: ModelLoader.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_MODELLOADER_H
+#define SEAR_MODELLOADER_H 1
 
 /*
  * The Model Loader Interface is designed for use with
@@ -29,8 +31,6 @@ public:
   virtual void init() {}
   virtual void shutdown() {}
 
-  // TODO: why did =0; suddenly stop working?
-  // TODO: reduce  range of args
   virtual Model *loadModel(Render *, ModelStruct &) = 0;
   
   
@@ -38,4 +38,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _MODELLOADER_H_ */
+#endif /* SEAR_MODELLOADER_H */

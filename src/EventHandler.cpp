@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: EventHandler.cpp,v 1.3 2002-09-08 00:24:53 simon Exp $
+
 #include "EventHandler.h"
 #include "Event.h"
 #include "System.h"

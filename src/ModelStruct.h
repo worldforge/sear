@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef MODELSTRUCT_H
-#define MODELSTRUCT_H 1
+// $Id: ModelStruct.h,v 1.4 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_MODELSTRUCT_H
+#define SEAR_MODELSTRUCT_H 1
 
 #include <wfmath/axisbox.h>
 
@@ -27,4 +29,4 @@ typedef struct {
 
 } /* namespace Sear */
 	
-#endif /* MODELSTRUCT_H */
+#endif /* SEAR_MODELSTRUCT_H */

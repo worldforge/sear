@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _CURSORS_H_
-#define _CURSORS_H_ 1
+// $Id: cursors.h,v 1.2 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_CURSORS_H
+#define SEAR_CURSORS_H 1
 
 #define CURSOR_DEFAULT arrow
 #define CURSOR_PICKUP pickup
@@ -144,4 +146,4 @@ static const char *touch[] = {
 };
 
 
-#endif /* _CURSORS_H_ */
+#endif /* SEAR_CURSORS_H */

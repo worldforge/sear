@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _EVENTHANDLER_H_
-#define _EVENTHANDLER_H_ 1
+// $Id: EventHandler.h,v 1.4 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_EVENTHANDLER_H
+#define SEAR_EVENTHANDLER_H 1
 
 #include <list>
 
@@ -30,4 +32,4 @@ protected:
 };
 
 } /* namespace Sear */
-#endif /* _EVENTHANDLER_H_ */
+#endif /* SEAR_EVENTHANDLER_H */

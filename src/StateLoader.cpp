@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: StateLoader.cpp,v 1.7 2002-09-08 00:24:53 simon Exp $
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,14 +13,25 @@
 
 namespace Sear {
 
+StateLoader::StateLoader() :
+  _initialised(false)
+{}
+	
+StateLoader::~StateLoader() {
+  if (_initialised) shutdown();
+}
+
 void StateLoader::init() {
+  if (_initialised) shutdown();
   Log::writeLog("State Loader: Initialising.", Log::LOG_DEFAULT);
   _state_properties = std::map<std::string, StateProperties*>();
   StateProperties *sp = (StateProperties*)malloc(sizeof(StateProperties));
   memset(sp, 0, sizeof(StateProperties));
   strcat(sp->state, "default\0");
   _state_properties["default"] = sp;
+  _initialised = true;
 }
+
 
 void StateLoader::shutdown() {
   Log::writeLog("State Loader: Shutting Down", Log::LOG_DEFAULT);
@@ -27,6 +39,7 @@ void StateLoader::shutdown() {
     if (_state_properties.begin()->second) free(_state_properties.begin()->second);
     _state_properties.erase(_state_properties.begin());
   }
+  _initialised = false;
 }
 
 void StateLoader::readFiles(const std::string &file_name) {

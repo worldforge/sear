@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _EXCEPTION_H_
-#define _EXCEPTION_H_ 1
+// $Id: Exception.h,v 1.4 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_EXCEPTION_H
+#define SEAR_EXCEPTION_H 1
 
 #include <string>
 
@@ -67,4 +69,4 @@ protected:
 
 } /* namespace Sear */
 
-#endif /* _EXCEPTION_H_ */
+#endif /* SEAR_EXCEPTION_H */

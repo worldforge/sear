@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: ActionHandler.cpp,v 1.3 2002-09-08 00:24:53 simon Exp $
+
 #include "ActionHandler.h"
 #include "Console.h"
 #include "WorldEntity.h"
@@ -9,17 +11,19 @@
 namespace Sear {
 	
 ActionHandler::ActionHandler(System *system) :
-  _system(system)
+  _system(system),
+  _initialised(false)
 {
 
 }
 
 ActionHandler::~ActionHandler() {
-
+  if (_initialised) shutdown();
 }
 
 void ActionHandler::init() {
-
+  if (_initialised) shutdown();
+  _initialised = true;
 }
 
 void ActionHandler::shutdown() {
@@ -28,6 +32,7 @@ void ActionHandler::shutdown() {
     if (as) free (as);
     action_map.erase(action_map.begin());
   }
+  _initialised = false;
 }
 
 void ActionHandler::loadConfiguration(const std::string &filename) {

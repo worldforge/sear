@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Patch.h,v 1.4 2002-09-08 00:24:54 simon Exp $
+
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
-#ifndef _PATCH_H_
-#define _PATCH_H_ 1
+#ifndef SEAR_PATCH_H
+#define SEAR_PATCH_H 1
 
 // Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
 #define VARIANCE_DEPTH (6)
@@ -91,4 +93,4 @@ public:
 };
 
 } /* namespace Sear */
-#endif /* _PATCH_H_ */
+#endif /* SEAR_PATCH_H */

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Frustum.cpp,v 1.5 2002-09-08 00:24:53 simon Exp $
+
 #include "common/Utility.h"
 
 #include "System.h"

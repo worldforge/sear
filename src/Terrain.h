@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _TERRAIN_H_
-#define _TERRAIN_H_ 1
+// $Id: Terrain.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_TERRAIN_H
+#define SEAR_TERRAIN_H 1
 
 namespace Sear {
 
@@ -31,5 +33,5 @@ protected:
 };
 
 } /* namespace Sear */
-#endif /* _TERRAIN_H_ */
+#endif /* SEAR_TERRAIN_H */
 

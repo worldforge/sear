@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: FileHandler.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
 

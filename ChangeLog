@@ -1,4 +1,8 @@
 7th September 2002, Simon Goodall
+ * Added initialation check to all objects with init/shutdown methods
+ * added cvs tag Id: to all source files
+
+7th September 2002, Simon Goodall
  * Added intialisation check to all loader objects
 
 7th September 2002, Simon Goodall

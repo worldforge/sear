@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _CHARACTER_H_
-#define _CHARACTER_H_ 1
+// $Id: Character.h,v 1.8 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_CHARACTER_H
+#define SEAR_CHARACTER_H 1
 
 
 #include <string>
@@ -84,6 +86,7 @@ protected:
   bool _run_modifier;
 
   void Recontainered(Eris::Entity *, Eris::Entity *);
+  bool _initialised;
   
 private:
   static const char * const MOVE_FORWARD = "+character_move_forward";
@@ -114,4 +117,4 @@ private:
 };
 
 } /* namespace Sear */
-#endif /* _CHARACTER_H_ */
+#endif /* SEAR_CHARACTER_H */

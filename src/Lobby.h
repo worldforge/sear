@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: Lobby.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
 #ifndef SEAR_LOBBY_H
 #define SEAR_LOBBY_H 1
 
@@ -17,7 +19,9 @@ class Console;
 	
 class Lobby : public ConsoleObject, public SigC::Object {
 public:
-	
+  Lobby();
+  ~Lobby();
+  
   void init(Eris::Lobby *lobby);
   void say(const std::string &speech);
   void emote(const std::string &speech);
@@ -38,7 +42,8 @@ protected:
   void Changed(const Eris::StringSet&);
 
   Eris::Lobby *_lobby;
-
+  bool _initialised;
+  
 private:
   static const char * const JOIN_ROOM = "join_room";
   static const char * const LEAVE_ROOM = "leave_room";

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef SOUND_H
-#define SOUND_H 1
+// $Id: Sound.h,v 1.5 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_SOUND_H
+#define SEAR_SOUND_H 1
 
 #include <string>
 #include <map>
@@ -19,8 +21,8 @@ class Console;
 	
 class Sound : public ConsoleObject {
 public:
-  Sound() {}
-  ~Sound() {}
+  Sound();
+  ~Sound();
   void init();
   void shutdown();
   Mix_Chunk *getSample(const std::string &file_name);
@@ -43,10 +45,10 @@ private:
   static const char * const STOP_MUSIC = "stop_music";
   std::map<std::string, Mix_Chunk*> sound_map;
   std::map<std::string, Mix_Music*> music_map;
-
+  bool _initialised;
 };
   
 } /* namespace Sear */
 
-#endif /* SOUND_H */
+#endif /* SEAR_SOUND_H */
 

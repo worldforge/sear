@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _FRUSTUM_H_
-#define _FRUSTUM_H_ 1
+//$Id: Frustum.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_FRUSTUM_H
+#define SEAR_FRUSTUM_H 1
 
 #include <wfmath/axisbox.h>
 
@@ -25,4 +27,4 @@ public:
   
 } /* namespace Sear */
 
-#endif /* _FRUSTUM_H_ */
+#endif /* SEAR_FRUSTUM_H */

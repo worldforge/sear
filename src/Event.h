@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _EVENT_H_
-#define _EVENT_H_ 1
+// $Id: Event.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_EVENT_H
+#define SEAR_EVENT_H 1
 
 #include <string>
 
@@ -43,4 +45,4 @@ protected:
 };
 
 } /* namespace Sear */
-#endif /* _EVENT_H_ */
+#endif /* SEAR_EVENT_H */

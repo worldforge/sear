@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
+// $Id: Camera.cpp,v 1.8 2002-09-08 00:24:53 simon Exp $
+
 #include <string>
 
 #include <varconf/Config.h>
@@ -25,22 +27,26 @@ Camera::Camera() :
   _elevation_dir(0),
   _zoom_speed(0.0f),
   _rotation_speed(0.0f),
-  _elevation_speed(0.0f)
+  _elevation_speed(0.0f),
+  _initialised(false)
 { }
 
 Camera::~Camera() {
-	
+  if (_initialised) shutdown();
 }
 
 bool Camera::init() {
+  if (_initialised) shutdown();
   readConfig();
   // Write config now so defaults will get stored
   writeConfig();
+  _initialised = true;
   return true;
 }
 
 void Camera::shutdown() {
   Log::writeLog("Shutting down camera.", Log::LOG_DEFAULT);
+  _initialised = false;
 }
 
 void Camera::updateCameraPos(float time_elapsed) {
@@ -139,4 +145,4 @@ void Camera::runCommand(const std::string &command, const std::string &args) {
   else if (command == ELEVATE_STOP_DOWN) elevate(1);
 }
 
-}
+} /* namespace Sear */

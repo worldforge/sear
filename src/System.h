@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _SYSTEM_H_
-#define _SYSTEM_H_ 1
+// $Id: System.h,v 1.18 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_SYSTEM_H
+#define SEAR_SYSTEM_H 1
 
 #include <string>
 #include <list>
@@ -248,6 +250,8 @@ private:
   std::list<std::string> _command_history;
   std::list<std::string>::iterator _command_history_iterator;
 
+  bool _initialised;
+
   static const char * const EXIT = "exit";
   static const char * const QUIT = "quit";
 
@@ -279,5 +283,5 @@ private:
 };
 
 } /* namespace Sear */
-#endif /* _SYSTEM_H_ */
+#endif /* SEAR_SYSTEM_H */
 

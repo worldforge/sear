@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: SkyBox.cpp,v 1.6 2002-09-08 00:24:53 simon Exp $
+
 #include "common/Log.h"
 
 #include "src/Render.h"
@@ -17,13 +19,16 @@ float SkyBox::normal_coords[] = NORMAL_COORDS;
 
 SkyBox::SkyBox(System *system, Render *renderer) :
   _system(system),
-  _renderer(renderer)
+  _renderer(renderer),
+  _initialised(false)
 {}
 
 SkyBox::~SkyBox() {
+  if (_initialised) shutdown();
 }
 
 bool SkyBox::init() {
+  if (_initialised) shutdown();
   Log::writeLog("SkyBox: Initialising.", Log::LOG_DEFAULT);
   texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_NORTH, true);
   texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_SOUTH, true);
@@ -37,11 +42,13 @@ bool SkyBox::init() {
   texture_id[TEXTURE_SKY_NIGHT_EAST]   = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_EAST, true);
   texture_id[TEXTURE_SKY_NIGHT_TOP]    = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_TOP, true);
   texture_id[TEXTURE_SKY_NIGHT_BOTTOM] = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_BOTTOM, true);
+  _initialised = true;
   return true;
 }
 
 void SkyBox::shutdown() {
   Log::writeLog("SkyBox: Shutting down", Log::LOG_DEFAULT);
+  _initialised = false;
 }
 
 void SkyBox::draw() {

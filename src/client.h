@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: client.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
 
@@ -63,7 +65,7 @@ class Client :public SigC::Object, public ConsoleObject {
 
 public:
   Client(System *system, const std::string &client_name);
-  ~Client() { }
+  ~Client();
 
   bool init();
   void shutdown();
@@ -138,6 +140,8 @@ protected:
   
   int _status;
   std::string _client_name;
+  bool _initialised;
+  
 private:
   static const char * const SERVER_CONNECT = "connect";
   static const char * const SERVER_RECONNECT = "reconnect";

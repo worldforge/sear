@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _WORLDENTITY_H_
-#define _WORLDENTITY_H_ 1
+// $Id: WorldEntity.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_WORLDENTITY_H
+#define SEAR_WORLDENTITY_H 1
 
 #include <string>
 #include <list>
@@ -58,4 +60,4 @@ protected:
 };
 
 } /* namespace Sear */
-#endif /* _WORLDENTITY_H_ */
+#endif /* SEAR_WORLDENTITY_H */

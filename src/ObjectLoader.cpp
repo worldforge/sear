@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: ObjectLoader.cpp,v 1.17 2002-09-08 00:24:53 simon Exp $
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -12,7 +14,16 @@
 
 namespace Sear {
 
+ObjectLoader::ObjectLoader() :
+  _initialised(false)
+{}
+	
+ObjectLoader::~ObjectLoader() {
+  if (_initialised) shutdown();
+}
+
 void ObjectLoader::init() {
+  if (_initialised) shutdown();
   Log::writeLog("Object Loader: Initialising.", Log::LOG_DEFAULT);
   _object_properties = std::map<std::string, ObjectProperties*>();
   ObjectProperties *op = (ObjectProperties*)malloc(sizeof(ObjectProperties));
@@ -43,16 +54,9 @@ void ObjectLoader::init() {
   mp->diffuse[1] = 1.0f;
   mp->diffuse[2] = 1.0f;
   mp->diffuse[3] = 1.0f;
-  mp->specular[0] = 0.0f;
-  mp->specular[1] = 0.0f;
-  mp->specular[2] = 0.0f;
-  mp->specular[3] = 0.0f;
   mp->shininess = (float)50.0f;
-  mp->emission[0] = 0.0f;
-  mp->emission[1] = 0.0f;
-  mp->emission[2] = 0.0f;
-  mp->emission[3] = 0.0f;
   _object_properties["default"] = op;
+  _initialised = true;
 }
 
 void ObjectLoader::shutdown() {
@@ -65,6 +69,7 @@ void ObjectLoader::shutdown() {
     }
     _object_properties.erase(_object_properties.begin());
   }
+  _initialised = false;
 }
 
 void ObjectLoader::readFiles(const std::string &file_name) {

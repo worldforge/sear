@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: FileHandler.cpp,v 1.2 2002-09-08 00:24:53 simon Exp $
+
 #include <stdio.h>
 
 #include "FileHandler.h"

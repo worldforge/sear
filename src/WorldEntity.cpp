@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: WorldEntity.cpp,v 1.17 2002-09-08 00:24:53 simon Exp $
+
 #include "System.h"
 #include <wfmath/axisbox.h>
 #include <Eris/TypeInfo.h>
@@ -36,10 +38,10 @@ WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::Wor
 
 }
 
-WorldEntity::~WorldEntity() {}
+WorldEntity::~WorldEntity() {
+}
 
 void WorldEntity::handleMove() {
-  cout << _velocity << endl;
   SetVelocity();
   WorldEntity *we = (WorldEntity*)getContainer();
   if (we != NULL) {

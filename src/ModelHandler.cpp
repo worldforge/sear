@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: ModelHandler.cpp,v 1.19 2002-09-08 00:24:53 simon Exp $
+
 #include "System.h"
 #include <set>
 #include <string.h>
@@ -38,7 +40,8 @@
 namespace Sear {
 
 ModelHandler::ModelHandler() :
-  detail_level(1.0f)
+  detail_level(1.0f),
+  _initialised(false)
 	
 {
   // TODO: this is not the place
@@ -58,12 +61,15 @@ ModelHandler::ModelHandler() :
 
 ModelHandler::~ModelHandler() {
   //TODO: Check that clean up has been performed
+  if (_initialised) shutdown();
 }
 
 void ModelHandler::init() {
+  if (_initialised) shutdown();
   // TODO: Do  clean up if required
   _model_loaders = std::map<std::string, ModelLoader*>();
   _models = std::map<std::string, Model*>();
+  _initialised = true;
 }
 
 void ModelHandler::shutdown() {
@@ -83,6 +89,7 @@ void ModelHandler::shutdown() {
       _models[I->first] = NULL;
     }
   }
+  _initialised = false;
 }
   
 Model *ModelHandler::getModel(Render *render, WorldEntity *we) {

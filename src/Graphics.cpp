@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Graphics.cpp,v 1.9 2002-09-08 00:24:53 simon Exp $
+
 #include "System.h"
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
@@ -39,12 +41,16 @@ Graphics::Graphics(System * system) :
   _terrain(NULL),
   _sky(NULL),
   _num_frames(0),
-  _frame_time(0)
+  _frame_time(0),
+  _initialised(false)
 {}
 
-Graphics::~Graphics() {}
+Graphics::~Graphics() {
+  if (_initialised) shutdown();
+}
 
 void Graphics::init() {
+  if (_initialised) shutdown();
   readConfig();
   Log::writeLog("Initialising Terrain", Log::LOG_DEFAULT);
   _renderer = new GL(_system, this);
@@ -60,7 +66,7 @@ void Graphics::init() {
   _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
-
+  _initialised = true;
 }
 
 void Graphics::shutdown() {
@@ -87,6 +93,7 @@ void Graphics::shutdown() {
     delete _camera;
     _camera = NULL;
   }
+  _initialised = false;
 }
 
 void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {

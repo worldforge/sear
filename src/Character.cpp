@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Character.cpp,v 1.14 2002-09-08 00:24:53 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -43,15 +44,18 @@ Character::Character(WorldEntity *self, System *system) :
   _strafe_speed(0.0f),
   _orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
   _time(0),
-  _run_modifier(false)
+  _run_modifier(false),
+  _initialised(false)
 {
   _self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
 }
 
 Character::~Character() {
+  if (_initialised) shutdown();
 }
 
 bool Character::init() {
+  if (_initialised) shutdown();
   float divisor, zaxis;
   if (!_self) {
     Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
@@ -62,11 +66,13 @@ bool Character::init() {
   divisor = sqrt(square(_orient.vector().x()) + square(_orient.vector().y()) + square(_orient.vector().z()));
   zaxis = (divisor != 0.0f) ? (_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
   _angle = -2.0f * acos(_self->getOrientation().scalar()) * zaxis;
+  _initialised = true;
   return true;
 }
 
 void Character::shutdown() {
   writeConfig();
+  _initialised = false;
 }
 
 void Character::moveForward(float speed) {

@@ -2,10 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _ROAM_H_
-#define _ROAM_H_ 1
+// $Id: ROAM.h,v 1.7 2002-09-08 00:24:54 simon Exp $
 
-#include "../src/Terrain.h"
+#ifndef SEAR_ROAM_H
+#define SEAR_ROAM_H 1
+
+#include "src/Terrain.h"
 
 //#include <stdlib.h>
 //#include "Landscape.h"
@@ -72,8 +74,9 @@ protected:
   
   System *_system;
   Render *_renderer;
+  bool _initialised;
 };
 
 } /* namespace Sear */
-#endif /* _ROAM_H_ */
+#endif /* SEAR_ROAM_H */
 

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef CONSOLEOBJECT_H
-#define CONSOLEOBJECT_H 1
+// $Id: ConsoleObject.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_CONSOLEOBJECT_H
+#define SEAR_CONSOLEOBJECT_H 1
 
 #include <string>
 
@@ -34,4 +36,4 @@ public:
 };
 
 } /* namespace Sear */
-#endif /* CONSOLEOBJECT_H */
+#endif /* SEAR_CONSOLEOBJECT_H */

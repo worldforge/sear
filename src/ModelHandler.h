@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _MODELHANDLER_H_
-#define _MODELHANDLER_H_ 1
+// $Id: ModelHandler.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_MODELHANDLER_H
+#define SEAR_MODELHANDLER_H 1
 
 /* This class will provide THE place for models.
  * New models will be created through this class
@@ -59,8 +61,9 @@ protected:
   // Will not be an array as not dynamic -> a map would be better 
   std::map<std::string, ModelLoader*> _model_loaders;
   std::map<std::string, Model*> _models;
+  bool _initialised;
 };
 
 } /* namespace Sear */
 
-#endif /* _MODELHANDLER_H_ */
+#endif /* SEAR_MODELHANDLER_H */

@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Bindings.cpp,v 1.10 2002-09-08 00:24:53 simon Exp $
 
 #include <SDL/SDL.h>
 

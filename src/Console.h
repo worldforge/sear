@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef CONSOLE_H
-#define CONSOLE_H 1
+// $Id: Console.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_CONSOLE_H
+#define SEAR_CONSOLE_H 1
 
 #include <string>
 #include <list>
@@ -113,7 +115,9 @@ protected:
   static const char * const TOGGLE_CONSOLE = "toggle_console";
   static const char * const LIST_CONSOLE_COMMANDS = "list_commands";
   
+  bool _initialised;
+  
 };
 
 } /* namespace Sear */
-#endif /* CONSOLE_H */
+#endif /* SEAR_CONSOLE_H */

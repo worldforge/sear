@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: GL.cpp,v 1.28 2002-09-08 00:24:52 simon Exp $
+
 /*TODO
  * Allow texture unloading
  * Allow priority textures
@@ -133,7 +135,8 @@ GL::GL() :
   base(0),
   textureList(std::list<GLuint>()),
   terrain(NULL),
-  _cur_state(NULL)
+  _cur_state(NULL),
+  _initialised(false)
 {
   _instance = this;
 }
@@ -149,14 +152,20 @@ GL::GL(System *system, Graphics *graphics) :
   base(0),
   textureList(std::list<GLuint>()),
   terrain(NULL),
-  _cur_state(NULL)
+  _cur_state(NULL),
+  _initialised(false)
 {
   _instance = this;
 }
 
 GL::~GL() {
+  if (_initialised) shutdown();
+}
+
+void GL::shutdown() {
   writeConfig();
   shutdownFont();
+  _initialised = false;
 }
 
 void GL::initWindow(int width, int height) {
@@ -197,6 +206,7 @@ void GL::initWindow(int width, int height) {
 }
   
 void GL::init() {
+  if (_initialised) shutdown();
   // Most of this should be elsewhere
   readConfig();
   createDefaults();
@@ -208,7 +218,7 @@ void GL::init() {
 #ifdef DEBUG  
   CheckError();
 #endif
-
+  _initialised = true;
 }
 
 void GL::initLighting() {

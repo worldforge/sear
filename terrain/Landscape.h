@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Landscape.h,v 1.2 2002-09-08 00:24:54 simon Exp $
+
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
-#ifndef _LANDSCAPE_H_
-#define _LANDSCAPE_H_ 1
+#ifndef SEAR_LANDSCAPE_H
+#define SEAR_LANDSCAPE_H 1
 
 #include "Patch.h"
 
@@ -104,4 +106,4 @@ public:
 };
 
 } /* namespace Sear */
-#endif /* _LANDSCAPE_H_ */
+#endif /* SEAR_LANDSCAPE_H */

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _CAMERA_H_
-#define _CAMERA_H_ 1
+// $Id: Camera.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_CAMERA_H
+#define SEAR_CAMERA_H 1
 
 /*
  * This class represents the camera. Currently defined as a chase camera
@@ -104,7 +106,9 @@ protected:
 
   float _min_distance; // Minimum camera distance allowed
   float _max_distance; // Maximum camera distance allowed
+
+  bool _initialised;
 };
 
 } /* namespace Sear */
-#endif /* _CAMERA_H_ */
+#endif /* SEAR_CAMERA_H */

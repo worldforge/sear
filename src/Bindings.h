@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _BINDINGS_H_
-#define _BINDINGS_H_ 1
+// $Id: Bindings.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_BINDINGS_H
+#define SEAR_BINDINGS_H 1
 
 /*
  * This class takes care of the bindings between keys and their associated commands
@@ -66,4 +68,4 @@ protected:
 };
 
 } /* namespace Sear */
-#endif /* _BINDINGS_H_ */
+#endif /* SEAR_BINDINGS_H */

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _RENDER_H_
-#define _RENDER_H_ 1
+// $Id: Render.h,v 1.16 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_RENDER_H
+#define SEAR_RENDER_H 1
 
 #include <SDL/SDL.h>
 #include <string>
@@ -131,4 +133,4 @@ protected:
   
 } /* namespace Sear */
 
-#endif /* _RENDER_H_ */
+#endif /* SEAR_RENDER_H */

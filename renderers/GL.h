@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _GL_RENDER_H_
-#define _GL_RENDER_H_ 1
+// $Id: GL.h,v 1.15 2002-09-08 00:24:52 simon Exp $
+
+#ifndef SEAR_GL_RENDER_H
+#define SEAR_GL_RENDER_H 1
 
 #include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -39,7 +41,7 @@ public:
   ~GL();
   void init();
   void initWindow(int width, int height);
-  void shutdown() {};
+  void shutdown();
 
   void initLighting();
   void initFont();
@@ -198,7 +200,7 @@ protected:
   void setupExtensions();
   bool use_ext_texture_filter_anisotropic;
   bool use_sgis_generate_mipmap;
-  
+  bool _initialised;
 private:
   // Consts
   static const int sleep_time = 5000;
@@ -300,4 +302,4 @@ private:
 };
 
 } /* namespace Sear */
-#endif /* _GL_RENDER_H_ */
+#endif /* SEAR_GL_RENDER_H */

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _OBJECTLOADER_H_
-#define _OBJECTLOADER_H_ 1
+// $Id: ObjectLoader.h,v 1.16 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_OBJECTLOADER_H
+#define SEAR_OBJECTLOADER_H 1
 
 #include "System.h"
 #include <string>
@@ -65,6 +67,8 @@ typedef struct {
 
 class ObjectLoader {
 public:
+  ObjectLoader();
+  ~ObjectLoader();
   void init();
   void shutdown();
   void readFiles(const std::string &);
@@ -73,7 +77,8 @@ public:
 
 protected:
   std::map<std::string, ObjectProperties*> _object_properties;
+  bool _initialised;
 };
 
 } /* namespace Sear */
-#endif /* _OBJECTLOADER_H_ */
+#endif /* SEAR_OBJECTLOADER_H */

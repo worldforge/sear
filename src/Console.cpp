@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Console.cpp,v 1.20 2002-09-08 00:24:53 simon Exp $
+
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -21,12 +23,16 @@ Console::Console(System *system) :
   console_messages(std::list<std::string>()),
   screen_messages(std::list<screenMessage>()),
   _system(system),
-  _renderer(NULL)
+  _renderer(NULL),
+  _initialised(false)
 { }
 
-Console::~Console() {}
+Console::~Console() {
+  if (_initialised) shutdown();
+}
 
 bool Console::init() {
+  if (_initialised) shutdown();
   // Grab the render object. This is not available when console is created
   // and cannot be passed into the constructor.
   _renderer = _system->getGraphics()->getRender();
@@ -37,12 +43,13 @@ bool Console::init() {
   registerCommand(LIST_CONSOLE_COMMANDS, this);
   //Makes sure at least one key is bound to the console
   Bindings::bind("backquote", "/" + std::string(TOGGLE_CONSOLE));
+  _initialised = true;
   return true;
 }
 
 void Console::shutdown() {
   Log::writeLog("Shutting down console.", Log::LOG_DEFAULT);
-  
+  _initialised = false;
 }
 
 void Console::pushMessage(const std::string &message, int type, int duration) {

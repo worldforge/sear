@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef ACTIONHANDLER_H
-#define ACTIONHANDLER_H 1
+// $Id: ActionHandler.h,v 1.2 2002-09-08 00:24:53 simon Exp $
+
+#ifndef SEAR_ACTIONHANDLER_H
+#define SEAR_ACTIONHANDLER_H 1
 
 #include "System.h"
 
@@ -44,10 +46,12 @@ private:
   std::map<std::string, ActionStruct*> action_map;
 
   System *_system;
+
+  bool _initialised;
   
   static const char * const LOAD_CONFIG = "load_action_config";
   static const char * const DO_ACTION = "do_action";
 };
   
 } /* namespace Sear */
-#endif /* ACTIONHANDLER_H */
+#endif /* SEAR_ACTIONHANDLER_H */

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: client.cpp,v 1.29 2002-09-08 00:24:53 simon Exp $
+
 #include "System.h"
 
 #include <Eris/Connection.h>
@@ -62,11 +64,16 @@ Client::Client(System *system, const std::string &client_name) :
   the_lobby(NULL),
   _meta(NULL),
   _status(CLIENT_STATUS_DISCONNECTED),
-  _client_name(client_name)
-{
+  _client_name(client_name),
+  _initialised(false)
+{}
+
+Client::~Client() {
+  if (_initialised) shutdown();
 }
 
 bool Client::init() {
+  if (_initialised) shutdown();
   _connection = new Eris::Connection(_client_name, DEBUG_ERIS);
   if (!_connection) {
     Log::writeLog("Client - Connection is NULL", Log::LOG_ERROR);
@@ -81,6 +88,7 @@ bool Client::init() {
 
   Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
   Eris::Logged.connect(SigC::slot(*this, &Client::Log));
+  _initialised = true;
   return true;
   
 }
@@ -92,6 +100,7 @@ void Client::shutdown() {
   // TODO THIS IS CURRENTLY BUGGY
   if (_connection) delete _connection;
   // TODO clean up factory
+  _initialised = false;
 }
 
 void Client::Log(Eris::LogLevel lvl, const std::string &msg) {

@@ -3,19 +3,29 @@
 #include "Console.h"
 #include "common/Log.h"
 
+// $Id: Sound.cpp,v 1.8 2002-09-08 00:24:53 simon Exp $
+
 namespace Sear {
 
+Sound::Sound() :
+  _initialised(false)
+{}
+
+Sound::~Sound() {
+  if (_initialised) shutdown();
+}
+	
 void Sound::init() {
+  if (_initialised) shutdown();
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
     Log::writeLog(std::string("Error init SDL_AUDIO: ") + SDL_GetError(), Log::LOG_ERROR);
     throw Exception("Error initialising SDL Sound Subsystem!");
   }
-#define MONO (1)
-#define STEREO (2)
- if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, STEREO, 4096) != 0) {
+  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
     Log::writeLog(std::string("Error init SDL_mixer: ") + Mix_GetError(), Log::LOG_ERROR);
     throw Exception("Error initialising SDL_mixer!");
   }
+  _initialised = true;
 }
 
 void Sound::shutdown() {
@@ -31,6 +41,7 @@ void Sound::shutdown() {
     music_map.erase(music_map.begin());
   }
   SDL_QuitSubSystem(SDL_INIT_AUDIO);
+  _initialised = false;
 }
 
 Mix_Chunk *Sound::getSample(const std::string &file_name) {
