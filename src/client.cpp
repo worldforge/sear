@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.36 2002-10-29 18:00:07 simon Exp $
+// $Id: client.cpp,v 1.37 2002-12-10 19:36:50 simon Exp $
 
 #include "System.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
+#include <Eris/Avatar.h>
 #include <Eris/Log.h>
 #include <Eris/Lobby.h>
 #include <Eris/Entity.h>
@@ -379,7 +380,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   ch.SetAttr("description", description);
   Eris::World *world = NULL;
   try {
-    world = _player->createCharacter(ch);
+    world = _player->createCharacter(ch)->getWorld();
   } catch (Eris::InvalidOperation ie) {
     Log::writeLog("Client::createCharacter: Creation failed", Log::LOG_INFO);
     _system->pushMessage("Character Creation Failed: " +  ie._msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
@@ -415,7 +416,7 @@ int Client::takeCharacter(const std::string &id) {
   
   Eris::World *world = NULL;
   try {
-    world = _player->takeCharacter(id);
+    world = _player->takeCharacter(id)->getWorld();
   } catch (Eris::InvalidOperation ie) {
     Log::writeLog("Client::takeCharacter: Error", Log::LOG_INFO);
     _system->pushMessage("Error Taking Character: " + ie._msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
@@ -756,7 +757,7 @@ void Client::gotFailure(const std::string &msg) {
   Log::writeLog(msg, Log::LOG_ERROR);
 }
 
-void Client::receivedServerInfo(Eris::ServerInfo sInfo) {
+void Client::receivedServerInfo(const Eris::ServerInfo & sInfo) {
   std::cout << "Got serverinfo:\n\r"
   << "Hostname: " <<sInfo.getHostname()
   << "\n\rServerName: "<<sInfo.getServername()

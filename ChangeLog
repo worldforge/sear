@@ -1,4 +1,8 @@
 10th December 2002, Simon Goodall
+ * Applied patch by Al Riddoch to work with Eris 0.9.7
+ * Changed abs to fabs in Cal3d_Loader for gcc 3.2 compat
+
+10th December 2002, Simon Goodall
  * Bumped version number due to release
 
 10th December 2002, Simon Goodall

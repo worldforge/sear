@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.13 2002-11-12 23:59:22 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.14 2002-12-10 19:36:50 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -35,7 +35,7 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
   Cal3d *model = new Cal3d(render);
   float height = 1.0f;
 //  if (ms.hasBBox) {
-    height = abs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
+    height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
 //  }
   std::string file_name = System::instance()->getModel().getItem(CAL3D, model_record->data_file_id);
   if (!model->init(file_name, height)) {

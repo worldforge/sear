@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.11 2002-10-20 15:50:27 simon Exp $
+// $Id: client.h,v 1.12 2002-12-10 19:36:51 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -126,7 +126,7 @@ protected:
   //Metaserver
   void gotServerCount(int count);
   void gotFailure(const std::string& msg);
-  void receivedServerInfo(Eris::ServerInfo sInfo);
+  void receivedServerInfo(const Eris::ServerInfo & sInfo);
   void completedServerList();
 
   System *_system;
