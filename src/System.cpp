@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.99 2004-06-26 15:48:02 simon Exp $
+// $Id: System.cpp,v 1.100 2004-07-19 11:22:14 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -285,9 +285,12 @@ bool System::init(int argc, char *argv[]) {
   for (FileHandler::FileList::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     _script_engine->runScript(*I);
   }
- for (int i = 0; i < argc; ++i) {
-std::cout << argv[i] << std::endl;
-}
+//  if (debug) {
+//    for (int i = 0; i < argc; ++i) {
+//      std::cout << argv[i] << std::endl;
+//    }
+//  }
+  // Pass command line into general varconf object for processing
   m_general.getCmdline(argc, argv);
   readConfig();
   RenderSystem::getInstance().readConfig();

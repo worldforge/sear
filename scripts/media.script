@@ -1,3 +1,0 @@
-enable_dir_prefix
-cd textures
-load_textures textures.cfg

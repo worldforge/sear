@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.12 2004-06-30 12:44:21 simon Exp $
+// $Id: FileHandler.cpp,v 1.13 2004-07-19 11:22:14 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -176,7 +176,7 @@ FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filena
   for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
-        l.insert(filepath);
+      l.insert(filepath);
   }
   return l;  
 }

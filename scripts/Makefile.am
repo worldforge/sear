@@ -1,3 +1,2 @@
-EXTRA_DIST= \
-	startup.script \
-	shutdown.script
+confdir = $(datadir)/sear/scripts/
+dist_conf_DATA = startup.script shutdown.script

@@ -13,8 +13,8 @@ Copyright: GPL
 Group: Amusements/Games
 BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: %{_prefix}
-Requires: Atlas-C++ >= @ATLAS_VERSION@ libsigc++ >= 1.0 SDL >= @SDL_VERSION@ SDL_image >= 1.2.2 SDL_mixer >= 1.2.2 varconf >= @VARCONF_VERSION@ skstream >= @SKSTREAM_VERSION@ eris >= @ERIS_VERSION@ 
-BuildRequires: Atlas-C++-devel >= @ATLAS_VERSION@ libsigc++-devel >= 1.0 SDL-devel >= @SDL_VERSION@ SDL_image-devel >= 1.2.2 SDL_mixer-devel >= 1.2.2 varconf-devel >= @VARCONF_VERSION@ skstream-devel >= @SKSTREAM_VERSION@ eris-devel >= @ERIS_VERSION@ 
+Requires: SDL >= @SDL_VERSION@ SDL_image >= 1.2.2 SDL_mixer >= 1.2.2 varconf >= @VARCONF_VERSION@ eris >= @ERIS_VERSION@ mercator >= @MERCATOR_VERSION@ cal3d
+BuildRequires: SDL-devel >= @SDL_VERSION@ SDL_image-devel >= 1.2.2 SDL_mixer-devel >= 1.2.2 varconf-devel >= @VARCONF_VERSION@ eris-devel >= @ERIS_VERSION@ mercator-devel >= @MERCATOR_VERSION@ lib3ds >= @LIB3DS_VERSION@ cal3d-devel
 
 %description
 Sear is a 3D client for MMORPGs using the Worldforge system. 
@@ -40,8 +40,8 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{_datadir}/%{name}/*
+%{_bindir}/sear.bin
 %{_bindir}/sear
-%{_bindir}/runSear
 
 %doc README COPYING AUTHORS
 

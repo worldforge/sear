@@ -1,3 +1,18 @@
+2004-07-19  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* Makefile.am, data/Makefile.am, scripts/Makefile.am: Move data and
+	  scripts installation into data and script Makefile.am.
+	* configure.in: Bump sear version number for release. Update for spec 
+	  files and sear.in script
+	* sear-media.spec.in: Remove WFUT.jar from rpm
+	* sear-updater.spec.in: Make rpm containing WFUT.jar
+	* sear.spec.in: Remove requires that are derived from other libs. Add missing requires. Update for new script / binary files
+	* src/FileHandler.cpp: Fix code formating.
+	* src/Makefile.am: Update for new exec script
+	* src/System.cpp: Fix code formatting. Do not print cmd line args.
+	* src/sear.in: Script file to run updater if found before starting
+	  sear.bin
+
 2004-07-14  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* sear-media.spec.in: Initial version of spec file to generate media rpm

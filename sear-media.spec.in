@@ -1,5 +1,5 @@
 %define name sear-media
-%define version 20040713
+%define version 20040714
 %define release 1
 
 Summary: Sear - an 3D client for Worldforge
@@ -33,14 +33,10 @@ java -jar WFUT.jar update sear-media
 echo $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{_datadir}/sear
 cp -r sear-media $RPM_BUILD_ROOT/%{_datadir}/sear
-cp -r channels $RPM_BUILD_ROOT/%{_datadir}/sear
-cp WFUT.jar $RPM_BUILD_ROOT/%{_datadir}/sear
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(-,root,root)
-%{_datadir}/sear/WFUT.jar
 %{_datadir}/sear/sear-media/*
-%{_datadir}/sear/channels/sear-media.xml

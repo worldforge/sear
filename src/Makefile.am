@@ -1,5 +1,5 @@
-bin_PROGRAMS = sear
-
+bin_PROGRAMS = sear.bin
+bin_SCRIPTS = sear
 noinst_LIBRARIES = libSear.a
 
 INCLUDES = -I$(top_srcdir)
@@ -19,7 +19,7 @@ endif
 $(SEAR_RC_O): sear.rc
 	$(WINDRES) -i sear.rc -o $(SEAR_RC_O)
 
-sear_LDADD = \
+sear_bin_LDADD = \
 	libSear.a \
 	../common/libCommon.a \
 	../renderers/libRendererGL.a \
@@ -32,7 +32,7 @@ sear_LDADD = \
 	$(LIB3DS_LIBS) \
 	$(SEAR_RC_O)
 
-sear_SOURCES = \
+sear_bin_SOURCES = \
 	main.cpp
 
 libSear_a_SOURCES = \
@@ -95,3 +95,4 @@ libSear_a_SOURCES = \
 	LightManager.cpp \
 	Editor.cpp \
 	Editor.h
+

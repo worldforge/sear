@@ -1,6 +1,3 @@
-in terrain/ROAM.cpp, line 252 _terrain_scale is used before it has been set, which gives
-a warning in valgrind about use of uninitialised values.
-
 Many warning are given about initialised values in Sear::Frustrum::patchInFrustrum,
 with the error being in wfmath/point.h lines 199, 203 and 207
 
@@ -10,13 +7,8 @@ BUGS
  * Text box sometimes  repeatslast 3/4 chars across lines
  * out by one on terrain
 
-
-
  * some problems with multi texturing on cal3d when model doesn't have any second texture (or even first!) breaks alpha-mapping
  * segfaults with fullscreen - win32 on call, linux when quitting
-
- * Terrain segments don't join up correctly
- * Terrain detail ossilate rapidly
 
  * Fix font length problems
    - The font in many cases will not clip to the screen and go onto the next line. This is a problem on the console fonts, but no so much for the floating character speech
