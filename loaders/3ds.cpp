@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.17 2002-11-12 23:59:22 simon Exp $
+// $Id: 3ds.cpp,v 1.18 2003-01-11 17:18:39 simon Exp $
 
 
 #include <iostream>
@@ -38,7 +38,9 @@
 namespace Sear {
 	
 ThreeDS::ThreeDS(Render *render) : Model(render),
-  _initialised(false)
+  _initialised(false),
+  _list(0),
+  _list_select(0)
 {
 
 }
@@ -87,35 +89,53 @@ void ThreeDS::shutdown() {
     material_map.erase(material_map.begin());
   }
   _initialised = false;
+  _render->freeList(_list);
+  _list = 0;
+  _render->freeList(_list_select);
+  _list_select = 0;
 }
 
 void ThreeDS::render(bool select_mode) {
   int current_texture = 0;
   std::string current_material = "";
   if (select_mode) {
-    for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
-      RenderObject *ro = *I;
-      if (ro) {
-        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
+    if (_list_select) {
+      _render->playList(_list_select);
+    } else {
+      _list_select = _render->getNewList();
+      _render->beginRecordList(_list_select);
+      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
+        RenderObject *ro = *I;
+        if (ro) {
+          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
+        }
       }
+      _render->endRecordList();
     }
   } else {
-    for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
-      RenderObject *ro = *I;
-      if (ro) {
-        if (!ro->material_name.empty() && ro->material_name != current_material) {
-          Material *m = material_map[ro->material_name];
-          if (m) {
-            _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-            current_material = ro->material_name;
-          }	    
+    if (_list) {
+      _render->playList(_list);
+    } else {
+      _list = _render->getNewList();
+      _render->beginRecordList(_list);
+      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
+        RenderObject *ro = *I;
+        if (ro) {
+          if (!ro->material_name.empty() && ro->material_name != current_material) {
+            Material *m = material_map[ro->material_name];
+            if (m) {
+              _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+              current_material = ro->material_name;
+            }	    
+          }
+          if (current_texture != ro->texture_id) {
+            if (ro->texture_data) _render->switchTexture(ro->texture_id);
+            current_texture = ro->texture_id;
+          }
+          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
         }
-        if (current_texture != ro->texture_id) {
-          if (ro->texture_data) _render->switchTexture(ro->texture_id);
-          current_texture = ro->texture_id;
-        }
-        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
       }
+      _render->endRecordList();
     }
   }
 }

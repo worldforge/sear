@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.8 2002-10-20 15:50:26 simon Exp $
+// $Id: 3ds.h,v 1.9 2003-01-11 17:18:39 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -66,6 +66,8 @@ protected:
   std::list<RenderObject*> render_objects;
   std::map<std::string, Material*> material_map;
   bool _initialised;
+  unsigned int _list;
+  unsigned int _list_select;
 };
 
 } /* namespace Sear */

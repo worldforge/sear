@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.24 2002-12-24 18:08:17 simon Exp $
+// $Id: GL.h,v 1.25 2003-01-11 17:18:39 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -118,6 +118,12 @@ public:
   inline void renderActiveName();
   inline void applyCharacterLighting(float x, float y, float z);
   inline void getFrustum(float [6][4]);
+ 
+  void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
+  void endRecordList() { glEndList(); }
+  void playList(unsigned int list) { glCallList(list); }
+  unsigned int getNewList() { return glGenLists(1); }
+  void freeList(unsigned int list) { glDeleteLists(list, 1);};
   
 protected:
   System *_system;

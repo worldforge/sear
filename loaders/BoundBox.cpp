@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.13 2002-10-21 20:12:04 simon Exp $
+// $Id: BoundBox.cpp,v 1.14 2003-01-11 17:18:39 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -21,7 +21,9 @@ namespace Sear {
 BoundBox::BoundBox(Render *render) : Model(render), 
   _type("default"),
   _use_textures(true),
-  _initialised(false)
+  _initialised(false),
+  _list(0),
+  _list_select(0)
 {}
 
 BoundBox::~BoundBox() {
@@ -214,6 +216,10 @@ bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wra
 
 void BoundBox::shutdown() {
   _initialised = false;
+  _render->freeList(_list);
+  _list = 0;
+  _render->freeList(_list_select);
+  _list_select =0;
 }
 
 void BoundBox::render(bool select_mode) {
@@ -221,12 +227,28 @@ void BoundBox::render(bool select_mode) {
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+  
   if (select_mode) {
-    _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+     if (_list_select) {
+      _render->playList(_list_select);
+    } else {
+      _list_select = _render->getNewList();
+      _render->beginRecordList(_list_select);
+//      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+      _render->endRecordList();
+    } 
   } else {
-    _render->switchTexture(_render->requestTexture("boundbox", _type));
-    _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    if (_list) {
+      _render->playList(_list);
+    } else {
+      _list = _render->getNewList();
+      _render->beginRecordList(_list);
+      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+      _render->switchTexture(_render->requestTexture("boundbox", _type));
+      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+      _render->endRecordList();
+    } 
   }
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.22 2002-12-03 22:10:55 simon Exp $
+// $Id: Render.h,v 1.23 2003-01-11 17:18:39 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -137,6 +137,13 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void applyCharacterLighting(float x, float y, float z) =0;
   virtual void getFrustum(float [6][4]) =0;
+
+  virtual void beginRecordList(unsigned int list) = 0;
+  virtual void endRecordList() = 0;
+  virtual unsigned int getNewList() = 0;
+  virtual void playList(unsigned int list) =0;
+  virtual void freeList(unsigned int list) = 0;
+  
 protected:
   bool  _renderState[RENDER_LAST_STATE];
 
