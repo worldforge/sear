@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.39 2004-04-28 14:06:03 simon Exp $
+// $Id: System.h,v 1.40 2004-04-28 22:02:44 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -10,7 +10,15 @@
 #include <string>
 #include <list>
 #include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+
+#ifdef __APPLE__
+    extern "C" {
+        extern SDL_Surface* IMG_Load(const char*);
+    }
+#else
+    #include <SDL/SDL_image.h>
+#endif
+
 #include <sigc++/object_slot.h>
 
 #include "interfaces/ConsoleObject.h"
@@ -111,13 +119,6 @@ public:
    * @param duration Length of time to display message
    */ 
   void pushMessage(const std::string &msg, int type, int duration = MESSAGE_LIFE);
-
-  /**
-   * Function checks for the existance of the given file
-   * @param filename File to look for
-   * @return True if file exists
-   */ 
-  bool fileExists(const std::string &filename);
   
   /**
    * Processes a string converting any '~' characters found to the 
@@ -158,11 +159,6 @@ public:
    * @return Value of query state
    */ 
   bool checkState(SystemState ss) { return _systemState[ss]; }
-
-  const std::string getHomePath() { return home_path; }
-  const std::string getInstallPath() { return install_path; }
-  void setInstallDir(const std::string &install_dir) { install_path = install_dir; }
-  
 
   Graphics *getGraphics() const { return _graphics; }
   
@@ -243,15 +239,7 @@ protected:
   ActionHandler *_action_handler; ///< Pointer to action handler object
   ObjectHandler *_object_handler; ///< Pointer to object handler object
   Calendar *_calendar; ///< Pointer to calender object
-
-  std::list<std::string> additional_paths;
-  
-  std::string home_path;
-
-//  static const std::string SCRIPTS_DIR;
-//  static const std::string STARTUP_SCRIPT;
-//  static const std::string SHUTDOWN_SCRIPT;
- 
+   
   varconf::Config _general;
   varconf::Config _models;
 
@@ -273,8 +261,6 @@ protected:
 
   bool _mouse_move_select;
 
-  std::string _current_dir;
-
   float _seconds;
 
   typedef struct {
@@ -293,8 +279,6 @@ public:
   void varconf_general_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);
   
-  std::string getMediaRoot() const { return _media_root; }
-
 private:
   bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
@@ -303,9 +287,6 @@ private:
   std::list<std::string>::iterator _command_history_iterator;
 
   bool _initialised; ///< Initialisation state of System
-
-  std::string _media_root;
-
 };
 
 } /* namespace Sear */

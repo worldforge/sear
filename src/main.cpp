@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.17 2004-04-27 15:07:02 simon Exp $
+// $Id: main.cpp,v 1.18 2004-04-28 22:02:44 jmt Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -12,7 +12,7 @@
 #include <string>
 
 #ifdef HAVE_CONFIG_H
-  #include "config.h"
+    #include "config.h"
 #endif
 
 #include "conf.h"
@@ -83,7 +83,6 @@ under certain conditions; type `show c' for details.
 */
   
   sys = new Sear::System();
-//  sys->setInstallDir(std::string(INSTALLDIR) + std::string("/share/sear"));
   sys->addSearchPaths(path_list);
   if (!sys->init()) {
     std::cerr << "Error initialising Sear!" << std::endl;

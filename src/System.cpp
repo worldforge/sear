@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.80 2004-04-28 14:06:03 simon Exp $
+// $Id: System.cpp,v 1.81 2004-04-28 22:02:44 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -122,7 +122,6 @@ System::System() :
   _click_y(0),
   _script_engine(NULL),
   _event_handler(NULL),
-  _file_handler(NULL),
   _model_handler(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
@@ -143,6 +142,9 @@ System::System() :
   _instance = this;
   // Initialise system states
   for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) _systemState[i] = false;
+    
+  // create the filehandler early, so we can call addSearchPath on it
+  _file_handler = new FileHandler();
 }
 
 System::~System() {
@@ -167,46 +169,10 @@ bool System::init() {
     throw Exception("ERIS INIT");
   }
   
-
-#ifdef __WIN32__
-  const char *homedrive;
-  const char *homepath;
-  homedrive = getenv("HOMEDRIVE");
-  homepath = getenv("HOMEPATH");
-
-  if (homedrive == 0) homedrive = ".";
-  if (homepath == 0) homepath = "";
-  home_path = std::string(homedrive)+std::string(homepath);
-  if (homedrive) delete homedrive;
-  if (homepath) delete homepath;
-#else
-  home_path = std::string(getenv("HOME"));
-  if (home_path.empty()) home_path = ".";
-  else {
-    home_path += "/.sear/";
-    mkdir(home_path.c_str(), 0755);
-  }
-#endif
   // This should not be hardcoded!!
-  install_path = std::string(INSTALLDIR) + std::string("/share/sear/");
- 
   _action_handler = new ActionHandler(this);
   _action_handler->init();
 
-  _file_handler = new FileHandler();
-  _file_handler->addSearchPath(install_path);
-  _file_handler->addSearchPath(install_path + "/scripts");
-  _file_handler->addSearchPath(home_path);
-  _file_handler->addSearchPath(".");
-
-  _file_handler->setVariable("SEAR_INSTALL", install_path);
-  _file_handler->setVariable("SEAR_MEDIA", install_path + "/sear-media/");
-  _file_handler->setVariable("SEAR_HOME", home_path);
-
-  for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); ++I) {
-    _file_handler->addSearchPath(*I);
-  }
-  
   _object_handler = new ObjectHandler();
   _object_handler->init();
  
@@ -720,21 +686,8 @@ void System::pushMessage(const std::string &msg, int type, int duration) {
   if(_console) _console->pushMessage(msg, type, duration);
 }
 
-bool System::fileExists(const std::string &file_name) {
-  FILE *test_file = NULL;
-  test_file = fopen(file_name.c_str(), "r");
-  if (test_file) {
-    fclose(test_file);
-    return true;
-  }
-  return false;
-}
-
 std::string System::processHome(const std::string &input) {
-  int i = input.find("~");
-  if (i == -1) return input;
-  std::string output = input.substr(0, i) + home_path + input.substr(i + 1);
-  return output;
+    return input;
 }
 
 void System::setCharacter(Character *character) {
@@ -759,9 +712,6 @@ void System::readConfig() {
   _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
   temp = _general.getItem(SYSTEM, KEY_window_height);
   _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
-
-  temp = _general.getItem(SYSTEM, KEY_media_root);
-  _media_root = (!temp.is_string()) ? (INSTALLDIR) : ((std::string)temp);
 }
 
 void System::writeConfig() {
@@ -1001,7 +951,7 @@ void System::processRecords() {
 
 void System::addSearchPaths(std::list<std::string> l) {
   for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {        
-    additional_paths.push_back(*I);
+    _file_handler->addSearchPath(*I);
   }
 }
 

@@ -1,3 +1,10 @@
+28th April 2004, James Turner
+ * Move all the file-related and path-related code out of System
+   and into the FileHandler
+ * Add OS-X and Win32 specific versions of various path locators
+ * Change the default search order so CWd and home go before the
+   install paths.
+ 
 28th April 2004, Simon Goodall
  * Really fix the bad state stuff
 

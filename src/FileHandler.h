@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.6 2003-12-06 22:29:53 simon Exp $
+// $Id: FileHandler.h,v 1.7 2004-04-28 22:02:44 jmt Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -53,6 +53,16 @@ public:
 
   void expandString(std::string &str);
 
+    /** Determine if the given file exists at the provided path or not */
+    bool exists(const std::string& file) const;
+
+    std::string getInstallBasePath() const;
+    
+    /** retrive the path of the directory in which to store user setting
+    files. This will be in the per-user Application Support folder on Mac and Windows,
+    and $HOME/.sear on Unix. If the directory cannot be located, it will
+    fall back to '.' */
+    std::string getUserDataPath() const;
 protected:
   FileList  _searchpaths;
 
