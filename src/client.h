@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.18 2005-02-18 16:39:06 simon Exp $
+// $Id: client.h,v 1.19 2005-04-05 21:56:09 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -13,8 +13,6 @@
 #include <Eris/Log.h>
 #include <Eris/Account.h>
 #include <Atlas/Message/DecoderBase.h>
-
-#include "conf.h"
 #include "interfaces/ConsoleObject.h"
 
 //Client Messages
@@ -39,25 +37,28 @@
 #define CLIENT_NETWORK_FAILURE "Network Failure"
 #define CLIENT_ERIS_LOG_HEAD   "Eris Log:"
 
-#define CLIENT_STATUS_DISCONNECTED (0)
-#define CLIENT_STATUS_CONNECTED    (1)
-#define CLIENT_STATUS_LOGGED_IN    (2)
-#define CLIENT_STATUS_IN_WORLD     (3)
+typedef enum {
+  CLIENT_STATUS_DISCONNECTED = 0,
+  CLIENT_STATUS_CONNECTING,
+  CLIENT_STATUS_DISCONNECTING,
+  CLIENT_STATUS_CONNECTED,
+  CLIENT_STATUS_LOGGING_IN,
+  CLIENT_STATUS_LOGGING_OUT,
+  CLIENT_STATUS_LOGGED_IN,
+  CLIENT_STATUS_GOING_IN_WORLD,
+  CLIENT_STATUS_GOING_OUT_WORLD,
+  CLIENT_STATUS_IN_WORLD,
+  CLIENT_STATUS_LAST
+} ClientStatus;
 
 namespace Eris {
-  class Meta;
   class Account;
   class Connection;
-  class Lobby;
-  class Person;
-  class ServerInfo;
 }
 
 namespace Sear {
 class Factory;
-class WorldEntity;
 class Console;
-class Lobby;
 class System;
 
 class Client :public SigC::Object, public ConsoleObject {
@@ -69,8 +70,7 @@ public:
   bool init();
   void shutdown();
   
-  int connect(const std::string &, int port = DEFAULT_PORT);
-  int reconnect();
+  int connect(const std::string &, int port = 6767);
   int disconnect();
 
   int createAccount(const std::string &, const std::string &, const std::string &);
@@ -84,12 +84,8 @@ public:
   void poll();
   std::string getStatus();
   
-//  int listRooms();
-
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-//  void getServers();
-  //void stopServers();
  
   Eris::Account    *getAccount() const { return m_account; }
   Eris::Avatar     *getAvatar() const { return m_avatar; }
@@ -105,14 +101,8 @@ protected:
   void NetConnected();
   void NetDisconnected();
   bool NetDisconnecting();
-//  void Timeout(Eris::Connection::Status);
   void StatusChanged(Eris::Connection::Status);
   void Log(Eris::LogLevel, const std::string &);
-//  void GotTime(double time);
-
-  //Lobby
-//  void LoggedIn(const Atlas::Objects::Entity::Account &a);
-//  void SightPerson(Eris::Person*);
 
   // Account
   void LoginSuccess();
@@ -123,35 +113,20 @@ protected:
   void AvatarSuccess(Eris::Avatar *);
   void AvatarFailure(const std::string &msg);
 
-  //World	
-//  void EntityCreate(Eris::Entity*);
-//  void EntityDelete(Eris::Entity*);
-//  void Entered(Eris::Entity*);
-//  void Appearance(Eris::Entity*);
-//  void Disappearance(Eris::Entity*);
-//  void RootEntityChanged(Eris::Entity*);
 
-  //Metaserver
-//  void gotServerCount(int count);
-//  void gotFailure(const std::string& msg);
-  //void receivedServerInfo(const Eris::ServerInfo & sInfo);
-//  void completedServerList();
+  void GotCharacterEntity(Eris::Entity *e);
 
-  System *_system;
+  System *m_system;
 
   Eris::Connection *m_connection;
   Eris::Account    *m_account;
   Eris::Avatar     *m_avatar;
 
-//  Eris::Lobby* _lobby;
-//  Lobby *the_lobby;
-//  Eris::Meta *_meta;
-
-  Factory *_factory;
+  Factory *m_factory;
   
-  int _status;
-  std::string _client_name;
-  bool _initialised;
+  int m_status;
+  std::string m_client_name;
+  bool m_initialised;
   bool m_takeFirst;
 };
 

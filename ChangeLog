@@ -1,7 +1,17 @@
 2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/client.cpp, src/client.h: Re-write to handle changes between 
+	  states better (i.e. disconnected, connected, logged in, in game
+	  world). Remove reconnect method as it is not required. Move
+	  m_connection creation to connect function, and destroy it in
+	  disconnect to allow multiple connects  and disconnects. Remove 
+	  excessive use of exceptions in code.
+	* src/Graphics.cpp: Do not render world unless SYS_IN_WORLD flag is set.
+
+2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Implement invalidate
-	   method. Remove assert(render) call.
+	  method. Remove assert(render) call.
 
 2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
 

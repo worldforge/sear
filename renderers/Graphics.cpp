@@ -2,11 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.5 2005-03-15 17:55:04 simon Exp $
+// $Id: Graphics.cpp,v 1.6 2005-04-05 21:56:09 simon Exp $
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include <sage/sage.h>
 
 #include <varconf/Config.h>
@@ -159,18 +156,20 @@ void Graphics::shutdown() {
 }
 
 void Graphics::drawScene(bool select_mode, float time_elapsed) {
-  if (!m_renderer) {
-    std::cerr << "No Render object to render with!" << std::endl;
-    return;
-  }
-  if (select_mode) m_renderer->resetSelection();
-//  if (m_camera)
- if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
- RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
+  assert(m_renderer != NULL);
 
+  if (select_mode) m_renderer->resetSelection();
+
+  // Update camera position
+  if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
+  RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
+  // Do necessary GL initialisation for the frame
   m_renderer->beginFrame();
+
+  // Draw the world!
   drawWorld(select_mode, time_elapsed);
- if (!select_mode) {
+
+  if (!select_mode) {
 /* Removed for release
  
     Workspace *ws = m_system->getWorkspace();
@@ -178,12 +177,11 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     else throw Exception("Error no Workspace object");
 */
     Console *con = m_system->getConsole();
-assert(con);
-//    if (con)
- con->draw();
-//    else throw Exception("Error no Console object");
+    assert(con);
+    con->draw();
   }
 
+  // Update frame rate info
   if (!select_mode) {
     // Only update on a viewable frame
     m_frame_time += time_elapsed;
@@ -195,9 +193,10 @@ assert(con);
       m_frame_time = 0.0f;
     }
   }
-
+  // Render the entity name if available
   if (!select_mode) m_renderer->renderActiveName();
 
+  // Render the mouse cursor
   if (RenderSystem::getInstance().isMouseVisible()) {
     RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("cursor"));
     int mouse_x, mouse_y;
@@ -206,6 +205,7 @@ assert(con);
     glColor3f(1.0f, 1.0f, 1.0f);
     m_renderer->drawTextRect(mouse_x, mouse_y, 32, 32, RenderSystem::getInstance().getMouseCursor());
   }
+  // Do any GL bits to finish rendering the frame
   m_renderer->endFrame(select_mode);
 }
 
@@ -214,28 +214,31 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
-/*
-Camera coords
-//Should be stored in camera object an updated as required
-x = cos elevation * cos rotation * distance * distance;
-y = cos elevation * din rotation * distance * distance;
-z = sin elevation * distance;
+  assert(cam != NULL);
+  /*
+    Camera coords
+    //Should be stored in camera object an updated as required
+    x = cos elevation * cos rotation * distance * distance;
+    y = cos elevation * din rotation * distance * distance;
+    z = sin elevation * distance;
 
-((CAMERA + CHAR_POS) - ENTITY_POS)^2 = D^2
+    ((CAMERA + CHAR_POS) - ENTITY_POS)^2 = D^2
+  
+    Compare D^2 to choose what detail level to use
+  */
 
-Compare D^2 to choose what detail level to use
-
-*/
-
-	
+  // Reset enabled light sources
   m_lm->reset();
-  WFMath::Point<3> pos(0,0,0); // Initial camera position
-  Eris::Avatar *avatar = m_system->getClient()->getAvatar();
-  if (m_system->checkState(SYS_IN_WORLD) && avatar) {
+  WFMath::Point<3> pos(0,0,0); // Initial camera positiona
+  // Can we render the world yet?
+  if (m_system->checkState(SYS_IN_WORLD)) {
+    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+    assert(avatar != NULL);
     //if (!m_character) m_character = m_system->getCharacter();
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
-    if (focus) {
+    assert(focus != NULL);
+//    if (focus) {
       std::string id = focus->getId();
       static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
       m_orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
@@ -273,8 +276,8 @@ Compare D^2 to choose what detail level to use
       // m_renderer->applyCharacterLighting(x, y, z + height);
 
       m_renderer->getFrustum(m_frustum);
-    }
-
+//    }
+    // Setup main light sources
     m_renderer->applyLighting();
 
     if (!select_mode ) {
@@ -286,9 +289,12 @@ Compare D^2 to choose what detail level to use
       m_renderer->restore();
     }
 
-    WorldEntity *root = NULL; 
     Eris::View *view = avatar->getView();
-    if ((root = dynamic_cast<WorldEntity *>(view->getTopLevel()))) {
+    assert(view);
+    WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
+    assert(root);
+//    if (root != NULL) {
+      assert(System::instance()->getCharacter());
       System::instance()->getCharacter()->updateLocals(false);
       m_render_queue = Render::QueueMap();
       m_message_list = Render::MessageList();
@@ -297,7 +303,7 @@ Compare D^2 to choose what detail level to use
 
       m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
       if (!select_mode) m_renderer->drawMessageQueue(m_message_list);
-    }
+//    }
 
     m_renderer->store();
     RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
@@ -508,6 +514,7 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
   if (command == "invalidate") {
     RenderSystem::getInstance().invalidate();
     Environment::getInstance().invalidate();
+    ModelSystem::getInstance().invalidate();
   }
 }
 
