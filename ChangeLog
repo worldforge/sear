@@ -1,3 +1,8 @@
+2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/StateManager.cpp, renderers/StateManager.h: Change member 
+	  variable prefix to m_,
+
 2005-03-14  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.h: Reset pointers and clean up textures in

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: StateManager.h,v 1.6 2004-04-26 17:37:51 simon Exp $
+// $Id: StateManager.h,v 1.7 2005-03-15 16:30:29 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -59,8 +59,8 @@ public:
   StateManager();
   ~StateManager();
 
-  void init();
-  void shutdown();
+  int init();
+  int shutdown();
   void readFiles(const std::string &);
 
   StateID getState(const std::string &state_name) const;
@@ -76,7 +76,7 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &arguments);
   
-  StateID getCurrentState() const { return _current_state; }
+  StateID getCurrentState() const { return m_current_state; }
 
   void invalidate();
 
@@ -89,14 +89,14 @@ private:
  
   void buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state);
   
-  bool _initialised;
-  StateVector _states; ///< This stores all the state records
-  StateChangeVector _state_change_vector; ///< This keeps a display list for every state change
-  StateNameMap _state_name_map; ///< This maps a state name to its id
-  NameStateVector _name_state_vector; ///< This will map a stateid back to its name
+  bool m_initialised;
+  StateVector m_states; ///< This stores all the state records
+  StateChangeVector m_state_change_vector; ///< This keeps a display list for every state change
+  StateNameMap m_state_name_map; ///< This maps a state name to its id
+  NameStateVector m_name_state_vector; ///< This will map a stateid back to its name
 
-  StateID _current_state;
-  unsigned int _state_counter;
+  StateID m_current_state;
+  unsigned int m_state_counter;
 
 };
 

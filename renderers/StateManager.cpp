@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.17 2004-05-24 18:47:11 alriddoch Exp $
+// $Id: StateManager.cpp,v 1.18 2005-03-15 16:30:29 simon Exp $
 
 /*
  * TODO
@@ -84,27 +84,27 @@ static const std::string BLEND_src_alpha_saturate = "src_alpha_saturate";
 static const std::string CMD_LOAD_STATE_CONFIG = "load_state_file";
 
 StateManager::StateManager() :
-  _initialised(false),
-  _current_state(-1),
-  _state_counter(1)
+  m_initialised(false),
+  m_current_state(-1),
+  m_state_counter(1)
 {}
 
 StateManager::~StateManager() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
 }
 
-void StateManager::init() {
-  assert(_initialised == false);
-  if (_initialised) shutdown();
+int StateManager::init() {
+  assert(m_initialised == false);
+  if (m_initialised) shutdown();
   if (debug) std::cout << "State Loader: Initialising." << std::endl;
 
-  _current_state = -1;
-  _state_counter = 1;
+  m_current_state = -1;
+  m_state_counter = 1;
 
-  _states.resize(256);
-  _name_state_vector.resize(256);
-  _state_change_vector.resize(256);
-  for (unsigned int i = 0; i < 256; _state_change_vector[i++].resize(256));
+  m_states.resize(256);
+  m_name_state_vector.resize(256);
+  m_state_change_vector.resize(256);
+  for (unsigned int i = 0; i < 256; m_state_change_vector[i++].resize(256));
   
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
@@ -129,10 +129,10 @@ void StateManager::init() {
   default_state->alpha_value = 0.1f;
   default_state->blend_src_function = GL_SRC_ALPHA;
   default_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  _states[_state_counter] = default_state;
-  _state_name_map[default_state->state] = _state_counter;
-  _name_state_vector[_state_counter] = default_state->state;
-  ++_state_counter;
+  m_states[m_state_counter] = default_state;
+  m_state_name_map[default_state->state] = m_state_counter;
+  m_name_state_vector[m_state_counter] = default_state->state;
+  ++m_state_counter;
   
   //Create a font state so we can still see text
   //even if no files have been loaded into Sear
@@ -155,10 +155,10 @@ void StateManager::init() {
   font_state->alpha_value = 0.1f;
   font_state->blend_src_function = GL_SRC_ALPHA;
   font_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  _states[_state_counter] = font_state;
-  _state_name_map[font_state->state] = _state_counter;
-  _name_state_vector[_state_counter] = font_state->state;
-  ++_state_counter;
+  m_states[m_state_counter] = font_state;
+  m_state_name_map[font_state->state] = m_state_counter;
+  m_name_state_vector[m_state_counter] = font_state->state;
+  ++m_state_counter;
  
   //Create a font state so we can still see text
   //even if no files have been loaded into Sear
@@ -180,29 +180,31 @@ void StateManager::init() {
   select_state->alpha_value = 0.1f;
   select_state->blend_src_function = GL_SRC_ALPHA;
   select_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  _states[_state_counter] = select_state;
-  _state_name_map[select_state->state] = _state_counter;
-  _name_state_vector[_state_counter] = select_state->state;
-  ++_state_counter;
+  m_states[m_state_counter] = select_state;
+  m_state_name_map[select_state->state] = m_state_counter;
+  m_name_state_vector[m_state_counter] = select_state->state;
+  ++m_state_counter;
 
-  _initialised = true;
+  m_initialised = true;
+  return 0;
 }
 
-void StateManager::shutdown() {
-  assert(_initialised);
+int StateManager::shutdown() {
+  assert(m_initialised);
   if (debug) std::cout << "State Loader: Shutdown" << std::endl;
-  while (!_states.empty()) {
-//    if (*_states.begin()) {
-      StateProperties *sp = *(_states.begin());
+  while (!m_states.empty()) {
+//    if (*m_states.begin()) {
+      StateProperties *sp = *(m_states.begin());
       delete sp;
   //  }
-    _states.erase(_states.begin());
+    m_states.erase(m_states.begin());
   }
-  _initialised = false;
+  m_initialised = false;
+  return 0;
 }
 
 void StateManager::readFiles(const std::string &file_name) {
-  assert(_initialised);
+  assert(m_initialised);
   varconf::Config config;
   config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
   config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
@@ -210,9 +212,9 @@ void StateManager::readFiles(const std::string &file_name) {
 }
 
 void StateManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  assert(_initialised);
-  int in = _state_name_map[section];
-  StateProperties *record = _states[_state_name_map[section]];
+  assert(m_initialised);
+  int in = m_state_name_map[section];
+  StateProperties *record = m_states[m_state_name_map[section]];
   // If record does not exist, create it.
 //  if (!record) {
   if (in == 0) {
@@ -237,10 +239,10 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
       record->blend_src_function = GL_SRC_ALPHA;
       record->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
   
-      _states[_state_counter] = record;
-      _state_name_map[record->state] = _state_counter;
-      _name_state_vector[_state_counter] = record->state;
-      ++_state_counter;
+      m_states[m_state_counter] = record;
+      m_state_name_map[record->state] = m_state_counter;
+      m_name_state_vector[m_state_counter] = record->state;
+      ++m_state_counter;
       if (debug) std::cout << "Adding State: " << section << std::endl;
   }
 
@@ -277,9 +279,9 @@ void StateManager::varconf_error_callback(const char *message) {
 }
 
 StateID StateManager::getState(const std::string &state_name) const {
-  assert(_initialised);
-  StateNameMap::const_iterator S = _state_name_map.find(state_name);
-  if (S == _state_name_map.end()) {
+  assert(m_initialised);
+  StateNameMap::const_iterator S = m_state_name_map.find(state_name);
+  if (S == m_state_name_map.end()) {
     std::cerr << "state " << state_name << " is unknown" << std::endl;
     return 1;
   }
@@ -317,25 +319,25 @@ int StateManager::getBlendFunction(const std::string &blend_function) {
 }
 
 void StateManager::stateChange(StateID state) {
-  assert(_initialised == true);
-  if (_current_state == state) return; // No need to do anything
-  StateProperties *sp = _states[state];
+  assert(m_initialised == true);
+  if (m_current_state == state) return; // No need to do anything
+  StateProperties *sp = m_states[state];
   // If state doesn't exist, take first one
   assert(sp);
   if (!sp) {
     std::cout << "bad state found - " << state <<  std::endl;
-    sp = _states[1];
+    sp = m_states[1];
     state = 1;
   }
   assert(sp != NULL);
   // First time round, we have no states
-  if (_current_state != -1) {
-    unsigned int list = _state_change_vector[_current_state][state];
+  if (m_current_state != -1) {
+    unsigned int list = m_state_change_vector[m_current_state][state];
     // Check whether we need to generate a display list
     if (!glIsList(list)) {
       list = glGenLists(1);
-      buildStateChange(list, _states[_current_state], sp);
-      _state_change_vector[_current_state][state] = list;
+      buildStateChange(list, m_states[m_current_state], sp);
+      m_state_change_vector[m_current_state][state] = list;
     }
     glCallList(list);
   } else {
@@ -378,11 +380,11 @@ void StateManager::stateChange(StateID state) {
       glBlendFunc(sp->blend_src_function, sp->blend_dest_function);
   //  }
   }
-  _current_state = state;
+  m_current_state = state;
 }
 
 void StateManager::buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state) {
-  assert(_initialised);
+  assert(m_initialised);
   assert (previous_state != NULL);
   assert (next_state != NULL);
   glNewList(list, GL_COMPILE);
@@ -448,12 +450,12 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
 }
 
 void StateManager::registerCommands(Console *console) {
-  assert(_initialised);
+  assert(m_initialised);
   console->registerCommand(CMD_LOAD_STATE_CONFIG, this);
 }
 
 void StateManager::runCommand(const std::string &command, const std::string &arguments) {
-  assert(_initialised);
+  assert(m_initialised);
   if (command == CMD_LOAD_STATE_CONFIG) {
     std::string a = arguments;
     System::instance()->getFileHandler()->expandString(a);
@@ -462,18 +464,18 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
 }
 
 void StateManager::invalidate() {
-  assert(_initialised);
-  for (unsigned int i = 0; i < _state_change_vector.size(); ++i) {
-    for (unsigned int j = 0; j < _state_change_vector[i].size(); ++j) {
+  assert(m_initialised);
+  for (unsigned int i = 0; i < m_state_change_vector.size(); ++i) {
+    for (unsigned int j = 0; j < m_state_change_vector[i].size(); ++j) {
       // Delete display list if its still valid
-      if (glIsList(_state_change_vector[i][j])) {
-        glDeleteLists(_state_change_vector[i][j], 1);
+      if (glIsList(m_state_change_vector[i][j])) {
+        glDeleteLists(m_state_change_vector[i][j], 1);
       }
       // reset list value
-      _state_change_vector[i][j] = 0; 
+      m_state_change_vector[i][j] = 0; 
     }
   }
-  _current_state = -1;
+  m_current_state = -1;
 }
 
 } /* namespace Sear */
