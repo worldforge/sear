@@ -10,7 +10,7 @@ echo aclocal...
 
 libtoolize --force --copy
 
-aclocal -I $ACLOCAL_FLAGS
+aclocal $ACLOCAL_FLAGS
 
 echo autoheader...
 (autoheader --version) < /dev/null > /dev/null 2>&1 || {
@@ -40,6 +40,6 @@ autoconf
 
 CONFIGUREFLAGS="--prefix=/opt/worldforge"
 echo Running: configure $CONFIGUREFLAGS
-#./configure $CONFIGUREFLAGS $@
+./configure $CONFIGUREFLAGS $@
 
 exit 0
