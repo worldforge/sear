@@ -23,9 +23,7 @@ Impostor_Loader::~Impostor_Loader() {
 
 Model *Impostor_Loader::loadModel(Render *render, ModelStruct &ms) {
   Impostor *model = new Impostor(render);
-
   std::string type = ms.type;
-  cout << type << endl;
   int id = render->requestTexture("impostor", type);
   if (id == -1 && ms.parent) {
     type = ms.parent;
