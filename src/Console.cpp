@@ -167,7 +167,12 @@ void Console::runCommand(const std::string &command) {
   if ((c != '/' && c != '+' && c != '-')) {
     // Its a speech string, so SAY it
     // FIXME /say is not always available!
-    runCommand(std::string("/say ") + command);
+    if (_registered_commands["/say"]) {
+      runCommand(std::string("/say ") + command);
+    } else {
+    Log::writeLog(std::string("Cannot SAY, not in game yet: ") + command, Log::LOG_ERROR);
+    pushMessage("Cannot SAY, not it game yet" , CONSOLE_MESSAGE, 0);
+    }
     return; 
   }
   // If command has a leading /, remove it
