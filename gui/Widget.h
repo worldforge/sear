@@ -5,11 +5,15 @@
 #ifndef SEAR_GUI_WIDGET_H
 #define SEAR_GUI_WIDGET_H
 
+#include <sigc++/object.h>
+
 namespace Sear {
+
+class Window;
 
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
-class Widget {
+class Widget : virtual public SigC::Object {
 private:
   // Private and unimplemented to prevent slicing
   Widget(const Widget &);
@@ -25,6 +29,14 @@ public:
   void setParent(Widget * );
 
   virtual void show() = 0;
+  /// Create necessary window primitives, and map them into the space provided.
+  ///
+  /// @param w window this widget should be mapped into
+  /// @param x x coordinate of area to be used in parent window
+  /// @param y y coordinate of area to be used in parent window
+  /// @param w reference used to store with of widget once mapped
+  /// @param h reference used to store with of widget once mapped
+  virtual void map(Window * win, int x, int y, int & w, int & h) = 0;
 };
 
 } // namespace Sear

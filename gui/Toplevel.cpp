@@ -39,6 +39,8 @@ void Toplevel::setPos(int x, int y)
 
 void Toplevel::show()
 {
+  Container::show();
+
   Workspace * ws = dynamic_cast<Workspace *>(m_parent);
 
   if (ws == 0) {
@@ -48,7 +50,19 @@ void Toplevel::show()
   }
 
   RootWindow * rw = ws->getRootWindow();
-  rw->addChild(m_frame);
+  int width, height;
+  map(rw, 0, 0, width, height);
+}
+
+void Toplevel::map(Window * win, int x, int y, int & w, int & h)
+{
+  int cw = 0, ch = 0;
+  m_contents->map(m_frame, m_border, m_border, cw, ch);
+  m_frame->setSize(m_border * 2 + cw, m_border * 2 + ch);
+  win->addChild(m_frame);
+  w = m_frame->w();
+  h = m_frame->h();
+  std::cout << "Toplevel::map returning " << w << "," << h << std::endl << std::flush;
 }
 
 } // namespace Sear

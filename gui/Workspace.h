@@ -11,14 +11,26 @@
 
 namespace Sear {
 
+class Window;
 class RootWindow;
 class Toplevel;
 class System;
+
+typedef enum focus_policy {
+  FOCUS_CLICK,
+  FOCUS_SLOPPY,
+} FocusPolicy;
 
 class Workspace : public Container {
 protected:
   System * m_system;
   RootWindow * m_rootWindow;
+  FocusPolicy m_focusPolicy;
+
+  void mouseMotion(Window &, short, short);
+  void mouseDown(Window &, short, short);
+  void mouseUp(Window &, short, short);
+
 public:
   Workspace(System *);
   virtual ~Workspace();
@@ -28,10 +40,10 @@ public:
   }
 
   void draw();
-  void show();
   void handleEvent(const SDL_Event &);
   void addToplevel(Toplevel *);
 
+  virtual void map(Window * win, int x, int y, int & w, int & h);
 };
 
 } // namespace Sear

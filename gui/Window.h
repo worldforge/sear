@@ -7,6 +7,8 @@
 
 #include "gui/event.h"
 
+#include <sigc++/signal.h>
+
 #include <set>
 
 namespace Sear {
@@ -19,6 +21,7 @@ class Window {
 protected:
   Window * m_parent;
   std::set<Window *> m_children;
+  unsigned int m_eventMask;
   short m_x, m_y;
   short m_w, m_h;
 
@@ -30,13 +33,41 @@ private:
   const Window & operator=(const Window &);
 public:
   virtual ~Window();
+
+  const std::set<Window *> & getChildren() const {
+    return m_children;
+  }
+
+  short x() const {
+    return m_x;
+  }
+  
+  short y() const {
+    return m_y;
+  }
+  
+  short w() const {
+    return m_w;
+  }
+  
+  short h() const {
+    return m_h;
+  }
   
   void addChild(Window *);
   void setPos(int, int);
   void setSize(int, int);
+
+  void setEvents(unsigned int ev);
+
   void mouseMotion(short, short);
+  void mouseDown(short, short);
+  void mouseUp(short, short);
 
   virtual void render(Render *) = 0;
+
+  SigC::Signal0<void> MouseDown;
+  SigC::Signal0<void> MouseUp;
 };
 
 } // namespace Sear

@@ -1,4 +1,13 @@
+2004-10-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Box.cpp, gui/Box.h, gui/Button.cpp, gui/Button.h,
+	  gui/Container.cpp, gui/Container.h, gui/Frame.cpp, gui/Frame.h,
+	  gui/Label.cpp, gui/Label.h, gui/Toplevel.cpp, gui/Toplevel.h,
+	  gui/Widget.h, gui/Window.cpp, gui/Window.h, gui/Workspace.cpp,
+	  gui/Workspace.h, gui/event.h: More progress with the gui at last.
+
 2004-10-11  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Console.cpp: Show console by default on startup so newbie's have
 	  some idea of what to do.
 

@@ -7,9 +7,12 @@
 
 #include "gui/Container.h"
 
+#include <sigc++/signal.h>
+
 namespace Sear {
 
 class Graphic;
+class Frame;
 
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
@@ -18,12 +21,25 @@ private:
   // Private and unimplemented to prevent slicing
   Button(const Button &);
   const Button & operator=(const Button &);
+protected:
+  Frame * m_frame;
+  unsigned int m_border;
+  Widget * m_contents; // What are the contents?
+  bool m_pressed;
+
 public:
   explicit Button(const std::string & text);
   explicit Button(const Graphic & graphic);
   virtual ~Button();
 
   virtual void show();
+  virtual void map(Window * win, int x, int y, int & w, int & h);
+
+  // Called by event callbacks
+  void onPressed();
+  void onRelease();
+
+  SigC::Signal0<void> Clicked;
 };
 
 } // namespace Sear

@@ -18,11 +18,14 @@ private:
   // Private and unimplemented to prevent slicing
   Label(const Label &);
   const Label & operator=(const Label &);
+protected:
+  std::string m_text;
 public:
   explicit Label(const std::string & text);
   virtual ~Label();
 
   virtual void show();
+  virtual void map(Window * w, int x, int y, int & w, int & h);
 };
 
 } // namespace Sear

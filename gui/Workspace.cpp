@@ -21,7 +21,8 @@ namespace Sear {
 static const std::string WORKSPACE = "workspace";
 
 Workspace::Workspace(System * system) : m_system(system),
-                                        m_rootWindow(new RootWindow())
+                                        m_rootWindow(new RootWindow()),
+                                        m_focusPolicy(FOCUS_CLICK)
 {
 }
 
@@ -46,23 +47,79 @@ void Workspace::draw()
   renderer->setViewMode(PERSPECTIVE);
 }
 
-void Workspace::show()
+void Workspace::mouseMotion(Window & w, short x, short y)
 {
+  const std::set<Window *> & children = w.getChildren();
+  std::set<Window *>::const_iterator I = children.begin();
+  for(; I != children.end(); ++I) {
+    Window & c = **I;
+    short rx = x - c.x(),
+          ry = y - c.y();
+    if ((rx < 0) || (rx >= c.w()) ||
+        (ry < 0) || (ry >= c.h())) {
+      continue;
+    }
+    mouseMotion(c, rx, ry);
+    c.mouseMotion(rx, ry);
+  }
+}
+
+void Workspace::mouseDown(Window & w, short x, short y)
+{
+  const std::set<Window *> & children = w.getChildren();
+  std::set<Window *>::const_iterator I = children.begin();
+  for(; I != children.end(); ++I) {
+    Window & c = **I;
+    short rx = x - c.x(),
+          ry = y - c.y();
+    if ((rx < 0) || (rx >= c.w()) ||
+        (ry < 0) || (ry >= c.h())) {
+      continue;
+    }
+    c.mouseDown(rx, ry);
+  }
+}
+
+void Workspace::mouseUp(Window & w, short x, short y)
+{
+  const std::set<Window *> & children = w.getChildren();
+  std::set<Window *>::const_iterator I = children.begin();
+  for(; I != children.end(); ++I) {
+    Window & c = **I;
+    short rx = x - c.x(),
+          ry = y - c.y();
+    if ((rx < 0) || (rx >= c.w()) ||
+        (ry < 0) || (ry >= c.h())) {
+      continue;
+    }
+    c.mouseUp(rx, ry);
+  }
 }
 
 void Workspace::handleEvent(const SDL_Event & event)
 {
+  assert(m_rootWindow != 0);
   Render *renderer = m_system->getGraphics()->getRender();
 
   switch (event.type) {
     case SDL_MOUSEMOTION: {
         short x = event.motion.x;
         short y = renderer->getWindowHeight() - event.motion.y;
-        m_rootWindow->mouseMotion(x, y);
+        mouseMotion(*m_rootWindow, x, y);
       }
       break;
-    case SDL_MOUSEBUTTONDOWN:
-    case SDL_MOUSEBUTTONUP:
+    case SDL_MOUSEBUTTONDOWN: {
+        short x = event.motion.x;
+        short y = renderer->getWindowHeight() - event.motion.y;
+        mouseDown(*m_rootWindow, x, y);
+      }
+      break;
+    case SDL_MOUSEBUTTONUP: {
+        short x = event.motion.x;
+        short y = renderer->getWindowHeight() - event.motion.y;
+        mouseUp(*m_rootWindow, x, y);
+      }
+      break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
       // This is the type of event we are interested in
@@ -74,6 +131,10 @@ void Workspace::handleEvent(const SDL_Event & event)
 void Workspace::addToplevel(Toplevel * t)
 {
   addChild(t);
+}
+
+void Workspace::map(Window *, int, int, int &, int &)
+{
 }
 
 } // namespace Sear

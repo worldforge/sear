@@ -15,9 +15,19 @@ private:
   // Private and unimplemented to prevent slicing
   Frame(const Frame &);
   const Frame & operator=(const Frame &);
+protected:
+  bool m_down;
 public:
   Frame();
   virtual ~Frame();
+
+  void down() {
+    m_down = true;
+  }
+
+  void up() {
+    m_down = false;
+  }
 
   virtual void render(Render *);
 };

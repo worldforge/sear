@@ -7,23 +7,29 @@
 
 #include "gui/Container.h"
 
+#include <list>
+
 namespace Sear {
 
 /// Abstract class for widget containing a series of other widgets
 /// If this starts to seem a little gtk+, then that's because I stole
 /// the idea from gtk+
 class Box : public Container {
-protected:
-  Box();
-
 private:
   // Private and unimplemented to prevent slicing
   Box(const Box &);
   const Box & operator=(const Box &);
+protected:
+  Box();
+
+  std::list<Widget *> m_boxContents;
+  unsigned int m_packing;
 public:
   virtual ~Box();
 
+  Widget * push_back(Widget *);
   void render();
+  virtual void show();
 };
 
 class VBox : public Box {
@@ -34,6 +40,8 @@ private:
 public:
   VBox();
   virtual ~VBox();
+
+  virtual void map(Window * win, int x, int y, int & w, int & h);
 };
 
 class HBox : public Box {
@@ -44,6 +52,8 @@ private:
 public:
   HBox();
   virtual ~HBox();
+
+  virtual void map(Window * win, int x, int y, int & w, int & h);
 };
 
 } // namespace Sear

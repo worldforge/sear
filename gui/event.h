@@ -7,12 +7,10 @@
 
 namespace Sear {
 
-typedef enum event_mask {
-  MOUSE_MOTION        = 1 <<  0,
-  MOUSE_BUTTON_DOWN   = 1 <<  1,
-  MOUSE_BUTTON_UP     = 1 <<  2,
-  KEY_PRESS           = 1 <<  3,
-} EventMask;
+static const unsigned int MOUSE_MOTION        = 1 <<  0;
+static const unsigned int MOUSE_BUTTON_DOWN   = 1 <<  1;
+static const unsigned int MOUSE_BUTTON_UP     = 1 <<  2;
+static const unsigned int KEY_PRESS           = 1 <<  3;
 
 } // namespace Sear
 

@@ -5,6 +5,7 @@ INCLUDES = -I$(top_srcdir)
 libGui_a_SOURCES = Window.cpp Window.h \
                    RootWindow.cpp RootWindow.h \
                    Frame.cpp Frame.h \
+                   String.cpp String.h \
                    Widget.cpp Widget.h \
                    Label.cpp Label.h \
                    Container.cpp Container.h \

@@ -24,6 +24,7 @@ protected:
   Window * m_frame;
   std::string m_title;
 
+  static const int m_border = 4;
 public:
   explicit Toplevel(const std::string & title);
   virtual ~Toplevel();
@@ -36,6 +37,7 @@ public:
   void setPos(int x, int y);
 
   virtual void show();
+  virtual void map(Window * win, int x, int y, int & w, int & h);
 };
 
 } // namespace Sear

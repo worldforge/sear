@@ -28,7 +28,7 @@ protected:
 public:
   virtual ~Container();
 
-  void showAll();
+  virtual void show();
 };
 
 } // namespace Sear

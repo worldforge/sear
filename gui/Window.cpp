@@ -32,6 +32,11 @@ void Window::setSize(int w, int h)
   m_h = h;
 }
 
+void Window::setEvents(unsigned int ev)
+{
+  m_eventMask = ev;
+}
+
 void Window::mouseMotion(short x, short y)
 {
   if (m_parent != 0) {
@@ -50,5 +55,46 @@ void Window::mouseMotion(short x, short y)
   }
 }
 
+void Window::mouseDown(short x, short y)
+{
+  if (m_parent != 0) {
+    std::cout << "CHILD B " << x << " " << y << std::endl << std::flush;
+  }
+  std::set<Window *>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    Window & w = **I;
+    short rx = x - w.m_x,
+          ry = y - w.m_y;
+    if ((rx < 0) || (rx >= w.m_w) ||
+        (ry < 0) || (ry >= w.m_h)) {
+      continue;
+    }
+    w.mouseDown(rx, ry);
+  }
+  if (m_eventMask & MOUSE_BUTTON_DOWN) {
+    MouseDown.emit();
+  }
+}
+
+void Window::mouseUp(short x, short y)
+{
+  if (m_parent != 0) {
+    std::cout << "CHILD U " << x << " " << y << std::endl << std::flush;
+  }
+  std::set<Window *>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    Window & w = **I;
+    short rx = x - w.m_x,
+          ry = y - w.m_y;
+    if ((rx < 0) || (rx >= w.m_w) ||
+        (ry < 0) || (ry >= w.m_h)) {
+      continue;
+    }
+    w.mouseUp(rx, ry);
+  }
+  if (m_eventMask & MOUSE_BUTTON_UP) {
+    MouseUp.emit();
+  }
+}
 
 } // namespace Sear
