@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.15 2004-04-22 10:51:32 simon Exp $
+// $Id: TextureManager.cpp,v 1.16 2004-04-22 16:03:54 simon Exp $
 
 #include "TextureManager.h"
 
@@ -293,7 +293,7 @@ TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *
 #else // SDL_BYTEORDER == SDL_LIL_ENDIAN
     if (surface->format->Rshift < surface->format->Bshift) {
 #endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
-        format = (bpp == 24) ? GL_BGR : GL_BGRA;
+        format = (bpp == 24) ? GL_BGR_EXT : GL_BGRA_EXT;
     } else {
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }

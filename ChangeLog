@@ -1,4 +1,7 @@
 22nd April 2004, Simon Goodall
+ * Change GL_BGR anf GL_BGRA to use GL_BGR_EXT and GL_BGRA_EXT for win32
+
+22nd April 2004, Simon Goodall
  * Added normals to water to fix lighting problems
  * Disabled face culling on water so it is visible from both above and below
  * Fixed texture problem on 3ds models
