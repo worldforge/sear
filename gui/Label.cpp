@@ -3,7 +3,7 @@
 // Copyright (C) 2004 Alistair Riddoch
 
 #include "gui/Label.h"
-#include "gui/String.h"
+#include "gui/Text.h"
 
 #include <iostream>
 
@@ -19,7 +19,7 @@ Label::~Label()
 
 void Label::map(Window * win, int x, int y, int & w, int & h)
 {
-  String * s = new String(m_text);
+  Text * s = new Text(m_text);
   s->setPos(x, y);
   win->addChild(s);
   w = s->w();

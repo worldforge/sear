@@ -5,7 +5,7 @@
 #include "gui/TextEntry.h"
 
 #include "gui/Frame.h"
-#include "gui/String.h"
+#include "gui/Text.h"
 #include "gui/Caret.h"
 #include "gui/focus.h"
 
@@ -17,7 +17,7 @@
 namespace Sear {
 
 TextEntry::TextEntry(int size, const std::string & text) :
-           m_frame(new Frame()), m_text(new String("")),
+           m_frame(new Frame()), m_text(new Text("")),
            m_caret(new Caret(16)), m_input(text),
            m_textOffset(0), m_size(size), m_border(4)
 {

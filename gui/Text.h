@@ -2,8 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 Alistair Riddoch
 
-#ifndef SEAR_GUI_STRING_H
-#define SEAR_GUI_STRING_H
+#ifndef SEAR_GUI_TEXT_H
+#define SEAR_GUI_TEXT_H
 
 #include "gui/Window.h"
 
@@ -12,16 +12,16 @@
 namespace Sear {
 
 /// A rectangular window
-class String : public Window {
+class Text : public Window {
 private:
   // Private and unimplemented to prevent slicing
-  String(const String &);
-  const String & operator=(const String &);
+  Text(const Text &);
+  const Text & operator=(const Text &);
 protected:
   std::string m_content;
 public:
-  explicit String(const std::string &);
-  virtual ~String();
+  explicit Text(const std::string &);
+  virtual ~Text();
 
   const std::string & content() const {
     return m_content;
@@ -38,4 +38,4 @@ public:
 
 } // namespace Sear
 
-#endif // SEAR_GUI_STRING_H
+#endif // SEAR_GUI_TEXT_H

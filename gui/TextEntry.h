@@ -15,7 +15,7 @@
 
 namespace Sear {
 
-class String;
+class Text;
 class Frame;
 class Caret;
 
@@ -28,7 +28,7 @@ private:
   const TextEntry & operator=(const TextEntry &);
 protected:
   Frame * m_frame;
-  String * m_text;
+  Text * m_text;
   Caret * m_caret;
   std::string m_input;
   unsigned int m_textOffset;
