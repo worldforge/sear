@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.54 2004-06-24 15:20:13 simon Exp $
+// $Id: Graphics.cpp,v 1.55 2004-06-26 07:02:15 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,8 @@
 #include "Console.h"
 #include "Exception.h"
 #include "Frustum.h"
+#include "Light.h"
+#include "LightManager.h"
 #include "Model.h"
 #include "ModelHandler.h"
 #include "ModelRecord.h"
@@ -68,7 +70,24 @@ static const std::string SELECT = "select_state";
 
   static const std::string KEY_lower_frame_rate_bound = "lower_frame_rate_bound";
   static const std::string KEY_upper_frame_rate_bound = "upper_frame_rate_bound";
-  
+ 
+  static const std::string KEY_fire_ac = "fire_attenuation_constant";
+  static const std::string KEY_fire_al = "fire_attenuation_linear";
+  static const std::string KEY_fire_aq = "fire_attenuation_quadratic";
+
+  static const std::string KEY_fire_amb_red = "fire_ambient_red";
+  static const std::string KEY_fire_amb_green = "fire_ambient_green";
+  static const std::string KEY_fire_amb_blue = "fire_ambient_blue";
+  static const std::string KEY_fire_amb_alpha = "fire_ambient_alpha";
+  static const std::string KEY_fire_diff_red = "fire_diffuse_red";
+  static const std::string KEY_fire_diff_green = "fire_diffuse_green";
+  static const std::string KEY_fire_diff_blue = "fire_diffuse_blue";
+  static const std::string KEY_fire_diff_alpha = "fire_diffuse_alpha";
+  static const std::string KEY_fire_spec_red = "fire_specular_red";
+  static const std::string KEY_fire_spec_green = "fire_specular_green";
+  static const std::string KEY_fire_spec_blue = "fire_specular_blue";
+  static const std::string KEY_fire_spec_alpha = "fire_specular_alpha";
+ 
   // Default config values
   static const float DEFAULT_use_textures = true;
   static const float DEFAULT_use_lighting = true;
@@ -77,6 +96,24 @@ static const std::string SELECT = "select_state";
 
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;
+
+  
+  static const float DEFAULT_fire_ac = 0.7f;
+  static const float DEFAULT_fire_al = 0.2f;
+  static const float DEFAULT_fire_aq = 0.15f;
+
+  static const float DEFAULT_fire_amb_red = 0.0f;
+  static const float DEFAULT_fire_amb_green = 0.0f;
+  static const float DEFAULT_fire_amb_blue = 0.0f;
+  static const float DEFAULT_fire_amb_alpha = 0.0f;
+  static const float DEFAULT_fire_diff_red = 1.0f;
+  static const float DEFAULT_fire_diff_green = 1.0f;
+  static const float DEFAULT_fire_diff_blue = 0.9f;
+  static const float DEFAULT_fire_diff_alpha = 0.0f;
+  static const float DEFAULT_fire_spec_red = 0.0f;
+  static const float DEFAULT_fire_spec_green = 0.0f;
+  static const float DEFAULT_fire_spec_blue = 0.0f;
+  static const float DEFAULT_fire_spec_alpha = 0.0f;
  
 Graphics::Graphics(System *system) :
   _system(system),
@@ -111,6 +148,7 @@ void Graphics::init() {
     m_compass = new Compass(580.f, 50.f);
     m_compass->setup();
     
+   m_lm = new LightManager();
   _initialised = true;
 }
 
@@ -124,6 +162,7 @@ void Graphics::shutdown() {
   }
   
   delete m_compass;
+  delete m_lm;
   _initialised = false;
 }
 
@@ -182,8 +221,9 @@ Compare D^2 to choose what detail level to use
 */
 
 	
+  m_lm->reset();
   WFMath::Point<3> pos(0,0,0); // Initial camera position
-#warning FIXME Should not be treating World as a singleton
+  #warning FIXME Should not be treating World as a singleton
   Eris::World *world = Eris::World::getPrimary();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
@@ -228,13 +268,10 @@ Compare D^2 to choose what detail level to use
 
     if (!select_mode ) {
       _renderer->store();
-  //    _terrain->draw();
-
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-  glEnableClientState(GL_VERTEX_ARRAY);
-  Environment::getInstance().renderTerrain(pos);
-  glDisableClientState(GL_VERTEX_ARRAY);
-
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+      glEnableClientState(GL_VERTEX_ARRAY);
+      Environment::getInstance().renderTerrain(pos);
+      glDisableClientState(GL_VERTEX_ARRAY);
       _renderer->restore();
     }
 #if(1)
@@ -243,7 +280,9 @@ Compare D^2 to choose what detail level to use
       if (_character) _character->updateLocals(false);
       _render_queue = Render::QueueMap();
       _message_list = Render::MessageList();
+
       buildQueues(root, 0, select_mode, _render_queue, _message_list);
+
       _renderer->drawQueue(_render_queue, select_mode, time_elapsed);
       if (!select_mode) _renderer->drawMessageQueue(_message_list);
     }
@@ -329,6 +368,24 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       // TODO determine what model queue to use.
       // TODO if queue is empty switch to another
 //      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
+
+      // Setup lights as we go
+      if (we->type() == "fire") {
+        // Turn on light source
+        m_fire.enabled = true;
+
+        // Set position to entity posotion
+        m_fire.position = we->getAbsPos();
+        m_fire.position.z() += 0.5f; // Raise position off the ground a bit
+
+        // Add light to gl system
+        m_lm->applyLight(m_fire);
+        
+        // Disable as we don't need it again for now 
+        m_fire.enabled = false;
+      }
+
+
       // Loop through all models in list
       if (object_record->draw_self) {
         for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
@@ -339,7 +396,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
             if (!select_mode) {
                // Add to queue by state, then model record
 //               assert(_system->getModelRecords().findItem(*I, "state_num"));
-               int number = _system->getModelRecords().getItem(*I, "state_num");
+//               int number = _system->getModelRecords().getItem(*I, "state_num");
 //               assert(number > 0);
                render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
               if (we->hasMessages()) message_list.push_back(we);
@@ -362,23 +419,141 @@ void Graphics::readConfig() {
   varconf::Config &general = _system->getGeneral();
 
   // Setup frame rate detail boundaries
-  if (general.getItem("graphics", KEY_lower_frame_rate_bound)) {
-    temp = general.getItem("graphics", KEY_lower_frame_rate_bound);
+  if (general.getItem(GRAPHICS, KEY_lower_frame_rate_bound)) {
+    temp = general.getItem(GRAPHICS, KEY_lower_frame_rate_bound);
     _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
   }
-  if (general.findItem("graphics", KEY_upper_frame_rate_bound)) {
-    temp = general.getItem("graphics", KEY_upper_frame_rate_bound);
+  if (general.findItem(GRAPHICS, KEY_upper_frame_rate_bound)) {
+    temp = general.getItem(GRAPHICS, KEY_upper_frame_rate_bound);
     _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
   }
-  
+ 
+  // Read Fire properties 
+  if (general.findItem(GRAPHICS, KEY_fire_ac)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_ac);
+    m_fire.attenuation_constant = (!temp.is_double()) ? (DEFAULT_fire_ac) : ((double)(temp));
+  } else {
+    m_fire.attenuation_constant = DEFAULT_fire_ac;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_al)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_al);
+    m_fire.attenuation_linear = (!temp.is_double()) ? (DEFAULT_fire_al) : ((double)(temp));
+  } else {
+    m_fire.attenuation_linear = DEFAULT_fire_al;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_aq)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_aq);
+    m_fire.attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_fire_aq) : ((double)(temp));
+  } else {
+    m_fire.attenuation_quadratic = DEFAULT_fire_aq;
+  }
+
+  if (general.findItem(GRAPHICS, KEY_fire_amb_red)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_amb_red);
+    m_fire.ambient[0] = (!temp.is_double()) ? (DEFAULT_fire_amb_red) : ((double)(temp));
+  } else {
+    m_fire.ambient[0] = DEFAULT_fire_amb_red;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_amb_green)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_amb_green);
+    m_fire.ambient[1] = (!temp.is_double()) ? (DEFAULT_fire_amb_green) : ((double)(temp));
+  } else {
+    m_fire.ambient[1] = DEFAULT_fire_amb_green;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_amb_blue)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_amb_blue);
+    m_fire.ambient[2] = (!temp.is_double()) ? (DEFAULT_fire_amb_blue) : ((double)(temp));
+  } else {
+    m_fire.ambient[3] = DEFAULT_fire_amb_blue;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_amb_alpha)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_amb_alpha);
+    m_fire.ambient[3] = (!temp.is_double()) ? (DEFAULT_fire_amb_alpha) : ((double)(temp));
+  } else {
+    m_fire.ambient[4] = DEFAULT_fire_amb_alpha;
+  }
+
+
+  if (general.findItem(GRAPHICS, KEY_fire_diff_red)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_diff_red);
+    m_fire.diffuse[0] = (!temp.is_double()) ? (DEFAULT_fire_diff_red) : ((double)(temp));
+  } else {
+    m_fire.diffuse[0] = DEFAULT_fire_diff_red;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_diff_green)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_diff_green);
+    m_fire.diffuse[1] = (!temp.is_double()) ? (DEFAULT_fire_diff_green) : ((double)(temp));
+  } else {
+    m_fire.diffuse[1] = DEFAULT_fire_diff_green;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_diff_blue)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_diff_blue);
+    m_fire.diffuse[2] = (!temp.is_double()) ? (DEFAULT_fire_diff_blue) : ((double)(temp));
+  } else {
+    m_fire.diffuse[2] =  DEFAULT_fire_diff_blue;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_diff_alpha)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_diff_alpha);
+    m_fire.diffuse[3] = (!temp.is_double()) ? (DEFAULT_fire_diff_alpha) : ((double)(temp));
+  } else {
+    m_fire.diffuse[3] = DEFAULT_fire_diff_alpha;
+  }
+
+
+
+  if (general.findItem(GRAPHICS, KEY_fire_spec_red)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_spec_red);
+    m_fire.specular[0] = (!temp.is_double()) ? (DEFAULT_fire_spec_red) : ((double)(temp));
+  } else {
+    m_fire.specular[0] = DEFAULT_fire_spec_red;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_spec_green)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_spec_green);
+    m_fire.specular[1] = (!temp.is_double()) ? (DEFAULT_fire_spec_green) : ((double)(temp));
+  } else {
+    m_fire.specular[1] = DEFAULT_fire_spec_green;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_spec_blue)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_spec_blue);
+    m_fire.specular[2] = (!temp.is_double()) ? (DEFAULT_fire_spec_blue) : ((double)(temp));
+  } else {
+    m_fire.specular[2] = DEFAULT_fire_spec_blue;
+  }
+  if (general.findItem(GRAPHICS, KEY_fire_spec_alpha)) {
+    temp = general.getItem(GRAPHICS, KEY_fire_spec_alpha);
+    m_fire.specular[3] = (!temp.is_double()) ? (DEFAULT_fire_spec_alpha) : ((double)(temp));
+  } else {
+    m_fire.specular[3] = DEFAULT_fire_spec_alpha;
+  }
+
 }  
 
 void Graphics::writeConfig() {
   varconf::Config &general = _system->getGeneral();
   
   // Save frame rate detail boundaries
-  general.setItem("graphics", KEY_lower_frame_rate_bound, _lower_frame_rate_bound);
-  general.setItem("graphics", KEY_upper_frame_rate_bound, _upper_frame_rate_bound);
+  general.setItem(GRAPHICS, KEY_lower_frame_rate_bound, _lower_frame_rate_bound);
+  general.setItem(GRAPHICS, KEY_upper_frame_rate_bound, _upper_frame_rate_bound);
+
+  general.setItem(GRAPHICS, KEY_fire_ac, m_fire.attenuation_constant);
+  general.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
+  general.setItem(GRAPHICS, KEY_fire_aq, m_fire.attenuation_quadratic);
+  
+  general.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[0]);
+  general.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[1]);
+  general.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[2]);
+  general.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[3]);
+
+  general.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[0]);
+  general.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[1]);
+  general.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[2]);
+  general.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[3]);
+
+  general.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[0]);
+  general.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[1]);
+  general.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[2]);
+  general.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[3]);
+
 }  
 
 void Graphics::readComponentConfig() {

@@ -2,10 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.3 2004-04-27 15:07:02 simon Exp $
+// $Id: LightManager.cpp,v 1.4 2004-06-26 07:02:36 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
+
+#include <GL/gl.h>
 
 #include "LightManager.h"
 #include "Light.h"
@@ -20,39 +22,70 @@
 namespace Sear {
 
 LightManager::LightManager() :
-  _initialised(false)
+  m_initialised(false),
+  m_totalLights(0),
+  m_lightCounter(0)
 {}
 
 LightManager::~LightManager() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
 }
   
 void LightManager::init() {
-  if (_initialised) shutdown();
-  readConfig();
-  _config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &LightManager::config_update));
-  _initialised = true;
+  if (m_initialised) shutdown();
+  m_initialised = true;
 }
 
 void LightManager::shutdown() {
-  writeConfig();
-  _config_connection.disconnect();
-  _initialised = false;
+  m_initialised = false;
 }
 
-void LightManager::readConfig() {
-  
+void LightManager::reset() {
+  // Reset counter
+  m_lightCounter = 0;
+  // Reset lights
+  glDisable(GL_LIGHT2);
+  glDisable(GL_LIGHT3);
+  glDisable(GL_LIGHT4);
+  glDisable(GL_LIGHT5);
+  glDisable(GL_LIGHT6);
+  glDisable(GL_LIGHT7);
 }
 
-void LightManager::writeConfig() {
+void LightManager::applyLight(const Light &light) {
+  // Don't do anything if the light is disabled
+  if (!light.enabled) return;
 
-}
+  // Increment counter so we know how many lights we have used this frame
+  m_lightCounter++;
 
-void LightManager::config_update(const std::string &section, const std::string &key, varconf::Config &config){
-}
-  
-void LightManager::update(float time_elapsed) {
+  // Select light number
+  GLenum lightNum = GL_LIGHT2;
+  switch (m_lightCounter) {
+    case (0) : lightNum  = GL_LIGHT2;break;
+    case (1) : lightNum  = GL_LIGHT3;break;
+    case (2) : lightNum  = GL_LIGHT4;break;
+    case (3) : lightNum  = GL_LIGHT5;break;
+    case (4) : lightNum  = GL_LIGHT6;break;
+    case (5) : lightNum  = GL_LIGHT7;break;
+    default: return; // Number out of allowed range
+  }
 
+  // Turn on light
+  glEnable(lightNum);
+  // Set position
+  float pos[] = {light.position.x(), light.position.y(), light.position.z(), 1.0f}; // 1.0f for positional light
+  glLightfv(lightNum, GL_POSITION, pos);
+
+  // Set attenuation levels
+  glLightf(lightNum, GL_CONSTANT_ATTENUATION, light.attenuation_constant);
+  glLightf(lightNum, GL_LINEAR_ATTENUATION, light.attenuation_linear);
+  glLightf(lightNum, GL_QUADRATIC_ATTENUATION, light.attenuation_quadratic);
+
+  // Set light colour
+  glLightfv(lightNum, GL_AMBIENT, light.ambient);
+  glLightfv(lightNum, GL_DIFFUSE, light.diffuse);
+  glLightfv(lightNum, GL_SPECULAR, light.specular);
 }
 
 } /* namespace Sear */

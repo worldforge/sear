@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: LightManager.h,v 1.1 2002-12-24 16:17:15 simon Exp $
+// $Id: LightManager.h,v 1.2 2004-06-26 07:02:36 simon Exp $
 
 #ifndef SEAR_LIGHTMANAGER_H
 #define SEAR_LIGHTMANAGER_H 1
@@ -13,14 +13,13 @@
 #include <vector>
 #include <stack>
 #include <queue>
+
+#include "Light.h"
+
 namespace Sear {
 
-class Light;
-	
-class LightManager : public SigC::Object {
+class LightManager {
 public:
-  typedef std::priority_queue<std::vector<Light*> > LightQueue;
-//  typedef std::priority_queue<std::vector<Light*>, std::greater<Light*> > LightQueue;
 	
   LightManager();
   ~LightManager();
@@ -28,26 +27,13 @@ public:
   void init();
   void shutdown();
 
-  void readConfig();
-  void writeConfig();
+  void reset();
+  void applyLight(const Light &light); 
 
-  void config_update(const std::string &section, const std::string &key, varconf::Config &config);
-
-  void update(float time_elapsed);
- 
-  LightQueue &getLights();
-  
-  unsigned int getNumberOfLights() const { return _number_of_lights; }
-  void setNumberOfLights(unsigned int number_of_lights);
-  
-  
 private:
-  bool _initialised;
-  SigC::Connection _config_connection;
-  
-  unsigned int _number_of_lights;  
-
-  LightQueue _lights;
+  bool m_initialised;
+  int m_totalLights;
+  int m_lightCounter;
 };
 	
 } /* namespace Sear */

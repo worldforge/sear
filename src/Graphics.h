@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.15 2004-05-23 21:28:35 jmt Exp $
+// $Id: Graphics.h,v 1.16 2004-06-26 07:02:36 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -16,6 +16,7 @@
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 
+#include "Light.h"
 #include "Render.h"
 #include "interfaces/ConsoleObject.h"
 
@@ -37,7 +38,7 @@ class System;
 class Character;
 class Console;
 class Compass;
-
+class LightManager;
 class Graphics : public ConsoleObject, public SigC::Object{
 
 public:
@@ -121,6 +122,9 @@ private:
     Compass* m_compass;
   
  TerrainRenderer *tr;
+  LightManager *m_lm;
+
+  Light m_fire;
 };
 
 } /* namespace Sear */

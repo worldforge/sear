@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Light.h,v 1.2 2004-04-29 10:33:26 simon Exp $
+// $Id: Light.h,v 1.3 2004-06-26 07:02:36 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1

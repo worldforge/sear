@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.97 2004-06-24 15:20:13 simon Exp $
+// $Id: System.cpp,v 1.98 2004-06-26 07:02:36 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -291,6 +291,7 @@ std::cout << argv[i] << std::endl;
   m_general.getCmdline(argc, argv);
   readConfig();
   RenderSystem::getInstance().readConfig();
+  _graphics->readConfig();
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();

@@ -491,7 +491,7 @@ void GL::initLighting() {
   glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].attenuation_constant);
   glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].attenuation_linear);
   glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, lights[LIGHT_SUN].attenuation_quadratic);
-  glEnable(GL_LIGHT1);
+//  glEnable(GL_LIGHT1);
 }
 
 void GL::initFont() {
@@ -1054,17 +1054,13 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       // Translate Model
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
       translateObject(pos.x(), pos.y(), pos.z() );
-      // Move object to correct position
+      // Correct model position
       translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
-//      WFMath::Quaternion r = WFMath::Quaternion(0, model_record->rotate_x);
-//      r.rotation(1, model_record->rotate_y);
-//      r.rotation(2, model_record->rotate_z);
-        glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
 
-// model_record->rotate_x, model_record->rotate_y, model_record->rotate_z, 1.0f);
+      // Correct model rotation
+      glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
       // Rotate Model
       rotateObject(object_record, model_record);
-//      applyQuaternion(r);
 
       // Scale Object
       float scale = model_record->scale;
