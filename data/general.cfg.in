@@ -1,10 +1,3 @@
-[system]
-iconfile = "sear_icon.bmp"
-
 [terrain]
 num_x_landscapes = "2"
 num_y_landscapes = "2"
-landscape_0_0 = "moraf_nw_hm.png"
-landscape_1_0 = "moraf_ne_hm.png"
-landscape_0_1 = "moraf_sw_hm.png"
-landscape_1_1 = "moraf_se_hm.png"

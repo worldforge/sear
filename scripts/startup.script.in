@@ -1,7 +1,8 @@
 /cd @prefix@/share/sear/data/
 /enable_dir_prefix
-/load_general general.cfg
+/load_general general_files.cfg
 /disable_dir_prefix
+/load_general general.cfg
 /load_bindings bindings.cfg
 /load_object_file object_file.cfg
 /load_object_file buildings.cfg

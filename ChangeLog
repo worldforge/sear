@@ -1,4 +1,7 @@
 29th November 2002, Simon Goodall
+ * Fixed bug in config files where the path name was prefixed to a numeric value, fixed by adding another general config file
+
+29th November 2002, Simon Goodall
  * Fixed an out by one error on the getHeight code in terrain
  * Fixd code terrain code so it will go to much greater detail than before
 

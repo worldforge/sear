@@ -1,0 +1,8 @@
+[system]
+iconfile = "sear_icon.bmp"
+
+[terrain]
+landscape_0_0 = "moraf_nw_hm.png"
+landscape_1_0 = "moraf_ne_hm.png"
+landscape_0_1 = "moraf_sw_hm.png"
+landscape_1_1 = "moraf_se_hm.png"

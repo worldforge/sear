@@ -16,7 +16,7 @@ BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: %{_prefix}
 
 %description
-Sear is a client for MMORPGs using the Worldforge system. 
+Sear is a 3D client for MMORPGs using the Worldforge system. 
 
 written by Simon Goodall <sear@simongoodall.co.uk>
 

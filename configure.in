@@ -330,6 +330,7 @@ AC_OUTPUT([
 	sear-media.spec
 	data/bindings.cfg
 	data/general.cfg
+	data/general_files.cfg
 	data/models.cfg
 	data/object_file.cfg
 	data/buildings.cfg
