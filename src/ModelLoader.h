@@ -14,8 +14,7 @@
 
 #include <string>
 
-class ObjectProperties;
-//#include "ObjectLoader.h"
+#include "ObjectLoader.h"
 
 namespace Sear {
 
