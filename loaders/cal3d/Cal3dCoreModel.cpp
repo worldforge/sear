@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.13 2003-07-15 11:11:22 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.14 2003-07-17 16:41:01 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -76,9 +76,9 @@ void Cal3dCoreModel::init(const std::string &filename) {
     CalError::printLastError();
     return;
   }
-  std::cerr << "reading config" << std::endl << std::flush;
+//  std::cerr << "reading config" << std::endl << std::flush;
   readConfig(filename);
-  std::cerr << "done reading config" << std::endl << std::flush;
+ // std::cerr << "done reading config" << std::endl << std::flush;
 }
 
 void Cal3dCoreModel::shutdown() {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.5 2003-03-14 11:02:42 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.6 2003-07-17 16:41:01 simon Exp $
 
 #include "CoreModelHandler.h"
 #include "Cal3dCoreModel.h"
@@ -39,7 +39,7 @@ Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
   assert(_initialised && "CoreModelHandler not initialised");
   // Check to see if we have this core model loaded?
   if (_core_models[filename] == NULL) {
-    std::cout << "Loading Core Model" << std::endl << std::flush;
+//    std::cout << "Loading Core Model" << std::endl << std::flush;
     // load core model
     Cal3dCoreModel *core_model = new Cal3dCoreModel();
     core_model->init(filename);
