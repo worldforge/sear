@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.41 2004-06-20 18:43:35 simon Exp $
+// $Id: Character.cpp,v 1.42 2004-06-21 06:17:17 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -569,6 +569,7 @@ void Character::clearApp() {
   Atlas::Message::Element::MapType msg;
   const Atlas::Message::Element::MapType mt;
   msg["id"] = _self->getID();
+  msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
@@ -594,6 +595,7 @@ void Character::setApp() {
 
 //  set.sendFrom(_self->getID());
   msg["id"] = _self->getID();
+  msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
@@ -608,6 +610,7 @@ void Character::setHeight(float height) {
 
   Atlas::Message::Element::MapType msg;
   msg["id"] = _self->getID();
+  msg["objtype"] = "obj";
   msg[HEIGHT] = height;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));

@@ -1,3 +1,8 @@
+2004-06-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Add objtype to arguments of Set ops for
+	  customizing characters.
+
 2004-06-20  Simon Goodall  <simon@simongoodall.co.uk>
 	* src/WorldEntity.cpp: Add a "swimming" mode check
 
