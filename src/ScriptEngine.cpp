@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.9 2004-04-28 10:57:01 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.10 2004-05-03 07:02:49 jmt Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -79,7 +79,7 @@ void ScriptEngine::runScript(const std::string &file_name) {
     //  _file_dir += "/" + newFN.substr(0, pos); 
     //}
   //}
-  std::ifstream script_file(newFN.c_str());//System::instance()->processHome(file_name).c_str());
+  std::ifstream script_file(newFN.c_str());
 //  char cur_dir[256];
 //  memset(cur_dir, '\0', 256);
 //  getcwd(cur_dir, 255);
@@ -133,7 +133,7 @@ void ScriptEngine::runCommand(const std::string &command, const std::string &arg
 //  else if (command == ENABLE_DIR_PREFIX) _prefix_enabled = true;
 ///  else if (command == DISABLE_DIR_PREFIX) _prefix_enabled = false;
 //  else 
-if (command == RUN_SCRIPT) runScript(System::instance()->processHome(args));
+if (command == RUN_SCRIPT) runScript(args);
 //  else if (command == CHANGE_TO_FILE_DIRECTORY) { 
 //std::cout << "Changing dir to " << _file_dir << std::endl;
 //chdir(_file_dir.c_str());
