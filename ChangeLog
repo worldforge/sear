@@ -1,3 +1,6 @@
+10th December 2002, Simon Goodall
+ * Fixed bug where front and back face polygon culling would sometimes cull the wrong side
+
 7th December 2002, Simon Goodall
  * Fixed bug in Cally loader where it would segfault if it couldn't find a non-RAW texture
  * Landscape segments now have visibility test in addition to patch visiblity tests

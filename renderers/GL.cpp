@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.45 2002-12-09 13:28:01 simon Exp $
+// $Id: GL.cpp,v 1.46 2002-12-10 13:18:23 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -836,6 +836,8 @@ void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StatePr
   if (previous_state->cull_face != next_state->cull_face) {
     if (next_state->cull_face) glEnable(GL_CULL_FACE);
     else glDisable(GL_CULL_FACE);
+  }
+  if (previous_state->cull_face_cw != next_state->cull_face_cw) {
     if (next_state->cull_face_cw) glFrontFace(GL_CW);
     else glFrontFace(GL_CCW);
   }
