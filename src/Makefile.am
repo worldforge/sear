@@ -64,6 +64,7 @@ sear_bin_LDADD = \
 	../renderers/libRendererGL.a \
 	../environment/libEnvironment.a \
 	../loaders/libModelLoader.a \
+	../loaders/cal3d/libLoaderCal3d.a \
 	../gui/libGui.a \
 	$(SEAR_RC_O) \
 	$(SEAR_EXT_LIBS)

@@ -18,6 +18,3 @@ libModelLoader_a_SOURCES = \
 	ModelLoader.h \
 	Model.h \
 	ObjectRecord.h 
-
-libModelLoader_a_LIBADD = \
-	cal3d/libLoaderCal3d.a
