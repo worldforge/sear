@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.32 2004-04-19 09:15:52 simon Exp $
+// $Id: WorldEntity.cpp,v 1.33 2004-04-19 13:14:02 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -170,12 +170,15 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
       std::string mode = getProperty(MODE).asString();
       if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
         new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
+      } else if (mode == "floating") {
+      // Do nothing, use server Z
+      }
+    } else {
+      Eris::Entity *loc = getContainer(); // getLocation();
+      if (loc && loc->hasProperty("terrain")) {  
+        new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
       }
     }
-//    Eris::Entity *loc = getContainer(); // getLocation();
-//    if (loc && loc->hasProperty("terrain")) {  
-//      new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
-//    }
   }
   return new_pos;
 }
