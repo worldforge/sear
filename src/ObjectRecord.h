@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.2 2002-09-26 18:56:16 simon Exp $
+// $Id: ObjectRecord.h,v 1.3 2002-12-20 00:37:14 simon Exp $
 
 #ifndef SEAR_OBJECTRECORD_H
 #define SEAR_OBJECTRECORD_H 1
@@ -67,6 +67,7 @@ public:
   WFMath::AxisBox<3> bbox;
   WFMath::Point<3> position;
   WFMath::Quaternion orient;
+  WorldEntity *entity;
 };
 
 } /* namespace Sear */

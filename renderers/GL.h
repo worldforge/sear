@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.22 2002-12-19 23:11:30 simon Exp $
+// $Id: GL.h,v 1.23 2002-12-20 00:37:14 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -81,7 +81,7 @@ public:
   inline void switchTextureID(unsigned int texture) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
   void createDefaults();
   
-  std::string getActiveID() { return activeID; }
+  std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
 
@@ -140,8 +140,9 @@ protected:
 
   float frustum[6][4];
   
-  std::string activeID;
+//  std::string activeID;
   std::string active_name;
+  WorldEntity *activeEntity;
   int x_pos;
   int y_pos;
   
@@ -190,8 +191,8 @@ protected:
   std::map<std::string, GLuint> _state_map;
 
   static const unsigned int NUM_COLOURS = 500;
-//  int colourArray[NUM_COLOURS];
-//  WorldEntity *entityArray[NUM_COLOURS];
+  GLubyte colourArray[NUM_COLOURS][3];
+  WorldEntity *entityArray[NUM_COLOURS];
   unsigned int colour_index;
 //  std::set<int> colourSet;
 //  std::set<int>::const_iterator colourSetIterator;
@@ -203,8 +204,10 @@ protected:
   
   inline static  GLuint makeMask(GLuint bits);
   inline void resetColours();
-  inline std::string getSelectedID(unsigned int i);
-  void nextColour(const std::string &id);
+//  inline std::string getSelectedID(unsigned int i);
+  inline WorldEntity *getSelectedID(unsigned int i);
+//  void nextColour(const std::string &id);
+  void nextColour(WorldEntity*);
 
   void setupExtensions();
   bool use_ext_texture_filter_anisotropic;

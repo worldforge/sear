@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.49 2002-12-19 23:43:10 simon Exp $
+// $Id: GL.cpp,v 1.50 2002-12-20 00:37:14 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -82,42 +82,23 @@ static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
 inline GLuint GL::makeMask(GLuint bits) {
   return (0xFF >> (8 - bits));
-//  return ((GLuint)1 << bits);
 }
 
-inline std::string GL::getSelectedID(unsigned int i) {
-  return colour_mapped[i];
+inline WorldEntity *GL::getSelectedID(unsigned int i) {
+  return entityArray[i];
 }
 
-void GL::nextColour(const std::string &id) {
-  unsigned int ic;
-  ic = colour_index++;
-  
-//  if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
-//  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
-
-  colour_mapped[ic] = id;
-  
-  
-  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
-  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
-  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
-//  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
-//  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
-//  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
-  
-  glColor3ub(red, green, blue);
+void GL::nextColour(WorldEntity *we) {
+  unsigned int ic = colour_index++;
+  entityArray[ic] = we;
+  glColor3ubv(colourArray[ic]);
 }
 
 inline void GL::resetColours(){
-  colour_mapped = std::map<unsigned int, std::string>();
   colour_index = 1;
-//  colourSetIterator = colourSet.begin();
-//  *colourSetIterator++;
 }
 
 void GL::buildColourSet() {
-//  unsigned int numPrims = 500;
   glGetIntegerv (GL_RED_BITS, &redBits);
   glGetIntegerv (GL_GREEN_BITS, &greenBits);
   glGetIntegerv (GL_BLUE_BITS, &blueBits);
@@ -128,18 +109,15 @@ void GL::buildColourSet() {
   redShift =   greenBits + blueBits;
   greenShift =  blueBits;
   blueShift = 0;
-//  unsigned long indx;
-//  colourSet = std::set<int>();
   
-//  for (indx = 0; indx < numPrims; ++indx) {
-//    int ic = 0;
-//    ic += indx & (redMask << redShift);
-//    ic += indx & (greenMask << greenShift);
-//    ic += indx & (blueMask << blueShift);
-//    colourSet.insert(ic);
-//    colourSet.insert(indx);
-//  }
-//  if (debug) Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_INFO);
+  for (unsigned int indx = 0; indx < NUM_COLOURS; ++indx) {
+    GLubyte red = (indx & (redMask << redShift)) << (8 - redBits);
+    GLubyte green = (indx & (greenMask << greenShift)) << (8 - greenBits);
+    GLubyte blue = (indx & (blueMask << blueShift)) << (8 - blueBits);
+    colourArray[indx][0] = red;
+    colourArray[indx][1] = green;
+    colourArray[indx][2] = blue;
+  }
 }
 
 
@@ -154,11 +132,13 @@ GL::GL() :
   next_id(1), // was 0 error?
   base(0),
   textureList(std::vector<GLuint>()),
+  activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false)
 {
   _instance = this;
+  memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
 
 GL::GL(System *system, Graphics *graphics) :
@@ -171,11 +151,14 @@ GL::GL(System *system, Graphics *graphics) :
   next_id(1),
   base(0),
   textureList(std::vector<GLuint>()),
+  activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false)
+	
 {
   _instance = this;
+  memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
 
 GL::~GL() {
@@ -642,9 +625,9 @@ void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) 
 }
 
 void GL::procEvent(int x, int y) {
-  static unsigned int ic;
-  static std::string selected_id;
-  static GLubyte i[3];
+  unsigned int ic;
+//  static std::string selected_id;
+  GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
   _graphics->drawScene("", true, 0);
   y = window_height - y;
@@ -658,14 +641,15 @@ void GL::procEvent(int x, int y) {
 
   ic = 0;
   ic += red;
-  ic = ic << redBits;
+  ic <<= redBits;
   ic += green;
-  ic = ic << greenBits;
+  ic <<= greenBits;
   ic += blue;
-  selected_id = getSelectedID(ic);
-  if (selected_id != activeID) {
-    activeID = selected_id;
-    if (debug && !activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
+  //selected_id = getSelectedID(ic);
+  WorldEntity *selected_entity = getSelectedID(ic);
+  if (selected_entity != activeEntity) {
+    activeEntity = selected_entity;
+    if (debug && activeEntity) Log::writeLog(std::string("ActiveID: ") + activeEntity->getID(), Log::LOG_DEFAULT);
   }
 }
 
@@ -1097,10 +1081,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       
       // Draw Model
       if (select_mode) {
-        nextColour(object_record->id);
+        nextColour(object_record->entity);
 	model->render(true);
       } else {
-        if (object_record->id == activeID) {
+        if (object_record->entity == activeEntity) {
           active_name = object_record->name;
 	  drawOutline(model_record);
 	}
@@ -1528,4 +1512,8 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
   }
 }
 
+std::string GL::getActiveID() {
+  return (activeEntity) ? (activeEntity->getID()) : ("");
+}
+	;// { return activeID; }
 } /* namespace Sear */

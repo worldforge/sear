@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.22 2002-12-06 22:36:41 simon Exp $
+// $Id: Graphics.cpp,v 1.23 2002-12-20 00:37:14 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -361,6 +361,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       }
       object_record->name = we->getName();
       object_record->id = we->getID();
+      object_record->entity = we;
 
       if (we->hasBBox()) {
         object_record->bbox = we->getBBox();

@@ -1,3 +1,7 @@
+21st December 2002, Simon Goodall
+ * Precompute all selection colours so we can put array straight into renderer
+ * Entities now directly stored in array for selection
+
 20th December 2002, Simon Goodall
  * Removed unrequired code that slowed down selection process. We were storing a sequence of numbers in an std::set, this has been replaced by a single int.
 
