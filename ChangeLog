@@ -1,3 +1,7 @@
+2004-12-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* Fix memory leak on TerrainRenderer shutdown
+
 2004-12-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.in, src/Makefile.am: Automate getting path names for

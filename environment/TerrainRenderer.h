@@ -52,7 +52,9 @@ class TerrainRenderer
     void readTerrain();
   public:
     TerrainRenderer();
-    virtual ~TerrainRenderer() {}
+    virtual ~TerrainRenderer() {
+      delete [] m_lineIndeces;
+    }
 
     virtual void render( const PosType & camPos);
     virtual void renderSea() { drawSea(m_terrain); }
