@@ -8,10 +8,11 @@
 #include "../src/Terrain.h"
 
 #include <stdlib.h>
-#include "Landscape.h"
+//#include "Landscape.h"
 
 namespace Sear {
 
+class Landscape;
 class System;
 class Render;
 
@@ -45,8 +46,8 @@ public:
   float getHeight(float, float);
   int ground_id; 
 
-  void lowerDetail() { gLand->lowerDetail(); }
-  void raiseDetail() { gLand->raiseDetail(); }
+  void lowerDetail() { };//gLand->lowerDetail(); }
+  void raiseDetail() { };//gLand->raiseDetail(); }
   
   static float _water_level;
   void readConfig();

@@ -2,10 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "common/Utility.h"
+
 #include "System.h"
 #include "Terrain.h"
 #include "WorldEntity.h"
-#include "Utility.h"
 #include "Frustum.h"
 
 namespace Sear {

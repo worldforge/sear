@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "SkyBox.h"
-#include "../src/Config.h"
+#include "common/Config.h"
+#include "common/Log.h"
 
-#include "../src/Log.h"
-#include "../src/Render.h"
-#include "../src/Models.h"
+#include "src/Render.h"
+#include "src/Model.h"
+
+#include "SkyBox.h"
 namespace Sear {
 
 // Setup static data items
@@ -64,22 +65,22 @@ void SkyBox::renderTextureSet(int base) {
   base *= 6; //NUM OF CUBE SIDES
   //Top
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_TOP]);
-  _renderer->renderArrays(Models::QUADS, 0, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 0, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //North
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_NORTH]);
-  _renderer->renderArrays(Models::QUADS, 4, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 4, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //South
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_SOUTH]);
-  _renderer->renderArrays(Models::QUADS, 8, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 8, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //East
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_EAST]);
-  _renderer->renderArrays(Models::QUADS, 12, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 12, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //West
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_WEST]);
-  _renderer->renderArrays(Models::QUADS, 16, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 16, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   //Bottom
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_BOTTOM]);
-  _renderer->renderArrays(Models::QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
   
 }
 

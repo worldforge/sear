@@ -9,6 +9,7 @@
 #include <list>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+
 #include "ConsoleObject.h"
 
 namespace Sear {
@@ -22,6 +23,7 @@ class StateLoader;
 class Config;
 class Console;
 class Character;
+class Graphics;
 
 typedef enum {
   SYS_UNKNOWN = 0,
@@ -70,7 +72,9 @@ public:
   void setInstallDir(const std::string &install_dir) { install_path = install_dir; }
   
 
-  Render *getRenderer() const { return renderer; }
+//  Render *getRenderer() const { return renderer; }
+  Graphics *getGraphics() const { return _graphics; }
+  
   Config *getGeneral() { return _general; }
   Config *getTexture() { return _textures; }
   Config *getModel() { return _models; } 
@@ -110,6 +114,10 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
+#ifdef COLOUR_CURSOR_TEST
+  int getXPos() { return _x_pos;}
+  int getYPos() { return _y_pos;}
+#endif
 protected:
   bool repeat; 
   int action;
@@ -121,6 +129,7 @@ protected:
   int window_height;
   bool fullscreen;
   SDL_Surface *screen;
+  Graphics *_graphics;
   Render *renderer;
   Client *_client;
   static System *_instance;
@@ -206,6 +215,9 @@ protected:
   float _dusk_time;
   float _night_time;
   TimeArea _time_area;
+#ifdef COLOUR_CURSOR_TEST  
+  int _x_pos, _y_pos;
+#endif
 private:
   bool _systemState[SYS_LAST_STATE];
   bool _system_running;

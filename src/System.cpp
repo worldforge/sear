@@ -2,33 +2,34 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "System.h"
-#include "Render.h"
-#include "../renderers/GL.h"
-#include "client.h"
-#include "Camera.h"
-#include "Bindings.h"
-#include "Console.h"
-#include "EventHandler.h"
-#include "ModelHandler.h"
-#include "Config.h"
-#include "Character.h"
-#include "conf.h"
-#include "ObjectLoader.h"
-#include "StateLoader.h"
-#include "Utility.h"
-#include "WorldEntity.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
-
 #include <unistd.h>
-#include "cursors.h"
 
-#include "Exception.h"
-#include "Log.h"
 #include <Eris/Types.h>
+
+#include "common/Log.h"
+#include "common/Config.h"
+#include "common/Utility.h"
+
+#include "Bindings.h"
+#include "Camera.h"
+#include "Character.h"
+#include "client.h"
+#include "conf.h"
+#include "Console.h"
+#include "cursors.h"
+#include "EventHandler.h"
+#include "Exception.h"
+#include "Graphics.h"
+#include "ModelHandler.h"
+#include "ObjectLoader.h"
+#include "Render.h"
+#include "StateLoader.h"
+#include "System.h"
+#include "WorldEntity.h"
 
 namespace Sear {
 
@@ -294,23 +295,30 @@ void System::createWindow(bool fullscreen) {
     renderer->shutdown();
     delete renderer;
   }// else {
-    renderer = new GL(this);
+    _graphics = new Graphics(this);
+    _graphics->init();
+ //   renderer = new GL(this);
     _console->init();
-    renderer->init();
-    renderer->initWindow(_width, _height);
+//    renderer->init();
+    _graphics->getRender()->initWindow(_width, _height);
+    renderer = _graphics->getRender();
 //    renderer->buildDisplayLists();
     pushMessage("Loading, Please wait...", 2, 100);
-    renderer->drawScene("", false); // Render scene one before producing colour set
+    _graphics->drawScene("", false, 0); // Render scene one before producing colour set
     renderer->buildColourSet();
 //  }
 }
 
 void System::mainLoop() {
   SDL_Event event;
+  float last_time = 0.0f;
   while (_system_running) {
     try {
+      float time_elapsed;
       _seconds = (float)SDL_GetTicks() / 1000.0f;
       _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
+      time_elapsed = _seconds - last_time;
+      last_time = _seconds;
       while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
       _current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
       if (_current_time < _dawn_time) _time_area = NIGHT;
@@ -324,9 +332,13 @@ void System::mainLoop() {
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
+#ifdef COLOUR_CURSOR_TEST      
+      SDL_GetMouseState(&_x_pos, &_y_pos);
+//      SDL_GetRelativeMouseState(&_x_pos, &_y_pos);
+#endif      
       _event_handler->poll();
       _client->poll();
-      renderer->drawScene(command, false);
+      _graphics->drawScene(command, false, time_elapsed);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
@@ -788,9 +800,12 @@ void System::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == READ_CONFIG) {
     readConfig();
+    if (_graphics) {
+      _graphics->readConfig();
+      _graphics->readComponentConfig();
+    }
     if (renderer) {
       renderer->readConfig();
-      renderer->readComponentConfig();
     }
     if (_character)_character->readConfig();
   }

@@ -48,6 +48,8 @@ AC_ARG_ENABLE(debug,
   ]
 )
 
+dnl CXXFLAGS="$CXXFLAGS -DCOLOUR_CURSOR_TEST"
+
 dnl Check SDL
 SDL_VERSION=1.2.4
 AM_PATH_SDL($SDL_VERSION)
@@ -129,6 +131,7 @@ dnl Check other libs
 if test $cross_compiling == no; then
 
   AC_CHECK_LIB(SDL_image,IMG_Load)
+dnl  AC_CHECK_LIB(SDL_sound,Sound_Init)
   AC_CHECK_LIB(GL,glViewport)
   AC_CHECK_LIB(GLU,gluPerspective)
   AC_CHECK_LIB(glut, glutSwapBuffers)
@@ -157,6 +160,16 @@ else
   else
 	AC_MSG_ERROR(Error could not find SDL_image)
   fi
+
+dnl  AC_CHECK_HEADER(SDL/SDL_sound.h,
+dnl	[found_sdl_image=yes break],
+dnl	[found_sdl_image=no])
+
+dnl  if test $found_sdl_image == yes; then
+dnl	LIBS="$LIBS -lSDL_sound"
+dnl  else
+dnl	AC_MSG_ERROR(Error could not find SDL_sound)
+dnl  fi
 
   AC_CHECK_HEADER(GL/gl.h,
 	[found_gl=yes break],
@@ -196,6 +209,7 @@ fi
 dnl Generate files
 AC_OUTPUT([
 	Makefile
+	common/Makefile
 	src/Makefile
 	loaders/Makefile
 	renderers/Makefile

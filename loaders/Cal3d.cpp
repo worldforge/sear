@@ -3,15 +3,17 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 
-#include "Cal3d.h"
 #include <GL/gl.h>
-#include "../src/System.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include "../src/Log.h"
-#include "../src/Utility.h"
 
-#include "../src/Render.h"
+#include "common/Log.h"
+#include "common/Utility.h"
+
+#include "src/System.h"
+#include "src/Render.h"
+
+#include "Cal3d.h"
 
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
@@ -23,7 +25,7 @@ const int Cal3d::STATE_IDLE = 0;
 const int Cal3d::STATE_FANCY = 1;
 const int Cal3d::STATE_MOTION = 2;
 
-float Cal3d::_walk_blend[] = {1.0, 0.0, 0.0};
+float Cal3d::_walk_blend[] = {0.8, 0.2, 0.0};
 float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
 
 //----------------------------------------------------------------------------//
@@ -408,7 +410,7 @@ bool Cal3d::init(const std::string& strFilename)
 
 void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 {
-  static Render *renderer = System::instance()->getRenderer();
+  static Render *renderer = System::instance()->getGraphics()->getRender();
   // get the renderer of the model
   CalRenderer *pCalRenderer;
   pCalRenderer = m_calModel.getRenderer();
@@ -478,9 +480,9 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
         // set the vertex and normal buffers
         if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           renderer->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
-          renderer->renderElements(Models::TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
+          renderer->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
 	} else {
-          renderer->renderElements(Models::TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
+          renderer->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
 	}
 
 

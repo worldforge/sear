@@ -5,16 +5,15 @@
 #ifndef _WIREFRAME_LOADER_H_
 #define _WIREFRAME_LOADER_H_ 1
 
-#include "../src/ModelLoader.h"
-
-#include "../src/ObjectLoader.h"
-
 #include <string>
+
+#include "src/ModelLoader.h"
+#include "src/ObjectLoader.h"
 
 namespace Sear {
 
 // Forward Declarations
-class Models;
+class Model;
 class ModelHandler;
 //class ObjectProperties;
 	
@@ -23,7 +22,7 @@ public:
   WireFrame_Loader(ModelHandler *mh);
   ~WireFrame_Loader();
 
-  Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name);
+  Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name);
 
 };
 

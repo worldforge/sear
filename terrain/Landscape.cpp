@@ -6,16 +6,18 @@
 
 #include <math.h>
 
+#include <Eris/Entity.h>
+#include <Eris/World.h>
+
+#include "../common/Config.h"
+
+#include "../src/Camera.h"
 #include "../src/System.h"
 #include "../src/Render.h"
 #include "../src/ObjectLoader.h"
+
 #include "Landscape.h"
 #include "ROAM.h"
-#include <Eris/Entity.h>
-#include <Eris/World.h>
-//#include "../src/Character.h"
-#include "../src/Camera.h"
-#include "../src/Config.h"
 
 namespace Sear {
 
@@ -140,7 +142,7 @@ void Landscape::render() {
 
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange("terrain");
-  if (_renderer->checkState(RENDER_TEXTURES)) {
+  if (_renderer->checkState(Render::RENDER_TEXTURES)) {
     _renderer->switchTexture(_renderer->requestMipMap("terrain_grass"));
   } else {
     // Do Nothing
@@ -151,7 +153,7 @@ void Landscape::render() {
   
   _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
   _renderer->stateChange("water");
-  if (_renderer->checkState(RENDER_TEXTURES)) {
+  if (_renderer->checkState(Render::RENDER_TEXTURES)) {
     _renderer->switchTexture(_renderer->requestMipMap("water_water"));
   } else {
     //Do Nothing

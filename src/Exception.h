@@ -5,7 +5,6 @@
 #ifndef _EXCEPTION_H_
 #define _EXCEPTION_H_ 1
 
-#include <iostream.h>
 #include <string>
 
 namespace Sear {

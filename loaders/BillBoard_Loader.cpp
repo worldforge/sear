@@ -2,15 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+#include <string>
+
+#include "src/ModelHandler.h"
+#include "src/WorldEntity.h"
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
+#include "src/ObjectLoader.h"
+
 #include "BillBoard_Loader.h"
 #include "BillBoard.h"
-#include "../src/ModelHandler.h"
-#include "../src/WorldEntity.h"
-#include "../src/System.h"
-#include "../src/Render.h"
-#include "../src/ObjectLoader.h"
-
-#include <string>
 
 namespace Sear {
 
@@ -22,14 +24,14 @@ BillBoard_Loader::~BillBoard_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Models *BillBoard_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
+Model *BillBoard_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
   BillBoard *model = new BillBoard();
 
   std::string type = we->type();
-  int id = System::instance()->getRenderer()->requestTexture(std::string("billboard_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("billboard_") + type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getRenderer()->requestTexture(std::string("billboard_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("billboard_") + type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

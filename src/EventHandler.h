@@ -6,6 +6,7 @@
 #define _EVENTHANDLER_H_ 1
 
 #include <list>
+
 #include "Event.h"
 
 namespace Sear {

@@ -5,4 +5,3 @@
 #define CLIENT_NAME "Sear"
 #define DEFAULT_PORT 6767
 
-//#include "Error.h"

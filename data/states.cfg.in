@@ -1,15 +1,3 @@
-state = skybox
-alpha_test = false
-blend = false
-lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
 state = terrain
 alpha_test = false
 blend = false
@@ -161,6 +149,30 @@ lighting = false
 textures = true
 colour_material = true
 depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = false
+end_of_state
+state = sky_0
+alpha_test = false
+blend = false
+lighting = false
+textures = true
+colour_material = false
+depth_test = false
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = false
+end_of_state
+state = sky_1
+alpha_test = false
+blend = true
+lighting = false
+textures = true
+colour_material = false
+depth_test = false
 cull_face = false
 cull_face_cw = false
 stencil = false

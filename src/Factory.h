@@ -6,6 +6,7 @@
 #define _FACTORY_H_ 1
 
 #include <Eris/Factory.h>
+#include <Eris/World.h>
 
 #include "WorldEntity.h"
 
@@ -13,8 +14,8 @@ namespace Sear {
 
 class Factory : public Eris::Factory {
 public:
-  virtual bool accept(const Atlas::Objects::Entity::GameEntity &) { return true; }
-  virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity & ge) { return new WorldEntity(ge); }
+  virtual bool accept(const Atlas::Objects::Entity::GameEntity &, Eris::World *) { return true; }
+  virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity & ge, Eris::World *world) { return new WorldEntity(ge, world); }
 
 };
 } /* namespace Sear */

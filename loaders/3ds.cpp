@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-#include "3ds.h"
+#include <GL/gl.h>
 
 #include <lib3ds/file.h>
 #include <lib3ds/mesh.h>
@@ -12,12 +12,10 @@
 #include <lib3ds/vector.h>
 #include <lib3ds/light.h>
 
-#include "../src/Log.h"
+#include "common/Log.h"
+#include "common/Utility.h"
 
-
-#include "../src/Utility.h"
-
-#include <GL/gl.h>
+#include "3ds.h"
 
 Lib3dsFile* model = NULL;
 GLuint treemodel_list = 0;
@@ -114,7 +112,7 @@ bool ThreeDS::init(const std::string &file_name) {
     // Create new model
     _models[mesh_number] = new ThreeDSMesh();
     // Assign data to model
-    _models[mesh_number]->init(Models::TRIANGLES, mesh->faces * 3, vertex_data, texture_data, normal_data);
+    _models[mesh_number]->init(Model::TRIANGLES, mesh->faces * 3, vertex_data, texture_data, normal_data);
   }
   // Free file
   lib3ds_file_free(model);

@@ -6,23 +6,24 @@
 
 #include <Eris/TypeInfo.h>
 
+#include "common/Config.h"
+#include "common/Log.h"
+
+#include "loaders/3ds_Loader.h"
+#include "loaders/Cal3d_Loader.h"
+#include "loaders/BoundBox_Loader.h"
+#include "loaders/BillBoard_Loader.h"
+#include "loaders/Impostor_Loader.h"
+#include "loaders/WireFrame_Loader.h"
+
+#include "Exception.h"
+#include "Model.h"
 #include "ModelHandler.h"
 #include "ModelLoader.h"
-#include "Models.h"
-#include "Exception.h"
-#include "WorldEntity.h"
-#include "System.h"
-#include "Config.h"
 #include "ObjectLoader.h"
-#include "Log.h"
+#include "System.h"
+#include "WorldEntity.h"
 
-
-#include "../loaders/Cal3d_Loader.h"
-#include "../loaders/BoundBox_Loader.h"
-#include "../loaders/BillBoard_Loader.h"
-#include "../loaders/WireFrame_Loader.h"
-#include "../loaders/Impostor_Loader.h"
-#include "../loaders/3ds_Loader.h"
 
 namespace Sear {
 
@@ -44,7 +45,7 @@ ModelHandler::~ModelHandler() {
 void ModelHandler::init() {
   // TODO: Do  clean up if required
   _model_loaders = std::map<std::string, ModelLoader*>();
-  _models = std::map<std::string, Models*>();
+  _models = std::map<std::string, Model*>();
 }
 
 void ModelHandler::shutdown() {
@@ -56,8 +57,8 @@ void ModelHandler::shutdown() {
       _model_loaders[I->first] = NULL;
     }
   } 
- // Clear Up Models
-  for (std::map<std::string, Models*>::iterator I = _models.begin(); I != _models.end(); I++) {
+ // Clear Up Model
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
     if (I->second) {
       I->second->shutdown();
       delete I->second;
@@ -66,7 +67,7 @@ void ModelHandler::shutdown() {
   }
 }
   
-Models *ModelHandler::getModel(WorldEntity *we) {
+Model *ModelHandler::getModel(WorldEntity *we) {
   // Check for NULL pointer	
   if (!we) throw Exception("WorldEntity is NULL");
   
@@ -84,7 +85,7 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   ObjectLoader *ol = System::instance()->getObjectLoader();
   std::string object_type = "";
   std::string data_source = "";
-  Models *model = NULL;
+  Model *model = NULL;
   static Config *model_config = System::instance()->getModel();
   object_type = we->type();
   std::set<std::string> parents_list = we->getType()->getParentsAsSet();
@@ -138,7 +139,7 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
 }
 
 void ModelHandler::checkModelTimeout(const std::string &id) {
-  Models *model = _models[id];
+  Model *model = _models[id];
   if (!model) return;
   if (!model->getInUse()) {
     if (model->getFlag("ModelByType")) return;

@@ -5,11 +5,11 @@
 #ifndef _CONSOLE_H_
 #define _CONSOLE_H_ 1
 
-//#include <stdlib.h>
-//#include <stdio.h>
 #include <string>
 #include <list>
 #include <map>
+
+#include "ConsoleObject.h"
 
 #define MAX_MESSAGES (5)
 #define FONT_HEIGHT  (15)
@@ -25,8 +25,6 @@
 
 #define CONSOLE_MESSAGE 0x1
 #define SCREEN_MESSAGE  0x2
-
-#include "ConsoleObject.h"
 
 namespace Sear {
 

@@ -14,8 +14,9 @@
  *  character's head) and the view plane
  */ 
 
-#include "ConsoleObject.h"
 #include <string>
+
+#include "ConsoleObject.h"
 
 namespace Sear {
 

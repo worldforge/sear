@@ -12,7 +12,7 @@
  * This class should also take care of recycling unused
  * models or unloading them after a certain timeout value
  * This is the only class that shoud know about the specific 
- * sub classes of MultiModels and Models
+ * sub classes of MultiModel and Model
  */ 
 
 #include <map>
@@ -21,7 +21,7 @@
 namespace Sear {
 
 // Forward Declarationa
-class Models;
+class Model;
 class ModelLoader;
 class WorldEntity;
 	
@@ -36,7 +36,7 @@ public:
   /*
    * Obtains a model for the given WorldEntity we
    */ 
-  Models *getModel(WorldEntity *we);
+  Model *getModel(WorldEntity *we);
 
   /*
    * Sets up a callback to use to load a model with model_type
@@ -49,7 +49,7 @@ protected:
   unsigned int _number_of_models; //required?
   // Will not be an array as not dynamic -> a map would be better 
   std::map<std::string, ModelLoader*> _model_loaders;
-  std::map<std::string, Models*> _models;
+  std::map<std::string, Model*> _models;
 };
 
 } /* namespace Sear */

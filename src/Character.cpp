@@ -1,33 +1,32 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
-#include "System.h"
-#include "Character.h"
-#include "client.h"
 
+
+#include <math.h>
+#include <string>
 #include <SDL/SDL.h>
-
 
 #include <Atlas/Objects/Operation/Move.h>
 #include <Atlas/Objects/Operation/Touch.h>
 #include <Atlas/Objects/Operation/Talk.h>
 
-#include <Eris/Connection.h>
-#include "WorldEntity.h"
-#include <math.h>
 #include <wfmath/atlasconv.h>
+#include <Eris/Connection.h>
 
-#include "System.h"
+#include "common/Log.h"
+#include "common/Utility.h"
+#include "common/Config.h"
+
+#include "WorldEntity.h"
 #include "EventHandler.h"
 #include "Event.h"
-#include "Config.h"
-#include "Utility.h"
-#include <string>
-
-#include "Log.h"
-
+#include "System.h"
+#include "Character.h"
+#include "client.h"
 #include "Console.h"
 #include "Render.h"
+#include "Graphics.h"
 
 namespace Sear {
 
@@ -363,7 +362,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
        item += " ";
        item += tokens.front(); tokens.pop_front();
      }
-     giveEntity(item, quantity, _system->getRenderer()->getActiveID());
+     giveEntity(item, quantity, _system->getGraphics()->getRender()->getActiveID());
    }
    else if (command == DROP) {
      int quantity = 0;

@@ -7,13 +7,13 @@
 
 #include <string>
 
-#include "../src/ModelLoader.h"
-#include "../src/ObjectLoader.h"
+#include "src/ModelLoader.h"
+#include "src/ObjectLoader.h"
 
 namespace Sear {
 
 // Forward Declarations
-class Models;
+class Model;
 class ModelHandler;
 
 class Cal3d_Loader : public ModelLoader {
@@ -21,7 +21,7 @@ public:
   Cal3d_Loader(ModelHandler *mh);
   ~Cal3d_Loader();
 
-  Models *loadModel(WorldEntity *, ObjectProperties*, const std::string &file_name);
+  Model *loadModel(WorldEntity *, ObjectProperties*, const std::string &file_name);
 
 };
 

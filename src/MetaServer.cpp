@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#include "MetaServer.h"
+
+#include <iostream.h>
 
 #include <sigc++/object_slot.h>
 #include <sigc++/object.h>
 
-#include <iostream.h>
+#include "MetaServer.h"
 
 namespace Sear {
 

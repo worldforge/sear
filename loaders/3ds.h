@@ -5,23 +5,24 @@
 #ifndef _3DS_H_
 #define _3DS_H_ 1
 
-#include "../src/Models.h"
+#include <stdlib.h>
+#include <string>
+
+#include "src/Model.h"
 /*
  * This class represents a 3D Studio model. It makes use of the lib3ds library
- * to retrieve the model data. It uses the Models and MultiModels interfaces to
+ * to retrieve the model data. It uses the Model and MultiModel interfaces to
  * provide a generic interface for use with the rest of Sear.
  */ 
 
 
-#include <stdlib.h>
-#include <string>
 
 
 namespace Sear {
 
 // Forward declarations	
 
-class ThreeDS : public Models {
+class ThreeDS : public Model {
 public:
   /*
    * Defualt constructor

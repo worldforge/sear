@@ -2,13 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+#include <string>
+
+#include "src/ModelHandler.h"
+#include "src/ObjectLoader.h"
+
 #include "Cal3d_Loader.h"
 #include "Cal3d.h"
-
-#include "../src/ModelHandler.h"
-#include "../src/ObjectLoader.h"
-
-#include <string>
 
 namespace Sear {
 
@@ -20,7 +20,7 @@ Cal3d_Loader::~Cal3d_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Models *Cal3d_Loader::loadModel(WorldEntity*, ObjectProperties* op, const std::string &file_name) {
+Model *Cal3d_Loader::loadModel(WorldEntity*, ObjectProperties* op, const std::string &file_name) {
   Cal3d *model = new Cal3d();
   model->init(file_name);
   model->setInUse(true);

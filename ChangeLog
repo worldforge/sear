@@ -1,3 +1,10 @@
+1st August 2002, Simon Goodall
+ * Updated Factory.h and WorldEntity class to accomodate changes to Eris
+ * Graphics class introduced which performs the generic rendering functions, while Render now only does the specific ones
+ * Fixed bug where default font would not be used even if no font was specified
+ * Converted terrain engine to use a vertex arrays instead of drawing each triangle one by one
+ * Terrain engine no longer uses OpenGL directly
+
 24th July 2002, Simon Goodall
  * Re-implemented floating character speech
  * Fixed selection bug caused by using a texture when they should have been disabled
@@ -60,8 +67,8 @@
 5th July 2002, Simon Goodall
  * Improved 3ds model loader - now adds in normal and texture data if possible. (CURRENTLY NOT IN NEW MODEL INTERFACE)
  * Improved comments in some header files
- * Introduced New model loading interface. Specific model type are in sear/loaders. Main code only knows about Models and ModelLoader interfaces. As such models currently do not load as required
- 
+ * Introduced New model loading interface. Specific model type are in sear/loaders. Main code only knows about Models and ModelLoader interfaces. As such models currently do not load as required.
+
 3rd July 2002, Simon Goodall
  * Removed some redundant rendering code
  * Added base for 3ds model loader - currently only loads mesh

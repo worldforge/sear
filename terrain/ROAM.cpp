@@ -2,13 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "ROAM.h"
-#include "../src/Render.h"
-#include "../src/System.h"
-#include "../src/Config.h"
 #include <string>
-#include "../src/Utility.h"
-#include "../src/Log.h"
+
+#include "common/Utility.h"
+#include "common/Log.h"
+#include "common/Config.h"
+
+#include "src/Render.h"
+#include "src/System.h"
+
+#include "ROAM.h"
+#include "Landscape.h"
 
 namespace Sear {
 
@@ -44,7 +48,6 @@ void ROAM::shutdown() {
 }
 
 void ROAM::draw() {
-//  _renderer->stateChange(Render::TERRAIN);
   render();
 }
 

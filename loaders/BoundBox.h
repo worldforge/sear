@@ -10,12 +10,13 @@
  *
  */ 
 
-#include "../src/Models.h"
 #include <wfmath/axisbox.h>
+
+#include "src/Model.h"
 
 namespace Sear {
 
-class BoundBox : public Models {
+class BoundBox : public Model {
 public:
   /*
    * Constructor stores the bounding box for the basis of this model.

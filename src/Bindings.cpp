@@ -3,13 +3,12 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 
-#include "Bindings.h"
-#include "Config.h"
-
 #include <SDL/SDL.h>
-#include "Log.h"
 
-#include <iostream>
+#include "common/Config.h"
+#include "common/Log.h"
+
+#include "Bindings.h"
 
 namespace Sear {
 
@@ -176,7 +175,7 @@ void Bindings::shutdown() {
 void Bindings::loadBindings(const std::string &file_name) {
   // Merges key bindings file, file_name with existing contents
   if (_bindings) _bindings->loadConfig(file_name);
-  else std::cerr << "Bindings: Error - bindings config object not created" << std::endl;
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
 void Bindings::saveBindings() {

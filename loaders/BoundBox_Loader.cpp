@@ -2,17 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+#include <string>
+
+#include "common/Utility.h"
+
+#include "src/ModelHandler.h"
+#include "src/WorldEntity.h"
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
+#include "src/ObjectLoader.h"
+
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"
-#include "../src/ModelHandler.h"
-#include "../src/WorldEntity.h"
-#include "../src/System.h"
-#include "../src/Render.h"
-#include "../src/Utility.h"
-
-#include "../src/ObjectLoader.h"
-
-#include <string>
 
 namespace Sear {
 
@@ -24,7 +26,7 @@ BoundBox_Loader::~BoundBox_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Models *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
+Model *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
   BoundBox *model = new BoundBox();
 
   WFMath::AxisBox<3> bbox = we->getBBox();
@@ -34,10 +36,10 @@ Models *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
   std::string type = we->type();
-  int id = System::instance()->getRenderer()->requestTexture(std::string("boundbox_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("boundbox_") + type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getRenderer()->requestTexture(std::string("boundbox_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("boundbox_") + type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

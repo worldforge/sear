@@ -7,11 +7,12 @@
 
 #include <cal3d/cal3d.h>
 
-#include "../src/Models.h"
+#include "src/Model.h"
+#include "src/Graphics.h"
 
 namespace Sear {
 
-class Cal3d : public Models
+class Cal3d : public Model
 {
 // misc
 public:
@@ -63,7 +64,7 @@ public:
 
   bool useTextures() { return _use_textures; }
   void action(const std::string &action);
-  RotationStyle rotationStyle() { return NORMAL; }
+  Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
   void setFlag(const std::string &flag, bool state);
   bool getFlag(const std::string &flag);
  

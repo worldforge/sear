@@ -5,14 +5,17 @@
 #ifndef _CHARACTER_H_
 #define _CHARACTER_H_ 1
 
-#include "ConsoleObject.h"
 
 #include <string>
+
 #include <wfmath/quaternion.h>
+
+#include "ConsoleObject.h"
 
 namespace Sear {
 
 class Client;
+class System;
 class WorldEntity;
 
 class Character : public ConsoleObject{

@@ -2,14 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
+#include <string>
+
+#include "common/Config.h"
+#include "common/Utility.h"
+#include "common/Log.h"
+
 #include "Camera.h"
 #include "System.h"
-#include "Config.h"
 #include "conf.h"
 #include "Console.h"
-#include "Utility.h"
-#include <string>
-#include "Log.h"
 
 namespace Sear {
 

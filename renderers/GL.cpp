@@ -10,34 +10,29 @@
  */ 
 
 
-#include "GL.h"
-
+#include <unistd.h>
 #include <GL/glu.h>
+
+#include <wfmath/quaternion.h>
+#include <wfmath/vector.h>
+#include <Eris/Entity.h>
+#include <Eris/World.h>
+
+#include "../common/Config.h"
+#include "../common/Log.h"
+#include "../common/Utility.h"
 
 #include "../src/Camera.h"
 #include "../src/System.h"
-#include "../src/Config.h"
 #include "../src/Terrain.h"
 #include "../src/Sky.h"
-#include "../src/Camera.h"
 #include "../src/WorldEntity.h"
 #include "../src/Console.h"
-#include "../src/Utility.h"
-#include <Eris/Entity.h>
-#include <Eris/World.h>
-#include <wfmath/quaternion.h>
-#include <wfmath/vector.h>
-#include "../src/Character.h"
 #include "../src/ObjectLoader.h"
-
 #include "../src/Frustum.h"
-
-#include "../src/Models.h"
-#include <unistd.h>
-
+#include "../src/Graphics.h"
+#include "../src/Model.h"
 #include "../src/ModelHandler.h"
-
-#include "../src/Log.h"
 
 #include "../terrain/ROAM.h"
 #include "../sky/SkyBox.h"
@@ -45,35 +40,22 @@
 #include "../src/default_image.xpm"
 #include "../src/default_font.xpm"
 
+#include "GL.h"
+
 namespace Sear {
 
-float GL::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
-float GL::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
+static float _halo_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
 
-//.TODO put this into a class
-	
-std::set<int> colourSet;
-std::set<int>::const_iterator colourSetIterator;
-std::map<unsigned int, std::string> colour_mapped;
-
-GLint redBits, greenBits, blueBits;
-GLuint redMask;
-GLuint greenMask;
-GLuint blueMask;
-int redShift;
-int greenShift;
-int blueShift;
-  
-GLuint makeMask(GLint bits) {
+inline GLuint GL::makeMask(GLint bits) {
   return (0xFF >> (8 - bits));
 }
 
 
-std::string getSelectedID(unsigned int i) {
+inline std::string GL::getSelectedID(unsigned int i) {
   return colour_mapped[i];
 }
 
-void nextColour(const std::string &id) {
+void GL::nextColour(const std::string &id) {
   unsigned int ic;
   
   if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
@@ -88,23 +70,25 @@ void nextColour(const std::string &id) {
   glColor3ub(red, green, blue);
 }
 
-void resetColors(){
+inline void GL::resetColours(){
   colour_mapped = std::map<unsigned int, std::string>();
   colourSetIterator = colourSet.begin();
   *colourSetIterator++;
 }
 
-GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
-GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
-GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
-GLfloat  whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
-GLfloat  blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
-GLfloat  ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
-GLfloat  diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
-GLfloat  specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
+static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
+
+static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
+//static GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+//static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
+static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
+//static GLfloat whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
+static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
+//static GLfloat ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
+//static GLfloat diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
+//static GLfloat specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
 void GL::buildColourSet() {
   unsigned int numPrims = 500;
@@ -140,38 +124,27 @@ GL::GL() :
   window_height(0),
   fov(RENDER_FOV),
   near_clip(RENDER_NEAR_CLIP),
-  far_clip(RENDER_FAR_CLIP),
   next_id(1),
   base(0),
   textureList(std::list<GLuint>()),
   terrain(NULL),
-  skybox(NULL),
-  camera(NULL),
-  player_model(NULL),
-  num_frames(0),
-  frame_time(0.0f),
-  _character(NULL)
+  _cur_state(NULL)
 {
   _instance = this;
 }
 
-GL::GL(System *system) :
+GL::GL(System *system, Graphics *graphics) :
   _system(system),
+  _graphics(graphics),
   window_width(0),
   window_height(0),
   fov(RENDER_FOV),
   near_clip(RENDER_NEAR_CLIP),
-  far_clip(RENDER_FAR_CLIP),
   next_id(1),
   base(0),
   textureList(std::list<GLuint>()),
   terrain(NULL),
-  skybox(NULL),
-  camera(NULL),
-  player_model(NULL),
-  num_frames(0),
-  frame_time(0.0f),
-  _character(NULL)
+  _cur_state(NULL)
 {
   _instance = this;
 }
@@ -179,18 +152,6 @@ GL::GL(System *system) :
 GL::~GL() {
   writeConfig();
   shutdownFont();
-
-  if (terrain) {
-    terrain->shutdown();
-//    delete terrain;
-  }
-  if (skybox) {
-    skybox->shutdown();
-    delete skybox;
-  }
-  if (camera) {
-    delete camera;
-  }
 }
 
 void GL::initWindow(int width, int height) {
@@ -226,22 +187,6 @@ void GL::init() {
   splash_id = requestTexture(splash_texture);
   initFont();
   // TODO: initialisation need to go into system
-  Log::writeLog("Initialising Terrain", Log::LOG_DEFAULT);
-  terrain = new ROAM(_system, this);
-  if (!terrain->init()) {
-    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
-  }
-  skybox = new SkyBox(_system, this);
-  if (!skybox->init()) {
-    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::LOG_ERROR);
-  }
-  camera = new Camera();
-  camera->init();
-  camera->registerCommands(_system->getConsole());
-  initLighting();
-  mh = _system->getModelHandler();
-
-  _state_loader = _system->getStateLoader();
   setupStates();
 #ifdef DEBUG  
   CheckError();
@@ -270,9 +215,6 @@ void GL::initLighting() {
   glLightfv(GL_LIGHT1, GL_AMBIENT, blackLight);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, blackLight);
   glLightfv(GL_LIGHT1, GL_SPECULAR, blackLight);
-//  glLightfv(GL_LIGHT1, GL_AMBIENT, lights[LIGHT_SUN].ambient);
-//  glLightfv(GL_LIGHT1, GL_DIFFUSE, lights[LIGHT_SUN].diffuse);
-//  glLightfv(GL_LIGHT1, GL_SPECULAR, lights[LIGHT_SUN].specular);
   
   glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].kc);
   glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].kl);
@@ -286,11 +228,11 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   Log::writeLog("Render: Initilising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
-  font_id = requestTexture(font_texture);
+  font_id = requestTexture("ui_font");
   GLuint texture = getTextureID(font_id);
-  if (!glIsTexture(texture)) {
-    static GLuint default_id = getTextureID(requestTexture("default_font"));
-    texture = default_id;
+  if (!glIsTexture(texture) || font_id == -1) {
+    font_id = requestTexture("default_font");
+    texture = getTextureID(font_id);
   }
   glBindTexture(GL_TEXTURE_2D, texture);
   for (loop=0; loop<256; loop++) {
@@ -320,17 +262,17 @@ void GL::shutdownFont() {
 void GL::print(GLint x, GLint y, const char * string, int set) {
   if (set > 1) set = 1;
   GLuint texture = getTextureID(font_id);
-  if (!glIsTexture(texture)) {
-    static GLuint default_id = getTextureID(requestTexture("default_font"));
-    texture = default_id;
-  }
+//  if (!glIsTexture(texture)) {
+//    static GLuint default_id = getTextureID(requestTexture("default_font"));
+//    texture = default_id;
+//  }
   glBindTexture(GL_TEXTURE_2D, texture);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-  glPushMatrix(); // Store The Projection Matrix
+  store();
   glLoadIdentity(); // Reset The Projection Matrix
   glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
   glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-  glPushMatrix(); // Store The Modelview Matrix
+  store();
   glLoadIdentity(); // Reset The Modelview Matrix
   glTranslated(x,y,0); // Position The Text (0,0 - Bottom Left)
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
@@ -349,13 +291,13 @@ void GL::print3D(const char *string, int set) {
     texture = default_id;
   }
   glBindTexture(GL_TEXTURE_2D, texture);
-  glPushMatrix(); // Store The Projection Matrix
+  store();
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
   glPopMatrix(); // Restore The Old Projection Matrix
 }
 
-void GL::newLine() {
+inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
 
@@ -483,235 +425,9 @@ inline GLuint GL::getTextureID(int texture_id) {
   return *I;
 }
 
-void GL::drawScene(const std::string& command, bool select_mode) {
-  // TODO: Move to generic render class
-//select_mode = true;
-  if (select_mode) resetColors();
-  active_name = "";
-  // This clears the currently loaded texture
-  if (select_mode) glBindTexture(GL_TEXTURE_2D, 0);
- // Calculate in system 
-  float time_elapsed =  (SDL_GetTicks() - this->time) / 1000.0f;
-  this->time = SDL_GetTicks();
-  num_frames++;
-  frame_time += time_elapsed;
-
-  if (checkState(RENDER_STENCIL)) {
-    glClearStencil(1);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
-    } else {
-      glClear(GL_DEPTH_BUFFER_BIT);
-    }
-  camera->updateCameraPos(time_elapsed);
-  glLoadIdentity(); // Reset The View
-  
-  //Rotate Coordinate System so Z points upwards and Y points into the screen. 
-  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
-
-  Eris::World *world = Eris::World::Instance();
-  if (_system->checkState(SYS_IN_WORLD) && world) {
-    if (!_character) _character = _system->getCharacter();
-    if (select_mode) stateChange("select"); //SELECT
-// Function is still unstable!
-//    Eris::World::Instance()->tick(); 
-    WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
-    if (focus != NULL) {
-      float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
-      std::string id = focus->getID();
-      orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), WFMath::Pi / 2.0f); // Rotate by 90 degrees as WF 0 degrees is East
-      WFMath::Point<3> pos = focus->getAbsPos();
-      x = -pos.x();
-      y = -pos.y();
-      z = -pos.z();
-      
-      // Apply camera rotations
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), camera->getElevation());
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), camera->getRotation());
-
-      if (_character) orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), _character->getAngle());
-      float rotation_matrix[4][4];
-      QuatToMatrix(orient, rotation_matrix); //Get the rotation matrix for base rotation
-
-      // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
-      // Hence within push/pop matrix black
-      if (!select_mode) {
-        glPushMatrix();
-          glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-          skybox->draw(); //Draw the sky box
-        glPopMatrix();
-      }
-
-      // Translate camera getDist() units away from the character. Allows closups or large views
-      glTranslatef(0.0f, camera->getDistance(), 0.0f);
-      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-      z -= terrain->getHeight(-x, -y);
-      
-      glTranslatef(x, y, z - 2.0f); //Translate to accumulated position - Also adjust so origin is nearer head level
-      
-      float ps[] = {-x, -y, -z + 2.0f, 1.0f};
-      glLightfv(GL_LIGHT0,GL_POSITION,ps);
-
-      float  proj[16];
-      float  modl[16];
-      /* Get the current PROJECTION matrix from OpenGL */
-      glGetFloatv( GL_PROJECTION_MATRIX, proj );
-                              
-      /* Get the current MODELVIEW matrix from OpenGL */
-      glGetFloatv( GL_MODELVIEW_MATRIX, modl );
-      
-      Frustum::getFrustum(frustum, proj, modl); 
-    }
-    // Setup Sun
-    if (checkState(RENDER_LIGHTING)) {
-      float tim = _system->getTimeOfDay();
-      float dawn_time = _system->getDawnTime();
-      float day_time = _system->getDayTime();
-      float dusk_time = _system->getDuskTime();
-      float night_time = _system->getNightTime();
-      
-      GLfloat fog_colour[4];// = {0.50f, 0.50f, 0.50f, 0.50f};
-      switch (_system->getTimeArea()) {
-        case System::DAWN: {
-          _light_level = (tim - dawn_time) / (day_time - dawn_time);
-          float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-          lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
-          break;
-        }
-        case System::DAY: {
-          _light_level = 1.0f;
-          float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-          lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
-          break;
-        }
-        case System::DUSK: {
-          _light_level = 1.0f - ((tim - dusk_time) / (night_time - dusk_time));
-          float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
-          lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
-          break;
-        }
-        case System::NIGHT: {
-          _light_level = 0.0f;
-          break;
-        }
-      }
-      
-      fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
-      glFogfv(GL_FOG_COLOR, fog_colour);
-      float sun_pos[] = {lights[LIGHT_SUN].x_pos, 0.0f, 100.0f, 1.0f};
-      lights[LIGHT_SUN].ambient[0] = lights[LIGHT_SUN].ambient[1] = lights[LIGHT_SUN].ambient[2] = _light_level * 0.5f;
-      lights[LIGHT_SUN].diffuse[0] = lights[LIGHT_SUN].diffuse[1] = lights[LIGHT_SUN].diffuse[2] = _light_level;
-      glLightfv(GL_LIGHT1,GL_POSITION,sun_pos);
-      glLightfv(GL_LIGHT1, GL_AMBIENT, lights[LIGHT_SUN].ambient);
-      glLightfv(GL_LIGHT1, GL_DIFFUSE, lights[LIGHT_SUN].diffuse);
-    }
-    if (!select_mode) {
-      glPushMatrix();
-        terrain->draw();
-      glPopMatrix();
-    }
-// Draw known entities
-    WorldEntity *root = NULL; 
-    if ((root = (WorldEntity *)world->getRootEntity())) {
-      if (_character) _character->updateLocals(false);
-      render_queue = std::map<std::string, Queue>();
-      buildQueues(root, 0, select_mode);
-      drawQueue(render_queue, select_mode, time_elapsed);
-      stateChange("font");
-      drawMessageQueue(render_queue, select_mode);
-      // TODO: make into rasieDetail and lowerDetail methods
-      if (!select_mode) {
-        if (frame_rate < _lower_frame_rate_bound) {
-          model_detail -= 0.1f;
-          if (model_detail < 0.0f) model_detail = 0.0f;
-          terrain->lowerDetail();
-        } else if (frame_rate > _upper_frame_rate_bound) {
-          model_detail += 0.05f;
-          if (model_detail > 1.0f) model_detail = 1.0f;
-          terrain->raiseDetail();
-        }
-      }
-    }
-  } else {
-    stateChange("splash");
-    #ifndef _WIN32
-      // TODO Need to find a win32 version
-      usleep(sleep_time);
-    #endif
-    glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-    glPushMatrix(); // Store The Projection Matrix
-    glLoadIdentity(); // Reset The Projection Matrix
-    glOrtho(0,window_width,0,window_height,-1,1); // Set Up An Ortho Screen
-    glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-    glPushMatrix(); // Store The Modelview Matrix
-    glLoadIdentity(); // Reset The Modelview Matrix
-  
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glBindTexture(GL_TEXTURE_2D, getTextureID(splash_id));
-    glBegin(GL_QUADS); 
-      glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
-      glTexCoord2i(0, 1); glVertex2f(0.0f, window_height);
-      glTexCoord2i(1, 1); glVertex2f(window_width, window_height);
-      glTexCoord2i(1, 0); glVertex2f(window_width, 0.0f);
-    glEnd(); 
-    glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-    glPopMatrix(); // Restore The Old Projection Matrix
-    glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-    glPopMatrix(); // Restore The Old Projection Matrix
-
-  }
-  if (!select_mode) {
-//    stateChange("font"); // TODO this is probably not required!
-   _system->getConsole()->draw(command);
-//  Calc FPS
-    stateChange("font");
-    frame_rate = (float)num_frames /frame_time;
-    if (checkState(RENDER_FPS)) {
-      std::string frame_rate_string = string_fmt(frame_rate).substr(0, 4);
-      glColor3f(1.0f, 0.0f, 0.0f);
-      print(10, 100, frame_rate_string.c_str(), 0);
-    }
-  
-    if (frame_time > 1.0f) {
-      num_frames = 0;
-      frame_time = 0.0f;
-    }
-    glColor3f(1.0f, 0.75f, 0.2f);
-    print(x_pos, y_pos, active_name.c_str(), 1);
-  
-  }
-  glFlush();
-  
-  if (!select_mode) SDL_GL_SwapBuffers();
-#ifdef DEBUG
-  CheckError();
-#endif
-}
-
-void GL::buildQueues(WorldEntity *we, int depth, bool select_mode) {
-  // Assuming depth 0 is the world and that world is not visible	
-  if (depth == 0 || we->isVisible()) {
-    if (we->getType() != NULL) {
-      ObjectProperties *op = we->getObjectProperties();
-      if (!op) {
-	mh->getModel(we); // Allocates a model and an ObjectProperties
-        op = we->getObjectProperties();
-      }
-      if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
-      
-      if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->select_state].push_back(we);
-      if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->state].push_back(we);
-      if (op->draw_members) {
-        for (unsigned int i = 0; i < we->getNumMembers(); i++) {
-          buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode);
-        }
-      }
-    }
-  }
-}
-
 void GL::stateChange(const std::string &state) {
-  stateChange(_state_loader->getStateProperties(state));
+  static StateLoader *state_loader = System::instance()->getStateLoader();
+  stateChange(state_loader->getStateProperties(state));
 }
 
 void GL::stateChange(StateProperties *sp) {
@@ -752,22 +468,13 @@ void GL::stateChange(StateProperties *sp) {
     if (sp->fog) glEnable(GL_FOG);
     else glDisable(GL_FOG);
   }
-  _current_state = std::string(sp->state);
-  
 }
 
 
 void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
   // TODO should use switchTexture
   glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
-
-  glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-  glPushMatrix(); // Store The Projection Matrix
-  glLoadIdentity(); // Reset The Projection Matrix
-  glOrtho(0,window_width,0,window_height,-1,1); // Set Up An Ortho Screen
-  glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-  glPushMatrix(); // Store The Modelview Matrix
-  glLoadIdentity(); // Reset The Modelview Matrix
+  setViewMode(ORTHOGRAPHIC);
   // TODO: make into arrays?
   glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
@@ -779,21 +486,15 @@ void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) 
     glTexCoord2i(1, 0);
     glVertex2i(x + width, y);
   glEnd();
-
-  glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-  glPopMatrix(); // Restore The Old Projection Matrix
-  glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-  glPopMatrix(); // Restore The Old Projection Matrix
-
+  setViewMode(PERSPECTIVE);
 }
 
 void GL::procEvent(int x, int y) {
   unsigned int ic;
   std::string selected_id;
   GLubyte i[3];
-  stateChange("select"); // SELECT
   glClear(GL_COLOR_BUFFER_BIT);
-  drawScene("", true);
+  _graphics->drawScene("", true, 0);
   y = window_height - y;
   x_pos = x;
   y_pos = y;
@@ -811,10 +512,10 @@ void GL::procEvent(int x, int y) {
   ic += blue;
   selected_id = getSelectedID(ic);
   if (selected_id != activeID) {
-    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
     activeID = selected_id;
+    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
+    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
   }
-  stateChange("font"); // FONT
 }
 
 void GL::CheckError() {
@@ -831,7 +532,6 @@ void GL::CheckError() {
     default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
   }
   if (!msg.empty()) Log::writeLog(msg, Log::LOG_ERROR);
-  if (!msg.empty()) exit(1);
 }
 
 //TODO should be in general render class
@@ -895,13 +595,7 @@ void GL::readConfig() {
   setState(RENDER_FPS, (temp.empty()) ? (DEFAULT_show_fps) : (temp == "true"));
   temp = general->getAttribute(KEY_use_stencil);
   setState(RENDER_STENCIL, (temp.empty()) ? (DEFAULT_use_stencil) : (temp == "true"));
-
-  // Setup frame rate detail boundaries
-  temp = general->getAttribute(KEY_lower_frame_rate_bound);
-  _lower_frame_rate_bound = (temp.empty()) ? (DEFAULT_lower_frame_rate_bound) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_upper_frame_rate_bound);
-  _upper_frame_rate_bound = (temp.empty()) ? (DEFAULT_upper_frame_rate_bound) : atof(temp.c_str());
-
+  
   // Setup the speech offsets
   temp = general->getAttribute(KEY_speech_offset_x);
   _speech_offset_x = (temp.empty()) ? (DEFAULT_speech_offset_x) : atof(temp.c_str());
@@ -958,10 +652,6 @@ void GL::writeConfig() {
   general->setAttribute(KEY_show_fps, (checkState(RENDER_FPS)) ? ("true") : ("false"));
   general->setAttribute(KEY_use_stencil, (checkState(RENDER_STENCIL)) ? ("true") : ("false"));
   
-  // Save frame rate detail boundaries
-  general->setAttribute(KEY_lower_frame_rate_bound, string_fmt(_lower_frame_rate_bound));
-  general->setAttribute(KEY_upper_frame_rate_bound, string_fmt(_upper_frame_rate_bound));
-
   // Save the speech offsets
   general->setAttribute(KEY_speech_offset_x, string_fmt(_speech_offset_x));
   general->setAttribute(KEY_speech_offset_y, string_fmt(_speech_offset_y));
@@ -1029,44 +719,30 @@ void GL::setupStates() {
   glFogfv(GL_FOG_COLOR, fog_colour);
   glFogf(GL_FOG_START, _fog_start);
   glFogf(GL_FOG_END, _fog_end);
-
-//  stateChange("font"); //font
 }
 
-void GL::readComponentConfig() {
-  if (camera) camera->readConfig();
-  if (terrain) terrain->readConfig();
-}
-
-void GL::writeComponentConfig() {
-  if (camera) camera->writeConfig();
-  if (terrain) terrain->writeConfig();
-}
-void GL::translateObject(float x, float y, float z) {
+inline void GL::translateObject(float x, float y, float z) {
   glTranslatef(x, y, z);
 }
 
 void GL::rotateObject(WorldEntity *we, int type) {
   if (!we) return; // THROW ERROR;
   switch (type) {
-    case Models::NONE: return; break;
-    case Models::POSITION: {
+    case Graphics::ROS_NONE: return; break;
+    case Graphics::ROS_POSITION: {
        WFMath::Point<3> pos = we->getPosition();
        glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
        break;
     }       
-    case Models::NORMAL: {
-      WFMath::Quaternion q = we->getAbsOrient();
-      float rotation_matrix[4][4];
-      QuatToMatrix(q, rotation_matrix);
-      glMultMatrixf(&rotation_matrix[0][0]);
+    case Graphics::ROS_NORMAL: {
+      applyQuaternion(we->getAbsOrient());
       break;
     }
-    case Models::BILLBOARD: // Same as HALO, but does not rotate with camera elevation
-    case Models::HALO: {
+    case Graphics::ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
+    case Graphics::ROS_HALO: {
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= orient;
+      orient2 /= _graphics->getCameraOrientation();
       QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
       glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
       break;
@@ -1087,6 +763,7 @@ void GL::setViewMode(int type) {
       // Calculate The Aspect Ratio Of The Window
       gluPerspective(fov,(GLfloat)window_width/(GLfloat)window_height, near_clip, _far_clip_dist);
       glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
       break;
     }
     case ORTHOGRAPHIC: {
@@ -1094,6 +771,7 @@ void GL::setViewMode(int type) {
       glLoadIdentity(); // Reset The Projection Matrix
       glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
       glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
+      glLoadIdentity();
       break;
     }			    
     case ISOMETRIC: {
@@ -1118,8 +796,8 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   bool lighting = checkState(RENDER_LIGHTING);
  
   if (!vertex_data) {
-	  Log::writeLog("No Vertex Data", Log::LOG_ERROR);
-	  return; //throw Exception(""); 
+    Log::writeLog("No Vertex Data", Log::LOG_ERROR);
+    return; //throw Exception(""); 
   }
   glVertexPointer(3, GL_FLOAT, 0, vertex_data);
   glEnableClientState(GL_VERTEX_ARRAY);
@@ -1133,14 +811,14 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   }
 
   switch (type) {
-    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (Models::POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
-    case (Models::LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
-    case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
-    case (Models::QUADS): glDrawArrays(GL_QUADS, offset, number_of_points); break;
-    case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
-    case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
-    case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
+    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (Graphics::RES_POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
+    case (Graphics::RES_LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
+    case (Graphics::RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
+    case (Graphics::RES_QUADS): glDrawArrays(GL_QUADS, offset, number_of_points); break;
+    case (Graphics::RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
+    case (Graphics::RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
+    case (Graphics::RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
@@ -1167,14 +845,14 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   }
 
   switch (type) {
-    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (Models::POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Models::QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (Graphics::RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (Graphics::RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
@@ -1202,15 +880,16 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
 }
 
 void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
+  static StateLoader *state_loader = System::instance()->getStateLoader();
+  static ModelHandler *model_handler = _system->getModelHandler();
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
-    stateChange(_state_loader->getStateProperties((std::string)I->first));
+    stateChange(state_loader->getStateProperties(I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 
       WorldEntity *we = (WorldEntity *)*J;
-      std::string type = we->type();
       // Get model
-      Models *model = mh->getModel(we);
+      Model *model = model_handler->getModel(we);
       if (!model) {  // ERROR GETTING MODEL
 	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
@@ -1237,7 +916,10 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
         nextColour(we->getID());
 	model->render(true);
       } else {
-        if (we->getID() == activeID) drawOutline(we, model, checkState(RENDER_STENCIL) && model->getFlag("outline"));
+        if (we->getID() == activeID) {
+          active_name = we->getName();
+	  drawOutline(model, checkState(RENDER_STENCIL) && model->getFlag("outline"));
+	}
 	else model->render(false);
       }
       
@@ -1245,25 +927,18 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
     }
   }
 }
-//#if(0)
-void GL::drawMessageQueue(std::map<std::string, Queue> queue, bool select_mode) {
-  if (select_mode) return;
-//  std::string type, parent;
+
+void GL::drawMessageQueue(std::map<std::string, Queue> queue) {
   glColor4fv(yellow);
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
-//    WorldEntity *we = (WorldEntity *)*(I->second.begin());
-//    type = we->getType()->getName();
-//    parent = *we->getType()->getParentsAsSet().begin();
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
       WorldEntity *we = (WorldEntity*)*J;
       glPushMatrix();
       WFMath::Point<3> pos = we->getAbsPos();
       glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-      float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= orient; 
-      QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
-      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+      orient2 /= _graphics->getCameraOrientation(); 
+      applyQuaternion(orient2);
       glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
       glScalef(0.025f, 0.025f, 0.025f);
       glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
@@ -1272,19 +947,18 @@ void GL::drawMessageQueue(std::map<std::string, Queue> queue, bool select_mode) 
     }
   }
 }
-//#endif
  
-float GL::distFromNear(float x, float y, float z) {
+inline float GL::distFromNear(float x, float y, float z) {
   return Frustum::distFromNear(frustum, x, y, z);
 }
 	
-int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
+inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
   return Frustum::patchInFrustum(frustum, bbox);
 }
 
-void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
-  active_name = we->getName();
-  if (use_stencil) { // Using Stencil Buffer
+void GL::drawOutline(Model *model, bool use_stencil) {
+  // TODO Work out why the stencil has stopped working. Is this to do with the states?
+  if (checkState(RENDER_STENCIL) && use_stencil) { // Using Stencil Buffer
     StateProperties *sp = _cur_state; // Store current state
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, -1, 1);
@@ -1294,7 +968,7 @@ void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
     glPopMatrix();
     stateChange("halo");
     glStencilFunc(GL_NOTEQUAL, -1, 1);
-    glColor4fv(_halo_blend_colour);
+    glColor4fv(_halo_colour);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     model->render(true);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1302,7 +976,7 @@ void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
     glColor4fv(white);
     stateChange(sp); // Restore state
   } else { // Just use solid colour on object 
-    glColor4fv(_halo_blend_colour);  
+    glColor4fv(_halo_colour);  
     model->render(true);
     glColor4fv(white);
   }
@@ -1315,7 +989,10 @@ void GL::createDefaults() {
   unsigned int width, height;
   glGenTextures(1, &texture_id);
 
-  if (texture_id == 0) return;
+  if (texture_id == 0) {
+    Log::writeLog("Error creating deafult font", Log::LOG_ERROR);
+    return;
+  }
 
   unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
   
@@ -1337,7 +1014,10 @@ void GL::createDefaults() {
   texture_id = 0;
   glGenTextures(1, &texture_id);
 
-  if (texture_id == 0) return;
+  if (texture_id == 0) {
+    Log::writeLog("Error creating deafult font", Log::LOG_ERROR);	 
+    return;
+  }
 
   //data = xpm_to_image(default_font, default_font_width, default_font_height);
   data = xpm_to_image((const char**)default_font_xpm, width, height);
@@ -1356,16 +1036,127 @@ void GL::createDefaults() {
   texture_map["default_font"] = next_id++;
 }
  
-void GL::switchTexture(int texture) {
+inline void GL::switchTexture(int texture) {
   switchTextureID(getTextureID(texture));
 }
 
-void GL::switchTextureID(unsigned int texture) {
+inline void GL::switchTextureID(unsigned int texture) {
   if (!glIsTexture(texture)) {
     static GLuint default_id = getTextureID(requestTexture("default"));
     texture = default_id;
   }
   glBindTexture(GL_TEXTURE_2D, texture);
 }
+
+inline void GL::store() { glPushMatrix(); }
+inline void GL::restore() { glPopMatrix(); }
+
+inline void GL::beginFrame() {
+  terrain = _graphics->getTerrain();
+  active_name = "";
+  if (checkState(RENDER_STENCIL)) {
+    glClearStencil(1);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
+    } else {
+      glClear(GL_DEPTH_BUFFER_BIT);
+    }
+  glLoadIdentity(); // Reset The View
+  //Rotate Coordinate System so Z points upwards and Y points into the screen. 
+  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+}
+
+inline void GL::endFrame(bool select_mode) {
+  glFlush();
+  if (!select_mode) SDL_GL_SwapBuffers();
+#ifdef DEBUG
+  CheckError();
+#endif
+}
+  
+inline void GL::drawFPS(float fps) {
+  std::string frame_rate_string = string_fmt(fps).substr(0, 4);
+  stateChange("font");
+  glColor4fv(red);
+  print(10, 100, frame_rate_string.c_str(), 0);
+}
+  
+void GL::drawSplashScreen() {
+  stateChange("splash");
+  #ifndef _WIN32
+    // TODO Need to find a win32 version
+    usleep(sleep_time);
+  #endif
+  setViewMode(ORTHOGRAPHIC);
+  
+  glColor4fv(white);
+  switchTexture(requestTexture("ui_splash"));
+  glBegin(GL_QUADS); 
+    glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
+    glTexCoord2i(0, 1); glVertex2f(0.0f, window_height);
+    glTexCoord2i(1, 1); glVertex2f(window_width, window_height);
+    glTexCoord2i(1, 0); glVertex2f(window_width, 0.0f);
+  glEnd(); 
+  setViewMode(PERSPECTIVE);
+}
+  
+inline void GL::applyQuaternion(WFMath::Quaternion quaternion) {
+  float rotation_matrix[4][4];
+  QuatToMatrix(quaternion, rotation_matrix); //Get the rotation matrix for base rotation
+  glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+}
+  
+void GL::applyLighting() {
+  float tim = _system->getTimeOfDay();
+  float dawn_time = _system->getDawnTime();
+  float day_time = _system->getDayTime();
+  float dusk_time = _system->getDuskTime();
+  float night_time = _system->getNightTime();
+     
+  static GLfloat fog_colour[4];// = {0.50f, 0.50f, 0.50f, 0.50f};
+  switch (_system->getTimeArea()) {
+    case System::DAWN: {
+      _light_level = (tim - dawn_time) / (day_time - dawn_time);
+      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
+      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+      break;
+    }
+    case System::DAY: {
+      _light_level = 1.0f;
+      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
+      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+      break;
+    }
+    case System::DUSK: {
+      _light_level = 1.0f - ((tim - dusk_time) / (night_time - dusk_time));
+      float pos_mod = (tim - dawn_time) / (night_time - dawn_time);
+      lights[LIGHT_SUN].x_pos = -200.0f * (pos_mod - 0.5f);
+      break;
+    }
+    case System::NIGHT: {
+      _light_level = 0.0f;
+      break;
+    }
+  }
+   
+  fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
+  glFogfv(GL_FOG_COLOR, fog_colour);
+  float sun_pos[] = {lights[LIGHT_SUN].x_pos, 0.0f, 100.0f, 1.0f};
+  lights[LIGHT_SUN].ambient[0] = lights[LIGHT_SUN].ambient[1] = lights[LIGHT_SUN].ambient[2] = _light_level * 0.5f;
+  lights[LIGHT_SUN].diffuse[0] = lights[LIGHT_SUN].diffuse[1] = lights[LIGHT_SUN].diffuse[2] = _light_level;
+  glLightfv(GL_LIGHT1,GL_POSITION,sun_pos);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, lights[LIGHT_SUN].ambient);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, lights[LIGHT_SUN].diffuse);
+}
+
+inline void GL::resetSelection() {
+  resetColours();
+}
+
+inline void GL::renderActiveName() {
+  stateChange("font");
+  glColor4fv(activeNameColour);
+  print(x_pos, y_pos, active_name.c_str(), 1);
+}
+
   
 } /* namespace Sear */

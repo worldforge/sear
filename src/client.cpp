@@ -3,7 +3,6 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 
-#include "System.h"
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
@@ -16,22 +15,22 @@
 #include <sigc++/object_slot.h>
 #include <sigc++/bind.h>
 
+#include "common/Log.h"
+#include "common/Utility.h"
+
+#include "System.h"
 #include "WorldEntity.h"
 #include "client.h"
-
 #include "Console.h"
 #include "Factory.h"
 #include "Character.h"
-
 #include "EventHandler.h"
 #include "Event.h"
 #include "Render.h"
 #include "ModelHandler.h"
-#include "Models.h"
-#include "Log.h"
+#include "Model.h"
 #include "Exception.h"
 
-#include "Utility.h"
 #ifdef DEBUG
   #define DEBUG_ERIS 1
   #define ERIS_LOG_LEVEL 1

@@ -18,6 +18,9 @@ public:
   
   virtual void draw() = 0;
 
+  virtual void readConfig() {};
+  virtual void writeConfig() {};
+
 protected:
 };
 

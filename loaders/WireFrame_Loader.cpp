@@ -2,15 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+#include <string>
+
+#include "common/Utility.h"
+
+#include "src/Model.h"
+#include "src/ModelHandler.h"
+#include "src/WorldEntity.h"
+#include "src/ObjectLoader.h"
+
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
-#include "../src/Models.h"
-#include "../src/ModelHandler.h"
-#include "../src/WorldEntity.h"
-#include "../src/ObjectLoader.h"
-
-#include "../src/Utility.h"
-#include <string>
 
 namespace Sear {
 
@@ -22,7 +24,7 @@ WireFrame_Loader::~WireFrame_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Models *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
+Model *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
   WireFrame *model = new WireFrame();
 
   WFMath::AxisBox<3> bbox = we->getBBox();

@@ -10,6 +10,7 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
+#include <Eris/World.h>
 
 #include "ObjectLoader.h"
 
@@ -22,8 +23,8 @@ static const unsigned int WORLD_ENTITY_STRING_SIZE = 40;
 class WorldEntity : public Eris::Entity {
 public:
 // TODO: move code to .cpp file
- WorldEntity(const Atlas::Objects::Entity::GameEntity &ge):
-   Eris::Entity(ge),
+ WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
+   Eris::Entity(ge, world),
    time(0),
    abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
    abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),

@@ -5,13 +5,14 @@
 #ifndef _IMPOSTOR_H_
 #define _IMPOSTOR_H_ 1
 
-#include "../src/Models.h"
 #include <string>
 
+#include "src/Model.h"
+#include "src/Graphics.h"
 
 namespace Sear {
 	
-class Impostor : public Models {
+class Impostor : public Model {
 public:
   Impostor();
   ~Impostor();
@@ -22,7 +23,7 @@ public:
   void render(bool); 
   bool useTextures() { return  _use_textures; }
 
-  RotationStyle rotationStyle() { return Models::POSITION; }
+  Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
   
 private:
   bool _use_textures;

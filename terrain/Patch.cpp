@@ -5,25 +5,40 @@
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
 #include <math.h>
-#include <GL/gl.h>		// OpenGL
 
 #include <Eris/World.h>
 #include <Eris/Entity.h>
 
-#include "../src/System.h"
+#include "common/Utility.h"
+
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Camera.h"
+#include "src/Render.h"
+
 #include "Patch.h"
 #include "Landscape.h"
 #include "ROAM.h"
-#include "../src/Camera.h"
-#include "../src/Render.h"
-#include "../src/Utility.h"
+
+#include <assert.h>
 
 namespace Sear {
 
-// -------------------------------------------------------------------------------------------------
-//	PATCH CLASS
-// -------------------------------------------------------------------------------------------------
+Patch::Patch() :
+  _renderer(NULL),
+  _terrain(NULL),
+  _landscape(NULL)
 
+{}
+
+Patch::Patch(Render* render, ROAM *roam, Landscape *landscape) :
+  _renderer(render),
+  _terrain(roam),
+  _landscape(landscape)
+{}
+
+Patch::~Patch() {}
+	
 // ---------------------------------------------------------------------
 // Split a single Triangle and link it into the mesh.
 // Will correctly force-split diamonds.
@@ -92,7 +107,9 @@ void Patch::RecursTessellate( TriTreeNode *tri,
   int centerX = (leftX + rightX)>>1; // Compute X coordinate of center of Hypotenuse
   int centerY = (leftY + rightY)>>1; // Compute Y coord...
 
-  if ( node < (1<<VARIANCE_DEPTH) ) {
+  static int var_depth = 1 << VARIANCE_DEPTH;
+  
+  if ( node < var_depth) {
     // Extremely slow distance metric (sqrt is used).
     // Replace this with a faster one!
 	 
@@ -102,12 +119,12 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     // This should also be replaced with a faster operation.
     TriVariance = ((float)m_CurrentVariance[node] * _landscape->map_size * 2)/distance;	// Take both distance and variance into consideration
   }
-  if ( (node >= (1<<VARIANCE_DEPTH)) ||	// IF we do not have variance info for this node, then we must have gotten here by splitting, so continue down to the lowest level.
+  if ( (node >= var_depth) ||	// IF we do not have variance info for this node, then we must have gotten here by splitting, so continue down to the lowest level.
   (TriVariance > _landscape->gFrameVariance))	// OR if we are not below the variance tree, test for variance.
   {
     Split(tri);														// Split this triangle.
-    int n =(int)(log(_landscape->patch_size)/log(2));
-    int rdepth = 2*n -1;
+    static int n =(int)(log(_landscape->patch_size)/log(2));
+    static int rdepth = 2*n -1;
     if (tri->LeftChild && node < (1<<rdepth))
     {
       RecursTessellate( tri->LeftChild,   apexX,  apexY, leftX, leftY, centerX, centerY,    node<<1  );
@@ -125,42 +142,42 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
     int centerY = (leftY + rightY)>>1;	// Compute Y coord...
     RecursRender( tri->LeftChild,  apexX,   apexY, leftX, leftY, centerX, centerY );
     RecursRender( tri->RightChild, rightX, rightY, apexX, apexY, centerX, centerY );
-  } else {									// A leaf node!  Output a triangle to be rendered.
+  } else {							
+	  // A leaf node!  Output a triangle to be rendered.
     // Actual number of rendered triangles...
     _landscape->gNumTrisRendered++;
-
-    GLfloat leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
-    GLfloat rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
-    GLfloat apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
+    float leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
+    float rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
+    float apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
 
     leftZ  -= (leftZ  < 127.0f) ? (10.0f) : (0.0f);
     rightZ -= (rightZ < 127.0f) ? (10.0f) : (0.0f);
     apexZ  -= (apexZ  < 127.0f) ? (10.0f) : (0.0f);
 
-    float scale = ((ROAM*)_renderer->getTerrain())->_terrain_scale;
+    static float scale = ((ROAM*)System::instance()->getGraphics()->getTerrain())->_terrain_scale;
     
     leftZ *=  scale;
     rightZ *=  scale;
     apexZ *=  scale;
     // Perform polygon coloring based on a height sample
 
-    if (_renderer->checkState(RENDER_LIGHTING)) {
-      float v[3][3];
-      float out[3];
+    if (_renderer->checkState(Render::RENDER_LIGHTING)) {
+      static float v[3][3];
+      static float out[3];
       // Create a vertex normal for this triangle.
       // NOTE: This is an extremely slow operation for illustration purposes only.
       //       You should use a texture map with the lighting pre-applied to the texture.
-      v[1][0] = (GLfloat) leftX;// / MULT_SCALE_LAND;
-      v[1][1] = (GLfloat) leftY;// / MULT_SCALE_LAND;
-      v[1][2] = (GLfloat) leftZ;// / MULT_SCALE_HEIGHT;
+      v[1][0] = (float) leftX;// / MULT_SCALE_LAND;
+      v[1][1] = (float) leftY;// / MULT_SCALE_LAND;
+      v[1][2] = (float) leftZ;// / MULT_SCALE_HEIGHT;
       
-      v[0][0] = (GLfloat) rightX;// / MULT_SCALE_LAND;
-      v[0][1] = (GLfloat) rightY;// / MULT_SCALE_LAND;
-      v[0][2] = (GLfloat) rightZ;// / MULT_SCALE_HEIGHT;
+      v[0][0] = (float) rightX;// / MULT_SCALE_LAND;
+      v[0][1] = (float) rightY;// / MULT_SCALE_LAND;
+      v[0][2] = (float) rightZ;// / MULT_SCALE_HEIGHT;
   
-      v[2][0] = (GLfloat) apexX;// / MULT_SCALE_LAND;
-      v[2][1] = (GLfloat) apexY;// / MULT_SCALE_LAND;
-      v[2][2] = (GLfloat) apexZ;/// MULT_SCALE_HEIGHT;
+      v[2][0] = (float) apexX;// / MULT_SCALE_LAND;
+      v[2][1] = (float) apexY;// / MULT_SCALE_LAND;
+      v[2][2] = (float) apexZ;/// MULT_SCALE_HEIGHT;
   
       calcNormal( v, out );
   
@@ -169,7 +186,17 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 //      out[0] /= MULT_SCALE_LAND;
 //      out[1] /= MULT_SCALE_LAND;
 //      out[2] /= MULT_SCALE_HEIGHT;
-      glNormal3fv( out );
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
+     
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
+      
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
     }
     
 //    if (_renderer->checkState(RENDER_TEXTURES)) {
@@ -188,12 +215,27 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
       ax /= (float)_landscape->patch_size;
       ay /= (float)_landscape->patch_size;
 
-      glTexCoord2f(lx, ly);
-      glVertex3f((GLfloat) leftX, (GLfloat) leftY, (GLfloat)leftZ);
-      glTexCoord2f(rx, ry);
-      glVertex3f((GLfloat) rightX, (GLfloat) rightY, (GLfloat)rightZ);
-      glTexCoord2f(ax, ay);
-      glVertex3f((GLfloat) apexX, (GLfloat) apexY, (GLfloat)apexZ);
+      texture_data[t_counter][0] = lx;
+      texture_data[t_counter++][1] = ly;
+    
+      texture_data[t_counter][0] = rx;
+      texture_data[t_counter++][1] = ry;
+      
+      texture_data[t_counter][0] = ax;
+      texture_data[t_counter++][1] = ay;
+
+      vertex_data[v_counter][0] = leftX;
+      vertex_data[v_counter][1] = leftY;
+      vertex_data[v_counter++][2] = leftZ;
+
+      vertex_data[v_counter][0] = rightX;
+      vertex_data[v_counter][1] = rightY;
+      vertex_data[v_counter++][2] = rightZ;
+
+      vertex_data[v_counter][0] = apexX;
+      vertex_data[v_counter][1] = apexY;
+      vertex_data[v_counter++][2] = apexZ;
+      
 //    } else {
 //      float fColor = (60.0f + leftZ) / 256.0f;
 //      if ( fColor > 1.0f )  fColor = 1.0f;
@@ -256,8 +298,8 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
 // Initialize a patch.
 //
 void Patch::Init( int heightX, int heightY, int worldX, int worldY, unsigned char *hMap ) {
-//  _renderer = System::instance()->getRenderer();
-  _landscape = ((ROAM*)_renderer->getTerrain())->getLandscape();
+//  _renderer = System::instance()->getGraphics()->getRender();
+//  _landscape = ((ROAM*)System::instance()->getGraphics()->getTerrain())->getLandscape();
   // Clear all the relationships
   m_BaseLeft.RightNeighbor = m_BaseLeft.LeftNeighbor = m_BaseRight.RightNeighbor = m_BaseRight.LeftNeighbor =
     m_BaseLeft.LeftChild = m_BaseLeft.RightChild = m_BaseRight.LeftChild = m_BaseLeft.LeftChild = NULL;
@@ -310,29 +352,9 @@ void Patch::ComputeVariance() {
 }
 
 // ---------------------------------------------------------------------
-// Discover the orientation of a triangle's points:
-//
-// Taken from "Programming Principles in Computer Graphics", L. Ammeraal (Wiley)
-//
-inline int orientation( int pX, int pY, int qX, int qY, int rX, int rY ) {
-  int aX, aY, bX, bY;
-  float d;
-
-  aX = qX - pX;
-  aY = qY - pY;
-
-  bX = rX - pX;
-  bY = rY - pY;
-
-  d = (float)aX * (float)bY - (float)aY * (float)bX;
-  return (d < 0) ? (-1) : (d > 0);
-}
-
-// ---------------------------------------------------------------------
 // Set patch's visibility flag.
 //
 void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
-
   WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX -100, m_WorldY-100, _landscape->getHeight(m_WorldX-100, m_WorldY -100));
   WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size - 100, m_WorldY+_landscape->patch_size - 100, _landscape->getHeight(m_WorldX+_landscape->patch_size-100, m_WorldY+_landscape->patch_size-100));
   int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
@@ -356,127 +378,127 @@ void Patch::Tessellate() {
 // ---------------------------------------------------------------------
 // Render the mesh.
 //
-void Patch::render()
-{
-  // Store old matrix
-  glPushMatrix();
-  // Translate the patch to the proper world coordinates
-  glTranslatef( (GLfloat)m_WorldX, (GLfloat)m_WorldY, 0 );
-  glBegin(GL_TRIANGLES);
-    RecursRender(&m_BaseLeft, 0, _landscape->patch_size, _landscape->patch_size, 0, 0, 0);
-    RecursRender(&m_BaseRight, _landscape->patch_size, 0, 0, _landscape->patch_size, _landscape->patch_size, _landscape->patch_size);
-  glEnd();
-  // Restore the matrix
-  glPopMatrix();
+void Patch::render() {
+  v_counter = n_counter = t_counter = 0;
+  
+  RecursRender(&m_BaseLeft, 0, _landscape->patch_size, _landscape->patch_size, 0, 0, 0);
+  RecursRender(&m_BaseRight, _landscape->patch_size, 0, 0, _landscape->patch_size, _landscape->patch_size, _landscape->patch_size);
+
+  _renderer->store();
+  _renderer->translateObject(m_WorldX, m_WorldY, 0 );
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0]);
+  _renderer->restore();
 }
 
 void Patch::renderWater() {
-//	return;
-   // Store old matrix
-   glPushMatrix();
-   // Translate the patch to the proper world coordinates
-   glTranslatef( (GLfloat)m_WorldX, (GLfloat)m_WorldY, 0 );
-   glBegin(GL_TRIANGLES);
-    RecursRenderWater(&m_BaseLeft, 0, _landscape->patch_size, _landscape->patch_size, 0, 0, 0);
-    RecursRenderWater(&m_BaseRight, _landscape->patch_size, 0, 0, _landscape->patch_size, _landscape->patch_size, _landscape->patch_size);
-  glEnd();
-  // Restore the matrix
-  glPopMatrix();
+  v_counter = n_counter = t_counter = 0;
+  RecursRenderWater(&m_BaseLeft, 0, _landscape->patch_size, _landscape->patch_size, 0, 0, 0);
+  RecursRenderWater(&m_BaseRight, _landscape->patch_size, 0, 0, _landscape->patch_size, _landscape->patch_size, _landscape->patch_size);
+
+  _renderer->store();
+  _renderer->translateObject(m_WorldX, m_WorldY, 0 );
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0]);
+  _renderer->restore();
 }
 
-void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY) {
-  if ( tri->LeftChild ) { // All non-leaf nodes have both children, so just check for one
-    int centerX = (leftX + rightX)>>1;      // Compute X coordinate of center of Hypotenuse
-    int centerY = (leftY + rightY)>>1;      // Compute Y coord...
+void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int rightX, int rightY, int apexX, int apexY ) {
+  if ( tri->LeftChild ) {					// All non-leaf nodes have both children, so just check for one
+    int centerX = (leftX + rightX)>>1;	// Compute X coordinate of center of Hypotenuse
+    int centerY = (leftY + rightY)>>1;	// Compute Y coord...
     RecursRenderWater( tri->LeftChild,  apexX,   apexY, leftX, leftY, centerX, centerY );
     RecursRenderWater( tri->RightChild, rightX, rightY, apexX, apexY, centerX, centerY );
-  } else { // A leaf node!  Output a triangle to be rendered.
+  } else {							
+	  // A leaf node!  Output a triangle to be rendered.
     // Actual number of rendered triangles...
-    GLfloat leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
-    GLfloat rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
-    GLfloat apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
+    float leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
+    float rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
+    float apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
 
+    // Perform polygon coloring based on a height sample
     if (leftZ <=  Landscape::waterlevel || rightZ <=  Landscape::waterlevel || apexZ <=  Landscape::waterlevel) {
       leftZ *=  MULT_SCALE_HEIGHT;
       rightZ *=  MULT_SCALE_HEIGHT;
       apexZ *=  MULT_SCALE_HEIGHT;
-      // Output the LEFT VERTEX for the triangle
-//      if (_renderer->checkState(RENDER_LIGHTING)) {
-        float v[3][3];
-        float out[3];
-        // Create a vertex normal for this triangle.
-        // NOTE: This is an extremely slow operation for illustration purposes only.
-        //       You should use a texture map with the lighting pre-applied to the texture.
-        v[1][0] = (GLfloat) leftX;// / MULT_SCALE_LAND;
-        v[1][1] = (GLfloat) leftY;// / MULT_SCALE_LAND;
-        v[1][2] = (GLfloat) leftZ;// / MULT_SCALE_HEIGHT;
+			      
+      static float v[3][3];
+      static float out[3];
+      // Create a vertex normal for this triangle.
+      // NOTE: This is an extremely slow operation for illustration purposes only.
+      //       You should use a texture map with the lighting pre-applied to the texture.
+      v[1][0] = (float) leftX;// / MULT_SCALE_LAND;
+      v[1][1] = (float) leftY;// / MULT_SCALE_LAND;
+      v[1][2] = (float) leftZ;// / MULT_SCALE_HEIGHT;
       
-        v[0][0] = (GLfloat) rightX;// / MULT_SCALE_LAND;
-        v[0][1] = (GLfloat) rightY;// / MULT_SCALE_LAND;
-        v[0][2] = (GLfloat) rightZ;// / MULT_SCALE_HEIGHT;
-    
-        v[2][0] = (GLfloat) apexX;// / MULT_SCALE_LAND;
-        v[2][1] = (GLfloat) apexY;// / MULT_SCALE_LAND;
-        v[2][2] = (GLfloat) apexZ;// / MULT_SCALE_HEIGHT;
- 
-       
-        calcNormal( v, out );
-        //Scale Normal so it will become normalized after scaling is applied to it
-//        out[0] /= MULT_SCALE_LAND;
-//        out[1] /= MULT_SCALE_LAND;
-//        out[2] /= MULT_SCALE_HEIGHT;
+      v[0][0] = (float) rightX;// / MULT_SCALE_LAND;
+      v[0][1] = (float) rightY;// / MULT_SCALE_LAND;
+      v[0][2] = (float) rightZ;// / MULT_SCALE_HEIGHT;
   
-        glNormal3fv( out );
-//      }
-    
-      if (_renderer->checkState(RENDER_TEXTURES)) {
-//        _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
-
-        float lx = leftX;
-        float ly = leftY;
-        float rx = rightX; 
-        float ry = rightY;	    
-        float ax = apexX;
-        float ay = apexY;
-
-	float diff = (sin(System::instance()->getTime() / 1000.0f) - 1.0f)/ 1.0f;
-        float val = _landscape->patch_size - diff;
-	
-        lx /= (float)val;
-        ly /= (float)val;
-        rx /= (float)val;
-        ry /= (float)val;
-        ax /= (float)val;
-	ay /= (float)val;
-
-
-//        lx /= (float)_landscape->patch_size;
-//        ly /= (float)_landscape->patch_size;
-//        rx /= (float)_landscape->patch_size;
-//        ry /= (float)_landscape->patch_size;
-//        ax /= (float)_landscape->patch_size;
-//        ay /= (float)_landscape->patch_size;
-	
-//	lx -= diff;
-//	ly -= diff;
-//	rx -= diff;
-//	ry -= diff;
-//	ax -= diff;
-//	ay -= diff;
-	
-
-        glTexCoord2f(lx, ly);
-        glVertex3f((GLfloat) leftX, (GLfloat) leftY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-        glTexCoord2f(rx, ry);
-        glVertex3f((GLfloat) rightX, (GLfloat) rightY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-        glTexCoord2f(ax, ay);
-        glVertex3f((GLfloat) apexX, (GLfloat) apexY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-      } else {
-        glVertex3f((GLfloat) leftX, (GLfloat) leftY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-        glVertex3f((GLfloat) rightX, (GLfloat) rightY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-        glVertex3f((GLfloat) apexX, (GLfloat) apexY,  (GLfloat)Landscape::waterlevel * MULT_SCALE_HEIGHT);
-      }
+      v[2][0] = (float) apexX;// / MULT_SCALE_LAND;
+      v[2][1] = (float) apexY;// / MULT_SCALE_LAND;
+      v[2][2] = (float) apexZ;/// MULT_SCALE_HEIGHT;
+  
+      calcNormal( v, out );
+  
+//  std::cout << out[0] << "," << out[1] << "," << out[2] << std::endl;
+      //Scale Normal so it will become normalized after scaling is applied to it
+//      out[0] /= MULT_SCALE_LAND;
+//      out[1] /= MULT_SCALE_LAND;
+//      out[2] /= MULT_SCALE_HEIGHT;
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
+     
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
+      
+      normal_data[n_counter][0] = out[0];
+      normal_data[n_counter][1] = out[1];
+      normal_data[n_counter++][2] = out[2];
     }
+    
+//    if (_renderer->checkState(RENDER_TEXTURES)) {
+      _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
+
+      float lx = leftX;
+      float ly = leftY;
+      float rx = rightX; 
+      float ry = rightY;	    
+      float ax = apexX;
+      float ay = apexY;
+
+
+      float diff = (sin(System::instance()->getTime() / 1000.0f) - 1.0f);
+      float val = _landscape->patch_size - diff;
+
+      lx /= (float)val;
+      ly /= (float)val;
+      rx /= (float)val;
+      ry /= (float)val;
+      ax /= (float)val;
+      ay /= (float)val;
+      
+      texture_data[t_counter][0] = lx;
+      texture_data[t_counter++][1] = ly;
+    
+      texture_data[t_counter][0] = rx;
+      texture_data[t_counter++][1] = ry;
+      
+      texture_data[t_counter][0] = ax;
+      texture_data[t_counter++][1] = ay;
+
+      float z = (float)Landscape::waterlevel * MULT_SCALE_HEIGHT;
+      vertex_data[v_counter][0] = leftX;
+      vertex_data[v_counter][1] = leftY;
+      vertex_data[v_counter++][2] = z;
+
+      vertex_data[v_counter][0] = rightX;
+      vertex_data[v_counter][1] = rightY;
+      vertex_data[v_counter++][2] = z;
+
+      vertex_data[v_counter][0] = apexX;
+      vertex_data[v_counter][1] = apexY;
+      vertex_data[v_counter++][2] = z;
   }
 }
 

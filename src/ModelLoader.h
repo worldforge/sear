@@ -19,7 +19,7 @@
 namespace Sear {
 
 // Forward Declarationa
-class Models;
+class Model;
 class WorldEntity;
 
 class ModelLoader {
@@ -32,7 +32,7 @@ public:
 
   // TODO: why did =0; suddenly stop working?
   // TODO: reduce  range of args
-  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) = 0;
+  virtual Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) = 0;
   
   
 };

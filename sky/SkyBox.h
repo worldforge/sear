@@ -6,7 +6,6 @@
 #define _SKYBOX_H_ 1
 
 #include "../src/System.h"
-//#include "../src/Render.h"
 
 #define NUM_SKY_TEXTURES 12
 

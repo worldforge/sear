@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "ObjectLoader.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "Log.h"
+
+#include "common/Log.h"
+
+#include "ObjectLoader.h"
 
 namespace Sear {
 

@@ -5,12 +5,13 @@
 #ifndef _WIREFRAME_H_
 #define _WIREFRAME_H_ 1
 
-#include "../src/Models.h"
 #include <wfmath/axisbox.h>
+
+#include "src/Model.h"
 
 namespace Sear {
 
-class WireFrame : public Models{
+class WireFrame : public Model{
 public:
   WireFrame();
   ~WireFrame();

@@ -14,22 +14,28 @@
 #include <iostream.h>
 #include <string>
 
-#include "../renderers/GL.h"
-#include "../src/Models.h"
-#include "../src/ModelLoader.h"
-#include "../src/ModelHandler.h"
-#include "../src/WorldEntity.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-#include "../src/Utility.h"
+
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
+#include "renderers/GL.h"
+
+#include "src/Model.h"
+#include "src/ModelLoader.h"
+#include "src/ModelHandler.h"
+#include "src/WorldEntity.h"
+
+#include "common/Log.h"
+#include "common/Utility.h"
 
 
 
-Sear::Models *model = NULL;
+
+
+Sear::Model *model = NULL;
 Sear::GL *render = NULL;
 
 WFMath::Quaternion q = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);

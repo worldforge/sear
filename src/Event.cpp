@@ -2,15 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include <string>
+#include <Eris/World.h>
+
+#include "common/Log.h"
+
 #include "System.h"
 #include "Event.h"
 #include "WorldEntity.h"
 #include "ModelHandler.h"
-#include <Eris/World.h>
-#include <string>
 #include "Render.h"
 #include "Character.h"
-#include "Log.h"
 
 namespace Sear {
 

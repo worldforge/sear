@@ -9,13 +9,15 @@
  * This class represents the data for a billboard model
  */ 
 
-#include "../src/Models.h"
-
 #include <string>
+
+#include "src/Model.h"
+#include "src/Graphics.h"
+
 
 namespace Sear {
 
-class BillBoard : public Models {
+class BillBoard : public Model {
 public:
   /*
    * Constructor suppling the desired width and height for the billboard.
@@ -40,7 +42,7 @@ public:
 
   void render(bool);
 
-  RotationStyle rotationStyle() { return BILLBOARD; }
+  Graphics::RotationStyle rotationStyle() { return Graphics::ROS_BILLBOARD; }
 
   bool useTextures() { return _use_textures; }
   

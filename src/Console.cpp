@@ -2,17 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "common/Utility.h"
+#include "common/Log.h"
+
 #include "Console.h"
 #include "ConsoleObject.h"
 #include "System.h"
+#include "Graphics.h"
 #include "Render.h"
-#include "Utility.h"
-#include "Log.h"
 
 namespace Sear {
 
 bool Console::init() {
-  _renderer = _system->getRenderer();
+  _renderer = _system->getGraphics()->getRender();
   panel_id = _renderer->requestTexture("ui_panel");
   registerCommand(TOGGLE_CONSOLE, this);
   registerCommand(LIST_CONSOLE_COMMANDS, this);

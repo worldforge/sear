@@ -1,41 +1,53 @@
- * Move render type def from Models to renderer
- * Add ability to specify search paths for default file locations 
+ * Fix lighting
+  
+* Add ability to specify search paths for default file locations 
+
  * Add ability to tokenise on quotes, not just spaces
+
  * Determine why some models are not properly rotated 
   - Might be how they come from the server so need to check this data
- * Re-implement model type conversion / downgrading
+
  * Add a stand alone option -> ModelViewer
+
  * Allow line editing in console
+
  * Check for OpenGL hardware -> ie if vendor == NONE report error
+
  * In game menu for configuration
+
  * Improve memory usage
    - Unload unused textures, models, and other data.
+
  * Add a BSP tree or equivalent
+
  * Update configure + autogen to provide better help. -> IE if not found, goto www...
+
  * Move OpenGL code into one object
- * Make OpenGL Render class a plugin
+
  * Add a better GUI
    - First step is to add a gui_queue for rendering. This starts with the splash screen, then with anything else such as entity text
    - Finally render console.
 
  * Add Meta Server support
+
  * Add collision detection
    - This can be as an addition to the BSP tree or equivalent code
+
  * Improve terrain engine
    - Include demetar?
    - Look in gamedev/flipcode for the possible additions to current terrain engine
+
  * Allow mulitple terrains
    - Allow us to load in new terrain settings on the fly
+
  * Add support to create custom font textures from say freetype
 
  * Add a sky dome
    - See flipcode skydome tutorial
 
- * Add Stage support
-   Check format of Atlas messages. 
-
  * Colour cursors
-   Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors could be implemented by telling SDL to hide the cursor and instead blitting a texture to the scene as the last object using OpenGL based cursor position. Cursor position may be easily obtainable from a method, or else you need to use the SDL MouseMove event to keep track of move mousements and store the cursor position somewhere.
+   Cursors are currently implemented using the SDL cursor methods. These are only in black and white, and the cursors are hard coded in cursors.h. Colour cursors can be easily implemented by rendering the cursor as a texture and hiding the real one. The trick is to get mouse position.
+  SDL offers two ways. one is to use SDL_GetMouseState and the second is to store the position on every MOUSEMOTION event. However both of these methods do not offer sufficient update intervals to be of real use. We require either another way or need to increase the rate of updates.
 
  * Add sound / music effects
    SDL has built in sound effects, and addon libraries for additional support. Sound support should be added to the  System class and provide functions to play a specific sound, or music track. These should also be available through the console.

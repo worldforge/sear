@@ -2,22 +2,22 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include <wfmath/axisbox.h>
+#include <Eris/TypeInfo.h>
+
+#include "common/Log.h"
+#include "common/Utility.h"
+
+#include "Console.h"
+#include "Event.h"
+#include "EventHandler.h"
+#include "Graphics.h"
+#include "ModelHandler.h"
+#include "Model.h"
+#include "Render.h"
 #include "System.h"
 #include "WorldEntity.h"
-#include "Console.h"
-#include "Render.h"
 
-#include <wfmath/axisbox.h>
-
-#include "EventHandler.h"
-#include "Event.h"
-
-#include "ModelHandler.h"
-#include "Models.h"
-
-#include <Eris/TypeInfo.h>
-#include "Log.h"
-#include "Utility.h"
 
 namespace Sear {
 
@@ -27,6 +27,7 @@ int WorldEntity::message_life = WORLD_ENTITY_MESSAGE_LIFE;
 void WorldEntity::handleMove() {
   SetVelocity();
   WorldEntity *we = (WorldEntity*)getContainer();
+  static ModelHandler *model_handler = System::instance()->getModelHandler();
   if (we != NULL) {
     translateAbsPos(we->getAbsPos());
     rotateAbsOrient(we->getAbsOrient());
@@ -34,10 +35,11 @@ void WorldEntity::handleMove() {
     translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
   }
-  if (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()) >= 7.0f) {
-    System::instance()->getModelHandler()->getModel(this)->action("run");
-  } else {
-    System::instance()->getModelHandler()->getModel(this)->action("walk");
+  Model *model = NULL;
+  if (model_handler) model = model_handler->getModel(this);
+  if (model) {
+    if (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()) >= 7.0f) model->action("run");
+    else model->action("walk");
   }
 }
 
@@ -84,7 +86,7 @@ void WorldEntity::renderMessages() {
      
   }
   // Render text strings
-  Render *renderer = System::instance()->getRenderer();
+  Render *renderer = System::instance()->getGraphics()->getRender();
   std::list<std::string>::iterator J;
   for (J = mesgs.begin(); J != mesgs.end(); J++) {	  
     std::string str = (*J);

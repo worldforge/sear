@@ -2,10 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "WireFrame.h"
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
 
-#include "../src/System.h"
-#include "../src/Render.h"
+#include "WireFrame.h"
 
 namespace Sear {
 
@@ -80,8 +81,8 @@ void WireFrame::shutdown() {
 }
 
 void WireFrame::render(bool) {
-  static Render *render = System::instance()->getRenderer();
-  render->renderArrays(Models::LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+  static Render *render = System::instance()->getGraphics()->getRender();
+  render->renderArrays(Graphics::RES_LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
 }
 
 } /* namespace Sear */

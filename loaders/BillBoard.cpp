@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
+
 #include "BillBoard.h"
-#include "../src/System.h"
-#include "../src/Render.h"
 
 namespace Sear {
 
@@ -42,13 +44,13 @@ void BillBoard::shutdown() {
 }
 
 void BillBoard::render(bool select_mode) {
-  static Render *_render = System::instance()->getRenderer();
+  static Render *_render = System::instance()->getGraphics()->getRender();
   if (select_mode) {	
     _render->switchTexture(_render->requestTextureMask(_type));
   } else {
     _render->switchTexture(_render->requestTexture(_type));
   }
-  _render->renderArrays(Models::QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
+  _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
 }
 
 } /* namespace Sear */

@@ -1,6 +1,9 @@
+INCLUDES = -I..
+
 bin_PROGRAMS = sear
 
 sear_LDADD = \
+	../common/libCommon.a \
 	../renderers/libRendererGL.a \
 	../terrain/libTerrainROAM.a \
 	../sky/libSkyBox.a \
@@ -20,9 +23,7 @@ sear_SOURCES = \
 	Character.h \
 	client.cpp \
 	client.h \
-	Config.cpp \
 	conf.h \
-	Config.h \
 	Console.cpp \
 	Console.h \
 	cursors.h \
@@ -32,8 +33,8 @@ sear_SOURCES = \
 	EventHandler.h \
 	Exception.h \
 	Factory.h \
-	Log.cpp \
-	Log.h \
+	Graphics.cpp \
+	Graphics.h \
 	main.cpp \
 	Models.h \
 	ObjectLoader.h \
@@ -43,8 +44,6 @@ sear_SOURCES = \
 	System.cpp \
 	System.h \
 	Terrain.h \
-	Utility.cpp \
-	Utility.h \
 	WorldEntity.cpp \
 	WorldEntity.h \
 	ModelHandler.cpp \
