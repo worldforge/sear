@@ -10,20 +10,21 @@
 
 #include "StateLoader.h"
 
+#include "Render.h"
 #include "Graphics.h"
 
 namespace Sear {
 
 class Model {
 public:
-  Model() :
-    _in_use(false)
+  Model(Render *render) :
+    _render(render),
+    _in_use(true)
   {}
   virtual ~Model() {}
   virtual bool init() { return false; }
   virtual void shutdown() {}
   virtual void update (float time_elapsed) {}
-  virtual float getScale() { return 1.0f; }
   virtual void render(bool select_mode) {}
   virtual void setDetailLevel(float f) {}
 
@@ -41,7 +42,8 @@ public:
   void setSelectState(StateProperties *sp) { _select_state = sp; }
  
   StateProperties *getSelectState() { return _select_state; }
-  
+protected: 
+  Render *_render;
 private:
   bool _in_use;
   std::map<std::string, bool> _flag_map;

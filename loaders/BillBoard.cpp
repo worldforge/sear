@@ -10,7 +10,7 @@
 
 namespace Sear {
 
-BillBoard::BillBoard() :
+BillBoard::BillBoard(Render *render) : Model(render),
 	// TODO: Should be set to false UNLESS a texture can be loaded
   _use_textures(true)
 {}
@@ -44,7 +44,6 @@ void BillBoard::shutdown() {
 }
 
 void BillBoard::render(bool select_mode) {
-  static Render *_render = System::instance()->getGraphics()->getRender();
   if (select_mode) {	
     _render->switchTexture(_render->requestTextureMask("billboard", _type));
   } else {

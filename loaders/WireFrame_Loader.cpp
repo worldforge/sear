@@ -8,8 +8,6 @@
 
 #include "src/Model.h"
 #include "src/ModelHandler.h"
-#include "src/WorldEntity.h"
-#include "src/ObjectLoader.h"
 
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
@@ -24,11 +22,11 @@ WireFrame_Loader::~WireFrame_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
-  WireFrame *model = new WireFrame();
+Model *WireFrame_Loader::loadModel(Render *render, ModelStruct &ms) {
+  WireFrame *model = new WireFrame(render);
 
-  WFMath::AxisBox<3> bbox = we->getBBox();
-  if (!we->hasBBox()) {
+  WFMath::AxisBox<3> bbox = ms.bbox;
+  if (!ms.hasBBox) {
     WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
     WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);

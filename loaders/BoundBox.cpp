@@ -10,7 +10,7 @@
 
 namespace Sear {
 
-BoundBox::BoundBox() :
+BoundBox::BoundBox(Render *render) : Model(render), 
   _type("default"),
   _use_textures(true)
 {}
@@ -141,12 +141,12 @@ void BoundBox::shutdown() {
 }
 
 void BoundBox::render(bool select_mode) {
-  static Render *render = System::instance()->getGraphics()->getRender();
+  if (!_render) return;
   if (select_mode) {
-    render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+    _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
   } else {
-    render->switchTexture(render->requestTexture("boundbox", _type));
-    render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    _render->switchTexture(_render->requestTexture("boundbox", _type));
+    _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   }
 }
 

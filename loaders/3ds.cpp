@@ -27,9 +27,8 @@
 
 namespace Sear {
 
-ThreeDS::ThreeDS() : 
-  _model (NULL),
-  _scale(1.0f)
+ThreeDS::ThreeDS(Render *render) : Model(render),
+  _model (NULL)
 {
 
 }
@@ -38,11 +37,7 @@ ThreeDS::~ThreeDS() {
 
 }
 
-bool ThreeDS::init(const std::string &file_name, float scale, float offset[3]) {
-  if (scale) _scale = scale;
-  _offset[0] = offset[0];
-  _offset[1] = offset[1];
-  _offset[2] = offset[2];
+bool ThreeDS::init(const std::string &file_name) {
   // Load 3ds file
   Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
   _model = lib3ds_file_load(file_name.c_str());
@@ -65,15 +60,13 @@ void ThreeDS::shutdown() {
 }
 
 void ThreeDS::render(bool select_mode) {
-  static Render *rend = System::instance()->getGraphics()->getRender();
   int current_texture = 0;
   std::string current_material = "";
-  rend->translateObject(_offset[0], _offset[1], _offset[2]);
   if (select_mode) {
     for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
       RenderObject *ro = *I;
       if (ro) {
-        rend->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
+        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
       }
     }
   } else {
@@ -83,22 +76,21 @@ void ThreeDS::render(bool select_mode) {
         if (ro->material_name && std::string(ro->material_name) != current_material) {
           Material *m = material_map[ro->material_name];
           if (m) {
-            rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+            _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
             current_material = ro->material_name;
           }	    
         }
         if (current_texture != ro->texture_id) {
-          if (ro->texture_data) rend->switchTexture(ro->texture_id);
+          if (ro->texture_data) _render->switchTexture(ro->texture_id);
           current_texture = ro->texture_id;
         }
-        rend->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
+        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
       }
     }
   }
 }
 
 void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
-  static Render *rend = System::instance()->getGraphics()->getRender();
   Lib3dsNode *p;
   Lib3dsObjectData *d;
   d=&node->data.object;
@@ -157,7 +149,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	    material_map[std::string(f->material)] = m;
 	  }
           if (mat->texture1_map.name[0]) {
-	    int texture_id = rend->requestTexture("3ds", mat->texture1_map.name);
+	    int texture_id = _render->requestTexture("3ds", mat->texture1_map.name);
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
@@ -215,15 +207,15 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
           if (ro->material_name && std::string(ro->material_name) != current_material) {
             Material *m = material_map[ro->material_name];
             if (m) {
-              rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+              _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
               current_material = ro->material_name;
             }	    
           }
           if (current_texture != ro->texture_id) {
-            if (ro->texture_data) rend->switchTexture(ro->texture_id);
+            if (ro->texture_data) _render->switchTexture(ro->texture_id);
             current_texture = ro->texture_id;
           }
-          rend->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
+          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
 	  if (ro->vertex_data) free(ro->vertex_data);
   	  if (ro->normal_data) free(ro->normal_data);
 	  if (ro->texture_data) free(ro->texture_data);
@@ -236,8 +228,6 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
     if (node->user.d) {
 
       glPushMatrix();
-      glTranslatef(_offset[0], _offset[1], _offset[2]);
-      if (_scale != 1.0f) glScalef(_scale, _scale, _scale);
       glCallList(node->user.d);
       glPopMatrix();
     }

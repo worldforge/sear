@@ -14,7 +14,7 @@ namespace Sear {
 	
 class NPlane : public Model {
 public:
-  NPlane();
+  NPlane(Render*);
   ~NPlane();
   
   bool init(const std::string &, unsigned int num_planes, float width, float height);

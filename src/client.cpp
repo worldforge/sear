@@ -444,7 +444,8 @@ void Client::Appearance(Eris::Entity *e){
   Log::writeLog(std::string("Appearance: ") + e->getName(), Log::LOG_INFO);
   ((WorldEntity *)e)->handleMove();
   static ModelHandler *mh =  _system->getModelHandler();
-  mh->getModel((WorldEntity*)e)->setInUse(true);
+  Model *m = mh->getModel(NULL, (WorldEntity*)e);
+  if (m) m->setInUse(true);
 //  ((WorldEntity *)e)->displayInfo();
   
 }
@@ -452,7 +453,8 @@ void Client::Appearance(Eris::Entity *e){
 void Client::Disappearance(Eris::Entity *e){
   Log::writeLog("Disappearance: " + e->getName(), Log::LOG_INFO);
   static ModelHandler *mh =  _system->getModelHandler();
-  mh->getModel((WorldEntity*)e)->setInUse(false);
+  Model *m = mh->getModel(NULL, (WorldEntity*)e);
+  if (m) m->setInUse(false);
   // Delete model after 1 minute
   _system->getEventHandler()->addEvent(Event(EF_FREE_MODEL, Event::stringToObject(e->getID()), EC_TIME, 60000 + System::instance()->getTime()));
 }

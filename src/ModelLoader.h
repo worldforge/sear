@@ -12,9 +12,8 @@
  * to load.
  */ 
 
-#include <string>
-
-#include "ObjectLoader.h"
+#include "ModelStruct.h"
+#include "Render.h"
 
 namespace Sear {
 
@@ -32,7 +31,7 @@ public:
 
   // TODO: why did =0; suddenly stop working?
   // TODO: reduce  range of args
-  virtual Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) = 0;
+  virtual Model *loadModel(Render *, ModelStruct &) = 0;
   
   
 };

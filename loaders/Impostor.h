@@ -14,7 +14,7 @@ namespace Sear {
 	
 class Impostor : public Model {
 public:
-  Impostor();
+  Impostor(Render*);
   ~Impostor();
   
   bool init(const std::string &, float width, float height);

@@ -22,7 +22,7 @@ public:
    * Constructor stores the bounding box for the basis of this model.
    * wrap indicates how to produce the texture coords. IE 0->1 or 0->size of face
    */ 	
-  BoundBox();
+  BoundBox(Render*);
 
   /*
    * Default destructor
@@ -38,7 +38,6 @@ public:
    * Cleans up object
    */ 
   void shutdown();
-  float getScale() { return 1.0f; } 
   void render(bool); 
 
   bool useTextures() { return _use_textures; }

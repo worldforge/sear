@@ -5,10 +5,9 @@
 #ifndef _3DS_LOADER_H_
 #define _3DS_LOADER_H_ 1
 
-#include <string>
 
 #include "src/ModelLoader.h"
-#include "src/ObjectLoader.h"
+#include "src/ModelStruct.h"
 
 
 namespace Sear {
@@ -22,7 +21,7 @@ public:
   ThreeDS_Loader(ModelHandler *mh);
   ~ThreeDS_Loader();
 
-  Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name);
+  Model *loadModel(Render *, ModelStruct &);
 
 };
 

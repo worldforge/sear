@@ -3,9 +3,9 @@
 AppName=Sear
 AppVerName=Sear @SEAR_VERSION@
 AppPublisher=Simon Goodall
-AppPublisherURL=http://www.ecs.soton.ac.uk/~sg399/sear/
-AppSupportURL=http://www.ecs.soton.ac.uk/~sg399/sear/
-AppUpdatesURL=http://www.ecs.soton.ac.uk/~sg399/sear/
+AppPublisherURL=http://www.worldforge.org/dev/eng/clients/sear
+AppSupportURL=http://www.worldforge.org/dev/eng/clients/sear
+AppUpdatesURL=http://www.worldforge.org/dev/eng/clients/sear
 DefaultDirName={pf}\Sear
 DefaultGroupName=Sear
 AllowNoIcons=yes
@@ -25,7 +25,6 @@ Source: "bindings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "shutdown.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "startup.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "general.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "textures.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "zlib.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "COPYING"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "AUTHORS"; DestDir: "{app}"; CopyMode: alwaysoverwrite
@@ -33,19 +32,27 @@ Source: "jpeg.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "libpng1.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "models.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "object_file.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "buildings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "Readme.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "SDL.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "SDL_image.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "data\*.png"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
 Source: "data\*.cal"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
 Source: "data\*.bmp"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "textures\*.*"; DestDir: "{app}\textures"; CopyMode: alwaysoverwrite
 Source: "cal3d_data\cally\*.*"; DestDir: "{app}\cal3d_data\cally"; CopyMode: alwaysoverwrite
 Source: "cal3d_data\paladin\*.*"; DestDir: "{app}\cal3d_data\paladin"; CopyMode: alwaysoverwrite
 Source: "cal3d_data\skeleton\*.*"; DestDir: "{app}\cal3d_data\skeleton"; CopyMode: alwaysoverwrite
+Source: "sear_media\*.*"; DestDir: "{app}\sear_media"; CopyMode: alwaysoverwriteSource: "sear_media\billboards\*.*"; DestDir: "{app}\sear_media\billboards"; CopyMode: alwaysoverwrite
+Source: "sear_media\boundbox\*.*"; DestDir: "{app}\sear_media\boundbox"; CopyMode: alwaysoverwrite
+Source: "sear_media\impostors\*.*"; DestDir: "{app}\sear_media\impostors"; CopyMode: alwaysoverwrite
+Source: "sear_media\skybox\*.*"; DestDir: "{app}\sear_media\skybox"; CopyMode: alwaysoverwrite
+Source: "sear_media\terrain\*.*"; DestDir: "{app}\sear_media\terrain"; CopyMode: alwaysoverwrite
+Source: "sear_media\ui\*.*"; DestDir: "{app}\sear_media\ui"; CopyMode: alwaysoverwrite
+Source: "sear_media\water\*.*"; DestDir: "{app}\sear_media\water"; CopyMode: alwaysoverwrite
+
 
 [INI]
-Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ecs.soton.ac.uk/~sg399/sear/"
+Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.worldforge.org/dev/eng/clients/sear"
 
 [Icons]
 Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; IconFilename: "{app}\data\sear_icon.bmp"

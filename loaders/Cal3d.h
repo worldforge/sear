@@ -12,6 +12,8 @@
 
 namespace Sear {
 
+class Render;
+	
 class Cal3d : public Model
 {
 // misc
@@ -43,7 +45,7 @@ protected:
   
 // constructors/destructor
 public:
-	Cal3d();
+	Cal3d(Render*);
 	virtual ~Cal3d();
 
 // member functions

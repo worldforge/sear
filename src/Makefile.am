@@ -1,8 +1,11 @@
 bin_PROGRAMS = sear
 
+noinst_LIBRARIES = libSear.a
+
 INCLUDES = -I..
 
 sear_LDADD = \
+	libSear.a \
 	../common/libCommon.a \
 	../renderers/libRendererGL.a \
 	../terrain/libTerrainROAM.a \
@@ -16,6 +19,9 @@ sear_LDADD = \
 	../loaders/libLoaderNPlane.a 
 
 sear_SOURCES = \
+	main.cpp
+
+libSear_a_SOURCES = \
 	Bindings.cpp \
 	Bindings.h \
 	Camera.cpp \

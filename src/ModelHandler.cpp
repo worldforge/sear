@@ -4,6 +4,7 @@
 
 #include "System.h"
 #include <set>
+#include <string.h>
 
 #include <varconf/Config.h>
 #include <Eris/TypeInfo.h>
@@ -23,6 +24,7 @@
 #include "ModelHandler.h"
 #include "ModelLoader.h"
 #include "ObjectLoader.h"
+#include "Render.h"
 #include "StateLoader.h"
 #include "WorldEntity.h"
 
@@ -72,7 +74,7 @@ void ModelHandler::shutdown() {
   }
 }
   
-Model *ModelHandler::getModel(WorldEntity *we) {
+Model *ModelHandler::getModel(Render *render, WorldEntity *we) {
   // Check for NULL pointer	
   if (!we) throw Exception("WorldEntity is NULL");
   
@@ -85,6 +87,7 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   // If entity already has an associated model, return it.
   if (_models[id]) return _models[id];
 ///  if (_models[type]) return _models[type];
+  if (!render) return NULL;
   
   // Get object type record
   ObjectProperties *op = we->getObjectProperties();
@@ -92,7 +95,10 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   std::string object_type = "";
   std::string data_source = "";
   Model *model = NULL;
-
+  ModelStruct *ms = (ModelStruct*)malloc(sizeof(ModelStruct));
+  memset(ms, 0, sizeof(ModelStruct));
+  ms->type = type.c_str();
+  ms->parent = parent.c_str();
   static varconf::Config *model_config = System::instance()->getModel();
 
   object_type = we->type();
@@ -103,13 +109,21 @@ Model *ModelHandler::getModel(WorldEntity *we) {
     op = ol->getObjectProperties(object_type);
     if (op) {
       data_source = model_config->getItem(op->model_type, object_type);
+      ms->file_name = data_source.c_str();
       if (op->model_by_type) {
         if (_models[object_type]) {
           model = _models[object_type];
 	  break;
         }
       }
-      if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(we, op, data_source);
+      ms->width = op->width;
+      ms->height = op->height;
+      ms->wrap_texture = op->wrap_texture;
+      ms->scale = op->scale;
+      ms->num_planes = op->num_planes;
+      ms->hasBBox = we->hasBBox();
+      ms->bbox = we->getBBox();
+      if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(render, *ms);
     }
     if (!model) {
       if (I == parents_list.end()) {
@@ -135,9 +149,40 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   if (model) {
     model->setSelectState(System::instance()->getStateLoader()->getStateProperties(op->select_state));
   }
+  free(ms);
   return model; 
 }
 
+Model *ModelHandler::getModel(Render *render, const std::string &object_type, ObjectProperties *op) {
+  if (!render) return NULL;
+  // Get object type record
+//  System
+  ObjectLoader *ol = System::instance()->getObjectLoader();
+  Model *model = NULL;
+
+  static varconf::Config *model_config = System::instance()->getModel();
+  if(ol->getObjectProperties(object_type)) {
+    memcpy(op,ol->getObjectProperties(object_type), sizeof(ObjectProperties));
+  }
+  if (op) {
+    ModelStruct *ms = (ModelStruct*)malloc(sizeof(ModelStruct));
+    memset(ms, 0, sizeof(ModelStruct));
+    ms->type = object_type.c_str();
+    ms->parent = NULL;
+    ms->width = op->width;
+    ms->height = op->height;
+    ms->wrap_texture = op->wrap_texture;
+    ms->scale = op->scale;
+    ms->num_planes = op->num_planes;
+    ms->hasBBox = false;
+    ms->bbox = WFMath::AxisBox<3>();
+    std::string data_source = model_config->getItem(op->model_type, object_type);
+    ms->file_name = data_source.c_str();
+    if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(render, *ms);
+    free (ms);
+  }
+  return model; 
+}
 void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoader *model_loader) {
   // Check for bad values	
   if (model_type.empty()) throw Exception("No type specified");
@@ -149,6 +194,10 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
   _model_loaders[model_type] = model_loader;
 }
 
+void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader) {
+  // Only unregister a model laoder if it is properly registered
+  if (_model_loaders[model_type] == model_loader) _model_loaders[model_type] = NULL;
+}
 void ModelHandler::checkModelTimeout(const std::string &id) {
   Model *model = _models[id];
   if (!model) return;

@@ -22,7 +22,7 @@ public:
   /*
    * Defualt constructor
    */ 
-  ThreeDS();
+  ThreeDS(Render*);
 
   /*
    * Destructor
@@ -32,15 +32,13 @@ public:
   /*
    * Initialise 3ds model. Should probably be combined with loadModel
    */ 
-  bool init(const std::string &file_name, float scale, float offset[3]);
+  bool init(const std::string &file_name);
 
   /*
    * Called when model is to be removed from memory. It cleans up its children.
    */
   void shutdown();
   void render(bool);
-
-  float getScale() { return _scale; }
 
 protected:
   typedef struct {
@@ -62,8 +60,6 @@ protected:
   void render_node(Lib3dsNode * node, Lib3dsFile * file);
   
   Lib3dsFile* _model;
-  float _scale;
-  float _offset[3];
 
   std::list<RenderObject*> render_objects;
   std::map<std::string, Material*> material_map;

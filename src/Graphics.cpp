@@ -183,7 +183,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
     if (we->getType() != NULL) {
       ObjectProperties *op = we->getObjectProperties();
       if (!op) {
-        _model_handler->getModel(we); // Allocates a model and an ObjectProperties
+        _model_handler->getModel(_renderer, we); // Allocates a model and an ObjectProperties
         op = we->getObjectProperties();
       }
       if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg

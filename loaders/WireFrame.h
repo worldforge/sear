@@ -13,7 +13,7 @@ namespace Sear {
 
 class WireFrame : public Model{
 public:
-  WireFrame();
+  WireFrame(Render*);
   ~WireFrame();
   
   bool init(WFMath::AxisBox<3>);

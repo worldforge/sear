@@ -2,13 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _WIREFRAME_LOADER_H_
-#define _WIREFRAME_LOADER_H_ 1
-
-#include <string>
+#ifndef WIREFRAME_LOADER_H
+#define WIREFRAME_LOADER_H 1
 
 #include "src/ModelLoader.h"
-#include "src/ObjectLoader.h"
+#include "src/ModelStruct.h"
 
 namespace Sear {
 
@@ -22,10 +20,10 @@ public:
   WireFrame_Loader(ModelHandler *mh);
   ~WireFrame_Loader();
 
-  Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name);
+  Model *loadModel(Render *, ModelStruct &);
 
 };
 
 } /* namespace Sear */
 
-#endif /* _WIREFRAME_LOADER_H_ */
+#endif /* WIREFRAME_LOADER_H */

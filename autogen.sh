@@ -36,6 +36,6 @@ echo autoconf...
 
 autoconf
 # Default install is /opt/worldforge
-./configure --prefix=/opt/worldforge $@
+./configure --prefix=/opt/worldforge --enable-debug=yes $@
 
 exit 0

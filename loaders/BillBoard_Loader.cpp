@@ -6,10 +6,7 @@
 #include <string>
 
 #include "src/ModelHandler.h"
-#include "src/WorldEntity.h"
-#include "src/Graphics.h"
 #include "src/Render.h"
-#include "src/ObjectLoader.h"
 
 #include "BillBoard_Loader.h"
 #include "BillBoard.h"
@@ -24,21 +21,21 @@ BillBoard_Loader::~BillBoard_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *BillBoard_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
-  BillBoard *model = new BillBoard();
+Model *BillBoard_Loader::loadModel(Render *render, ModelStruct &ms) {
+  if (!render) return NULL;
+  BillBoard *model = new BillBoard(render);
 
-  std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture("billboard", type);
+  std::string type = ms.type;
+  int id = render->requestTexture("billboard", type);
   if (id == -1) {
-    type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture("billboard", type);
+    type = ms.parent;
+    id = render->requestTexture("billboard", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, op->width, op->height);
-  model->setInUse(true);
+  model->init(type, ms.width, ms.height);
   return model;
 }
 

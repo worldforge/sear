@@ -11,7 +11,7 @@
 
 namespace Sear {
 
-NPlane::NPlane() :
+NPlane::NPlane(Render *render) : Model(render),
   _use_textures(true),
   _num_planes(0),
   _vertex_data(NULL),
@@ -69,14 +69,14 @@ void NPlane::shutdown() {
 }
 
 void NPlane::render(bool select_mode) {
+  if (!_render) return;
   //TODO, should we use one texture for the whole model, or one per plane?
-  static Render *render = System::instance()->getGraphics()->getRender();
   if (select_mode) {
-    render->switchTexture(render->requestTextureMask("nplane", _type));
+    _render->switchTexture(_render->requestTextureMask("nplane", _type));
   } else {
-    render->switchTexture(render->requestTexture("nplane", _type));
+    _render->switchTexture(_render->requestTexture("nplane", _type));
   }
-  render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
+  _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
 }
 
 } /* namespace Sear */

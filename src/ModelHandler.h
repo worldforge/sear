@@ -18,11 +18,14 @@
 #include <map>
 #include <string>
 
+#include "ObjectLoader.h"
+
 namespace Sear {
 
 // Forward Declarationa
 class Model;
 class ModelLoader;
+class Render;
 class WorldEntity;
 	
 class ModelHandler {
@@ -36,12 +39,14 @@ public:
   /*
    * Obtains a model for the given WorldEntity we
    */ 
-  Model *getModel(WorldEntity *we);
+  Model *getModel(Render *, WorldEntity *we);
+  Model *getModel(Render *, const std::string&, ObjectProperties *op);
 
   /*
    * Sets up a callback to use to load a model with model_type
    */ 
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
+  void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
 
   void checkModelTimeout(const std::string &);
 

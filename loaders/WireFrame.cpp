@@ -10,7 +10,8 @@
 
 namespace Sear {
 
-WireFrame::WireFrame() {}
+WireFrame::WireFrame(Render *render) : Model(render)
+{}
  
 WireFrame::~WireFrame() {}
   

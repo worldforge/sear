@@ -5,10 +5,8 @@
 #ifndef _CAL3D_LOADER_H_
 #define _CAL3D_LOADER_H_ 1
 
-#include <string>
-
 #include "src/ModelLoader.h"
-#include "src/ObjectLoader.h"
+#include "src/ModelStruct.h"
 
 namespace Sear {
 
@@ -21,7 +19,7 @@ public:
   Cal3d_Loader(ModelHandler *mh);
   ~Cal3d_Loader();
 
-  Model *loadModel(WorldEntity *, ObjectProperties*, const std::string &file_name);
+  Model *loadModel(Render *, ModelStruct &);
 
 };
 

@@ -5,10 +5,8 @@
 #ifndef _IMPOSTOR_LOADER_H_
 #define _IMPOSTOR_LOADER_H_ 1
 
-#include <string>
-
 #include "src/ModelLoader.h"
-#include "src/ObjectLoader.h"
+#include "src/ModelStruct.h"
 
 namespace Sear {
 
@@ -22,7 +20,7 @@ public:
   Impostor_Loader(ModelHandler *mh);
   ~Impostor_Loader();
 
-  Model *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name);
+  Model *loadModel(Render *, ModelStruct &);
 
 };
 

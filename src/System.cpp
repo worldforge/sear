@@ -95,6 +95,7 @@ bool System::init() {
     mkdir(home_path.c_str(), 0755);
   }
 #endif
+  // This should not be hardcoded!!
   install_path = std::string(INSTALLDIR) + std::string("/share/sear");
   
   _ol = new ObjectLoader();

@@ -4,11 +4,7 @@
 
 #include "src/System.h"
 
-#include <string>
-
 #include "src/ModelHandler.h"
-#include "src/WorldEntity.h"
-#include "src/ObjectLoader.h"
 
 #include "3ds_Loader.h"
 #include "3ds.h"
@@ -23,11 +19,10 @@ ThreeDS_Loader::~ThreeDS_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *ThreeDS_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
-  ThreeDS *model = new ThreeDS();
-  model->init(file_name, op->scale, op->offset);
+Model *ThreeDS_Loader::loadModel(Render *render, ModelStruct &ms) {
+  ThreeDS *model = new ThreeDS(render);
+  model->init(ms.file_name);
   model->setInUse(true);
-  model->setFlag("outline", op->outline);
   return model;
 }
 

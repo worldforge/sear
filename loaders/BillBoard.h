@@ -23,7 +23,7 @@ public:
    * Constructor suppling the desired width and height for the billboard.
    * Should probably move this info to init
    */ 	
-  BillBoard();
+  BillBoard(Render*);
 
   /*
    * Default destructor

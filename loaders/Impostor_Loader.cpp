@@ -5,9 +5,7 @@
 #include "src/System.h"
 #include <string>
 
-#include "src/WorldEntity.h"
 #include "src/Render.h"
-#include "src/ObjectLoader.h"
 #include "src/ModelHandler.h"
 
 #include "Impostor_Loader.h"
@@ -23,20 +21,20 @@ Impostor_Loader::~Impostor_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *Impostor_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
-  Impostor *model = new Impostor();
+Model *Impostor_Loader::loadModel(Render *render, ModelStruct &ms) {
+  Impostor *model = new Impostor(render);
 
-  std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture("impostor", type);
+  std::string type = ms.type;
+  int id = render->requestTexture("impostor", type);
   if (id == -1) {
-    type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture("impostor", type);
+    type = ms.parent;
+    id = render->requestTexture("impostor", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, op->width, op->height);
+  model->init(type, ms.width, ms.height);
   model->setInUse(true);
   return model;
 }

@@ -11,6 +11,14 @@
  * - Currently the design of Sear means we need the entire program to make this work!!!
  */ 
 
+/*
+ * CONTROLS
+ * CAMERA is cursors and PAGE UP/DOWN
+ * MODEL - hold down mouse button and move mouse at the same time
+ * QUIT Escape of q
+ * */
+
+
 #include <iostream.h>
 #include <string>
 
@@ -26,6 +34,7 @@
 #include "src/Model.h"
 #include "src/ModelLoader.h"
 #include "src/ModelHandler.h"
+#include "src/ObjectLoader.h"
 #include "src/WorldEntity.h"
 
 #include "common/Log.h"
@@ -38,10 +47,12 @@
 Sear::Model *model = NULL;
 Sear::GL *render = NULL;
 
+Sear::ObjectProperties *op = NULL;
+
 WFMath::Quaternion q = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
 
 float camera_x = 0.0f;
-float camera_y = 5.0f;
+float camera_y = 0.0f;
 float camera_z = 0.0f;
 
 float model_x = 0.0f;
@@ -78,12 +89,30 @@ void display() {
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 
   glTranslatef(camera_x, camera_y, camera_z);
+
+  render->stateChange("default");
+  glBegin(GL_LINES);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(-10.0f, 0.0f, 0.0f);
+    glVertex3f(10.0f, 0.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(0.0f, -10.0f, 0.0f);
+    glVertex3f(0.0f, 10.0f, 0.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(0.0f, 0.0f, -10.0f);
+    glVertex3f(0.0f, 0.0f, 10.0f);
+  glEnd();
+  
+  render->stateChange(op->state);
+
+  glDisable(GL_FOG);
+  glColor3f(1.0f, 1.0f, 1.0f);
      float rotation_matrix[4][4];
      Sear::QuatToMatrix(q, rotation_matrix); //Get the rotation matrix for base rotation
      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
   glPushMatrix();
   
-    
+  if(op && op->scale) glScalef(op->scale, op->scale, op->scale); 
     model->render(false);
   glPopMatrix();
   glutSwapBuffers();
@@ -92,6 +121,7 @@ void display() {
 
 void key(unsigned char key, int x, int y) {
   switch (key) {
+    case 27: 
     case 'q': exit(0); break;
     case 't': model_x += 0.1f; break;
     case 'y': model_x -= 0.1f; break;
@@ -104,14 +134,13 @@ void key(unsigned char key, int x, int y) {
 
 void special(int key, int x, int y) {
   switch (key) {
+//    case GLUT_KEY_ESC: exit(0); break;
     case GLUT_KEY_LEFT: camera_x += 0.1f; break;
     case GLUT_KEY_RIGHT: camera_x -= 0.1f; break;
     case GLUT_KEY_UP: camera_y -= 0.1f; break;
     case GLUT_KEY_DOWN: camera_y += 0.1f; break;
     case GLUT_KEY_PAGE_UP: camera_z -= 0.1f; break;
     case GLUT_KEY_PAGE_DOWN: camera_z += 0.1f; break;
-
-
   }
 }
 
@@ -136,6 +165,16 @@ void motion (int x, int y) {
 }
 
 int main(int argc, char** argv) {
+    std::string type = "";
+  if (argc >1) {
+    type = argv[1];
+    
+  } else {
+    std::cerr << "No model type specified!" << std::endl << std::flush;
+
+    exit(1);
+  }
+	  
   glutInit(&argc, argv);
   glutInitWindowSize(640, 480);
   glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
@@ -147,13 +186,33 @@ int main(int argc, char** argv) {
   glutSpecialFunc(special);
   glutMotionFunc(motion);
   
-  std::string file_name = "/opt/worldforge/share/sear/data/paladin.cal";
-  render = new Sear::GL();
- 
-  Sear::ModelHandler *mh = new Sear::ModelHandler();
-  Sear::WorldEntity *we;
-  model = mh->getModel(we);
-  
-  glutMainLoop(); 
+  Sear::System *system = new Sear::System();
+  system->init();
+  render = new Sear::GL(system, NULL);
+  render->init();
+  Sear::ModelHandler *mh = system->getModelHandler();
+//  Sear::StateLoader *sl = system->getStateLoader();
+  op = (Sear::ObjectProperties*)malloc(sizeof(Sear::ObjectProperties));
+//  Sear::WorldEntity *we;
+//  we = new WorldEntity();
+  model = mh->getModel(render, type, op);
+  if (model) glutMainLoop(); 
+
+  if (model) {
+    model->shutdown();
+    delete model;
+    model = NULL;
+  }
+  if (op) free (op);
+  if (mh) {
+    mh->shutdown();	  
+    delete mh;
+    mh = NULL;
+  }
+  if (system) {
+    system->shutdown();
+    delete system;
+    system = NULL;
+  }
   
 }

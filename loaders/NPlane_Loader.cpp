@@ -5,9 +5,7 @@
 #include "src/System.h"
 #include <string>
 
-#include "src/WorldEntity.h"
 #include "src/Render.h"
-#include "src/ObjectLoader.h"
 #include "src/ModelHandler.h"
 
 #include "NPlane_Loader.h"
@@ -23,20 +21,20 @@ NPlane_Loader::~NPlane_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *NPlane_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
-  NPlane *model = new NPlane();
+Model *NPlane_Loader::loadModel(Render *render, ModelStruct &ms) {
+  NPlane *model = new NPlane(render);
 
-  std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture("nplane", type);
+  std::string type = ms.type;
+  int id = render->requestTexture("nplane", type);
   if (id == -1) {
-    type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture("nplane", type);
+    type = ms.parent;
+    id = render->requestTexture("nplane", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, op->num_planes, op->width, op->height);
+  model->init(type, ms.num_planes, ms.width, ms.height);
   model->setInUse(true);
   return model;
 }

@@ -32,7 +32,7 @@ float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
 
-Cal3d::Cal3d()
+Cal3d::Cal3d(Render *render) : Model(render)
 {
   m_state = STATE_IDLE;
   m_motionBlend[0] = 0.6f;
@@ -410,7 +410,6 @@ bool Cal3d::init(const std::string& strFilename)
 
 void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 {
-  static Render *renderer = System::instance()->getGraphics()->getRender();
   // get the renderer of the model
   CalRenderer *pCalRenderer;
   pCalRenderer = m_calModel.getRenderer();
@@ -455,7 +454,7 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
           specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
 
 
-          renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+          _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
 	}
 	
         // get the transformed vertices of the submesh
@@ -479,10 +478,10 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 
         // set the vertex and normal buffers
         if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
-          renderer->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
-          renderer->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
+          _render->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
 	} else {
-          renderer->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
 	}
 
 
@@ -496,11 +495,11 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 // Render the model                                                           //
 //----------------------------------------------------------------------------//
 
-void Cal3d::render(bool useTextures, bool useLighting, bool select_mode)
-{
-    glRotatef(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east
-    
+void Cal3d::render(bool useTextures, bool useLighting, bool select_mode) {
+  if (_render) {
+    glRotatef(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
+  }
 }
 
 //----------------------------------------------------------------------------//

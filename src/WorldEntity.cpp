@@ -37,7 +37,7 @@ void WorldEntity::handleMove() {
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
   }
   Model *model = NULL;
-  if (model_handler) model = model_handler->getModel(this);
+  if (model_handler) model = model_handler->getModel(NULL, this);
   if (model) {
     if (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()) >= 7.0f) model->action("run");
     else model->action("walk");

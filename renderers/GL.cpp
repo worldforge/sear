@@ -444,8 +444,8 @@ inline GLuint GL::getTextureID(int texture_id) {
 }
 
 void GL::stateChange(const std::string &state) {
-  static StateLoader *state_loader = System::instance()->getStateLoader();
-  stateChange(state_loader->getStateProperties(state));
+  StateLoader *state_loader = _system->getStateLoader();
+  if (state_loader) stateChange(state_loader->getStateProperties(state));
 }
 
 void GL::stateChange(StateProperties *sp) {
@@ -916,7 +916,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
 
       WorldEntity *we = (WorldEntity *)*J;
       // Get model
-      Model *model = model_handler->getModel(we);
+      Model *model = model_handler->getModel(this, we);
       if (!model) {  // ERROR GETTING MODEL
 	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
