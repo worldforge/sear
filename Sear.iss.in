@@ -9,68 +9,51 @@ AppUpdatesURL=http://www.worldforge.org/dev/eng/clients/sear
 DefaultDirName={pf}\WorldForge\Sear
 DefaultGroupName=Sear
 AllowNoIcons=yes
-InfoAfterFile=Readme.txt
 Uninstallable=yes
 UninstallFilesDir={app}\uninst
-UninstallDisplayIcon={app}\Sear.exe
+UninstallDisplayIcon={app}\Sear.bat
 UninstallDisplayName=Sear
 OutputBaseFilename=sear_win32_setup-@SEAR_VERSION@
-
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"
 Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescription: "Additional icons:"; Flags: unchecked
 
 [Files]
-Source: "sear.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "bindings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "shutdown.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "startup.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "general.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "zlib.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "COPYING"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "AUTHORS"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "jpeg.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "libpng1.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "models.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "states.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "object_file.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "buildings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "media.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "Readme.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "SDL.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "SDL_image.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "SDL_mixer.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
-Source: "data\*.png"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "data\*.bmp"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\billboards\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\billboards"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\boundbox\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\boundbox"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\impostors\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\impostors"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\skybox\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\skybox"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\terrain\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\terrain"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\ui\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\ui"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\water\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\water"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\cally\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\cally"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\lumber\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\lumber"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\paladin\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\paladin"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\pig\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\pig"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\malebuilder\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\malebuilder"; CopyMode: alwaysoverwrite
-Source: "sear-media-@SEAR_VERSION@\objects\skeleton\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\skeleton"; CopyMode: alwaysoverwrite
+Source: "authors"; DestDir: "{app}"; Flags: ignoreversion
+Source: "bindings.cfg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "copying"; DestDir: "{app}"; Flags: ignoreversion
+Source: "general.cfg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "jpeg.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "libpng1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "readme.txt"; DestDir: "{app}"; Flags: ignoreversion isreadme
+Source: "sdl.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "sdl_image.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "sdl_mixer.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "sear.bat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "sear.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "shutdown.script"; DestDir: "{app}"; Flags: ignoreversion
+Source: "startup.script"; DestDir: "{app}"; Flags: ignoreversion
+Source: "states.cfg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "WFUT.jar"; DestDir: "{app}"; Flags: ignoreversion
+Source: "zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "channels\sear-media.xml"; DestDir: "{app}\channels"; Flags: ignoreversion
+Source: "data\*.png"; DestDir: "{app}\data"; Flags: ignoreversion
+Source: "sear-media\*.*"; DestDir: "{app}\sear-media"; Flags: ignoreversion recursesubdirs;
 
 [INI]
 
 Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.worldforge.org/dev/eng/clients/sear"
 
 [Icons]
-Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; IconFilename: "{app}\sear.exe"
+Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; IconFilename: "{app}\sear.exe"
 Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\sear.exe"
 Name: "{group}\Uninstall Sear"; Filename: "{app}\uninst"
-Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: desktopicon; IconFilename: "{app}\sear.exe"
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: quicklaunchicon; IconFilename:"{app}\sear.exe"
+Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: desktopicon; IconFilename: "{app}\sear.exe"
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: quicklaunchicon; IconFilename:"{app}\sear.exe"
 
 [UninstallDelete]
 Type: files; Name: "{app}\sear.url"
 Type: files; Name: "{app}\Sear.atlas-recvlog"
 Type: files; Name: "{app}\Sear.atlas-sendlog"
-
+Type: files; Name: "{app}\stdout.txt"
+Type: files; Name: "{app}\stderr.txt"
