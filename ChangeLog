@@ -1,5 +1,9 @@
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/StaticObject.cpp, renderers/StaticObject.h: Create an object to wrap static mesh handling and rendering.
+
+2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/StateManager.cpp, renderers/StateManager.h: Change member 
 	  variable prefix to m_,
 
