@@ -2,7 +2,7 @@ bin_PROGRAMS = sear
 
 noinst_LIBRARIES = libSear.a
 
-INCLUDES = -I..
+INCLUDES = -I$(top_srcdir)
 
 EXTRA_DIST = sear.rc
 

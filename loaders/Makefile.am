@@ -4,7 +4,7 @@ LIB3DS_LIBS = libLoader3ds.a
 
 noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a $(LIB3DS_LIBS)
 
-INCLUDES = -I..
+INCLUDES = -I$(top_srcdir)
 
 libLoaderWireFrame_a_SOURCES = \
 	WireFrame.cpp WireFrame.h \

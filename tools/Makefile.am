@@ -1,4 +1,4 @@
-INCLUDES = -I..
+INCLUDES = -I$(top_srcdir)
 
 bin_PROGRAMS = model_viewer
 

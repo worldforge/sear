@@ -1,3 +1,7 @@
+2004-06-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* Fix up all the Makefile.am files so that distcheck works.
+
 2004-06-11  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Render.h, renderers/GL.h, renderers/GL.cpp,

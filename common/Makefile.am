@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libCommon.a 
 
-INCLUDES = -I..
+INCLUDES = -I$(top_srcdir)
 
 if MMGR
 MMGR_FILES=mmgr.cpp nommgr.h mmgr.h

@@ -13,8 +13,8 @@ install-data-local:
 	mkdir -p $(DESTDIR)$(datadir)/sear
 	mkdir -p $(DESTDIR)$(datadir)/sear/data
 	mkdir -p $(DESTDIR)$(datadir)/sear/scripts
-	cp -f data/*.cfg $(DESTDIR)$(datadir)/sear/data
-	cp -f scripts/*.script $(DESTDIR)$(datadir)/sear/scripts
+	cp -f $(top_srcdir)/data/*.cfg $(DESTDIR)$(datadir)/sear/data
+	cp -f $(top_srcdir)/scripts/*.script $(DESTDIR)$(datadir)/sear/scripts
 
 	@echo 
 	@echo "Sear is now installed in "$(prefix)
@@ -24,6 +24,9 @@ install-data-local:
 	@echo "$> "$(prefix)"/bin/sear"
 	@echo
 
+uninstall-local:
+	rm -f $(DESTDIR)$(datadir)/sear/data/*.cfg
+	rm -f $(DESTDIR)$(datadir)/sear/scripts/*.script
 
 # Rule to build tar-gzipped distribution package
 $(PACKAGE)-$(VERSION).tar.gz: dist

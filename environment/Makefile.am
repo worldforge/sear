@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libEnvironment.a 
 
-INCLUDES = -I..
+INCLUDES = -I$(top_srcdir)
 
 libEnvironment_a_SOURCES = \
 	TerrainRenderer.cpp TerrainRenderer.h \

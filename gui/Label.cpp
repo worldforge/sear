@@ -6,7 +6,7 @@
 
 namespace Sear {
 
-Label::Label(const std::string & text) : m_text(text)
+Label::Label(const std::string & text)
 {
 }
 

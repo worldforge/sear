@@ -7,6 +7,8 @@
 
 #include "Widget.h"
 
+#include <string>
+
 namespace Sear {
 
 /// Higher level class defining any part in the gui.
