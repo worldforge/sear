@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.4 2002-11-27 00:38:47 simon Exp $
+// $Id: Landscape.h,v 1.5 2002-12-03 22:10:55 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -30,7 +30,7 @@ class Render;
 // 0.25f == 1/4 meter resolution
 // etc..
 //#define MULT_SCALE_HEIGHT (0.01f)
-#define MULT_SCALE_HEIGHT (0.01f)
+//#define MULT_SCALE_HEIGHT (0.01f)
 #define MULT_SCALE_LAND   (1.0f)
 
 // How many TriTreeNodes should be allocated?
@@ -105,15 +105,15 @@ public:
   int offset_x;
   int offset_y;
   
-  float getHeight(float x, float y);
+//  float getHeight(float x, float y);
 
   void raiseDetail() {
      gDesiredTris += 50;
-     if (gDesiredTris < 30000) gDesiredTris = 30000;
+     if (gDesiredTris > 50000) gDesiredTris = 50000;
   }
   void lowerDetail() {
     gDesiredTris -= 100;
-    if (gDesiredTris > 60000) gDesiredTris = 60000;
+    if (gDesiredTris < 5000) gDesiredTris = 5000;
   }
 
   Patch *getPatch(unsigned int x, unsigned int y) {

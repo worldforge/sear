@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.10 2002-11-27 00:38:48 simon Exp $
+// $Id: ROAM.h,v 1.11 2002-12-03 22:10:55 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -31,6 +31,7 @@ public:
   ~ROAM();
 
   static const unsigned int map_size = 200;
+//  static const unsigned int map_size = 512;
 
   bool init();
   void shutdown();

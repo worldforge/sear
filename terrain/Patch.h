@@ -2,14 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.h,v 1.6 2002-11-27 00:38:47 simon Exp $
+// $Id: Patch.h,v 1.7 2002-12-03 22:10:55 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_PATCH_H
 #define SEAR_PATCH_H 1
 
 // Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
-#define VARIANCE_DEPTH (6)
+//#define VARIANCE_DEPTH (6)
+#define VARIANCE_DEPTH (9)
 #include "common/Utility.h"
 //#include <queue>
 
@@ -48,7 +49,7 @@ protected:
   unsigned char *m_HeightMap;
   int m_WorldX, m_WorldY; // World coordinate offset of this patch.
   
-  unsigned char m_VarianceLeft[ 1<<(VARIANCE_DEPTH)];	// Left variance tree
+  unsigned char m_VarianceLeft[1<<(VARIANCE_DEPTH)];	// Left variance tree
   unsigned char m_VarianceRight[1<<(VARIANCE_DEPTH)];	// Right variance tree
   unsigned char *m_CurrentVariance; // Which varience we are currently using. [Only valid during the Tessellate and ComputeVariance passes]
   unsigned char m_VarianceDirty; // Does the Varience Tree need to be recalculated for this Patch?

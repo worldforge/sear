@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.21 2002-10-21 22:24:29 simon Exp $
+// $Id: Render.h,v 1.22 2002-12-03 22:10:55 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -11,7 +11,7 @@
 #include <string>
 #include <list>
 #include <map>
-#include <pair.h>
+#include <utility>
 
 #include <wfmath/axisbox.h>
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.11 2002-11-27 00:38:47 simon Exp $
+// $Id: Landscape.cpp,v 1.12 2002-12-03 22:10:55 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -25,6 +25,10 @@
   static const bool debug = false;
 #endif
 namespace Sear {
+
+static const std::string TERRAIN = "terrain";
+static const std::string GRASS = "grass";
+static const std::string WATER = "water";
 
 // -------------------------------------------------------------------------------------------------
 //	LANDSCAPE CLASS
@@ -154,6 +158,7 @@ void Landscape::Tessellate() {
 //
 void Landscape::render() {
 
+    //cout << gFrameVariance << endl;
    //TODO: split into render land, render water
   int nCount;
   Patch *patch = &(m_Patches[0][0]);
@@ -164,46 +169,52 @@ void Landscape::render() {
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
 
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
-  _renderer->stateChange("terrain");
+  _renderer->stateChange(TERRAIN);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchTexture(_renderer->requestMipMap("terrain", "grass"));
+    _renderer->switchTexture(_renderer->requestMipMap(TERRAIN, GRASS));
   } else {
     // Do Nothing
   }
   
   for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; ++nCount, ++patch) if (patch->isVisibile()) patch->render();
+
   patch = &(m_Patches[0][0]);
   
-  _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
-  _renderer->stateChange("water");
+//  _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
+  _renderer->stateChange(WATER);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchTexture(_renderer->requestMipMap("water", "water"));
+    _renderer->switchTexture(_renderer->requestMipMap(WATER, WATER));
   } else {
-    //Do Nothing
+//    //Do Nothing
   }
   for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; ++nCount, ++patch) if (patch->isVisibile()) patch->renderWater();
 					
   // Check to see if we got close to the desired number of triangles.
   // Adjust the frame variance to a better value.
-  if ( GetNextTriNode() != gDesiredTris ) gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
+//  cout << "A: " << GetNextTriNode() << " - " << gFrameVariance << endl;
+  float change = 0.0f;
+  if ( GetNextTriNode() != gDesiredTris ) change= ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
+  if (change > 0.05f) change = 0.05f;
+  gFrameVariance += change;
+  //if ( GetNextTriNode() != gDesiredTris ) gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
+//  cout << "B: " << GetNextTriNode() << " - " << gFrameVariance << endl;
   // Bounds checking.
   if (gFrameVariance < 0 ) gFrameVariance = 0;
+//  if (gFrameVariance < 5 ) gFrameVariance = 5;
+//  cout << "NUM TRIS: " << GetNextTriNode() << " " << gNumTrisRendered << endl;
 }
-
+/*
 float Landscape::getHeight(float x, float y) {
   float height;
-  float mod_x = x + (ROAM::map_size >> 1);
-  float mod_y = y + (ROAM::map_size >> 1);
-  if (mod_x < 0 || mod_x >= ROAM::map_size || mod_y < 0 || mod_y >= ROAM::map_size) return 0.0f;
-  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * ROAM::map_size];
-  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * ROAM::map_size];
-  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * ROAM::map_size];
-  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * ROAM::map_size];
+  float h1 = m_HeightMap[(int)(x) + (int)y * ROAM::map_size];
+  float h2 = m_HeightMap[(int)(x + 1) +  (int)y * ROAM::map_size];
+  float h3 = m_HeightMap[(int)(x + 1) + (int)(y + 1) * ROAM::map_size];
+  float h4 = m_HeightMap[(int)(x)+(int)(y + 1) * ROAM::map_size];
   float x_m = (float)x - (float)((int)x);
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
   height = h1 + (h / 2.0f);
-  return height * _terrain->_terrain_scale;
+  return height ;// * _terrain->_terrain_scale;
 }
-
+*/
 } /* namespace Sear */

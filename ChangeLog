@@ -1,9 +1,17 @@
+3rd December 2002, Simon Goodall
+ * Fixed terrain getHeight code
+ * Fixed terrain so water level now scales with terrain scale
+ * Reduced terrain popping effect by limiting amount of change per frame
+
 29th November 2002, Simon Goodall
  * Fixed bug in config files where the path name was prefixed to a numeric value, fixed by adding another general config file
 
 29th November 2002, Simon Goodall
  * Fixed an out by one error on the getHeight code in terrain
  * Fixd code terrain code so it will go to much greater detail than before
+
+27th November 2002, Simon Goodall
+ * Fixed some mad code which had limit checks set for the wrong end of increment and decrement functions
 
 27th November 2002, Simon Goodall
  * ROAM engine can now handle multiple height maps
