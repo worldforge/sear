@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.69 2004-04-05 13:39:38 alriddoch Exp $
+// $Id: System.cpp,v 1.70 2004-04-06 11:57:59 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,10 +44,6 @@
 //#include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
-#ifdef HAVE_GLGOOEY
-#include "glgooey/WindowManager.h"
-#endif
-
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -151,6 +147,8 @@ System::~System() {
 bool System::init() {
   if (_initialised) shutdown();
   if (!initVideo()) return false;
+
+
   _event_handler = new EventHandler();
   _event_handler->init();
   _script_engine = new ScriptEngine();
@@ -203,7 +201,6 @@ bool System::init() {
   for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); ++I) {
     _file_handler->addSearchPath(*I);
   }
-  
 //  _state_loader = new StateLoader();
 //  _state_loader->init();
   

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.11 2004-04-01 21:24:26 simon Exp $
+// $Id: Frustum.cpp,v 1.12 2004-04-06 11:57:59 simon Exp $
 
 #include "common/Utility.h"
 
@@ -188,12 +188,12 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::sphereInFrustum(float frustum[6][4], WFMath::AxisBox<3> &bbox, WFMath::Point<3> &pos,Environment *env) {
+bool Frustum::sphereInFrustum(float frustum[6][4], WFMath::AxisBox<3> &bbox, WFMath::Point<3> &pos) {
   float x, y, z, radius;
   WFMath::Ball<3> b = bbox.boundingSphere();
   x = b.getCenter().x() + pos.x();
   y = b.getCenter().y() + pos.y();
-  z = b.getCenter().z() + pos.z() + env->getHeight(pos.x(), pos.y());
+  z = b.getCenter().z() + pos.z() + Environment::getInstance().getHeight(pos.x(), pos.y());
   radius = b.radius();
   for(int p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )

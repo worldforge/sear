@@ -1,3 +1,6 @@
+6th April 2004, Simon Goodall
+ * Fixed terrain height tracking
+
 5th April 2004, Al Riddoch
  * src/System.h, src/System.cpp: Add interface for handling analogue input
    devices, like mouse and joystick. Add init code and test code for joystick.

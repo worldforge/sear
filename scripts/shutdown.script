@@ -1,3 +1,3 @@
-/save_general ~/general.cfg
-/save_bindings ~/bindings.cfg
+/save_general ${SEAR_HOME}/general.cfg
+/save_bindings ${SEAR_HOME}/bindings.cfg
 

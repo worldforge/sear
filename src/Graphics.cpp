@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.33 2004-04-01 21:24:26 simon Exp $
+// $Id: Graphics.cpp,v 1.34 2004-04-06 11:57:59 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -17,8 +17,7 @@
 
 #include "common/Log.h"
 #include "common/Utility.h"
-#include "environment/TerrainRenderer.h"
-#include "environment/SkyDome.h"
+#include "environment/Environment.h"
 #include "renderers/GL.h"
 #include "Camera.h"
 #include "Character.h"
@@ -33,8 +32,6 @@
 #include "Render.h"
 #include "System.h"
 #include "WorldEntity.h"
-
-#include "environment/Environment.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -126,14 +123,6 @@ void Graphics::shutdown() {
 
 
 void Graphics::initST() {
-tr = new TerrainRenderer();
-  int X = 16;
-int Y = 16;
-   for (int x = -X; x < X; ++x) {
-     for (int y = -Y; y < Y; ++y) {
-//       tr->m_terrain.setBasePoint(x, y, ((float)rand() / (float)RAND_MAX * 60.0f) - 20.0f);
-     }
-   }
 }
 
 
@@ -184,12 +173,12 @@ Compare D^2 to choose what detail level to use
 */
 
 	
+      float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
     WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
     if (focus) {
-      float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
       std::string id = focus->getID();
       static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
       orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
@@ -219,6 +208,7 @@ Compare D^2 to choose what detail level to use
       _renderer->applyQuaternion(orient);
       
 //      if (_terrain) z -= _terrain->getHeight(-x, -y);
+ z -= Environment::getInstance().getHeight(-x, -y);
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
       _renderer->translateObject(x, y, z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
@@ -235,7 +225,7 @@ Compare D^2 to choose what detail level to use
 
 _renderer->stateChange(_renderer->getStateID("terrain"));
   glEnableClientState(GL_VERTEX_ARRAY);
-  tr->render(WFMath::Point<3>(0,0,0));//x_pos, y_pos, z_pos));
+  Environment::getInstance().render(WFMath::Point<3>(x, y, z));
   glDisableClientState(GL_VERTEX_ARRAY);
 
       _renderer->restore();
@@ -325,7 +315,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       // Loop through all models in list
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
         // Check we;re visible
-        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, &Environment::getInstance())) {
+        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position)) {
           if (!select_mode) {
             // Add to queue by state, then model record
 	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.1 2004-03-30 11:38:04 simon Exp $
+// $Id: Factory.cpp,v 1.2 2004-04-06 11:57:59 simon Exp $
 
 #include "Factory.h"
 
@@ -15,7 +15,7 @@
                                                                                 
 #include "System.h"
 #include "Graphics.h"
-#include "environment/TerrainRenderer.h"
+#include "environment/Environment.h"
 
 
 namespace Sear {
@@ -65,7 +65,7 @@ namespace Sear {
             ymin = std::min(ymin, y);
             ymax = std::max(ymax, y);
     //        m_terrain.setBasePoint(x, y, point[2].asNum());
-System::instance()->getGraphics()->getTerrainRenderer()->m_terrain.setBasePoint(x,y,point[2].asNum());
+Environment::getInstance().setBasePoint(x,y,point[2].asNum());
         }
     } else if (I->second.isMap()) {
 
@@ -88,7 +88,8 @@ System::instance()->getGraphics()->getTerrainRenderer()->m_terrain.setBasePoint(
             ymin = std::min(ymin, y);
             ymax = std::max(ymax, y);
           //  m_terrain.setBasePoint(x, y, point[2].asNum());
-System::instance()->getGraphics()->getTerrainRenderer()->m_terrain.setBasePoint(x,y,point[2].asNum());
+Environment::getInstance().setBasePoint(x,y,point[2].asNum());
+//System::instance()->getGraphics()->getTerrainRenderer()->m_terrain.setBasePoint(x,y,point[2].asNum());
 //System::Instance()->getGraphics(x,y,point[2].asNum());
         }
 

@@ -12,7 +12,12 @@
 #include <wfmath/point.h>
 
 namespace Sear {
+
+class Environment;
+
 typedef WFMath::Point<3> PosType;
+
+
 class TerrainRenderer 
 {
   public:
@@ -47,6 +52,8 @@ class TerrainRenderer
 
     virtual void render( const PosType & camPos);
     virtual void select( const PosType & camPos);
+
+  friend class Environment;
 };
 }
 #endif // APOGEE_TERRAIN_RENDERER_H

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.73 2004-04-01 21:24:26 simon Exp $
+// $Id: GL.cpp,v 1.74 2004-04-06 11:57:58 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -327,6 +327,7 @@ void GL::initWindow(int width, int height) {
   _texture_manager->init();
   _state_manager->init();
   //splash_id = requestTexture(TEXTURE_splash_texture);
+Environment::getInstance().init();
   initFont();
 
 }
