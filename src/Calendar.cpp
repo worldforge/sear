@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.4 2003-05-02 20:24:55 simon Exp $
+// $Id: Calendar.cpp,v 1.5 2003-08-05 13:42:17 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -88,6 +88,7 @@ Calendar::Calendar() :
   _weeks_per_month(DEFAULT_WEEKS_PER_MONTH),
   _months_per_year(DEFAULT_MONTHS_PER_YEAR),
   _seconds(0.0f),
+  _seconds_counter(0.0f),
   _minutes(0),
   _hours(12), // Default start time is noon
   _days(0),

@@ -247,12 +247,11 @@ void ROAM::readConfig() {
   varconf::Variable temp;
   varconf::Config &general = _system->getGeneral();
   
-  temp = general.getItem(TERRAIN, KEY_water_level);
-  _water_level_base = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
-  _water_level = _water_level_base * _terrain_scale;
-
   temp = general.getItem(TERRAIN, KEY_terrain_scale);
   _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
+
+  temp = general.getItem(TERRAIN, KEY_water_level);
+  _water_level_base = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
 
   _water_level = _water_level_base * _terrain_scale;
   

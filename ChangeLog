@@ -1,3 +1,6 @@
+5th August 2003, Simon Goodall
+ * Fixed some use of variables uninitialised
+
 16th July 2003, Simon Goodall
  * Some cleanups
 
