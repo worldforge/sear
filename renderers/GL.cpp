@@ -810,6 +810,7 @@ void GL::setViewMode(int type) {
 void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
   // TODO: set up missing values
   if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   ambient);
+  else cout << "ug" << endl;
   if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   diffuse);
   if (specular)          glMaterialfv (GL_FRONT, GL_SPECULAR,  specular);
   if (shininess >= 0.0f) glMaterialf  (GL_FRONT, GL_SHININESS, shininess);

@@ -32,7 +32,6 @@ Model *WireFrame_Loader::loadModel(Render *render, ModelStruct &ms) {
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
   model->init(bboxCheck(bbox));
-  model->setInUse(true);
   return model;
 }
 

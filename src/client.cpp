@@ -485,6 +485,7 @@ void Client::LoginFailure(Eris::LoginFailureType failure_type, const std::string
     default: mesg = "Unknown Eris::LoginFailureType";             break;
   }
   Log::writeLog("Login Failure" + mesg, Log::LOG_DEFAULT);
+  _system->pushMessage("Login Failure" + mesg, CONSOLE_MESSAGE);
 }
 
 void Client::LogoutComplete(bool clean_logout) {

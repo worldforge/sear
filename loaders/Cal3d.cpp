@@ -123,57 +123,55 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
   _use_textures = true;
   
   if (strFilename.substr(strFilename.length() - 4) == ".raw") {
-  // open the texture file
-  std::ifstream file;
-  file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
-  if(!file)
-  {
-    Log::writeLog(std::string("Texture file '") + strFilename + std::string("' not found."), Log::LOG_ERROR);
-    return 0;
-  }
-
-  // load the dimension of the texture
-  file.read((char *)&width, 4);
-  file.read((char *)&height, 4);
-  file.read((char *)&depth, 4);
-
-  // allocate a temporary buffer to load the texture to
-  unsigned char *pBuffer;
-  pBuffer = new unsigned char[2 * width * height * depth];
-  if(pBuffer == 0)
-  {
-    Log::writeLog(std::string("Memory allocation for texture '") + strFilename + std::string("' failed."), Log::LOG_ERROR);
-    return 0;
-  }
-
-  // load the texture
-  file.read((char *)pBuffer, width * height * depth);
-
-  // explicitely close the file
-  file.close();
-
-  // flip texture around y-axis (-> opengl-style)
-  int y;
-  for(y = 0; y < height; y++)
-  {
-    memcpy(&pBuffer[(height + y) * width * depth], &pBuffer[(height - y - 1) * width * depth], width * depth);
-  }
-
-  // generate texture
-  glGenTextures(1, &textureId);
-  glBindTexture(GL_TEXTURE_2D, textureId);
-
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, &pBuffer[width * height * depth]);
-
-  // free the allocated memory
-  delete [] pBuffer;
+    // open the texture file
+    std::ifstream file;
+    file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
+    if(!file)
+    {
+      Log::writeLog(std::string("Texture file '") + strFilename + std::string("' not found."), Log::LOG_ERROR);
+      return 0;
+    }
+  
+    // load the dimension of the texture
+    file.read((char *)&width, 4);
+    file.read((char *)&height, 4);
+    file.read((char *)&depth, 4);
+  
+    // allocate a temporary buffer to load the texture to
+    unsigned char *pBuffer;
+    pBuffer = new unsigned char[2 * width * height * depth];
+    if(pBuffer == 0)
+    {
+      Log::writeLog(std::string("Memory allocation for texture '") + strFilename + std::string("' failed."), Log::LOG_ERROR);
+      return 0;
+    }
+  
+    // load the texture
+    file.read((char *)pBuffer, width * height * depth);
+  
+    // explicitely close the file
+    file.close();
+  
+    // flip texture around y-axis (-> opengl-style)
+    int y;
+    for(y = 0; y < height; y++)
+    {
+      memcpy(&pBuffer[(height + y) * width * depth], &pBuffer[(height - y - 1) * width * depth], width * depth);
+    }
+  
+    // generate texture
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, &pBuffer[width * height * depth]);
+  
+    // free the allocated memory
+    delete [] pBuffer;
   } else {
-    //SDL IMAGE LOAD - NEEDS TESTING
-	Log::writeLog("Experimental Texture Loader being used", Log::LOG_INFO);
     SDL_Surface * image = System::loadImage(strFilename);
     width = image->w;
     height = image->h;
@@ -186,9 +184,6 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
     free(image);
-
-    
-
   }
 
   return textureId;
@@ -437,10 +432,10 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
 	
-        unsigned char meshColor[4];
-        float ambient[4];
-        float diffuse[4];
-        float specular[4];
+        static unsigned char meshColor[4];
+        static float ambient[4];
+        static float diffuse[4];
+        static float specular[4];
 	if (!select_mode) {
           pCalRenderer->getAmbientColor(&meshColor[0]);
           ambient[0] = meshColor[0] / 255.0f;  ambient[1] = meshColor[1] / 255.0f; ambient[2] = meshColor[2] / 255.0f; ambient[3] = meshColor[3] / 255.0f;
@@ -596,7 +591,10 @@ void Cal3d::setState(int state, float delay)
 }
 
 void Cal3d::action(const std::string &action) {
-  if (action == "walk") {
+//  if (action == "idle") {
+//    setMotionBlend((float *)&_idle_blend[0], 0);
+//  } else
+	  if (action == "walk") {
     setMotionBlend((float *)&_walk_blend[0], 0);
   } else if (action == "run") {
     setMotionBlend((float *)&_run_blend[0], 0);

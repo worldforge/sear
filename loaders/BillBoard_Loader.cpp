@@ -27,7 +27,7 @@ Model *BillBoard_Loader::loadModel(Render *render, ModelStruct &ms) {
 
   std::string type = ms.type;
   int id = render->requestTexture("billboard", type);
-  if (id == -1) {
+  if (id == -1 && ms.parent) {
     type = ms.parent;
     id = render->requestTexture("billboard", type);
   }

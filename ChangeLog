@@ -1,4 +1,7 @@
 19th August 2002, Simon Goodall
+ * Fixed SEGFAULT caused by object having no parent type specified in model loaders
+
+19th August 2002, Simon Goodall
  * Added +/- keys to allows vertical repositioning of model in model viewer
 
 19th August 2002, Simon Goodall
