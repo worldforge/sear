@@ -243,9 +243,13 @@ void SkyDome::getHorizonColors()
 void SkyDome::updateFogColor(float t)
 {
     if (m_horizonColors.empty()) getHorizonColors();
-    
+       
     if (t == 1.0f) t = 0.0f; // ensure t is in the range [0.0 .. 1.0)
     t *= m_horizonColors.size(); // t is now in [0.0 ... num_colors)
+    
+    // offset so integral values map to half way between two pixels
+    t -= 0.5f;
+    if (t < 0.0) t+= m_horizonColors.size();
     
 // compute I and J indices into horizon colors, then interpolate
 // note this code uses lots of local variables, for clarity, and we only

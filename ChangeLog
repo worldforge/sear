@@ -1,3 +1,8 @@
+2004-06-25  James Turner  <james@worldforge.org>
+
+	* environment/SkyDome.cpp: fix fog color calculation to include
+	  a 0.5 offset so we blend two values correctly at integral pixels.
+
 2004-06-25  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* src/ModelLoader.h: Fix cut and paste error where offset_x was ignored
@@ -6,7 +11,7 @@
 
 	* Add a Z rotation option to model records to rotate odd objects
 
-2004-06-22  James Turner  <james@worldforge.org>
+2004-06-24  James Turner  <james@worldforge.org>
 
 	* Add support for world editing (via an admin account) using commands
 	  bound to keys. New functionality in Editor class, created by system,
