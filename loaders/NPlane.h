@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.7 2005-01-06 12:46:54 simon Exp $
+// $Id: NPlane.h,v 1.8 2005-03-15 17:33:58 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -21,27 +21,26 @@ public:
   NPlane(Render*);
   ~NPlane();
   
-  bool init(const std::string &, unsigned int num_planes, float width, float height);
-  void shutdown();
+  int init(const std::string &, unsigned int num_planes, float width, float height);
+  int shutdown();
  
-  void invalidate() {}
+  void invalidate();
  
   void render(bool); 
-  bool useTextures() { return  _use_textures; }
 
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
   
 private:
-  bool _use_textures;
-  unsigned int _num_planes;
-  std::string _type;
-  Vertex_3 *_vertex_data;
-  Normal *_normal_data;
-  Texel *_texture_data;
-  bool _initialised;
+  unsigned int m_num_planes;
+  std::string m_type;
+  Vertex_3 *m_vertex_data;
+  Normal *m_normal_data;
+  Texel *m_texture_data;
+  bool m_initialised;
 
 
   int tex_1, tex_2;
+  int m_disp, m_select_disp;
 };
 
 } /* namespace Sear */ 

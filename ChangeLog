@@ -1,5 +1,21 @@
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/Model.h, loaders/3ds.cpp, loaders/3ds.h, loaders/BoundBox.cpp,
+	  loaders/BoundBox.h, loaders/NPlane.cpp, loaders/NPlane.h, 
+	  loaders/WireFrame.cpp, loaders/WireFrame.h,
+	  loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h: Change 
+	  member variables to start with m_. 
+	* loaders/3ds.cpp, loaders/3ds.h: Refactor code to add a render_mesh
+	  function instead of near identical code in render_file and 
+	  render_node. Create a default material so sections without materials
+	  don't just inherit whatever the last material settings were. Re-add
+	  display lists for non-vbo use.
+	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/NPlane.cpp,
+	  loaders/NPlane.h, loaders/WireFrame.cpp, loaders/WireFrame.h: Use 
+	  display lists.
+
+2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/Environment.cpp, environment/Environment.h: Add some 
 	  asserts to replace some NULL checks
 

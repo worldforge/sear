@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001-2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.35 2005-01-06 12:46:54 simon Exp $
+// $Id: 3ds.cpp,v 1.36 2005-03-15 17:33:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -27,14 +27,9 @@
 #include "src/System.h"
 #include "renderers/Graphics.h"
 #include "renderers/Render.h"
-
-
-#include "3ds.h"
-
 #include "renderers/RenderSystem.h"
 
-#include <iostream>
-
+#include "3ds.h"
 
 
 #ifdef USE_MMGR
@@ -47,94 +42,107 @@
   static const bool debug = false;
 #endif
 namespace Sear {
-	
+  
 ThreeDS::ThreeDS(Render *render) : Model(render),
-  _initialised(false),
-  _list(0),
-  _list_select(0),
+  m_initialised(false),
+  m_list(0),
+  m_list_select(0),
   m_height(1.0f)
-{
-
-}
+{}
 
 ThreeDS::~ThreeDS() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
 }
 
-bool ThreeDS::init(const std::string &file_name) {
+int ThreeDS::init(const std::string &file_name) {
+  assert(m_initialised == false);
+  
   // Load 3ds file
-  if (debug) Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
-  Lib3dsFile *_model = lib3ds_file_load(file_name.c_str());
-  if (!_model) {
-    Log::writeLog(std::string("Unable to load ") + file_name, Log::LOG_ERROR);
-    return false;
+  if (debug) printf("3ds: Loading: %s\n", file_name.c_str());
+
+  Lib3dsFile *model = lib3ds_file_load(file_name.c_str());
+
+  if (!model) {
+    fprintf(stderr, "3ds: Unable to load %s\n", file_name.c_str());
+    return 1;
   }
+
+  // Create default material
+  Material *m = new Material;
+  m->ambient[0] = 1.0f;
+  m->ambient[1] = 1.0f;
+  m->ambient[2] = 1.0f;
+  m->ambient[3] = 1.0f;
+
+  m->diffuse[0] = 0.0f;
+  m->diffuse[1] = 0.0f;
+  m->diffuse[2] = 0.0f;
+  m->diffuse[3] = 0.0f;
+
+  m->specular[0] = 0.0f;
+  m->specular[1] = 0.0f;
+  m->specular[2] = 0.0f;
+  m->specular[3] = 0.0f;
+
+  m->shininess = 0.0f;
+
+  m_material_map["sear:default"] = m;
+
   // Calculate initial positions
-  lib3ds_file_eval(_model,1);
-  Lib3dsNode *p = NULL;
-  if (_model->nodes == 0) {
-    if (debug) std::cout << "Rendering Meshes direct" << std::endl;
-    render_file(_model);
+  lib3ds_file_eval(model,1);
+  if (model->nodes == NULL) {
+    if (debug) printf("3ds: Rendering Meshes direct\n");
+    render_file(model);
   } else {
-    for (p=_model->nodes; p!=0; p=p->next) {
-//      if (debug) std::cout << "Rendering Node" << std::endl;
-      render_node(p, _model);
+    for (Lib3dsNode *n = model->nodes; n != NULL; n = n->next) {
+      render_node(n, model);
     }
   }
-  lib3ds_file_free(_model);
-  _model = NULL;
-  _initialised = true;
-  return true;
+
+  lib3ds_file_free(model);
+
+  m_initialised = true;
+  return 0;
 }
 
-void ThreeDS::shutdown() {
-  //TODO Clean up 
-  while (!render_objects.empty()) {
-    RenderObject *ro = *render_objects.begin();
+int ThreeDS::shutdown() {
+  assert(m_initialised == true);
+
+  // Clean up OpenGL bits
+  invalidate();
+
+  while (!m_render_objects.empty()) {
+    RenderObject *ro = *m_render_objects.begin();
     if (ro) {
       if (ro->vertex_data) delete [] (ro->vertex_data);
       if (ro->texture_data) delete [] (ro->texture_data);
       if (ro->normal_data) delete [] (ro->normal_data);
 
-      if (glIsBufferARB(ro->vb_vertex_data)) {
-        glDeleteBuffersARB(1, &ro->vb_vertex_data);
-        ro->vb_vertex_data = 0;
-      }
-      if (glIsBufferARB(ro->vb_texCoords_data)) {
-        glDeleteBuffersARB(1, &ro->vb_texCoords_data);
-        ro->vb_texCoords_data = 0;
-      }
-      if (glIsBufferARB(ro->vb_normal_data)) {
-        glDeleteBuffersARB(1, &ro->vb_normal_data);
-        ro->vb_normal_data = 0;
-      }
-
-
       delete ro;
     }
-    render_objects.erase(render_objects.begin());
+    m_render_objects.erase(m_render_objects.begin());
   }
-  while (!material_map.empty()) {
-    Material *m = material_map.begin()->second;
-    if (m) delete (m);
-    material_map.erase(material_map.begin());
+  while (!m_material_map.empty()) {
+    Material *m = m_material_map.begin()->second;
+    assert(m);
+    delete m;
+    m_material_map.erase(m_material_map.begin());
   }
-  _initialised = false;
-  if (_render) {
-    _render->freeList(_list);
-    _render->freeList(_list_select);
-  }
-  _list = 0;
-  _list_select = 0;
+
+  m_initialised = false;
+  return 0;
 }
 
 void ThreeDS::invalidate() {
   // Clean up display lists
-  if (_render) {
-    _render->freeList(_list);
-    _render->freeList(_list_select);
-  }
-  for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
+  assert(m_render);
+
+  m_render->freeList(m_list);
+  m_render->freeList(m_list_select);
+
+  for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin();
+                                                I != m_render_objects.end();
+                                                ++I) {
     RenderObject *ro = *I;
     if (ro) {
       if (glIsBufferARB(ro->vb_vertex_data)) {
@@ -151,74 +159,111 @@ void ThreeDS::invalidate() {
       }
     }
   }
-  _list = 0;
-  _list_select = 0;
+
+  m_list = 0;
+  m_list_select = 0;
 }
 
 void ThreeDS::render(bool select_mode) {
-  std::string current_material = "";
-  _render->scaleObject(m_height);
-  for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
-    RenderObject *ro = *I;
-    if (ro) {
-      if (!ro->material_name.empty() && ro->material_name != current_material) {
-        Material *m = material_map[ro->material_name];
-        if (m) {
-          _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-          current_material = ro->material_name;
-        }	    
-      }
-      if (ro->texture_data) {
-        if (select_mode) {
-          RenderSystem::getInstance().switchTexture(ro->texture_mask_id);
-        } else {
-          RenderSystem::getInstance().switchTexture(ro->texture_id);
-        }
-      } else {
-        RenderSystem::getInstance().switchTexture(0);
-      }
-      if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-        // Generate VBO's if required
-        if (!glIsBufferARB(ro->vb_vertex_data)) {
-          glGenBuffersARB(1, &ro->vb_vertex_data);
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
-          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->vertex_data, GL_STATIC_DRAW_ARB);
-          if (ro->normal_data != NULL) {
-            glGenBuffersARB(1, &ro->vb_normal_data);
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
-          }
-          if (ro->texture_data != NULL) {
-            glGenBuffersARB(1, &ro->vb_texCoords_data);
-            glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
-          }
-        }
+  assert(m_render);
 
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
-        glVertexPointer(3, GL_FLOAT, 0, NULL);
-        if (ro->normal_data != NULL) {
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-          glNormalPointer(GL_FLOAT, 0, NULL);
-        }
-        if (ro->texture_data != NULL) {
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-          glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-        }
-        // Draw object
-        glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
-        // Reset states
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-      } else {
-        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
+  std::string current_material = "";
+
+  m_render->scaleObject(m_height);
+  bool end_list = false;
+  if (select_mode) {
+    if (m_list_select) {
+      m_render->playList(m_list_select);
+      return;
+    } else {
+      if (!sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+        m_list_select = m_render->getNewList();
+        m_render->beginRecordList(m_list_select);
+        end_list = true;
       }
     }
+  } else  {
+    if (m_list) {
+      m_render->playList(m_list);
+      return;
+    } else {
+      if (!sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+        m_list = m_render->getNewList();
+        m_render->beginRecordList(m_list);
+        end_list = true;
+      }
+    }
+  }
+
+  for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    RenderObject *ro = *I;
+    assert(ro);
+
+    if (ro->material_name != current_material) {
+      Material *m = m_material_map[ro->material_name];
+      assert(m);
+      m_render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+      current_material = ro->material_name;
+    }
+    if (ro->texture_data) {
+      if (select_mode) {
+        RenderSystem::getInstance().switchTexture(ro->texture_mask_id);
+      } else {
+        RenderSystem::getInstance().switchTexture(ro->texture_id);
+      }
+    } else {
+      RenderSystem::getInstance().switchTexture(0);
+    }
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      // Generate VBO's if required
+      if (!glIsBufferARB(ro->vb_vertex_data)) {
+        glGenBuffersARB(1, &ro->vb_vertex_data);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->vertex_data, GL_STATIC_DRAW_ARB);
+        if (ro->normal_data != NULL) {
+          glGenBuffersARB(1, &ro->vb_normal_data);
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
+        }
+        if (ro->texture_data != NULL) {
+          glGenBuffersARB(1, &ro->vb_texCoords_data);
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
+        }
+      }
+
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
+      glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+      if (ro->normal_data != NULL) {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+        glNormalPointer(GL_FLOAT, 0, NULL);
+      }
+
+      if (ro->texture_data != NULL) {
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+        glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+      }
+      // Draw object
+      glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
+      // Reset states
+      glDisableClientState(GL_VERTEX_ARRAY);
+      if (ro->normal_data != NULL) {
+        glDisableClientState(GL_NORMAL_ARRAY);
+      }
+      if (ro->texture_data != NULL) {
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    } else {
+      m_render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
+    }
+  }
+  if (end_list) {
+    m_render->endRecordList();
   }
 }
 
@@ -233,222 +278,126 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
     if (strcmp(node->name,"$$$DUMMY")==0) return;
     if (!node->user.d) {
       Lib3dsMesh *mesh=lib3ds_file_mesh_by_name(file, node->name);
-      if (!mesh)  return; 
-      unsigned p;
-      Lib3dsVector *normalL=(Lib3dsVector*)malloc(3*sizeof(Lib3dsVector)*mesh->faces);
-      
-      Lib3dsMatrix M;
-      lib3ds_matrix_copy(M, mesh->matrix);
-      lib3ds_matrix_inv(M);
-      lib3ds_mesh_calculate_normals(mesh, normalL);
-      unsigned int v_counter = 0;
-      unsigned int n_counter = 0;
-      unsigned int t_counter = 0;
-      RenderObject *ro = new RenderObject;
-      render_objects.push_back(ro);
-      ro->num_points = 3 * mesh->faces;
-      ro->vertex_data = new Vertex_3[ro->num_points];
-      ro->normal_data = new Normal[ro->num_points];
-      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-      int current_texture = 0;
-      for (p=0; p<mesh->faces; ++p) {
-        Lib3dsFace *f=&mesh->faceL[p];
-        Lib3dsMaterial *mat=0;
-        if (f->material[0]) {
-          mat=lib3ds_file_material_by_name(file, f->material);
-	  ro->material_name = "";
-        }
-        if (mat) {
-	  ro->material_name = std::string(f->material);
-          if (!material_map[std::string(f->material)]) {
-	    Material *m = new Material;//*)malloc(sizeof(Material));
-	    m->ambient[0] = 0.0f;
-	    m->ambient[1] = 0.0f;
-	    m->ambient[2] = 0.0f;
-	    m->ambient[3] = 1.0f;
-	    
-	    m->diffuse[0] = mat->diffuse[0];
-	    m->diffuse[1] = mat->diffuse[1];
-	    m->diffuse[2] = mat->diffuse[2];
-	    m->diffuse[3] = mat->diffuse[3];
-	    m->specular[0] = mat->specular[0];
-	    m->specular[1] = mat->specular[1];
-	    m->specular[2] = mat->specular[2];
-	    m->specular[3] = mat->specular[3];
-            m->shininess = pow(2, 10.0*mat->shininess);
-	    if (m->shininess>128.0f) m->shininess = 128.0f;
-	    material_map[std::string(f->material)] = m;
-	  }
-	  int texture_id = -1;
-	  int texture_mask_id = -1;
-          if (mat->texture1_map.name[0]) {
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
-	    texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
-	  }  
-	  if (texture_id != -1) {
-	    if (current_texture == 0) {
-              ro->texture_id = current_texture = texture_id;
-	      ro->texture_mask_id = texture_mask_id;
-            }
-            if (texture_id != current_texture) {
-	      current_texture = texture_id;
-	      ro->num_points = v_counter;// / 3;
-	      
-              v_counter = n_counter = t_counter = 0;
-	      
-              ro = new RenderObject();
-	      ro->texture_id = texture_id;
-	      ro->texture_mask_id = texture_mask_id;
-              ro->num_points = 3 * mesh->faces;
-              ro->vertex_data = new Vertex_3[ro->num_points];
-              ro->normal_data = new Normal[ro->num_points];
-              ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-	      render_objects.push_back(ro);
-	    }
-          }
-        }     
-        int i;
-        for (i=0; i<3; ++i) {
-	  float out[3];
-          lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
-
-          out[0] *= d->scl[0];
-          out[1] *= d->scl[1];
-          out[2] *= d->scl[2];
-
-          out[0] -= d->pivot[0];
-          out[1] -= d->pivot[1];
-          out[2] -= d->pivot[2];
-//	  float *v_data = (float*)ro->vertex_data;
-          lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], node->matrix, out);
-
-          /* It is very likely the normals have been completely messed up by these transformations */
-	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
-          out[0] -= d->pivot[0];
-          out[1] -= d->pivot[1];
-          out[2] -= d->pivot[2];
-	  lib3ds_vector_transform((float*)&ro->normal_data[n_counter], node->matrix, out);
-          n_counter++;
-
-	  if (mesh->texels) {
-            ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
-            ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
-	  }
-
-        }
-      }
-      ro->num_points = v_counter;
-      free(normalL);
+      render_mesh(mesh, file, d);
     }
   }
 }
 
-void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file) {}
 void ThreeDS::render_file(Lib3dsFile *file) {
   Lib3dsMesh *mesh;
   for (mesh=file->meshes; mesh!=0; mesh=mesh->next) {
-    if (!mesh->user.d) {
-      unsigned p;
-      Lib3dsVector *normalL=(Lib3dsVector*)malloc(3*sizeof(Lib3dsVector)*mesh->faces);
-      
-      Lib3dsMatrix M;
-      lib3ds_matrix_copy(M, mesh->matrix);
-      lib3ds_matrix_inv(M);
-      lib3ds_mesh_calculate_normals(mesh, normalL);
-      unsigned int v_counter = 0;
-      unsigned int n_counter = 0;
-      unsigned int t_counter = 0;
-      RenderObject *ro = new RenderObject();
-      render_objects.push_back(ro);
-      ro->num_points = 3 * mesh->faces;
-      ro->vertex_data = new Vertex_3[ro->num_points];
-      ro->normal_data = new Normal[ro->num_points];
-      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-      int current_texture = 0;
-      for (p=0; p<mesh->faces; ++p) {
-        Lib3dsFace *f=&mesh->faceL[p];
-        Lib3dsMaterial *mat=0;
-        if (f->material[0]) {
-          mat=lib3ds_file_material_by_name(file, f->material);
-	  ro->material_name = "";
-        }
-        if (mat) {
-	  ro->material_name = std::string(f->material);
-          if (!material_map[std::string(f->material)]) {
-	    Material *m = new Material;
-	    m->ambient[0] = 0.0f;
-	    m->ambient[1] = 0.0f;
-	    m->ambient[2] = 0.0f;
-	    m->ambient[3] = 1.0f;
-	    
-	    m->diffuse[0] = mat->diffuse[0];
-	    m->diffuse[1] = mat->diffuse[1];
-	    m->diffuse[2] = mat->diffuse[2];
-	    m->diffuse[3] = mat->diffuse[3];
-	    m->specular[0] = mat->specular[0];
-	    m->specular[1] = mat->specular[1];
-	    m->specular[2] = mat->specular[2];
-	    m->specular[3] = mat->specular[3];
-            m->shininess = pow(2, 10.0*mat->shininess);
-	    if (m->shininess>128.0f) m->shininess = 128.0f;
-	    material_map[std::string(f->material)] = m;
-	  }
-	  int texture_id = -1;
-	  int texture_mask_id = -1;
-          if (mat->texture1_map.name[0]) {
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
-	    texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
-	  }  
-	  if (texture_id != -1) {
-	    if (current_texture == 0) {
-              ro->texture_id = current_texture = texture_id;
-	      ro->texture_mask_id = texture_mask_id;
-            }
-            if (texture_id != current_texture) {
-	      current_texture = texture_id;
-	      ro->num_points = v_counter;
-	      
-              v_counter = n_counter = t_counter = 0;
-	      
-              ro = new RenderObject();
-	      ro->texture_id = texture_id;
-	      ro->texture_mask_id = texture_mask_id;
-              ro->num_points = 3 * mesh->faces;
-              ro->vertex_data = new Vertex_3[ro->num_points];
-              ro->normal_data = new Normal[ro->num_points];
-              ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-	      render_objects.push_back(ro);
-	    }
-          }
-        }     
-        int i;
-        for (i=0; i<3; ++i) {
-	  float out[3];
-          lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
-//          out[0] -= d->pivot[0];
-//          out[1] -= d->pivot[1];
-//          out[2] -= d->pivot[2];
-          lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], mesh->matrix, out);
+    render_mesh(mesh, file, NULL);
+  }
+}
 
-          /* It is very likely the normals have been completely messed up by these transformations */
-	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
-//          out[0] -= d->pivot[0];
-//          out[1] -= d->pivot[1];
-//          out[2] -= d->pivot[2];
-	  lib3ds_vector_transform((float*)&ro->normal_data[n_counter], mesh->matrix, out);
-          n_counter++;
+void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *d) {
+  unsigned p;
+  Lib3dsVector *normalL=(Lib3dsVector*)malloc(3*sizeof(Lib3dsVector)*mesh->faces);
+    
+  Lib3dsMatrix M;
+  lib3ds_matrix_copy(M, mesh->matrix);
+  lib3ds_matrix_inv(M);
+  lib3ds_mesh_calculate_normals(mesh, normalL);
+  unsigned int v_counter = 0;
+  unsigned int n_counter = 0;
+  unsigned int t_counter = 0;
+  RenderObject *ro = new RenderObject();
+  m_render_objects.push_back(ro);
+  ro->num_points = 3 * mesh->faces;
+  ro->vertex_data = new Vertex_3[ro->num_points];
+  ro->normal_data = new Normal[ro->num_points];
+  ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
+  int current_texture = 0;
+  for (p=0; p<mesh->faces; ++p) {
+    Lib3dsFace *f=&mesh->faceL[p];
+    Lib3dsMaterial *mat = NULL;
+    if (f->material[0]) {
+      mat = lib3ds_file_material_by_name(file, f->material);
+    }
+    if (mat) {
+      ro->material_name = std::string(f->material);
+    } else {
+      ro->material_name = "sear:default";
+    }
 
-	  if (mesh->texels) {
-            ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
-            ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
-	  }
+    MaterialMap::const_iterator I = m_material_map.find(std::string(f->material));
+    if (I == m_material_map.end()) {
+      Material *m = new Material;
+      m->ambient[0] = 0.0f;
+      m->ambient[1] = 0.0f;
+      m->ambient[2] = 0.0f;
+      m->ambient[3] = 1.0f;
 
-        }
+      m->diffuse[0] = mat->diffuse[0];
+      m->diffuse[1] = mat->diffuse[1];
+      m->diffuse[2] = mat->diffuse[2];
+      m->diffuse[3] = mat->diffuse[3];
+      m->specular[0] = mat->specular[0];
+      m->specular[1] = mat->specular[1];
+      m->specular[2] = mat->specular[2];
+      m->specular[3] = mat->specular[3];
+      m->shininess = pow(2, 10.0*mat->shininess);
+      if (m->shininess>128.0f) m->shininess = 128.0f;
+      m_material_map[std::string(f->material)] = m;
+    }
+    int texture_id = -1;
+    int texture_mask_id = -1;
+    if (mat->texture1_map.name[0]) {
+      texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
+      texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
+    }  
+    if (texture_id != -1) {
+      if (current_texture == 0) {
+        ro->texture_id = current_texture = texture_id;
+        ro->texture_mask_id = texture_mask_id;
       }
-      ro->num_points = v_counter;
-      free(normalL);
+      if (texture_id != current_texture) {
+        current_texture = texture_id;
+        ro->num_points = v_counter;
+        
+        v_counter = n_counter = t_counter = 0;
+        
+        ro = new RenderObject();
+        ro->texture_id = texture_id;
+        ro->texture_mask_id = texture_mask_id;
+        ro->num_points = 3 * mesh->faces;
+        ro->vertex_data = new Vertex_3[ro->num_points];
+        ro->normal_data = new Normal[ro->num_points];
+        ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
+        m_render_objects.push_back(ro);
+      }
+    }
+
+    int i;
+    for (i=0; i<3; ++i) {
+      float out[3];
+      lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
+      if (d) {
+        out[0] -= d->pivot[0];
+        out[1] -= d->pivot[1];
+        out[2] -= d->pivot[2];
+      }
+      lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], mesh->matrix, out);
+  
+       /* It is very likely the normals have been completely messed up by these transformations */
+      lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
+      if (d) {
+        out[0] -= d->pivot[0];
+        out[1] -= d->pivot[1];
+        out[2] -= d->pivot[2];
+      }
+      lib3ds_vector_transform((float*)&ro->normal_data[n_counter], mesh->matrix, out);
+      ++n_counter;
+  
+      if (mesh->texels) {
+        ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
+        ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
+      }
     }
   }
+ 
+  ro->num_points = v_counter;
+  free(normalL);
 }
 
 } /* namespace Sear */

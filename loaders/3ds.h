@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.h,v 1.15 2005-01-06 12:46:54 simon Exp $
+// $Id: 3ds.h,v 1.16 2005-03-15 17:33:58 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -13,6 +13,7 @@
 #include <map>
 
 #include <lib3ds/file.h>
+#include <lib3ds/node.h>
 
 #include "common/types.h"
 
@@ -37,12 +38,12 @@ public:
   /*
    * Initialise 3ds model. Should probably be combined with loadModel
    */ 
-  bool init(const std::string &file_name);
+  int init(const std::string &file_name);
 
   /*
    * Called when model is to be removed from memory. It cleans up its children.
    */
-  void shutdown();
+  int shutdown();
   void render(bool);
 
   void invalidate();
@@ -82,15 +83,16 @@ public:
     float shininess;
   } Material;
   
-  void render_node(Lib3dsNode * node, Lib3dsFile * file);
-  void render_mesh(Lib3dsMesh * mesh, Lib3dsFile * file);
-  void render_file(Lib3dsFile * file);
+  void render_node(Lib3dsNode *node, Lib3dsFile *file);
+  void render_file(Lib3dsFile *file);
+  void render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *d);
   
-  std::list<RenderObject*> render_objects;
-  std::map<std::string, Material*> material_map;
-  bool _initialised;
-  unsigned int _list;
-  unsigned int _list_select;
+  std::list<RenderObject*> m_render_objects;
+  typedef std::map<std::string, Material*> MaterialMap;
+  MaterialMap m_material_map;
+  bool m_initialised;
+  unsigned int m_list;
+  unsigned int m_list_select;
   float m_height;
 };
 

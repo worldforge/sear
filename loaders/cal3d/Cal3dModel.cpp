@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.18 2005-03-04 17:58:24 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.19 2005-03-15 17:33:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -51,32 +51,34 @@ static const std::string ANIM_default = "default";
 
 Cal3dModel::Cal3dModel(Render *render) :
   Model(render),
-  _initialised(false),
-  _core_model(NULL),
+  m_initialised(false),
+  m_core_model(NULL),
   m_calModel(NULL),
   m_rotate(90.0f)
 {
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
-  _height = 1.0f;
+  m_height = 1.0f;
 }
 
 Cal3dModel::~Cal3dModel() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
-bool Cal3dModel::init(Cal3dCoreModel *core_model) {
-  if (_initialised) shutdown();
+int Cal3dModel::init(Cal3dCoreModel *core_model) {
+  assert(m_initialised == false);
+
   assert(core_model && "Core model is NULL");
-  _core_model = core_model;
+  m_core_model = core_model;
   // create the model instance from the loaded core model
-  if(!(m_calModel = new CalModel(_core_model->getCalCoreModel()))) {
+  if(!(m_calModel = new CalModel(m_core_model->getCalCoreModel()))) {
     CalError::printLastError();
     return false;
   }
 
   // attach all meshes to the model
-  for(int meshId = 0; meshId < _core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
+  for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
     m_calModel->attachMesh(meshId);
   }
 
@@ -84,13 +86,13 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
   m_calModel->setMaterialSet(0);
 
   // set initial animation state
-  m_calModel->getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
+  m_calModel->getMixer()->blendCycle(m_core_model->m_animations[STANDING], 1.0f, 0.0f);
 
-  m_renderScale = _core_model->getScale();
+  m_renderScale = m_core_model->getScale();
 
-  m_rotate = _core_model->getRotate();
-  _initialised = true;
-  return true;
+  m_rotate = m_core_model->getRotate();
+  m_initialised = true;
+  return 0;
 }
 
 void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode) {
@@ -133,7 +135,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
 	  shininess = pCalRenderer->getShininess();
 
-          _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
+          m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
 	}
 	
         // get the transformed vertices of the submesh
@@ -162,9 +164,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             RenderSystem::getInstance().switchTexture(0, (int)pCalRenderer->getMapUserData(0));
             RenderSystem::getInstance().switchTexture(1, (int)pCalRenderer->getMapUserData(1));
 	  }
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
+          m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
 	} else {
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
+          m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
 	}
       }
     }
@@ -173,26 +175,29 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 }
 
 void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
-  if (_render) {
-    float scale = _height * getScale();
-    _render->scaleObject(scale);
-    _render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
+  assert(m_render);
+//  if (m_render) {
+    float scale = m_height * getScale();
+    m_render->scaleObject(scale);
+    m_render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
   }
-}
+//}
 
 void Cal3dModel::update(float time_elapsed) {
   // update the model
   m_calModel->update(time_elapsed);
 }
 
-void Cal3dModel::shutdown() {
+int Cal3dModel::shutdown() {
+  assert (m_initialised == true);
   // destroy the model instance
   if (m_calModel) {
     delete m_calModel;
     m_calModel = NULL;
   }
-  _initialised = false;
+  m_initialised = false;
+  return 0;
 }
 
 void Cal3dModel::setLodLevel(float lodLevel) {
@@ -202,7 +207,7 @@ void Cal3dModel::setLodLevel(float lodLevel) {
 }
 
 void Cal3dModel::action(const std::string &action) {
-  Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
+  Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   if (action == "standing") {
     m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
     m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
@@ -234,7 +239,7 @@ void Cal3dModel::setAppearance(Atlas::Message::MapType &map) {
     std::cout << "No 'mesh' found -- using defaults" << std::endl;
     // instantiate defaults
     Atlas::Message::MapType meshes;
-    for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
+    for (Cal3dCoreModel::MeshMap::const_iterator J = m_core_model->m_meshes.begin(); J != m_core_model->m_meshes.end(); ++J) {
       std::string name = J->first;
       if (name.find("_") != std::string::npos)
         meshes[name.substr(0, name.find("_"))] = "1";
@@ -253,10 +258,10 @@ void Cal3dModel::setAppearance(Atlas::Message::MapType &map) {
 
 
   // Make sure only single val meshes are attached
-  for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
+  for (Cal3dCoreModel::MeshMap::const_iterator J = m_core_model->m_meshes.begin(); J != m_core_model->m_meshes.end(); ++J) {
     std::string name = J->first;
     if (name.find("_") != std::string::npos)
-      m_calModel->detachMesh(_core_model->_meshes[name]);
+      m_calModel->detachMesh(m_core_model->m_meshes[name]);
   }
 
   // Attach meshes and set materials 
@@ -265,9 +270,9 @@ void Cal3dModel::setAppearance(Atlas::Message::MapType &map) {
     std::string value = I->second.asString();
     std::cout << "Name: " << name << " - Value: " << value << std::endl;
     // Attach mesh
-    if (_core_model->_meshes.find(name + "_" + value) 
-      != _core_model->_meshes.end()) {
-      m_calModel->attachMesh(_core_model->_meshes[name + "_" + value]);
+    if (m_core_model->m_meshes.find(name + "_" + value) 
+      != m_core_model->m_meshes.end()) {
+      m_calModel->attachMesh(m_core_model->m_meshes[name + "_" + value]);
     // Set material set
     
     Atlas::Message::MapType::const_iterator K = materials.find(name);
@@ -303,12 +308,12 @@ void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
 }
 
 std::list<std::string> Cal3dModel::getMaterialNames() {
-  return _core_model->_material_list;
+  return m_core_model->m_material_list;
 }
 
 std::list<std::string> Cal3dModel::getMeshNames() {
   std::list<std::string> l;
-  for (Cal3dCoreModel::MeshMap::const_iterator I = _core_model->_meshes.begin(); I != _core_model->_meshes.end(); ++I) {
+  for (Cal3dCoreModel::MeshMap::const_iterator I = m_core_model->m_meshes.begin(); I != m_core_model->m_meshes.end(); ++I) {
     l.push_back(I->first);
   }
   return l;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.2 2005-03-04 17:58:23 simon Exp $
+//$Id: Model.h,v 1.3 2005-03-15 17:33:58 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -20,12 +20,12 @@ namespace Sear {
 class Model {
 public:
   Model(Render *render) :
-    _render(render),
-    _in_use(true)
+    m_render(render),
+    m_in_use(true)
   {}
   virtual ~Model() {}
-  virtual bool init() { return false; }
-  virtual void shutdown() {}
+//  virtual int init() = 0;
+  virtual int shutdown() = 0;
 
   virtual void invalidate() = 0;
 
@@ -33,30 +33,30 @@ public:
   virtual void render(bool select_mode) {}
   virtual void setDetailLevel(float f) {}
 
-  virtual bool useTextures() { return false; }
   virtual void action(const std::string &action) {}
   virtual void setHeight(float height) {} 
-  virtual void setAppearance(Atlas::Message::MapType &mt) {
-  std::cout << "No app" << std::endl;
+  virtual void setAppearance(Atlas::Message::MapType &mt) {}
+
+  virtual void setFlag(const std::string &flag, bool state) { m_flag_map[flag] = state; }
+  virtual bool getFlag(const std::string &flag) const {
+    std::map<std::string, bool>::const_iterator I = m_flag_map.find(flag);
+    return ((I != m_flag_map.end()) ? (I->second) : (false));
   }
 
-  virtual void setFlag(const std::string &flag, bool state) { _flag_map[flag] = state; }
-  virtual bool getFlag(const std::string &flag) { return _flag_map[flag]; }
-
-  bool getInUse() { return _in_use;}
-  void setInUse(bool in_use) { _in_use = in_use; }
+  bool getInUse() const { return m_in_use;}
+  void setInUse(bool in_use) { m_in_use = in_use; }
   
   virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NONE; }
 
-  float getLastTime() { return _last_time; }
-  void setLastTime(float t) { _last_time = t; }
+  float getLastTime() const { return m_last_time; }
+  void setLastTime(float t) { m_last_time = t; }
   
 protected: 
-  Render *_render;
-  float _last_time;
+  Render *m_render;
+  float m_last_time;
 private:
-  bool _in_use;
-  std::map<std::string, bool> _flag_map;
+  bool m_in_use;
+  std::map<std::string, bool> m_flag_map;
   
 };
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.24 2005-01-06 12:46:54 simon Exp $
+// $Id: BoundBox.cpp,v 1.25 2005-03-15 17:33:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -28,248 +28,189 @@
 namespace Sear {
 
 BoundBox::BoundBox(Render *render) : Model(render), 
-  _type("default"),
-  _use_textures(true),
-  _initialised(false),
-  _list(0),
-  _list_select(0)
+  m_initialised(false),
+  m_use_textures(true),
+  m_type("default"),
+  m_list(0),
+  m_list_select(0)
 {}
 
 BoundBox::~BoundBox() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
   
-bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wrap) {
-  _type = type;
-  /*
-  float min_x = _bbox.lowCorner().x();
-  float max_x = _bbox.highCorner().x();
-  float min_y = _bbox.lowCorner().y();
-  float max_y = _bbox.highCorner().y();
-  float min_z = _bbox.lowCorner().z();
-  float max_z = _bbox.highCorner().z();
+int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &type, bool _wrap) {
+  assert(m_initialised == false);
+  m_type = type;
 
-  if (detail < 0.0f) detail = 1.0f;
+  m_vertex_data[0].x = bbox.lowCorner().x(); m_vertex_data[0].y = bbox.highCorner().y(); m_vertex_data[0].z = bbox.lowCorner().z();
+  m_vertex_data[1].x = bbox.lowCorner().x(); m_vertex_data[1].y = bbox.lowCorner().y(); m_vertex_data[1].z = bbox.lowCorner().z();
+  m_vertex_data[2].x = bbox.highCorner().x(); m_vertex_data[2].y = bbox.lowCorner().y(); m_vertex_data[2].z = bbox.lowCorner().z();
+  m_vertex_data[3].x = bbox.highCorner().x(); m_vertex_data[3].y = bbox.highCorner().y(); m_vertex_data[3].z = bbox.lowCorner().z();
 
-  float x_length = abs(max_x - min_x) / detail;
-  float y_length = abs(max_y - min_y) / detail;
-  float z_length = abs(max_z - min_z) / detail;
-  
-  unsigned int x, y, z;
-  unsigned int vertex_counter = 0;
-  unsigned int normal_counter = 0;
-  unsigned int texture_counter = 0;
-  
-  // Top plane
-  z = max_z;
-  for (x = min_x; x < max_x; x += x_length) {
-    for (y = min_y; y < max_y; y += y_length) {
-      _vertex_data[vertex_counter++] = x;
-      _vertex_data[vertex_counter++] = y;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x + x_length;
-      _vertex_data[vertex_counter++] = y;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x + x_length;
-      _vertex_data[vertex_counter++] = y + y_length;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x;
-      _vertex_data[vertex_counter++] = y + y_length;
-      _vertex_data[vertex_counter++] = z;
-      _texture_data[texture_counter++] = x / (max_x - min_x);
-      _texture_data[texture_counter++] = y / (max_y - min_y);
-      _texture_data[texture_counter++] = (x + x_length) / (max_x - min_x);
-      _texture_data[texture_counter++] = y / (max_y - min_y);
-      _texture_data[texture_counter++] = (x + x_length) / (max_x - min_x);
-      _texture_data[texture_counter++] = (y + y_length) / (max_y - min_y);
-      _texture_data[texture_counter++] = x / (max_x - min_x);
-      _texture_data[texture_counter++] = (y + y_length) / (max_y - min_y);
-    }
-  }
-  // Bottom plane
-  z = min_z;
-  for (x = min_x; x < max_x; x += x_length) {
-    for (y = min_y; y < max_y; y += y_length) {
-      _vertex_data[vertex_counter++] = x;
-      _vertex_data[vertex_counter++] = y;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x + x_length;
-      _vertex_data[vertex_counter++] = y;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x + x_length;
-      _vertex_data[vertex_counter++] = y + y_length;
-      _vertex_data[vertex_counter++] = z;
-      _vertex_data[vertex_counter++] = x;
-      _vertex_data[vertex_counter++] = y + y_length;
-      _vertex_data[vertex_counter++] = z;
-    }
-  }
-  */
-  _vertex_data[0].x = _bbox.lowCorner().x(); _vertex_data[0].y = _bbox.highCorner().y(); _vertex_data[0].z = _bbox.lowCorner().z();
-  _vertex_data[1].x = _bbox.lowCorner().x(); _vertex_data[1].y = _bbox.lowCorner().y(); _vertex_data[1].z = _bbox.lowCorner().z();
-  _vertex_data[2].x = _bbox.highCorner().x(); _vertex_data[2].y = _bbox.lowCorner().y(); _vertex_data[2].z = _bbox.lowCorner().z();
-  _vertex_data[3].x = _bbox.highCorner().x(); _vertex_data[3].y = _bbox.highCorner().y(); _vertex_data[3].z = _bbox.lowCorner().z();
+  m_vertex_data[4].x = bbox.lowCorner().x(); m_vertex_data[4].y = bbox.lowCorner().y(); m_vertex_data[4].z = bbox.highCorner().z();
+  m_vertex_data[5].x = bbox.lowCorner().x(); m_vertex_data[5].y = bbox.highCorner().y(); m_vertex_data[5].z = bbox.highCorner().z();
+  m_vertex_data[6].x = bbox.highCorner().x(); m_vertex_data[6].y = bbox.highCorner().y(); m_vertex_data[6].z = bbox.highCorner().z();
+  m_vertex_data[7].x = bbox.highCorner().x(); m_vertex_data[7].y = bbox.lowCorner().y(); m_vertex_data[7].z = bbox.highCorner().z();
 
-  _vertex_data[4].x = _bbox.lowCorner().x(); _vertex_data[4].y = _bbox.lowCorner().y(); _vertex_data[4].z = _bbox.highCorner().z();
-  _vertex_data[5].x = _bbox.lowCorner().x(); _vertex_data[5].y = _bbox.highCorner().y(); _vertex_data[5].z = _bbox.highCorner().z();
-  _vertex_data[6].x = _bbox.highCorner().x(); _vertex_data[6].y = _bbox.highCorner().y(); _vertex_data[6].z = _bbox.highCorner().z();
-  _vertex_data[7].x = _bbox.highCorner().x(); _vertex_data[7].y = _bbox.lowCorner().y(); _vertex_data[7].z = _bbox.highCorner().z();
+  m_vertex_data[8].x = bbox.lowCorner().x(); m_vertex_data[8].y = bbox.highCorner().y(); m_vertex_data[8].z = bbox.lowCorner().z();
+  m_vertex_data[9].x = bbox.lowCorner().x(); m_vertex_data[9].y = bbox.highCorner().y(); m_vertex_data[9].z = bbox.highCorner().z();
+  m_vertex_data[10].x = bbox.lowCorner().x(); m_vertex_data[10].y = bbox.lowCorner().y(); m_vertex_data[10].z = bbox.highCorner().z();
+  m_vertex_data[11].x = bbox.lowCorner().x(); m_vertex_data[11].y = bbox.lowCorner().y(); m_vertex_data[11].z = bbox.lowCorner().z();
 
-  _vertex_data[8].x = _bbox.lowCorner().x(); _vertex_data[8].y = _bbox.highCorner().y(); _vertex_data[8].z = _bbox.lowCorner().z();
-  _vertex_data[9].x = _bbox.lowCorner().x(); _vertex_data[9].y = _bbox.highCorner().y(); _vertex_data[9].z = _bbox.highCorner().z();
-  _vertex_data[10].x = _bbox.lowCorner().x(); _vertex_data[10].y = _bbox.lowCorner().y(); _vertex_data[10].z = _bbox.highCorner().z();
-  _vertex_data[11].x = _bbox.lowCorner().x(); _vertex_data[11].y = _bbox.lowCorner().y(); _vertex_data[11].z = _bbox.lowCorner().z();
+  m_vertex_data[12].x = bbox.highCorner().x(); m_vertex_data[12].y = bbox.lowCorner().y(); m_vertex_data[12].z = bbox.lowCorner().z();
+  m_vertex_data[13].x = bbox.highCorner().x(); m_vertex_data[13].y = bbox.lowCorner().y(); m_vertex_data[13].z = bbox.highCorner().z();
+  m_vertex_data[14].x = bbox.highCorner().x(); m_vertex_data[14].y = bbox.highCorner().y(); m_vertex_data[14].z = bbox.highCorner().z();
+  m_vertex_data[15].x = bbox.highCorner().x(); m_vertex_data[15].y = bbox.highCorner().y(); m_vertex_data[15].z = bbox.lowCorner().z();
 
-  _vertex_data[12].x = _bbox.highCorner().x(); _vertex_data[12].y = _bbox.lowCorner().y(); _vertex_data[12].z = _bbox.lowCorner().z();
-  _vertex_data[13].x = _bbox.highCorner().x(); _vertex_data[13].y = _bbox.lowCorner().y(); _vertex_data[13].z = _bbox.highCorner().z();
-  _vertex_data[14].x = _bbox.highCorner().x(); _vertex_data[14].y = _bbox.highCorner().y(); _vertex_data[14].z = _bbox.highCorner().z();
-  _vertex_data[15].x = _bbox.highCorner().x(); _vertex_data[15].y = _bbox.highCorner().y(); _vertex_data[15].z = _bbox.lowCorner().z();
+  m_vertex_data[16].x = bbox.highCorner().x(); m_vertex_data[16].y = bbox.highCorner().y(); m_vertex_data[16].z = bbox.lowCorner().z();
+  m_vertex_data[17].x = bbox.highCorner().x(); m_vertex_data[17].y = bbox.highCorner().y(); m_vertex_data[17].z = bbox.highCorner().z();
+  m_vertex_data[18].x = bbox.lowCorner().x();  m_vertex_data[18].y = bbox.highCorner().y(); m_vertex_data[18].z = bbox.highCorner().z();
+  m_vertex_data[19].x = bbox.lowCorner().x();  m_vertex_data[19].y = bbox.highCorner().y(); m_vertex_data[19].z = bbox.lowCorner().z();
 
-  _vertex_data[16].x = _bbox.highCorner().x(); _vertex_data[16].y = _bbox.highCorner().y(); _vertex_data[16].z = _bbox.lowCorner().z();
-  _vertex_data[17].x = _bbox.highCorner().x(); _vertex_data[17].y = _bbox.highCorner().y(); _vertex_data[17].z = _bbox.highCorner().z();
-  _vertex_data[18].x = _bbox.lowCorner().x();  _vertex_data[18].y = _bbox.highCorner().y(); _vertex_data[18].z = _bbox.highCorner().z();
-  _vertex_data[19].x = _bbox.lowCorner().x();  _vertex_data[19].y = _bbox.highCorner().y(); _vertex_data[19].z = _bbox.lowCorner().z();
-
-  _vertex_data[20].x = _bbox.lowCorner().x();  _vertex_data[20].y = _bbox.lowCorner().y(); _vertex_data[20].z = _bbox.lowCorner().z();
-  _vertex_data[21].x = _bbox.lowCorner().x(); _vertex_data[21].y = _bbox.lowCorner().y(); _vertex_data[21].z = _bbox.highCorner().z();
-  _vertex_data[22].x = _bbox.highCorner().x(); _vertex_data[22].y = _bbox.lowCorner().y(); _vertex_data[22].z = _bbox.highCorner().z();
-  _vertex_data[23].x = _bbox.highCorner().x(); _vertex_data[23].y = _bbox.lowCorner().y(); _vertex_data[23].z = _bbox.lowCorner().z();
+  m_vertex_data[20].x = bbox.lowCorner().x();  m_vertex_data[20].y = bbox.lowCorner().y(); m_vertex_data[20].z = bbox.lowCorner().z();
+  m_vertex_data[21].x = bbox.lowCorner().x(); m_vertex_data[21].y = bbox.lowCorner().y(); m_vertex_data[21].z = bbox.highCorner().z();
+  m_vertex_data[22].x = bbox.highCorner().x(); m_vertex_data[22].y = bbox.lowCorner().y(); m_vertex_data[22].z = bbox.highCorner().z();
+  m_vertex_data[23].x = bbox.highCorner().x(); m_vertex_data[23].y = bbox.lowCorner().y(); m_vertex_data[23].z = bbox.lowCorner().z();
   if (!_wrap) {
-    _texture_data[0].s = 0.0f; _texture_data[0].t = 0.0f;
-    _texture_data[1].s = 0.0f; _texture_data[1].t = 1.0f;
-    _texture_data[2].s = 1.0f; _texture_data[2].t = 1.0f;
-    _texture_data[3].s = 1.0f; _texture_data[3].t = 0.0f;
+    m_texture_data[0].s = 0.0f; m_texture_data[0].t = 0.0f;
+    m_texture_data[1].s = 0.0f; m_texture_data[1].t = 1.0f;
+    m_texture_data[2].s = 1.0f; m_texture_data[2].t = 1.0f;
+    m_texture_data[3].s = 1.0f; m_texture_data[3].t = 0.0f;
   
-    _texture_data[4].s = 0.0f; _texture_data[4].t = 0.0f;
-    _texture_data[5].s = 0.0f; _texture_data[5].t = 1.0f;
-    _texture_data[6].s = 1.0f; _texture_data[6].t = 1.0f;
-    _texture_data[7].s = 1.0f; _texture_data[7].t = 0.0f;
+    m_texture_data[4].s = 0.0f; m_texture_data[4].t = 0.0f;
+    m_texture_data[5].s = 0.0f; m_texture_data[5].t = 1.0f;
+    m_texture_data[6].s = 1.0f; m_texture_data[6].t = 1.0f;
+    m_texture_data[7].s = 1.0f; m_texture_data[7].t = 0.0f;
 
-    _texture_data[8].s = 0.0f; _texture_data[8].t = 0.0f;
-    _texture_data[9].s = 0.0f; _texture_data[9].t = 1.0f;
-    _texture_data[10].s = 1.0f; _texture_data[10].t = 1.0f;
-    _texture_data[11].s = 1.0f; _texture_data[11].t = 0.0f;
+    m_texture_data[8].s = 0.0f; m_texture_data[8].t = 0.0f;
+    m_texture_data[9].s = 0.0f; m_texture_data[9].t = 1.0f;
+    m_texture_data[10].s = 1.0f; m_texture_data[10].t = 1.0f;
+    m_texture_data[11].s = 1.0f; m_texture_data[11].t = 0.0f;
 
-    _texture_data[12].s = 0.0f; _texture_data[12].t = 0.0f;
-    _texture_data[13].s = 0.0f; _texture_data[13].t = 1.0f;
-    _texture_data[14].s = 1.0f; _texture_data[14].t = 1.0f;
-    _texture_data[15].s = 1.0f; _texture_data[15].t = 0.0f;
+    m_texture_data[12].s = 0.0f; m_texture_data[12].t = 0.0f;
+    m_texture_data[13].s = 0.0f; m_texture_data[13].t = 1.0f;
+    m_texture_data[14].s = 1.0f; m_texture_data[14].t = 1.0f;
+    m_texture_data[15].s = 1.0f; m_texture_data[15].t = 0.0f;
 
-    _texture_data[16].s = 0.0f; _texture_data[16].t = 0.0f;
-    _texture_data[17].s = 0.0f; _texture_data[17].t = 1.0f;
-    _texture_data[18].s = 1.0f; _texture_data[18].t = 1.0f;
-    _texture_data[19].s = 1.0f; _texture_data[19].t = 0.0f;
+    m_texture_data[16].s = 0.0f; m_texture_data[16].t = 0.0f;
+    m_texture_data[17].s = 0.0f; m_texture_data[17].t = 1.0f;
+    m_texture_data[18].s = 1.0f; m_texture_data[18].t = 1.0f;
+    m_texture_data[19].s = 1.0f; m_texture_data[19].t = 0.0f;
 
-    _texture_data[20].s = 0.0f; _texture_data[20].t = 0.0f;
-    _texture_data[21].s = 0.0f; _texture_data[21].t = 1.0f;
-    _texture_data[22].s = 1.0f; _texture_data[22].t = 1.0f;
-    _texture_data[23].s = 1.0f; _texture_data[23].t = 0.0f;
+    m_texture_data[20].s = 0.0f; m_texture_data[20].t = 0.0f;
+    m_texture_data[21].s = 0.0f; m_texture_data[21].t = 1.0f;
+    m_texture_data[22].s = 1.0f; m_texture_data[22].t = 1.0f;
+    m_texture_data[23].s = 1.0f; m_texture_data[23].t = 0.0f;
   } else {
-    _texture_data[0].s = _bbox.lowCorner().x(); _texture_data[0].t = _bbox.highCorner().y();
-    _texture_data[1].s = _bbox.lowCorner().x(); _texture_data[1].t = _bbox.lowCorner().y();
-    _texture_data[2].s = _bbox.highCorner().x(); _texture_data[2].t = _bbox.lowCorner().y();
-    _texture_data[3].s = _bbox.highCorner().x(); _texture_data[3].t = _bbox.highCorner().y();
+    m_texture_data[0].s = bbox.lowCorner().x(); m_texture_data[0].t = bbox.highCorner().y();
+    m_texture_data[1].s = bbox.lowCorner().x(); m_texture_data[1].t = bbox.lowCorner().y();
+    m_texture_data[2].s = bbox.highCorner().x(); m_texture_data[2].t = bbox.lowCorner().y();
+    m_texture_data[3].s = bbox.highCorner().x(); m_texture_data[3].t = bbox.highCorner().y();
       
-    _texture_data[4].s = _bbox.lowCorner().x(); _texture_data[4].t = _bbox.lowCorner().y();
-    _texture_data[5].s = _bbox.lowCorner().x(); _texture_data[5].t = _bbox.highCorner().y();
-    _texture_data[6].s = _bbox.highCorner().x(); _texture_data[6].t = _bbox.highCorner().y();
-    _texture_data[7].s = _bbox.highCorner().x(); _texture_data[7].t = _bbox.lowCorner().y();
+    m_texture_data[4].s = bbox.lowCorner().x(); m_texture_data[4].t = bbox.lowCorner().y();
+    m_texture_data[5].s = bbox.lowCorner().x(); m_texture_data[5].t = bbox.highCorner().y();
+    m_texture_data[6].s = bbox.highCorner().x(); m_texture_data[6].t = bbox.highCorner().y();
+    m_texture_data[7].s = bbox.highCorner().x(); m_texture_data[7].t = bbox.lowCorner().y();
 	      
-    _texture_data[8].s = _bbox.highCorner().y(); _texture_data[8].t = _bbox.lowCorner().z();
-    _texture_data[9].s = _bbox.highCorner().y(); _texture_data[9].t = _bbox.highCorner().z();
-    _texture_data[10].s = _bbox.lowCorner().y(); _texture_data[10].t = _bbox.highCorner().z();
-    _texture_data[11].s = _bbox.lowCorner().y(); _texture_data[11].t = _bbox.lowCorner().z();
+    m_texture_data[8].s = bbox.highCorner().y(); m_texture_data[8].t = bbox.lowCorner().z();
+    m_texture_data[9].s = bbox.highCorner().y(); m_texture_data[9].t = bbox.highCorner().z();
+    m_texture_data[10].s = bbox.lowCorner().y(); m_texture_data[10].t = bbox.highCorner().z();
+    m_texture_data[11].s = bbox.lowCorner().y(); m_texture_data[11].t = bbox.lowCorner().z();
 
-    _texture_data[12].s = _bbox.lowCorner().y(); _texture_data[12].t = _bbox.lowCorner().z();      
-    _texture_data[13].s = _bbox.lowCorner().y(); _texture_data[13].t = _bbox.highCorner().z();
-    _texture_data[14].s = _bbox.highCorner().y(); _texture_data[14].t = _bbox.highCorner().z();
-    _texture_data[15].s = _bbox.highCorner().y(); _texture_data[15].t = _bbox.lowCorner().z();
+    m_texture_data[12].s = bbox.lowCorner().y(); m_texture_data[12].t = bbox.lowCorner().z();      
+    m_texture_data[13].s = bbox.lowCorner().y(); m_texture_data[13].t = bbox.highCorner().z();
+    m_texture_data[14].s = bbox.highCorner().y(); m_texture_data[14].t = bbox.highCorner().z();
+    m_texture_data[15].s = bbox.highCorner().y(); m_texture_data[15].t = bbox.lowCorner().z();
 
-    _texture_data[16].s = _bbox.highCorner().x(); _texture_data[16].t = _bbox.lowCorner().z();
-    _texture_data[17].s = _bbox.highCorner().x(); _texture_data[17].t = _bbox.highCorner().z();
-    _texture_data[18].s = _bbox.lowCorner().x(); _texture_data[18].t = _bbox.highCorner().z();
-    _texture_data[19].s = _bbox.lowCorner().x(); _texture_data[19].t = _bbox.lowCorner().z();
+    m_texture_data[16].s = bbox.highCorner().x(); m_texture_data[16].t = bbox.lowCorner().z();
+    m_texture_data[17].s = bbox.highCorner().x(); m_texture_data[17].t = bbox.highCorner().z();
+    m_texture_data[18].s = bbox.lowCorner().x(); m_texture_data[18].t = bbox.highCorner().z();
+    m_texture_data[19].s = bbox.lowCorner().x(); m_texture_data[19].t = bbox.lowCorner().z();
 
-    _texture_data[20].s = _bbox.lowCorner().x(); _texture_data[20].t = _bbox.lowCorner().z();
-    _texture_data[21].s = _bbox.lowCorner().x(); _texture_data[21].t = _bbox.highCorner().z();
-    _texture_data[22].s = _bbox.highCorner().x(); _texture_data[22].t = _bbox.highCorner().z();
-    _texture_data[23].s = _bbox.highCorner().x(); _texture_data[23].t = _bbox.lowCorner().z();
+    m_texture_data[20].s = bbox.lowCorner().x(); m_texture_data[20].t = bbox.lowCorner().z();
+    m_texture_data[21].s = bbox.lowCorner().x(); m_texture_data[21].t = bbox.highCorner().z();
+    m_texture_data[22].s = bbox.highCorner().x(); m_texture_data[22].t = bbox.highCorner().z();
+    m_texture_data[23].s = bbox.highCorner().x(); m_texture_data[23].t = bbox.lowCorner().z();
   }
-  _normal_data[0].x =  0.0f; _normal_data[0].y =  0.0f; _normal_data[0].z = -1.0f;
-  _normal_data[1].x =  0.0f; _normal_data[1].y =  0.0f; _normal_data[1].z = -1.0f;
-  _normal_data[2].x =  0.0f; _normal_data[2].y =  0.0f; _normal_data[2].z = -1.0f;
-  _normal_data[3].x =  0.0f; _normal_data[3].y =  0.0f; _normal_data[3].z = -1.0f;
-  _normal_data[4].x =  0.0f; _normal_data[4].y =  0.0f; _normal_data[4].z =  1.0f;
-  _normal_data[5].x =  0.0f; _normal_data[5].y =  0.0f; _normal_data[5].z =  1.0f;
-  _normal_data[6].x =  0.0f; _normal_data[6].y =  0.0f; _normal_data[6].z =  1.0f;
-  _normal_data[7].x =  0.0f; _normal_data[7].y =  0.0f; _normal_data[7].z =  1.0f;
-  _normal_data[8].x = -1.0f; _normal_data[8].y =  0.0f; _normal_data[8].z =  0.0f;
-  _normal_data[9].x = -1.0f; _normal_data[9].y =  0.0f; _normal_data[9].z =  0.0f;
-  _normal_data[10].x = -1.0f; _normal_data[10].y =  0.0f; _normal_data[10].z =  0.0f;
-  _normal_data[11].x = -1.0f; _normal_data[11].y =  0.0f; _normal_data[11].z =  0.0f;
-  _normal_data[12].x =  1.0f; _normal_data[12].y =  0.0f; _normal_data[12].z =  0.0f;
-  _normal_data[13].x =  1.0f; _normal_data[13].y =  0.0f; _normal_data[13].z =  0.0f;
-  _normal_data[14].x =  1.0f; _normal_data[14].y =  0.0f; _normal_data[14].z =  0.0f;
-  _normal_data[15].x =  1.0f; _normal_data[15].y =  0.0f; _normal_data[15].z =  0.0f;
-  _normal_data[16].x =  0.0f; _normal_data[16].y =  1.0f; _normal_data[16].z =  0.0f;
-  _normal_data[17].x =  0.0f; _normal_data[17].y =  1.0f; _normal_data[17].z =  0.0f;
-  _normal_data[18].x =  0.0f; _normal_data[18].y =  1.0f; _normal_data[18].z =  0.0f;
-  _normal_data[19].x =  0.0f; _normal_data[19].y =  1.0f; _normal_data[19].z =  0.0f;
-  _normal_data[20].x =  0.0f; _normal_data[20].y = -1.0f; _normal_data[20].z =  0.0f;
-  _normal_data[21].x =  0.0f; _normal_data[21].y = -1.0f; _normal_data[21].z =  0.0f;
-  _normal_data[22].x =  0.0f; _normal_data[22].y = -1.0f; _normal_data[22].z =  0.0f;
-  _normal_data[23].x =  0.0f; _normal_data[23].y = -1.0f; _normal_data[23].z =  0.0f;
-  _initialised = true;
-  return true;
+  m_normal_data[0].x =  0.0f; m_normal_data[0].y =  0.0f; m_normal_data[0].z = -1.0f;
+  m_normal_data[1].x =  0.0f; m_normal_data[1].y =  0.0f; m_normal_data[1].z = -1.0f;
+  m_normal_data[2].x =  0.0f; m_normal_data[2].y =  0.0f; m_normal_data[2].z = -1.0f;
+  m_normal_data[3].x =  0.0f; m_normal_data[3].y =  0.0f; m_normal_data[3].z = -1.0f;
+  m_normal_data[4].x =  0.0f; m_normal_data[4].y =  0.0f; m_normal_data[4].z =  1.0f;
+  m_normal_data[5].x =  0.0f; m_normal_data[5].y =  0.0f; m_normal_data[5].z =  1.0f;
+  m_normal_data[6].x =  0.0f; m_normal_data[6].y =  0.0f; m_normal_data[6].z =  1.0f;
+  m_normal_data[7].x =  0.0f; m_normal_data[7].y =  0.0f; m_normal_data[7].z =  1.0f;
+  m_normal_data[8].x = -1.0f; m_normal_data[8].y =  0.0f; m_normal_data[8].z =  0.0f;
+  m_normal_data[9].x = -1.0f; m_normal_data[9].y =  0.0f; m_normal_data[9].z =  0.0f;
+  m_normal_data[10].x = -1.0f; m_normal_data[10].y =  0.0f; m_normal_data[10].z =  0.0f;
+  m_normal_data[11].x = -1.0f; m_normal_data[11].y =  0.0f; m_normal_data[11].z =  0.0f;
+  m_normal_data[12].x =  1.0f; m_normal_data[12].y =  0.0f; m_normal_data[12].z =  0.0f;
+  m_normal_data[13].x =  1.0f; m_normal_data[13].y =  0.0f; m_normal_data[13].z =  0.0f;
+  m_normal_data[14].x =  1.0f; m_normal_data[14].y =  0.0f; m_normal_data[14].z =  0.0f;
+  m_normal_data[15].x =  1.0f; m_normal_data[15].y =  0.0f; m_normal_data[15].z =  0.0f;
+  m_normal_data[16].x =  0.0f; m_normal_data[16].y =  1.0f; m_normal_data[16].z =  0.0f;
+  m_normal_data[17].x =  0.0f; m_normal_data[17].y =  1.0f; m_normal_data[17].z =  0.0f;
+  m_normal_data[18].x =  0.0f; m_normal_data[18].y =  1.0f; m_normal_data[18].z =  0.0f;
+  m_normal_data[19].x =  0.0f; m_normal_data[19].y =  1.0f; m_normal_data[19].z =  0.0f;
+  m_normal_data[20].x =  0.0f; m_normal_data[20].y = -1.0f; m_normal_data[20].z =  0.0f;
+  m_normal_data[21].x =  0.0f; m_normal_data[21].y = -1.0f; m_normal_data[21].z =  0.0f;
+  m_normal_data[22].x =  0.0f; m_normal_data[22].y = -1.0f; m_normal_data[22].z =  0.0f;
+  m_normal_data[23].x =  0.0f; m_normal_data[23].y = -1.0f; m_normal_data[23].z =  0.0f;
+
+  m_initialised = true;
+
+  return 0;
 }
 
-void BoundBox::shutdown() {
-  _initialised = false;
-  if (_render) {
-    _render->freeList(_list);
-    _render->freeList(_list_select);
-  }
-  _list = 0;
-  _list_select =0;
+int BoundBox::shutdown() {
+  assert(m_initialised == true);
+
+  invalidate();
+
+  m_initialised = false;
+  return 0;
 }
 
 void BoundBox::invalidate() {
+  assert(m_render != NULL);
   // Clear up display lists
-  if (_render) {
-    _render->freeList(_list);
-    _render->freeList(_list_select);
-  }
-  _list = 0;
-  _list_select =0;
+  m_render->freeList(m_list);
+  m_render->freeList(m_list_select);
+
+  m_list = 0;
+  m_list_select = 0;
 }
 
 void BoundBox::render(bool select_mode) {
-  assert(_render && "BoundBox _render is null");
-//  if (!_render) return;
+  assert(m_render && "BoundBox m_render is null");
+
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   
   if (select_mode) {
-     if (_list_select) {
-      _render->playList(_list_select);
+     if (m_list_select) {
+      m_render->playList(m_list_select);
     } else {
-      _list_select = _render->getNewList();
-      _render->beginRecordList(_list_select);
-//      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0], NULL, NULL, false);
-      _render->endRecordList();
+      m_list_select = m_render->getNewList();
+      m_render->beginRecordList(m_list_select);
+//      m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+      m_render->renderArrays(Graphics::RES_QUADS, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
+      m_render->endRecordList();
     } 
   } else {
-    RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(_type));
-    if (_list) {
-      _render->playList(_list);
+    RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(m_type));
+    if (m_list) {
+      m_render->playList(m_list);
     } else {
-      _list = _render->getNewList();
-      _render->beginRecordList(_list);
-      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0], &_texture_data[0], &_normal_data[0], false);
-      _render->endRecordList();
+      printf("BoundBox: New Display list\n");
+      m_list = m_render->getNewList();
+      m_render->beginRecordList(m_list);
+      m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+      m_render->renderArrays(Graphics::RES_QUADS, 0, m_num_points, &m_vertex_data[0], &m_texture_data[0], &m_normal_data[0], false);
+      m_render->endRecordList();
     } 
   }
 }

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.7 2005-01-06 12:46:54 simon Exp $
+// $Id: WireFrame.h,v 1.8 2005-03-15 17:33:58 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -20,18 +20,18 @@ public:
   WireFrame(Render*);
   ~WireFrame();
   
-  bool init(WFMath::AxisBox<3>);
-  void shutdown();
+  int init(WFMath::AxisBox<3>);
+  int shutdown();
  
-  void invalidate()  {}
+  void invalidate();
  
   void render(bool);
-  bool useTextures() { return false; }
   
 private:
-  static const int _num_points = 32;
-  Vertex_3 _vertex_data[_num_points];
-  bool _initialised;
+  static const int m_num_points = 32;
+  bool m_initialised;
+  int m_disp;
+  Vertex_3 m_vertex_data[m_num_points];
 };
 
 } /* namespace Sear */
