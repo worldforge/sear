@@ -15,7 +15,7 @@ namespace Sear {
 
 bool Console::init() {
   _renderer = _system->getGraphics()->getRender();
-  panel_id = _renderer->requestTexture("ui_panel");
+  panel_id = _renderer->requestTexture("ui", "panel");
   registerCommand(TOGGLE_CONSOLE, this);
   registerCommand(LIST_CONSOLE_COMMANDS, this);
   return true;

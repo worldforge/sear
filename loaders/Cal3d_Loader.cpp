@@ -22,7 +22,11 @@ Cal3d_Loader::~Cal3d_Loader() {
 
 Model *Cal3d_Loader::loadModel(WorldEntity*, ObjectProperties* op, const std::string &file_name) {
   Cal3d *model = new Cal3d();
-  model->init(file_name);
+  if (!model->init(file_name)) {
+    model->shutdown();
+    delete (model);
+    return NULL;
+  }
   model->setInUse(true);
   model->setFlag("outline", op->outline);
   return model;

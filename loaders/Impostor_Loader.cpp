@@ -27,16 +27,16 @@ Model *Impostor_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const s
   Impostor *model = new Impostor();
 
   std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("impostor_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture("impostor", type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("impostor_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture("impostor", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(std::string("impostor_") + type, op->width, op->height);
+  model->init(type, op->width, op->height);
   model->setInUse(true);
   return model;
 }

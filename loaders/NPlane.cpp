@@ -72,9 +72,9 @@ void NPlane::render(bool select_mode) {
   //TODO, should we use one texture for the whole model, or one per plane?
   static Render *render = System::instance()->getGraphics()->getRender();
   if (select_mode) {
-    render->switchTexture(render->requestTextureMask(_type));
+    render->switchTexture(render->requestTextureMask("nplane", _type));
   } else {
-    render->switchTexture(render->requestTexture(_type));
+    render->switchTexture(render->requestTexture("nplane", _type));
   }
   render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
 }

@@ -5,7 +5,8 @@
 
 #include <SDL/SDL.h>
 
-#include "common/Config.h"
+#include <varconf/Config.h>
+
 #include "common/Log.h"
 
 #include "Bindings.h"
@@ -14,37 +15,37 @@ namespace Sear {
 
 // Static Declarations	
 std::map<int, std::string> Bindings::keymap = std::map<int, std::string>();
-Config *Bindings::_bindings = NULL;
+varconf::Config *Bindings::_bindings = NULL;
 
 void Bindings::init() {
-  _bindings = new Config(); // Create a new config object to store data in
+  _bindings = new varconf::Config(); // Create a new config object to store data in
   initKeyMap(); // Initilise key mappings
 }
 
 void Bindings::initKeyMap() {
   keymap = std::map<int, std::string>(); // Create an empty mapping
   // Assign keys to textual representation
-  keymap[SDLK_BACKSPACE] = "{BACKSPACE}";
-  keymap[SDLK_TAB] = "{TAB}";
-  keymap[SDLK_CLEAR] = "{CLEAR}";
-  keymap[SDLK_RETURN] = "{RETURN}";
-  keymap[SDLK_PAUSE] = "{PAUSE}";
-  keymap[SDLK_ESCAPE] = "{ESCAPE}";
-  keymap[SDLK_SPACE] = "{SPACE}";
-  keymap[SDLK_EXCLAIM] = "!";
-  keymap[SDLK_QUOTEDBL] = "{DBL_QUOTE}";
-  keymap[SDLK_HASH] = "#";
-  keymap[SDLK_DOLLAR] = "$";
-  keymap[SDLK_AMPERSAND] = "&";
-  keymap[SDLK_QUOTE] = "{QUOTE}";
-  keymap[SDLK_LEFTPAREN] = "(";
-  keymap[SDLK_RIGHTPAREN] = "(";
-  keymap[SDLK_ASTERISK] = "*";
-  keymap[SDLK_PLUS] = "+";
-  keymap[SDLK_COMMA] = ",";
+  keymap[SDLK_BACKSPACE] = "backspace";
+  keymap[SDLK_TAB] = "tab";
+  keymap[SDLK_CLEAR] = "clear";
+  keymap[SDLK_RETURN] = "return";
+  keymap[SDLK_PAUSE] = "pause";
+  keymap[SDLK_ESCAPE] = "escape";
+  keymap[SDLK_SPACE] = "space";
+  keymap[SDLK_EXCLAIM] = "exclaim";
+  keymap[SDLK_QUOTEDBL] = "dbl_quote";
+  keymap[SDLK_HASH] = "hash";
+  keymap[SDLK_DOLLAR] = "dollar";
+  keymap[SDLK_AMPERSAND] = "ampersand";
+  keymap[SDLK_QUOTE] = "quote";
+  keymap[SDLK_LEFTPAREN] = "left_paren";
+  keymap[SDLK_RIGHTPAREN] = "right_paren";
+  keymap[SDLK_ASTERISK] = "asterisk";
+  keymap[SDLK_PLUS] = "plus";
+  keymap[SDLK_COMMA] = "comma";
   keymap[SDLK_MINUS] = "-";
-  keymap[SDLK_PERIOD] = ".";
-  keymap[SDLK_SLASH] = "/";
+  keymap[SDLK_PERIOD] = "period";
+  keymap[SDLK_SLASH] = "slash";
   keymap[SDLK_0] = "0";
   keymap[SDLK_1] = "1";
   keymap[SDLK_2] = "2";
@@ -55,19 +56,19 @@ void Bindings::initKeyMap() {
   keymap[SDLK_7] = "7";
   keymap[SDLK_8] = "8";
   keymap[SDLK_9] = "9";
-  keymap[SDLK_COLON] = ":";
-  keymap[SDLK_SEMICOLON] = ";";
-  keymap[SDLK_LESS] = "<";
-  keymap[SDLK_EQUALS] = "{EQUALS}";
-  keymap[SDLK_GREATER] = ">";
-  keymap[SDLK_QUESTION] = "?";
-  keymap[SDLK_AT] = "@";
-  keymap[SDLK_LEFTBRACKET] = "{LEFT_BRACE}";
-  keymap[SDLK_BACKSLASH] = "\\";
-  keymap[SDLK_RIGHTBRACKET] = "{RIGHT_BRACE}";
-  keymap[SDLK_CARET] = "|";
+  keymap[SDLK_COLON] = "colon";
+  keymap[SDLK_SEMICOLON] = "semi_colon";
+  keymap[SDLK_LESS] = "less_than";
+  keymap[SDLK_EQUALS] = "equals";
+  keymap[SDLK_GREATER] = "greater_then";
+  keymap[SDLK_QUESTION] = "question";
+  keymap[SDLK_AT] = "at";
+  keymap[SDLK_LEFTBRACKET] = "left_brace";
+  keymap[SDLK_BACKSLASH] = "backslash";
+  keymap[SDLK_RIGHTBRACKET] = "right_brace";
+  keymap[SDLK_CARET] = "caret";
   keymap[SDLK_UNDERSCORE] = "_";
-  keymap[SDLK_BACKQUOTE] = "{BACKQUOTE}";
+  keymap[SDLK_BACKQUOTE] = "backquote";
   keymap[SDLK_a] = "a";
   keymap[SDLK_b] = "b";
   keymap[SDLK_c] = "c";
@@ -94,75 +95,74 @@ void Bindings::initKeyMap() {
   keymap[SDLK_x] = "x";
   keymap[SDLK_y] = "y";
   keymap[SDLK_z] = "z";
-  keymap[SDLK_DELETE] = "{DELETE}";
-  keymap[SDLK_KP0] = "{KP_0}";
-  keymap[SDLK_KP1] = "{KP_1}";
-  keymap[SDLK_KP2] = "{KP_2}";
-  keymap[SDLK_KP3] = "{KP_3}";
-  keymap[SDLK_KP4] = "{KP_4}";
-  keymap[SDLK_KP5] = "{KP_5}";
-  keymap[SDLK_KP6] = "{KP_6}";
-  keymap[SDLK_KP7] = "{KP_7}";
-  keymap[SDLK_KP8] = "{KP_8}";
-  keymap[SDLK_KP9] = "{KP_9}";
-  keymap[SDLK_KP_PERIOD] = "{KP_PERIOD}";
-  keymap[SDLK_KP_DIVIDE] = "{KP_DIVIDE}";
-  keymap[SDLK_KP_MULTIPLY] = "{KP_MULTI}";
-  keymap[SDLK_KP_MINUS] = "KP_MINUS}";
-  keymap[SDLK_KP_PLUS] = "{KP_PLUS}";
-  keymap[SDLK_KP_ENTER] = "{KP_ENTER}";
-  keymap[SDLK_KP_EQUALS] = "{KP_EQUALS}";
-  keymap[SDLK_UP] = "{UP}";
-  keymap[SDLK_DOWN] = "{DOWN}";
-  keymap[SDLK_RIGHT] = "{RIGHT}";
-  keymap[SDLK_LEFT] = "{LEFT}";
-  keymap[SDLK_INSERT] = "{INSERT}";
-  keymap[SDLK_HOME] = "{HOME}";
-  keymap[SDLK_END] = "{END}";
-  keymap[SDLK_PAGEUP] = "{PAGE_UP}";
-  keymap[SDLK_PAGEDOWN] = "{PAGE_DOWN}";
-  keymap[SDLK_F1] = "{F1}";
-  keymap[SDLK_F2] = "{F2}";
-  keymap[SDLK_F3] = "{F3}";
-  keymap[SDLK_F4] = "{F4}";
-  keymap[SDLK_F5] = "{F5}";
-  keymap[SDLK_F6] = "{F6}";
-  keymap[SDLK_F7] = "{F7}";
-  keymap[SDLK_F8] = "{F8}";
-  keymap[SDLK_F9] = "{F9}";
-  keymap[SDLK_F10] = "{F10}";
-  keymap[SDLK_F11] = "{F11}";
-  keymap[SDLK_F12] = "{F12}";
-  keymap[SDLK_F13] = "{F13}";
-  keymap[SDLK_F14] = "{F14}";
-  keymap[SDLK_F15] = "{F15}";
+  keymap[SDLK_DELETE] = "delete";
+  keymap[SDLK_KP0] = "kp_0";
+  keymap[SDLK_KP1] = "kp_1";
+  keymap[SDLK_KP2] = "kp_2";
+  keymap[SDLK_KP3] = "kp_3";
+  keymap[SDLK_KP4] = "kp_4";
+  keymap[SDLK_KP5] = "kp_5";
+  keymap[SDLK_KP6] = "kp_6";
+  keymap[SDLK_KP7] = "kp_7";
+  keymap[SDLK_KP8] = "kp_8";
+  keymap[SDLK_KP9] = "kp_9";
+  keymap[SDLK_KP_PERIOD] = "kp_period";
+  keymap[SDLK_KP_DIVIDE] = "kp_divide";
+  keymap[SDLK_KP_MULTIPLY] = "kp_multi";
+  keymap[SDLK_KP_MINUS] = "kp_minus";
+  keymap[SDLK_KP_PLUS] = "kp_plus";
+  keymap[SDLK_KP_ENTER] = "kp_enter";
+  keymap[SDLK_KP_EQUALS] = "kp_equals";
+  keymap[SDLK_UP] = "up";
+  keymap[SDLK_DOWN] = "down";
+  keymap[SDLK_RIGHT] = "right";
+  keymap[SDLK_LEFT] = "left";
+  keymap[SDLK_INSERT] = "insert";
+  keymap[SDLK_HOME] = "home";
+  keymap[SDLK_END] = "end";
+  keymap[SDLK_PAGEUP] = "page_up";
+  keymap[SDLK_PAGEDOWN] = "page_down";
+  keymap[SDLK_F1] = "f1";
+  keymap[SDLK_F2] = "f2";
+  keymap[SDLK_F3] = "f3";
+  keymap[SDLK_F4] = "f4";
+  keymap[SDLK_F5] = "f5";
+  keymap[SDLK_F6] = "f6";
+  keymap[SDLK_F7] = "f7";
+  keymap[SDLK_F8] = "f8";
+  keymap[SDLK_F9] = "f9";
+  keymap[SDLK_F10] = "f10";
+  keymap[SDLK_F11] = "f11";
+  keymap[SDLK_F12] = "f12";
+  keymap[SDLK_F13] = "f13";
+  keymap[SDLK_F14] = "f14";
+  keymap[SDLK_F15] = "f15";
 
-  keymap[SDLK_NUMLOCK] = "{NUM}";
-  keymap[SDLK_CAPSLOCK] = "{CAPS}";
-  keymap[SDLK_SCROLLOCK] = "{SRCOLL}";
-  keymap[SDLK_RSHIFT] = "{RIGHT_SHIFT}";
-  keymap[SDLK_LSHIFT] = "{LEFT_SHIFT}";
-  keymap[SDLK_RCTRL] = "{RIGHT_CRTL}";
-  keymap[SDLK_LCTRL] = "{LEFT_CTRL}";
-  keymap[SDLK_RALT] = "{RIGHT_ALT}";
-  keymap[SDLK_LALT] = "{LEFT_ALT}";
-  keymap[SDLK_RMETA] = "{RIGHT_META}";
-  keymap[SDLK_LMETA] = "{LEFT_META}";
-  keymap[SDLK_LSUPER] = "{LEFT_SUPER}";
-  keymap[SDLK_RSUPER] = "{RIGHT_SUPER}";
-  keymap[SDLK_MODE]= "{MODE}";
-  keymap[SDLK_COMPOSE] = "{COMPOSE}";
-  keymap[SDLK_PRINT] = "{PRINT}";
-  keymap[SDLK_SYSREQ] = "{SYSREQ}";
-  keymap[SDLK_BREAK] = "{BREAK}";
-  keymap[SDLK_MENU] = "{MENU}";
-  keymap[SDLK_POWER] = "{POWER}";
-  keymap[SDLK_EURO] = "{EURO}";
+  keymap[SDLK_NUMLOCK] = "num";
+  keymap[SDLK_CAPSLOCK] = "caps";
+  keymap[SDLK_SCROLLOCK] = "srcoll";
+  keymap[SDLK_RSHIFT] = "right_shift";
+  keymap[SDLK_LSHIFT] = "left_shift";
+  keymap[SDLK_RCTRL] = "right_crtl";
+  keymap[SDLK_LCTRL] = "left_ctrl";
+  keymap[SDLK_RALT] = "right_alt";
+  keymap[SDLK_LALT] = "left_alt";
+  keymap[SDLK_RMETA] = "right_meta";
+  keymap[SDLK_LMETA] = "left_meta";
+  keymap[SDLK_LSUPER] = "left_super";
+  keymap[SDLK_RSUPER] = "right_super";
+  keymap[SDLK_MODE]= "mode";
+  keymap[SDLK_COMPOSE] = "compose";
+  keymap[SDLK_PRINT] = "print";
+  keymap[SDLK_SYSREQ] = "sysreq";
+  keymap[SDLK_BREAK] = "break";
+  keymap[SDLK_MENU] = "menu";
+  keymap[SDLK_POWER] = "power";
+  keymap[SDLK_EURO] = "euro";
 }
 
 void Bindings::shutdown() {
   if (_bindings) {
-    _bindings->shutdown();
     delete _bindings;
     _bindings = NULL;
   }
@@ -174,25 +174,22 @@ void Bindings::shutdown() {
 
 void Bindings::loadBindings(const std::string &file_name) {
   // Merges key bindings file, file_name with existing contents
-  if (_bindings) _bindings->loadConfig(file_name);
+  if (_bindings){ 
+    if (!_bindings->readFromFile(file_name)) 
+      Log::writeLog(std::string("Error processing ") + file_name, Log::LOG_ERROR);
+  }
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
-void Bindings::saveBindings() {
-  // Save current key bindings to last used file name
-  if (_bindings) _bindings->saveConfig();
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
-}
 void Bindings::saveBindings(const std::string &file_name) {
   // Save current key bindings to file_name
-  if (_bindings) _bindings->saveConfig(file_name);
+  if (_bindings) _bindings->writeToFile(file_name);
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
 void Bindings::bind(std::string key, std::string command) {
   if (key.empty()) return; // Check we were sent a key
-//  if (command.empty()) command = "{UNBOUND}"; // If command is empty we are unbinding the key. Need some text to avoid empty string
-  if (_bindings) _bindings->setAttribute(key, command); // Store new binding
+  if (_bindings) _bindings->setItem("key_bindings", key, command); // Store new binding
   else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
@@ -209,7 +206,9 @@ std::string Bindings::getBinding(const std::string &key) {
   }
   if (key.empty()) return "";
   // Retrive current binding
-  std::string cmd = _bindings->getAttribute(key);
+  std::string the_key = std::string(key);
+  _bindings->clean(the_key);
+  std::string cmd = _bindings->getItem("key_bindings", the_key);
   if (cmd.empty()) { // Retrieved command should not be the empty string
 //    _bindings->setAttribute(key, "{UNBOUND}");
     return "";

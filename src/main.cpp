@@ -10,6 +10,7 @@
 
 #include "conf.h"
 #include "System.h"
+#include "Exception.h"
 
 int main(int argc, char** argv) {
   bool exit_program = false;
@@ -66,10 +67,16 @@ under certain conditions; type `show c' for details.
     std::cerr << "Error initialising Sear!" << std::endl;
     exit (1);
   }
-  sys->createWindow(false);
-  sys->setCaption(CLIENT_NAME, CLIENT_NAME);
-//  sys->setInstallDir(install_dir);
-  sys->mainLoop();
+  try {
+    sys->createWindow(false);
+    sys->setCaption(CLIENT_NAME, CLIENT_NAME);
+  //  sys->setInstallDir(install_dir);
+    sys->mainLoop();
+  } catch (Exception e) {
+    std::cerr << "Exception: " << e.getMessage() << std::endl;
+  } catch (...) {
+    std::cerr << "Unknown Exception" << std::endl;
+  }
   sys->shutdown();
   delete sys;
   exit(0);

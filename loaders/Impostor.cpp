@@ -57,9 +57,9 @@ void Impostor::shutdown() {
 void Impostor::render(bool select_mode) {
   static Render *render = System::instance()->getGraphics()->getRender();
   if (select_mode) {
-    render->switchTexture(render->requestTextureMask(_type));
+    render->switchTexture(render->requestTextureMask("impostor", _type));
   } else {
-    render->switchTexture(render->requestTexture(_type));
+    render->switchTexture(render->requestTexture("impostor", _type));
   }
   render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 

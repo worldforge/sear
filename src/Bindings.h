@@ -14,10 +14,13 @@
 #include <string>
 #include <map>
 
+// Forward Declarations
+namespace varconf {
+  class Config;
+}
+
 namespace Sear {
 
-// Forward Declarations
-class Config;
 
 class Bindings {
 public:
@@ -33,10 +36,6 @@ public:
    * Merges current bindings with those in file_name
    */ 
   static void loadBindings(const std::string &file_name);
-  /*
-   * Saves current bindings to last specified file.
-   */ 
-  static void saveBindings();
   /*
    * Saves current bindings to file_name
    */ 
@@ -63,7 +62,7 @@ protected:
   static void initKeyMap();
   
   static std::map<int, std::string> keymap; // Mapping storing associations between an SDL key id and a textual representation
-  static Config* _bindings; // Config object storing bindings
+  static varconf::Config* _bindings; // Config object storing bindings
 };
 
 } /* namespace Sear */

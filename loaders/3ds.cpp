@@ -156,7 +156,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	    material_map[std::string(f->material)] = m;
 	  }
           if (mat->texture1_map.name[0]) {
-	    int texture_id = rend->requestTexture(mat->texture1_map.name);
+	    int texture_id = rend->requestTexture("3ds", mat->texture1_map.name);
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
@@ -188,9 +188,9 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
           /* It is very likely the normals have been completely messed up by these transformations */
 	  
 	  lib3ds_vector_transform(out, M,  normalL[3 * p * i]);
-          out[0] -= d->pivot[0];
-          out[1] -= d->pivot[1];
-          out[2] -= d->pivot[2];
+//          out[0] -= d->pivot[0];
+//          out[1] -= d->pivot[1];
+//          out[2] -= d->pivot[2];
 	  lib3ds_vector_transform(&ro->normal_data[n_counter], node->matrix, out);
 	  n_counter += 3;
 

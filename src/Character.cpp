@@ -11,12 +11,12 @@
 #include <Atlas/Objects/Operation/Touch.h>
 #include <Atlas/Objects/Operation/Talk.h>
 
+#include <varconf/Config.h>
 #include <wfmath/atlasconv.h>
 #include <Eris/Connection.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
-#include "common/Config.h"
 
 #include "WorldEntity.h"
 #include "EventHandler.h"
@@ -248,29 +248,29 @@ void Character::toggleRunModifier() {
 }
 
 void Character::readConfig() {
-  std::string temp;
-  Config *general = _system->getGeneral();
+  varconf::Variable temp;
+  varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
     return;
   }
-  temp = general->getAttribute(KEY_character_walk_speed);
-  _walk_speed = (temp.empty()) ? (DEFAULT_character_walk_speed) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_character_run_speed);
-  _run_speed = (temp.empty()) ? (DEFAULT_character_run_speed) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_character_rotate_speed);
-  _rotate_speed = (temp.empty()) ? (DEFAULT_character_rotate_speed) : atof(temp.c_str());
+  temp = general->getItem("character", KEY_character_walk_speed);
+  _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
+  temp = general->getItem("character", KEY_character_run_speed);
+  _run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
+  temp = general->getItem("character", KEY_character_rotate_speed);
+  _rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
 }
 
 void Character::writeConfig() {
-  Config *general = _system->getGeneral();
+  varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
     return;
   }
-  general->setAttribute(KEY_character_walk_speed, string_fmt(_walk_speed));
-  general->setAttribute(KEY_character_run_speed, string_fmt(_run_speed));
-  general->setAttribute(KEY_character_rotate_speed, string_fmt(_rotate_speed));
+  general->setItem("character", KEY_character_walk_speed, _walk_speed);
+  general->setItem("character", KEY_character_run_speed, _run_speed);
+  general->setItem("character", KEY_character_rotate_speed, _rotate_speed);
 }
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {

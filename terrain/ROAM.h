@@ -44,7 +44,6 @@ public:
   Landscape *getLandscape() { return gLand; }
   
   float getHeight(float, float);
-  int ground_id; 
 
   void lowerDetail();
   void raiseDetail();
@@ -67,8 +66,7 @@ protected:
   static const char * const KEY_water_level = "terrain_water_level";
   static const char * const KEY_height = "terrain_height";
   
-  static const char * const KEY_height_map = "Height_Map";
-  static const char * const KEY_ground_texture = "terrain_grass";
+  static const char * const KEY_height_map = "height_map";
   static const char * const KEY_terrain_scale = "terrain_scale";
   
   void render();

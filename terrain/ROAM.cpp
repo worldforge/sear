@@ -4,9 +4,9 @@
 
 #include <string>
 
+#include <varconf/Config.h>
 #include "common/Utility.h"
 #include "common/Log.h"
-#include "common/Config.h"
 
 #include "src/Render.h"
 #include "src/System.h"
@@ -20,8 +20,6 @@ float ROAM::_water_level = 0.0f;
 
 bool ROAM::init() {
   readConfig();
-  std::string groundTexture = System::instance()->getTexture()->getAttribute(KEY_ground_texture);
-  ground_id = _renderer->requestMipMap(groundTexture);
   loadHeightMap();
   gLand = new Landscape(_renderer, this);
   if (hMap) {
@@ -61,7 +59,7 @@ void ROAM::loadHeightMap() {
   int i, x, y;
   hMap = NULL;
   SDL_Surface *terrain = NULL;
-  std::string hmap = _system->getGeneral()->getAttribute(KEY_height_map);
+  std::string hmap = _system->getGeneral()->getItem("terrain", KEY_height_map);
   
   terrain = IMG_Load(hmap.c_str());
   if (terrain == NULL) {
@@ -107,32 +105,32 @@ float ROAM::getHeight(float x, float y) {
 
 
 void ROAM::readConfig() {
-  std::string temp;
-  Config *general = System::instance()->getGeneral();
+  varconf::Variable temp;
+  varconf::Config *general = System::instance()->getGeneral();
   if (!general) {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
   }
-  temp = general->getAttribute(KEY_height);
-  _height = (temp.empty()) ? (DEFAULT_height) : (atoi(temp.c_str()));
+  temp = general->getItem("terrain", KEY_height);
+  _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
 
-  temp = general->getAttribute(KEY_water_level);
-  _water_level = (temp.empty()) ? (DEFAULT_water_level) : (atof(temp.c_str()));
+  temp = general->getItem("terrain", KEY_water_level);
+  _water_level = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
 
-  temp = general->getAttribute(KEY_terrain_scale);
-  _terrain_scale = (temp.empty()) ? (DEFAULT_terrain_scale) : (atof(temp.c_str()));
+  temp = general->getItem("terrain", KEY_terrain_scale);
+  _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
 }
 
 void ROAM::writeConfig() {
   Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
-  Config *general = System::instance()->getGeneral();
+  varconf::Config *general = System::instance()->getGeneral();
   if (!general) {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
   }
-  general->setAttribute(KEY_height, string_fmt(_height));
-  general->setAttribute(KEY_water_level, string_fmt(_water_level));
-  general->setAttribute(KEY_terrain_scale, string_fmt(_terrain_scale));
+  general->setItem("terrain", KEY_height, _height);
+  general->setItem("terrain", KEY_water_level, _water_level);
+  general->setItem("terrain", KEY_terrain_scale, _terrain_scale);
 }
 
 void ROAM::lowerDetail() { 

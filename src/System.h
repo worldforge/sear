@@ -9,8 +9,13 @@
 #include <list>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <sigc++/object_slot.h>
 
 #include "ConsoleObject.h"
+
+namespace varconf {
+  class Config;
+}
 
 namespace Sear {
 
@@ -20,7 +25,6 @@ class EventHandler;
 class ModelHandler;
 class ObjectLoader;
 class StateLoader;
-class Config;
 class Console;
 class Character;
 class Graphics;
@@ -39,7 +43,7 @@ typedef enum {
 
 
 
-class System : public ConsoleObject{
+class System : public ConsoleObject, public SigC::Object{
 public:
   System();
   ~System();
@@ -75,9 +79,9 @@ public:
 //  Render *getRenderer() const { return renderer; }
   Graphics *getGraphics() const { return _graphics; }
   
-  Config *getGeneral() { return _general; }
-  Config *getTexture() { return _textures; }
-  Config *getModel() { return _models; } 
+  varconf::Config *getGeneral() { return _general; }
+  varconf::Config *getTexture() { return _textures; }
+  varconf::Config *getModel() { return _models; } 
   ObjectLoader *getObjectLoader() { return _ol; }
   StateLoader *getStateLoader() { return _sl; }
   EventHandler *getEventHandler() { return _event_handler; }
@@ -114,10 +118,7 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-#ifdef COLOUR_CURSOR_TEST
-  int getXPos() { return _x_pos;}
-  int getYPos() { return _y_pos;}
-#endif
+
 protected:
   bool repeat; 
   int action;
@@ -153,9 +154,9 @@ protected:
   static const std::string STARTUP_SCRIPT;
   static const std::string SHUTDOWN_SCRIPT;
  
-  Config *_general;
-  Config *_textures;
-  Config *_models;
+  varconf::Config *_general;
+  varconf::Config *_textures;
+  varconf::Config *_models;
   Console *_console;
   Character *_character;
  
@@ -169,7 +170,7 @@ protected:
   static const char * const KEY_minutes_per_hour = "minutes_per_hour";
   static const char * const KEY_hours_per_day = "hours_per_day";
   
-  static const char * const KEY_icon_file = "IconFile";
+  static const char * const KEY_icon_file = "iconfile";
   static const char * const KEY_mouse_move_select = "mouse_move_select";
   
   static const char * const KEY_dawn_time = "dawn_time";
@@ -215,9 +216,19 @@ protected:
   float _dusk_time;
   float _night_time;
   TimeArea _time_area;
-#ifdef COLOUR_CURSOR_TEST  
-  int _x_pos, _y_pos;
-#endif
+
+  typedef struct {
+    const char *section;
+    const char *key;
+    varconf::Config *config;
+  } VarconfRecord;
+
+  std::list<VarconfRecord*> record_list;
+  bool _process_records;
+  void processRecords();
+public:
+  void varconf_callback(const std::string &, const std::string &, varconf::Config &);
+  
 private:
   bool _systemState[SYS_LAST_STATE];
   bool _system_running;

@@ -4,7 +4,8 @@
 
 #include <string>
 
-#include "common/Config.h"
+#include <varconf/Config.h>
+
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -58,50 +59,50 @@ void Camera::rotate (int dir) { _rotation_dir += dir; }
 void Camera::elevate  (int dir) { _elevation_dir += dir; }
 
 void Camera::readConfig() {
-  std::string temp;
-  Config *general = System::instance()->getGeneral();
+  varconf::Variable temp;
+  varconf::Config *general = System::instance()->getGeneral();
   if (!general) {
     Log::writeLog("Camera: Error - General config object not created!", Log::LOG_ERROR);
     return;
   }
   
-  temp = general->getAttribute(KEY_camera_distance);
-  _distance = (temp.empty()) ? (DEFAULT_camera_distance) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_camera_rotation);
-  _rotation = (temp.empty()) ? (DEFAULT_camera_rotation) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_camera_elevation);
-  _elevation = (temp.empty()) ? (DEFAULT_camera_elevation) : atof(temp.c_str());
+  temp = general->getItem("camera", KEY_camera_distance);
+  _distance = (!temp.is_double()) ? (DEFAULT_camera_distance) : ((double)(temp));
+  temp = general->getItem("camera", KEY_camera_rotation);
+  _rotation = (!temp.is_double()) ? (DEFAULT_camera_rotation) : ((double)(temp));
+  temp = general->getItem("camera", KEY_camera_elevation);
+  _elevation = (!temp.is_double()) ? (DEFAULT_camera_elevation) : ((double)(temp));
   
-  temp = general->getAttribute(KEY_camera_zoom_speed);
-  _zoom_speed = (temp.empty()) ? (DEFAULT_camera_zoom_speed) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_camera_rotation_speed);
-  _rotation_speed = (temp.empty()) ? (DEFAULT_camera_rotation_speed) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_camera_elevation_speed);
-  _elevation_speed = (temp.empty()) ? (DEFAULT_camera_elevation_speed) : atof(temp.c_str());
+  temp = general->getItem("camera", KEY_camera_zoom_speed);
+  _zoom_speed = (!temp.is_double()) ? (DEFAULT_camera_zoom_speed) : ((double)(temp));
+  temp = general->getItem("camera", KEY_camera_rotation_speed);
+  _rotation_speed = (!temp.is_double()) ? (DEFAULT_camera_rotation_speed) : ((double)(temp));
+  temp = general->getItem("camera", KEY_camera_elevation_speed);
+  _elevation_speed = (!temp.is_double()) ? (DEFAULT_camera_elevation_speed) : ((double)(temp));
   
-  temp = general->getAttribute(KEY_camera_min_distance);
-  _min_distance = (temp.empty()) ? (DEFAULT_camera_min_distance) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_camera_max_distance);
-  _max_distance = (temp.empty()) ? (DEFAULT_camera_max_distance) : atof(temp.c_str());
+  temp = general->getItem("camera", KEY_camera_min_distance);
+  _min_distance = (!temp.is_double()) ? (DEFAULT_camera_min_distance) : ((double)(temp));
+  temp = general->getItem("camera", KEY_camera_max_distance);
+  _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
 }
 
 void Camera::writeConfig() {
-  Config *general = System::instance()->getGeneral();
+  varconf::Config *general = System::instance()->getGeneral();
   if (!general) {
     Log::writeLog("Camera: Error - General config object not created!", Log::LOG_ERROR);
     return;
   }
 
-  general->setAttribute(KEY_camera_distance, string_fmt(_distance));
-  general->setAttribute(KEY_camera_rotation, string_fmt(_rotation));
-  general->setAttribute(KEY_camera_elevation, string_fmt(_elevation));
+  general->setItem("camera", KEY_camera_distance, _distance);
+  general->setItem("camera", KEY_camera_rotation, _rotation);
+  general->setItem("camera", KEY_camera_elevation, _elevation);
 
-  general->setAttribute(KEY_camera_zoom_speed, string_fmt(_zoom_speed));
-  general->setAttribute(KEY_camera_rotation_speed, string_fmt(_rotation_speed));
-  general->setAttribute(KEY_camera_elevation_speed, string_fmt(_elevation_speed));
+  general->setItem("camera", KEY_camera_zoom_speed, _zoom_speed);
+  general->setItem("camera", KEY_camera_rotation_speed, _rotation_speed);
+  general->setItem("camera", KEY_camera_elevation_speed, _elevation_speed);
   
-  general->setAttribute(KEY_camera_min_distance, string_fmt(_min_distance));
-  general->setAttribute(KEY_camera_max_distance, string_fmt(_max_distance));
+  general->setItem("camera", KEY_camera_min_distance, _min_distance);
+  general->setItem("camera", KEY_camera_max_distance, _max_distance);
 }
 
 void Camera::registerCommands(Console *console) {

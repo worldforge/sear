@@ -72,8 +72,8 @@ typedef std::list<WorldEntity*> Queue;
   
   virtual float getLightLevel() =0;
   
-  virtual int requestTexture(const std::string&, bool clamp = false) =0;
-  virtual int requestMipMap(const std::string &, bool clamp = false) =0;
+  virtual int requestTexture(const std::string &section, const std::string &texture, bool clamp = false) =0;
+  virtual int requestMipMap(const std::string &section, const std::string &texture, bool clamp = false) =0;
   virtual void buildColourSet() =0;
   virtual unsigned int getTextureID(int texture_id)=0;
 //  virtual void drawScene(const std::string &,bool, float) =0;
@@ -103,7 +103,7 @@ typedef std::list<WorldEntity*> Queue;
   virtual void readConfig() =0;
   virtual void writeConfig() =0;
 
-  virtual int requestTextureMask(const std::string&, bool clamp = false) =0;
+  virtual int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
   virtual void createTextureMask(SDL_Surface*, unsigned int, bool) =0;
   
   virtual void translateObject(float x, float y, float z) =0;

@@ -27,16 +27,16 @@ Model *NPlane_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std
   NPlane *model = new NPlane();
 
   std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("nplane_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture("nplane", type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("nplane_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture("nplane", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(std::string("nplane_") + type, op->num_planes, op->width, op->height);
+  model->init(type, op->num_planes, op->width, op->height);
   model->setInUse(true);
   return model;
 }

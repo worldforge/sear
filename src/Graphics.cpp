@@ -2,12 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include <varconf/Config.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
-#include "common/Config.h"
 #include "common/Log.h"
 #include "common/Utility.h"
 
@@ -66,17 +66,26 @@ void Graphics::init() {
 void Graphics::shutdown() {
   writeConfig();
 
+  if (_renderer) {
+    _renderer->shutdown();
+    delete _renderer;
+    _renderer = NULL;
+  }
+    
   if (_terrain) {
     _terrain->shutdown();
     delete _terrain;
+    _terrain = NULL;
   }
   if (_sky) {
     _sky->shutdown();
     delete _sky;
+    _sky = NULL;
   }
   if (_camera) {
     _camera->shutdown();
     delete _camera;
+    _camera = NULL;
   }
 }
 
@@ -190,8 +199,8 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
 }
 
 void Graphics::readConfig() {
-  std::string temp;
-  Config *general = _system->getGeneral();
+  varconf::Variable temp;
+  varconf::Config *general = _system->getGeneral();
   Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
   if (!general) {
     Log::writeLog("Graphics: Error - General config object does not exist!", Log::LOG_ERROR);
@@ -199,23 +208,23 @@ void Graphics::readConfig() {
   }
 
   // Setup frame rate detail boundaries
-  temp = general->getAttribute(KEY_lower_frame_rate_bound);
-  _lower_frame_rate_bound = (temp.empty()) ? (DEFAULT_lower_frame_rate_bound) : atof(temp.c_str());
-  temp = general->getAttribute(KEY_upper_frame_rate_bound);
-  _upper_frame_rate_bound = (temp.empty()) ? (DEFAULT_upper_frame_rate_bound) : atof(temp.c_str());
+  temp = general->getItem("graphics", KEY_lower_frame_rate_bound);
+  _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
+  temp = general->getItem("graphics", KEY_upper_frame_rate_bound);
+  _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
   
 }  
 
 void Graphics::writeConfig() {
-  Config *general = _system->getGeneral();
+  varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("Graphics: Error - General config object does not exist!", Log::LOG_ERROR);
     return;
   }
   
   // Save frame rate detail boundaries
-  general->setAttribute(KEY_lower_frame_rate_bound, string_fmt(_lower_frame_rate_bound));
-  general->setAttribute(KEY_upper_frame_rate_bound, string_fmt(_upper_frame_rate_bound));
+  general->setItem("graphics", KEY_lower_frame_rate_bound, _lower_frame_rate_bound);
+  general->setItem("graphics", KEY_upper_frame_rate_bound, _upper_frame_rate_bound);
 }  
 
 void Graphics::readComponentConfig() {

@@ -36,16 +36,16 @@ Model *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const s
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
   std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("boundbox_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture("boundbox", type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("boundbox_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture("boundbox_", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(bboxCheck(bbox), std::string("boundbox_") + type, op->wrap_texture);
+  model->init(bboxCheck(bbox), type, op->wrap_texture);
   model->setInUse(true);
   model->setFlag("outline", op->outline);
   return model;

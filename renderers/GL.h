@@ -47,9 +47,9 @@ public:
   void print3D(const char* string, int set);
   inline void newLine();
 
-  int requestTexture(const std::string&, bool clamp = false);
-  int requestMipMap(const std::string &, bool clamp = false);
-  int requestTextureMask(const std::string&, bool clamp = false);
+  int requestTexture(const std::string &section, const std::string &texture, bool clamp = false);
+  int requestMipMap(const std::string &section, const std::string &texture, bool clamp = false);
+  int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false);
   void createTexture(SDL_Surface*, unsigned int, bool);
   void createMipMap(SDL_Surface*, unsigned int, bool);
   void createTextureMask(SDL_Surface*, unsigned int, bool);

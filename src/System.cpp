@@ -7,11 +7,12 @@
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sigc++/slot.h>
 
+#include <varconf/varconf.h>
 #include <Eris/Types.h>
 
 #include "common/Log.h"
-#include "common/Config.h"
 #include "common/Utility.h"
 
 #include "Bindings.h"
@@ -102,9 +103,13 @@ bool System::init() {
   _sl = new StateLoader();
   _sl->init();
   
-  _general = new Config();
-  _textures = new Config();
-  _models = new Config();
+  _general = new varconf::Config();
+  _textures = new varconf::Config();
+  _models = new varconf::Config();
+
+  _general->sigsv.connect(SigC::slot(this, &System::varconf_callback));
+  _textures->sigsv.connect(SigC::slot(this, &System::varconf_callback));
+  _models->sigsv.connect(SigC::slot(this, &System::varconf_callback));
   
   Bindings::init();
   
@@ -159,10 +164,12 @@ void System::shutdown() {
     delete _ol;
     _ol = NULL;
   }
-  if (renderer) {
-    renderer->shutdown();
-    delete renderer;
-    renderer = NULL;
+  if (_graphics) {
+    _graphics->writeConfig();
+    _graphics->writeComponentConfig();
+    _graphics->shutdown();
+    delete _graphics;
+    _graphics = NULL;
   }
 
   writeConfig();
@@ -178,17 +185,17 @@ void System::shutdown() {
   Bindings::shutdown();
 
   if (_general) {
-    _general->shutdown();
+//    _general->shutdown();
     delete _general;
     _general = NULL;
   }	  
   if (_textures) {
-    _textures->shutdown();
+//    _textures->shutdown();
     delete _textures;
     _textures = NULL;
   }	  
   if (_models) {
-    _models->shutdown();
+//    _models->shutdown();
     delete _models;
     _models = NULL;
   }	  
@@ -253,6 +260,12 @@ void System::createWindow(bool fullscreen) {
   int bpp = 0;
   bpp = info->vfmt->BitsPerPixel;
   if (fullscreen) flags |= SDL_FULLSCREEN;
+  if (!(_width && _height)) {
+    Log::writeLog(std::string("Invalid resolution: ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_ERROR);
+    _system_running = false;
+    exit(1);
+  }
+  Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
   screen = SDL_SetVideoMode(_width, _height, 0, flags);
   if (screen == NULL ) {
     Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
@@ -272,7 +285,7 @@ void System::createWindow(bool fullscreen) {
   Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
 
-  if (value < 1) _general->setAttribute("render_use_stencil", "false");
+  if (value < 1) _general->setItem("render_options", "use_stencil_buffer", false);
   
   Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
@@ -381,14 +394,6 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     } 
     case SDL_KEYDOWN: {
-//      if (Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)) == CMD_TOGGLE_CONSOLE) {
-//        _console->toggleConsole();
-//  	if (_console->consoleStatus()) {
-//	  }else {	  
-//	  }
-//        command = "";
-//	break;
-//      }
      // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
         if (!repeat) {
@@ -398,14 +403,12 @@ void System::handleEvents(const SDL_Event &event) {
 	}
 	if (event.key.keysym.sym == SDLK_UP) {
           // Previous command
-//	  Log::writeLog("Previous Command", Log::LOG_INFO);
 	  if (_command_history_iterator != _command_history.begin()) {
 	    _command_history_iterator--;
             command = (*_command_history_iterator);
 	  }
 	}
 	else if (event.key.keysym.sym == SDLK_DOWN) {
-//	  Log::writeLog("Next Command", Log::LOG_INFO);
           // next command
 	  if (_command_history_iterator != _command_history.end()) {
 	    _command_history_iterator++;
@@ -609,37 +612,38 @@ void System::setCharacter(Character *character) {
 }
 
 void System::readConfig() {
-  std::string temp;
+  varconf::Variable temp;
   if (!_general) {
     Log::writeLog("System: Error - General config object not created", Log::LOG_ERROR);
     return;
   }
-  temp = _general->getAttribute(KEY_dawn_time);
-  _dawn_time = (temp.empty()) ? (DEFAULT_dawn_time) : (atof(temp.c_str()));
-  temp = _general->getAttribute(KEY_day_time);
-  _day_time = (temp.empty()) ? (DEFAULT_day_time) : (atof(temp.c_str()));
-  temp = _general->getAttribute(KEY_dusk_time);
-  _dusk_time = (temp.empty()) ? (DEFAULT_dusk_time) : (atof(temp.c_str()));
-  temp = _general->getAttribute(KEY_night_time);
-  _night_time = (temp.empty()) ? (DEFAULT_night_time) : (atof(temp.c_str()));
+  temp = _general->getItem("general", KEY_dawn_time);
+  _dawn_time = (!temp.is_double()) ? (DEFAULT_dawn_time) : ((double)temp);
+  temp = _general->getItem("general", KEY_day_time);
+  _day_time = (!temp.is_double()) ? (DEFAULT_day_time) : ((double)temp);
+  temp = _general->getItem("general", KEY_dusk_time);
+  _dusk_time = (!temp.is_double()) ? (DEFAULT_dusk_time) : ((double)temp);
+  temp = _general->getItem("general", KEY_night_time);
+  _night_time = (!temp.is_double()) ? (DEFAULT_night_time) : ((double)temp);
 
-  temp = _general->getAttribute(KEY_seconds_per_minute);
-  _seconds_per_minute = (temp.empty()) ? (DEFAULT_seconds_per_minute) : (atof(temp.c_str()));
-  temp = _general->getAttribute(KEY_minutes_per_hour);
-  _minutes_per_hour = (temp.empty()) ? (DEFAULT_minutes_per_hour) : (atof(temp.c_str()));
-  temp = _general->getAttribute(KEY_hours_per_day);
-  _hours_per_day = (temp.empty()) ? (DEFAULT_hours_per_day) : (atof(temp.c_str()));
+  temp = _general->getItem("general", KEY_seconds_per_minute);
+  _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
+  temp = _general->getItem("general", KEY_minutes_per_hour);
+  _minutes_per_hour = (!temp.is_double()) ? (DEFAULT_minutes_per_hour) : ((double)temp);
+  temp = _general->getItem("general", KEY_hours_per_day);
+  _hours_per_day = (!temp.is_double()) ? (DEFAULT_hours_per_day) : ((double)temp);
 
   _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
   
-  _icon_file = _general->getAttribute(KEY_icon_file);
-  temp = _general->getAttribute(KEY_mouse_move_select);
-  _mouse_move_select =  (temp.empty()) ? (DEFAULT_mouse_move_select) : (temp == "true");
+  _icon_file = _general->getItem("general", KEY_icon_file);
+  
+  temp = _general->getItem("general", KEY_mouse_move_select);
+  _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
 
-  temp = _general->getAttribute(KEY_window_width);
-  _width = (temp.empty()) ? (DEFAULT_window_width) : (atoi(temp.c_str()));
-  temp = _general->getAttribute(KEY_window_height);
-  _height = (temp.empty()) ? (DEFAULT_window_height) : (atoi(temp.c_str()));
+  temp = _general->getItem("general", KEY_window_width);
+  _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
+  temp = _general->getItem("general", KEY_window_height);
+  _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
 }
 
 void System::writeConfig() {
@@ -647,19 +651,19 @@ void System::writeConfig() {
     Log::writeLog("System: Error- General config object not created", Log::LOG_ERROR);
     return;
   }
-  _general->setAttribute(KEY_dawn_time, string_fmt(_dawn_time));
-  _general->setAttribute(KEY_day_time, string_fmt(_day_time));
-  _general->setAttribute(KEY_dusk_time, string_fmt(_dusk_time));
-  _general->setAttribute(KEY_night_time, string_fmt(_night_time));
+  _general->setItem("general", KEY_dawn_time, _dawn_time);
+  _general->setItem("general", KEY_day_time, _day_time);
+  _general->setItem("general", KEY_dusk_time, _dusk_time);
+  _general->setItem("general", KEY_night_time, _night_time);
   
-  _general->setAttribute(KEY_seconds_per_minute, string_fmt(_seconds_per_minute));
-  _general->setAttribute(KEY_minutes_per_hour, string_fmt(_minutes_per_hour));
-  _general->setAttribute(KEY_hours_per_day, string_fmt(_hours_per_day));
+  _general->setItem("general", KEY_seconds_per_minute, _seconds_per_minute);
+  _general->setItem("general", KEY_minutes_per_hour, _minutes_per_hour);
+  _general->setItem("general", KEY_hours_per_day, _hours_per_day);
   
-  _general->setAttribute(KEY_mouse_move_select,  (_mouse_move_select) ? ("true") : ("false"));
+  _general->setItem("general", KEY_mouse_move_select,  _mouse_move_select);
 
-  _general->setAttribute(KEY_window_width, string_fmt(_width));
-  _general->setAttribute(KEY_window_height, string_fmt(_height));
+  _general->setItem("general", KEY_window_width, _width);
+  _general->setItem("general", KEY_window_height, _height);
   
 }
 
@@ -754,12 +758,15 @@ void System::runCommand(const std::string &command, const std::string &args) {
   tokeniser.initTokens(args);
   if (command == EXIT || command == QUIT) _system_running = false;
   else if (command == GET_ATTRIBUTE) {
-    if (_general) pushMessage(_general->getAttribute(args), CONSOLE_MESSAGE);
+    std::string section = tokeniser.nextToken();
+    std::string key = tokeniser.remainingTokens();
+    if (_general) pushMessage(_general->getItem(section, key), CONSOLE_MESSAGE);
   }
   else if (command == SET_ATTRIBUTE) {
+    std::string section = tokeniser.nextToken();
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
-    if (_general) _general->setAttribute(key, value);
+    if (_general) _general->setItem(section, key, value);
   }
   else if (command == CHANGE_DIRECTORY) {
     if (args.empty()) return;
@@ -775,28 +782,45 @@ void System::runCommand(const std::string &command, const std::string &args) {
     if (_sl) _sl->readFiles(processHome(args));
   }
   else if (command == LOAD_GENERAL_CONFIG) {
-    if (_general) _general->loadConfig(processHome(args));
-    else cout << "ARG" << endl;
+    if (_general) {
+      _process_records = _prefix_cwd;
+      _general->readFromFile(processHome(args));
+      if (_process_records) {
+	_process_records = false;
+        processRecords();
+      }
+    }
   }
   else if (command == LOAD_TEXTURE_CONFIG) {
-    if (_textures) _textures->loadConfig(processHome(args), _prefix_cwd);
-    else cout << "ARG" << endl;
+    if (_textures) {
+      _process_records = _prefix_cwd;
+      _textures->readFromFile(processHome(args));
+      if (_process_records) {
+	_process_records = false;
+        processRecords();
+      }
+    }
   }
   else if (command == LOAD_MODEL_CONFIG) {
-    if (_models) _models->loadConfig(processHome(args));
+    if (_models) {
+      _process_records = _prefix_cwd;
+      _models->readFromFile(processHome(args));
+      if (_process_records) {
+	_process_records = false;
+        processRecords();
+      }
+    }
   }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(processHome(args));
   }
   else if (command == SAVE_GENERAL_CONFIG) {
     if (_general) {
-      if (args.empty()) _general->saveConfig();
-      else _general->saveConfig(processHome(args));
+      _general->writeToFile(processHome(args));
     }
   }
   else if (command == SAVE_KEY_BINDINGS) {
-    if (args.empty()) Bindings::saveBindings();
-    else Bindings::saveBindings(processHome(args));
+    Bindings::saveBindings(processHome(args));
   }
   else if (command == READ_CONFIG) {
     readConfig();
@@ -832,6 +856,36 @@ void System::runCommand(const std::string &command, const std::string &args) {
     if (we) we->displayInfo();  
   }
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
+}
+
+void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  if (_process_records && _prefix_cwd) {
+    varconf::Variable v = config.getItem(section, key);
+    if (v.is_string()) {
+      VarconfRecord *r = (VarconfRecord*)malloc(sizeof(VarconfRecord));
+      r->section = (const char *)malloc(section.size() * sizeof(char) + 1);
+      strcpy((char*)r->section, section.c_str()); 
+      r->key = (const char *)malloc(key.size() * sizeof(char) + 1);
+      strcpy((char*)r->key, key.c_str()); 
+//      r->key = key.c_str();
+      r->config = &config;
+      record_list.push_back(r);
+    }
+  }
+}
+
+void System::processRecords() {
+  while (!record_list.empty()) {
+    VarconfRecord *r = *record_list.begin();
+    std::string value = r->config->getItem(r->section, r->key);
+    char cwd[256];
+    memset(cwd, '\0', 256);
+    getcwd(cwd, 255);
+    std::string val = std::string(cwd) + "/" + std::string(value);
+    r->config->setItem(r->section, r->key, val);
+    free(r);
+    record_list.erase(record_list.begin());
+  }
 }
 
 } /* namespace Sear */

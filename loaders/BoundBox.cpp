@@ -145,7 +145,7 @@ void BoundBox::render(bool select_mode) {
   if (select_mode) {
     render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
   } else {
-    render->switchTexture(render->requestTexture(_type));
+    render->switchTexture(render->requestTexture("boundbox", _type));
     render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   }
 }

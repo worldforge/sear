@@ -28,16 +28,16 @@ Model *BillBoard_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
   BillBoard *model = new BillBoard();
 
   std::string type = we->type();
-  int id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("billboard_") + type);
+  int id = System::instance()->getGraphics()->getRender()->requestTexture("billboard", type);
   if (id == -1) {
     type = we->parent();
-    id = System::instance()->getGraphics()->getRender()->requestTexture(std::string("billboard_") + type);
+    id = System::instance()->getGraphics()->getRender()->requestTexture("billboard", type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(std::string("billboard_") + type, op->width, op->height);
+  model->init(type, op->width, op->height);
   model->setInUse(true);
   return model;
 }

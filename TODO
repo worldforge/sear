@@ -1,10 +1,20 @@
- * Allow 3ds models to be selected 
+ * Allow console to be opened even if not key bindings have been loaded
+
+ * Setup system to update values as varconf values update
+  - Every object that uses a varconf object could connect a callback to the object.
+
+ * Allow general varconf object to parse command line.
+
+ * Convert Object Loader and State Loader to use varconf. Requires being able to specify an array in the config file. File format will use the state or object name as the section heading.
 
  * Add support for OpenGL extensions
  
  * Fix lighting
+  - 3ds normals are wonky.
+  - Check  whole system lighting model.
   
  * Add ability to specify search paths for default file locations 
+  - This should be done by config files and/or command line args
 
  * Add ability to tokenise on quotes, not just spaces
 

@@ -12,19 +12,19 @@
 // defines for Config key values
 
 #define CONFIG_SKYDIST "SkyDist"
-#define CONFIG_SKY_DAY_NORTH   "skybox_day_north"
-#define CONFIG_SKY_DAY_EAST    "skybox_day_east"
-#define CONFIG_SKY_DAY_SOUTH   "skybox_day_south"
-#define CONFIG_SKY_DAY_WEST    "skybox_day_west"
-#define CONFIG_SKY_DAY_TOP     "skybox_day_top"
-#define CONFIG_SKY_DAY_BOTTOM  "skybox_day_bottom"
+#define CONFIG_SKY_DAY_NORTH   "day_north"
+#define CONFIG_SKY_DAY_EAST    "day_east"
+#define CONFIG_SKY_DAY_SOUTH   "day_south"
+#define CONFIG_SKY_DAY_WEST    "day_west"
+#define CONFIG_SKY_DAY_TOP     "day_top"
+#define CONFIG_SKY_DAY_BOTTOM  "day_bottom"
 
-#define CONFIG_SKY_NIGHT_NORTH   "skybox_night_north"
-#define CONFIG_SKY_NIGHT_EAST    "skybox_night_east"
-#define CONFIG_SKY_NIGHT_SOUTH   "skybox_night_south"
-#define CONFIG_SKY_NIGHT_WEST    "skybox_night_west"
-#define CONFIG_SKY_NIGHT_TOP     "skybox_night_top"
-#define CONFIG_SKY_NIGHT_BOTTOM  "skybox_night_bottom"
+#define CONFIG_SKY_NIGHT_NORTH   "night_north"
+#define CONFIG_SKY_NIGHT_EAST    "night_east"
+#define CONFIG_SKY_NIGHT_SOUTH   "night_south"
+#define CONFIG_SKY_NIGHT_WEST    "night_west"
+#define CONFIG_SKY_NIGHT_TOP     "night_top"
+#define CONFIG_SKY_NIGHT_BOTTOM  "night_bottom"
 
 // Define texture locations 
 

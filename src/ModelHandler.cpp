@@ -4,9 +4,9 @@
 
 #include <set>
 
+#include <varconf/Config.h>
 #include <Eris/TypeInfo.h>
 
-#include "common/Config.h"
 #include "common/Log.h"
 
 #include "loaders/3ds_Loader.h"
@@ -93,7 +93,7 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   std::string data_source = "";
   Model *model = NULL;
 
-  static Config *model_config = System::instance()->getModel();
+  static varconf::Config *model_config = System::instance()->getModel();
 
   object_type = we->type();
 
@@ -102,12 +102,11 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   while(!model) {
     op = ol->getObjectProperties(object_type);
     if (op) {
-      data_source = model_config->getAttribute(object_type);
+      data_source = model_config->getItem(op->model_type, object_type);
       if (op->model_by_type) {
         if (_models[object_type]) {
           model = _models[object_type];
 	  break;
-          //return _models[id];
         }
       }
       if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(we, op, data_source);
