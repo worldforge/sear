@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.26 2003-07-17 16:46:44 simon Exp $
+// $Id: Character.cpp,v 1.27 2003-09-27 13:53:19 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -224,8 +224,8 @@ void Character::updateLocals(bool send_to_server) {
 void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient) {
   assert ((_initialised == true) && "Character not initialised");	
   Atlas::Objects::Operation::Move move;
-  Atlas::Message::Object::MapType args;
-  Atlas::Message::Object::ListType vel;
+  Atlas::Message::Element::MapType args;
+  Atlas::Message::Element::ListType vel;
 //  if (!_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
@@ -238,17 +238,17 @@ void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient)
   args[ORIENTATION] = orient.toAtlas();
   args[LOC] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
   args[ID] = _self->getID();
-  move.SetFrom(_self->getID());
-  move.SetSerialno(Eris::getNewSerialno());
-  move.SetArgs(Atlas::Message::Object::ListType(1, args));
+  move.setFrom(_self->getID());
+  move.setSerialno(Eris::getNewSerialno());
+  move.setArgs(Atlas::Message::Element::ListType(1, args));
   Eris::Connection::Instance()->send(move);
 }
 
 void Character::getEntity(const std::string &id) {
   assert ((_initialised == true) && "Character not initialised");	
   Atlas::Objects::Operation::Move move;
-  Atlas::Message::Object::MapType args;
-  Atlas::Message::Object::ListType pos;
+  Atlas::Message::Element::MapType args;
+  Atlas::Message::Element::ListType pos;
 //  if (!_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
@@ -260,9 +260,9 @@ void Character::getEntity(const std::string &id) {
   args[POS] = pos;
   args[LOC] = _self->getID();
   args[ID] = id;
-  move.SetFrom(_self->getID());
-//  move.SetSerialno(Eris::getNewSerialno());
-  move.SetArgs(Atlas::Message::Object::ListType(1, args));
+  move.setFrom(_self->getID());
+//  move.setSerialno(Eris::getNewSerialno());
+  move.setArgs(Atlas::Message::Element::ListType(1, args));
   Eris::Connection::Instance()->send(move);
 }
 
@@ -281,8 +281,8 @@ void Character::dropEntity(const std::string &name, int quantity) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
       Atlas::Objects::Operation::Move move;
-      Atlas::Message::Object::MapType args;
-      Atlas::Message::Object::ListType pos;
+      Atlas::Message::Element::MapType args;
+      Atlas::Message::Element::ListType pos;
       move = Atlas::Objects::Operation::Move::Instantiate();
       pos.push_back(_self->GetPos().x());
       pos.push_back(_self->GetPos().y());
@@ -290,9 +290,9 @@ void Character::dropEntity(const std::string &name, int quantity) {
       args[POS] = pos;
       args[LOC] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
       args[ID] = we->getID();
-      move.SetFrom(_self->getID());
-//      move.SetSerialno(Eris::getNewSerialno());
-      move.SetArgs(Atlas::Message::Object::ListType(1, args));
+      move.setFrom(_self->getID());
+//      move.setSerialno(Eris::getNewSerialno());
+      move.setArgs(Atlas::Message::Element::ListType(1, args));
       Eris::Connection::Instance()->send(move);
       quantity--;
     }
@@ -303,17 +303,17 @@ void Character::touchEntity(const std::string &id) {
   assert ((_initialised == true) && "Character not initialised");
   if (id.empty()) return;	
   Atlas::Objects::Operation::Touch touch;
-  Atlas::Message::Object::MapType args;
+  Atlas::Message::Element::MapType args;
 //  if (!_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
   touch = Atlas::Objects::Operation::Touch::Instantiate();
   args[ID] = id;
-  touch.SetFrom(_self->getID());
-  touch.SetTo(id);
-  touch.SetArgs(Atlas::Message::Object::ListType(1, args));
-//  touch.SetSerialno(Eris::getNewSerialno());
+  touch.setFrom(_self->getID());
+  touch.setTo(id);
+  touch.setArgs(Atlas::Message::Element::ListType(1, args));
+//  touch.setSerialno(Eris::getNewSerialno());
   Eris::Connection::Instance()->send(touch);
 }
 
@@ -335,16 +335,16 @@ void Character::displayInventory() {
 void Character::say(const std::string &msg) {
   assert ((_initialised == true) && "Character not initialised");	
   Atlas::Objects::Operation::Talk talk;
-  Atlas::Message::Object::MapType args;
+  Atlas::Message::Element::MapType args;
 //  if (!_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
   talk =  Atlas::Objects::Operation::Talk::Instantiate();
   args[SAY] = msg;
-  talk.SetArgs(Atlas::Message::Object::ListType(1, args));
-//  talk.SetSerialno(Eris::getNewSerialno());
-  talk.SetFrom(_self->getID());
+  talk.setArgs(Atlas::Message::Element::ListType(1, args));
+//  talk.setSerialno(Eris::getNewSerialno());
+  talk.setFrom(_self->getID());
   Eris::Connection::Instance()->send(talk);
 }
 
@@ -393,8 +393,8 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
       Atlas::Objects::Operation::Move move;
-      Atlas::Message::Object::MapType args;
-      Atlas::Message::Object::ListType pos;
+      Atlas::Message::Element::MapType args;
+      Atlas::Message::Element::ListType pos;
       move = Atlas::Objects::Operation::Move::Instantiate();
       pos.push_back(_self->GetPos().x());
       pos.push_back(_self->GetPos().y());
@@ -402,9 +402,9 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
       args[POS] = pos;
       args[LOC] = target;
       args[ID] = we->getID();
-      move.SetFrom(_self->getID());
-      move.SetArgs(Atlas::Message::Object::ListType(1, args));
-//      move.SetSerialno(Eris::getNewSerialno());
+      move.setFrom(_self->getID());
+      move.setArgs(Atlas::Message::Element::ListType(1, args));
+//      move.setSerialno(Eris::getNewSerialno());
       Eris::Connection::Instance()->send(move);
       quantity--;
     }

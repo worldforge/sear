@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.47 2003-07-17 16:41:02 simon Exp $
+// $Id: client.cpp,v 1.48 2003-09-27 13:53:18 simon Exp $
 
 #include "System.h"
 
@@ -391,11 +391,11 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   Log::writeLog("Client: Creating character - Name: " + name + " Type: " + type + " Sex: " + sex + " Description: " + description, Log::LOG_DEFAULT);
   _system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
   Atlas::Objects::Entity::GameEntity ch = Atlas::Objects::Entity::GameEntity::Instantiate();
-  Atlas::Message::Object::ListType prs(1, Atlas::Message::Object(type));
-  ch.SetParents(prs);
-  ch.SetName(name);
-  ch.SetAttr("sex", sex);
-  ch.SetAttr("description", description);
+  Atlas::Message::Element::ListType prs(1, Atlas::Message::Element(type));
+  ch.setParents(prs);
+  ch.setName(name);
+  ch.setAttr("sex", sex);
+  ch.setAttr("description", description);
   Eris::World *world = NULL;
   try {
     world = _player->createCharacter(ch)->getWorld();
@@ -601,7 +601,7 @@ void Client::LogoutComplete(bool clean_logout) {
 }
 
 void Client::GotCharacterInfo(const Atlas::Objects::Entity::GameEntity& ge) {
-  Log::writeLog("Got Char - Name: " + ge.GetName() + " ID: " + ge.GetId(), Log::LOG_INFO);
+  Log::writeLog("Got Char - Name: " + ge.getName() + " ID: " + ge.getId(), Log::LOG_INFO);
 }
 
 void Client::GotAllCharacters() {
@@ -613,7 +613,7 @@ void Client::GotAllCharacters() {
   Eris::CharacterList l = _player->getCharacters();
   for (Eris::CharacterList::iterator I=l.begin(); I != l.end(); ++I) {
     Atlas::Objects::Entity::GameEntity ge = *I;
-    _system->pushMessage(ge.GetId().c_str(), CONSOLE_MESSAGE);
+    _system->pushMessage(ge.getId().c_str(), CONSOLE_MESSAGE);
   }
 }
 
