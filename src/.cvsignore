@@ -1,3 +1,7 @@
 Shapes
 Sky
 unused
+Makefile
+Makefile.in
+.deps
+.libs
