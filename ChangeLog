@@ -1,4 +1,9 @@
 7th September 2002, Simon Goodall
+ * Added support for the  GL extension: EXT_texture_filter_anisotropic
+ * Added support for the  GL extension: SGIS_generate_mipmap
+ * Added check to Cal3d destructor to make sure shutdown gets called before deletion
+
+7th September 2002, Simon Goodall
  * Changed order of configure library detection to follow dependancies
 
 6th September 2002, Simon Goodall

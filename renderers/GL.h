@@ -195,6 +195,9 @@ protected:
   inline std::string getSelectedID(unsigned int i);
   void nextColour(const std::string &id);
 
+  void setupExtensions();
+  bool use_ext_texture_filter_anisotropic;
+  bool use_sgis_generate_mipmap;
   
 private:
   // Consts

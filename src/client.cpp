@@ -243,12 +243,18 @@ int Client::login(const std::string &username, const std::string &password) {
 }
 
 void Client::poll() {
-//  try {
+  try {
 //    if (_connection != NULL) _connection->poll();
     Eris::PollDefault::poll();   
-//  } catch (...) {
-  //  Log::writeLog("Caught some error - ignoring");
-//  }
+  } catch (Eris::InvalidOperation io) {
+  Log::writeLog(io._msg, Log::LOG_ERROR);
+  } catch (Eris::BaseException be) {
+  Log::writeLog(be._msg, Log::LOG_ERROR);
+  } catch (std::runtime_error re) {
+  Log::writeLog("STD::RUNTIME ERROR", Log::LOG_ERROR);
+  } catch (...) {
+  Log::writeLog("Caught some error - ignoring", Log::LOG_ERROR);
+  }
 }
 
 void Client::NetFailure(const std::string &msg)  {

@@ -20,7 +20,11 @@ void Lobby::say(const std::string &speech) {
 }
 
 void Lobby::emote(const std::string &speech) {
+	try {
   _lobby->emote(speech);
+	} catch (...) {
+  cerr << "BUGGER" << endl;
+	}
 }
 void Lobby::sayPrivate(const std::string &speech, const std::string &to) {
   

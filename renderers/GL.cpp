@@ -42,6 +42,12 @@
 #include "src/default_font.xpm"
 
 #include "GL.h"
+// GL EXTENSIONS DEF
+#define GENERATE_MIPMAP_SGIS            0x8191
+#define GENERATE_MIPMAP_HINT_SGIS       0x8192
+
+#define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
+#define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
 
 namespace Sear {
 
@@ -187,6 +193,7 @@ void GL::initWindow(int width, int height) {
   window_height = height;
 
   setViewMode(PERSPECTIVE);
+  setupExtensions();
 }
   
 void GL::init() {
@@ -412,6 +419,11 @@ void GL::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   }
+  if (use_ext_texture_filter_anisotropic) {
+    GLfloat largest_supported_anisotropy;
+    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+  }
   glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 }
  
@@ -426,7 +438,17 @@ void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
   }
-  gluBuild2DMipmaps(GL_TEXTURE_2D, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+  if (use_ext_texture_filter_anisotropic) {
+    GLfloat largest_supported_anisotropy;
+    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+  }
+  if (use_sgis_generate_mipmap) {
+    glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+    glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+  } else {
+    gluBuild2DMipmaps(GL_TEXTURE_2D, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+  }
 }
 
 void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clamp) {
@@ -440,6 +462,11 @@ void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clam
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  }
+  if (use_ext_texture_filter_anisotropic) {
+    GLfloat largest_supported_anisotropy;
+    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   if (surface->format->BytesPerPixel == 4) {
     for (i = 0; i < surface->w * surface->h * 4; i += 4) {
@@ -470,20 +497,35 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
   }
+  if (use_ext_texture_filter_anisotropic) {
+    GLfloat largest_supported_anisotropy;
+    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+  }
   if (surface->format->BytesPerPixel == 4) {
     for (i = 0; i < surface->w * surface->h * 4; i += 4) {
       ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, surface->w, surface->h, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    if (use_sgis_generate_mipmap) {
+      glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+      glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    } else {
+      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, surface->w, surface->h, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+    }
   } else {
     for (i = 0; i < surface->w * surface->h * 3; i += 3) {
       ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    if (use_sgis_generate_mipmap) {
+      glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    } else {
+      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+    }
   }
 }
 
@@ -1262,5 +1304,40 @@ inline void GL::getFrustum(float frust[6][4]) {
     }
   }
 }
+
+void GL::setupExtensions() {
+  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
+  if (extensions.find("GL_SGIS_generate_mipmap") != std::string::npos) {
+    use_sgis_generate_mipmap = true;
+    Log::writeLog("Using GL_SGIS_generate_mipmap Extension", Log::LOG_INFO);
+  } else {
+    use_sgis_generate_mipmap = false;
+  }
+  if (extensions.find("GL_EXT_texture_filter_anisotropic") != std::string::npos) {
+    use_ext_texture_filter_anisotropic = true;
+    Log::writeLog("Using GL_EXT_texture_filter_anisotropic Extension", Log::LOG_INFO);
+  } else {
+    use_ext_texture_filter_anisotropic = false;
+  }
+  /* Example use og getting a function
   
+  typedef void (*GL_ActiveTextureARB_func)(unsigned int);
+  GL_ActiveTextureARB_Func glActiveTexture_ARB_ptr = 0;
+  bool has_multitexture = true;
+  glActiveTextureARB_ptr = (GL_ActiveTRextureARB_Func)SDL_GL_GetProcAddress("glActiveTextureARB");
+  if (!glActiveTextureARB_ptr) {
+    // Print Error message?
+    has_multitexture = false;
+  }
+  
+  */  
+
+}
+
 } /* namespace Sear */
+
+//clear up defines
+#undef GL_GENERATE_MIPMAP_SGIS
+#undef GL_GENERATE_MIPMAP_HINT_SGIS
+#undef TEXTURE_MAX_ANISOTROPY_EXT
+#undef MAX_TEXTURE_MAX_ANISOTROPY_EXT

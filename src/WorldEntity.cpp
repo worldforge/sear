@@ -39,6 +39,7 @@ WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::Wor
 WorldEntity::~WorldEntity() {}
 
 void WorldEntity::handleMove() {
+  cout << _velocity << endl;
   SetVelocity();
   WorldEntity *we = (WorldEntity*)getContainer();
   if (we != NULL) {

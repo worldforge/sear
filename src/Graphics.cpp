@@ -179,14 +179,17 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
 
 void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
   _model_handler = _system->getModelHandler();
-  we->checkActions();
+  we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
+      // Get assinged object prop	    
       ObjectProperties *op = we->getObjectProperties();
-      if (!op) {
+      if (!op) { // No op? then the model hasn't been created yet so create it
         _model_handler->getModel(_renderer, we); // Allocates a model and an ObjectProperties
-        op = we->getObjectProperties();
+        op = we->getObjectProperties(); // Obtain newly assigned op
       }
+      // Seems that sometimes the models don't get an op
+      // TODO something about this
       if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
       if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->select_state].push_back(we);
       if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->state].push_back(we);

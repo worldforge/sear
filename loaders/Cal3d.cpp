@@ -3,6 +3,8 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 
+$Id: Cal3d.cpp,v 1.18 2002-09-07 22:42:45 simon Exp $
+
 #include <GL/gl.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -37,7 +39,9 @@ int Cal3d::instance_count = 0;
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
 
-Cal3d::Cal3d(Render *render) : Model(render)
+Cal3d::Cal3d(Render *render) :
+  Model(render),
+  _intialised(false)
 {
   m_state = STATE_IDLE;
   m_motionBlend[0] = 0.6f;
@@ -56,6 +60,7 @@ Cal3d::Cal3d(Render *render) : Model(render)
 
 Cal3d::~Cal3d()
 {
+  if (_initalised) shutdown();
 }
 
 //----------------------------------------------------------------------------//
@@ -480,6 +485,7 @@ bool Cal3d::init(const std::string& strFilename) {
   m_calModel.getMixer()->blendCycle(map->m_animationId[IDLE], 1.0f, 0.0f);
 
   instance_count++;
+  _initalised = true;
   return true;
 }
 
@@ -611,6 +617,7 @@ void Cal3d::shutdown()
     }
 //  map->m_calCoreModel->destroy();
   }
+  _initialised = false;
 }
 
 //----------------------------------------------------------------------------//

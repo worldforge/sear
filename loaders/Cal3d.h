@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+$Id: Cal3d.h,v 1.13 2002-09-07 22:42:45 simon Exp $
+
 #ifndef _CAL3D_H_
 #define _CAL3D_H_ 1
 
@@ -18,10 +20,7 @@ namespace Sear {
 class Render;
 	
 class Cal3d : public Model {
-// misc
 public:
-
-	
   typedef enum {
     IDLE = 0,
     WALK,
@@ -106,6 +105,8 @@ protected:
   static int instance_count;
 //  static std::map<std::string, CalCoreModel*> core_models;
   static std::map<std::string, ModelAnimPair*> core_models;
+
+  bool _intialised;
 };
 
 } /* namespace Sear */
