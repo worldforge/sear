@@ -1,4 +1,7 @@
 26th September 2002, Simon Goodall 
+ * Re-implemented frustum culling
+
+26th September 2002, Simon Goodall 
  * Changed Model/Object properties loading mechanism. New version allows more than one model per entity, allows different quality/detail level of models and provides a much more flexible interface for arbitrary model loaders. This causes the existing model configuration files to be obsolete. Still lots of work to do to bring back to required functionality.
 
 21st September 2002, Simon Goodall

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
+// $Id: Frustum.cpp,v 1.7 2002-09-26 18:56:16 simon Exp $
 
 #include "common/Utility.h"
 
@@ -177,15 +177,15 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::sphereInFrustum(float frustum[6][4], WorldEntity *we, Terrain *terrain) {
+bool Frustum::sphereInFrustum(float frustum[6][4], WFMath::AxisBox<3> &bbox, WFMath::Point<3> &pos, Terrain *terrain) {
 //  return true;	
   int p;
   float x, y, z, radius;
-  WFMath::AxisBox<3> bbox = bboxCheck(we->getBBox());
+//  WFMath::AxisBox<3> bbox = bboxCheck(we->getBBox());
   WFMath::Ball<3> b = bbox.boundingSphere();
-  x = b.getCenter().x() + we->getAbsPos().x();
-  y = b.getCenter().y() + we->getAbsPos().y();
-  z = b.getCenter().z() + we->getAbsPos().z() + terrain->getHeight(we->getAbsPos().x(), we->getAbsPos().y());
+  x = b.getCenter().x() + pos.x();
+  y = b.getCenter().y() + pos.y();
+  z = b.getCenter().z() + pos.z() + terrain->getHeight(pos.x(), pos.y());
   radius = b.radius();
   for( p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.11 2002-09-08 13:08:21 simon Exp $
+// $Id: WorldEntity.h,v 1.12 2002-09-26 18:56:16 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -14,7 +14,7 @@
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 
-#include "ObjectLoader.h"
+//#include "ObjectLoader.h"
 
 namespace Sear {
 
@@ -39,8 +39,8 @@ public:
   std::string type();
   std::string parent();
 
-  ObjectProperties *getObjectProperties() { return _op; }
-  void setObjectProperties(ObjectProperties *op) { _op = op; }
+//  ObjectProperties *getObjectProperties() { return _op; }
+ // void setObjectProperties(ObjectProperties *op) { _op = op; }
   void checkActions();
   
 protected:
@@ -49,7 +49,7 @@ protected:
   WFMath::Quaternion abs_orient;
   WFMath::Point<3> abs_pos;
   std::list<message> messages;
-  ObjectProperties *_op;
+  //ObjectProperties *_op;
 
   static const int message_life = 5000;
   static const int string_size = 40;

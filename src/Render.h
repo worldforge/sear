@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.18 2002-09-26 17:17:46 simon Exp $
+// $Id: Render.h,v 1.19 2002-09-26 18:56:16 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -15,7 +15,7 @@
 
 #include <wfmath/axisbox.h>
 
-#include "ObjectLoader.h"
+//#include "ObjectLoader.h"
 
 #define RENDER_FOV (45.0f)
 //#define RENDER_FAR_CLIP (100.0f)

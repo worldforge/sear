@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.11 2002-09-26 17:17:46 simon Exp $
+// $Id: Graphics.cpp,v 1.12 2002-09-26 18:56:16 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -27,7 +27,7 @@
 #include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
-#include "ObjectLoader.h"
+//#include "ObjectLoader.h"
 #include "ObjectHandler.h"
 #include "Render.h"
 #include "Sky.h"
@@ -206,26 +206,31 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
 //      if (op->draw_self && select_mode) _render_queue[op->select_state].push_back(we);
       ObjectHandler *object_handler = _system->getObjectHandler();
       ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
+//      object_record->type = we->getID();
       if (!object_record) {
         object_record = object_handler->getObjectRecord(we->type());
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
+//        object_record->type = we->type();
       }
       if (!object_record) {
         object_record = object_handler->getObjectRecord(we->parent());
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
+//        object_record->type = we->parent();
       }
       if (!object_record) {
         object_record = object_handler->getObjectRecord("default");
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
+//        object_record->type = "default";
       }
       if (!object_record) {
         std::cout << "No Record found" << endl;	      
         return;   
       }
       object_record->name = we->getName();
+      //object_record->name = we->getName();
       object_record->id = we->getID();
       if (we->hasBBox()) {
         object_record->bbox = we->getBBox();
@@ -240,8 +245,10 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
       // TODO determine what model queue to use.
       // TODO if queue is empty switch to another
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
-        if (!select_mode) _render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
-	else _render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
+        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
+          if (!select_mode) _render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
+          else _render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
+	}
       }
       if (object_record->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); ++i) {

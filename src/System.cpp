@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.36 2002-09-26 17:17:46 simon Exp $
+// $Id: System.cpp,v 1.37 2002-09-26 18:56:16 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@
 #include "Graphics.h"
 #include "ModelHandler.h"
 #include "ObjectHandler.h"
-#include "ObjectLoader.h"
+//#include "ObjectLoader.h"
 #include "Render.h"
 #include "Sound.h"
 #include "StateLoader.h"

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.19 2002-09-26 17:17:46 simon Exp $
+// $Id: WorldEntity.cpp,v 1.20 2002-09-26 18:56:16 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -30,8 +30,7 @@ WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::Wor
    time(0),
    abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
    abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
-   messages(std::list<message>()),
-   _op(NULL)
+   messages(std::list<message>())
 {
 
 }

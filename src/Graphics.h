@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.4 2002-09-26 17:17:46 simon Exp $
+// $Id: Graphics.h,v 1.5 2002-09-26 18:56:16 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -15,7 +15,7 @@
 #include <wfmath/quaternion.h>
 
 #include "Render.h"
-#include "ObjectLoader.h"
+//#include "ObjectLoader.h"
 
 namespace Sear {
 

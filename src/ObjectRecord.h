@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.1 2002-09-26 17:17:46 simon Exp $
+// $Id: ObjectRecord.h,v 1.2 2002-09-26 18:56:16 simon Exp $
 
 #ifndef SEAR_OBJECTRECORD_H
 #define SEAR_OBJECTRECORD_H 1
@@ -57,6 +57,7 @@ public:
   
   std::string name;
   std::string id;
+  std::string type;
   ModelList low_quality;
   ModelList medium_quality;
   ModelList high_quality;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.32 2002-09-26 17:17:46 simon Exp $
+// $Id: GL.cpp,v 1.33 2002-09-26 18:56:16 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -31,7 +31,7 @@
 #include "src/ModelHandler.h"
 #include "src/ModelRecord.h"
 #include "src/ObjectRecord.h"
-#include "src/ObjectLoader.h"
+//#include "src/ObjectLoader.h"
 #include "src/Sky.h"
 #include "src/System.h"
 #include "src/Terrain.h"
@@ -1107,14 +1107,14 @@ void GL::drawMessageQueue(QueueMap queue) {
 }
  
 inline float GL::distFromNear(float x, float y, float z) {
-	return 1.0f;
+//	return 1.0f;
 	
-//  return Frustum::distFromNear(frustum, x, y, z);
+  return Frustum::distFromNear(frustum, x, y, z);
 }
 	
 inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
-	return 1;
-//  return Frustum::patchInFrustum(frustum, bbox);
+//	return 1;
+  return Frustum::patchInFrustum(frustum, bbox);
 }
 
 void GL::drawOutline(Model *model, bool use_stencil) {
@@ -1331,7 +1331,7 @@ inline void GL::getFrustum(float frust[6][4]) {
   glGetFloatv(GL_PROJECTION_MATRIX, proj );
   /* Get the current MODELVIEW matrix from OpenGraphics */
   glGetFloatv(GL_MODELVIEW_MATRIX, modl );
-  //Frustum::getFrustum(frust, proj, modl);
+  Frustum::getFrustum(frust, proj, modl);
   for (int i = 0; i < 6; ++i) {
     for (int j = 0; j < 4; ++j) {
       frustum[i][j] = frust[i][j];

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.14 2002-09-26 17:17:46 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.15 2002-09-26 18:56:16 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -57,7 +57,6 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
 //    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
 //    bbox = WFMath::AxisBox<3>(lc, hc);
 //  }
-  std::string type = record->name;
   // BUG: FIXME boundbox has a slash and no slash?
   // 
 //  int id = render->requestTexture("boundbox", type);
@@ -69,9 +68,10 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
 //    // TODO: what happens if we still cannot find a texture?
 //
 //  }
-  
+ 
+  std::string type = record->name;
   if (!model->init(bboxCheck(bbox), type, (bool)model_config->getItem(model_id, "wrap_texture"))) {
-	  cerr<< "error initing model" << endl;
+    cerr<< "error initing model" << endl;
     model->shutdown();
     delete model;
     return NULL;
