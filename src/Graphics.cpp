@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.39 2004-04-19 12:51:45 simon Exp $
+// $Id: Graphics.cpp,v 1.40 2004-04-22 21:38:24 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -123,12 +123,6 @@ void Graphics::shutdown() {
   _initialised = false;
 }
 
-
-
-void Graphics::initST() {
-}
-
-
 void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {
   if (!_renderer) throw Exception("No Render object to render with!");
   if (select_mode) _renderer->resetSelection();
@@ -201,11 +195,9 @@ Compare D^2 to choose what detail level to use
       // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
       if (!select_mode) {
 	_renderer->store();
-       _renderer->applyQuaternion(orient);
-//renderDome(1.0f, 30,30);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("sky_0"));
-  Environment::getInstance().renderSky();
-//        _sky->draw(); //Draw the sky box
+        _renderer->applyQuaternion(orient);
+        RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("sky_0"));
+        Environment::getInstance().renderSky();
 	_renderer->restore();
       }
 

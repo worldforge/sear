@@ -13,16 +13,10 @@ namespace Sear {
 
 class SkyDome {
 public:
-  SkyDome() :
-    m_initialised(false),
-    m_verts(NULL), m_texCoords(NULL),
-    m_vb_verts(0), m_vb_texCoords(0)
-  {}
-
+  SkyDome();
   virtual ~SkyDome();
   
-void init() {
-
+  void init() {
   }
 
   void shutdown() {
@@ -46,6 +40,9 @@ private:
   bool m_initialised;
   float *m_verts, *m_texCoords;
   unsigned int m_vb_verts, m_vb_texCoords;
+  static float m_box[];
+  static float m_quad_v[];
+  static float m_quad_t[];
 
   TextureID m_textures[5];
 };

@@ -12,7 +12,62 @@
 
 #include "SkyDome.h"
 
+#define VERTEX_COORDS { \
+  -1.0f,  1.0f,  1.0f,  \
+  -1.0f, -1.0f,  1.0f,  \
+   1.0f, -1.0f,  1.0f,  \
+   1.0f,  1.0f,  1.0f,  \
+                        \
+  -1.0f,  1.0f, -1.0f,  \
+  -1.0f,  1.0f,  1.0f,  \
+   1.0f,  1.0f,  1.0f,  \
+   1.0f,  1.0f, -1.0f,  \
+                        \
+   1.0f, -1.0f, -1.0f,  \
+   1.0f, -1.0f,  1.0f,  \
+  -1.0f, -1.0f,  1.0f,  \
+  -1.0f, -1.0f, -1.0f,  \
+                        \
+   1.0f,  1.0f, -1.0f,  \
+   1.0f,  1.0f,  1.0f,  \
+   1.0f, -1.0f,  1.0f,  \
+   1.0f, -1.0f, -1.0f,  \
+                        \
+  -1.0f ,-1.0f, -1.0f,  \
+  -1.0f, -1.0f,  1.0f,  \
+  -1.0f,  1.0f,  1.0f,  \
+  -1.0f,  1.0f, -1.0f,  \
+                        \
+  -1.0f, -1.0f, -1.0f,  \
+  -1.0f,  1.0f, -1.0f,  \
+   1.0f,  1.0f, -1.0f,  \
+   1.0f, -1.0f, -1.0f }
+
+#define DIST 100.0f
+
+#define QUAD_COORDS { \
+	-DIST,  DIST, 1.0f, \
+	 DIST,  DIST, 1.0f, \
+	 DIST, -DIST, 1.0f, \
+	-DIST, -DIST, 1.0f}
+
+#define QUAD_TEX { \
+	0, 0, \
+	5, 0, \
+	5, 5, \
+	0, 5}
+
 namespace Sear {
+
+float SkyDome::m_box[] = VERTEX_COORDS;
+float SkyDome::m_quad_v[] = QUAD_COORDS;
+float SkyDome::m_quad_t[] = QUAD_TEX;
+
+  SkyDome::SkyDome() :
+    m_initialised(false),
+    m_verts(NULL), m_texCoords(NULL),
+    m_vb_verts(0), m_vb_texCoords(0)
+  {}
 
 SkyDome::~SkyDome() {
   if (m_verts) {
@@ -125,6 +180,8 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
     glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * 2 * 4 * sizeof(float), m_texCoords, GL_STATIC_DRAW_ARB);
     delete [] m_texCoords;
     m_texCoords = NULL;
+    
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
   }
 }
 
@@ -144,13 +201,7 @@ void SkyDome::render(float radius, int levels, int segments) {
   float val = (float)(counter) / (float)INCR;
 
   glEnableClientState(GL_VERTEX_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
  
-  // Set the dome vetices
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_verts);
-  }
-  glVertexPointer(3, GL_FLOAT, 0, m_verts);
   // Select atmosphere texture
   RenderSystem::getInstance().switchTexture(m_textures[0]);
 
@@ -163,38 +214,26 @@ void SkyDome::render(float radius, int levels, int segments) {
   glMatrixMode(GL_MODELVIEW);
 
   // Quick hack so we dont call readpixels every frame
-  static int delay = 0;
-  if (++delay == 20) {
-    glBegin(GL_QUADS);
-      glTexCoord2i(0,0);
-
-      glVertex3f(-1.0f, -1.0f, 1.0f);
-      glVertex3f(1.0f, -1.0f, 1.0f);
-      glVertex3f(1.0f, -1.0f, -1.0f);
-      glVertex3f(-1.0f, -1.0f, -1.0f);
+  static int delay = 20; // set so we do this in the first frame
+  if (++delay >= 20) {
+    glTexCoord2i(0, 0);
+    glVertexPointer(3, GL_FLOAT, 0, &m_box[0]);
+    glDrawArrays(GL_QUADS, 0, sizeof(m_box) / 4);
  
-      glVertex3f(-1.0f, 1.0f, 1.0f);
-      glVertex3f(1.0f, 1.0f, 1.0f);
-      glVertex3f(1.0f, 1.0f, -1.0f);
-      glVertex3f(-1.0f, 1.0f, -1.0f);
-   
-      glVertex3f(-1.0f, 1.0f, 1.0f);
-      glVertex3f(-1.0f, -1.0f, 1.0f);
-      glVertex3f(-1.0f, -1.0f, -1.0f);
-      glVertex3f(-1.0f, 1.0f, -1.0f);
-  
-      glVertex3f(1.0f, 1.0f, 1.0f);
-      glVertex3f(1.0f, -1.0f, 1.0f);
-      glVertex3f(1.0f, -1.0f, -1.0f);
-      glVertex3f(1.0f, 1.0f, -1.0f);
-    glEnd(); 
-
     GLfloat i[4];
-    glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT, &i);
+    glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT,&i);
     glFogfv(GL_FOG_COLOR,i);
     glClearColor(i[0], i[1], i[2], i[3]); // Colour used to clear window
     delay = 0;
   }
+
+  // Set the dome vetices
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_verts);
+  }
+  glVertexPointer(3, GL_FLOAT, 0, m_verts);
+
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   // Setup dome texture coords
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texCoords);
@@ -213,17 +252,13 @@ void SkyDome::render(float radius, int levels, int segments) {
   // Render large polygon for cloud layer
   // TODO split into smaller polys
   // turn down edges so its not so flat looking
-  #define DIST 100.0f
-  glBegin(GL_QUADS);
-    glTexCoord2i(0,0);
-    glVertex3f(-DIST, DIST, 1.0f);
-    glTexCoord2i(5,0);
-    glVertex3f(DIST, DIST, 1.0f);
-    glTexCoord2i(5,5);
-    glVertex3f(DIST, -DIST, 1.0f);
-    glTexCoord2i(0,5);
-    glVertex3f(-DIST, -DIST, 1.0f);
-  glEnd();
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+  }
+  
+  glVertexPointer(3, GL_FLOAT, 0, &m_quad_v[0]);
+  glTexCoordPointer(2, GL_FLOAT, 0, &m_quad_t[0]);
+  glDrawArrays(GL_QUADS, 0, 4);
 
   // Translate further so cloud layers move
   // at different speeds
@@ -234,16 +269,9 @@ void SkyDome::render(float radius, int levels, int segments) {
   // Render cloud layer two
   RenderSystem::getInstance().switchTexture(m_textures[2]);
 
-  glBegin(GL_QUADS);
-    glTexCoord2i(0,0);
-    glVertex3f(-DIST, DIST, 1.0f);
-    glTexCoord2i(5,0);
-    glVertex3f(DIST, DIST, 1.0f);
-    glTexCoord2i(5,5);
-    glVertex3f(DIST, -DIST, 1.0f);
-    glTexCoord2i(0,5);
-    glVertex3f(-DIST, -DIST, 1.0f);
-  glEnd();
+  glVertexPointer(3, GL_FLOAT, 0, &m_quad_v[0]);
+  glTexCoordPointer(2, GL_FLOAT, 0, &m_quad_t[0]);
+  glDrawArrays(GL_QUADS, 0, 4);
 
   // reset texture matrix
   glMatrixMode(GL_TEXTURE);

@@ -1,4 +1,7 @@
 22nd April 2004, Simon Goodall
+ * Converted glBegin calls to vertex buffers in SkyDome
+
+22nd April 2004, Simon Goodall
  * Update SkyDome to check existance of VBO's before using them
 
 22nd April 2004, Simon Goodall

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.13 2004-04-01 21:24:26 simon Exp $
+// $Id: Graphics.h,v 1.14 2004-04-22 21:38:24 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -82,7 +82,6 @@ typedef enum {
   
   Render *getRender() { return _renderer; }
   Camera* getCamera() { return _camera; }
-void initST(); 
   void setupStates();
   void readConfig();
   void writeConfig();
