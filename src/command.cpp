@@ -14,7 +14,7 @@
 #include "Utility.h"
 
 #include <string>
-#include <string.h>
+//#include <string.h>
 #include "Event.h"
 #include "EventHandler.h"
 
@@ -23,8 +23,12 @@
 #include "WorldEntity.h"
 #include <unistd.h>
 
+#include "Log.h"
+
 namespace Sear {
 
+
+//TODO replace string tokenizer with a better version	
 std::string::size_type pos, last_pos;
 std::string token_string;
 const std::string &delimeters = " ";
@@ -67,12 +71,12 @@ void System::runCommand(const std::string &command) {
       std::string arg2 = nextToken();
       if (arg2.empty()) {
         if (_client) err = _client->connect(arg1);
-        else DEBUG_PRINT("Client not created!");
+        else Log::writeLog("Client not created", Log::ERROR);
       } else {
         int i=0;
 	cast_stream(arg2, i);
         if (_client) err = _client->connect(arg1, i);
-        else DEBUG_PRINT("Client not created!");
+        else Log::writeLog("Client not created", Log::ERROR);
       }
     }
     else if (strcasecmp(tok, CMD_DISCONNECT) == 0) err = _client->disconnect();
@@ -82,21 +86,21 @@ void System::runCommand(const std::string &command) {
       std::string arg2 = nextToken();
       std::string arg3 = remainingTokens();
       if (_client) err = _client->createAccount(arg1, arg3, arg2);
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_ACCOUNT_LOGIN) == 0) {
       std::string arg1 = nextToken();
       std::string arg2 = nextToken();
       if (_client) err = _client->login(arg1, arg2);
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_ACCOUNT_LOGOUT) == 0) {
       if (_client)  err = _client->logout();
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_CHARACTER_LIST) == 0) {
       if (_client) err = _client->getCharacters();
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_CHARACTER_CREATE) == 0) {
       std::string arg1 = nextToken(); // Name
@@ -104,31 +108,31 @@ void System::runCommand(const std::string &command) {
       std::string arg3 = nextToken(); // Sex
       std::string arg4 = remainingTokens(); //Description
       if (_client) err = _client->createCharacter(arg1, arg2, arg3, arg4);
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_CHARACTER_TAKE) == 0) {
       std::string arg1 = nextToken();
       if (_client) err = _client->takeCharacter(arg1);
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_STATUS) == 0) {
-      if (_client) std::cout << "Status: " << _client->getStatus() << std::endl;
-      else DEBUG_PRINT("Client not created");
+      if (_client) Log::writeLog(std::string("Status: ") +  _client->getStatus(), Log::DEFAULT);
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_ROOM_LIST) == 0) {
       if (_client) _client->listRooms();
-      else DEBUG_PRINT("Client not created!");
+      else Log::writeLog("Client not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_SET_ATTRIBUTE) == 0) {
       std::string arg1 = nextToken();
       std::string arg2 = nextToken();
       if (_general) _general->setAttribute(arg1, arg2);
-      else DEBUG_PRINT("General config not created!");
+      else Log::writeLog("General config not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_GET_ATTRIBUTE) == 0) {
       std::string arg1 = nextToken();
       if (_general) pushMessage(_general->getAttribute(arg1), CONSOLE_MESSAGE);
-      else DEBUG_PRINT("General Config not created!");
+      else Log::writeLog("General config not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_SAY) == 0) {
       std::string arg1 = remainingTokens();
@@ -163,6 +167,12 @@ void System::runCommand(const std::string &command) {
     else if (strcasecmp(tok, CMD_CHAR_ROT_RIGHT) == 0)      { if (_character) _character->rotate( 1); }
     else if (strcasecmp(tok, CMD_CHAR_STOP_ROT_LEFT) == 0)  { if (_character) _character->rotate( 1); }
     else if (strcasecmp(tok, CMD_CHAR_STOP_ROT_RIGHT) == 0) { if (_character) _character->rotate(-1); }
+
+    else if (strcasecmp(tok, CMD_CHAR_STRAFE_LEFT) == 0)       { if (_character) _character->strafe(-1); }
+    else if (strcasecmp(tok, CMD_CHAR_STRAFE_RIGHT) == 0)      { if (_character) _character->strafe( 1); }
+    else if (strcasecmp(tok, CMD_CHAR_STOP_STRAFE_LEFT) == 0)  { if (_character) _character->strafe( 1); }
+    else if (strcasecmp(tok, CMD_CHAR_STOP_STRAFE_RIGHT) == 0) { if (_character) _character->strafe(-1); }
+    
     else if (strcasecmp(tok, CMD_GIVE) == 0) {
       std::string arg1 = nextToken();
       std::string arg2 = remainingTokens();
@@ -236,22 +246,22 @@ void System::runCommand(const std::string &command) {
     else if (strcasecmp(tok, CMD_LOAD_OBJECT_FILE) == 0) {
       std::string arg1 = processHome(nextToken());
       if (_ol) _ol->readFiles(arg1);
-      else DEBUG_PRINT("Object Loader not created!");
+      else Log::writeLog("Object loader not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_LOAD_GENERAL) == 0) {
       std::string arg1 = processHome(nextToken());
       if (_general) _general->loadConfig(arg1);
-      else DEBUG_PRINT("General config not created!");
+      else Log::writeLog("General config not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_LOAD_TEXTURE) == 0) {
       std::string arg1 = processHome(nextToken());
-      if (_textures) _textures->loadConfig(arg1, prefix_cwd);
-      else DEBUG_PRINT("Texturesl config not created!");
+      if (_textures) _textures->loadConfig(arg1, _prefix_cwd);
+      else Log::writeLog("Textures config not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_LOAD_MODEL) == 0) {
       std::string arg1 = processHome(nextToken());
       if (_models) _models->loadConfig(arg1);
-      else DEBUG_PRINT("Models config not created!");
+      else Log::writeLog("Models config not created", Log::ERROR);
     }
     else if (strcasecmp(tok, CMD_LOAD_BINDING) == 0) {
       std::string arg1 = processHome(nextToken());
@@ -263,7 +273,7 @@ void System::runCommand(const std::string &command) {
         if (arg1.empty()) _general->saveConfig();
         else _general->saveConfig(arg1);
       } else {
-        DEBUG_PRINT("General config not created!");
+        Log::writeLog("General config not created", Log::ERROR);
       }
     }
     else if (strcasecmp(tok, CMD_SAVE_BINDING) == 0) {
@@ -304,14 +314,14 @@ void System::runCommand(const std::string &command) {
       chdir(dir.c_str());
     }
     else if (strcasecmp(tok, "enable_dir_prefix") == 0) {
-      prefix_cwd = true;
+      _prefix_cwd = true;
     }
     else if (strcasecmp(tok, "disable_dir_prefix") == 0) {
-      prefix_cwd = false;
+      _prefix_cwd = false;
     }
-    else DEBUG_PRINT(std::string("Unknown Command:") + tok);
+    else Log::writeLog("Unknown command", Log::ERROR);
   } catch (...) {
-    DEBUG_PRINT("Caught Unknown Exception");
+    Log::writeLog("Caught unknown exception", Log::ERROR);
   }
 //  if (err != 0) traceError(err);
 }

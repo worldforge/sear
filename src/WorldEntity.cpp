@@ -13,6 +13,8 @@
 #include "Event.h"
 
 #include <Eris/TypeInfo.h>
+#include "Log.h"
+#include "Utility.h"
 
 namespace Sear {
 
@@ -32,7 +34,7 @@ void WorldEntity::handleMove() {
 }
 
 void WorldEntity::handleTalk(const std::string &msg) {
-  DEBUG_PRINT(_id + ": " + msg);	
+  Log::writeLog(_id + std::string(": ") + msg, Log::DEFAULT);	
   System::instance()->pushMessage(_name + ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
 
   if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
@@ -136,25 +138,23 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
   return new_pos;
 }
 
-
-
 void WorldEntity::displayInfo() {
-  std::cout << "Entity ID: " << getID() << std::endl;
-  std::cout << "Entity Name: " << getName() << std::endl;
+  Log::writeLog(std::string("Entity ID: ") + getID(), Log::DEFAULT);
+  Log::writeLog(std::string("Entity Name: ") + getName(), Log::DEFAULT);
   std::string type = getType()->getName();
   std::string parent_type = *this->getType()->getParentsAsSet().begin();
-  std::cout << "Type: " << type << std::endl;
-  std::cout << "Parent Type: " << parent_type << std::endl;
+  Log::writeLog(std::string("Type: ") + type, Log::DEFAULT);
+  Log::writeLog(std::string("Parent Type: ") + parent_type, Log::DEFAULT);
   WFMath::Point<3> pos = GetPos();
-  std::cout << "X: " << pos.x() << " Y: " << pos.y() << " Z: " << pos.z() << endl;
+  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::DEFAULT);
   Eris::Entity *e = getContainer();
-  std::cout << "Parent: " << ((e == NULL) ? ("NULL") : (e->getID())) << std::endl;
-  std::cout << "Num Children: " << getNumMembers() << std::endl;
+  Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::DEFAULT);
+  Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::DEFAULT);
   WFMath::AxisBox<3> bbox = getBBox();
-  std::cout << "Ux: " << bbox.lowCorner().x() << " Uy: " << bbox.lowCorner().y() << " Uz: " << bbox.lowCorner().z() << std::endl;
-  std::cout << "Vx: " << bbox.highCorner().x() << " Vy: " << bbox.highCorner().y() << " Vz: " << bbox.highCorner().z() << std::endl;
-  std::cout << "Visibility: " << ((isVisible()) ? ("true") : ("false")) << std::endl;
-  std::cout << "Stamp: " << getStamp() << std::endl;
+  Log::writeLog(std::string("Ux: ") + string_fmt(bbox.lowCorner().x()) + std::string(" Uy: ") + string_fmt(bbox.lowCorner().y()) + std::string(" Uz: ") + string_fmt(bbox.lowCorner().z()), Log::DEFAULT);
+  Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::DEFAULT);
+  Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::DEFAULT);
+  Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::DEFAULT);
 }
 
 } /* namespace Sear */

@@ -7,8 +7,8 @@
 #include "System.h"
 #include "Config.h"
 #include <string>
-#include <iostream.h>
 #include "Utility.h"
+#include "Log.h"
 
 namespace Sear {
 
@@ -25,7 +25,7 @@ bool Terrain::init() {
     gLand->Init(hMap, hMapWidth);
   }
   else {
-    std::cerr << "Terrain: Error creating height map array" << std::endl;
+    Log::writeLog("Terrain: Error creating height map array", Log::ERROR);
     return false;
   }
   Landscape::waterlevel = _water_level;
@@ -33,16 +33,14 @@ bool Terrain::init() {
 }
 
 void Terrain::shutdown() {
-  std::cout << "Shutting down Terrain" << std::endl;
+  Log::writeLog("Shutting down Terrain", Log::DEFAULT);
   writeConfig();
-  std::cout << "Deleting Terrain" << std::endl;
+  Log::writeLog("Deleting Terrain", Log::DEFAULT);
   if (gLand) {
     delete gLand;
   }
-  std::cout << "Freeing HeightMap" << std::endl;
+  Log::writeLog("Freeing HeightMap", Log::DEFAULT);
   if (hMap) free(hMap);
-  
-  std::cout << "Finished Shutting down Terrain" << std::endl;
 }
 
 void Terrain::draw() {
@@ -66,18 +64,15 @@ void Terrain::loadHeightMap() {
   
   terrain = IMG_Load(hmap.c_str());
   if (terrain == NULL) {
-//    std::cerr << "Error loading heightmap!" << std::endl;
-    std::cerr << "Unable to load heightmap: " << hmap << ": " <<  SDL_GetError() << std::endl;
-    std::cerr << "Using flat terrain instead" << std::endl;
-//    exit(1);
-//    return;
+    Log::writeLog(std::string("Unable to load heightmap: ") + hmap + std::string(": ") + string_fmt (SDL_GetError()), Log::ERROR);
+    Log::writeLog("Using flat terrain instead", Log::ERROR);
     hMapHeight = DEFAULT_map_height;
     hMapWidth = DEFAULT_map_width;
     hMap = (unsigned char *)malloc(hMapWidth * hMapHeight * sizeof(unsigned char));
     if (hMap) {
       memset(hMap, DEFAULT_height, hMapHeight * hMapWidth * sizeof(unsigned char));
     } else {
-      std::cerr << "Terrain: Error - Unable to allocate memory for height map array" << std::endl;
+      Log::writeLog("Terrain: Error - Unable to allocate memory for height map array", Log::ERROR);
     }
     return;
   }
@@ -87,7 +82,7 @@ void Terrain::loadHeightMap() {
   hMapHeight = terrain->h;
   hMap = (unsigned char *)malloc(hMapWidth * hMapHeight * sizeof(unsigned char));
   if (!hMap) {
-    std::cerr << "Terrain: Error - Unable to allocate memory for height map array" << std::endl;
+    Log::writeLog("Terrain: Error - Unable to allocate memory for height map array", Log::ERROR);
     return;
   }
   i = 0;
@@ -114,7 +109,7 @@ void Terrain::readConfig() {
   std::string temp;
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    std::cerr << "Terrain: General config object not created!" << std::endl;
+    Log::writeLog("Terrain: General config object not created!", Log::ERROR);
     return;
   }
   temp = general->getAttribute(KEY_height);
@@ -128,10 +123,10 @@ void Terrain::readConfig() {
 }
 
 void Terrain::writeConfig() {
-  std::cout << "Writing Terrain Config" << std::endl;
+  Log::writeLog("Writing Terrain Config", Log::DEFAULT);
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    std::cerr << "Terrain: General config object not created!" << std::endl;
+    Log::writeLog("Terrain: General config object not created!", Log::ERROR);
     return;
   }
   general->setAttribute(KEY_height, string_fmt(_height));

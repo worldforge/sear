@@ -7,12 +7,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <iostream>
+#include "Log.h"
 
 namespace Sear {
 
 void ObjectLoader::init() {
-  std::cout << "Object Loader: Initialising." << std::endl;
+  Log::writeLog("Object Loader: Initialising.", Log::DEFAULT);
   _object_properties = std::map<std::string, ObjectProperties*>();
   ObjectProperties *op = (ObjectProperties*)malloc(sizeof(ObjectProperties));
   MaterialProperties *mp = (MaterialProperties *)malloc(sizeof(MaterialProperties));
@@ -50,7 +50,7 @@ void ObjectLoader::init() {
 }
 
 void ObjectLoader::shutdown() {
-  std::cout << "Object Loader: Shutting Down" << std::endl;
+  Log::writeLog("Object Loader: Shutting Down", Log::DEFAULT);
   while (!_object_properties.empty()) {
     if (_object_properties.begin()->second) {
       if (_object_properties.begin()->second->lighting_properties) free(_object_properties.begin()->second->lighting_properties);
@@ -63,10 +63,10 @@ void ObjectLoader::shutdown() {
 
 void ObjectLoader::readFiles(const std::string &file_name) {
   FILE *object_file = NULL;
-  std::cout << "Object Loader: Loading file - " << file_name << std::endl;
+  Log::writeLog(std::string("Object Loader: Loading file - ") + file_name, Log::DEFAULT);
   object_file = fopen(file_name.c_str(),"r");
   if (object_file == NULL) {
-    std::cerr << "Object Loader: Error opening object file - " << file_name << std::endl;
+    Log::writeLog(std::string("Object Loader: Error opening object file - ") + file_name, Log::ERROR);
     return;
   }
   
@@ -199,7 +199,7 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
       sscanf(str, "%*s = %f", &lp->quadratic_attenuation);
     }
     else {
-      std::cerr << "Object Loader: Unknown Tag - " << tag << std::endl;
+      Log::writeLog(std::string("Object Loader: Unknown Tag - ") + tag, Log::ERROR);
     }
   }
   free(lp);

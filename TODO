@@ -1,7 +1,7 @@
+ * Add a stand alone option
  * Add a command history
  * Add Model loader for 3D packages e.g. 3ds -> loader will return a model object
  * Check for OpenGL hardware -> ie if vendor == NONE report error
- * Add Sear Namespace
  * In game menu for configuration
  * Improve memory usage
  * Colour cursors
@@ -11,15 +11,12 @@
    - Function pointer takes a string for its args and it proccesses string as needed.
    - Sets pointer to NULL when finished.
  * Update configure + autogen to provide better help. -> IE if not found, goto www...
- * Allow character side-steping
  * Move OpenGL code into one object
  * Make OpenGL Render class a plugin
  * Add a sky dome
  * Add a better GUI
  * Add Meta Server support
  * Add model loading support - via plugins?
- * Build in exception handling
- * Add a log class
  * Add Stage support
  * Add collision etection
  * Add sound / music effects

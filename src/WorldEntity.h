@@ -9,7 +9,6 @@
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
 
-#include "debug.h"
 
 #define WORLD_ENTITY_MESSAGE_LIFE (5000)
 #define WORLD_ENTITY_STRING_SIZE  (40)

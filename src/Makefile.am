@@ -21,7 +21,6 @@ sear_SOURCES = \
 	Console.cpp \
 	Console.h \
 	cursors.h \
-	debug.h \
 	Error.cpp \
 	Error.h \
 	Event.cpp \

@@ -9,7 +9,6 @@
 #include "Camera.h"
 #include "Bindings.h"
 #include "Console.h"
-#include "debug.h"
 #include "EventHandler.h"
 #include "Config.h"
 #include "Character.h"
@@ -18,7 +17,6 @@
 #include "cmd.h"
 #include "Utility.h"
 
-#include <iostream.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -49,8 +47,8 @@ System::System() :
   _ol(NULL),
   _console(NULL),
   _character(NULL),
-  _system_running(false),
-  prefix_cwd(false)
+  _prefix_cwd(false),
+  _system_running(false)
 {
   int i;
   _instance = this;
@@ -67,9 +65,7 @@ bool System::init() {
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
     Log::writeLog("Error initializing Eris", Log::ERROR);
-//    std::cerr << "Error initializing Eris!" << std::endl;
     throw Exception("");
-//    return false;
   }
   
   SDL_EnableUNICODE(1);
@@ -198,7 +194,7 @@ void System::shutdown() {
 bool System::initVideo() {
   Log::writeLog("Initialising Video", Log::INFO);
   if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
-    std::cerr <<  "Unable to init SDL: " <<  SDL_GetError() << std::endl;
+    Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::ERROR);
     return false;
   } 
   return true;
@@ -216,18 +212,18 @@ void System::createWindow(bool fullscreen) {
   const SDL_VideoInfo *info;
   info = SDL_GetVideoInfo();
   if (!info) {
-    std::cerr << "Error quering video" << std::endl;
+    Log::writeLog("Error quering video", Log::DEFAULT);
   }
-  std::cout << "hw_available: " << info->hw_available << std::endl;
-  std::cout << "wm_available: " << info->wm_available << std::endl;
-  std::cout << "blit_hw: " << info->blit_hw << std::endl;
-  std::cout << "blit_hw_CC: " << info->blit_hw_CC << std::endl;
-  std::cout << "blit_hw_A: " << info->blit_hw_A << std::endl;
-  std::cout << "blit_sw: " << info->blit_sw << std::endl;
-  std::cout << "blit_sw_CC: " << info->blit_sw_CC << std::endl;
-  std::cout << "blit_sw_A: " << info->blit_sw_A << std::endl;
-  std::cout << "video_mem: " << info->video_mem << std::endl;
-  std::cout << "hw_available: " << info->hw_available << std::endl;
+  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::DEFAULT);
+  Log::writeLog(std::string("wm_available: ") + string_fmt(info->wm_available), Log::DEFAULT);
+  Log::writeLog(std::string("blit_hw: ") + string_fmt(info->blit_hw), Log::DEFAULT);
+  Log::writeLog(std::string("blit_hw_CC: ") + string_fmt(info->blit_hw_CC), Log::DEFAULT);
+  Log::writeLog(std::string("blit_hw_A: ") + string_fmt(info->blit_hw_A), Log::DEFAULT);
+  Log::writeLog(std::string("blit_sw: ") + string_fmt(info->blit_sw), Log::DEFAULT);
+  Log::writeLog(std::string("blit_sw_CC: ") + string_fmt(info->blit_sw_CC), Log::DEFAULT);
+  Log::writeLog(std::string("blit_sw_A: ") + string_fmt(info->blit_sw_A), Log::DEFAULT);
+  Log::writeLog(std::string("video_mem: ") + string_fmt(info->video_mem), Log::DEFAULT);
+  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::DEFAULT);
 
   
   //Create Window
@@ -237,7 +233,7 @@ void System::createWindow(bool fullscreen) {
   if (fullscreen) flags |= SDL_FULLSCREEN;
   screen = SDL_SetVideoMode(_width, _height, 0, flags);
   if (screen == NULL ) {
-    std::cerr <<  "Unable to set " << _width << " x " << _height << " video: " << SDL_GetError() << std::endl;
+    Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::ERROR);
     _system_running = false;
     exit(1);
   }
@@ -245,26 +241,26 @@ void System::createWindow(bool fullscreen) {
   // Check OpenGL flags
   int value = 0;
   SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
-  std::cout << "Red Size: " << value << std::endl;
+  Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
-  std::cout << "Blue Size: " << value << std::endl;
+  Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
-  std::cout << "Green Size: " << value << std::endl;
+  Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
-  std::cout << "Depth Size: " << value << std::endl;
+  Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
 
   if (value < 1) _general->setAttribute("render_use_stencil", "false");
   
-  std::cout << "Stencil Size: " << value << std::endl;
+  Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
-  std::cout << "Double Buffer: " << value << std::endl;
+  Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::DEFAULT);
  
   if (!_icon) _icon = IMG_Load(_icon_file.c_str());
   // Should set the icon transparency but it does not work.
   if (_icon) {
     if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGB(_icon->format, 0x0, 0x0, 0x0)) == -1) {
-    std::cerr << "ERROR icon setting transparency" << std::endl;
+      Log::writeLog("ERROR icon setting transparency", Log::ERROR);
     }
     SDL_WM_SetIcon(_icon, NULL);
   } 
@@ -434,13 +430,13 @@ SDL_Surface *System::loadImage(const  std::string &filename) {
   int i/*, j*/;
   image = IMG_Load(filename.c_str());
   if ( image == NULL ) { 
-    std::cerr << "Unable to load " << filename << ": " <<  SDL_GetError() << std::endl;
+    Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::ERROR);
     return(NULL);
   }
   /* GL surfaces are upsidedown and RGB, not BGR :-) */
   tmpbuf = (Uint8 *)malloc(image->pitch);
   if ( tmpbuf == NULL ) {  
-    std::cerr << "Out of memory" << std::endl;
+    Log::writeLog("Out of memory", Log::ERROR);
     return(NULL);
   }
   rowhi = (Uint8 *)image->pixels;
@@ -475,15 +471,15 @@ void System::runScript(const std::string &file_name) {
   FILE *script_file = NULL;
   const int MAX_LINE_SIZE = 256;
   char string_data[MAX_LINE_SIZE];
-  std::cout << "System: Running script - " << file_name << std::endl;
+  Log::writeLog(std::string("System: Running script - ") + file_name, Log::DEFAULT);
   script_file = fopen(processHome(file_name).c_str(), "r");
   char cur_dir[257];
   memset(cur_dir, '\0', 257);
   getcwd(cur_dir, 256);
-  std::cout << "Current Directory: " << cur_dir << std::endl;
-  bool pre_cwd = prefix_cwd; // Store current setting
+  Log::writeLog(std::string("Current Directory: ") + cur_dir, Log::DEFAULT);
+  bool pre_cwd = _prefix_cwd; // Store current setting
   if (!script_file) {
-    std::cerr << "System: Error opening script file: " << file_name << std::endl;
+    Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::ERROR);
     return;
   }
   while (!feof(script_file)) {
@@ -491,7 +487,7 @@ void System::runScript(const std::string &file_name) {
     runCommand(std::string(string_data));
   }
   chdir(cur_dir);
-  prefix_cwd = pre_cwd; // Restore setting
+  _prefix_cwd = pre_cwd; // Restore setting
   fclose(script_file);
 }
 
@@ -529,7 +525,7 @@ void System::setCharacter(Character *character) {
 void System::readConfig() {
   std::string temp;
   if (!_general) {
-    std::cerr << "System: Error - General config object not created" << std::endl;
+    Log::writeLog("System: Error - General config object not created", Log::ERROR);
     return;
   }
   temp = _general->getAttribute(KEY_dawn_time);
@@ -562,7 +558,7 @@ void System::readConfig() {
 
 void System::writeConfig() {
   if (!_general) {
-    std::cerr << "System: Error- General config object not created" << std::endl;
+    Log::writeLog("System: Error- General config object not created", Log::ERROR);
     return;
   }
   _general->setAttribute(KEY_dawn_time, string_fmt(_dawn_time));

@@ -7,6 +7,8 @@
 #include "System.h"
 #include "Render.h"
 
+#include "Log.h"
+
 namespace Sear {
 
 bool Console::init() {
@@ -16,7 +18,7 @@ bool Console::init() {
 }
 
 void Console::shutdown() {
-  std::cout << "Shutting down console." << std::endl;
+  Log::writeLog("Shutting down console.", Log::DEFAULT);
 }
 
 //void Console::PushMessage(const char *message, char* extra) {
@@ -54,7 +56,7 @@ void Console::draw(const std::string &command) {
 
 void Console::renderConsoleMessages(const std::string &command) {
   if (!_renderer) {
-    std::cerr << "Console: Error - Renderer object not created" << std::endl;
+    Log::writeLog("Console: Error - Renderer object not created", Log::ERROR);
     return;
   }
   std::list<std::string>::const_iterator I;

@@ -9,7 +9,7 @@
 
 #include "Utility.h"
 #include <string>
-#include <iostream>
+#include "Log.h"
 
 namespace Sear {
 
@@ -37,7 +37,7 @@ bool Camera::init() {
 }
 
 void shutdown() {
-  std::cout << "Shutting down camera." << std::endl;
+  Log::writeLog("Shutting down camera.", Log::DEFAULT);
 }
 
 void Camera::updateCameraPos(float time_elapsed) {
@@ -45,8 +45,8 @@ void Camera::updateCameraPos(float time_elapsed) {
   // Don't let us move the camera past the focus point
   if (_distance < _min_distance) _distance = _min_distance; 
   if (_distance > _max_distance) _distance = _max_distance; 
-  _rotation  += _rotation_speed * (float)_rotation_dir * time_elapsed * DEG_TO_RAD;
-  _elevation += _elevation_speed * (float)_elevation_dir * time_elapsed * DEG_TO_RAD;
+  _rotation  += deg_to_rad(_rotation_speed * (float)_rotation_dir * time_elapsed);
+  _elevation += deg_to_rad(_elevation_speed * (float)_elevation_dir * time_elapsed);
 }
 
 void Camera::zoom  (int dir) { _zoom_dir += dir; }
@@ -59,7 +59,7 @@ void Camera::readConfig() {
   std::string temp;
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    std::cerr << "Camera: Error - General config object not created!" << std::endl;
+    Log::writeLog("Camera: Error - General config object not created!", Log::ERROR);
     return;
   }
   
@@ -86,7 +86,7 @@ void Camera::readConfig() {
 void Camera::writeConfig() {
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    std::cerr << "Camera: Error - General config object not created!" << std::endl;
+    Log::writeLog("Camera: Error - General config object not created!", Log::ERROR);
     return;
   }
 

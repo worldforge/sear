@@ -6,6 +6,7 @@
 #include "Config.h"
 
 #include <GL/gl.h>
+#include "Log.h"
 
 namespace Sear {
 
@@ -23,7 +24,7 @@ SkyBox::~SkyBox() {
 }
 
 bool SkyBox::init() {
-  std::cout << "SkyBox: Initialising." << std::endl;
+  Log::writeLog("SkyBox: Initialising.", Log::DEFAULT);
   texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_NORTH, true);
   texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_SOUTH, true);
   texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture(CONFIG_SKY_DAY_WEST, true);
@@ -40,7 +41,7 @@ bool SkyBox::init() {
 }
 
 void SkyBox::shutdown() {
-  cout << "SkyBox: Shutting down" << endl;
+  Log::writeLog("SkyBox: Shutting down", Log::DEFAULT);
 }
 
 void SkyBox::draw() {

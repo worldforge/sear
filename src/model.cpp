@@ -22,6 +22,9 @@
 #include "System.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include "Log.h"
+#include "Utility.h"
+
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
 //----------------------------------------------------------------------------//
@@ -129,7 +132,7 @@ GLuint Model::loadTexture(const std::string& strFilename)
   file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
   if(!file)
   {
-    std::cerr << "Texture file '" << strFilename << "' not found." << std::endl;
+    Log::writeLog(std::string("Texture file '") + strFilename + std::string("' not found."), Log::ERROR);
     return 0;
   }
 
@@ -143,7 +146,7 @@ GLuint Model::loadTexture(const std::string& strFilename)
   pBuffer = new unsigned char[2 * width * height * depth];
   if(pBuffer == 0)
   {
-    std::cerr << "Memory allocation for texture '" << strFilename << "' failed." << std::endl;
+    Log::writeLog(std::string("Memory allocation for texture '") + strFilename + std::string("' failed."), Log::ERROR);
     return 0;
   }
 
@@ -207,7 +210,7 @@ bool Model::onInit(const std::string& strFilename)
   file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
   if(!file)
   {
-    std::cerr << "Failed to open model configuration file '" << strFilename << "'." << std::endl;
+    Log::writeLog(std::string("Failed to open model configuration file '") + strFilename + std::string("'."), Log::ERROR);
     return false;
   }
 
@@ -239,7 +242,7 @@ bool Model::onInit(const std::string& strFilename)
     // check if an error happend while reading from the file
     if(!file)
     {
-      std::cerr << "Error while reading from the model configuration file '" << strFilename << "'." << std::endl;
+      Log::writeLog(std::string("Error while reading from the model configuration file '") + strFilename + std::string("'."), Log::ERROR);
       return false;
     }
 
@@ -268,7 +271,7 @@ bool Model::onInit(const std::string& strFilename)
     pos = strBuffer.find_first_not_of(" \t", pos);
     if((pos == std::string::npos) || (strBuffer[pos] != '='))
     {
-      std::cerr << strFilename << "(" << line << "): Invalid syntax." << std::endl;
+      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::ERROR);
       return false;
     }
 
@@ -293,7 +296,7 @@ bool Model::onInit(const std::string& strFilename)
     else if(strKey == "skeleton")
     {
       // load core skeleton
-      std::cout << "Loading skeleton '" << strData << "'..." << std::endl;
+//      Log::writeLog(std::string("Loading skeleton '") + strData + std::string("'..."), Log::DEFAULT);
       if(!m_calCoreModel.loadCoreSkeleton(strPath + strData))
       {
         CalError::printLastError();
@@ -335,7 +338,7 @@ bool Model::onInit(const std::string& strFilename)
     }
     else
     {
-      std::cerr << strFilename << "(" << line << "): Invalid syntax." << std::endl;
+      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::ERROR);
       return false;
     }
   }

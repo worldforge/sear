@@ -32,6 +32,11 @@
 #define CMD_CHAR_STOP_ROT_LEFT    "-charlookleft"
 #define CMD_CHAR_STOP_ROT_RIGHT   "-charlookright"
 
+#define CMD_CHAR_STRAFE_LEFT    "+charstepleft"
+#define CMD_CHAR_STRAFE_RIGHT   "+charstepright"
+#define CMD_CHAR_STOP_STRAFE_LEFT    "-charstepleft"
+#define CMD_CHAR_STOP_STRAFE_RIGHT   "-charstepright"
+
 #define CMD_CAMERA_ZOOM_IN       "+camera_zoom_in"
 #define CMD_CAMERA_ZOOM_OUT      "+camera_zoom_out"
 #define CMD_CAMERA_STOP_ZOOM_IN  "-camera_zoom_in"

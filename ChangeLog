@@ -1,3 +1,12 @@
+1st July 2002, Simon Goodall
+ * Log applied to Bindings, Camerai, Character, Config, Console, Event, GL_Render, Model, Object Loader, SkyBox, System, Terrain and WorldEntity classes.
+ * debug.h removed as will be encapsulated in Log class
+ * System re-order fixed.
+ * Now use WFMath's Pi instead of system defined
+ * Moved degree to radian macro to template code in utilit class
+ * Moved SQR code to utility class
+ * Allow character strafing
+
 30th June 2002, Simon Goodall
  * Implemented basic Exceptions to eventually replace all error checking
  * Added Sear Namespace

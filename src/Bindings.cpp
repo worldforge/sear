@@ -7,7 +7,7 @@
 #include "Config.h"
 
 #include <SDL/SDL.h>
-#include <iostream.h>
+#include "Log.h"
 
 namespace Sear {
 
@@ -176,18 +176,18 @@ void Bindings::loadBindings(const std::string &file_name) {
 
 void Bindings::saveBindings() {
   if (_bindings) _bindings->saveConfig();
-  else std::cerr << "Bindings: Error - bindings config object not created" << std::endl;
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 void Bindings::saveBindings(const std::string &file_name) {
   if (_bindings) _bindings->saveConfig(file_name);
-  else std::cerr << "Bindings: Error - bindings config object not created" << std::endl;
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 
 void Bindings::bind(std::string key, std::string command) {
   if (key.empty()) return;
   if (command.empty()) command = "{UNBOUND}";
   if (_bindings) _bindings->setAttribute(key, command);
-  else cerr << "Bindings: Error - bindings config object not created" << endl;
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
 }
 
 std::string Bindings::idToString(int key) {
@@ -196,7 +196,7 @@ std::string Bindings::idToString(int key) {
 
 std::string Bindings::getBinding(std::string key) {
   if (!_bindings) {
-    cerr << "Bindings: Error - bindings config object not created" << endl;
+    Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
     return "";
   }
   std::string cmd = _bindings->getAttribute(key);

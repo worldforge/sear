@@ -15,7 +15,6 @@
 #include <sigc++/slot.h>
 #include <sigc++/object_slot.h>
 #include <sigc++/bind.h>
-#include <iostream.h>
 
 #include "WorldEntity.h"
 #include "Console.h"

@@ -17,8 +17,6 @@
 
 #include <Atlas/Message/DecoderBase.h>
 
-#include "debug.h"
-
 
 //Client Messages
 #define CLIENT_CONNECTING       "Connecting"

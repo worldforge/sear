@@ -183,7 +183,7 @@ protected:
   SDL_Cursor *_cursor_touch;
 
   bool _mouse_move_select;
-bool prefix_cwd;
+  bool _prefix_cwd;
 
   float _current_time;
   float _seconds;

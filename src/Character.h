@@ -6,7 +6,6 @@
 #define _CHARACTER_H_ 1
 
 #include <string>
-#include "debug.h"
 
 //#include <SDL/SDL.h>
 
@@ -26,6 +25,7 @@ public:
   void shutdown();
   
   void moveForward(float);
+  void strafe(float);
   void rotate(float);
   
   void updateLocals(bool);
@@ -72,6 +72,7 @@ protected:
   float _angle;
   float _rate;
   float _speed;
+  float _strafe_speed;
 
   WFMath::Quaternion _orient;
 

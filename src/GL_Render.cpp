@@ -22,7 +22,6 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include "Character.h"
-#include "debug.h"
 #include "ObjectLoader.h"
 
 #include "Models.h"
@@ -32,6 +31,8 @@
 #include "Impostor.h"
 #include <unistd.h>
 
+#include "Log.h"
+
 #include "conf.h"
 
 namespace Sear {
@@ -39,6 +40,8 @@ namespace Sear {
 float GL_Render::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
 float GL_Render::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
 
+//.TODO put this into a class
+	
 std::set<int> colourSet;
 std::set<int>::const_iterator colourSetIterator;
 
@@ -76,7 +79,7 @@ void GL_Render::buildColourSet() {
     ic += indx & (blueMask << blueShift);
     colourSet.insert(ic);
   }
-  std::cout << "Number of colours: " << colourSet.size() << std::endl;
+  Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::DEFAULT);
 }
 
 std::map<unsigned int, std::string> colour_mapped;
@@ -206,11 +209,11 @@ GL_Render::~GL_Render() {
 }
 
 void GL_Render::initWindow(int width, int height) {
-  std::cout << "Render: Initilising Renderer" << std::endl;
-  std::cout << "GL_VENDER: " << glGetString(GL_VENDOR) << std::endl;
-  std::cout << "GL_RENDERER: " << glGetString(GL_RENDERER) << std::endl;
-  std::cout << "GL_VERSION: " << glGetString(GL_VERSION) << std::endl;
-  std::cout << "GL_EXTENSIONS: " << glGetString(GL_EXTENSIONS) << std::endl;
+  Log::writeLog("Render: Initilising Renderer", Log::DEFAULT);
+  Log::writeLog(std::string("GL_VENDER: ") + string_fmt(glGetString(GL_VENDOR)), Log::DEFAULT);
+  Log::writeLog(std::string("GL_RENDERER: ") + string_fmt(glGetString(GL_RENDERER)), Log::DEFAULT);
+  Log::writeLog(std::string("GL_VERSION: ") + string_fmt(glGetString(GL_VERSION)), Log::DEFAULT);
+  Log::writeLog(std::string("GL_EXTENSIONS: ") + string_fmt(glGetString(GL_EXTENSIONS)), Log::DEFAULT);
   
   glLineWidth(4);
   //Check for divide by 0
@@ -240,14 +243,14 @@ void GL_Render::init() {
   setupStates();
   splash_id = requestTexture(splash_texture);
   initFont();
-  DEBUG_PRINT("Initialising Terrain");
+  Log::writeLog("Initialising Terrain", Log::DEFAULT);
   terrain = new Terrain(_system, this);
   if (!terrain->init()) {
-    DEBUG_PRINT("Error initialising Terrain. Suggest Restart!");
+    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::ERROR);
   }
   skybox = new SkyBox(_system, this);
   if (!skybox->init()) {
-    std::cerr << "Render: Error - Could not initialise Sky Box" << std::endl;
+    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::ERROR);
   }
   camera = new Camera();
   camera->init();
@@ -256,7 +259,7 @@ void GL_Render::init() {
 }
 
 void GL_Render::initLighting() {
-  std::cout << "Render: initialising lighting" << std::endl;
+  Log::writeLog("Render: initialising lighting", Log::DEFAULT);
   float gambient[4] = {0.1f, 0.1f,0.1f, 1.0f};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT,gambient);
 //  glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Should make this specific to billboard and impostors and not globally relevant
@@ -290,7 +293,7 @@ void GL_Render::initFont() {
   int loop;
   float cx;  // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
-  std::cout << "Render: Initilising Fonts" << std::endl;
+  Log::writeLog("Render: Initilising Fonts", Log::DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
   font_id = requestTexture(font_texture);
   if (font_id == -1) return; //ERROR
@@ -315,7 +318,7 @@ void GL_Render::initFont() {
 }
 
 void GL_Render::shutdownFont() {
-  std::cout << "Render: Shutting down fonts" << std::endl;
+  Log::writeLog("Render: Shutting down fonts", Log::DEFAULT);
   glDeleteLists(base,256); // Delete All 256 Display Lists
 }
 
@@ -362,7 +365,7 @@ int GL_Render::requestTexture(const std::string &texture_name, bool clamp) {
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
-    DEBUG_PRINT("Error loading texture");
+    Log::writeLog("Error loading texture", Log::ERROR);
     return -1;
   }
   createTexture(tmp, texture_id, clamp);
@@ -401,7 +404,7 @@ int GL_Render::requestTextureMask(const std::string &texture_name, bool clamp) {
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
-    DEBUG_PRINT("Error loading texture");
+    Log::writeLog("Error loading texture", Log::ERROR);
     return -1;
   }
   createTextureMask(tmp, texture_id, clamp);
@@ -516,7 +519,7 @@ void GL_Render::drawScene(const std::string& command, bool select_mode) {
       float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
       std::string id = focus->getID();
       orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), SEAR_PI / 2.0f); // Rotate by 90 degrees as WF 0 degrees is East
+      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), WFMath::Pi / 2.0f); // Rotate by 90 degrees as WF 0 degrees is East
       WFMath::Point<3> pos = focus->getAbsPos();
       x = -pos.x();
       y = -pos.y();
@@ -1033,7 +1036,7 @@ void GL_Render::procEvent(int x, int y) {
   ic += blue;
   selected_id = getSelectedID(ic);
   if (selected_id != activeID) {
-    if (!activeID.empty()) std::cout <<  "ActiveID: " << activeID <<  std::endl;
+    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::DEFAULT);
     activeID = selected_id;
   }
   stateChange(FONT);
@@ -1270,23 +1273,24 @@ void GL_Render::drawBBox(BoundBox *bbox) {
 
 void GL_Render::CheckError() {
   GLenum err = glGetError();
+  string msg;
   switch (err) {
     case GL_NO_ERROR: break;
-    case GL_INVALID_ENUM: std::cerr << "GL Error: Invalid enum!" << std::endl; break;
-    case GL_INVALID_VALUE: std::cerr << "GL Error: Invalid value!" << std::endl; break;
-    case GL_INVALID_OPERATION: std::cerr << "GL Error: Invalid operation!" << std::endl;; break;
-    case GL_STACK_OVERFLOW: std::cerr << "GL Error: Stack overflow!" << std::endl; break;
-    case GL_STACK_UNDERFLOW: std::cerr << "GL Error: Stack Underflow!" << std::endl; break;
-    case GL_OUT_OF_MEMORY: std::cerr << "GL Error: Out of memory!" << std::endl; break;
-    default: std::cerr << "GL Error: Unknown Error: " <<  err << std::endl; break; 
+    case GL_INVALID_ENUM: msg = "GL Error: Invalid enum!"; break;
+    case GL_INVALID_VALUE: msg = "GL Error: Invalid value!"; break;
+    case GL_INVALID_OPERATION: msg = "GL Error: Invalid operation!"; break;
+    case GL_STACK_OVERFLOW: msg = "GL Error: Stack overflow!"; break;
+    case GL_STACK_UNDERFLOW: msg = "GL Error: Stack Underflow!"; break;
+    case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
+    default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
   }
-  std::cerr.flush();
+  Log::writeLog(msg, Log::ERROR);
 }
 
 void GL_Render::processObjectProperties(ObjectProperties *op) {
   if (!op) {
-    std::cerr << "No OP!" << std::endl;	  
-	  return;
+    Log::writeLog("No OP!", Log::ERROR);
+    return;
   }
   glMaterialfv (GL_FRONT, GL_AMBIENT,   op->material_properties->ambient);
   glMaterialfv (GL_FRONT, GL_DIFFUSE,   op->material_properties->diffuse);
@@ -1299,15 +1303,15 @@ void GL_Render::checkModelStatus(const std::string &id) {
   ModelStruct *ms = _entity_models[id];
   if (ms) {
     if (!ms->in_use) {
-      std::cout << "Freeing entity data" << std::endl;
-      if (ms->model) {
-        std:: cout << "Deleting a model" << std::endl;
+      Log::writeLog("Freeing entity data", Log::DEFAULT);
+      if (ms->model) { // Cal3D model
+        Log::writeLog("Deleting a model", Log::DEFAULT);
         ms->model->onShutdown();
 	delete ms->model;
 	ms->model = NULL;
       }
       if (ms->models) {
-        std::cout << "Deleting a models" << std::endl;
+        Log::writeLog("Deleting a model", Log::DEFAULT);
         ms->models->shutdown();
 	delete ms->models;
 	ms->models = NULL;
@@ -1438,7 +1442,7 @@ void GL_Render::buildDisplayLists() {
   setupStates();
   states = glGenLists(LAST_STATE);
   for (State state = (State)0; state != LAST_STATE; ((int)state)++) {
-    std::cout << "Building list for state: " << state << std::endl;
+    Log::writeLog("Building list for state: " + string_fmt(state), Log::DEFAULT);
     glNewList(states + state, GL_COMPILE);
       if (stateProperties[state].alpha_test) glEnable(GL_ALPHA_TEST);
       else glDisable(GL_ALPHA_TEST);
@@ -1571,9 +1575,9 @@ void GL_Render::drawImpostor(Impostor *impostor) {
 void GL_Render::readConfig() {
   std::string temp;
   Config *general = _system->getGeneral();
-  DEBUG_PRINT("Loading Renderer Config");
+  Log::writeLog("Loading Renderer Config", Log::DEFAULT);
   if (!general) {
-    std::cerr << "GL_Render: Error - General config object does not exist!" << std::endl;
+    Log::writeLog("GL_Render: Error - General config object does not exist!", Log::ERROR);
     return;
   }
 
@@ -1656,7 +1660,7 @@ void GL_Render::readConfig() {
 void GL_Render::writeConfig() {
   Config *general = _system->getGeneral();
   if (!general) {
-    std::cerr << "GL_Render: Error- General config object does not exist!" << std::endl;
+    Log::writeLog("GL_Render: Error - General config object does not exist!", Log::ERROR);
     return;
   }
   
@@ -1895,7 +1899,6 @@ void GL_Render::nextState(int desired_state) {
   if (_current_state >= LAST_CHANGE) _current_state = 0;
   if (_current_state != desired_state) {
     // Do not want to be here if at all possible
-//    std::cout << desired_state << ", " << _current_state << std::endl;
     // Force change to required state
     switch(desired_state) {
       case FONT_TO_SKYBOX: stateChange(SKYBOX); break;
@@ -1908,7 +1911,6 @@ void GL_Render::nextState(int desired_state) {
       case FONT_TO_PANEL: stateChange(PANEL); break;
       case PANEL_TO_FONT: stateChange(FONT); break;
     }
-//    std::cerr << "Bad State Change: - " << (int)desired_state<< std::endl;
     _current_state = desired_state;  
   } else glCallList(_states + _current_state);
 }

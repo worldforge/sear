@@ -5,6 +5,7 @@
 #ifndef _UTILITY_H_
 #define _UTILITY_H_ 1
 
+#include <wfmath/const.h>
 #include <wfmath/quaternion.h>
 //class Quaternion;
 #include <string>
@@ -24,6 +25,21 @@ typedef std::strstream SSTREAM;
 #endif
 
 namespace Sear {
+
+template <class T>
+T deg_to_rad(const T & t) {
+  return (t * (WFMath::Pi / 180.0f));
+}
+	
+template <class T>
+T rad_to_deg(const T & t) {
+  return (t * (180.0f / WFMath::Pi));
+}
+
+template <class T>
+T square(T t) {
+  return (t * t);
+}
 
 template <class out_value, class in_value>
 void cast_stream(const in_value &in, out_value &out) {

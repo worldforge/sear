@@ -40,7 +40,6 @@ class Render;
 
 #define SQR(x) ((x) * (x))
 #define MAX(a,b) ((a < b) ? (b) : (a))
-#define DEG2RAD(a) (((a) * SEAR_PI) / 180.0f)
 
 //
 // Landscape Class

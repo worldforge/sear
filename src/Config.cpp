@@ -4,12 +4,11 @@
 
 #include "Config.h"
 #include <stdio.h>
-#include "debug.h"
-//#include <stdlib.h>
-#include <iostream.h>
 #include <fstream.h>
 
 #include <unistd.h>
+#include "Log.h"
+
 
 namespace Sear {
 
@@ -20,10 +19,10 @@ void Config::shutdown() {
 void Config::loadConfig(const std::string &file_name, bool prefix_cwd) {
   FILE *configfile = NULL;
   char *str = NULL;
-  std::cout << "Config: Loading file - " << file_name << std::endl;
+  Log::writeLog(std::string("Config: Loading file - ") + file_name, Log::DEFAULT);
   configfile = fopen(file_name.c_str(), READ_ACCESS);
   if (configfile == NULL) {
-    std::cerr << "Config: Error opening config file - " <<  file_name << std::endl;
+    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::ERROR);
     return;
   }
   _last_file_name = file_name;
@@ -33,9 +32,9 @@ void Config::loadConfig(const std::string &file_name, bool prefix_cwd) {
     char key[MAX_SIZE], value[MAX_SIZE];
     sscanf(str, FORMAT,  &key[0], &value[0]);
     if (prefix_cwd) {
-      char cwd[257];
-      memset(cwd, '\0', 257);
-      getcwd(cwd, 256);
+      char cwd[256];
+      memset(cwd, '\0', 256);
+      getcwd(cwd, 255);
       std::string val = std::string(cwd) + "/" + std::string(value);
       _attributes[key] = val;
     }
@@ -51,10 +50,10 @@ void Config::saveConfig() {
 
 void Config::saveConfig(const std::string &file_name) {
   FILE *configfile = NULL;
-  std::cout << "Config: Saving file - " << file_name << std::endl;
+  Log::writeLog(std::string("Config: Saving file - ") + file_name, Log::DEFAULT);
   configfile = fopen(file_name.c_str(), WRITE_ACCESS);
   if (configfile == NULL) {
-    std::cerr << "Config: Error opening config file - " <<  file_name << std::endl;
+    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::ERROR);
     return;
   }
   for (std::map<std::string, std::string>::const_iterator I = _attributes.begin(); I != _attributes.end(); I++) {

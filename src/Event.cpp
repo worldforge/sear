@@ -7,10 +7,10 @@
 #include "WorldEntity.h"
 
 #include <Eris/World.h>
-#include <iostream.h>
 #include <string>
 #include "Render.h"
 #include "Character.h"
+#include "Log.h"
 
 namespace Sear {
 
@@ -44,7 +44,7 @@ void Event::doEvent() {
     }
     case (EF_PRINT): {
       char* msg = (char*)_target;
-      std::cout << msg << std::endl;
+      Log::writeLog(msg, Log::DEFAULT);
       free(_target);
       break;
     }	  

@@ -26,7 +26,8 @@
 #include "Utility.h"
 #include <string>
 
-#define SQR(x) ((x) * (x))
+#include "Log.h"
+
 
 namespace Sear {
 
@@ -39,6 +40,7 @@ Character::Character(WorldEntity *self, System *system) :
   _angle(0.0f),
   _rate(0.0f),
   _speed(0.0f),
+  _strafe_speed(0.0f),
   _orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
   _time(0),
   _run_modifier(false)
@@ -52,12 +54,12 @@ Character::~Character() {
 bool Character::init() {
   float divisor, zaxis;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return false;
   }
   readConfig();
   _orient = _self->getOrientation();
-  divisor = sqrt(SQR(_orient.vector().x()) + SQR(_orient.vector().y()) + SQR(_orient.vector().z()));
+  divisor = sqrt(square(_orient.vector().x()) + square(_orient.vector().y()) + square(_orient.vector().z()));
   zaxis = (divisor != 0.0f) ? (_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
   _angle = -2.0f * acos(_self->getOrientation().scalar()) * zaxis;
   return true;
@@ -69,16 +71,25 @@ void Character::shutdown() {
 
 void Character::moveForward(float speed) {
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   _speed += speed;
   updateLocals(true);
 }
 
+void Character::strafe(float speed) {
+  if (!_self) {
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
+    return;
+  }
+  _strafe_speed += speed;
+  updateLocals(true);
+}
+
 void Character::rotate(float rate) {
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   if (rate != CMD_modifier) _rate += rate * _rotate_speed;
@@ -92,17 +103,21 @@ void Character::updateLocals(bool send_to_server) {
   float angle;
   unsigned int ticks;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   ticks = SDL_GetTicks();
-  angle = _rate * ((ticks - _time) / 1000.0f) * DEG_TO_RAD;
+  angle = deg_to_rad(_rate * ((ticks - _time) / 1000.0f));
   _angle += angle;
-//  if (_angle == SEAR_PI) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
+//  if (_angle == WFMath::Pi) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
   mod_speed = (_run_modifier) ? (_speed * _run_speed) : (_speed * _walk_speed);
   z = 0.0f;
   y = mod_speed * -sin(_angle);
-  x = mod_speed * cos(_angle);
+  x = mod_speed * cos(_angle);  
+  mod_speed = (_run_modifier) ? (_strafe_speed * _run_speed) : (_strafe_speed * _walk_speed);
+  z += 0.0f;
+  y += mod_speed * -sin(_angle + (WFMath::Pi / 2.0f));
+  x += mod_speed * cos(_angle + (WFMath::Pi / 2.0f));
   _time = ticks;
   _orient *= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -angle);
   if (send_to_server) updateMove(x, y, z, _orient);
@@ -113,7 +128,7 @@ void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient)
   Atlas::Message::Object::MapType args;
   Atlas::Message::Object::ListType vel;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   move = Atlas::Objects::Operation::Move::Instantiate();
@@ -134,7 +149,7 @@ void Character::getEntity(const std::string &id) {
   Atlas::Message::Object::MapType args;
   Atlas::Message::Object::ListType pos;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   move = Atlas::Objects::Operation::Move::Instantiate();
@@ -151,14 +166,14 @@ void Character::getEntity(const std::string &id) {
 
 void Character::dropEntity(const std::string &name, int quantity) {
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   if (quantity == 0) {
-    std::cout << "Quantity is 0! Dropping nothing." << std::endl;
+    Log::writeLog( "Quantity is 0! Dropping nothing.", Log::DEFAULT);
     return;
   }
-  std::cout << "Dropping " << quantity << " items of " << name << std::endl;
+  Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::DEFAULT);
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); i++) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
@@ -185,7 +200,7 @@ void Character::touchEntity(const std::string &id) {
   Atlas::Objects::Operation::Touch touch;
   Atlas::Message::Object::MapType args;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   touch = Atlas::Objects::Operation::Touch::Instantiate();
@@ -214,7 +229,7 @@ void Character::say(const std::string &msg) {
   Atlas::Objects::Operation::Talk talk;
   Atlas::Message::Object::MapType args;
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   talk =  Atlas::Objects::Operation::Talk::Instantiate();
@@ -226,7 +241,7 @@ void Character::say(const std::string &msg) {
 
 void Character::toggleRunModifier() {
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   _run_modifier = !_run_modifier;
@@ -239,7 +254,7 @@ void Character::readConfig() {
   std::string temp;
   Config *general = _system->getGeneral();
   if (!general) {
-    std::cerr << "Character: Error - General config object not created!" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   temp = general->getAttribute(KEY_character_walk_speed);
@@ -253,7 +268,7 @@ void Character::readConfig() {
 void Character::writeConfig() {
   Config *general = _system->getGeneral();
   if (!general) {
-    std::cerr << "Character: Error - General config object not created!" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   general->setAttribute(KEY_character_walk_speed, string_fmt(_walk_speed));
@@ -263,14 +278,14 @@ void Character::writeConfig() {
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {
   if (!_self) {
-    std::cerr << "Character: Error - Character object not created" << std::endl;
+    Log::writeLog("Character: Error - Character object not created", Log::ERROR);
     return;
   }
   if (quantity == 0) {
-    std::cout << "Quantity is 0! Dropping nothing." << std::endl;
+    Log::writeLog( "Quantity is 0! Dropping nothing.", Log::DEFAULT);
     return;
   }
-  std::cout << "Giving " << quantity << " items of " << name << " to " << target <<  std::endl;
+  Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::DEFAULT);
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); i++) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
