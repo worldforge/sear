@@ -1,3 +1,8 @@
+2004-12-01  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* acinclude.m4: Distribute lib3ds and SDL m4 macros to avoid configure
+	  errors
+
 2004-11-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Calendar.h: Add sigc++ include required for sigc++ 2.0.
