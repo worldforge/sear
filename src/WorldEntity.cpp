@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.38 2004-06-20 18:43:35 simon Exp $
+// $Id: WorldEntity.cpp,v 1.39 2004-06-20 20:04:20 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -184,7 +184,9 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
           if (new_pos.z() < jetty_z) new_pos.z() = jetty_z;
         }
       } else if (mode == "floating") {
-      // Do nothing, use server Z
+        // Do nothing, use server Z
+      } else if (mode == "swimming") {
+        // Do nothing, use server Z
       }
     } else {
       Eris::Entity *loc = getContainer(); // getLocation();
