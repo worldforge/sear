@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.8 2004-04-27 15:07:02 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.9 2004-04-28 10:57:01 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -41,7 +41,7 @@ namespace Sear {
 
 ScriptEngine::ScriptEngine() :
   _initialised(false),
-  //_prefix_enabled(false),
+  _prefix_enabled(true),
   _file_dir("")
 {}
 

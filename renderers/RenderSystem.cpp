@@ -107,6 +107,7 @@ void RenderSystem::invalidate() {
   assert (m_initialised);
   m_textureManager->invalidate();
   m_stateManager->invalidate();
+  dynamic_cast<GL*>(m_renderer)->invalidate();
 }
 
 StateID RenderSystem::getCurrentState() {
