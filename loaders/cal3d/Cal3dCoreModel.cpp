@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.16 2004-04-17 15:55:45 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.17 2004-04-19 19:50:19 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -50,16 +50,16 @@ static const std::string KEY_material = "material";
 static const std::string KEY_animation = "animation";
 
 static const std::string KEY_ambient_red = "ambient_red";
-static const std::string KEY_ambient_green = "ambient_blue";
-static const std::string KEY_ambient_blue = "ambient_green";
+static const std::string KEY_ambient_green = "ambient_green";
+static const std::string KEY_ambient_blue = "ambient_blue";
 static const std::string KEY_ambient_alpha = "ambient_alpha";
 static const std::string KEY_diffuse_red = "diffuse_red";
-static const std::string KEY_diffuse_green = "diffuse_blue";
-static const std::string KEY_diffuse_blue = "diffuse_green";
+static const std::string KEY_diffuse_green = "diffuse_green";
+static const std::string KEY_diffuse_blue = "diffuse_blue";
 static const std::string KEY_diffuse_alpha = "diffuse_alpha";
 static const std::string KEY_specular_red = "specular_red";
-static const std::string KEY_specular_green = "specular_blue";
-static const std::string KEY_specular_blue = "specular_green";
+static const std::string KEY_specular_green = "specular_green";
+static const std::string KEY_specular_blue = "specular_blue";
 static const std::string KEY_specular_alpha = "specular_alpha";
 static const std::string KEY_shininess = "shininess";
 static const std::string KEY_texture_map = "texture_map";

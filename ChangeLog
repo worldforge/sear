@@ -1,4 +1,10 @@
 19th April 2004, Simon Goodall
+ * Fixed blue / green mix up in cal3d loader
+
+19th April 2004, Simon Goodall
+ * Added terrain tracking for jetty entity
+
+19th April 2004, Simon Goodall
  * Added check for mode type floating for terrain tracking
 
 19th April 2004, Simon Goodall
