@@ -4,6 +4,7 @@ INCLUDES = -I..
 
 libGui_a_SOURCES = Window.cpp Window.h \
                    RootWindow.cpp RootWindow.h \
+                   Frame.cpp Frame.h \
                    Widget.cpp Widget.h \
                    Workspace.cpp Workspace.h \
                    Button.cpp Button.h \

@@ -7,6 +7,8 @@
 
 #include "gui/Container.h"
 
+namespace Sear {
+
 /// Abstract class for widget containing a series of other widgets
 /// If this starts to seem a little gtk+, then that's because I stole
 /// the idea from gtk+
@@ -43,5 +45,7 @@ public:
   HBox();
   virtual ~HBox();
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_BOX_H

@@ -5,6 +5,8 @@
 #ifndef SEAR_GUI_WIDGET_H
 #define SEAR_GUI_WIDGET_H
 
+namespace Sear {
+
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
 class Widget {
@@ -24,5 +26,7 @@ public:
 
   virtual void render() = 0;
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_WIDGET_H

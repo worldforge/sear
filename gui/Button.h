@@ -7,6 +7,8 @@
 
 #include "gui/Container.h"
 
+namespace Sear {
+
 class Graphic;
 
 /// Higher level class defining any part in the gui.
@@ -23,5 +25,7 @@ public:
 
   virtual void render() = 0;
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_WIDGET_H

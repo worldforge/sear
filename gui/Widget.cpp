@@ -6,6 +6,8 @@
 
 #include <cassert>
 
+namespace Sear {
+
 Widget::Widget() : m_parent(0) {
 }
 
@@ -19,3 +21,5 @@ void Widget::setParent(Widget * w)
 
     m_parent = w;
 }
+
+} // namespace Sear

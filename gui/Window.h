@@ -7,6 +7,8 @@
 
 #include <set>
 
+namespace Sear {
+
 /// Low level class defining any area of the screen in which we might be
 /// interested
 class Window {
@@ -23,5 +25,7 @@ private:
 public:
   virtual ~Window();
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_WINDOW_H

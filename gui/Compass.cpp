@@ -85,4 +85,4 @@ void Compass::click()
 {
 }
 
-}
+} // namespace Sear

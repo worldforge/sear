@@ -7,6 +7,8 @@
 
 #include "gui/Window.h"
 
+namespace Sear {
+
 /// This defines the gui level background of the window the game is running
 /// in, similar to the desktop in a conventional windowing system.
 class RootWindow : public Window {
@@ -14,5 +16,7 @@ public:
   RootWindow();
   virtual ~RootWindow();
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_ROOT_WINDOW_H

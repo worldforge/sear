@@ -2,30 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 Alistair Riddoch
 
-#include "gui/Box.h"
+#include "gui/Frame.h"
 
 namespace Sear {
 
-Box::Box()
+Frame::Frame()
 {
 }
 
-Box::~Box()
+Frame::~Frame()
 {
 }
 
-VBox::VBox()
-{
-}
-
-VBox::~VBox()
-{
-}
-
-HBox::HBox()
-{
-}
-HBox::~HBox()
+void Frame::render()
 {
 }
 

@@ -4,8 +4,12 @@
 
 #include "gui/RootWindow.h"
 
+namespace Sear {
+
 RootWindow::RootWindow() {
 }
 
 RootWindow::~RootWindow() {
 }
+
+} // namespace Sear

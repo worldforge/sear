@@ -4,8 +4,12 @@
 
 #include "gui/Window.h"
 
+namespace Sear {
+
 Window::Window() : m_parent(0) {
 }
 
 Window::~Window() {
 }
+
+} // namespace Sear

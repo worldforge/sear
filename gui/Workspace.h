@@ -7,6 +7,8 @@
 
 #include "gui/Widget.h"
 
+namespace Sear {
+
 class RootWindow;
 
 class Workspace : public Widget {
@@ -15,6 +17,10 @@ protected:
 public:
   Workspace();
   virtual ~Workspace();
+
+  void render();
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_WORKSPACE_H

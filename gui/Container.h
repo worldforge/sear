@@ -9,6 +9,8 @@
 
 #include <set>
 
+namespace Sear {
+
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
 class Container : public Widget {
@@ -26,5 +28,7 @@ public:
 
   virtual void render() = 0;
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUI_CONTAINER_H

@@ -6,8 +6,17 @@
 
 #include "gui/RootWindow.h"
 
+namespace Sear {
+
 Workspace::Workspace() : m_rootWindow(new RootWindow()) {
 }
 
 Workspace::~Workspace() {
 }
+
+void Workspace::render()
+{
+
+}
+
+} // namespace Sear
