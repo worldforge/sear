@@ -1,14 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.1 2005-01-06 16:33:42 simon Exp $
+// $Id: ModelRecord.h,v 1.2 2005-01-06 17:19:42 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
 
 #include <string>
-#include "Graphics.h"
+#include "renderers/Graphics.h"
 
 namespace Sear {
   class Model;
