@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.42 2004-06-21 06:17:17 alriddoch Exp $
+// $Id: Character.cpp,v 1.43 2004-06-21 10:18:34 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -101,9 +101,9 @@ namespace Sear {
 const float Character::CMD_modifier = 9999.9f;
 
 //actions
-static const std::string STOPPED = "stopped_";
-static const std::string WALKING = "walking_";
-static const std::string RUNNING = "running_";
+static const std::string STOPPED = "ch_stopped_";
+static const std::string WALKING = "ch_walking_";
+static const std::string RUNNING = "ch_running_";
 
 static const std::string GUISE = "guise";
 static const std::string HEIGHT = "height";

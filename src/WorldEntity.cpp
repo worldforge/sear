@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.39 2004-06-20 20:04:20 simon Exp $
+// $Id: WorldEntity.cpp,v 1.40 2004-06-21 10:18:34 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -29,6 +29,7 @@
 #include "Model.h"
 #include "Render.h"
 #include "WorldEntity.h"
+#include "ActionHandler.h"
 
 #include "environment/Environment.h"
 #include <set>
@@ -254,7 +255,7 @@ void WorldEntity::checkActions() {
   
   if (hasProperty(ACTION)) {
     std::string action = getProperty(ACTION).asString();
-std::cout << "Action: " << action << std::endl;
+    if (debug) std::cout << "Action: " << action << std::endl;
     if (action != last_action) {
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -267,7 +268,7 @@ std::cout << "Action: " << action << std::endl;
 	 
   if (hasProperty(MODE)) {
     std::string mode = getProperty(MODE).asString();
-std::cout << "Mode: " << mode << std::endl;
+    if (debug) std::cout << "Mode: " << mode << std::endl;
     if (mode != last_mode) {
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -283,9 +284,12 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
   ObjectHandler *object_handler = System::instance()->getObjectHandler();
   for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
     std::string str = *I;
+    if (debug) std::cout << "Changed - " << str << std::endl;
     if (str == MODE) {
       const std::string mode = getProperty(MODE).asString();
-std::cout << "Mode: " << mode << std::endl;
+      static ActionHandler *ac = System::instance()->getActionHandler();
+      ac->handleAction(mode + "_" + type(), NULL);
+      if (debug) std::cout << "Mode: " << mode << std::endl;
       if (mode != last_mode) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -294,7 +298,9 @@ std::cout << "Mode: " << mode << std::endl;
       }
     } else if (str == ACTION) {
       const std::string action = getProperty(ACTION).asString();
-std::cout << "Action: " << action << std::endl;
+      static ActionHandler *ac = System::instance()->getActionHandler();
+      ac->handleAction(action + "_" + type(), NULL);
+      std::cout << "Action: " << action << std::endl;
       if (action != last_action) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -306,6 +312,12 @@ std::cout << "Action: " << action << std::endl;
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
       if (record) record->setAppearance(mt);
+    } else if (str == "bbox") {
+std::cout << "Changing Height;" << std::endl;
+      float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
+      ObjectRecord *record = NULL;
+      if (object_handler) record = object_handler->getObjectRecord(getID());
+      if (record) record->setHeight(height);
     }
   }
 }

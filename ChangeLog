@@ -1,3 +1,9 @@
+2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>
+	* src/WorldEntity.cpp: Add action events for mode and action changed
+	* src/Character.cpp: Rename action event to avoid name clashes
+	* src/Model.h, src/ObjectRecord.h, src/WorldEntity.cpp: Dyamically
+	  resize models when bbox changes.
+
 2004-06-22  James Turner  <james@worldforge.org>
 
 	* Make joystick axes configurable in general.cfg

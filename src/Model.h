@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.7 2004-06-13 18:21:01 simon Exp $
+//$Id: Model.h,v 1.8 2004-06-21 10:18:34 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -35,6 +35,7 @@ public:
 
   virtual bool useTextures() { return false; }
   virtual void action(const std::string &action) {}
+  virtual void setHeight(float height) {} 
   virtual void setAppearance(Atlas::Message::Element::MapType &mt) {
   std::cout << "No app" << std::endl;
   }
