@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.21 2002-11-12 23:59:22 simon Exp $
+// $Id: Graphics.cpp,v 1.22 2002-12-06 22:36:41 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -153,16 +153,18 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   if (_camera) _camera->updateCameraPos(time_elapsed);
 
   _renderer->beginFrame();
-  switch(render_mode) {
-    case (SPLASH): drawSplash(command, select_mode, time_elapsed); break;
-    case (SERVER): drawServer(command, select_mode, time_elapsed); break;
-    case (ACCOUNT): drawAccount(command, select_mode, time_elapsed); break;
-    case (LOBBY): drawLobby(command, select_mode, time_elapsed); break;
-    case (CHARACTER): drawCharacter(command, select_mode, time_elapsed); break;
-    case (INVENTORY): drawInventory(command, select_mode, time_elapsed); break;
-    case (WORLD): drawWorld(command, select_mode, time_elapsed); break;
-    default: drawSplash(command, select_mode, time_elapsed); break;
-  }
+//  switch(render_mode) {
+//    case (SPLASH): drawSplash(command, select_mode, time_elapsed); break;
+//    case (SERVER): drawServer(command, select_mode, time_elapsed); break;
+//    case (ACCOUNT): drawAccount(command, select_mode, time_elapsed); break;
+//    case (LOBBY): drawLobby(command, select_mode, time_elapsed); break;
+//    case (CHARACTER): drawCharacter(command, select_mode, time_elapsed); break;
+//    case (INVENTORY): drawInventory(command, select_mode, time_elapsed); break;
+//    case (WORLD): 
+  drawWorld(command, select_mode, time_elapsed); 
+//  break;
+//    default: drawSplash(command, select_mode, time_elapsed); break;
+//  }
 
   if (!select_mode) {
     Console *con = _system->getConsole();
@@ -319,9 +321,9 @@ Compare D^2 to choose what detail level to use
     }
   } else {
     _renderer->drawSplashScreen();
-    _renderer->stateChange(FONT);
-    _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-    _renderer->print(20, 50, "World Screen", 0);
+//    _renderer->stateChange(FONT);
+//    _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+//    _renderer->print(20, 50, "World Screen", 0);
   }
 }
 

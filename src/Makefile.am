@@ -73,6 +73,7 @@ libSear_a_SOURCES = \
 	FileHandler.h \
 	default_image.xpm \
 	default_font.xpm \
+	sear_icon.xpm \
 	ObjectRecord.h \
 	ModelRecord.h \
 	ObjectHandler.h \

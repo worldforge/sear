@@ -10,7 +10,7 @@ dnl AC_CANONICAL_TARGET
 dnl Initialise automake
 SEAR_MAJOR_VERSION=0
 SEAR_MINOR_VERSION=4
-SEAR_MICRO_VERSION=3
+SEAR_MICRO_VERSION=4
 SEAR_VERSION=$SEAR_MAJOR_VERSION.$SEAR_MINOR_VERSION.$SEAR_MICRO_VERSION
 
 AC_SUBST(SEAR_VERSION)
@@ -165,7 +165,7 @@ PKG_CHECK_MODULES(SIGC, sigc++-1.2 >= 1.1.11,
     ])
 
 dnl Check Eris
-ERIS_VERSION=0.9.5
+ERIS_VERSION=0.9.6
 AM_PATH_ERIS($ERIS_VERSION, [
   CFLAGS="$CFLAGS $ERIS_CFLAGS"
   CPPFLAGS="$CPPFLAGS $ERIS_CFLAGS"
@@ -326,16 +326,15 @@ AC_OUTPUT([
 	terrain/Makefile
 	sky/Makefile
 	gui/Makefile
+	data/Makefile
+	scripts/Makefile
 	sear.spec
 	sear-media.spec
 	data/bindings.cfg
 	data/general.cfg
 	data/general_files.cfg
-	data/models.cfg
 	data/object_file.cfg
-	data/buildings.cfg
 	data/states.cfg
-	scripts/login.script
 	scripts/startup.script
 	scripts/shutdown.script
 	Sear.iss

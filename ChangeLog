@@ -1,4 +1,8 @@
 6th December 2002, Simon Goodall
+ * file cleanups
+ * Bumped version numbers
+
+6th December 2002, Simon Goodall
  * Fixes hole where terrain joined
  * Fixes some config problems with terrain
  * Fixed segfault caused during terrain initialisation by using arrays before being created

@@ -6,10 +6,6 @@
 
  * Add support for OpenGL extensions. This is to provide higher quality effects.
  
- * Fix lighting
-  - 3ds normals are wonky.
-  - Check  whole system lighting model.
-  
  * Add ability to tokenise on quotes, not just spaces. This is a must. can only have one arg with spaces at the mo.
 
  * Allow line editing in console.
@@ -35,9 +31,6 @@
  * Improve terrain engine
    - Include demetar?
    - Look in gamedev/flipcode for the possible additions to current terrain engine
-
- * Allow mulitple terrains
-   - Allow us to load in new terrain settings on the fly
 
  * Add support to create custom font textures from say freetype
 
