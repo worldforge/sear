@@ -1,4 +1,7 @@
 BUGS
+ * some problems with multi texturing on cal3d when model doesn't have any second texture (or even first!) breaks alpha-mapping
+ * segfaults with fullscreen - win32 on call, linux when quitting
+
  * Terrain segments don't join up correctly
  * Terrain detail ossilate rapidly
 
