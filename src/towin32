@@ -1,5 +1,0 @@
-#Compiles Sear for windows as configure is currently broken for cross compiling
-
-/usr/local/cross-tools/i386-mingw32msvc/bin/gcc *.cpp -c -DHAVE_STRSTREAM -I. -I.. -I /usr/local/cross-tools/i386-mingw32msvc/lib/sigc++/include -DNDEBUG -DHAVE_STRSTREAM
-
-/usr/local/cross-tools/i386-mingw32msvc/bin/gcc *.o -lstdc++ -leris -lAtlas  -lskstream -lwsock32 -lopengl32 -lglu32 -lsigc -lcal3d -lAtlasObjects -lAtlasObjectsOperation -lAtlasObjectsEntity -lAtlasMessage -lAtlasNet -lAtlasCodecs -lwfmath -lSDL -lSDL_image -lSDLmain -o sear.exe
