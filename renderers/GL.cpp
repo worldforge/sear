@@ -197,7 +197,11 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
-  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
+  // Only request stencil if specified
+  if (checkState(RENDER_STENCIL)) {
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
+  }
+
 
   const SDL_VideoInfo *info = SDL_GetVideoInfo();
   if (!info) {
