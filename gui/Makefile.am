@@ -6,5 +6,8 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    RootWindow.cpp RootWindow.h \
                    Widget.cpp Widget.h \
                    Workspace.cpp Workspace.h \
+                   Button.cpp Button.h \
+                   Container.cpp Container.h \
+                   Box.cpp Box.h \
+                   Graphic.cpp Graphic.h \
                    Compass.cpp Compass.h
-                   

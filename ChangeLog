@@ -1,3 +1,7 @@
+2004-05-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/*: Updated ground work for gui widgets.
+
 2004-05-23  James Turner  <james@worldforge.org>
 
 	* Add in a Sprite class, including a new config file, and changes
@@ -8,7 +12,7 @@
 	  and modified.
 	* Change Graphics to create a compass and update it's angle.
 	* Add a 'sprite' state to the state config file
-	
+
 2004-05-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.h, src/Character.cpp: Add a make command that

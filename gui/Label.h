@@ -2,27 +2,23 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 Alistair Riddoch
 
-#ifndef SEAR_GUI_WIDGET_H
-#define SEAR_GUI_WIDGET_H
+#ifndef SEAR_GUI_LABEL_H
+#define SEAR_GUI_LABEL_H
+
+#include "Widget.h"
 
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
-class Widget {
-protected:
-  Widget * m_parent;
-
-  Widget();
-
+class Label : public Widget {
 private:
   // Private and unimplemented to prevent slicing
-  Widget(const Widget &);
-  const Widget & operator=(const Widget &);
+  Label(const Label &);
+  const Label & operator=(const Label &);
 public:
-  virtual ~Widget();
+  explicit Label(const std::string & text);
+  virtual ~Label();
 
-  void setParent(Widget * );
-
-  virtual void render() = 0;
+  virtual void render();
 };
 
-#endif // SEAR_GUI_WIDGET_H
+#endif // SEAR_GUI_LABEL_H
