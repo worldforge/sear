@@ -1,4 +1,8 @@
 6th March 2002, Simon Goodall
+ * Fixed terrain bug caused by array out of bounds. (might have broken something else though who thought comments were a bad idea?)
+ * Fixed bug on cally re-write where first material was not loaded properly
+
+6th March 2002, Simon Goodall
  * Updated cal3d loader to take height and default material set def
 
 5th March 2002, Simon Goodall
