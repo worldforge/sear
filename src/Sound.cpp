@@ -13,7 +13,7 @@ void Sound::init() {
 #define MONO (1)
 #define STEREO (2)
  if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, STEREO, 4096) != 0) {
-    Log::writeLog(std::string("Error init SDL_mixer: ") + MIX_GetError(), Log::LOG_ERROR);
+    Log::writeLog(std::string("Error init SDL_mixer: ") + Mix_GetError(), Log::LOG_ERROR);
     throw Exception("Error initialising SDL_mixer!");
   }
 }
@@ -42,7 +42,7 @@ Mix_Chunk *Sound::getSample(const std::string &file_name) {
     sound_map[file_name] = sample;
     return sample;
   }
-  Log::writeLog(std::string("Mix_LoadWAV: ") + MIX_GetError(), Log::LOG_ERROR);
+  Log::writeLog(std::string("Mix_LoadWAV: ") + Mix_GetError(), Log::LOG_ERROR);
   return NULL;
 }
 
@@ -55,7 +55,7 @@ Mix_Music *Sound::getMusic(const std::string &file_name) {
     music_map[file_name] = music;
     return music;
   }
-  Log::writeLog(std::string("Mix_LoadMUS: ") + MIX_GetError(), Log::LOG_ERROR);
+  Log::writeLog(std::string("Mix_LoadMUS: ") + Mix_GetError(), Log::LOG_ERROR);
   return NULL;
 }
 
