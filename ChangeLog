@@ -1,4 +1,7 @@
 20th August 2002, Simon Goodall
+ * Improved sound by changing from SDL-sound to SDL_mixer. This allows multiple sounds to be played at once
+
+20th August 2002, Simon Goodall
  * Added sound support to Sear through SDL_sound library. use the console command "/play_sound sound_file" to play a sound. currently will only play one sound file at a time.
 
 20th August 2002, Simon Goodall

@@ -173,8 +173,8 @@ if test $cross_compiling == no; then
   AC_CHECK_LIB(SDL_image,IMG_Load, [], [
     AC_MSG_ERROR(Couldn't find SDL_image. Please goto http://www.libsdl.org/projects/SDL_image)
 ])
-  AC_CHECK_LIB(SDL_sound,Sound_Init, [], [
-    AC_MSG_ERROR(Couldn't find SDL_sound. Please goto http://icculus.org/SDL_sound)
+  AC_CHECK_LIB(SDL_mixer,Mix_OpenAudio, [], [
+    AC_MSG_ERROR(Couldn't find SDL_sound. Please goto http://www.libsdl.org/projects/SDL_mixer/)
 ])
 
 
@@ -208,14 +208,14 @@ else
 	AC_MSG_ERROR(Error could not find SDL_image)
   fi
 
-  AC_CHECK_HEADER(SDL/SDL_sound.h,
-	[found_sdl_image=yes break],
-	[found_sdl_image=no])
+  AC_CHECK_HEADER(SDL/SDL_mixer.h,
+	[found_sdl_mixer=yes break],
+	[found_sdl_mixer=no])
 
-  if test $found_sdl_image == yes; then
-	LIBS="$LIBS -lSDL_sound"
+  if test $found_sdl_mixer == yes; then
+	LIBS="$LIBS -lSDL_mixer"
   else
-	AC_MSG_ERROR(Error could not find SDL_sound)
+	AC_MSG_ERROR(Error could not find SDL_mixer)
   fi
 
   AC_CHECK_HEADER(GL/gl.h,
