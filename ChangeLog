@@ -1,3 +1,7 @@
+2004-07-27  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* src/sear.in: More debian related fixes
+
 2004-07-26  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* sear.spec.in, src/Makefile.am, src/sear.in: Rename sear.bin to 
