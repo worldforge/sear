@@ -5,9 +5,9 @@
 #include "Utility.h"
 
 #include <wfmath/quaternion.h>
-
+#include <stdio.h>
 #include <string>
-
+#include <map>
 #define DELTA 0.0
 #include <math.h>
 
@@ -275,55 +275,38 @@ std::string Tokeniser::remainingTokens() {
 //  }
 }                                
   
-unsigned char *xpm_to_image(const char *image[], unsigned int width, unsigned int height) {
+unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned int &height) {
   unsigned int i, row, col;
+  unsigned int num_colours = 0;
+  unsigned int unknown = 0;
+  unsigned int index = 0;
+  cout << image[0] << endl;
+//  sscanf(image[0], "%u", &width);//, &height, &num_colours, &unknown);
+  sscanf(&image[0][0], "%u %u %u %u", &width, &height, &num_colours, &unknown);
+  cout << "Width: " << width << " Height: " << height << " Num Colours: " << num_colours << endl;
+  std::map<char, unsigned int> colour_map;
+  for (index = 1; index <= num_colours; index++) {
+    char code = image[index][0];
+    std::string colour_name = std::string(image[index]).substr(4);
+    unsigned int colour = 0;
+    if (colour_name == "None") colour = 0x00000000;
+    else {
+      sscanf(colour_name.c_str(), "#%x", &colour);
+      colour <<= 8;
+      colour |= 0xFF;
+    }
+    cout << "Colour " << code << " is " << colour_name << ", " << colour << endl;
+    colour_map[code] = colour;
+  }
   unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
   i = 0;
   for ( row=0; row < height; ++row ) {
     for ( col=0; col < width; ++col ) {
-      switch (image[height - row - 1][col]) {
-        case '.':
-          data[i++] = 0xFF;
-          data[i++] = 0xFF;
-          data[i++] = 0xFF;
-          data[i++] = 0xFF;
-          break;
-        case 'X':
-	  data[i++] = 0x0;
-	  data[i++] = 0x0;
-	  data[i++] = 0x0;
-	  data[i++] = 0x0;
-          break;
-        case ' ':
-          break;
-      }
-    }	
-  } 
-  return data;  
-}
-
-unsigned char *xpm_to_font(const char *image[], unsigned int width, unsigned int height) {
-  unsigned int i, row, col;
-  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
-  i = 0;
-  for ( row=0; row < height; ++row ) {
-    for ( col=0; col < width; ++col ) {
-      switch (image[height - row - 1][col]) {
-        case '.':
-          data[i++] = 0xFF;
-          data[i++] = 0xFF;
-          data[i++] = 0xFF;
-          data[i++] = 0x00;
-          break;
-        case 'X':
-	  data[i++] = 0x0;
-	  data[i++] = 0x0;
-	  data[i++] = 0x0;
-	  data[i++] = 0xFF;
-          break;
-        case ' ':
-          break;
-      }
+      unsigned int colour = colour_map[image[height - row - 1 + index][col]];
+      data[i++] = (colour & 0xFF000000) >> 24;
+      data[i++] = (colour & 0x00FF0000) >> 16;
+      data[i++] = (colour & 0x0000FF00) >> 8;
+      data[i++] = (colour & 0x000000FF);
     }	
   } 
   return data;  

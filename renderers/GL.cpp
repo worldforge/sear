@@ -351,7 +351,12 @@ void GL::print(GLint x, GLint y, const char * string, int set) {
 
 void GL::print3D(const char *string, int set) {
   if (set > 1) set = 1;
-  glBindTexture(GL_TEXTURE_2D, getTextureID(font_id)); // Select Our Font Texture
+  GLuint texture = getTextureID(font_id);
+  if (!glIsTexture(texture)) {
+    static GLuint default_id = getTextureID(requestTexture("default_font"));
+    texture = default_id;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture);
   glPushMatrix(); // Store The Projection Matrix
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
@@ -669,25 +674,27 @@ void GL::drawScene(const std::string& command, bool select_mode) {
 
   }
 //  nextState(FONT_TO_PANEL);
-  stateChange("console");
-if (!select_mode) _system->getConsole()->draw(command);
+  if (!select_mode) {
+    stateChange("console");
+   _system->getConsole()->draw(command);
 //  nextState(PANEL_TO_FONT);
 //  Calc FPS
-  stateChange("font");
-  frame_rate = (float)num_frames /frame_time;
-  if (checkState(RENDER_FPS)) {
-    std::string frame_rate_string = string_fmt(frame_rate).substr(0, 4);
-    glColor3f(1.0f, 0.0f, 0.0f);
-    print(10, 100, frame_rate_string.c_str(), 0);
-  }
+    stateChange("font");
+    frame_rate = (float)num_frames /frame_time;
+    if (checkState(RENDER_FPS)) {
+      std::string frame_rate_string = string_fmt(frame_rate).substr(0, 4);
+      glColor3f(1.0f, 0.0f, 0.0f);
+      print(10, 100, frame_rate_string.c_str(), 0);
+    }
   
-  if (frame_time > 1.0f) {
-    num_frames = 0;
-    frame_time = 0.0f;
-  }
-  glColor3f(1.0f, 0.75f, 0.2f);
-  print(x_pos, y_pos, active_name.c_str(), 1);
+    if (frame_time > 1.0f) {
+      num_frames = 0;
+      frame_time = 0.0f;
+    }
+    glColor3f(1.0f, 0.75f, 0.2f);
+    print(x_pos, y_pos, active_name.c_str(), 1);
   
+  }
   glFlush();
   
   if (!select_mode) SDL_GL_SwapBuffers();
@@ -801,6 +808,7 @@ void GL::procEvent(int x, int y) {
   stateChange("select"); // SELECT
   glClear(GL_COLOR_BUFFER_BIT);
   drawScene("", true);
+  return;
   y = window_height - y;
   x_pos = x;
   y_pos = y;
@@ -1292,11 +1300,12 @@ void GL::createDefaults() {
   //Create Default Texture
   Log::writeLog("Building Default Texture", Log::INFO);
   unsigned int texture_id = 0;
+  unsigned int width, height;
   glGenTextures(1, &texture_id);
 
   if (texture_id == 0) return;
 
-  unsigned char *data = xpm_to_image(default_image, default_image_width, default_image_height);
+  unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
   
   glBindTexture(GL_TEXTURE_2D, texture_id);
   
@@ -1305,7 +1314,7 @@ void GL::createDefaults() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, default_image_width, default_image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
   free (data);
   textureList.push_back(texture_id);
@@ -1318,7 +1327,8 @@ void GL::createDefaults() {
 
   if (texture_id == 0) return;
 
-  data = xpm_to_image(default_font, default_font_width, default_font_height);
+  //data = xpm_to_image(default_font, default_font_width, default_font_height);
+  data = xpm_to_image((const char**)default_font_xpm, width, height);
   
   glBindTexture(GL_TEXTURE_2D, texture_id);
   
@@ -1327,7 +1337,7 @@ void GL::createDefaults() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, default_font_width, default_font_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
   free (data);
   textureList.push_back(texture_id);

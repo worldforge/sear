@@ -1,4 +1,7 @@
 22nd July 2002, Simon Goodall
+ * Default texture and font now really xpm files as exported from gimp
+
+22nd July 2002, Simon Goodall
  * Added a built-in texture that will be used should the requested one be invalid
  * Added a built-in font texture that will be used should the requested one be invalid
 

@@ -88,8 +88,7 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
 void tokenise(std::deque<std::string> &tokens, const std::string &input);
 
-unsigned char *xpm_to_image(const char * image[], unsigned int width, unsigned int height);
-unsigned char *xpm_to_font(const char * image[], unsigned int width, unsigned int height);;
+unsigned char *xpm_to_image(const char * image[], unsigned int &width, unsigned int &height);
 
 class Tokeniser {
 public:
