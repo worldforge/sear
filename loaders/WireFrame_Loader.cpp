@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.16 2005-01-06 12:46:54 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.17 2005-03-15 17:55:04 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -48,9 +48,9 @@ ModelRecord *WireFrame_Loader::loadModel(Render *render, ObjectRecord *record, c
   WireFrame *model = new WireFrame(render);
 
   WFMath::AxisBox<3> bbox = record->bbox;
-  if (!model->init(bbox)) {
+  if (model->init(bbox)) {
   //if (!model->init(bboxCheck(bbox))) {
-    model->shutdown();
+//    model->shutdown();
     delete model;
     return NULL;
   }

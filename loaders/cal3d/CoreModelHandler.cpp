@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.8 2004-04-27 15:07:02 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.9 2005-03-15 17:55:04 simon Exp $
 
 
 #ifdef HAVE_CONFIG_H
@@ -21,43 +21,47 @@
 namespace Sear {
 	
 CoreModelHandler::CoreModelHandler() :
-  _initialised(false)
+  m_initialised(false)
 {}
 
 CoreModelHandler::~CoreModelHandler() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
+//  if (m_initialised) shutdown();
 }
 	
-void CoreModelHandler::init() {
-  if (_initialised) shutdown();
+int CoreModelHandler::init() {
+  assert(m_initialised == false);
+//  if (_initialised) shutdown();
 
-  _initialised = true;
+  m_initialised = true;
+  return 0;
 }
 
-void CoreModelHandler::shutdown() {
-  while (!_core_models.empty()) {
-    Cal3dCoreModel *core_model = _core_models.begin()->second;
+int CoreModelHandler::shutdown() {
+  assert(m_initialised == true);
+  while (!m_core_models.empty()) {
+    Cal3dCoreModel *core_model = m_core_models.begin()->second;
     assert(core_model && "Core model is NULL");
     core_model->shutdown();
     delete core_model;
-    _core_models.erase(_core_models.begin());
+    m_core_models.erase(m_core_models.begin());
   }
-  _initialised = false;
+  m_initialised = false;
+  return 0;
 }
 
 Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
-  assert(_initialised && "CoreModelHandler not initialised");
+  assert(m_initialised && "CoreModelHandler not initialised");
   // Check to see if we have this core model loaded?
-  CoreModelMap::iterator I = _core_models.find(filename);
+  CoreModelMap::iterator I = m_core_models.find(filename);
   Cal3dCoreModel *core_model;
-  if (I != _core_models.end()) {
+  if (I != m_core_models.end()) {
     core_model = I->second;
   } else {
-//    std::cout << "Loading Core Model" << std::endl << std::flush;
     // load core model
     core_model = new Cal3dCoreModel();
     core_model->init(filename);
-    _core_models[filename] = core_model;
+    m_core_models[filename] = core_model;
   }
   assert(core_model && "Core model is NULL");
   // Instantiate and return a model

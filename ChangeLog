@@ -1,5 +1,38 @@
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds_Loader.cpp, loaders/LibModelFile_Loader.cpp,
+	  loaders/cal3d/Cal3d_Loader.cpp: Expand string variables. Handle
+	  changes to init / shutdown correctly.
+	* loaders/BoundBox_Loader.cpp, loaders/NPlane_Loader.cpp,
+	  loaders/WireFrame_Loader.h: Handle changes to init / shutdown
+	  correctly.
+	* loaders/LibModelFile.cpp, loaders/LibModelFile.h, 
+	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h,
+	  loaders/cal3d/Cal3d_Loader.cpp, loaders/cal3d/Cal3d_Loader.h,
+	  loaders/cal3d/CoreModelhandler.cpp, loaders/cal3d/CoreModelHandler.h,
+	  renderers/GL.cpp, renderers/GL.h, renderers/GL.h, src/System.cpp, 
+	  src/System.h: Change member variables prefix to m_.
+	* loaders/Makefile.am, loaders/ModelHandler.cpp, loaders/ModelHandler.h,
+	  loaders/ObjectHandler.cpp, loaders/ObjectHandler.h,
+	  loaders/ObjectRecord.h, renderers/Graphics.cpp, src/Character.cpp,
+	  src/System.cpp, src/System.h, wrc/WorldEntity.cpp: Add new ModelSystem
+	  class to encapsulate model loader functions. Move config file loading
+	  from System class to appropriate loader class. Move objectrecord
+	  selection code from Graphics class to ModelSystem class.
+	* loaders/ModelHandler.cpp, loader/ModelHandler.h,
+	  loaders/ObjectHandler.cpp, loaders/ObjectHandler.h: Change member
+	  variables prefix to m_.
+	* renderers/GL.cpp, renderers/GL.h: Add initial code to get world coords
+	  from mouse click
+	* renderers/Makefile.am: Add static object to build.
+	* src/Character.cpp: Fix use of Eris::Timeouts to stop warning messages
+	* src/System.cpp: Shutdown Environment object. Register StaticObject
+	  with cachemanager. 
+	* src/WorldEntity.cpp: Update calculation of Z coord to (hopefully) 
+	  correctly handle moving into a container entity.
+
+2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/Model.h, loaders/3ds.cpp, loaders/3ds.h, loaders/BoundBox.cpp,
 	  loaders/BoundBox.h, loaders/NPlane.cpp, loaders/NPlane.h, 
 	  loaders/WireFrame.cpp, loaders/WireFrame.h,

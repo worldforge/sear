@@ -1,6 +1,19 @@
  TODO
 ======
 
+ -- allow multiple terrain entities
+
+Render Queue
+------------
+
+ * Loop through each object and update the animations
+ * Loop through each object and check visibility
+ * Loop through each object and get all the meshes to render
+  - Encode required transform and re-check visibility
+  - Add to a priority queue and sort by texture, states, transparency etc..
+ * Render the queue
+
+
 TextureManager
  * Implement reference counting for textures so they can be unloaded when no 
    longer required

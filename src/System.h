@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.52 2005-03-04 17:58:24 simon Exp $
+// $Id: System.h,v 1.53 2005-03-15 17:55:05 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -23,8 +23,8 @@ class ActionHandler;
 class Calendar;
 class Client;
 class FileHandler;
-class ModelHandler;
-class ObjectHandler;
+//class ModelHandler;
+//class ObjectHandler;
 class ScriptEngine;
 class Console;
 class Workspace;
@@ -136,14 +136,14 @@ public:
    * @param ss Sytem state to set
    * @param state Value of state
    */ 
-  void setState(SystemState ss, bool state) { _systemState[ss] = state; }
+  void setState(SystemState ss, bool state) { m_systemState[ss] = state; }
   
   /**
    * Get value of a system state
    * @param ss System state to query
    * @return Value of query state
    */ 
-  bool checkState(SystemState ss) const { return _systemState[ss]; }
+  bool checkState(SystemState ss) const { return m_systemState[ss]; }
 
   //Graphics *getGraphics() const { return _graphics; }
   
@@ -156,17 +156,17 @@ public:
    * Get the Model Config object
    * @return Reference to model config object
    */ 
-  varconf::Config &getModel() { return _models; } 
+//  varconf::Config &getModel() { return m_models; } 
   /**
    * Get the ModelRecords Config object
    * @return Reference to ModelRecords config object
    */ 
-  varconf::Config &getModelRecords() { return _model_records; }
+//  varconf::Config &getModelRecords() { return m_model_records; }
   /**
    * Get the ObjectRecords Config object
    * @return Reference to ObjectRecords config object
    */ 
-  varconf::Config &getObjectRecords() { return _object_records; }
+//  varconf::Config &getObjectRecords() { return m_object_records; }
   
   /**
    * Enable or disable key repeating.
@@ -174,18 +174,18 @@ public:
    **/
   void vEnableKeyRepeat(bool bEnable = true);
  
-  ScriptEngine *getScriptEngine() const { return _script_engine; }
-  ModelHandler *getModelHandler() const { return _model_handler; }
-  ActionHandler *getActionHandler() const { return _action_handler; }
-  FileHandler *getFileHandler() const { return _file_handler; }
-  ObjectHandler *getObjectHandler() const { return _object_handler; }
-  Calendar *getCalendar() const { return _calendar; }
+  ScriptEngine *getScriptEngine() const { return m_script_engine; }
+//  ModelHandler *getModelHandler() const { return m_model_handler; }
+  ActionHandler *getActionHandler() const { return m_action_handler; }
+  FileHandler *getFileHandler() const { return m_file_handler; }
+//  ObjectHandler *getObjectHandler() const { return m_object_handler; }
+  Calendar *getCalendar() const { return m_calendar; }
   
-  Console *getConsole() { return _console; }
-  Workspace *getWorkspace() { return _workspace; }
-  Character *getCharacter() { return _character; }
+  Console *getConsole() { return m_console; }
+  Workspace *getWorkspace() { return m_workspace; }
+  Character *getCharacter() { return m_character; }
   
-  static System *instance() { return _instance; }
+  static System *instance() { return m_instance; }
 
   void switchCursor(int);
   void setAction(int);
@@ -194,50 +194,52 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-  Client *getClient() const { return _client; }
+  Client *getClient() const { return m_client; }
+
 protected:
-  int action;
   bool initVideo();
   
   void handleEvents(const SDL_Event &);
   void handleAnalogueControllers();
-  void handleJoystickMotion(Uint8 axis, Sint16 value);
-  
-  bool mouseLook;
-  SDL_Surface *screen;
-  Client *_client;
-  static System *_instance;
-  std::string _icon_file;
-  SDL_Surface *_icon;
+  void handleJoystickMotion(Uint8 axis, Sint16 value);  
+  void processRecords();
+
+  int m_action;
+  bool m_mouseLook;
+  SDL_Surface *m_screen;
+  Client *m_client;
+  static System *m_instance;
+  std::string m_icon_file;
+  SDL_Surface *m_icon;
   
   int m_width;
   int m_height;
   int m_KeyRepeatDelay;
   int m_KeyRepeatRate;
 
-  bool _click_on;
-  int _click_x;
-  int _click_y;
-  std::string _click_id;
-  double _click_seconds;
+  bool m_click_on;
+  int m_click_x;
+  int m_click_y;
+  std::string m_click_id;
+  double m_click_seconds;
 
-  ScriptEngine *_script_engine; ///< Pointer to scripting engine object
-  FileHandler *_file_handler; ///< Pointer to file handler object
-  ModelHandler *_model_handler; ///< Pointer to model handler object
-  ActionHandler *_action_handler; ///< Pointer to action handler object
-  ObjectHandler *_object_handler; ///< Pointer to object handler object
-  Calendar *_calendar; ///< Pointer to calender object
+  ScriptEngine *m_script_engine; ///< Pointer to scripting engine object
+  FileHandler *m_file_handler; ///< Pointer to file handler object
+//  ModelHandler *m_model_handler; ///< Pointer to model handler object
+  ActionHandler *m_action_handler; ///< Pointer to action handler object
+//  ObjectHandler *m_object_handler; ///< Pointer to object handler object
+  Calendar *m_calendar; ///< Pointer to calender object
    
   varconf::Config m_general;
-  varconf::Config _models;
+//  varconf::Config m_models;
 
-  varconf::Config _model_records;
-  varconf::Config _object_records;
+//  varconf::Config m_model_records;
+//  varconf::Config m_object_records;
   
-  SDL_Joystick *_controller;
-  Console *_console;
-  Workspace *_workspace;
-  Character *_character;
+  SDL_Joystick *m_controller;
+  Console *m_console;
+  Workspace *m_workspace;
+  Character *m_character;
  
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
@@ -245,7 +247,7 @@ protected:
 
   bool m_mouse_move_select;
 
-  double _seconds;
+  double m_seconds;
 
   typedef struct {
     std::string section;
@@ -253,10 +255,9 @@ protected:
     varconf::Config *config;
   } VarconfRecord;
 
-  std::list<VarconfRecord*> record_list;
-  bool _process_records;
-  void processRecords();
-  Sound *sound;
+  std::list<VarconfRecord*> m_record_list;
+  bool m_process_records;
+  Sound *m_sound;
   
   typedef enum {
     AXIS_STRAFE,
@@ -274,11 +275,11 @@ public:
   void varconf_error_callback(const char *);
   
 private:
-  bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
-  bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
+  bool m_systemState[SYS_LAST_STATE]; ///< Array storing various system states
+  bool m_system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
 
   Editor *m_editor;
-  bool _initialised; ///< Initialisation state of System
+  bool m_initialised; ///< Initialisation state of System
 };
 
 } /* namespace Sear */

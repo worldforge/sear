@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.18 2005-01-06 12:46:54 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.19 2005-03-15 17:55:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -64,8 +64,8 @@ ModelRecord *NPlane_Loader::loadModel(Render *render, ObjectRecord *record, cons
   float height =  (double)model_config.getItem(model_id, KEY_height);
   int num_planes = (int)model_config.getItem(model_id, KEY_num_planes);
   // Initialise model
-  if (!model->init(type, num_planes, width, height)) {
-    model->shutdown();
+  if (model->init(type, num_planes, width, height)) {
+//    model->shutdown();
     delete model;
     return NULL;
   }

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2005 Simon Goodall
 
-// $Id: CacheObject.h,v 1.1 2005-01-09 16:09:44 simon Exp $
+// $Id: CacheObject.h,v 1.2 2005-03-15 17:55:05 simon Exp $
 
 #ifndef SEAR_CACHEOBJECT_H
 #define SEAR_CACHEOBJECT_H 1

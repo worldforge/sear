@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.2 2005-03-04 17:58:23 simon Exp $
+// $Id: LibModelFile.cpp,v 1.3 2005-03-15 17:55:03 simon Exp $
 
 /*
   Debug check list
@@ -57,14 +57,16 @@ LibModelFile::LibModelFile(Render *render) : Model(render),
 {}
 
 LibModelFile::~LibModelFile() {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
+//  if (m_initialised) shutdown();
 }
   
-bool LibModelFile::init(const std::string &filename) {
+int LibModelFile::init(const std::string &filename) {
+  assert(m_initialised == false);
   libmd3_file *modelFile = libmd3_file_load(filename.c_str());
   if (!modelFile) {
     std::cerr << "Error loading .md3 file" << std::endl;
-    return false;
+    return 1;
   }
 
   for (int i = 0; i < modelFile->header->mesh_count; ++i) {
@@ -172,10 +174,10 @@ bool LibModelFile::init(const std::string &filename) {
 //  free (modelFile);
 
   m_initialised = true;
-  return true;
+  return 0;
 }
 
-void LibModelFile::shutdown() {
+int LibModelFile::shutdown() {
   assert(m_initialised);
   m_initialised = false;
 
@@ -196,6 +198,8 @@ void LibModelFile::shutdown() {
   m_faces = NULL;
 
   m_num_triangles = 0;
+
+  return 0;
 }
 
 void LibModelFile::invalidate() {
@@ -239,7 +243,7 @@ void LibModelFile::genVBOs() {
 }
  
 void LibModelFile::render(bool select_mode) {
-  assert(_render && "LibModelFile _render is null");
+  assert(m_render && "LibModelFile m_render is null");
 
   // Default material properties
   static float ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -256,7 +260,7 @@ void LibModelFile::render(bool select_mode) {
     if (!glIsBufferARB(m_vbos[0])) genVBOs();
 
     // Set material properties
-    _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
+    m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
 
     // Bind Vertex Array
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[0]);
@@ -298,7 +302,7 @@ void LibModelFile::render(bool select_mode) {
       glNewList(list, GL_COMPILE_AND_EXECUTE);
 
       // Set material properties
-      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
+      m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
 
       // Setup vertex pointers
       glVertexPointer(3, GL_SHORT, 0, m_vertex_data);

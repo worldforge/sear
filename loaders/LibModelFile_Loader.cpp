@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.1 2005-02-21 14:16:46 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.2 2005-03-15 17:55:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -11,6 +11,9 @@
 #include <varconf/Config.h>
 
 #include "src/System.h"
+#include "src/FileHandler.h"
+
+#include "ModelSystem.h"
 
 #include "ModelHandler.h"
 #include "ModelRecord.h"
@@ -43,14 +46,20 @@ LibModelFile_Loader::~LibModelFile_Loader() {
 
 ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-  if (!System::instance()->getModel().findItem(LIBMODELFILE, model_record->data_file_id)) {
+
+
+  if (!ModelSystem::getInstance().getModels().findItem(LIBMODELFILE, model_record->data_file_id)) {
     std::cerr << "Error: No MD3 filename" << std::endl;
     return NULL;
   }
-  std::string file_name = System::instance()->getModel().getItem(LIBMODELFILE, model_record->data_file_id);
+  std::string file_name = ModelSystem::getInstance().getModels().getItem(LIBMODELFILE, model_record->data_file_id);
+  System::instance()->getFileHandler()->expandString(file_name);
+
+  if (debug) printf("LibModelFile_Loader: Loading %s\n", file_name.c_str());
+
   LibModelFile *model = new LibModelFile(render);
-  if (!model->init(file_name)) {
-    model->shutdown();
+  if (model->init(file_name)) {
+//    model->shutdown();
     delete model;
     return NULL;
   }

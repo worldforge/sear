@@ -4,6 +4,7 @@ noinst_LIBRARIES = libModelLoader.a
 INCLUDES = -I$(top_srcdir)
 
 libModelLoader_a_SOURCES = \
+	ModelSystem.cpp ModelSystem.h \
 	ModelHandler.cpp ModelHandler.h \
 	ObjectHandler.cpp ObjectHandler.h \
 	WireFrame.cpp WireFrame_Loader.cpp \

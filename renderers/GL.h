@@ -91,7 +91,7 @@ public:
   void writeConfig(varconf::Config &config);
   void setupStates();
 
-  float getLightLevel() { return _light_level; }
+  float getLightLevel() { return m_light_level; }
 
   void translateObject(float x, float y, float z);
   void rotate(float angle, float x, float y, float z);
@@ -125,26 +125,28 @@ public:
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void resize(int width, int height);
 
+  void getWorldCoords(int x, int y, float &wx, float &wy,float &wz);
+
 protected:
-  System *_system;
-  Graphics *_graphics;
+  System *m_system;
+  Graphics *m_graphics;
 
-  const float fov;
-  const float near_clip;
-  float _far_clip_dist;
+  const float m_fov;
+  const float m_near_clip;
+  float m_far_clip_dist;
 
-  GLuint base;
+  GLuint m_base;
 
-  int font_id;
-  int splash_id;
+  int m_font_id;
+  int m_splash_id;
 
-  float frustum[6][4];
+  float m_frustum[6][4];
   
 //  std::string activeID;
-  std::string active_name;
-  WorldEntity *activeEntity;
-  int x_pos;
-  int y_pos;
+  std::string m_active_name;
+  WorldEntity *m_activeEntity;
+  int m_x_pos;
+  int m_y_pos;
   
   
   void buildQueues(WorldEntity*, int, bool);
@@ -155,35 +157,37 @@ protected:
     LIGHT_LAST
   } lightSources;
 
-  Light lights[LIGHT_LAST];
+  Light m_lights[LIGHT_LAST];
 
-  float _speech_offset_x;
-  float _speech_offset_y;
-  float _speech_offset_z;
+  float m_speech_offset_x;
+  float m_speech_offset_y;
+  float m_speech_offset_z;
 
-  float _fog_start;
-  float _fog_end;
-  float _light_level;
+  float m_fog_start;
+  float m_fog_end;
+  float m_light_level;
 
   static const unsigned int NUM_COLOURS = 512;
-  GLubyte colourArray[NUM_COLOURS][3];
-  WorldEntity *entityArray[NUM_COLOURS];
-  unsigned int colour_index;
-  std::map<unsigned int, std::string> colour_mapped;
+  GLubyte m_colourArray[NUM_COLOURS][3];
+  WorldEntity *m_entityArray[NUM_COLOURS];
+  unsigned int m_colour_index;
+  std::map<unsigned int, std::string> m_colour_mapped;
   
-  GLint redBits, greenBits, blueBits;
-  GLuint redMask, greenMask, blueMask;
-  int redShift, greenShift, blueShift;
+  GLint m_redBits, m_greenBits, m_blueBits;
+  GLuint m_redMask, m_greenMask, m_blueMask;
+  int m_redShift, m_greenShift, m_blueShift;
   
-  inline static  GLuint makeMask(GLuint bits);
-  inline void resetColours();
+  static GLuint makeMask(GLuint bits) {
+    // Create an 8-bit mask with 'bits' set to 1
+    return (0xFF >> (8 - bits));
+  }
+  void resetColours() { m_colour_index = 1; }
   inline WorldEntity *getSelectedID(unsigned int i);
   void nextColour(WorldEntity*);
 
   void setupExtensions();
-  bool use_ext_texture_filter_anisotropic;
-  bool use_sgis_generate_mipmap;
-  bool _multi_texture_mode;
+  bool m_use_sgis_generate_mipmap;
+  bool m_multi_texture_mode;
   bool m_initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);

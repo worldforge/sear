@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.110 2005-03-04 17:58:24 simon Exp $
+// $Id: System.cpp,v 1.111 2005-03-15 17:55:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -16,6 +16,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sigc++/slot.h>
+#include <sage/sage.h>
 #include <sage/GL.h>
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
@@ -36,9 +37,11 @@
 #include "Exception.h"
 #include "FileHandler.h"
 #include "renderers/Graphics.h"
-#include "loaders/ModelHandler.h"
-#include "loaders/ObjectHandler.h"
+#include "loaders/ModelSystem.h"
+//#include "loaders/ModelHandler.h"
+//#include "loaders/ObjectHandler.h"
 #include "renderers/Render.h"
+#include "renderers/GL.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
 #include "System.h"
@@ -49,6 +52,9 @@
 
 #include "gui/Workspace.h"
 #include "gui/Toplevel.h"
+
+#include "CacheManager.h"
+#include "renderers/StaticObject.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -83,11 +89,11 @@ namespace Sear {
   static const std::string GET_ATTRIBUTE = "getat";
   static const std::string SET_ATTRIBUTE = "setat";
 
-  static const std::string LOAD_MODEL_RECORDS = "load_model_records";
-  static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
+//  static const std::string LOAD_MODEL_RECORDS = "load_model_records";
+//  static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
   static const std::string LOAD_GENERAL_CONFIG = "load_general";
   static const std::string LOAD_KEY_BINDINGS = "load_bindings";
-  static const std::string LOAD_MODEL_CONFIG = "load_models";
+//  static const std::string LOAD_MODEL_CONFIG = "load_models";
   static const std::string SAVE_GENERAL_CONFIG = "save_general";
   static const std::string SAVE_KEY_BINDINGS = "save_bindings";
   static const std::string READ_CONFIG = "read_config";
@@ -124,125 +130,127 @@ namespace Sear {
   static const int DEFAULT_key_repeat_delay = 1000;
   static const int DEFAULT_key_repeat_rate = 500;
   
-System *System::_instance = NULL;
+System *System::m_instance = NULL;
 
 System::System() :
-  action(ACTION_DEFAULT),
-  mouseLook(0),
-  screen(NULL),
-  _client(NULL),
-  _icon(NULL),
-   m_width(0),
-   m_height(0),
-   m_KeyRepeatDelay(DEFAULT_key_repeat_delay),
-   m_KeyRepeatRate(DEFAULT_key_repeat_rate),
-  _click_on(false),
-  _click_x(0),
-  _click_y(0),
-  _script_engine(NULL),
-  _model_handler(NULL),
-  _action_handler(NULL),
-  _object_handler(NULL),
-  _calendar(NULL),
-  _controller(NULL),
-  _console(NULL),
-  _character(NULL),
+  m_action(ACTION_DEFAULT),
+  m_mouseLook(0),
+  m_screen(NULL),
+  m_client(NULL),
+  m_icon(NULL),
+  m_width(0),
+  m_height(0),
+  m_KeyRepeatDelay(DEFAULT_key_repeat_delay),
+  m_KeyRepeatRate(DEFAULT_key_repeat_rate),
+  m_click_on(false),
+  m_click_x(0),
+  m_click_y(0),
+  m_script_engine(NULL),
+//  m_model_handler(NULL),
+  m_action_handler(NULL),
+//  m_object_handler(NULL),
+  m_calendar(NULL),
+  m_controller(NULL),
+  m_console(NULL),
+  m_character(NULL),
   m_mouse_move_select(false),
-  _seconds(0.0),
-  _process_records(false),
-  sound(NULL),
-  _system_running(false),
+  m_seconds(0.0),
+  m_process_records(false),
+  m_sound(NULL),
+  m_system_running(false),
   m_editor(NULL),
-  _initialised(false)
+  m_initialised(false)
 {
-  _instance = this;
+  m_instance = this;
   // Initialise system states
-  for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) _systemState[i] = false;
+  for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) m_systemState[i] = false;
     
   // create the filehandler early, so we can call addSearchPath on it
-  _file_handler = new FileHandler();
+  m_file_handler = new FileHandler();
 }
 
 System::~System() {
-  if (_initialised) shutdown();
+  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 
 bool System::init(int argc, char *argv[]) {
-  if (_initialised) shutdown();
+  assert (m_initialised == false);
+  if (m_initialised) shutdown();
   if (!initVideo()) return false;
 
 
-  _script_engine = new ScriptEngine();
-  _script_engine->init();
-  _model_handler = new ModelHandler();
-  _model_handler->init();
-  _client = new Client(this, CLIENT_NAME);
-  if(!_client->init()) {
+  m_script_engine = new ScriptEngine();
+  m_script_engine->init();
+//  m_model_handler = new ModelHandler();
+//  m_model_handler->init();
+  m_client = new Client(this, CLIENT_NAME);
+  if(!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
     throw Exception("ERIS INIT");
   }
   
   // This should not be hardcoded!!
-  _action_handler = new ActionHandler(this);
-  _action_handler->init();
+  m_action_handler = new ActionHandler(this);
+  m_action_handler->init();
 
-  _object_handler = new ObjectHandler();
-  _object_handler->init();
+//  m_object_handler = new ObjectHandler();
+//  m_object_handler->init();
  
-  _calendar = new Calendar();
-  _calendar->init();
+  m_calendar = new Calendar();
+  m_calendar->init();
  
   // Connect signals for record processing 
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+//  m_models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+//  m_model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
   // Connect signals for error messages
   m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+//  m_models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+//  m_model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
   Bindings::bind("escape", "/" + QUIT);
   Bindings::bind("backquote", "/toggle_console");
   Bindings::bind("caret", "/toggle_console");
   
-  _console = new Console(this);
-  _console->init();
-  registerCommands(_console);
+  m_console = new Console(this);
+  m_console->init();
+  registerCommands(m_console);
 
-  _client->registerCommands(_console);
-  _script_engine->registerCommands(_console);
-  _action_handler->registerCommands(_console);
-  _file_handler->registerCommands(_console);
-  _object_handler->registerCommands(_console);
-  _calendar->registerCommands(_console);
+  m_client->registerCommands(m_console);
+  m_script_engine->registerCommands(m_console);
+  m_action_handler->registerCommands(m_console);
+  m_file_handler->registerCommands(m_console);
+//  m_object_handler->registerCommands(m_console);
+  m_calendar->registerCommands(m_console);
 
-  _character = new Character();
-  _character->init();
-  _character->registerCommands(_console);
+  m_character = new Character();
+  m_character->init();
+  m_character->registerCommands(m_console);
 
 // TODO this is leaked
   m_editor = new Editor();
-  m_editor->registerCommands(_console);
+  m_editor->registerCommands(m_console);
 
-  _workspace = new Workspace(this);
+  m_workspace = new Workspace(this);
   // Toplevel * t = new Toplevel("Panel");
   // t->setPos(50, 50);
-  // _workspace->addToplevel(t);
-  _workspace->show();
-  // _workspace->registerCommands(_console);
+  // m_workspace->addToplevel(t);
+  m_workspace->show();
+  // m_workspace->registerCommands(m_console);
 
   int sticks = SDL_NumJoysticks();
   if (sticks > 0) {
     SDL_JoystickEventState(SDL_ENABLE);
-    _controller = SDL_JoystickOpen(0);
-    int axes = SDL_JoystickNumAxes(_controller);
+    m_controller = SDL_JoystickOpen(0);
+    int axes = SDL_JoystickNumAxes(m_controller);
     if (axes < 4) {
       std::cout << "Joystick has less than 4 axis" << std::endl << std::flush;
     }
-    int buttons = SDL_JoystickNumButtons(_controller);
+    int buttons = SDL_JoystickNumButtons(m_controller);
     std::cout << "Got a joystick with " << axes << " axes, and " <<
               buttons << " buttons." << std::endl << std::flush;
               
@@ -271,20 +279,29 @@ bool System::init(int argc, char *argv[]) {
   try { 
     sound = new Sound();
     sound->init();
-    sound->registerCommands(_console);
+    sound->registerCommands(m_console);
   } catch (Exception &e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
 */
   RenderSystem::getInstance().init();
-  RenderSystem::getInstance().registerCommands(_console);
+  RenderSystem::getInstance().registerCommands(m_console);
+  ModelSystem::getInstance().init();
+  ModelSystem::getInstance().registerCommands(m_console);
+  CacheManager::getInstance().init();
+
+  // Register StaticObject with CacheManager
+  StaticObject *so = new StaticObject();
+  CacheManager::getInstance().addType(so);
+  delete so;
+  
  
   Environment::getInstance().init();
 
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
-  FileHandler::FileList startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
+  FileHandler::FileList startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (FileHandler::FileList::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
-    _script_engine->runScript(*I);
+    m_script_engine->runScript(*I);
   }
 
 //  if (debug) {
@@ -311,101 +328,104 @@ bool System::init(int argc, char *argv[]) {
   if (!success) return false;
 
   // TODO:these are probably leaked, however freeing them often causes a segfault!
-  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
-  SDL_WM_SetIcon(_icon, NULL);
+  if (!m_icon) m_icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+  SDL_WM_SetIcon(m_icon, NULL);
   // Hide cursor
   SDL_ShowCursor(0);
 
   RenderSystem::getInstance().initContext();
 
-  _system_running = true;
-  _initialised = true;
+  m_system_running = true;
+  m_initialised = true;
   return true;
 }
 
 void System::shutdown() {
 
-  assert (_initialised == true);
+  assert (m_initialised == true);
   std::cout << "System: Starting Shutdown" << std::endl;
   // Save config
   writeConfig(m_general);
 
-  if (_character) {
-    _character->shutdown();
-    delete _character;
-    _character = NULL;
+  if (m_character) {
+    m_character->shutdown();
+    delete m_character;
+    m_character = NULL;
   }
-  if (_client) {
-    _client->shutdown();
-    delete _client;
-    _client = NULL;
+  if (m_client) {
+    m_client->shutdown();
+    delete m_client;
+    m_client = NULL;
   }
   
-  if (_action_handler) {
-    _action_handler->shutdown();
-    delete _action_handler;
-    _action_handler = NULL;
+  if (m_action_handler) {
+    m_action_handler->shutdown();
+    delete m_action_handler;
+    m_action_handler = NULL;
   }
-  if (_object_handler) {
-    _object_handler->shutdown();
-    delete _object_handler;
-    _object_handler = NULL;
-  }
+//  if (m_object_handler) {
+//    m_object_handler->shutdown();
+//    delete m_object_handler;
+//    m_object_handler = NULL;
+///  }
  
-  if (_model_handler) {
-    _model_handler->shutdown();
-    delete _model_handler;
-    _model_handler = NULL;
-  }  
-  
+//  if (m_model_handler) {
+//    m_model_handler->shutdown();
+//    delete m_model_handler;
+//    m_model_handler = NULL;
+//  }  
+  CacheManager::getInstance().shutdown();
+  Environment::getInstance().shutdown();
+  ModelSystem::getInstance().shutdown(); 
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
+
 
   if (m_editor) {
     delete m_editor;
     m_editor = NULL;
   }
 
-  if (_workspace)  {
-    delete _workspace;
-    _workspace = NULL;
+  if (m_workspace)  {
+    delete m_workspace;
+    m_workspace = NULL;
   }
 
-  if (_calendar) {
-    _calendar->shutdown();
-    delete _calendar;
-    _calendar = NULL;
+  if (m_calendar) {
+    m_calendar->shutdown();
+    delete m_calendar;
+    m_calendar = NULL;
   }
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
-  FileHandler::FileList shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
+  FileHandler::FileList shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
   for (FileHandler::FileList::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
-    _script_engine->runScript(*I);
+    m_script_engine->runScript(*I);
   }
   Bindings::shutdown();
-  if (_script_engine) {
-    _script_engine->shutdown();
-    delete _script_engine;
-    _script_engine = NULL;
+  if (m_script_engine) {
+    m_script_engine->shutdown();
+    delete m_script_engine;
+    m_script_engine = NULL;
   }  
-  if (_file_handler) {
-//    _file_handler->shutdown();
-    delete _file_handler;
-    _file_handler = NULL;
+  if (m_file_handler) {
+//    m_file_handler->shutdown();
+    delete m_file_handler;
+    m_file_handler = NULL;
   }
-  if (_console) {
-    _console->shutdown();
-    delete _console;
-    _console = NULL;
+  if (m_console) {
+    m_console->shutdown();
+    delete m_console;
+    m_console = NULL;
   }
  
-  if (sound) {
-    sound->shutdown();
-    delete sound;
-    sound = NULL;
+  if (m_sound) {
+    m_sound->shutdown();
+    delete m_sound;
+    m_sound = NULL;
   }
   SDL_Quit();
-  _initialised = false;
+  m_initialised = false;
   std::cout << "System: Finished Shutdown" << std::endl;
 }
 
@@ -428,27 +448,27 @@ bool System::initVideo() {
 void System::mainLoop() {
   SDL_Event event;
   static double last_time = 0.0;
-  _action_handler->handleAction("system_start", NULL);
-  while (_system_running) {
+  m_action_handler->handleAction("system_start", NULL);
+  while (m_system_running) {
     try {
-      _seconds = (double)SDL_GetTicks() / 1000.0f;
-      double time_elapsed = _seconds - last_time;
-      last_time = _seconds;
+      m_seconds = (double)SDL_GetTicks() / 1000.0f;
+      double time_elapsed = m_seconds - last_time;
+      last_time = m_seconds;
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
         // Stop processing events if we are quiting
-        if (!_system_running) break;
+        if (!m_system_running) break;
       }
       // Handle mouse and joystick
       handleAnalogueControllers();
       // poll network
-      _client->poll();
-      if (_client->getAvatar() && _client->getAvatar()->getView()) {
-        _client->getAvatar()->getView()->update();
+      m_client->poll();
+      if (m_client->getAvatar() && m_client->getAvatar()->getView()) {
+        m_client->getAvatar()->getView()->update();
       }
       // Update Calendar
-//      _calendar->update(time_elapsed);
-      if (_client->getAvatar()) _calendar->setWorldTime(_client->getAvatar()->getWorldTime());
+//      m_calendar->update(time_elapsed);
+      if (m_client->getAvatar()) m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);
     } catch (ClientException ce) {
@@ -472,23 +492,25 @@ void System::mainLoop() {
 
 void System::handleEvents(const SDL_Event &event) {
   Render *renderer = RenderSystem::getInstance().getRenderer();
-  _workspace->handleEvent(event);
+  m_workspace->handleEvent(event);
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   { 
-          _click_on = true;
-          _click_x = event.button.x;
-          _click_y = event.button.y;
-          _click_seconds = _seconds;
+          m_click_on = true;
+          m_click_x = event.button.x;
+          m_click_y = event.button.y;
+          m_click_seconds = m_seconds;
           renderer->procEvent(event.button.x, event.button.y);
-          _click_id = renderer->getActiveID();
+          float x,y,z;
+          dynamic_cast<GL*>(renderer)->getWorldCoords(m_click_x, m_click_y, x,y,z);
+          m_click_id = renderer->getActiveID();
           break;
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-          if (_character != NULL) {
-            _character->moveForward(1);
+          if (m_character != NULL) {
+            m_character->moveForward(1);
           }
         }
         break;
@@ -498,31 +520,31 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONUP: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   {
-          switch (action) {
+          switch (m_action) {
             case (ACTION_DEFAULT): {
-              double period = _seconds - _click_seconds;
+              double period = m_seconds - m_click_seconds;
               if ((period > DEFAULT_max_click_time) &&
-                  ((event.button.x != _click_x) ||
-                   (event.button.y != _click_y))) {
+                  ((event.button.x != m_click_x) ||
+                   (event.button.y != m_click_y))) {
                   std::cout << "DRAG" << std::endl << std::flush;
-                  if (_character) _character->getEntity(_click_id);
+                  if (m_character) m_character->getEntity(m_click_id);
               } else {
                   std::cout << "CLICK" << std::endl << std::flush;
-                  if (_character) _character->touchEntity(_click_id);
+                  if (m_character) m_character->touchEntity(m_click_id);
               }
             }
             break;
-            case (ACTION_PICKUP):  if (_character) _character->getEntity(_click_id); break;
-            case (ACTION_TOUCH): if (_character) _character->touchEntity(_click_id); break;
+            case (ACTION_PICKUP):  if (m_character) m_character->getEntity(m_click_id); break;
+            case (ACTION_TOUCH): if (m_character) m_character->touchEntity(m_click_id); break;
           }
           setAction(ACTION_DEFAULT);
-          _click_on = false;
+          m_click_on = false;
           break;
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-          if (_character != NULL) {
-            _character->moveForward(-1);
+          if (m_character != NULL) {
+            m_character->moveForward(-1);
           }
         }
         break;
@@ -530,11 +552,11 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_MOUSEMOTION: {
-      if (m_mouse_move_select && !mouseLook) renderer->procEvent(event.button.x, event.button.y);
+      if (m_mouse_move_select && !m_mouseLook) renderer->procEvent(event.button.x, event.button.y);
       break;
     } 
     case SDL_KEYDOWN: {
-      if (_console->consoleStatus()) {
+      if (m_console->consoleStatus()) {
         // Keys that still execute bindings with console open 
         if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
             (event.key.keysym.sym == SDLK_CARET) ||
@@ -557,7 +579,7 @@ void System::handleEvents(const SDL_Event &event) {
         {
           runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
         } else {
-          _console->vHandleInput(event.key.keysym.sym, event.key.keysym.unicode);
+          m_console->vHandleInput(event.key.keysym.sym, event.key.keysym.unicode);
         }
       } else {
         runCommand(Bindings::getBindingForKeysym(event.key.keysym));
@@ -565,7 +587,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_KEYUP: {
-      if (!_console->consoleStatus()) {
+      if (!m_console->consoleStatus()) {
         char *binding = (char *) Bindings::getBindingForKeysym(event.key.keysym).c_str();
         if (binding[0] == '+') {
           runCommand("-" + std::string(++binding));
@@ -582,11 +604,11 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_JOYBUTTONDOWN: {
       if (event.jbutton.button == DEFAULT_joystick_touch_button) {
         renderer->procEvent(m_width / 2, m_height / 2);
-        if (_character) _character->touchEntity(renderer->getActiveID());
+        if (m_character) m_character->touchEntity(renderer->getActiveID());
       }
       if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
         renderer->procEvent(m_width / 2, m_height / 2);
-        if (_character) _character->getEntity(renderer->getActiveID());
+        if (m_character) m_character->getEntity(renderer->getActiveID());
       }
       break;
     }
@@ -595,14 +617,14 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_QUIT: {
-      _system_running = false;
+      m_system_running = false;
       break;
     }
   }
 }
 
 void System::handleAnalogueControllers() {
-  if (mouseLook) {
+  if (m_mouseLook) {
     // We should still be ok if the user wants to drag something
     int mx = m_width / 2,
         my = m_height / 2;
@@ -612,8 +634,8 @@ void System::handleAnalogueControllers() {
     dy -= my;
     if (dx != 0) {
       float rotation = dx / 4.f;
-      if (_character != NULL) {
-        _character->rotateImmediate(rotation);
+      if (m_character != NULL) {
+        m_character->rotateImmediate(rotation);
       }
     }
     if (dy != 0) {
@@ -633,21 +655,21 @@ void System::handleAnalogueControllers() {
     }
   }
   
-/*  if (_controller) {
+/*  if (m_controller) {
     for (AxisBindingMap::const_iterator B=m_axisBindings.begin(); B != m_axisBindings.end(); ++B) {
-        Sint16 av = SDL_JoystickGetAxis(_controller, B->second);
+        Sint16 av = SDL_JoystickGetAxis(m_controller, B->second);
         handleJoystickMotion(B->second, av);
     }
   }
     
     std::cout << "Upd "
-              << SDL_JoystickGetAxis(_controller, 0) << ":"
-              << SDL_JoystickGetAxis(_controller, 1) << ":"
-              << SDL_JoystickGetAxis(_controller, 2) << ":"
-              << SDL_JoystickGetAxis(_controller, 3) << ":"
-              << SDL_JoystickGetAxis(_controller, 4) << ":"
-              << SDL_JoystickGetAxis(_controller, 5) << ":"
-              << SDL_JoystickGetAxis(_controller, 6) << ":"
+              << SDL_JoystickGetAxis(m_controller, 0) << ":"
+              << SDL_JoystickGetAxis(m_controller, 1) << ":"
+              << SDL_JoystickGetAxis(m_controller, 2) << ":"
+              << SDL_JoystickGetAxis(m_controller, 3) << ":"
+              << SDL_JoystickGetAxis(m_controller, 4) << ":"
+              << SDL_JoystickGetAxis(m_controller, 5) << ":"
+              << SDL_JoystickGetAxis(m_controller, 6) << ":"
               << std::endl << std::flush;
   } */
 }
@@ -655,35 +677,35 @@ void System::handleAnalogueControllers() {
 void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 {
     if (!m_axisBindings.count(axis)) return;
-    if (_character == NULL) return;
+    if (m_character == NULL) return;
     
     std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
     
     switch (m_axisBindings[axis]) {
     case AXIS_STRAFE: // Left right move
         if (abs(value) > 3200) {
-          _character->setStrafeSpeed(value / 10000.f);
+          m_character->setStrafeSpeed(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
-          _character->setStrafeSpeed(0);
+          m_character->setStrafeSpeed(0);
         }
         break;
           
     case AXIS_MOVE: // For back move
         if (abs(value) > 3200) {
-          _character->setMovementSpeed(value / -10000.f);
+          m_character->setMovementSpeed(value / -10000.f);
         } else {
             std::cout << "Y too small" << std::endl << std::flush;
-          _character->setMovementSpeed(0);
+          m_character->setMovementSpeed(0);
         }
       break;
           
     case AXIS_PAN: // Left right view
         if (abs(value) > 3200) {
-          _character->setRotationRate(value / 10000.f);
+          m_character->setRotationRate(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
-          _character->setRotationRate(0);
+          m_character->setRotationRate(0);
         }
         break;
           
@@ -711,8 +733,8 @@ void System::setCaption(const std::string &title, const std::string &icon) {
 
 void System::toggleMouselook() {
   std::cout << "System::toggleMouselook()" << std::endl << std::flush;
-  mouseLook = ! mouseLook;
-  if (mouseLook) {
+  m_mouseLook = ! m_mouseLook;
+  if (m_mouseLook) {
     RenderSystem::getInstance().setMouseVisible(false);
 //    SDL_ShowCursor(SDL_DISABLE);
     SDL_WarpMouse(m_width / 2, m_height / 2);
@@ -723,7 +745,8 @@ void System::toggleMouselook() {
 }
 
 void System::pushMessage(const std::string &msg, int type, int duration) {
-  if(_console) _console->pushMessage(msg, type, duration);
+  assert(m_console);
+  m_console->pushMessage(msg, type, duration);
 }
 
 void System::readConfig(varconf::Config &config) {
@@ -758,8 +781,9 @@ void System::readConfig(varconf::Config &config) {
 
 
   RenderSystem::getInstance().readConfig(config);
-  _character->readConfig(config);
-  _calendar->readConfig(config);
+  ModelSystem::getInstance().readConfig(config);
+  m_character->readConfig(config);
+  m_calendar->readConfig(config);
 }
 
 void System::writeConfig(varconf::Config &config) {
@@ -771,8 +795,9 @@ void System::writeConfig(varconf::Config &config) {
 
   // Write Other config objects
   RenderSystem::getInstance().writeConfig(config);
-  _character->writeConfig(config);
-  _calendar->writeConfig(config);
+  ModelSystem::getInstance().writeConfig(config);
+  m_character->writeConfig(config);
+  m_calendar->writeConfig(config);
 }
 
 void System::vEnableKeyRepeat(bool bEnable) {
@@ -789,7 +814,7 @@ void System::setAction(int new_action) {
     case (ACTION_PICKUP): switchCursor(RenderSystem::CURSOR_PICKUP); break;
     case (ACTION_TOUCH): switchCursor(RenderSystem::CURSOR_TOUCH); break;
   }
-  action = new_action;
+  m_action = new_action;
 }
 
 void System::switchCursor(int cursor) {
@@ -801,11 +826,11 @@ void System::registerCommands(Console *console) {
   console->registerCommand(EXIT, this);
   console->registerCommand(GET_ATTRIBUTE, this);
   console->registerCommand(SET_ATTRIBUTE, this);
-  console->registerCommand(LOAD_MODEL_RECORDS, this);
+//  console->registerCommand(LOAD_MODEL_RECORDS, this);
 //  console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
   console->registerCommand(LOAD_KEY_BINDINGS, this);
-  console->registerCommand(LOAD_MODEL_CONFIG, this);
+//  console->registerCommand(LOAD_MODEL_CONFIG, this);
   console->registerCommand(SAVE_GENERAL_CONFIG, this);
   console->registerCommand(SAVE_KEY_BINDINGS, this);
   console->registerCommand(READ_CONFIG, this);
@@ -824,7 +849,7 @@ void System::registerCommands(Console *console) {
 void System::runCommand(const std::string &command) {
   if (debug) Log::writeLog(command, Log::LOG_INFO);
   try {
-    _console->runCommand(command);
+    m_console->runCommand(command);
   } catch (Exception e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }// catch (...) {
@@ -835,9 +860,9 @@ void System::runCommand(const std::string &command) {
 void System::runCommand(const std::string &command, const std::string &args_t) {
   Tokeniser tokeniser;
   std::string args = args_t;
-  _file_handler->expandString(args);
+  m_file_handler->expandString(args);
   tokeniser.initTokens(args);
-  if (command == EXIT || command == QUIT) _system_running = false;
+  if (command == EXIT || command == QUIT) m_system_running = false;
   else if (command == GET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.remainingTokens();
@@ -850,33 +875,33 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     m_general.setItem(section, key, value);
   }
   else if (command == LOAD_GENERAL_CONFIG) {
-    _process_records = _script_engine->prefixEnabled();
+    m_process_records = m_script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
     m_general.readFromFile(args);
-    if (_process_records) {
-      _process_records = false;
+    if (m_process_records) {
+      m_process_records = false;
       processRecords();
     }
   }
-  else if (command == LOAD_MODEL_RECORDS) {
-    _process_records = _script_engine->prefixEnabled();
-  System::instance()->getFileHandler()->expandString(args);
-    _model_records.readFromFile(args);
-    if (_process_records) {
-      _process_records = false;
-      processRecords();
-    }
-  }
- else if (command == LOAD_MODEL_CONFIG) {
-    _process_records = _script_engine->prefixEnabled();
-  System::instance()->getFileHandler()->expandString(args);
-    _models.readFromFile(args);
-    if (_process_records) {
-      _process_records = false;
-      processRecords();
-    }
-  System::instance()->getFileHandler()->expandString(args);
-  }
+//  else if (command == LOAD_MODEL_RECORDS) {
+///    m_process_records = m_script_engine->prefixEnabled();
+//  System::instance()->getFileHandler()->expandString(args);
+//    m_model_records.readFromFile(args);
+//    if (m_process_records) {
+//      m_process_records = false;
+//      processRecords();
+//    }
+//  }
+// else if (command == LOAD_MODEL_CONFIG) {
+//    m_process_records = m_script_engine->prefixEnabled();
+//  System::instance()->getFileHandler()->expandString(args);
+//    m_models.readFromFile(args);
+//    if (m_process_records) {
+//      m_process_records = false;
+//      processRecords();
+//    }
+//  System::instance()->getFileHandler()->expandString(args);
+//  }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(args);
   }
@@ -890,7 +915,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == READ_CONFIG) {
     readConfig(m_general);
-    if (_character)_character->readConfig(m_general);
+    if (m_character)m_character->readConfig(m_general);
   }
   else if (command == BIND_KEY) {
     std::string key = tokeniser.nextToken();
@@ -903,9 +928,9 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == TOGGLE_FULLSCREEN) RenderSystem::getInstance().toggleFullscreen();
   else if (command == TOGGLE_MLOOK) toggleMouselook();
   else if (command == IDENTIFY_ENTITY) {
-    if (!_client->getAvatar()) return;
+    if (!m_client->getAvatar()) return;
     Render *renderer = RenderSystem::getInstance().getRenderer();
-    WorldEntity *we = (dynamic_cast<WorldEntity*>(_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
+    WorldEntity *we = (dynamic_cast<WorldEntity*>(m_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
     if (we) we->displayInfo();  
   }
 
@@ -915,11 +940,11 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == "setvar") {
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
-    _file_handler->setVariable(key, value);
+    m_file_handler->setVariable(key, value);
   }
   else if (command == "getvar") {
     std::string key = tokeniser.nextToken();
-    pushMessage(_file_handler->getVariable(key), CONSOLE_MESSAGE);
+    pushMessage(m_file_handler->getVariable(key), CONSOLE_MESSAGE);
   }
   
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
@@ -937,32 +962,32 @@ void System::varconf_callback(const std::string &section, const std::string &key
   if (key == "select_state") {
     config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
   }
-  if (_process_records && _script_engine->prefixEnabled()) {
+  if (m_process_records && m_script_engine->prefixEnabled()) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {
       VarconfRecord *r = new VarconfRecord();//*)malloc(sizeof(VarconfRecord));
       r->section = section;
       r->key = key; 
       r->config = &config;
-      record_list.push_back(r);
+      m_record_list.push_back(r);
     }
   }
 }
 
 void System::processRecords() {
-  while (!record_list.empty()) {
-    VarconfRecord *r = *record_list.begin();
+  while (!m_record_list.empty()) {
+    VarconfRecord *r = *m_record_list.begin();
     std::string value = r->config->getItem(r->section, r->key);
-    _file_handler->expandString(value);
+    m_file_handler->expandString(value);
     r->config->setItem(r->section, r->key, value);
     delete r;
-    record_list.erase(record_list.begin());
+    m_record_list.erase(m_record_list.begin());
   }
 }
 
 void System::addSearchPaths(std::list<std::string> l) {
   for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {        
-    _file_handler->addSearchPath(*I);
+    m_file_handler->addSearchPath(*I);
   }
 }
 
@@ -985,7 +1010,7 @@ void System::varconf_general_callback(const std::string &section, const std::str
 }
 
 void System::updateTime(double time) {
-  _calendar->serverUpdate(time);
+  m_calendar->serverUpdate(time);
 }
        
 } /* namespace Sear */

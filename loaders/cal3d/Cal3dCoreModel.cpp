@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.24 2005-02-18 11:10:32 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.25 2005-03-15 17:55:04 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -64,34 +64,39 @@ static const std::string KEY_texture_map = "texture_map";
 static const std::string KEY_rotate = "rotate";
 	
 Cal3dCoreModel::Cal3dCoreModel() :
-  _initialised(false),
+  m_initialised(false),
   m_rotate(90.0f)
 {}
 
 Cal3dCoreModel::~Cal3dCoreModel() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
+  //if (m_initialised) shutdown();
 }
 
-void Cal3dCoreModel::init(const std::string &filename) {
-  if (_initialised) shutdown();	
+int Cal3dCoreModel::init(const std::string &filename) {
+  assert(m_initialised == false);
+//  if (_initialised) shutdown();	
   // open the model configuration file
-  _core_model = new CalCoreModel("dummy");
+  m_core_model = new CalCoreModel("dummy");
   // create a core model instance
-  if(!_core_model) {
+  if(!m_core_model) {
     CalError::printLastError();
-    return;
+    return 1;
   }
 //  std::cerr << "reading config" << std::endl << std::flush;
   readConfig(filename);
  // std::cerr << "done reading config" << std::endl << std::flush;
+  return 0;
 }
 
-void Cal3dCoreModel::shutdown() {
-  if (_core_model) {
-    delete _core_model;
-    _core_model = NULL;
-  }
-  _initialised = false;
+int Cal3dCoreModel::shutdown() {
+  assert(m_initialised);
+//  if (m_core_model) {
+  delete m_core_model;
+  m_core_model = NULL;
+//  }
+  m_initialised = false;
+  return 0;
 }
 
 void Cal3dCoreModel::readConfig(const std::string &filename) {
@@ -114,80 +119,81 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
     System::instance()->getFileHandler()->expandString(path);
   }
   // Load skeleton
-  if (!_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
+  if (!m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
     CalError::printLastError();
     throw Exception();
     return;
   }
   // Get scale
   if (config.findItem(SECTION_model, KEY_scale)) {
-    _scale = (double)config.getItem(SECTION_model, KEY_scale);
+    m_scale = (double)config.getItem(SECTION_model, KEY_scale);
   } else {
-    _scale = 1.0f;
+    m_scale = 1.0f;
   }
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
 printf("Rotate %f\n", m_rotate);
   }
   // Load all meshes 
-  for (MeshMap::const_iterator I = _meshes.begin(); I != _meshes.end(); ++I) {
+  for (MeshMap::const_iterator I = m_meshes.begin(); I != m_meshes.end(); ++I) {
     std::string mesh_name = I->first;
-    int mesh = _core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
+    int mesh = m_core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
     if (mesh == -1) {
       std::cerr << "Error loading mesh - " << path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name) << std::endl;
       CalError::printLastError();
     } else {
-      _meshes[mesh_name] = mesh;
+      m_meshes[mesh_name] = mesh;
     }
   }
   // Load all animations
-  for (AnimationMap::const_iterator I = _animations.begin(); I != _animations.end(); ++I) {
+  for (AnimationMap::const_iterator I = m_animations.begin(); I != m_animations.end(); ++I) {
     std::string animation_name = I->first;
-    int animation = _core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
+    int animation = m_core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
     if (animation == -1) {
       std::cerr << "Error loading animation - " << path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name) << std::endl;
       CalError::printLastError();
     } else {
-      _animations[animation_name] = animation;
+      m_animations[animation_name] = animation;
     }
   }
   // Load all materials
-  for (MaterialList::const_iterator I = _material_list.begin(); I != _material_list.end(); ++I) {
+  for (MaterialList::const_iterator I = m_material_list.begin();
+                                    I != m_material_list.end(); ++I) {
     std::string material_name = *I;
     int length =  material_name.find_first_of("_");
     std::string set = material_name.substr(0,length);
     std::string part = material_name.substr(length + 1);
    std::cout << "Set: " << set << " - Part: " << part << std::endl;
-    int material = _core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
+    int material = m_core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
     if (material == -1) {
       std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
       CalError::printLastError();
     } else {
-      _materials[set][part] = material;
+      m_materials[set][part] = material;
     }
     // Create material thread and assign material to a set;
-    if (_sets[set] == 0) {
-      _sets[set] = set_counter++;
+    if (m_sets[set] == 0) {
+      m_sets[set] = set_counter++;
 //      if (debug)
- std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
+ std::cout << "Creating set " << set << " with id  " << m_sets[set] << std::endl;
     }
-    if (_parts[part] == 0) {
-      _parts[part] = part_counter++;
+    if (m_parts[part] == 0) {
+      m_parts[part] = part_counter++;
 //      if (debug)
- std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
+ std::cout << "Creating part " << part << " with id  " << m_parts[part] << std::endl;
     }
-    _core_model->createCoreMaterialThread(_parts[part] - 1);
+    m_core_model->createCoreMaterialThread(m_parts[part] - 1);
 //     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
-    _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);
+    m_core_model->setCoreMaterialId(m_parts[part] - 1, m_sets[set] - 1, material);
   }
   // Check for custom material settings
-  for (MaterialsMap::const_iterator I = _materials.begin(); I != _materials.end(); ++I) {
+  for (MaterialsMap::const_iterator I = m_materials.begin(); I != m_materials.end(); ++I) {
     std::string set = I->first;
     for (MaterialMap::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
       std::string part = J->first;
       std::string section = SECTION_material + "_" + set + "_" + part;
-      CalCoreMaterial *material = _core_model->getCoreMaterial(J->second);
+      CalCoreMaterial *material = m_core_model->getCoreMaterial(J->second);
       if (!material) continue;
       // Check all keys
       if (config.findItem(section, KEY_ambient_red)) {
@@ -266,15 +272,15 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
   if (section == SECTION_model) {
     if (key == KEY_mesh) {}
     else if (key.substr(0, KEY_mesh.size()) == KEY_mesh) {
-      _meshes[key.substr(KEY_mesh.size() + 1)] = 0;
+      m_meshes[key.substr(KEY_mesh.size() + 1)] = 0;
     }
     if (key == KEY_animation) {}
     else if (key.substr(0, KEY_animation.size()) == KEY_animation) {
-      _animations[key.substr(KEY_animation.size() + 1)] = 0;
+      m_animations[key.substr(KEY_animation.size() + 1)] = 0;
     }
     if (key == KEY_material) {}
     else if (key.substr(0, KEY_material.size()) == KEY_material) {
-      _material_list.push_back(key.substr(KEY_material.size() + 1));;
+      m_material_list.push_back(key.substr(KEY_material.size() + 1));;
     }
   }
 }
@@ -291,7 +297,10 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
 
 Cal3dModel *Cal3dCoreModel::instantiate() {
   Cal3dModel *model = new Cal3dModel(RenderSystem::getInstance().getRenderer());
-  model->init(this);
+  if (model->init(this)) {
+    delete model;
+    model = NULL;
+  }
   return model;
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.47 2005-03-04 17:58:25 simon Exp $
+// $Id: WorldEntity.cpp,v 1.48 2005-03-15 17:55:05 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -24,6 +24,7 @@
 #include "Console.h"
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
+#include "loaders/ModelSystem.h"
 #include "loaders/Model.h"
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
@@ -137,17 +138,23 @@ const WFMath::Quaternion WorldEntity::getAbsOrient()
 const WFMath::Point<3> WorldEntity::getAbsPos() {
 //return getPredictedPos();
 #if (1)
-   // This function is still required to adjust the Z position of the entity
-   // TODO Needs checking when terrain start working again
+ // This function is still required to adjust the Z position of the entity
+ // TODO Needs checking when terrain start working again
 
 
-    WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
-    if (!loc) return getPredictedPos(); // nothing below makes sense for the world.
+  WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
+  if (!loc) return getPredictedPos(); // nothing below makes sense for the world.
 //    
-    WFMath::Point<3> absPos(
- loc->getPredictedPos().x() + getPredictedPos().x(),
- loc->getPredictedPos().y() + getPredictedPos().y(),
- loc->getPredictedPos().z() + getPredictedPos().z());
+  WFMath::Point<3> absPos(
+    loc->getPredictedPos().x() + getPredictedPos().x(),
+    loc->getPredictedPos().y() + getPredictedPos().y(),
+    loc->getPredictedPos().z() + getPredictedPos().z());
+
+
+  if (loc->hasAttr("terrain")) {  
+    absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+    //absPos.z() += Environment::getInstance().getHeight(absPos.x(), absPos.y());
+  }
 //    WFMath::Point<3> absPos(
 // getPredictedPos().x(),
 // getPredictedPos().y(),
@@ -155,24 +162,24 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
 //        getInterpolatedPos().rotate(loc->getAbsOrient().inverse());
     
   // Set Z coord to terrain height if required
-
   if (hasAttr(MODE)) {
     std::string mode = valueOfAttr(MODE).asString();
-    if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
-        absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
-        
-        if (loc->type() == "jetty") {
-          float jetty_z = loc->getAbsPos().z();
-          if (absPos.z() < jetty_z) absPos.z() = jetty_z;
-        }
-      } else if (mode == "floating") {
-        // Do nothing, use server Z
-      } else if (mode == "swimming") {
-        // Do nothing, use server Z
+    if (mode == "floating") {
+      // Do nothing, use server Z
+    } else if (mode == "swimming") {
+      // Do nothing, use server Z
+    } else {
+//    if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
+//      z_mod = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+       
+      if (loc->type() == "jetty") {
+        float jetty_z = loc->getAbsPos().z();
+        if (absPos.z() < jetty_z) absPos.z() = jetty_z;
       }
-    } else if (loc->hasAttr("terrain")) {  
-        absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
     }
+//  } else if (loc->hasAttr("terrain")) {  
+//    absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+  }
 
   return absPos;
 #endif
@@ -231,7 +238,7 @@ std::string WorldEntity::parent() {
 
 void WorldEntity::checkActions() {
   return;
-  ObjectHandler *object_handler = System::instance()->getObjectHandler();
+  ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
 
   // TODO possibility to link into action handler
   
@@ -263,7 +270,7 @@ void WorldEntity::checkActions() {
 }
 
 void WorldEntity::sigChanged(const Eris::StringSet &ss) {
-  ObjectHandler *object_handler = System::instance()->getObjectHandler();
+  ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
   for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
     std::string str = *I;
     if (debug) std::cout << "Changed - " << str << std::endl;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.4 2005-03-04 17:58:24 simon Exp $
+// $Id: Graphics.cpp,v 1.5 2005-03-15 17:55:04 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,6 +27,7 @@
 #include "Frustum.h"
 #include "Light.h"
 #include "LightManager.h"
+#include "loaders/ModelSystem.h"
 #include "loaders/Model.h"
 #include "loaders/ModelRecord.h"
 #include "loaders/ObjectRecord.h"
@@ -169,8 +170,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   m_renderer->beginFrame();
   drawWorld(select_mode, time_elapsed);
-
-  if (!select_mode) {
+ if (!select_mode) {
 /* Removed for release
  
     Workspace *ws = m_system->getWorkspace();
@@ -178,8 +178,10 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     else throw Exception("Error no Workspace object");
 */
     Console *con = m_system->getConsole();
-    if (con) con->draw();
-    else throw Exception("Error no Console object");
+assert(con);
+//    if (con)
+ con->draw();
+//    else throw Exception("Error no Console object");
   }
 
   if (!select_mode) {
@@ -320,55 +322,8 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 //  we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
-      // TODO there must be a better way of doing this - after the first time round for each object, it should only require one call
-      ObjectHandler *object_handler = m_system->getObjectHandler();
-      ObjectRecord *object_record = object_handler->getObjectRecord(we->getId());
-      if (object_record && object_record->type.empty()) object_record->type = we->getId();
-      if (!object_record) {
-        std::string type = we->type();
-        varconf::Config::inst()->clean(type);
-        object_record = object_handler->getObjectRecord(type);
-	object_handler->copyObjectRecord(we->getId(), object_record);
-        object_record = object_handler->getObjectRecord(we->getId());
-        if (object_record) object_record->type = we->type();
-      }
-      if (!object_record) {
-        std::string parent = we->parent();
-        varconf::Config::inst()->clean(parent);
-        object_record = object_handler->getObjectRecord(parent);
-	object_handler->copyObjectRecord(we->getId(), object_record);
-        object_record = object_handler->getObjectRecord(we->getId());
-        if (object_record) object_record->type = we->parent();
-      }
-      if (!object_record) {
-        object_record = object_handler->getObjectRecord(DEFAULT);
-	object_handler->copyObjectRecord(we->getId(), object_record);
-        object_record = object_handler->getObjectRecord(we->getId());
-        if (object_record) object_record->type = DEFAULT;
-      }
-      if (!object_record) {
-        std::cout << "No Record found" << std::endl;	      
-        return;   
-      }
-      object_record->name = we->getName();
-      object_record->id = we->getId();
-      object_record->entity = we;
-
-      if (we->hasBBox()) {
-        object_record->bbox = we->getBBox();
-      } else {
-//        WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-//        WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-//        object_record->bbox = WFMath::AxisBox<3>(lc, hc);
-      }
-
-      // Hmm, might be better to explicity link to object.
-      // calls only required if Pos, or orientation changes - how can we tell?
-      object_record->position = we->getAbsPos();
-      object_record->orient = we->getAbsOrient();
-      // TODO determine what model queue to use.
-      // TODO if queue is empty switch to another
-//      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
+      ObjectRecord *object_record = ModelSystem::getInstance().getObjectRecord(we);
+      assert (object_record);
 
       // Setup lights as we go
       if (we->type() == "fire") {
@@ -399,11 +354,12 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
           //if (Frustum::orientBBoxInFrustum(m_frustum, we->getOrientBBox(), object_record->position)) {
             for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
               if (!select_mode) {
+assert((int)ModelSystem::getInstance().getModelRecords().getItem(*I, "state_num") > 1.0);
                  // Add to queue by state, then model record
-                 render_queue[m_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
+                 render_queue[ModelSystem::getInstance().getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
                 if (we->hasMessages()) message_list.push_back(we);
               }
-              else render_queue[m_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
+              else render_queue[ModelSystem::getInstance().getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
             }
           }
         }

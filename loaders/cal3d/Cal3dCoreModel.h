@@ -1,11 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.6 2004-04-22 10:51:32 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.7 2005-03-15 17:55:04 simon Exp $
 
-#ifndef SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H
-#define SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H 1
+#ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
+#define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
 
 #include <sigc++/object_slot.h>
 
@@ -54,18 +54,18 @@ public:
    * Create an instance of the core model based on config file
    * @param filename Cal3d config file
    */ 
-  void init(const std::string &filename);
+  int init(const std::string &filename);
 
   /**
    * Clean up this object
    */ 
-  void shutdown();
+  int shutdown();
 
   /**
    * Returns pointer to the Cal3d core model
    * @return Pointer to cal3d core model
    */
-  CalCoreModel *getCalCoreModel() const { return _core_model; }
+  CalCoreModel *getCalCoreModel() const { return m_core_model; }
 
   /**
    * Crate a Cal3d model based upon this core model
@@ -77,7 +77,7 @@ public:
    * Get the scale this model should be rendered at
    * @return Scale to render model at
    */ 
-  float getScale() const { return _scale; }
+  float getScale() const { return m_scale; }
 
   float getRotate() const  { return m_rotate; }
   
@@ -113,16 +113,16 @@ private:
    */ 
   unsigned int loadTexture(const std::string &strFilename);
   
-  bool _initialised; ///< Flag indicating whether object has been initialised
-  CalCoreModel *_core_model; ///< Pointer to the cal3d core model we represent
+  bool m_initialised; ///< Flag indicating whether object has been initialised
+  CalCoreModel *m_core_model; ///< Pointer to the cal3d core model we represent
 
-  float _scale; ///< The scale the model should be rendered at
-  MeshMap _meshes; ///< Mapping between mesh name and id
-  AnimationMap _animations; ///< Mapping between animation and id
-  MaterialList _material_list; ///< List of material names
-  MaterialsMap _materials; ///< Mapping between material part and set to id
-  PartMap _parts; ///< Mapping between part name and id
-  SetMap _sets; ///< mapping between set name and id  
+  float m_scale; ///< The scale the model should be rendered at
+  MeshMap m_meshes; ///< Mapping between mesh name and id
+  AnimationMap m_animations; ///< Mapping between animation and id
+  MaterialList m_material_list; ///< List of material names
+  MaterialsMap m_materials; ///< Mapping between material part and set to id
+  PartMap m_parts; ///< Mapping between part name and id
+  SetMap m_sets; ///< mapping between set name and id  
   float m_rotate;
 };
 

@@ -30,6 +30,7 @@
 #include "src/Exception.h"
 #include "Frustum.h"
 #include "Graphics.h"
+#include "loaders/ModelSystem.h"
 #include "loaders/Model.h"
 #include "loaders/ModelHandler.h"
 #include "loaders/ModelRecord.h"
@@ -157,7 +158,7 @@ static std::string HALO = "halo";
 static std::string MASK = "_mask";
 static std::string RENDER = "render";
 	
-static GLfloat _halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static GLfloat halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
 static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
 static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -175,7 +176,7 @@ static const bool debug = false;
 namespace Sear {
 
 bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
-  _graphics = RenderSystem::getInstance().getGraphics();
+  m_graphics = RenderSystem::getInstance().getGraphics();
   // Destroy the existing window
   if (m_screen != NULL) destroyWindow();
   
@@ -347,7 +348,7 @@ void GL::checkError() {
 void GL::setupExtensions() {
   sage_init();
 
-  use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
+  m_use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
 
   if (use_multitexturing) {
@@ -359,50 +360,42 @@ void GL::setupExtensions() {
   }
 }
                                                                                 
-inline GLuint GL::makeMask(GLuint bits) {
-  // Create an 8-bit mask with 'bits' set to 1
-  return (0xFF >> (8 - bits));
-}
 
 inline WorldEntity *GL::getSelectedID(unsigned int i) {
 
   if (i >= NUM_COLOURS) return NULL; // Check for array out of bounds
-  return entityArray[i]; // Return stored entity pointer
+  return m_entityArray[i]; // Return stored entity pointer
 }
 
 void GL::nextColour(WorldEntity *we) {
-  entityArray[colour_index] = we; // Store entity in array slot
-  glColor3ubv(colourArray[colour_index]); // Set colour from appropriate index
-  ++colour_index; // Increment counter for next pass
-}
-
-inline void GL::resetColours(){
-  colour_index = 1; // Set index to 1 as 0 is black and counts as unused
+  m_entityArray[m_colour_index] = we; // Store entity in array slot
+  glColor3ubv(m_colourArray[m_colour_index]); // Set colour from appropriate index
+  ++m_colour_index; // Increment counter for next pass
 }
 
 void GL::buildColourSet() {
   // Get the bits info from OpenGL
-  glGetIntegerv (GL_RED_BITS, &redBits);
-  glGetIntegerv (GL_GREEN_BITS, &greenBits);
-  glGetIntegerv (GL_BLUE_BITS, &blueBits);
+  glGetIntegerv (GL_RED_BITS, &m_redBits);
+  glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
+  glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
 
   // Create masks
-  redMask = makeMask(redBits);
-  greenMask = makeMask(greenBits);
-  blueMask = makeMask(blueBits);
+  m_redMask = makeMask(m_redBits);
+  m_greenMask = makeMask(m_greenBits);
+  m_blueMask = makeMask(m_blueBits);
   // Calculate shifts
-  redShift =   greenBits + blueBits;
-  greenShift =  blueBits;
-  blueShift = 0;
+  m_redShift =   m_greenBits + m_blueBits;
+  m_greenShift =  m_blueBits;
+  m_blueShift = 0;
   
   // Pre-Calculate each colour and store in array
   for (unsigned int indx = 0; indx < NUM_COLOURS; ++indx) {
-    GLubyte red = (indx & (redMask << redShift)) << (8 - redBits);
-    GLubyte green = (indx & (greenMask << greenShift)) << (8 - greenBits);
-    GLubyte blue = (indx & (blueMask << blueShift)) << (8 - blueBits);
-    colourArray[indx][0] = red;
-    colourArray[indx][1] = green;
-    colourArray[indx][2] = blue;
+    GLubyte red = (indx & (m_redMask << m_redShift)) << (8 - m_redBits);
+    GLubyte green = (indx & (m_greenMask << m_greenShift)) << (8 - m_greenBits);
+    GLubyte blue = (indx & (m_blueMask << m_blueShift)) << (8 - m_blueBits);
+    m_colourArray[indx][0] = red;
+    m_colourArray[indx][1] = green;
+    m_colourArray[indx][2] = blue;
   }
 }
 
@@ -411,50 +404,52 @@ GL::GL() :
   m_width(0), m_height(0),
   m_fullscreen(false),
   m_screen(NULL),
-  _system(System::instance()),
-  _graphics(NULL),
-  fov(RENDER_FOV),
-  near_clip(RENDER_NEAR_CLIP),
-  _far_clip_dist(100.0f),
-  base(0),
-  font_id(-1),
-  splash_id(-1),
-  activeEntity(NULL),
-  x_pos(0), y_pos(0),
-  _speech_offset_x(0.0f),
-  _speech_offset_y(0.0f),
-  _speech_offset_z(0.0f),
-  _fog_start(100.0f),
-  _fog_end(150.0f),
-  _light_level(1.0f),
-  colour_index(0),
-  redBits(0), greenBits(0), blueBits(0),
-  redMask(0), greenMask(0), blueMask(0),
-  redShift(0), greenShift(0), blueShift(0),
-  use_ext_texture_filter_anisotropic(false),
-  use_sgis_generate_mipmap(false),
-  _multi_texture_mode(false),
+  m_system(System::instance()),
+  m_graphics(NULL),
+  m_fov(RENDER_FOV),
+  m_near_clip(RENDER_NEAR_CLIP),
+  m_far_clip_dist(100.0f),
+  m_base(0),
+  m_font_id(-1),
+  m_splash_id(-1),
+  m_activeEntity(NULL),
+  m_x_pos(0), m_y_pos(0),
+  m_speech_offset_x(0.0f),
+  m_speech_offset_y(0.0f),
+  m_speech_offset_z(0.0f),
+  m_fog_start(100.0f),
+  m_fog_end(150.0f),
+  m_light_level(1.0f),
+  m_colour_index(0),
+  m_redBits(0), m_greenBits(0), m_blueBits(0),
+  m_redMask(0), m_greenMask(0), m_blueMask(0),
+  m_redShift(0), m_greenShift(0), m_blueShift(0),
+  m_use_sgis_generate_mipmap(false),
+  m_multi_texture_mode(false),
   m_initialised(false)
 {
-  memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
+  memset(m_entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
 
 
 GL::~GL() {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
+//  if (m_initialised) shutdown();
 }
 
 void GL::shutdown() {
-  if (!m_initialised) return;
+  assert(m_initialised == true);
+//  if (!m_initialised) return;
   if (debug) std::cout << "GL: Shutdown" << std::endl;
 
-  //writeConfig();
-  shutdownFont();
+  invalidate();
+
   m_initialised = false;
 }
 
 void GL::init() {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
+//  if (m_initialised) shutdown();
   if (debug) std::cout << "GL: Initialise" << std::endl;
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
@@ -475,21 +470,21 @@ void GL::initLighting() {
   // Light values and coordinates
            
   // Setup and enable light 0
-  glLightfv(GL_LIGHT0, GL_AMBIENT, lights[LIGHT_CHARACTER].ambient);
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, lights[LIGHT_CHARACTER].diffuse);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
-  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_constant);
-  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_linear);
-  glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_quadratic);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, m_lights[LIGHT_CHARACTER].ambient);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, m_lights[LIGHT_CHARACTER].diffuse);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, m_lights[LIGHT_CHARACTER].specular);
+  glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, m_lights[LIGHT_CHARACTER].attenuation_constant);
+  glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, m_lights[LIGHT_CHARACTER].attenuation_linear);
+  glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, m_lights[LIGHT_CHARACTER].attenuation_quadratic);
   glEnable(GL_LIGHT0);
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, blackLight);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, blackLight);
   glLightfv(GL_LIGHT1, GL_SPECULAR, blackLight);
   
-  glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, lights[LIGHT_SUN].attenuation_constant);
-  glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, lights[LIGHT_SUN].attenuation_linear);
-  glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, lights[LIGHT_SUN].attenuation_quadratic);
+  glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, m_lights[LIGHT_SUN].attenuation_constant);
+  glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION, m_lights[LIGHT_SUN].attenuation_linear);
+  glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION, m_lights[LIGHT_SUN].attenuation_quadratic);
   glEnable(GL_LIGHT1);
 }
 
@@ -497,13 +492,13 @@ void GL::initFont() {
   float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
   if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
-  base=glGenLists(256); // Creating 256 Display Lists
-  font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
-  RenderSystem::getInstance().switchTexture(font_id);
+  m_base=glGenLists(256); // Creating 256 Display Lists
+  m_font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
+  RenderSystem::getInstance().switchTexture(m_font_id);
   for (int loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
-    glNewList(base+loop,GL_COMPILE); // Start Building A List
+    glNewList(m_base+loop,GL_COMPILE); // Start Building A List
     glBegin(GL_QUADS); // Use A Quad For Each Character
       glTexCoord2f(cx,1-cy-0.0625f); // Texture Coord (Bottom Left)
       glVertex2i(0,0); // Vertex Coord (Bottom Left)
@@ -522,14 +517,14 @@ void GL::initFont() {
 
 void GL::shutdownFont() {
   if (debug) Log::writeLog("Render: Shutting down fonts", Log::LOG_DEFAULT);
-  glDeleteLists(base,256); // Delete All 256 Display Lists
+  glDeleteLists(m_base,256); // Delete All 256 Display Lists
   m_fontInitialised = false;
 }
 
 void GL::print(int x, int y, const char * string, int set) {
   if (!m_fontInitialised) initFont();
   if (set > 1) set = 1;
-  RenderSystem::getInstance().switchTexture(font_id);
+  RenderSystem::getInstance().switchTexture(m_font_id);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
   glPushMatrix();
   glLoadIdentity(); // Reset The Projection Matrix
@@ -538,7 +533,7 @@ void GL::print(int x, int y, const char * string, int set) {
   glPushMatrix();
   glLoadIdentity(); // Reset The Modelview Matrix
   glTranslated(x,y,0); // Position The Text (0,0 - Bottom Left)
-  glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
+  glListBase(m_base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
   glPopMatrix(); // Restore The Old Projection Matrix
@@ -549,9 +544,9 @@ void GL::print(int x, int y, const char * string, int set) {
 void GL::print3D(const char *string, int set) {
   if (!m_fontInitialised) initFont();
   if (set > 1) set = 1;
-  RenderSystem::getInstance().switchTexture(font_id);
+  RenderSystem::getInstance().switchTexture(m_font_id);
   glPushMatrix();
-  glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
+  glListBase(m_base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
   glPopMatrix(); // Restore The Old Projection Matrix
 }
@@ -579,31 +574,31 @@ void GL::drawTextRect(int x, int y, int width, int height, int texture) {
 
 void GL::procEvent(int x, int y) {
   // No need to perform checks until we are in the game world
-  if (!_system->checkState(SYS_IN_WORLD)) return;
+  if (!m_system->checkState(SYS_IN_WORLD)) return;
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
   RenderSystem::getInstance().drawScene(true, 0);
-  x_pos = x;
+  m_x_pos = x;
   y = m_height - y;
-  y_pos = y;
+  m_y_pos = y;
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
 // TODO pre-cache 8 - bits?
   
-  GLubyte red = i[0] >> (8 - redBits);// & redMask;
-  GLubyte green = i[1] >> (8 - greenBits);// & greenMask;
-  GLubyte blue = i[2] >> (8 - blueBits);// & blueMask;
+  GLubyte red = i[0] >> (8 - m_redBits);// & m_redMask;
+  GLubyte green = i[1] >> (8 - m_greenBits);// & m_greenMask;
+  GLubyte blue = i[2] >> (8 - m_blueBits);// & m_blueMask;
 
   unsigned int ic = red;
-  ic <<= redBits;
+  ic <<= m_redBits;
   ic += green;
-  ic <<= greenBits;
+  ic <<= m_greenBits;
   ic += blue;
   //selected_id = getSelectedID(ic);
   WorldEntity *selected_entity = getSelectedID(ic);
-  if (selected_entity != activeEntity) {
-    activeEntity = selected_entity;
-    if (debug && activeEntity) Log::writeLog(std::string("ActiveID: ") + activeEntity->getId(), Log::LOG_DEFAULT);
+  if (selected_entity != m_activeEntity) {
+    m_activeEntity = selected_entity;
+    if (debug && m_activeEntity) Log::writeLog(std::string("ActiveID: ") + m_activeEntity->getId(), Log::LOG_DEFAULT);
   }
 }
 
@@ -616,114 +611,114 @@ void GL::readConfig(varconf::Config &config) {
   // Setup character light source
   if (config.findItem(RENDER, KEY_character_light_kc)) {
     temp = config.getItem(RENDER, KEY_character_light_kc);
-    lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].attenuation_constant = DEFAULT_character_light_kc;
+    m_lights[LIGHT_CHARACTER].attenuation_constant = DEFAULT_character_light_kc;
   }
   if (config.findItem(RENDER, KEY_character_light_kl)) {
     temp = config.getItem(RENDER, KEY_character_light_kl);
-    lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].attenuation_linear = DEFAULT_character_light_kl;
+    m_lights[LIGHT_CHARACTER].attenuation_linear = DEFAULT_character_light_kl;
   }
   if (config.findItem(RENDER, KEY_character_light_kq)) {
     temp = config.getItem(RENDER, KEY_character_light_kq);
-    lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].attenuation_quadratic = DEFAULT_character_light_kq;
+    m_lights[LIGHT_CHARACTER].attenuation_quadratic = DEFAULT_character_light_kq;
   }
   if (config.findItem(RENDER, KEY_character_light_ambient_red)) {
     temp = config.getItem(RENDER, KEY_character_light_ambient_red);
-    lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].ambient[0] = DEFAULT_character_light_ambient_red;
+    m_lights[LIGHT_CHARACTER].ambient[0] = DEFAULT_character_light_ambient_red;
   }
   if (config.findItem(RENDER, KEY_character_light_ambient_green)) {
     temp = config.getItem(RENDER, KEY_character_light_ambient_green);
-    lights[LIGHT_CHARACTER].ambient[1] = (float)((!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp)));
+    m_lights[LIGHT_CHARACTER].ambient[1] = (float)((!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp)));
   } else {
-    lights[LIGHT_CHARACTER].ambient[1] = DEFAULT_character_light_ambient_green;
+    m_lights[LIGHT_CHARACTER].ambient[1] = DEFAULT_character_light_ambient_green;
   }
   if (config.findItem(RENDER, KEY_character_light_ambient_blue)) {
     temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
-    lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].ambient[2] = DEFAULT_character_light_ambient_blue;
+    m_lights[LIGHT_CHARACTER].ambient[2] = DEFAULT_character_light_ambient_blue;
   }
   if (config.findItem(RENDER, KEY_character_light_ambient_alpha)) {
     temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
-    lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].ambient[3] = DEFAULT_character_light_ambient_alpha;
+    m_lights[LIGHT_CHARACTER].ambient[3] = DEFAULT_character_light_ambient_alpha;
   }
 
   if (config.findItem(RENDER, KEY_character_light_diffuse_red)) {
     temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
-    lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].diffuse[0] = DEFAULT_character_light_diffuse_red;
+    m_lights[LIGHT_CHARACTER].diffuse[0] = DEFAULT_character_light_diffuse_red;
   }
   if (config.findItem(RENDER, KEY_character_light_diffuse_green)) {
     temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
-    lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].diffuse[1] = DEFAULT_character_light_diffuse_green;
+    m_lights[LIGHT_CHARACTER].diffuse[1] = DEFAULT_character_light_diffuse_green;
   }
   if (config.findItem(RENDER, KEY_character_light_diffuse_blue)) {
     temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
-    lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].diffuse[2] = DEFAULT_character_light_diffuse_blue;
+    m_lights[LIGHT_CHARACTER].diffuse[2] = DEFAULT_character_light_diffuse_blue;
   }
   if (config.findItem(RENDER, KEY_character_light_diffuse_alpha)) {
     temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
-    lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].diffuse[3] = DEFAULT_character_light_diffuse_alpha;
+    m_lights[LIGHT_CHARACTER].diffuse[3] = DEFAULT_character_light_diffuse_alpha;
   }
 
   if (config.findItem(RENDER, KEY_character_light_specular_red)) {
     temp = config.getItem(RENDER, KEY_character_light_specular_red);
-    lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].specular[0] = DEFAULT_character_light_specular_red;
+    m_lights[LIGHT_CHARACTER].specular[0] = DEFAULT_character_light_specular_red;
   }
   if (config.findItem(RENDER, KEY_character_light_specular_green)) {
     temp = config.getItem(RENDER, KEY_character_light_specular_green);
-    lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].specular[1] = DEFAULT_character_light_specular_green;
+    m_lights[LIGHT_CHARACTER].specular[1] = DEFAULT_character_light_specular_green;
   }
   if (config.findItem(RENDER, KEY_character_light_specular_blue)) {
     temp = config.getItem(RENDER, KEY_character_light_specular_blue);
-    lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].specular[2] = DEFAULT_character_light_specular_blue;
+    m_lights[LIGHT_CHARACTER].specular[2] = DEFAULT_character_light_specular_blue;
   }
   if (config.findItem(RENDER, KEY_character_light_specular_alpha)) {
     temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
-    lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
+    m_lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
   } else {
-    lights[LIGHT_CHARACTER].specular[3] = DEFAULT_character_light_specular_alpha;
+    m_lights[LIGHT_CHARACTER].specular[3] = DEFAULT_character_light_specular_alpha;
   }
   //Setup Sun light source
   if (config.findItem(RENDER, KEY_sun_light_kc)) {
     temp = config.getItem(RENDER, KEY_sun_light_kc);
-    lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+    m_lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
   } else {
-    lights[LIGHT_SUN].attenuation_constant = DEFAULT_sun_light_kc;
+    m_lights[LIGHT_SUN].attenuation_constant = DEFAULT_sun_light_kc;
   }
   if (config.findItem(RENDER, KEY_sun_light_kc)) {
     temp = config.getItem(RENDER, KEY_sun_light_kl);
-    lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+    m_lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
   } else {
-    lights[LIGHT_SUN].attenuation_linear = DEFAULT_sun_light_kl;
+    m_lights[LIGHT_SUN].attenuation_linear = DEFAULT_sun_light_kl;
   }
   if (config.findItem(RENDER, KEY_sun_light_kc)) {
     temp = config.getItem(RENDER, KEY_sun_light_kq);
-    lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+    m_lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
   } else {
-    lights[LIGHT_SUN].attenuation_quadratic = DEFAULT_sun_light_kq;
+    m_lights[LIGHT_SUN].attenuation_quadratic = DEFAULT_sun_light_kq;
   }
 
   // Setup render states
@@ -749,70 +744,70 @@ void GL::readConfig(varconf::Config &config) {
   // Setup the speech offsets
   if(config.findItem(RENDER, KEY_speech_offset_x)) {
     temp = config.getItem(RENDER, KEY_speech_offset_x);
-    _speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
+    m_speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
   } else {
-    _speech_offset_x = DEFAULT_speech_offset_x;
+    m_speech_offset_x = DEFAULT_speech_offset_x;
   }
   if(config.findItem(RENDER, KEY_speech_offset_y)) {
     temp = config.getItem(RENDER, KEY_speech_offset_y);
-    _speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+    m_speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
   } else {
-    _speech_offset_y = DEFAULT_speech_offset_y;
+    m_speech_offset_y = DEFAULT_speech_offset_y;
   }
   if(config.findItem(RENDER, KEY_speech_offset_z)) {
     temp = config.getItem(RENDER, KEY_speech_offset_z);
-    _speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+    m_speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
   } else {
-    _speech_offset_z = DEFAULT_speech_offset_y;
+    m_speech_offset_z = DEFAULT_speech_offset_y;
   }
 
   if (config.findItem(RENDER, KEY_fog_start)) {
     temp = config.getItem(RENDER, KEY_fog_start);
-    _fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
+    m_fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
   } else {
-    _fog_start = DEFAULT_fog_start;
+    m_fog_start = DEFAULT_fog_start;
   }
   if (config.findItem(RENDER, KEY_fog_end)) {
     temp = config.getItem(RENDER, KEY_fog_end);
-    _fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
+    m_fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
   } else {
-    _fog_end = DEFAULT_fog_end;
+    m_fog_end = DEFAULT_fog_end;
   }
 
   if (config.findItem(RENDER, KEY_far_clip_dist)) {
     temp = config.getItem(RENDER, KEY_far_clip_dist);
-    _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
+    m_far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
   } else {
-    _far_clip_dist = DEFAULT_far_clip_dist;
+    m_far_clip_dist = DEFAULT_far_clip_dist;
   }
 }
 
 void GL::writeConfig(varconf::Config &config) {
   
   // Save character light source
-  config.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].attenuation_constant);
-  config.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].attenuation_linear);
-  config.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].attenuation_quadratic);
+  config.setItem(RENDER, KEY_character_light_kc, m_lights[LIGHT_CHARACTER].attenuation_constant);
+  config.setItem(RENDER, KEY_character_light_kl, m_lights[LIGHT_CHARACTER].attenuation_linear);
+  config.setItem(RENDER, KEY_character_light_kq, m_lights[LIGHT_CHARACTER].attenuation_quadratic);
 
-  config.setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
-  config.setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
-  config.setItem(RENDER, KEY_character_light_ambient_blue, lights[LIGHT_CHARACTER].ambient[2]);
-  config.setItem(RENDER, KEY_character_light_ambient_alpha, lights[LIGHT_CHARACTER].ambient[3]);
+  config.setItem(RENDER, KEY_character_light_ambient_red, m_lights[LIGHT_CHARACTER].ambient[0]);
+  config.setItem(RENDER, KEY_character_light_ambient_green, m_lights[LIGHT_CHARACTER].ambient[1]);
+  config.setItem(RENDER, KEY_character_light_ambient_blue, m_lights[LIGHT_CHARACTER].ambient[2]);
+  config.setItem(RENDER, KEY_character_light_ambient_alpha, m_lights[LIGHT_CHARACTER].ambient[3]);
 
-  config.setItem(RENDER, KEY_character_light_diffuse_red, lights[LIGHT_CHARACTER].diffuse[0]);
-  config.setItem(RENDER, KEY_character_light_diffuse_green, lights[LIGHT_CHARACTER].diffuse[1]);
-  config.setItem(RENDER, KEY_character_light_diffuse_blue, lights[LIGHT_CHARACTER].diffuse[2]);
-  config.setItem(RENDER, KEY_character_light_diffuse_alpha, lights[LIGHT_CHARACTER].diffuse[3]);
+  config.setItem(RENDER, KEY_character_light_diffuse_red, m_lights[LIGHT_CHARACTER].diffuse[0]);
+  config.setItem(RENDER, KEY_character_light_diffuse_green, m_lights[LIGHT_CHARACTER].diffuse[1]);
+  config.setItem(RENDER, KEY_character_light_diffuse_blue, m_lights[LIGHT_CHARACTER].diffuse[2]);
+  config.setItem(RENDER, KEY_character_light_diffuse_alpha, m_lights[LIGHT_CHARACTER].diffuse[3]);
 
-  config.setItem(RENDER, KEY_character_light_specular_red, lights[LIGHT_CHARACTER].specular[0]);
-  config.setItem(RENDER, KEY_character_light_specular_green, lights[LIGHT_CHARACTER].specular[1]);
-  config.setItem(RENDER, KEY_character_light_specular_blue, lights[LIGHT_CHARACTER].specular[2]);
-  config.setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
+  config.setItem(RENDER, KEY_character_light_specular_red, m_lights[LIGHT_CHARACTER].specular[0]);
+  config.setItem(RENDER, KEY_character_light_specular_green, m_lights[LIGHT_CHARACTER].specular[1]);
+  config.setItem(RENDER, KEY_character_light_specular_blue, m_lights[LIGHT_CHARACTER].specular[2]);
+  config.setItem(RENDER, KEY_character_light_specular_alpha, m_lights[LIGHT_CHARACTER].specular[3]);
   
   // Save Sun light source
-  config.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].attenuation_constant);
-  config.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].attenuation_linear);
-  config.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].attenuation_quadratic);
+  config.setItem(RENDER, KEY_sun_light_kc, m_lights[LIGHT_SUN].attenuation_constant);
+  config.setItem(RENDER, KEY_sun_light_kl, m_lights[LIGHT_SUN].attenuation_linear);
+  config.setItem(RENDER, KEY_sun_light_kq, m_lights[LIGHT_SUN].attenuation_quadratic);
 
   // Save render states
   config.setItem(RENDER, KEY_use_textures, RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES));
@@ -820,13 +815,13 @@ void GL::writeConfig(varconf::Config &config) {
   config.setItem(RENDER, KEY_use_stencil, RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL));
   
   // Save the speech offsets
-  config.setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
-  config.setItem(RENDER, KEY_speech_offset_y, _speech_offset_y);
-  config.setItem(RENDER, KEY_speech_offset_z, _speech_offset_z);
+  config.setItem(RENDER, KEY_speech_offset_x, m_speech_offset_x);
+  config.setItem(RENDER, KEY_speech_offset_y, m_speech_offset_y);
+  config.setItem(RENDER, KEY_speech_offset_z, m_speech_offset_z);
 
-  config.setItem(RENDER, KEY_fog_start, _fog_start);
-  config.setItem(RENDER, KEY_fog_end, _fog_end);
-  config.setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
+  config.setItem(RENDER, KEY_fog_start, m_fog_start);
+  config.setItem(RENDER, KEY_fog_end, m_fog_end);
+  config.setItem(RENDER, KEY_far_clip_dist, m_far_clip_dist);
 }  
 
 void GL::setupStates() {
@@ -837,8 +832,8 @@ void GL::setupStates() {
   glFogi(GL_FOG_MODE, GL_LINEAR);
   GLfloat fog_colour[] = {0.50f, 0.50f, 0.50f, 0.50f};
   glFogfv(GL_FOG_COLOR, fog_colour);
-  glFogf(GL_FOG_START, _fog_start);
-  glFogf(GL_FOG_END, _fog_end);
+  glFogf(GL_FOG_START, m_fog_start);
+  glFogf(GL_FOG_END, m_fog_end);
 }
 
 inline void GL::translateObject(float x, float y, float z) {
@@ -867,7 +862,7 @@ void GL::rotateObject(ObjectRecord *object_record, ModelRecord *model_record) {
     case Graphics::ROS_HALO: {
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= _graphics->getCameraOrientation();
+      orient2 /= m_graphics->getCameraOrientation();
       QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
       glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
       break;
@@ -889,7 +884,7 @@ void GL::setViewMode(int type) {
       glLoadIdentity(); // Reset The Projection Matrix
   
       // Calculate The Aspect Ratio Of The Window
-      gluPerspective(fov,(GLfloat)m_width/(GLfloat)m_height, near_clip, _far_clip_dist);
+      gluPerspective(m_fov,(GLfloat)m_width/(GLfloat)m_height, m_near_clip, m_far_clip_dist);
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       break;
@@ -1028,14 +1023,14 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
-//  static MoelHandler *model_handler = _system->getModelHandler();
+//  static MoelHandler *model_handler = m_system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
     RenderSystem::getInstance().switchState(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
       ObjectRecord *object_record = J->first;
-      ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second, object_record->entity);
+      ModelRecord *model_record = ModelSystem::getInstance().getModel(this, object_record, J->second, object_record->entity);
       if (!model_record) {
 //        std::cerr << "No model record!" << std::endl;	      
         continue;
@@ -1074,8 +1069,8 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
         nextColour(object_record->entity);
 	model->render(true);
       } else {
-        if (object_record->entity == activeEntity) {
-          active_name = object_record->name;
+        if (object_record->entity == m_activeEntity) {
+          m_active_name = object_record->name;
 	  drawOutline(model_record);
 	}
 	else model->render(false);
@@ -1094,22 +1089,22 @@ void GL::drawMessageQueue(MessageList &list) {
     WFMath::Point<3> pos = we->getAbsPos();
     glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-    orient2 /= _graphics->getCameraOrientation(); 
+    orient2 /= m_graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
     glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
     glScalef(0.025f, 0.025f, 0.025f);
-    glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
+    glTranslatef(m_speech_offset_x, m_speech_offset_y, m_speech_offset_z);
     we->renderMessages();
     glPopMatrix();
   }
 }
  
 inline float GL::distFromNear(float x, float y, float z) {
-  return Frustum::distFromNear(frustum, x, y, z);
+  return Frustum::distFromNear(m_frustum, x, y, z);
 }
 	
 inline int GL::patchInFrustum(const WFMath::AxisBox<3> & bbox) {
-  return Frustum::patchInFrustum(frustum, bbox);
+  return Frustum::patchInFrustum(m_frustum, bbox);
 }
 
 void GL::drawOutline(ModelRecord *model_record) {
@@ -1126,7 +1121,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     //TODO hard code halo in static const variable
     RenderSystem::getInstance().switchState(model_record->select_state);
     glStencilFunc(GL_NOTEQUAL, -1, 1);
-    glColor4fv(_halo_colour);
+    glColor4fv(halo_colour);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     model->render(true);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1134,7 +1129,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     glColor4fv(white);
   } else { // Just use solid colour on object 
     RenderSystem::getInstance().switchState(model_record->select_state);
-    glColor4fv(_halo_colour);  
+    glColor4fv(halo_colour);  
     model->render(true);
     glColor4fv(white);
   }
@@ -1147,7 +1142,7 @@ inline void GL::restore() { glPopMatrix(); }
 
 inline void GL::beginFrame() {
   // TODO into display list
-  active_name = "";
+  m_active_name = "";
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     glClearStencil(1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
@@ -1177,8 +1172,8 @@ void GL::drawSplashScreen() {
   
   glColor4fv(white);
 
-  if (splash_id == -1) splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
-  RenderSystem::getInstance().switchTexture(splash_id);
+  if (m_splash_id == -1) m_splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
+  RenderSystem::getInstance().switchTexture(m_splash_id);
 
   // TODO into vertex array?
   glBegin(GL_QUADS); 
@@ -1216,37 +1211,37 @@ void GL::applyLighting() {
   switch (calendar->getTimeArea()) {
     case Calendar::INVALID: break;
     case Calendar::DAWN: {
-      _light_level = tim / ((day_time - dawn_time) * modifier);
+      m_light_level = tim / ((day_time - dawn_time) * modifier);
       float pos_mod = tim / ((night_time - dawn_time) * modifier);
-      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
+      m_lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
     case Calendar::DAY: {
-      _light_level = 1.0f;
+      m_light_level = 1.0f;
       float pos_mod = tim / ((night_time - dawn_time) * modifier);
-      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
+      m_lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
     case Calendar::DUSK: {
-      _light_level = 1.0f - (tim / ((night_time - dusk_time) * modifier));
+      m_light_level = 1.0f - (tim / ((night_time - dusk_time) * modifier));
       float pos_mod = tim / ((night_time - dawn_time) * modifier);
-      lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
+      m_lights[LIGHT_SUN].position[0] = -200.0f * (pos_mod - 0.5f);
       break;
     }
     case Calendar::NIGHT: {
-      _light_level = 0.0f;
+      m_light_level = 0.0f;
       break;
     }
   }
-  if (_light_level < 0.15f) _light_level = 0.15f; 
-  fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
+  if (m_light_level < 0.15f) m_light_level = 0.15f; 
+  fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * m_light_level;
 //  glFogfv(GL_FOG_COLOR, fog_colour);
-  float sun_pos[] = {lights[LIGHT_SUN].position[0], 0.0f, 100.0f, 1.0f};
-  lights[LIGHT_SUN].ambient[0] = lights[LIGHT_SUN].ambient[1] = lights[LIGHT_SUN].ambient[2] = _light_level * 0.5f;
-  lights[LIGHT_SUN].diffuse[0] = lights[LIGHT_SUN].diffuse[1] = lights[LIGHT_SUN].diffuse[2] = _light_level;
+  float sun_pos[] = {m_lights[LIGHT_SUN].position[0], 0.0f, 100.0f, 1.0f};
+  m_lights[LIGHT_SUN].ambient[0] = m_lights[LIGHT_SUN].ambient[1] = m_lights[LIGHT_SUN].ambient[2] = m_light_level * 0.5f;
+  m_lights[LIGHT_SUN].diffuse[0] = m_lights[LIGHT_SUN].diffuse[1] = m_lights[LIGHT_SUN].diffuse[2] = m_light_level;
   glLightfv(GL_LIGHT1,GL_POSITION,sun_pos);
-  glLightfv(GL_LIGHT1, GL_AMBIENT, lights[LIGHT_SUN].ambient);
-  glLightfv(GL_LIGHT1, GL_DIFFUSE, lights[LIGHT_SUN].diffuse);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, m_lights[LIGHT_SUN].ambient);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, m_lights[LIGHT_SUN].diffuse);
 }
 
 inline void GL::resetSelection() {
@@ -1254,10 +1249,10 @@ inline void GL::resetSelection() {
 }
 
 inline void GL::renderActiveName() {
-  if (active_name.empty()) return;
+  if (m_active_name.empty()) return;
   glColor4fv(activeNameColour);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
-  print(x_pos, y_pos, active_name.c_str(), 1);
+  print(m_x_pos, m_y_pos, m_active_name.c_str(), 1);
 }
 
 inline void GL::getFrustum(float frust[6][4]) {
@@ -1268,10 +1263,10 @@ inline void GL::getFrustum(float frust[6][4]) {
   /* Get the current MODELVIEW matrix from OpenGraphics */
   glGetFloatv(GL_MODELVIEW_MATRIX, modl );
   Frustum::getFrustum(frust, proj, modl);
-  // Copy frustum - local copy plus one from graphics object
+  // Copy m_frustum - local copy plus one from graphics object
   for (int i = 0; i < 6; ++i) {
     for (int j = 0; j < 4; ++j) {
-      frustum[i][j] = frust[i][j];
+      m_frustum[i][j] = frust[i][j];
     }
   }
 }
@@ -1281,76 +1276,76 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
   if (section == RENDER) {
     if (key == KEY_character_light_kc) {
       temp = config.getItem(RENDER, KEY_character_light_kc);
-      lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
     }
     else if (key ==  KEY_character_light_kl) {
       temp = config.getItem(RENDER, KEY_character_light_kl);
-      lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
     }
     else if (key == KEY_character_light_kq) {
       temp = config.getItem(RENDER, KEY_character_light_kq);
-      lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
     }
     else if (key == KEY_character_light_ambient_red) {
       temp = config.getItem(RENDER, KEY_character_light_ambient_red);
-      lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
     }
     else if (key == KEY_character_light_ambient_green) {
       temp = config.getItem(RENDER, KEY_character_light_ambient_green);
-      lights[LIGHT_CHARACTER].ambient[1] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[1] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp));
     }
     else if (key == KEY_character_light_ambient_blue) {
       temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
-      lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
     }
     else if (key == KEY_character_light_ambient_alpha) {
       temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
-      lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
     }
     else if (key == KEY_character_light_diffuse_red) {
       temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
-      lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
     }
     else if (key == KEY_character_light_diffuse_green) {
       temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
-      lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
     }
     else if (key == KEY_character_light_diffuse_blue) {
       temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
-      lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
     }
     else if (key == KEY_character_light_diffuse_alpha) {
       temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
-      lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
     }
     else if (key == KEY_character_light_specular_red) {
       temp = config.getItem(RENDER, KEY_character_light_specular_red);
-      lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
     }
     else if (key == KEY_character_light_specular_green) {
       temp = config.getItem(RENDER, KEY_character_light_specular_green);
-      lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
     }
     else if (key == KEY_character_light_specular_blue) {
       temp = config.getItem(RENDER, KEY_character_light_specular_blue);
-      lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
     }
     else if (key == KEY_character_light_specular_alpha) {
       temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
-      lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
     }
     //Setup Sun light source
     else if (key == KEY_sun_light_kc) {
       temp = config.getItem(RENDER, KEY_sun_light_kc);
-      lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
     }
     else if (key == KEY_sun_light_kl) {
       temp = config.getItem(RENDER, KEY_sun_light_kl);
-      lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
     }
     else if (key == KEY_sun_light_kq) {
       temp = config.getItem(RENDER, KEY_sun_light_kq);
-      lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
     }
     // Setup render states
     else if (key == KEY_use_textures) {
@@ -1368,33 +1363,33 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
     // Setup the speech offsets
     else if (key == KEY_speech_offset_x) {
       temp = config.getItem(RENDER, KEY_speech_offset_x);
-      _speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
+      m_speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
     }
     else if (key == KEY_speech_offset_y) {
       temp = config.getItem(RENDER, KEY_speech_offset_y);
-      _speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+      m_speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
     }
     else if (key == KEY_speech_offset_z) {
       temp = config.getItem(RENDER, KEY_speech_offset_z);
-      _speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+      m_speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
     }
     else if (key == KEY_fog_start) {
       temp = config.getItem(RENDER, KEY_fog_start);
-      _fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
+      m_fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
     }
     else if (key == KEY_fog_end) {
       temp = config.getItem(RENDER, KEY_fog_end);
-      _fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
+      m_fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
     }
     else if (key == KEY_far_clip_dist) {
       temp = config.getItem(RENDER, KEY_far_clip_dist);
-      _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
+      m_far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
     }
   }
 }
 
 std::string GL::getActiveID() {
-  return (activeEntity) ? (activeEntity->getId()) : ("");
+  return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
 } 
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   if (!use_multitexturing) multitexture = false;
@@ -1535,5 +1530,27 @@ void GL::resize(int width, int height) {
   // Update view port
   setViewMode(PERSPECTIVE);
 }
+
+void GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
+  y = m_height - y;
+  GLint viewport[4];
+  GLdouble mvmatrix[16], projmatrix[16];
+
+  float z = 0.0f;
+  glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
+
+  glGetIntegerv (GL_VIEWPORT, viewport);
+  glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+  glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+  double tx, ty, tz;
+  gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
+  wx = ::lrint(tx);
+  wy = ::lrint(m_height - ty);
+  wz = tz;
+
+  if (debug) printf("World Coord: %f %f %f\n", wx, wy, wz);
+}
+
 
 } // namespace Sear

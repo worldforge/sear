@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2000-2003 Alistair Riddoch
+// Copyright (C) 2000-2003 Alistair Riddoch, Simon Goodall
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,12 +27,6 @@
 #ifdef USE_MMGR
 #include "common/mmgr.h"
 #endif
-
-/*
-
- TODO:
-   * Fall back to using Display lists is VBO's are not available
-*/
 
 namespace Sear {
 

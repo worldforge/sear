@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.54 2005-03-04 17:58:24 simon Exp $
+// $Id: Character.cpp,v 1.55 2005-03-15 17:55:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -35,6 +35,8 @@
 #include "renderers/Render.h"
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
+
+#include "loaders/ModelSystem.h"
 
 #include "common/operations.h"
 
@@ -148,6 +150,9 @@ bool Character::init() {
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
 
 
+  m_timeout_rotate = new Eris::Timeout("sear_character_rotate", this, 0);
+  m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
+
   m_initialised = true;
   return true;
 }
@@ -191,9 +196,8 @@ void Character::rotate(float rate) {
   if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
   updateLocals(true);
   // FIXME 0.0f is not safe to test for.
-  if (m_rate > 0.000001f && !m_timeout_rotate) {
-    m_timeout_rotate = new Eris::Timeout("sear_character_rotate", this, server_update_interval);
-    m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
+  if (m_rate > 0.000001f &&  m_timeout_rotate->isExpired()) {
+    m_timeout_rotate->reset(server_update_interval);
   }
 //System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
@@ -246,9 +250,8 @@ void Character::setRotationRate(float rate) {
   if (!m_avatar) return;
 
   m_rate = rate * m_rotate_speed;
-  if (m_rate > 0.000001f && !m_timeout_rotate) {
-    m_timeout_rotate = new Eris::Timeout("sear_character_rotate", this, server_update_interval);
-    m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
+  if (m_rate > 0.000001f && m_timeout_rotate->isExpired()) {
+    m_timeout_rotate->reset(server_update_interval);
   }
 //  // FIXME 0.0f is not safe to test for.
 //  if (m_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
@@ -597,7 +600,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     setAppearance(map, name, value);
   }
   else if (command == CMD_READ_APPEARANCE) {
-    ObjectHandler *object_handler = System::instance()->getObjectHandler();
+    ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
     Atlas::Message::MapType mt;
     ObjectRecord *record = NULL;
     if (object_handler) record = object_handler->getObjectRecord(m_self->getId());
@@ -726,8 +729,8 @@ void Character::GotCharacterEntity(Eris::Entity *e) {
 }
 
 void Character::RotateTimeoutExpired() {
-  Eris::deleteLater(m_timeout_rotate);
-  m_timeout_rotate = NULL;
+//  Eris::deleteLater(m_timeout_rotate);
+//  m_timeout_rotate = NULL;
   rotate(CMD_modifier);
 }
 void Character::UpdateTimeoutExpired() {

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.24 2005-01-06 12:46:54 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.25 2005-03-15 17:55:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -79,9 +79,9 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
     wrap = (bool)model_config.getItem(model_id, KEY_wrap_texture);
   }
   // Initialise model
-  if (!model->init(bbox, type, wrap)) {
-    std::cerr<< "error initing model" << std::endl;
-    model->shutdown();
+  if (model->init(bbox, type, wrap)) {
+    std::cerr<< "BoundBoxLoader: Error initialising model" << std::endl;
+//    model->shutdown();
     delete model;
     return NULL;
   }

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.2 2005-03-15 17:55:03 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -29,56 +29,67 @@
   
 namespace Sear {
 	
-static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
-	
+static const std::string CMD_LOAD_OBJECT_RECORDS = "load_object_records";
+
+static const std::string KEY_DRAW_SELF = "draw_self";
+static const std::string KEY_DRAW_MEMBERS = "draw_members";
+static const std::string KEY_LOW_QUALITY = "low_quality";
+static const std::string KEY_MEDIUM_QUALITY = "medium_quality";
+static const std::string KEY_HIGH_QUALITY = "high_quality";
+
 ObjectHandler::ObjectHandler() :
-  _initialised(false)	
-{
-  
-}
+  m_initialised(false)	
+{}
 
 ObjectHandler::~ObjectHandler() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
 }
 
 void ObjectHandler::init() {
-  if (debug) Log::writeLog("Initialising Object Handler", Log::LOG_DEFAULT);
-  if (_initialised) shutdown();
-  _object_records = ObjectRecordMap();
+  assert(m_initialised == false);
+  if (debug) std::cout << "Object Handler: Initialise" << std::endl;
+
+  m_object_records_map = ObjectRecordMap();
   // Create default record
   ObjectRecord *r = new ObjectRecord();
   r->name = "default";
   r->draw_self = true;
   r->draw_members = true;
   r->low_quality.push_back("default");
-  _object_records["default"] = r;
-  _initialised = true;
+  m_object_records_map["default"] = r;
+  m_initialised = true;
 }
 
 void ObjectHandler::shutdown() {
-  if (debug) Log::writeLog("Shutting down Object Handler", Log::LOG_DEFAULT);
+  assert(m_initialised == true);
+
+  if (debug) std::cout << "Object Handler: Shutdown" << std::endl;
+
   // Clean up object records	
-  while (!_object_records.empty()) {
-    ObjectRecord *record = _object_records.begin()->second;
-    if (record) delete record;
-    _object_records.erase(_object_records.begin());
+  while (!m_object_records_map.empty()) {
+    ObjectRecord *record = m_object_records_map.begin()->second;
+    assert(record != NULL);
+    delete record;
+    m_object_records_map.erase(m_object_records_map.begin());
   }
-  _initialised = false;
+  m_initialised = false;
 }
 
-void ObjectHandler::loadObjectRecords(const std::string &file_name) {
+void ObjectHandler::loadObjectRecords(const std::string &filename) {
   varconf::Config config;
   config.sigsv.connect(SigC::slot(*this, &ObjectHandler::varconf_callback));
   config.sige.connect(SigC::slot(*this, &ObjectHandler::varconf_error_callback));
-  config.readFromFile(file_name);
+  config.readFromFile(filename);
 }
 
 ObjectRecord *ObjectHandler::getObjectRecord(const std::string &id) {
-  return _object_records[id];	
+  return (m_object_records_map.find(id) != m_object_records_map.end()) 
+        ? (m_object_records_map[id]) : (NULL);
 }
 
 void ObjectHandler::copyObjectRecord(const std::string &id, ObjectRecord *object_record) {
-  if (!object_record) return;
+  assert(object_record != NULL);
+
   ObjectRecord *record = new ObjectRecord();
   record->draw_self = object_record->draw_self;
   record->draw_members = object_record->draw_members;
@@ -86,42 +97,53 @@ void ObjectHandler::copyObjectRecord(const std::string &id, ObjectRecord *object
   record->low_quality = object_record->low_quality;
   record->medium_quality = object_record->medium_quality;
   record->high_quality = object_record->high_quality;
-  if (_object_records[id]) { // Clean up existing record
-    delete _object_records[id];
+
+  if (m_object_records_map[id]) { // Clean up existing record
+    delete m_object_records_map[id];
   }
-  _object_records[id] = record;
+
+  m_object_records_map[id] = record;
 }
 
 void ObjectHandler::registerCommands(Console *console) {
-  console->registerCommand(LOAD_OBJECT_RECORDS, this);
+  console->registerCommand(CMD_LOAD_OBJECT_RECORDS, this);
 }
 
 void ObjectHandler::runCommand(const std::string &command, const std::string &args) {
-  if (command == LOAD_OBJECT_RECORDS) {
+  if (command == CMD_LOAD_OBJECT_RECORDS) {
     loadObjectRecords(args);
   }
 }
 
 void ObjectHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  ObjectRecord *record = _object_records[section];
+  ObjectRecord *record = m_object_records_map[section];
   // If record does not exist, create it.
   if (!record) {
     record = new ObjectRecord();
     record->name = section;
     record->draw_self = true;
     record->draw_members = true;
-    _object_records[section] = record;
+    m_object_records_map[section] = record;
     if (debug) {
       std::cout << "Adding ObjectRecord: " << section << std::endl;
     }
   }
-  if (key == "draw_self") record->draw_self = (bool)config.getItem(section, key);
-  else if (key == "draw_members") record->draw_members = (bool)config.getItem(section, key);
-  else if (key == "low_quality") {
+
+  if (key == KEY_DRAW_SELF) {
+    record->draw_self = (bool)config.getItem(section, key);
+  }
+  else if (key == KEY_DRAW_MEMBERS) {
+    record->draw_members = (bool)config.getItem(section, key);
+  }
+  else if (key == KEY_LOW_QUALITY) {
     record->low_quality.push_back((std::string)config.getItem(section, key));
   }
-  else if (key == "medium_quality") record->medium_quality.push_back((std::string)config.getItem(section, key));
-  else if (key == "high_quality") record->high_quality.push_back((std::string)config.getItem(section, key));
+  else if (key == KEY_MEDIUM_QUALITY) { 
+    record->medium_quality.push_back((std::string)config.getItem(section, key));
+  }
+  else if (key == KEY_HIGH_QUALITY) {
+    record->high_quality.push_back((std::string)config.getItem(section, key));
+  }
 }
 
 void ObjectHandler::varconf_error_callback(const char *message) {

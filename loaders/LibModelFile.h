@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.1 2005-02-21 14:16:46 simon Exp $
+// $Id: LibModelFile.h,v 1.2 2005-03-15 17:55:03 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -36,12 +36,12 @@ public:
   /*
    * Creates the data arrays
    */ 
-  bool init(const std::string &filename);
+  int init(const std::string &filename);
 
   /*
    * Cleans up object
    */ 
-  void shutdown();
+  int shutdown();
   void render(bool); 
 
   void invalidate();
