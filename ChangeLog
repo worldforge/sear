@@ -1,5 +1,15 @@
 2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/client.cpp, src/client.h: Add a setStatus function to make sure 
+	  the system object and character avatar pointer is consistent with the
+	  current state of entry into the game world. Delay passing the avatar
+	  object to the character class until the GotCharacterEntity signal so 
+	  avatar->getEntity is not NULL.
+	* src/Character.cpp, src/Character.h: Remove m_self #define and use
+	  member variable instead. This is set when the avatar object is set.
+
+2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/WorldEntity.cpp, src/WorldEntity.h: New eris API has an onTalk
 	  method instead of a handleTalk method.
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.26 2005-03-04 17:58:24 simon Exp $
+// $Id: Character.h,v 1.27 2005-04-06 13:24:15 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -104,12 +104,12 @@ public:
   void clearApp();
   void setHeight(float);
   void setAction(const std::string &action);
-  void GotCharacterEntity(Eris::Entity *e);
 
-  void setAvatar(Eris::Avatar *avatar) { m_avatar = avatar; }
+  void setAvatar(Eris::Avatar *avatar);
+
 private:
-//  WorldEntity *m_self;
   Eris::Avatar *m_avatar;
+  WorldEntity *m_self;
   float m_walk_speed;
   float m_run_speed;
   float m_rotate_speed;

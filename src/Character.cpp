@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.55 2005-03-15 17:55:05 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: Character.cpp,v 1.56 2005-04-06 13:24:15 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -55,7 +51,6 @@
   static const bool debug = false;
 #endif
 
-#define m_self (dynamic_cast<WorldEntity*>(m_avatar->getEntity()))
 
 namespace Sear {
   // Console commands	
@@ -121,6 +116,7 @@ static const std::string HEIGHT = "height";
 
 Character::Character() :
   m_avatar(NULL),
+  m_self(NULL),
   m_walk_speed(0.0f),
   m_run_speed(0.0f),
   m_rotate_speed(0.0f),
@@ -260,6 +256,7 @@ void Character::setRotationRate(float rate) {
 void Character::updateLocals(bool send_to_server) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
+  assert(m_self != NULL);
   float x, y, z;
   float mod_speed;
   float angle;
@@ -268,7 +265,7 @@ void Character::updateLocals(bool send_to_server) {
   static ActionHandler *ac = System::instance()->getActionHandler();
   static float old_speed = m_speed;
   static bool old_run = m_run_modifier;
-  static std::string type = m_self->type();
+  std::string type = m_self->type();
 
   //float divisor, zaxis;
 //  m_orient = m_self->getOrientation();
@@ -723,11 +720,6 @@ void Character::setAction(const std::string &action) {
   m_avatar->getConnection()->send(set);
 }
 
-void Character::GotCharacterEntity(Eris::Entity *e) {
-  //m_self = dynamic_cast<WorldEntity*>(e);
-//  init();
-}
-
 void Character::RotateTimeoutExpired() {
 //  Eris::deleteLater(m_timeout_rotate);
 //  m_timeout_rotate = NULL;
@@ -739,4 +731,13 @@ void Character::UpdateTimeoutExpired() {
   sendUpdate();
 }
 
+void Character::setAvatar(Eris::Avatar *avatar) {
+  m_avatar = avatar;
+  if (avatar == NULL) {
+    m_self = NULL;
+  } else {
+    m_self = dynamic_cast<WorldEntity*>(m_avatar->getEntity());
+    assert(m_self != NULL);
+  }
+}
 } /* namespace Sear */

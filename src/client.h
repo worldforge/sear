@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.19 2005-04-05 21:56:09 simon Exp $
+// $Id: client.h,v 1.20 2005-04-06 13:24:15 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -94,6 +94,7 @@ public:
 
  
 protected:
+  void setStatus(int status);
   //Callbacks
 
   //Connection

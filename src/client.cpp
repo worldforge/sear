@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.64 2005-04-06 09:51:41 simon Exp $
+// $Id: client.cpp,v 1.65 2005-04-06 13:24:15 simon Exp $
 
 #include "System.h"
 
@@ -119,6 +119,7 @@ void Client::shutdown() {
     delete m_account;
     m_account = NULL;
   }
+
   if (m_connection) {
     delete m_connection;
     m_connection = NULL;
@@ -129,7 +130,7 @@ void Client::shutdown() {
     m_factory = NULL;
   }
 
-  m_status = CLIENT_STATUS_DISCONNECTED;
+  setStatus(CLIENT_STATUS_DISCONNECTED);
 
   m_initialised = false;
 }
@@ -169,11 +170,11 @@ int Client::connect(const std::string &host, int port) {
   
   m_system->pushMessage(CLIENT_CONNECTING, CONSOLE_MESSAGE);
 
-  m_status = CLIENT_STATUS_CONNECTING;
+  setStatus(CLIENT_STATUS_CONNECTING);
   if (m_connection->connect()  != 0) {
     printf("Error: Connection Error\n");
     m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
-    m_status = CLIENT_STATUS_DISCONNECTED;
+    setStatus( CLIENT_STATUS_DISCONNECTED);
     delete m_connection;
     m_connection = NULL;
     return 1;
@@ -197,17 +198,14 @@ int Client::disconnect() {
   assert(m_connection);
   assert(m_connection->isConnected());
 
-  m_status = CLIENT_STATUS_DISCONNECTING;
+  setStatus(CLIENT_STATUS_DISCONNECTING);
   if (m_connection->disconnect() != 0) {
-    m_status = CLIENT_STATUS_CONNECTED;
+    setStatus(CLIENT_STATUS_CONNECTED);
     printf("Error: Disconnect Error\n");
     m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
     delete m_connection;
     m_connection = NULL;
-    m_status = CLIENT_STATUS_DISCONNECTED;
-    m_system->setState(SYS_IN_WORLD, false); 
-    m_system->setState(SYS_CONNECTED, false);
-    m_system->setState(SYS_LOGGED_IN, false);
+    setStatus(CLIENT_STATUS_DISCONNECTED);
     return 1;
   }
   return 0;
@@ -259,18 +257,18 @@ int Client::createAccount(const std::string &username, const std::string &fullna
     m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
   }
   try {
-    m_status = CLIENT_STATUS_LOGGING_IN;
+    setStatus(CLIENT_STATUS_LOGGING_IN);
     m_account->createAccount(username, fullname, password);
   } catch (Eris::InvalidOperation io) {
     printf("Eris Exception: %s\n", io._msg.c_str());
-    m_status = CLIENT_STATUS_CONNECTED;
+    setStatus(CLIENT_STATUS_CONNECTED);
     // Clean up object just to be safe
     delete m_account;
     m_account = NULL;
     return 1;
   } catch (...) {
     printf("Unknown Exception\n");
-    m_status = CLIENT_STATUS_CONNECTED;
+    setStatus(CLIENT_STATUS_CONNECTED);
     // Clean up object just to be safe
     delete m_account;
     m_account = NULL;
@@ -321,18 +319,18 @@ int Client::login(const std::string &username, const std::string &password) {
     m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
   }
   try {
-    m_status = CLIENT_STATUS_LOGGING_IN;
+    setStatus(CLIENT_STATUS_LOGGING_IN);
     m_account->login(username, password);
   } catch (Eris::InvalidOperation io) {
     printf("Eris Exception: %s\n", io._msg.c_str());
-    m_status = CLIENT_STATUS_CONNECTED;
+    setStatus(CLIENT_STATUS_CONNECTED);
     // Clean up object just to be safe
     delete m_account;
     m_account = NULL;
     return 1;
   } catch(...) {
     printf("Unknown Exception\n");
-    m_status = CLIENT_STATUS_CONNECTED;
+    setStatus(CLIENT_STATUS_CONNECTED);
     // Clean up object just to be safe
     delete m_account;
     m_account = NULL;
@@ -359,10 +357,7 @@ void Client::poll() {
 void Client::NetFailure(const std::string &msg)  {
   printf("Client::NetFailure\n");
   m_system->pushMessage("Network Failure: " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_DISCONNECTED;
-  m_system->setState(SYS_CONNECTED, false);
-  m_system->setState(SYS_LOGGED_IN, false);
-  m_system->setState(SYS_IN_WORLD, false);
+  setStatus(CLIENT_STATUS_DISCONNECTED);
 
   if (m_account) {
     delete m_account;
@@ -376,18 +371,15 @@ void Client::NetFailure(const std::string &msg)  {
 void Client::NetConnected() {
   if (debug) printf("Client:NetConnected\n");
   m_system->pushMessage(CLIENT_CONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_CONNECTED;
+  setStatus(CLIENT_STATUS_CONNECTED);
 
-  m_system->setState(SYS_CONNECTED, true);
 }
 
 void Client::NetDisconnected() {
   printf("Client::NetDisconnected\n");
   m_system->pushMessage(CLIENT_DISCONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_DISCONNECTED;
-  m_system->setState(SYS_CONNECTED, false);
-  m_system->setState(SYS_LOGGED_IN, false);
-  m_system->setState(SYS_IN_WORLD, false);
+  setStatus(CLIENT_STATUS_DISCONNECTED);
+
   if (m_account) {
     delete m_account;
     m_account = NULL;
@@ -405,8 +397,7 @@ bool Client::NetDisconnecting() {
 void Client::LoginSuccess() {
   if (debug) printf("Client::LoginSuccess\n");
   m_system->pushMessage("Login Success", CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_LOGGED_IN;
-  m_system->setState(SYS_LOGGED_IN, true);
+  setStatus(CLIENT_STATUS_LOGGED_IN);
 }
 
 int Client::createCharacter(const std::string &name, const std::string &type, const std::string &sex, const std::string &description) {
@@ -456,14 +447,14 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   ch->setAttr("description", description);
 
   try {
-    m_status = CLIENT_STATUS_GOING_IN_WORLD;
+    setStatus(CLIENT_STATUS_GOING_IN_WORLD);
     m_account->createCharacter(ch);
   } catch (Eris::InvalidOperation io) {
-    m_status = CLIENT_STATUS_LOGGED_IN;
+    setStatus(CLIENT_STATUS_LOGGED_IN);
     printf("Eris Exception: %s\n", io._msg.c_str());
     return 1;
   } catch (...){
-    m_status = CLIENT_STATUS_LOGGED_IN;
+    setStatus( CLIENT_STATUS_LOGGED_IN);
     printf("Unkown Exception\n");
     return 1;
   }
@@ -497,14 +488,14 @@ int Client::takeCharacter(const std::string &id) {
   m_system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
   
   try {
-    m_status = CLIENT_STATUS_GOING_IN_WORLD;
+    setStatus(CLIENT_STATUS_GOING_IN_WORLD);
     m_account->takeCharacter(id);
   } catch (Eris::InvalidOperation io) {
-    m_status = CLIENT_STATUS_LOGGED_IN;
+    setStatus(CLIENT_STATUS_LOGGED_IN);
     printf("Eris Exception: %s\n", io._msg.c_str());
     return 1;
   } catch (...) {
-    m_status = CLIENT_STATUS_LOGGED_IN;
+    setStatus(CLIENT_STATUS_LOGGED_IN);
     printf("Unkown Exception\n");
     return 1;
   }
@@ -530,7 +521,7 @@ int Client::logout() {
   if (m_status >= CLIENT_STATUS_LOGGED_IN) {
     m_system->pushMessage(CLIENT_LOGGING_OUT,CONSOLE_MESSAGE);
     printf("Client::logout: Logging Out\n");
-    m_status = CLIENT_STATUS_LOGGING_OUT;
+    setStatus(CLIENT_STATUS_LOGGING_OUT);
     m_account->logout();
   }
   return 0;
@@ -568,7 +559,7 @@ void Client::StatusChanged(Eris::Connection::Status s) {
 void Client::LoginFailure(const std::string& msg) {
   printf("Login Failure: %s\n", msg.c_str());
   m_system->pushMessage("Login Failure" + msg, CONSOLE_MESSAGE);
-  m_status = CLIENT_STATUS_CONNECTED;
+  setStatus(CLIENT_STATUS_CONNECTED);
 }
 
 void Client::LogoutComplete(bool clean_logout) {
@@ -580,9 +571,7 @@ void Client::LogoutComplete(bool clean_logout) {
     printf("Error during Logout\n");
   }
   m_system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_CONNECTED;
-  m_system->setState(SYS_LOGGED_IN, false);
-  m_system->setState(SYS_IN_WORLD, false);
+  setStatus(CLIENT_STATUS_CONNECTED);
 
   Eris::deleteLater(m_account);
   m_account = NULL;
@@ -672,20 +661,57 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
   std::cout << "Avatar sucessfully created" << std::endl;
   m_avatar = avatar;
 
-  m_system->getCharacter()->setAvatar(m_avatar);
   m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &Client::GotCharacterEntity));
 }
 
 void Client::AvatarFailure(const std::string &msg) {
   std::cerr << msg << std::endl;
   m_status = CLIENT_STATUS_LOGGED_IN;
-  
+  m_system->getCharacter()->setAvatar(NULL);
 }
 
 void Client::GotCharacterEntity(Eris::Entity *e) {
   assert(e != NULL);
-  m_system->setState(SYS_IN_WORLD, true);
-  m_status = CLIENT_STATUS_IN_WORLD;
+  assert(m_avatar != NULL);
+  m_system->getCharacter()->setAvatar(m_avatar);
+  setStatus(CLIENT_STATUS_IN_WORLD);
+}
+
+void Client::setStatus(int status) {
+  assert(m_system);
+  assert(m_system->getCharacter());
+  switch (status) {
+    case CLIENT_STATUS_DISCONNECTED:
+    case CLIENT_STATUS_DISCONNECTING:
+    case CLIENT_STATUS_CONNECTING:
+      m_system->setState(SYS_CONNECTED, false);
+      m_system->setState(SYS_LOGGED_IN, false);
+      m_system->setState(SYS_IN_WORLD, false);
+      m_system->getCharacter()->setAvatar(NULL);
+      break;
+    case CLIENT_STATUS_CONNECTED:
+    case CLIENT_STATUS_LOGGING_IN:
+    case CLIENT_STATUS_LOGGING_OUT:
+      m_system->setState(SYS_CONNECTED, true);
+      m_system->setState(SYS_LOGGED_IN, false);
+      m_system->setState(SYS_IN_WORLD, false);
+      m_system->getCharacter()->setAvatar(NULL);
+      break;
+    case CLIENT_STATUS_LOGGED_IN:
+    case CLIENT_STATUS_GOING_IN_WORLD:
+    case CLIENT_STATUS_GOING_OUT_WORLD:
+      m_system->setState(SYS_CONNECTED, true);
+      m_system->setState(SYS_LOGGED_IN, true);
+      m_system->setState(SYS_IN_WORLD, false);
+      m_system->getCharacter()->setAvatar(NULL);
+      break;
+    case CLIENT_STATUS_IN_WORLD:
+      m_system->setState(SYS_CONNECTED, true);
+      m_system->setState(SYS_LOGGED_IN, true);
+      m_system->setState(SYS_IN_WORLD, true);
+      break;
+  }
+  m_status = status;
 }
 
 } /* namespace Sear */
