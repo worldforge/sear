@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: StateManager.h,v 1.2 2003-04-23 20:28:27 simon Exp $
+// $Id: StateManager.h,v 1.3 2003-05-29 18:37:17 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -24,13 +24,17 @@ namespace Sear {
 
 class Console;
 	
+// This would be better obtained elsewhere ie from a query to
+// OpenGL, but simpler this way
+#define MAX_UNITS 6
+
 typedef struct {
   std::string state;
   bool alpha_test;
   bool blend;
   bool lighting;
   bool two_sided_lighting;
-  bool textures;
+  bool textures[MAX_UNITS];
   bool colour_material;
   bool depth_test;
   bool cull_face;

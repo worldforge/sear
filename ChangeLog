@@ -1,3 +1,7 @@
+29th May 2003, Simon Goodall
+ * Fixed Multitexturing.
+ * Multitexturing is now determined via the statemanager code
+
 2nd May 2003, Simon Goodall
  * String decls of ModelRecord now in code file to avoid compiler errors on some compilers
  * Removed mmgr.h from being included regardless of configure option in Calender.cpp

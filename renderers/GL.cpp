@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.64 2003-04-30 19:22:45 simon Exp $
+// $Id: GL.cpp,v 1.65 2003-05-29 18:37:17 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -237,7 +237,6 @@ GL::GL() :
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false),
-  _multi_texture_mode(false),
   _texture_manager(NULL),
   _state_manager(NULL)
 {
@@ -1072,7 +1071,10 @@ void GL::setupExtensions() {
   sage_init();
   use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
-  use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
+  if (use_multitexturing) {
+    std::cout << "Using arb_multitexture" << std::endl;
+  }
+//  use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
   if (use_ext_compiled_vertex_array) {
     std::cout << "Using use_ext_compiled_vertex_array" << std::endl; 
   }

@@ -3,6 +3,11 @@ dnl Initialise autoconf
 AC_INIT()
 AM_CONFIG_HEADER(config.h)
 
+###################################
+# TODO remove unrequired checks when eris is released as it pulls in most libs
+# We should check for eris and varconf within the same check
+##################################
+
 dnl Detect the canonical host and target build environment
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET

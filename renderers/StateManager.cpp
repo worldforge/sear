@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.4 2003-04-30 19:22:45 simon Exp $
+// $Id: StateManager.cpp,v 1.5 2003-05-29 18:37:17 simon Exp $
 
 /*
  * TODO
@@ -18,6 +18,7 @@
 #include <varconf/varconf.h>
 
 #include "common/Log.h"
+#include "common/Utility.h"
 
 #include "src/Console.h"
 
@@ -43,7 +44,7 @@ static const std::string ALPHA_TEST = "alpha_test";
 static const std::string BLEND = "blend";
 static const std::string LIGHTING = "lighting";
 static const std::string TWO_SIDED_LIGHTING = "two_sided_lighting";
-static const std::string TEXTURES = "textures";
+static const std::string TEXTURE = "texture_";
 static const std::string COLOUR_MATERIAL = "colour_material";
 static const std::string DEPTH_TEST = "depth_test";
 static const std::string CULL_FACE = "cull_face";
@@ -107,7 +108,8 @@ void StateManager::init() {
   default_state->blend = false;
   default_state->lighting = false;
   default_state->two_sided_lighting = false;
-  default_state->textures = false;
+  for (unsigned int i = 0; i < MAX_UNITS; ++i)
+    default_state->textures[i] = false;
   default_state->colour_material = false;
   default_state->depth_test = false;
   default_state->cull_face = false;
@@ -131,7 +133,9 @@ void StateManager::init() {
   font_state->blend = false;
   font_state->lighting = false;
   font_state->two_sided_lighting = false;
-  font_state->textures = true;
+  font_state->textures[0] = true;
+  for (unsigned int  i = 1; i < MAX_UNITS; ++i)
+    font_state->textures[i] = false;
   font_state->colour_material = false;
   font_state->depth_test = false;
   font_state->cull_face = false;
@@ -180,7 +184,8 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
       record->blend = false;
       record->lighting = false;
       record->two_sided_lighting = false;
-      record->textures = false;
+      for (unsigned int i = 0; i < MAX_UNITS; ++i)
+        record->textures[i] = false;
       record->colour_material = false;
       record->depth_test = false;
       record->cull_face = false;
@@ -204,7 +209,6 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
   else if (key == BLEND) record->blend = (bool)config.getItem(section, key);
   else if (key == LIGHTING) record->lighting = (bool)config.getItem(section, key);
   else if (key == TWO_SIDED_LIGHTING) record->two_sided_lighting = (bool)config.getItem(section, key);
-  else if (key == TEXTURES) record->textures = (bool)config.getItem(section, key);
   else if (key == COLOUR_MATERIAL) record->colour_material = (bool)config.getItem(section, key);
   else if (key == DEPTH_TEST) record->depth_test = (bool)config.getItem(section, key);
   else if (key == CULL_FACE) record->cull_face = (bool)config.getItem(section, key);
@@ -216,6 +220,17 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
   else if (key == ALPHA_VALUE) record->alpha_value = (double)config.getItem(section, key);
   else if (key == BLEND_SRC_FUNCTION) record->blend_src_function = getBlendFunction((std::string)config.getItem(section, key));
   else if (key == BLEND_DEST_FUNCTION) record->blend_dest_function = getBlendFunction((std::string)config.getItem(section, key));
+  else if (key.substr(0, TEXTURE.size()) == TEXTURE) {
+    unsigned int unit;
+    cast_stream(key.substr(TEXTURE.size()), unit);
+    if (unit < MAX_UNITS) {
+      record->textures[unit] = (bool)config.getItem(section, key);
+//      std::cout << "Setting " << section << " texture unit " << unit << " to " << record->textures[unit] << std::endl;
+    }
+  }
+//  try {
+//  std::cout << key << " - " << key.substr(0, TEXTURE.size()) << " - " << key.substr(TEXTURE.size()) << std::endl;
+//  } catch (...) {}
 }
 
 void StateManager::varconf_error_callback(const char *message) {
@@ -284,8 +299,11 @@ void StateManager::stateChange(StateID state) {
     if (sp->two_sided_lighting) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
 //    if (sp->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
-    if (sp->textures) glEnable(GL_TEXTURE_2D);
-    else glDisable(GL_TEXTURE_2D);
+    for (int i = MAX_UNITS - 1; i >= 0; --i) {
+      glActiveTextureARB(GL_TEXTURE0_ARB + i);
+      if (sp->textures[i]) glEnable(GL_TEXTURE_2D);
+      else glDisable(GL_TEXTURE_2D);
+    }
     if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
     else glDisable(GL_COLOR_MATERIAL);
     if (sp->depth_test) glEnable(GL_DEPTH_TEST);
@@ -332,10 +350,14 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
     if (next_state->lighting) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
   }
-  if (previous_state->textures != next_state->textures) {
-//    if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
-    if (next_state->textures) glEnable(GL_TEXTURE_2D);
-    else glDisable(GL_TEXTURE_2D);
+ 
+  for (int i = MAX_UNITS - 1; i >= 0; --i) {
+    glActiveTextureARB(GL_TEXTURE0_ARB + i);
+    if (previous_state->textures[i] != next_state->textures[i]) {
+//      if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
+      if (next_state->textures[i]) glEnable(GL_TEXTURE_2D);
+      else glDisable(GL_TEXTURE_2D);
+    }
   }
   if (previous_state->colour_material != next_state->colour_material) {
     if (next_state->colour_material) glEnable(GL_COLOR_MATERIAL);
