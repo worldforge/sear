@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.12 2003-03-23 19:51:49 simon Exp $
+// $Id: Camera.h,v 1.13 2004-04-07 00:54:18 alriddoch Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -79,6 +79,18 @@ public:
   void elevate(int dir) { _elevation_dir += dir; }
 
   /**
+   * Set the rotate state
+   * @param dir Direction and scale of rotation,
+   */
+  void setRotationSpeed(float dir) { _rotation_dir = dir; }
+
+  /**
+   * Set the elevation state
+   * @param dir Direction and scale of elevation,
+   */
+  void setElevationSpeed(float dir) { _elevation_dir = dir; }
+
+  /**
    * Get current rotation angle
    * @return Current rotation angle (radians)
    */ 
@@ -148,9 +160,9 @@ protected:
   float _rotation;  ///< horizontal rotation (radians)
   float _elevation; ///< vertical rotation (radians)
   
-  int _zoom_dir;      ///< Direction / rate of zoom
-  int _rotation_dir;  ///< Direction / rate of rotation
-  int _elevation_dir; ///< Direction / rate of elevation - negative values point downwards
+  float _zoom_dir;      ///< Direction / rate of zoom
+  float _rotation_dir;  ///< Direction / rate of rotation
+  float _elevation_dir; ///< Direction / rate of elevation - negative values point downwards
 
   float _zoom_speed;      ///< Speed of zoom changes
   float _rotation_speed;  ///< Speed of rotation changes

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.70 2004-04-06 11:57:59 simon Exp $
+// $Id: System.cpp,v 1.71 2004-04-07 00:54:18 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -239,6 +239,7 @@ bool System::init() {
 
   int sticks = SDL_NumJoysticks();
   if (sticks > 0) {
+    SDL_JoystickEventState(SDL_ENABLE);
     _controller = SDL_JoystickOpen(0);
     int axes = SDL_JoystickNumAxes(_controller);
     if (axes < 4) {
@@ -608,13 +609,64 @@ void System::handleEvents(const SDL_Event &event) {
       }
       break;
     }
-    case SDL_QUIT:
+    case SDL_JOYAXISMOTION: {
+      switch (event.jaxis.axis) {
+        case 0: // Left right move
+          if (_character != NULL) {
+            if (abs(event.jaxis.value) > 3200) {
+              _character->setStrafeSpeed(event.jaxis.value / 10000.f);
+            } else {
+                std::cout << "X too small" << std::endl << std::flush;
+              _character->setStrafeSpeed(0);
+            }
+          }
+          break;
+        case 1: // For back move
+          if (_character != NULL) {
+            if (abs(event.jaxis.value) > 3200) {
+              _character->setMovementSpeed(event.jaxis.value / -10000.f);
+            } else {
+                std::cout << "Y too small" << std::endl << std::flush;
+              _character->setMovementSpeed(0);
+            }
+          }
+          break;
+        case 4: // Left right view
+          if (_character != NULL) {
+            if (abs(event.jaxis.value) > 3200) {
+              _character->setRotationRate(event.jaxis.value / 10000.f);
+            } else {
+                std::cout << "X too small" << std::endl << std::flush;
+              _character->setRotationRate(0);
+            }
+          }
+          break;
+        case 5: // Up down view
+          Graphics * g = getGraphics();
+          if (g != NULL) {
+            Camera * c = g->getCamera();
+            if (c != NULL) {
+              if (abs(event.jaxis.value) > 3200) {
+                c->setElevationSpeed(event.jaxis.value / 10000.f);
+              } else {
+                std::cout << "Y too small" << std::endl << std::flush;
+                c->setElevationSpeed(0);
+              }
+            }
+          }
+          break;
+      }
+      break;
+    }
+    case SDL_QUIT: {
       _system_running = false;
       break;
     }
+  }
 }
 
 void System::handleAnalogueControllers() {
+#if 0
   if (_controller != NULL) {
     Graphics * g = getGraphics();
     if (g != NULL) {
@@ -622,12 +674,16 @@ void System::handleAnalogueControllers() {
       if (c != NULL) {
         int rot = SDL_JoystickGetAxis(_controller, 4);
         if (abs(rot) > 3200) {
-          c->rotate((rot < 0) ? 1 : -1);
+          c->setRotation(rot / -10000);
+        } else {
+          c->setRotation(0);
         }
 
         int elev = SDL_JoystickGetAxis(_controller, 5);
         if (abs(elev) > 3200) {
-          c->elevate((elev < 0) ? 1 : -1);
+          c->setElevation(elev / -10000);
+        } else {
+          c->setElevation(0);
         }
       }
     }
@@ -641,6 +697,7 @@ void System::handleAnalogueControllers() {
               << SDL_JoystickGetAxis(_controller, 6) << ":"
               << std::endl << std::flush;
   }
+#endif
 }
 
 void System::setCaption(const std::string &title, const std::string &icon) {

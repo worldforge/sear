@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.13 2004-01-19 12:15:17 simon Exp $
+// $Id: Character.h,v 1.14 2004-04-07 00:54:18 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -63,6 +63,10 @@ public:
   void moveForward(float);
   void strafe(float);
   void rotate(float);
+
+  void setMovementSpeed(float);
+  void setStrafeSpeed(float);
+  void setRotationRate(float);
   
   void updateLocals(bool);
   void updateMove(float, float, float, WFMath::Quaternion);

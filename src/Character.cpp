@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.30 2004-03-11 16:21:00 simon Exp $
+// $Id: Character.cpp,v 1.31 2004-04-07 00:54:18 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -164,8 +164,32 @@ void Character::rotate(float rate) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
+  std::cout << "Character::rotate" << std::endl << std::flush;
   if (rate != CMD_modifier) _rate += rate * _rotate_speed;
   updateLocals(true);
+  // FIXME 0.0f is not safe to test for.
+  if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+}
+
+void Character::setMovementSpeed(float speed) {
+  assert ((_initialised == true) && "Character not initialised");	
+
+  _speed = speed;
+  updateLocals(true);
+}
+
+void Character::setStrafeSpeed(float speed) {
+  assert ((_initialised == true) && "Character not initialised");	
+
+  _strafe_speed = speed;
+  updateLocals(true);
+}
+
+void Character::setRotationRate(float rate) {
+  assert ((_initialised == true) && "Character not initialised");	
+
+  _rate = rate * _rotate_speed;
+  // FIXME 0.0f is not safe to test for.
   if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
