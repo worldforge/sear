@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.61 2005-02-18 16:39:06 simon Exp $
+// $Id: client.cpp,v 1.62 2005-03-04 17:58:25 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -399,7 +399,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   Log::writeLog("Client: Creating character - Name: " + name + " Type: " + type + " Sex: " + sex + " Description: " + description, Log::LOG_DEFAULT);
   _system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
   Atlas::Objects::Entity::GameEntity ch;
-  Atlas::Message::Element::ListType prs(1, Atlas::Message::Element(type));
+  Atlas::Message::ListType prs(1, Atlas::Message::Element(type));
   ch->setParentsAsList(prs);
   ch->setName(name);
   ch->setAttr("sex", sex);
@@ -815,11 +815,15 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 void Client::AvatarSuccess(Eris::Avatar *avatar) {
   std::cout << "Avatar sucessfully created" << std::endl;
   m_avatar = avatar;
+// Character c = new Character();
+
   _system->setState(SYS_IN_WORLD, true);
-  _system->setCharacter(new Character(m_avatar));
-Character *c = _system->getCharacter();
-  m_avatar->GotCharacterEntity.connect(SigC::slot(*c,
- &Character::GotCharacterEntity));
+  //_system->setCharacter(new Character());
+//Character *c =
+ _system->getCharacter()->setAvatar(m_avatar);
+
+//  m_avatar->GotCharacterEntity.connect(SigC::slot(*c,
+// &Character::GotCharacterEntity));
 }
 
 void Client::AvatarFailure(const std::string &msg) {

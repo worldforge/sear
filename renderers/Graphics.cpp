@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.3 2005-02-21 14:16:46 simon Exp $
+// $Id: Graphics.cpp,v 1.4 2005-03-04 17:58:24 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +37,7 @@
 #include "src/client.h"
 
 #include "renderers/RenderSystem.h"
+#include "CameraSystem.h"
 #include "gui/Compass.h"
 #include "gui/Workspace.h"
 
@@ -111,8 +112,6 @@ static const std::string SELECT = "select_state";
 Graphics::Graphics(System *system) :
   m_system(system),
   m_renderer(NULL),
-  m_character(NULL),
-  m_camera(NULL),
   m_num_frames(0),
   m_frame_time(0),
   m_initialised(false),
@@ -121,22 +120,16 @@ Graphics::Graphics(System *system) :
 }
 
 Graphics::~Graphics() {
+  assert (m_initialised == false);
   if (m_initialised) shutdown();
 }
 
 void Graphics::init() {
+  assert (m_initialised == false);
   if (m_initialised) shutdown();
-  // Read  Graphics config options
-  readConfig();
   // Add callbeck to detect updated options
   m_system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
-  // Register console commands
 
-  // Create the default camera
-  m_camera = new Camera();
-  m_camera->init();
-  m_camera->registerCommands(m_system->getConsole());
-  
   // Create the compass
   m_compass = new Compass(580.f, 50.f);
   m_compass->setup();
@@ -148,14 +141,7 @@ void Graphics::init() {
 }
 
 void Graphics::shutdown() {
-  assert(m_initialised);
-  writeConfig();
-
-  if (m_camera) {
-    m_camera->shutdown();
-    delete m_camera;
-    m_camera = NULL;
-  }
+  assert(m_initialised == true);
  
   if (m_compass) {
     delete m_compass;
@@ -177,7 +163,9 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     return;
   }
   if (select_mode) m_renderer->resetSelection();
-  if (m_camera) m_camera->updateCameraPos(time_elapsed);
+//  if (m_camera)
+ if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
+ RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
 
   m_renderer->beginFrame();
   drawWorld(select_mode, time_elapsed);
@@ -208,19 +196,22 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   if (!select_mode) m_renderer->renderActiveName();
 
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("cursor"));
-  int mouse_x, mouse_y;
-  SDL_GetMouseState(&mouse_x, &mouse_y);
-  mouse_y = m_renderer->getWindowHeight() - mouse_y - 32;
-  glColor3f(1.0f, 1.0f, 1.0f);
-  m_renderer->drawTextRect(mouse_x, mouse_y, 32, 32, RenderSystem::getInstance().getMouseCursor());
-
+  if (RenderSystem::getInstance().isMouseVisible()) {
+    RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("cursor"));
+    int mouse_x, mouse_y;
+    SDL_GetMouseState(&mouse_x, &mouse_y);
+    mouse_y = m_renderer->getWindowHeight() - mouse_y - 32;
+    glColor3f(1.0f, 1.0f, 1.0f);
+    m_renderer->drawTextRect(mouse_x, mouse_y, 32, 32, RenderSystem::getInstance().getMouseCursor());
+  }
   m_renderer->endFrame(select_mode);
 }
 
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
+
+  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
 /*
 Camera coords
 //Should be stored in camera object an updated as required
@@ -239,7 +230,7 @@ Compare D^2 to choose what detail level to use
   WFMath::Point<3> pos(0,0,0); // Initial camera position
   Eris::Avatar *avatar = m_system->getClient()->getAvatar();
   if (m_system->checkState(SYS_IN_WORLD) && avatar) {
-    if (!m_character) m_character = m_system->getCharacter();
+    //if (!m_character) m_character = m_system->getCharacter();
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
     if (focus) {
@@ -253,10 +244,11 @@ Compare D^2 to choose what detail level to use
             z = pos.z();
       
       // Apply camera rotations
-      m_orient /= WFMath::Quaternion(y_vector, m_camera->getElevation());
-      m_orient /= WFMath::Quaternion(z_vector, m_camera->getRotation());
+      m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
+      m_orient /= WFMath::Quaternion(z_vector, cam->getRotation());
       
-      if (m_character) m_orient /= WFMath::Quaternion(z_vector,  m_character->getAngle());
+//      if (m_character)
+ m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
 
       // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
       if (!select_mode) {
@@ -265,8 +257,11 @@ Compare D^2 to choose what detail level to use
         Environment::getInstance().renderSky();
 	m_renderer->restore();
       }
-      // Translate camera getDist() units away from the character. Allows closups or large views
-      m_renderer->translateObject(0.0f, m_camera->getDistance(), -1.0f);
+
+      if (cam->getType() == Camera::CAMERA_CHASE) {
+        // Translate camera getDist() units away from the character. Allows closups or large views
+        m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
+      }
       m_renderer->applyCharacterLighting(0.5, 0, 0.5);
       m_renderer->applyQuaternion(m_orient);
       
@@ -288,11 +283,11 @@ Compare D^2 to choose what detail level to use
       glDisableClientState(GL_VERTEX_ARRAY);
       m_renderer->restore();
     }
-#if(1)
+
     WorldEntity *root = NULL; 
     Eris::View *view = avatar->getView();
     if ((root = dynamic_cast<WorldEntity *>(view->getTopLevel()))) {
-      if (m_character) m_character->updateLocals(false);
+      System::instance()->getCharacter()->updateLocals(false);
       m_render_queue = Render::QueueMap();
       m_message_list = Render::MessageList();
 
@@ -301,15 +296,15 @@ Compare D^2 to choose what detail level to use
       m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
       if (!select_mode) m_renderer->drawMessageQueue(m_message_list);
     }
-#endif
-      m_renderer->store();
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-  glEnableClientState(GL_VERTEX_ARRAY);
-  Environment::getInstance().renderSea();
-  glDisableClientState(GL_VERTEX_ARRAY);
-      m_renderer->restore();
+
+    m_renderer->store();
+    RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+    glEnableClientState(GL_VERTEX_ARRAY);
+    Environment::getInstance().renderSea();
+    glDisableClientState(GL_VERTEX_ARRAY);
+    m_renderer->restore();
     
-    m_compass->update(m_camera->getRotation());
+    m_compass->update(cam->getRotation());
     m_compass->draw(m_renderer, select_mode);
   } else {
     m_renderer->drawSplashScreen();
@@ -318,7 +313,11 @@ Compare D^2 to choose what detail level to use
 
 
 void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list) {
-  we->checkActions(); // See if model animations need to be updated
+
+  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
+
+//  we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
       // TODO there must be a better way of doing this - after the first time round for each object, it should only require one call
@@ -390,17 +389,22 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 
       // Loop through all models in list
       if (object_record->draw_self) {
-        // Check if we're visible
-        // Change method here
-        if (Frustum::sphereInFrustum(m_frustum, object_record->bbox, object_record->position)) {
-        //if (Frustum::orientBBoxInFrustum(m_frustum, we->getOrientBBox(), object_record->position)) {
-          for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
-            if (!select_mode) {
-               // Add to queue by state, then model record
-               render_queue[m_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
-              if (we->hasMessages()) message_list.push_back(we);
+        if ((cam->getType() == Camera::CAMERA_FIRST)
+         && (we->getId() == self->getId())) {
+           // Do nothing - We don't want to render ourself in first person mode
+        } else {
+          // Check if we're visible
+          // Change method here
+          if (Frustum::sphereInFrustum(m_frustum, object_record->bbox, object_record->position)) {
+          //if (Frustum::orientBBoxInFrustum(m_frustum, we->getOrientBBox(), object_record->position)) {
+            for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
+              if (!select_mode) {
+                 // Add to queue by state, then model record
+                 render_queue[m_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
+                if (we->hasMessages()) message_list.push_back(we);
+              }
+              else render_queue[m_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
             }
-            else render_queue[m_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
           }
         }
       }
@@ -413,76 +417,75 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
   }
 }
 
-void Graphics::readConfig() {
+void Graphics::readConfig(varconf::Config &config) {
   varconf::Variable temp;
-  varconf::Config &general = m_system->getGeneral();
  
   // Read Fire properties 
-  if (general.findItem(GRAPHICS, KEY_fire_ac)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_ac);
+  if (config.findItem(GRAPHICS, KEY_fire_ac)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_ac);
     m_fire.attenuation_constant = (!temp.is_double()) ? (DEFAULT_fire_ac) : ((double)(temp));
   } else {
     m_fire.attenuation_constant = DEFAULT_fire_ac;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_al)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_al);
+  if (config.findItem(GRAPHICS, KEY_fire_al)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_al);
     m_fire.attenuation_linear = (!temp.is_double()) ? (DEFAULT_fire_al) : ((double)(temp));
   } else {
     m_fire.attenuation_linear = DEFAULT_fire_al;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_aq)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_aq);
+  if (config.findItem(GRAPHICS, KEY_fire_aq)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_aq);
     m_fire.attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_fire_aq) : ((double)(temp));
   } else {
     m_fire.attenuation_quadratic = DEFAULT_fire_aq;
   }
 
-  if (general.findItem(GRAPHICS, KEY_fire_amb_red)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_amb_red);
+  if (config.findItem(GRAPHICS, KEY_fire_amb_red)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_amb_red);
     m_fire.ambient[0] = (!temp.is_double()) ? (DEFAULT_fire_amb_red) : ((double)(temp));
   } else {
     m_fire.ambient[0] = DEFAULT_fire_amb_red;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_amb_green)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_amb_green);
+  if (config.findItem(GRAPHICS, KEY_fire_amb_green)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_amb_green);
     m_fire.ambient[1] = (!temp.is_double()) ? (DEFAULT_fire_amb_green) : ((double)(temp));
   } else {
     m_fire.ambient[1] = DEFAULT_fire_amb_green;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_amb_blue)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_amb_blue);
+  if (config.findItem(GRAPHICS, KEY_fire_amb_blue)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_amb_blue);
     m_fire.ambient[2] = (!temp.is_double()) ? (DEFAULT_fire_amb_blue) : ((double)(temp));
   } else {
     m_fire.ambient[3] = DEFAULT_fire_amb_blue;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_amb_alpha)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_amb_alpha);
+  if (config.findItem(GRAPHICS, KEY_fire_amb_alpha)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_amb_alpha);
     m_fire.ambient[3] = (!temp.is_double()) ? (DEFAULT_fire_amb_alpha) : ((double)(temp));
   } else {
     m_fire.ambient[4] = DEFAULT_fire_amb_alpha;
   }
 
 
-  if (general.findItem(GRAPHICS, KEY_fire_diff_red)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_diff_red);
+  if (config.findItem(GRAPHICS, KEY_fire_diff_red)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_diff_red);
     m_fire.diffuse[0] = (!temp.is_double()) ? (DEFAULT_fire_diff_red) : ((double)(temp));
   } else {
     m_fire.diffuse[0] = DEFAULT_fire_diff_red;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_diff_green)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_diff_green);
+  if (config.findItem(GRAPHICS, KEY_fire_diff_green)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_diff_green);
     m_fire.diffuse[1] = (!temp.is_double()) ? (DEFAULT_fire_diff_green) : ((double)(temp));
   } else {
     m_fire.diffuse[1] = DEFAULT_fire_diff_green;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_diff_blue)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_diff_blue);
+  if (config.findItem(GRAPHICS, KEY_fire_diff_blue)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_diff_blue);
     m_fire.diffuse[2] = (!temp.is_double()) ? (DEFAULT_fire_diff_blue) : ((double)(temp));
   } else {
     m_fire.diffuse[2] =  DEFAULT_fire_diff_blue;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_diff_alpha)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_diff_alpha);
+  if (config.findItem(GRAPHICS, KEY_fire_diff_alpha)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_diff_alpha);
     m_fire.diffuse[3] = (!temp.is_double()) ? (DEFAULT_fire_diff_alpha) : ((double)(temp));
   } else {
     m_fire.diffuse[3] = DEFAULT_fire_diff_alpha;
@@ -490,26 +493,26 @@ void Graphics::readConfig() {
 
 
 
-  if (general.findItem(GRAPHICS, KEY_fire_spec_red)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_spec_red);
+  if (config.findItem(GRAPHICS, KEY_fire_spec_red)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_spec_red);
     m_fire.specular[0] = (!temp.is_double()) ? (DEFAULT_fire_spec_red) : ((double)(temp));
   } else {
     m_fire.specular[0] = DEFAULT_fire_spec_red;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_spec_green)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_spec_green);
+  if (config.findItem(GRAPHICS, KEY_fire_spec_green)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_spec_green);
     m_fire.specular[1] = (!temp.is_double()) ? (DEFAULT_fire_spec_green) : ((double)(temp));
   } else {
     m_fire.specular[1] = DEFAULT_fire_spec_green;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_spec_blue)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_spec_blue);
+  if (config.findItem(GRAPHICS, KEY_fire_spec_blue)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_spec_blue);
     m_fire.specular[2] = (!temp.is_double()) ? (DEFAULT_fire_spec_blue) : ((double)(temp));
   } else {
     m_fire.specular[2] = DEFAULT_fire_spec_blue;
   }
-  if (general.findItem(GRAPHICS, KEY_fire_spec_alpha)) {
-    temp = general.getItem(GRAPHICS, KEY_fire_spec_alpha);
+  if (config.findItem(GRAPHICS, KEY_fire_spec_alpha)) {
+    temp = config.getItem(GRAPHICS, KEY_fire_spec_alpha);
     m_fire.specular[3] = (!temp.is_double()) ? (DEFAULT_fire_spec_alpha) : ((double)(temp));
   } else {
     m_fire.specular[3] = DEFAULT_fire_spec_alpha;
@@ -517,40 +520,29 @@ void Graphics::readConfig() {
 
 }  
 
-void Graphics::writeConfig() {
-  varconf::Config &general = m_system->getGeneral();
+void Graphics::writeConfig(varconf::Config &config) {
   
   // Save frame rate detail boundaries
-  general.setItem(GRAPHICS, KEY_fire_ac, m_fire.attenuation_constant);
-  general.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
-  general.setItem(GRAPHICS, KEY_fire_aq, m_fire.attenuation_quadratic);
+  config.setItem(GRAPHICS, KEY_fire_ac, m_fire.attenuation_constant);
+  config.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
+  config.setItem(GRAPHICS, KEY_fire_aq, m_fire.attenuation_quadratic);
   
-  general.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[Light::RED]);
-  general.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[Light::GREEN]);
-  general.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[Light::BLUE]);
-  general.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[Light::ALPHA]);
+  config.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[Light::RED]);
+  config.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[Light::GREEN]);
+  config.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[Light::BLUE]);
+  config.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[Light::ALPHA]);
 
-  general.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[Light::RED]);
-  general.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[Light::GREEN]);
-  general.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[Light::BLUE]);
-  general.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[Light::ALPHA]);
+  config.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[Light::RED]);
+  config.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[Light::GREEN]);
+  config.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[Light::BLUE]);
+  config.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[Light::ALPHA]);
 
-  general.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[Light::RED]);
-  general.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[Light::GREEN]);
-  general.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[Light::BLUE]);
-  general.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[Light::ALPHA]);
+  config.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[Light::RED]);
+  config.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[Light::GREEN]);
+  config.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[Light::BLUE]);
+  config.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[Light::ALPHA]);
 
 }  
-
-void Graphics::readComponentConfig() {
-  if (m_renderer) m_renderer->readConfig();
-  if (m_camera) m_camera->readConfig();
-  if (m_camera) m_camera->writeConfig();
-}
-
-void Graphics::writeComponentConfig() {
-  if (m_renderer) m_renderer->writeConfig();
-}
 
 void Graphics::registerCommands(Console * console) {
   console->registerCommand("invalidate", this);

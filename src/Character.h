@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.25 2005-02-18 16:39:06 simon Exp $
+// $Id: Character.h,v 1.26 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -12,7 +12,7 @@
 
 #include <wfmath/quaternion.h>
 #include <Eris/Entity.h>
-//#include <Eris/Utils.h>
+#include <Eris/Timeout.h>
 #include <Eris/Types.h>
 #include <Eris/Avatar.h>
 #include "interfaces/ConsoleObject.h"
@@ -38,10 +38,8 @@ class Character : public ConsoleObject, public SigC::Object {
 public:
   /**
    * Constructor.
-   * @param we The character entity
-   * @param system The system object
    */
-  Character(Eris::Avatar *avatar);
+  Character();
 
   /**
    * Destructor
@@ -89,12 +87,13 @@ public:
   void make(const std::string&type, const std::string &name);
 
   float getAngle() { return m_angle; }
-  WFMath::Quaternion getOrientation() { return m_orient; }
-  WorldEntity *getSelf() { return m_self; }
+//  WFMath::Quaternion getOrientation() { return m_orient; }
+  Eris::Avatar *getAvatar() const { return m_avatar; }
+//  WorldEntity *getSelf() { return m_self; }
   void toggleRunModifier();
 
-  void readConfig();
-  void writeConfig();
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config);
 
   void registerCommands(Console*);
   void runCommand(const std::string &, const std::string &);
@@ -107,8 +106,9 @@ public:
   void setAction(const std::string &action);
   void GotCharacterEntity(Eris::Entity *e);
 
+  void setAvatar(Eris::Avatar *avatar) { m_avatar = avatar; }
 private:
-  WorldEntity *m_self;
+//  WorldEntity *m_self;
   Eris::Avatar *m_avatar;
   float m_walk_speed;
   float m_run_speed;
@@ -122,16 +122,19 @@ private:
   unsigned int m_lastUpdate;
   bool m_updateScheduled;
 
-  WFMath::Quaternion m_orient;
+//  WFMath::Quaternion m_orient;
 
   unsigned int m_time; ///< Used to record time since last server update
 
   bool m_run_modifier; ///< Flag storing run/walk state. True means run
 
-  void Recontainered(Eris::Entity*, Eris::Entity*);
   bool m_initialised; ///< Initialisation state of character object
 
   void varconf_callback(const std::string &key, const std::string &section, varconf::Config &config);
+
+  void RotateTimeoutExpired();
+  void UpdateTimeoutExpired();
+  Eris::Timeout *m_timeout_rotate, *m_timeout_update;
 
 };
 

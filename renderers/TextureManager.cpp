@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.33 2005-02-21 14:16:46 simon Exp $
+// $Id: TextureManager.cpp,v 1.34 2005-03-04 17:58:24 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -297,6 +297,8 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
       }
     }
   }
+
+
 // */ 
   // Create open gl texture
   GLuint texture_id;
@@ -396,7 +398,23 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
             fmt = GL_RGB5_A1; break; // Set default
         }
     }
-  
+// TODO Create this in a new SDL_surface, and assign in surface so the mipmap stuff will work below 
+  int width = scaleDimension(surface->w);
+  int height = scaleDimension(surface->h);
+
+  // Scale the image to a 2^N x 2^M size that is within the size allowed by GL
+  bool free_surface = false;
+  if  (width != surface->w || height != surface->h) {
+
+    SDL_Surface *newSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, width, height, surface->format->BitsPerPixel, surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
+
+    gluScaleImage(format, surface->w, surface->h, GL_UNSIGNED_BYTE, surface->pixels, newSurface->w, newSurface->h, GL_UNSIGNED_BYTE, newSurface->pixels);
+
+//    SDL_FreeSurface(surface);
+    surface = newSurface;
+    free_surface = true;
+  }
+
   if (mipmap) {
     if (m_baseMipmapLevel == 0)
         glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
@@ -436,6 +454,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     // don't leak the final mipmap
     if (mip != surface) SDL_FreeSurface(mip);
   } else {
+    //glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
   }
 
@@ -445,6 +464,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     glPrioritizeTextures(1, &texture_id, &priority);
   }
   
+  if (free_surface) SDL_FreeSurface(surface);
   return texture_id;
 }
 

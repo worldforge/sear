@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: Camera.h,v 1.2 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -18,7 +18,6 @@
 
 #include <string>
 #include <sigc++/object_slot.h>
-#include "interfaces/ConsoleObject.h"
 
 namespace varconf {
   class Config;
@@ -26,13 +25,18 @@ namespace varconf {
 
 namespace Sear {
 
-class Console;
-	
 /**
  * This class represents the camera in the game world.
  */ 
-class Camera : public ConsoleObject, public SigC::Object {
+class Camera : public SigC::Object {
 public:
+  typedef enum {
+    CAMERA_CHASE = 0,
+    CAMERA_FIRST,
+    CAMERA_LAST
+  } CameraType;
+
+
   /**
    * Default constructor
    */ 
@@ -64,19 +68,19 @@ public:
    * Change zoom state
    * @param dir Direction of zoom. -1 is move closer, 0 is stationary, 1 is move away
    */ 
-  void zoom(int dir) { _zoom_dir += dir; }
+  void zoom(int dir) { m_zoom_dir += dir; }
 
   /**
    * Change rotate state
    * @param dir Direction of rotation. -1 is rotate --, 0 is stationary, 1 is rotate --
    */ 
-  void rotate(int dir) { _rotation_dir += dir; }
+  void rotate(int dir) { m_rotation_dir += dir; }
 
   /**
    * Change elevation state
    * @param dir Direction of elevation. -1 is elevate --, 0 is stationary, 1 is elevate --
    */ 
-  void elevate(int dir) { _elevation_dir += dir; }
+  void elevate(int dir) { m_elevation_dir += dir; }
 
   /**
    * Make an immediate change to the rotation
@@ -94,71 +98,61 @@ public:
    * Set the rotate state
    * @param dir Direction and scale of rotation,
    */
-  void setRotationSpeed(float dir) { _rotation_dir = dir; }
+  void setRotationSpeed(float dir) { m_rotation_dir = dir; }
 
   /**
    * Set the elevation state
    * @param dir Direction and scale of elevation,
    */
-  void setElevationSpeed(float dir) { _elevation_dir = dir; }
+  void setElevationSpeed(float dir) { m_elevation_dir = dir; }
 
   /**
    * Get current rotation angle
    * @return Current rotation angle (radians)
    */ 
-  const float getRotation() const { return _rotation;  }
+  const float getRotation() const { return m_rotation;  }
   /**
    * Get current elevation angle
    * @return Current elevation angle (radians)
    */ 
-  const float getElevation() const { return _elevation; }
+  const float getElevation() const { return m_elevation; }
   /**
    * Get current zoom distance
    * @return Current zoom distance (meters)
    */ 
-  const float getDistance() const { return _distance; }
+  const float getDistance() const { return m_distance; }
 
   /**
    * Get camera X position
    * @return X position
    */ 
-  float getXPos() const { return _x_pos; }
+  float getXPos() const { return m_x_pos; }
 
   /**
    * Get camera Y position
    * @return Y position
    */ 
-  float getYPos() const { return _y_pos; }
+  float getYPos() const { return m_y_pos; }
 
   /**
    * Get camera Z position
    * @return Z position
    */ 
-  float getZPos() const { return _z_pos; }
+  float getZPos() const { return m_z_pos; }
 
   /**
    * Read camera config data
    */ 
-  void readConfig();
+  void readConfig(varconf::Config &config);
 
   /**
    * Write camera config data
    */ 
-  void writeConfig();
- 
-  /**
-   * Register console commands
-   * @param console Console object to register with
-   */ 
-  void registerCommands(Console *console);
+  void writeConfig(varconf::Config &config);
 
-  /**
-   * Runs a console command
-   * @param command Console command
-   * @param args Console command arguments
-   */ 
-  void runCommand(const std::string &command, const std::string &args);
-  
+  CameraType getType() const { return m_type; }
+  void setType(CameraType type) { m_type = type; }
+ 
 protected:
   /**
    * Callback used when config data changes
@@ -168,27 +162,29 @@ protected:
    */ 
    void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 
-  float _distance;  ///< distance from focus (meters)
-  float _rotation;  ///< horizontal rotation (radians)
-  float _elevation; ///< vertical rotation (radians)
+  bool m_initialised; ///< Camera initialisation state 
+
+  float m_distance;  ///< distance from focus (meters)
+  float m_rotation;  ///< horizontal rotation (radians)
+  float m_elevation; ///< vertical rotation (radians)
   
-  float _zoom_dir;      ///< Direction / rate of zoom
-  float _rotation_dir;  ///< Direction / rate of rotation
-  float _elevation_dir; ///< Direction / rate of elevation - negative values point downwards
+  float m_zoom_dir;      ///< Direction / rate of zoom
+  float m_rotation_dir;  ///< Direction / rate of rotation
+  float m_elevation_dir; ///< Direction / rate of elevation - negative values point downwards
 
-  float _zoom_speed;      ///< Speed of zoom changes
-  float _rotation_speed;  ///< Speed of rotation changes
-  float _elevation_speed; ///< Speed of elevation changes
+  float m_zoom_speed;      ///< Speed of zoom changes
+  float m_rotation_speed;  ///< Speed of rotation changes
+  float m_elevation_speed; ///< Speed of elevation changes
 
-  float _min_distance; ///< Minimum camera distance allowed
-  float _max_distance; ///< Maximum camera distance allowed
+  float m_min_distance; ///< Minimum camera distance allowed
+  float m_max_distance; ///< Maximum camera distance allowed
 
-  float _x_pos; ///< X position of camera
-  float _y_pos; ///< Y position of camera
-  float _z_pos; ///< Z position of camera
+  float m_x_pos; ///< X position of camera
+  float m_y_pos; ///< Y position of camera
+  float m_z_pos; ///< Z position of camera
 
-  bool _initialised; ///< Camera initialisation state 
-  bool _save_camera_position; ///< Flag for whether camera state should be saved
+  bool m_save_camera_position; ///< Flag for whether camera state should be saved
+  CameraType m_type;
 };
 
 } /* namespace Sear */

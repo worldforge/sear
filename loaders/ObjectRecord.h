@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: ObjectRecord.h,v 1.2 2005-03-04 17:58:23 simon Exp $
 
 #ifndef SEAR_OBJECTRECORD_H
 #define SEAR_OBJECTRECORD_H 1
@@ -70,7 +70,7 @@ public:
       if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
     }
   }
-  void setAppearance(Atlas::Message::Element::MapType &map) {
+  void setAppearance(Atlas::Message::MapType &map) {
     std::cout << "Setting Appearance" << std::endl << std::flush;
     for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
       ModelRecord *rec = System::instance()->getModelHandler()->getModel(NULL, this, *I);

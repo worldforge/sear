@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -14,6 +14,8 @@
 #include "TextureManager.h"
 #include "StateManager.h"
 #include "Graphics.h"
+#include "Camera.h"
+#include "CameraSystem.h"
 
 #include "Render.h"
 #include "GL.h"
@@ -50,6 +52,23 @@ void RenderSystem::init() {
   m_graphics->init();
   m_graphics->setRenderer(m_renderer);
 
+  m_cameraSystem = new CameraSystem();
+  m_cameraSystem->init();
+  // Create default cameras
+  // Chase camera
+  Camera *cam = new Camera();
+  cam->init();
+  cam->setType(Camera::CAMERA_CHASE);
+  int pos = m_cameraSystem->addCamera(cam);
+  // First person camera
+  cam = new Camera();
+  cam->init();
+  cam->setType(Camera::CAMERA_FIRST);
+  m_cameraSystem->addCamera(cam);
+  // Set default to chase cam
+  m_cameraSystem->setCurrentCamera(pos);
+
+  // Get ID's for cursor textures
   m_mouseState[CURSOR_DEFAULT] = m_textureManager->requestTextureID("cursor_default",false);
   m_mouseState[CURSOR_TOUCH] = m_textureManager->requestTextureID("cursor_touch", false);
   m_mouseState[CURSOR_PICKUP] = m_textureManager->requestTextureID("cursor_pickup", false);
@@ -63,6 +82,7 @@ void RenderSystem::registerCommands(Console *console) {
   m_textureManager->registerCommands(console);
   m_stateManager->registerCommands(console);
   m_graphics->registerCommands(console);
+  m_cameraSystem->registerCommands(console);
 }
 
 void RenderSystem::initContext() {
@@ -74,6 +94,10 @@ void RenderSystem::shutdown() {
   assert (m_initialised);
   if (!m_initialised) return;
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
+
+  m_cameraSystem->shutdown();
+  delete m_cameraSystem;
+  m_cameraSystem = NULL;
 
   m_graphics->shutdown();
   delete m_graphics;
@@ -120,9 +144,12 @@ void RenderSystem::switchState(StateID state) {
 }
 
 void RenderSystem::invalidate() {
-  assert (m_initialised);
+  assert (m_initialised == true);
+  dynamic_cast<GL*>(m_renderer)->invalidate();
   m_textureManager->invalidate();
   m_stateManager->invalidate();
+//  m_graphics->invalidate();
+  
   dynamic_cast<GL*>(m_renderer)->invalidate();
 }
 
@@ -150,20 +177,22 @@ void RenderSystem::drawScene(bool select_mode, float time_elapsed) {
   m_graphics->drawScene(select_mode, time_elapsed);
 }
 
-void RenderSystem::readConfig() {
+void RenderSystem::readConfig(varconf::Config &config) {
   assert (m_initialised);
-  m_renderer->readConfig();
+  m_renderer->readConfig(config);
 //  m_textureManager->readConfig();
 //  m_stateManager->readConfig();
-  m_graphics->readConfig();
-  m_graphics->readComponentConfig();
+  m_graphics->readConfig(config);
+  m_cameraSystem->readConfig(config);
 } 
 
-void RenderSystem::writeConfig() {
+void RenderSystem::writeConfig(varconf::Config &config) {
   assert (m_initialised);
-  m_renderer->writeConfig();
+  m_renderer->writeConfig(config);
 //  m_textureManager->writeConfig();
 //  m_stateManager->writeConfig();
+  m_graphics->writeConfig(config);
+  m_cameraSystem->writeConfig(config);
 } 
 
 void RenderSystem::resize(int width, int height) {

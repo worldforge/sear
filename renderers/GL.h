@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -87,8 +87,8 @@ public:
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
 
-  void readConfig();
-  void writeConfig();
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config);
   void setupStates();
 
   float getLightLevel() { return _light_level; }

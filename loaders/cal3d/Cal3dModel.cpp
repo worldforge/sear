@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.17 2005-02-18 11:10:32 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.18 2005-03-04 17:58:24 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -225,15 +225,15 @@ void Cal3dModel::action(const std::string &action) {
   }
 }
 
-void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
+void Cal3dModel::setAppearance(Atlas::Message::MapType &map) {
   std::cout << "------" << std::endl;
 
   // Get mesh atrributes
-  Atlas::Message::Element::MapType::const_iterator I = map.find("mesh");
+  Atlas::Message::MapType::const_iterator I = map.find("mesh");
   if (I == map.end()) {
     std::cout << "No 'mesh' found -- using defaults" << std::endl;
     // instantiate defaults
-    Atlas::Message::Element::MapType meshes;
+    Atlas::Message::MapType meshes;
     for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
       std::string name = J->first;
       if (name.find("_") != std::string::npos)
@@ -242,14 +242,14 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
     map["mesh"] = meshes;
     I = map.find("mesh");   
   }
-  const Atlas::Message::Element::MapType meshes = I->second.asMap();
+  const Atlas::Message::MapType meshes = I->second.asMap();
   I = map.find("material");
   if (I == map.end()) {
     // instantiate defaults
-    map["material"] = Atlas::Message::Element::MapType();
+    map["material"] = Atlas::Message::MapType();
     I = map.find("material");
   }
-  const Atlas::Message::Element::MapType materials = I->second.asMap();
+  const Atlas::Message::MapType materials = I->second.asMap();
 
 
   // Make sure only single val meshes are attached
@@ -270,7 +270,7 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
       m_calModel->attachMesh(_core_model->_meshes[name + "_" + value]);
     // Set material set
     
-    Atlas::Message::Element::MapType::const_iterator K = materials.find(name);
+    Atlas::Message::MapType::const_iterator K = materials.find(name);
     if (K != materials.end()) {
       setMaterialPartSet(name + "_" + value, K->second.asString());
     } else {

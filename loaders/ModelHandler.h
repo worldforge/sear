@@ -1,14 +1,16 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: ModelHandler.h,v 1.2 2005-03-04 17:58:23 simon Exp $
 
 #ifndef SEAR_MODELHANDLER_H
 #define SEAR_MODELHANDLER_H 1
 
 #include <map>
 #include <string>
+
+#include <Eris/Timeout.h>
 
 namespace Sear {
 
@@ -19,7 +21,7 @@ class ObjectRecord;
 class Render;
 class WorldEntity;
 	
-class ModelHandler {
+class ModelHandler : public SigC::Object {
 public:
   ModelHandler();
   ~ModelHandler();
@@ -35,6 +37,8 @@ public:
   void checkModelTimeouts();
   
 protected:
+  void TimeoutExpired();
+
   typedef std::map<std::string, ModelLoader*> ModelLoaderMap;
   typedef std::map<std::string, ModelRecord*> ModelRecordMap; 
   typedef std::map<std::string, ModelRecord*> ObjectRecordMap;
@@ -42,6 +46,7 @@ protected:
   ModelRecordMap m_model_records; // Stores all the model_by_type models
   ObjectRecordMap m_object_map; // Stores model for entity id and model_name
   bool m_initialised;
+  Eris::Timeout *m_timeout;
 };
 
 } /* namespace Sear */

@@ -9,6 +9,10 @@
 #include <wfmath/vector.h>
 #include <wfmath/MersenneTwister.h>
 
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 namespace Sear {
 
 Stars::Stars()

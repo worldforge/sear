@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.h,v 1.5 2004-11-08 02:13:47 alriddoch Exp $
+// $Id: Calendar.h,v 1.6 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -13,6 +13,7 @@
 #include <sigc++/connection.h>
 #include <varconf/Config.h>
 #include "interfaces/ConsoleObject.h"
+#include <wfmath/timestamp.h>
 
 /**
  * Sear namespace
@@ -68,15 +69,17 @@ public:
    */
   void serverUpdate(double time);
 
+  void setWorldTime(const WFMath::TimeStamp &ts);
+
   /**
    * Read Calendar config data
    */  
-  void readConfig();
+  void readConfig(varconf::Config &config);
   
   /**
    * Write Calendar config data
    */  
-  void writeConfig();
+  void writeConfig(varconf::Config &config);
   
   /**
    * Callback for config updates
@@ -237,6 +240,7 @@ private:
   unsigned int _months_per_year;    //</ Number of months in a year
 
   // Current time and date values
+  WFMath::TimeStamp m_ts;
   double _seconds; ///< Current seconds
   double m_server_seconds; ///< Predicted server seconds
   double _seconds_counter; ///< Number of seconds passed in current day

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall, University of Southampton
 
-// $Id: TerrainEntity.cpp,v 1.1 2005-02-18 17:06:16 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.2 2005-03-04 17:58:25 simon Exp $
 
 #include "TerrainEntity.h"
 
@@ -41,22 +41,22 @@ void TerrainEntity::updateTerrain() {
   if (!terrain.isMap()) {
     std::cerr << "Terrain is not a map" << std::endl << std::flush;
   }
-  const Atlas::Message::Element::MapType & tmap = terrain.asMap();
-  Atlas::Message::Element::MapType::const_iterator I = tmap.find("points");
+  const Atlas::Message::MapType & tmap = terrain.asMap();
+  Atlas::Message::MapType::const_iterator I = tmap.find("points");
   int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
   if (I == tmap.end()) {
     std::cerr << "No terrain points" << std::endl << std::flush;
   }
   if (I->second.isList()) {
     // Legacy support for old list format.
-    const Atlas::Message::Element::ListType & plist = I->second.asList();
-    Atlas::Message::Element::ListType::const_iterator J = plist.begin();
+    const Atlas::Message::ListType & plist = I->second.asList();
+    Atlas::Message::ListType::const_iterator J = plist.begin();
     for(; J != plist.end(); ++J) {
       if (!J->isList()) {
         std::cout << "Non list in points" << std::endl << std::flush;
         continue;
       }
-      const Atlas::Message::Element::ListType & point = J->asList();
+      const Atlas::Message::ListType & point = J->asList();
       if (point.size() != 3) {
         std::cout << "point without 3 nums" << std::endl << std::flush;
         continue;
@@ -70,14 +70,14 @@ void TerrainEntity::updateTerrain() {
       Environment::getInstance().setBasePoint(x,y,point[2].asNum());
     }
   } else if (I->second.isMap()) {
-    const Atlas::Message::Element::MapType & plist = I->second.asMap();
-    Atlas::Message::Element::MapType::const_iterator J = plist.begin();
+    const Atlas::Message::MapType & plist = I->second.asMap();
+    Atlas::Message::MapType::const_iterator J = plist.begin();
     for(; J != plist.end(); ++J) {
       if (!J->second.isList()) {
         std::cout << "Non list in points" << std::endl << std::flush;
         continue;
       }
-      const Atlas::Message::Element::ListType & point = J->second.asList();
+      const Atlas::Message::ListType & point = J->second.asList();
       if (point.size() != 3) {
         std::cout << "point without 3 nums" << std::endl << std::flush;
         continue;

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
 #ifdef HAVE_CONFIG_H
  #include "config.h"
@@ -259,8 +259,6 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   }
 
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
-//  if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
-
                                                                                 
     std::string vendor = string_fmt(glGetString(GL_VENDOR));
     std::string renderer = string_fmt(glGetString(GL_RENDERER));
@@ -450,7 +448,7 @@ void GL::shutdown() {
   if (!m_initialised) return;
   if (debug) std::cout << "GL: Shutdown" << std::endl;
 
-  writeConfig();
+  //writeConfig();
   shutdownFont();
   m_initialised = false;
 }
@@ -610,227 +608,225 @@ void GL::procEvent(int x, int y) {
 }
 
 //TODO should be in general render class
-void GL::readConfig() {
+void GL::readConfig(varconf::Config &config) {
   if (debug) std::cout << "GL: readConfig" << std::endl;
   varconf::Variable temp;
-  varconf::Config general = System::instance()->getGeneral();
   if (debug) Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
 
   // Setup character light source
-  if (general.findItem(RENDER, KEY_character_light_kc)) {
-    temp = general.getItem(RENDER, KEY_character_light_kc);
+  if (config.findItem(RENDER, KEY_character_light_kc)) {
+    temp = config.getItem(RENDER, KEY_character_light_kc);
     lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].attenuation_constant = DEFAULT_character_light_kc;
   }
-  if (general.findItem(RENDER, KEY_character_light_kl)) {
-    temp = general.getItem(RENDER, KEY_character_light_kl);
+  if (config.findItem(RENDER, KEY_character_light_kl)) {
+    temp = config.getItem(RENDER, KEY_character_light_kl);
     lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].attenuation_linear = DEFAULT_character_light_kl;
   }
-  if (general.findItem(RENDER, KEY_character_light_kq)) {
-    temp = general.getItem(RENDER, KEY_character_light_kq);
+  if (config.findItem(RENDER, KEY_character_light_kq)) {
+    temp = config.getItem(RENDER, KEY_character_light_kq);
     lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].attenuation_quadratic = DEFAULT_character_light_kq;
   }
-  if (general.findItem(RENDER, KEY_character_light_ambient_red)) {
-    temp = general.getItem(RENDER, KEY_character_light_ambient_red);
+  if (config.findItem(RENDER, KEY_character_light_ambient_red)) {
+    temp = config.getItem(RENDER, KEY_character_light_ambient_red);
     lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].ambient[0] = DEFAULT_character_light_ambient_red;
   }
-  if (general.findItem(RENDER, KEY_character_light_ambient_green)) {
-    temp = general.getItem(RENDER, KEY_character_light_ambient_green);
+  if (config.findItem(RENDER, KEY_character_light_ambient_green)) {
+    temp = config.getItem(RENDER, KEY_character_light_ambient_green);
     lights[LIGHT_CHARACTER].ambient[1] = (float)((!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp)));
   } else {
     lights[LIGHT_CHARACTER].ambient[1] = DEFAULT_character_light_ambient_green;
   }
-  if (general.findItem(RENDER, KEY_character_light_ambient_blue)) {
-    temp = general.getItem(RENDER, KEY_character_light_ambient_blue);
+  if (config.findItem(RENDER, KEY_character_light_ambient_blue)) {
+    temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
     lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].ambient[2] = DEFAULT_character_light_ambient_blue;
   }
-  if (general.findItem(RENDER, KEY_character_light_ambient_alpha)) {
-    temp = general.getItem(RENDER, KEY_character_light_ambient_alpha);
+  if (config.findItem(RENDER, KEY_character_light_ambient_alpha)) {
+    temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
     lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].ambient[3] = DEFAULT_character_light_ambient_alpha;
   }
 
-  if (general.findItem(RENDER, KEY_character_light_diffuse_red)) {
-    temp = general.getItem(RENDER, KEY_character_light_diffuse_red);
+  if (config.findItem(RENDER, KEY_character_light_diffuse_red)) {
+    temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
     lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].diffuse[0] = DEFAULT_character_light_diffuse_red;
   }
-  if (general.findItem(RENDER, KEY_character_light_diffuse_green)) {
-    temp = general.getItem(RENDER, KEY_character_light_diffuse_green);
+  if (config.findItem(RENDER, KEY_character_light_diffuse_green)) {
+    temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
     lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].diffuse[1] = DEFAULT_character_light_diffuse_green;
   }
-  if (general.findItem(RENDER, KEY_character_light_diffuse_blue)) {
-    temp = general.getItem(RENDER, KEY_character_light_diffuse_blue);
+  if (config.findItem(RENDER, KEY_character_light_diffuse_blue)) {
+    temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
     lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].diffuse[2] = DEFAULT_character_light_diffuse_blue;
   }
-  if (general.findItem(RENDER, KEY_character_light_diffuse_alpha)) {
-    temp = general.getItem(RENDER, KEY_character_light_diffuse_alpha);
+  if (config.findItem(RENDER, KEY_character_light_diffuse_alpha)) {
+    temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
     lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].diffuse[3] = DEFAULT_character_light_diffuse_alpha;
   }
 
-  if (general.findItem(RENDER, KEY_character_light_specular_red)) {
-    temp = general.getItem(RENDER, KEY_character_light_specular_red);
+  if (config.findItem(RENDER, KEY_character_light_specular_red)) {
+    temp = config.getItem(RENDER, KEY_character_light_specular_red);
     lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].specular[0] = DEFAULT_character_light_specular_red;
   }
-  if (general.findItem(RENDER, KEY_character_light_specular_green)) {
-    temp = general.getItem(RENDER, KEY_character_light_specular_green);
+  if (config.findItem(RENDER, KEY_character_light_specular_green)) {
+    temp = config.getItem(RENDER, KEY_character_light_specular_green);
     lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].specular[1] = DEFAULT_character_light_specular_green;
   }
-  if (general.findItem(RENDER, KEY_character_light_specular_blue)) {
-    temp = general.getItem(RENDER, KEY_character_light_specular_blue);
+  if (config.findItem(RENDER, KEY_character_light_specular_blue)) {
+    temp = config.getItem(RENDER, KEY_character_light_specular_blue);
     lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].specular[2] = DEFAULT_character_light_specular_blue;
   }
-  if (general.findItem(RENDER, KEY_character_light_specular_alpha)) {
-    temp = general.getItem(RENDER, KEY_character_light_specular_alpha);
+  if (config.findItem(RENDER, KEY_character_light_specular_alpha)) {
+    temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
     lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
   } else {
     lights[LIGHT_CHARACTER].specular[3] = DEFAULT_character_light_specular_alpha;
   }
   //Setup Sun light source
-  if (general.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = general.getItem(RENDER, KEY_sun_light_kc);
+  if (config.findItem(RENDER, KEY_sun_light_kc)) {
+    temp = config.getItem(RENDER, KEY_sun_light_kc);
     lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
   } else {
     lights[LIGHT_SUN].attenuation_constant = DEFAULT_sun_light_kc;
   }
-  if (general.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = general.getItem(RENDER, KEY_sun_light_kl);
+  if (config.findItem(RENDER, KEY_sun_light_kc)) {
+    temp = config.getItem(RENDER, KEY_sun_light_kl);
     lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
   } else {
     lights[LIGHT_SUN].attenuation_linear = DEFAULT_sun_light_kl;
   }
-  if (general.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = general.getItem(RENDER, KEY_sun_light_kq);
+  if (config.findItem(RENDER, KEY_sun_light_kc)) {
+    temp = config.getItem(RENDER, KEY_sun_light_kq);
     lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
   } else {
     lights[LIGHT_SUN].attenuation_quadratic = DEFAULT_sun_light_kq;
   }
 
   // Setup render states
-  if (general.findItem(RENDER, KEY_use_textures)) {
-    temp = general.getItem(RENDER, KEY_use_textures);
+  if (config.findItem(RENDER, KEY_use_textures)) {
+    temp = config.getItem(RENDER, KEY_use_textures);
     RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
   } else {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, DEFAULT_use_textures);
   }
-  if (general.findItem(RENDER, KEY_use_lighting)) {
-    temp = general.getItem(RENDER, KEY_use_lighting);
+  if (config.findItem(RENDER, KEY_use_lighting)) {
+    temp = config.getItem(RENDER, KEY_use_lighting);
     RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
   } else {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, DEFAULT_use_lighting);
   }
-  if (general.findItem(RENDER, KEY_use_stencil)) {
-    temp = general.getItem(RENDER, KEY_use_stencil);
+  if (config.findItem(RENDER, KEY_use_stencil)) {
+    temp = config.getItem(RENDER, KEY_use_stencil);
     RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
   } else {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, DEFAULT_use_stencil);
   }
 
   // Setup the speech offsets
-  if(general.findItem(RENDER, KEY_speech_offset_x)) {
-    temp = general.getItem(RENDER, KEY_speech_offset_x);
+  if(config.findItem(RENDER, KEY_speech_offset_x)) {
+    temp = config.getItem(RENDER, KEY_speech_offset_x);
     _speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
   } else {
     _speech_offset_x = DEFAULT_speech_offset_x;
   }
-  if(general.findItem(RENDER, KEY_speech_offset_y)) {
-    temp = general.getItem(RENDER, KEY_speech_offset_y);
+  if(config.findItem(RENDER, KEY_speech_offset_y)) {
+    temp = config.getItem(RENDER, KEY_speech_offset_y);
     _speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
   } else {
     _speech_offset_y = DEFAULT_speech_offset_y;
   }
-  if(general.findItem(RENDER, KEY_speech_offset_z)) {
-    temp = general.getItem(RENDER, KEY_speech_offset_z);
+  if(config.findItem(RENDER, KEY_speech_offset_z)) {
+    temp = config.getItem(RENDER, KEY_speech_offset_z);
     _speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
   } else {
     _speech_offset_z = DEFAULT_speech_offset_y;
   }
 
-  if (general.findItem(RENDER, KEY_fog_start)) {
-    temp = general.getItem(RENDER, KEY_fog_start);
+  if (config.findItem(RENDER, KEY_fog_start)) {
+    temp = config.getItem(RENDER, KEY_fog_start);
     _fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
   } else {
     _fog_start = DEFAULT_fog_start;
   }
-  if (general.findItem(RENDER, KEY_fog_end)) {
-    temp = general.getItem(RENDER, KEY_fog_end);
+  if (config.findItem(RENDER, KEY_fog_end)) {
+    temp = config.getItem(RENDER, KEY_fog_end);
     _fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
   } else {
     _fog_end = DEFAULT_fog_end;
   }
 
-  if (general.findItem(RENDER, KEY_far_clip_dist)) {
-    temp = general.getItem(RENDER, KEY_far_clip_dist);
+  if (config.findItem(RENDER, KEY_far_clip_dist)) {
+    temp = config.getItem(RENDER, KEY_far_clip_dist);
     _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
   } else {
     _far_clip_dist = DEFAULT_far_clip_dist;
   }
 }
 
-void GL::writeConfig() {
-  varconf::Config &general = _system->getGeneral();
+void GL::writeConfig(varconf::Config &config) {
   
   // Save character light source
-  general.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].attenuation_constant);
-  general.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].attenuation_linear);
-  general.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].attenuation_quadratic);
+  config.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].attenuation_constant);
+  config.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].attenuation_linear);
+  config.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].attenuation_quadratic);
 
-  general.setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
-  general.setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
-  general.setItem(RENDER, KEY_character_light_ambient_blue, lights[LIGHT_CHARACTER].ambient[2]);
-  general.setItem(RENDER, KEY_character_light_ambient_alpha, lights[LIGHT_CHARACTER].ambient[3]);
+  config.setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
+  config.setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
+  config.setItem(RENDER, KEY_character_light_ambient_blue, lights[LIGHT_CHARACTER].ambient[2]);
+  config.setItem(RENDER, KEY_character_light_ambient_alpha, lights[LIGHT_CHARACTER].ambient[3]);
 
-  general.setItem(RENDER, KEY_character_light_diffuse_red, lights[LIGHT_CHARACTER].diffuse[0]);
-  general.setItem(RENDER, KEY_character_light_diffuse_green, lights[LIGHT_CHARACTER].diffuse[1]);
-  general.setItem(RENDER, KEY_character_light_diffuse_blue, lights[LIGHT_CHARACTER].diffuse[2]);
-  general.setItem(RENDER, KEY_character_light_diffuse_alpha, lights[LIGHT_CHARACTER].diffuse[3]);
+  config.setItem(RENDER, KEY_character_light_diffuse_red, lights[LIGHT_CHARACTER].diffuse[0]);
+  config.setItem(RENDER, KEY_character_light_diffuse_green, lights[LIGHT_CHARACTER].diffuse[1]);
+  config.setItem(RENDER, KEY_character_light_diffuse_blue, lights[LIGHT_CHARACTER].diffuse[2]);
+  config.setItem(RENDER, KEY_character_light_diffuse_alpha, lights[LIGHT_CHARACTER].diffuse[3]);
 
-  general.setItem(RENDER, KEY_character_light_specular_red, lights[LIGHT_CHARACTER].specular[0]);
-  general.setItem(RENDER, KEY_character_light_specular_green, lights[LIGHT_CHARACTER].specular[1]);
-  general.setItem(RENDER, KEY_character_light_specular_blue, lights[LIGHT_CHARACTER].specular[2]);
-  general.setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
+  config.setItem(RENDER, KEY_character_light_specular_red, lights[LIGHT_CHARACTER].specular[0]);
+  config.setItem(RENDER, KEY_character_light_specular_green, lights[LIGHT_CHARACTER].specular[1]);
+  config.setItem(RENDER, KEY_character_light_specular_blue, lights[LIGHT_CHARACTER].specular[2]);
+  config.setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
   
   // Save Sun light source
-  general.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].attenuation_constant);
-  general.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].attenuation_linear);
-  general.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].attenuation_quadratic);
+  config.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].attenuation_constant);
+  config.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].attenuation_linear);
+  config.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].attenuation_quadratic);
 
   // Save render states
-  general.setItem(RENDER, KEY_use_textures, RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES));
-  general.setItem(RENDER, KEY_use_lighting, RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING));
-  general.setItem(RENDER, KEY_use_stencil, RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL));
+  config.setItem(RENDER, KEY_use_textures, RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES));
+  config.setItem(RENDER, KEY_use_lighting, RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING));
+  config.setItem(RENDER, KEY_use_stencil, RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL));
   
   // Save the speech offsets
-  general.setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
-  general.setItem(RENDER, KEY_speech_offset_y, _speech_offset_y);
-  general.setItem(RENDER, KEY_speech_offset_z, _speech_offset_z);
+  config.setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
+  config.setItem(RENDER, KEY_speech_offset_y, _speech_offset_y);
+  config.setItem(RENDER, KEY_speech_offset_z, _speech_offset_z);
 
-  general.setItem(RENDER, KEY_fog_start, _fog_start);
-  general.setItem(RENDER, KEY_fog_end, _fog_end);
-  general.setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
+  config.setItem(RENDER, KEY_fog_start, _fog_start);
+  config.setItem(RENDER, KEY_fog_end, _fog_end);
+  config.setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
 }  
 
 void GL::setupStates() {

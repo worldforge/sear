@@ -89,10 +89,6 @@ libSear_a_SOURCES = \
 	Console.cpp \
 	Console.h \
 	cursors.h \
-	Event.cpp \
-	Event.h \
-	EventHandler.cpp \
-	EventHandler.h \
 	Exception.h \
 	Factory.cpp \
 	Factory.h \

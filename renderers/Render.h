@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.2 2005-02-21 14:16:46 simon Exp $
+// $Id: Render.h,v 1.3 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -20,6 +20,10 @@
 #define RENDER_FOV (45.0f)
 #define RENDER_FAR_CLIP (1000.0f)
 #define RENDER_NEAR_CLIP (0.1f)
+
+namespace varconf {
+  class Config;
+}
 
 namespace Sear {
 
@@ -83,8 +87,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void renderActiveName() =0;
 
   virtual void setupStates() =0;
-  virtual void readConfig() =0;
-  virtual void writeConfig() =0;
+  virtual void readConfig(varconf::Config &config) =0;
+  virtual void writeConfig(varconf::Config &config) =0;
 
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotate(float angle, float x, float y, float z) =0;

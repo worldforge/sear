@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.109 2005-02-21 14:16:46 simon Exp $
+// $Id: System.cpp,v 1.110 2005-03-04 17:58:24 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,11 +28,11 @@
 #include "Bindings.h"
 #include "Calendar.h"
 #include "renderers/Camera.h"
+#include "renderers/CameraSystem.h"
 #include "Character.h"
 #include "client.h"
 #include "conf.h"
 #include "Console.h"
-#include "EventHandler.h"
 #include "Exception.h"
 #include "FileHandler.h"
 #include "renderers/Graphics.h"
@@ -130,7 +130,6 @@ System::System() :
   action(ACTION_DEFAULT),
   mouseLook(0),
   screen(NULL),
-  renderer(NULL),
   _client(NULL),
   _icon(NULL),
    m_width(0),
@@ -141,7 +140,6 @@ System::System() :
   _click_x(0),
   _click_y(0),
   _script_engine(NULL),
-  _event_handler(NULL),
   _model_handler(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
@@ -175,8 +173,6 @@ bool System::init(int argc, char *argv[]) {
   if (!initVideo()) return false;
 
 
-  _event_handler = new EventHandler();
-  _event_handler->init();
   _script_engine = new ScriptEngine();
   _script_engine->init();
   _model_handler = new ModelHandler();
@@ -223,6 +219,10 @@ bool System::init(int argc, char *argv[]) {
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
 
+  _character = new Character();
+  _character->init();
+  _character->registerCommands(_console);
+
 // TODO this is leaked
   m_editor = new Editor();
   m_editor->registerCommands(_console);
@@ -267,6 +267,7 @@ bool System::init(int argc, char *argv[]) {
         m_axisBindings[3] = AXIS_ELEVATE;
   }
 
+/*
   try { 
     sound = new Sound();
     sound->init();
@@ -274,10 +275,9 @@ bool System::init(int argc, char *argv[]) {
   } catch (Exception &e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
-
+*/
   RenderSystem::getInstance().init();
   RenderSystem::getInstance().registerCommands(_console);
-  renderer = RenderSystem::getInstance().getRenderer();
  
   Environment::getInstance().init();
 
@@ -294,8 +294,8 @@ bool System::init(int argc, char *argv[]) {
 //  }
   // Pass command line into general varconf object for processing
   m_general.getCmdline(argc, argv);
-  readConfig();
-  RenderSystem::getInstance().readConfig();
+  readConfig(m_general);
+  RenderSystem::getInstance().readConfig(m_general);
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
 
   // Try and create the window
@@ -324,7 +324,12 @@ bool System::init(int argc, char *argv[]) {
 }
 
 void System::shutdown() {
+
+  assert (_initialised == true);
   std::cout << "System: Starting Shutdown" << std::endl;
+  // Save config
+  writeConfig(m_general);
+
   if (_character) {
     _character->shutdown();
     delete _character;
@@ -371,18 +376,13 @@ void System::shutdown() {
     delete _calendar;
     _calendar = NULL;
   }
-  writeConfig();
+
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileList shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
   for (FileHandler::FileList::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
     _script_engine->runScript(*I);
   }
   Bindings::shutdown();
- if (_event_handler) {
-    _event_handler->shutdown();
-    delete _event_handler;
-    _event_handler = NULL;
-  }  
   if (_script_engine) {
     _script_engine->shutdown();
     delete _script_engine;
@@ -441,15 +441,14 @@ void System::mainLoop() {
       }
       // Handle mouse and joystick
       handleAnalogueControllers();
-      // Update Calendar
-      _calendar->update(time_elapsed);
-      // Poll event handler
-      _event_handler->poll();
       // poll network
       _client->poll();
       if (_client->getAvatar() && _client->getAvatar()->getView()) {
         _client->getAvatar()->getView()->update();
       }
+      // Update Calendar
+//      _calendar->update(time_elapsed);
+      if (_client->getAvatar()) _calendar->setWorldTime(_client->getAvatar()->getWorldTime());
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);
     } catch (ClientException ce) {
@@ -472,6 +471,7 @@ void System::mainLoop() {
 }
 
 void System::handleEvents(const SDL_Event &event) {
+  Render *renderer = RenderSystem::getInstance().getRenderer();
   _workspace->handleEvent(event);
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
@@ -618,10 +618,10 @@ void System::handleAnalogueControllers() {
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
-      Graphics * g = RenderSystem::getInstance().getGraphics();
+      CameraSystem * g = RenderSystem::getInstance().getCameraSystem();
       Camera * c = NULL;
       if (g != NULL) {
-        c = g->getCamera();
+        c = g->getCurrentCamera();
         if (c != NULL) {
           c->elevateImmediate(elevation);
         }
@@ -688,9 +688,9 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
         break;
           
     case AXIS_ELEVATE: // Up down view
-          Graphics * g = RenderSystem::getInstance().getGraphics();
+          CameraSystem * g = RenderSystem::getInstance().getCameraSystem();
           if (g != NULL) {
-            Camera * c = g->getCamera();
+            Camera * c = g->getCurrentCamera();
             if (c != NULL) {
               if (abs(value) > 3200) {
                 c->setElevationSpeed(value / 10000.f);
@@ -713,10 +713,12 @@ void System::toggleMouselook() {
   std::cout << "System::toggleMouselook()" << std::endl << std::flush;
   mouseLook = ! mouseLook;
   if (mouseLook) {
-    SDL_ShowCursor(SDL_DISABLE);
+    RenderSystem::getInstance().setMouseVisible(false);
+//    SDL_ShowCursor(SDL_DISABLE);
     SDL_WarpMouse(m_width / 2, m_height / 2);
   } else {
-    SDL_ShowCursor(SDL_ENABLE);
+  //  SDL_ShowCursor(SDL_ENABLE);
+    RenderSystem::getInstance().setMouseVisible(true);
   }
 }
 
@@ -724,55 +726,53 @@ void System::pushMessage(const std::string &msg, int type, int duration) {
   if(_console) _console->pushMessage(msg, type, duration);
 }
 
-void System::setCharacter(Character *character) {
-  if (_character) { // get rid of old instance if it exists
-    _character->shutdown();
-    delete _character;
-    _character = NULL;
-  }
-  _character = character;
-  // Assuming init has not been performed
-//  _character->init();
-  _character->registerCommands(_console);
-}
-
-void System::readConfig() {
+void System::readConfig(varconf::Config &config) {
   varconf::Variable temp;
   
-  if (m_general.findItem(SYSTEM, KEY_mouse_move_select)) {
-    temp = m_general.getItem(SYSTEM, KEY_mouse_move_select);
+  if (config.findItem(SYSTEM, KEY_mouse_move_select)) {
+    temp = config.getItem(SYSTEM, KEY_mouse_move_select);
     m_mouse_move_select = (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
   } else {
     m_mouse_move_select = DEFAULT_mouse_move_select;
   }
-  if (m_general.findItem(SYSTEM, KEY_window_width)) {
-    temp = m_general.getItem(SYSTEM, KEY_window_width);
+  if (config.findItem(SYSTEM, KEY_window_width)) {
+    temp = config.getItem(SYSTEM, KEY_window_width);
     m_width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
   } else {
     m_width = DEFAULT_window_width;
   }
-  if (m_general.findItem(SYSTEM, KEY_window_height)) {
-    temp = m_general.getItem(SYSTEM, KEY_window_height);
+  if (config.findItem(SYSTEM, KEY_window_height)) {
+    temp = config.getItem(SYSTEM, KEY_window_height);
     m_height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
   } else {
     m_height = DEFAULT_window_height;
   }
-  if(m_general.findItem(SECTION_INPUT, KEY_key_repeat_delay)) {
-    temp = m_general.getItem(SECTION_INPUT, KEY_key_repeat_delay);
+  if(config.findItem(SECTION_INPUT, KEY_key_repeat_delay)) {
+    temp = config.getItem(SECTION_INPUT, KEY_key_repeat_delay);
     m_KeyRepeatDelay = (temp.is_int() == true) ? ((int)(temp)) : (DEFAULT_key_repeat_delay);
   }
-  if(m_general.findItem(SECTION_INPUT, KEY_key_repeat_rate)) {
-    temp = m_general.getItem(SECTION_INPUT, KEY_key_repeat_rate);
+  if(config.findItem(SECTION_INPUT, KEY_key_repeat_rate)) {
+    temp = config.getItem(SECTION_INPUT, KEY_key_repeat_rate);
     m_KeyRepeatRate = (temp.is_int() == true) ? ((int)(temp)) : (DEFAULT_key_repeat_rate);
   }
+
+
+  RenderSystem::getInstance().readConfig(config);
+  _character->readConfig(config);
+  _calendar->readConfig(config);
 }
 
-void System::writeConfig() {
-  m_general.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select);
-  m_general.setItem(SYSTEM, KEY_window_width, m_width);
-  m_general.setItem(SYSTEM, KEY_window_height, m_height);
-  m_general.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay);
-  m_general.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
+void System::writeConfig(varconf::Config &config) {
+  config.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select);
+  config.setItem(SYSTEM, KEY_window_width, m_width);
+  config.setItem(SYSTEM, KEY_window_height, m_height);
+  config.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay);
+  config.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
+
+  // Write Other config objects
+  RenderSystem::getInstance().writeConfig(config);
+  _character->writeConfig(config);
+  _calendar->writeConfig(config);
 }
 
 void System::vEnableKeyRepeat(bool bEnable) {
@@ -889,8 +889,8 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     Bindings::saveBindings(args);
   }
   else if (command == READ_CONFIG) {
-    readConfig();
-    if (_character)_character->readConfig();
+    readConfig(m_general);
+    if (_character)_character->readConfig(m_general);
   }
   else if (command == BIND_KEY) {
     std::string key = tokeniser.nextToken();
@@ -902,16 +902,10 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == TOGGLE_FULLSCREEN) RenderSystem::getInstance().toggleFullscreen();
   else if (command == TOGGLE_MLOOK) toggleMouselook();
-  else if (command == ADD_EVENT) {
-    std::string event_function = tokeniser.nextToken();
-    std::string extra = tokeniser.nextToken();
-    std::string event_condition = tokeniser.nextToken();
-    std::string target = tokeniser.remainingTokens();
-    getEventHandler()->addEvent(Event(event_function, target, event_condition, extra));
-  }
   else if (command == IDENTIFY_ENTITY) {
     if (!_client->getAvatar()) return;
-    WorldEntity *we = ((WorldEntity*)(_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
+    Render *renderer = RenderSystem::getInstance().getRenderer();
+    WorldEntity *we = (dynamic_cast<WorldEntity*>(_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
     if (we) we->displayInfo();  
   }
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.9 2005-02-18 11:10:32 simon Exp $
+// $Id: Cal3dModel.h,v 1.10 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -40,7 +40,7 @@ public:
   void setLodLevel(float lodLevel);
 
   void action(const std::string &action);
-  void setAppearance(Atlas::Message::Element::MapType &map);
+  void setAppearance(Atlas::Message::MapType &map);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
  
   void setHeight(float height) { _height = height; }

@@ -96,12 +96,12 @@ void Editor::translate(const std::string& target, WFMath::Vector<3> delta, bool 
         std::cout << "making vector local" << delta << std::endl;
     }
     
-    Atlas::Message::Element::MapType msg;
+    Atlas::Message::MapType msg;
     WFMath::Point<3> pos = te->getPosition() + delta;
     msg["pos"] = pos.toAtlas();
     msg["id"] = te->getId();
     msg["loc"] = te->getLocation()->getId();
-    move->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+    move->setArgsAsList(Atlas::Message::ListType(1, msg));
       
     getAvatar()->getConnection()->send(move);
 }
@@ -115,14 +115,14 @@ void Editor::rotateZ(const std::string& target, double delta)
     move->setFrom(getAvatar()->getId());
     move->setTo(te->getId());
     
-    Atlas::Message::Element::MapType msg;
+    Atlas::Message::MapType msg;
     WFMath::Quaternion q = te->getOrientation() * WFMath::Quaternion(WFMath::Vector<3>(0.0, 0.0, 1.0), delta);
     
     msg["orientation"] = q.toAtlas();
     msg["pos"] = te->getPosition().toAtlas();    
     msg["loc"] = te->getLocation()->getId();
     msg["id"] = te->getId();
-    move->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+    move->setArgsAsList(Atlas::Message::ListType(1, msg));
       
     getAvatar()->getConnection()->send(move);
 }
@@ -136,9 +136,9 @@ void Editor::deleteEntity(const std::string& target)
     del->setFrom(getAvatar()->getId());
     del->setTo(te->getId());
     
-    Atlas::Message::Element::MapType msg;
+    Atlas::Message::MapType msg;
     msg["id"] = te->getId();
-    del->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+    del->setArgsAsList(Atlas::Message::ListType(1, msg));
       
     getAvatar()->getConnection()->send(del);
 }

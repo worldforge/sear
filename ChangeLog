@@ -1,3 +1,46 @@
+2005-03-04  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment.Stars.cpp: Add mmgr include.
+	* loaders/ModelHandler.cpp: Move creation of loaders to init method
+	  instead of constructor.
+	* renderers/CameraSystem.cpp, renderers/CameraSystem.h,
+	  renderers/Camera.cpp, renderers/Camera.h, renderers/Graphics.cpp,
+	  renderers/Graphics.h, renderers/RenderSystem.cpp,
+	  renderers/RenderSystem.h: Create new CameraSystem class to handle
+	  multiple cameras. Move camera init from Graphics to RenderSystem. 
+	  Create two default camera's  (Chase and first person), switchable
+	  with the "/switch_camera n" command where n is an int >= 0 and <
+	  num_cameras.
+	* src/Character.h, src/Character.cpp: Make Character class initialised
+	  at startup, and associate eris::avatar later
+	* renderers/Camera.cpp, renderers/Camera.h, renderers/GL.cpp, 
+	  renderers/GL.h, renderers/Graphics.cpp, renderers/Graphics.h,
+	  renderers/Render.h, renderers/RenderSystem.cpp, 
+	  renderers/RenderSystem.h, src/Calendar.cpp, src/Calendar.h, 
+	  src/Character.cpp, src/Character.h, src/System.cpp, src/System.h: 
+	  change readConfig and writeConfig calls to take a reference to a
+	  varconf object. Only call read/writeConfig when
+	  System::read/writeConfig is called.
+	* renderers/RenderSystem.h, renderers/Graphics.cpp, src/System.cpp: Add
+	  a setMouseVisible function to hide mouse cursor. Fix bug where mouse
+	  look was enabled and cursor was not hidden.
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Replace timeout with
+	  event handler with Eris::Timeout.
+	* src/Calender.cpp, src/Calendar.h, src/System.cpp: Sync to server time
+	* src/Character.h, src/Character.cpp: Replace Event handler code with 
+	  Eris::Timeouts
+	* src/Event.h, src/Event.cpp, src/EventHandler.cpp, src/EventHandler.h,
+	  src/System.cpp, src/System.h: Remove EventHandler code in favour of 
+	  Eris::Timeout
+	* configure.in, loaders/Model.h, loaders/ObjectRecord.h,
+	  loaders/cal3d/Cal3d_Loader.cpp, loaders/cal3d/Cal3dModel.cpp, 
+	  loaders/cal3d/Cal3dModel.h, src/client.cpp, src/Character.cpp,
+	  src/Editor.cpp, src/TerrainEntity.h: Use Atlas::Message::*Type
+	  instead of Atlas::Message::Element::*Types. Add define to 
+	  ATLAS_ELEMENT_TYPEDEF_PRIVATE to suppress warning messges.
+	* renderers/TextureManager.cpp: Resize input images to nearest 2^Nx2^M
+	  size, and makes sure it is not bigger than the size allowed by OpenGL
+
 2005-02-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.in, loaders/Makefile.am, loaders/LibModelFile.cpp,
@@ -74,7 +117,7 @@
 	  Manager. Aim is that we can convert 3D objects to an internal format
 	  and save directly to disk for subsequent faster loading. Does not
 	  need to take care of endinaness etc. as its only intended to use data
-	  created and stroed on the local machine. Could possible use for
+	  created and stored on the local machine. Could possibly use for
 	  textures too.
 	* src/FileHandler.cpp, src/FileHandler.h: Create a wrapper function for 
 	  mkdir.

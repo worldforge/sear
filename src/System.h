@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.51 2005-02-21 14:16:46 simon Exp $
+// $Id: System.h,v 1.52 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -20,19 +20,15 @@ namespace Sear {
 	
 // Forward declarations
 class ActionHandler;
-class Render;
 class Calendar;
 class Client;
-class EventHandler;
 class FileHandler;
 class ModelHandler;
 class ObjectHandler;
 class ScriptEngine;
-//class StateLoader;
 class Console;
 class Workspace;
 class Character;
-//class Graphics;
 class Sound;
 class Editor;
 
@@ -179,7 +175,6 @@ public:
   void vEnableKeyRepeat(bool bEnable = true);
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
-  EventHandler *getEventHandler() const { return _event_handler; }
   ModelHandler *getModelHandler() const { return _model_handler; }
   ActionHandler *getActionHandler() const { return _action_handler; }
   FileHandler *getFileHandler() const { return _file_handler; }
@@ -189,7 +184,6 @@ public:
   Console *getConsole() { return _console; }
   Workspace *getWorkspace() { return _workspace; }
   Character *getCharacter() { return _character; }
-  void setCharacter(Character *);
   
   static System *instance() { return _instance; }
 
@@ -211,8 +205,6 @@ protected:
   
   bool mouseLook;
   SDL_Surface *screen;
-  //Graphics *_graphics;
-  Render *renderer;
   Client *_client;
   static System *_instance;
   std::string _icon_file;
@@ -230,7 +222,6 @@ protected:
   double _click_seconds;
 
   ScriptEngine *_script_engine; ///< Pointer to scripting engine object
-  EventHandler *_event_handler; ///< Pointer to event handler object
   FileHandler *_file_handler; ///< Pointer to file handler object
   ModelHandler *_model_handler; ///< Pointer to model handler object
   ActionHandler *_action_handler; ///< Pointer to action handler object
@@ -248,9 +239,9 @@ protected:
   Workspace *_workspace;
   Character *_character;
  
-  void readConfig();
-  void writeConfig();
-  std::string install_path;  
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config);
+//  std::string install_path;  
 
   bool m_mouse_move_select;
 

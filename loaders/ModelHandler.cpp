@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.4 2005-02-21 14:16:46 simon Exp $
+// $Id: ModelHandler.cpp,v 1.5 2005-03-04 17:58:23 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,10 +15,6 @@
 
 #include <varconf/Config.h>
 
-#include "common/Log.h"
-
-#include "src/Event.h"
-#include "src/EventHandler.h"
 #include "src/Exception.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
@@ -48,9 +44,32 @@
 namespace Sear {
 
 ModelHandler::ModelHandler() :
-  m_initialised(false)
-	
+  m_initialised(false),
+  m_timeout(NULL)
 {
+}
+
+ModelHandler::~ModelHandler() {
+  assert (m_initialised == false);
+  if (m_initialised) shutdown();
+}
+
+void ModelHandler::init() {
+  assert (m_initialised == false);
+  if (m_initialised) shutdown();
+
+  m_timeout = new Eris::Timeout("sear_free_models", this, 60000);
+  m_timeout->Expired.connect(SigC::slot(*this, &ModelHandler::TimeoutExpired));
+
+  // Add default record
+  varconf::Config &model_config = System::instance()->getModelRecords();
+  model_config.setItem("default", ModelRecord::MODEL_LOADER, "wireframe");
+  model_config.setItem("default", ModelRecord::STATE, "default");
+  model_config.setItem("default", ModelRecord::SELECT_STATE, "select");
+  model_config.setItem("default", ModelRecord::OUTLINE, false);
+
+  m_initialised = true;
+
   // TODO: this is not the place
   // create all the model loaders
   new Cal3d_Loader(this);
@@ -61,24 +80,12 @@ ModelHandler::ModelHandler() :
   new LibModelFile_Loader(this);
 }
 
-ModelHandler::~ModelHandler() {
-  if (m_initialised) shutdown();
-}
-
-void ModelHandler::init() {
-  if (m_initialised) shutdown();
-  // TODO another method would be better - or a clean up of the event system
-  System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
-  // Add default record
-  varconf::Config &model_config = System::instance()->getModelRecords();
-  model_config.setItem("default", ModelRecord::MODEL_LOADER, "wireframe");
-  model_config.setItem("default", ModelRecord::STATE, "default");
-  model_config.setItem("default", ModelRecord::SELECT_STATE, "select");
-  model_config.setItem("default", ModelRecord::OUTLINE, false);
-  m_initialised = true;
-}
-
 void ModelHandler::shutdown() {
+  assert (m_initialised == true);
+  //TODO Bug James to implement this
+  //m_timeout->cancel(); 
+  delete m_timeout;
+
   // Clean up model loaders
   while (!m_model_loaders.empty()) {
     ModelLoader *ml = m_model_loaders.begin()->second;
@@ -117,22 +124,29 @@ void ModelHandler::shutdown() {
 }
   
 ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
+  assert (m_initialised == true);
   // Model loaded for this object?
-  if (m_object_map[record->id + model_id]) return m_object_map[record->id + model_id];
-  
+  if (m_object_map[record->id + model_id]) {
+    return m_object_map[record->id + model_id];
+  }
+
+
   if (m_model_records[model_id]) {
     m_object_map[record->id + model_id] = m_model_records[model_id];
     return m_model_records[model_id];
   }
+
   // No existing model found, load up a new one
   if (!render) {
     std::cerr << "renderer is null" << std::endl;	  
     return NULL;
   }
+
   if (!record) {
     std::cerr << "record is NULL" << std::endl;
     return NULL;
   }
+
   ModelRecord *model = NULL;
   varconf::Config &model_config = System::instance()->getModelRecords();
   std::string model_loader = (std::string)model_config.getItem(model_id, ModelRecord::MODEL_LOADER);
@@ -158,7 +172,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
 
   if (we != NULL) {
     if (we->hasAttr("guise")) {
-      Atlas::Message::Element::MapType mt = we->valueOfAttr("guise").asMap();
+      Atlas::Message::MapType mt = we->valueOfAttr("guise").asMap();
       model->model->setAppearance(mt);
     }                                                                          
   }
@@ -170,6 +184,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
 }
 
 void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoader *model_loader) {
+  assert (m_initialised == true);
   // Check for bad values	
   if (model_type.empty()) throw Exception("No type specified");
   if (!model_loader) throw Exception("No model loader given");
@@ -182,13 +197,16 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
 }
 
 void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader) {
+  assert (m_initialised == true);
   // Only unregister a model laoder if it is properly registered
   if (m_model_loaders[model_type] == model_loader) m_model_loaders[model_type] = NULL;
 }
 
 void ModelHandler::checkModelTimeouts() {
+  assert (m_initialised == true);
   // TODO what about records with no model?
   if (debug) std::cout << "Checking Timeouts" << std::endl;
+  // Loop through and find all objects that have expired and add to set object
   std::set<ModelRecord*> expired_set;
   for (ModelRecordMap::iterator I = m_model_records.begin(); I != m_model_records.end(); ++I) {
     ModelRecord *record = I->second;
@@ -196,12 +214,15 @@ void ModelHandler::checkModelTimeouts() {
       Model *model = record->model;
       if (model) {
         if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+          // Add to set object
           expired_set.insert(record);
+          // Remove record from list
           m_model_records[I->first] = NULL;
         }
       }
     }
   }
+  // Do the same again for the object map
   for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     ModelRecord *record = I->second;
     if (record) {
@@ -214,6 +235,7 @@ void ModelHandler::checkModelTimeouts() {
       }
     }
   }
+  // Unload old objects
   while (!expired_set.empty()) {
     ModelRecord *record = *expired_set.begin();
     if (record) {
@@ -224,7 +246,11 @@ void ModelHandler::checkModelTimeouts() {
     }
     expired_set.erase(expired_set.begin());
   }
-  System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
+}
+
+void ModelHandler::TimeoutExpired() {
+  checkModelTimeouts();
+  m_timeout->reset(60000);
 }
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.46 2005-02-21 14:16:46 simon Exp $
+// $Id: WorldEntity.cpp,v 1.47 2005-03-04 17:58:25 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -290,7 +290,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
         last_action = action;
       }
     } else if (str == GUISE) {
-      Atlas::Message::Element::MapType mt = valueOfAttr(GUISE).asMap();
+      Atlas::Message::MapType mt = valueOfAttr(GUISE).asMap();
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setAppearance(mt);

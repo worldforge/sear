@@ -4,8 +4,6 @@
 
 #include "operations.h"
 
-//using Atlas::Objects::Operation::SetData;
-
 UseData::~UseData()
 {
 }

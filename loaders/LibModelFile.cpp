@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.1 2005-02-21 14:16:46 simon Exp $
+// $Id: LibModelFile.cpp,v 1.2 2005-03-04 17:58:23 simon Exp $
 
 /*
   Debug check list
@@ -169,7 +169,7 @@ bool LibModelFile::init(const std::string &filename) {
 
   // Clean up 
   delete [] normal_counter;
-  free (modelFile);
+//  free (modelFile);
 
   m_initialised = true;
   return true;

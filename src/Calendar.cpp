@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.13 2005-01-06 12:46:55 simon Exp $
+// $Id: Calendar.cpp,v 1.14 2005-03-04 17:58:24 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -111,8 +111,6 @@ Calendar::~Calendar() {
 
 void Calendar::init() {
   if (_initialised) shutdown(); // shutdown first if we are already initialised
-  // Read in initial config
-  readConfig();
   // Bind signal to config for further updates
   _config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
   
@@ -120,31 +118,22 @@ void Calendar::init() {
 }
 
 void Calendar::shutdown() {
-  // Save config
-  writeConfig();
   // Remove update signal
   _config_connection.disconnect();
   _initialised = false;
 }
 
 void Calendar::serverUpdate(double time) {
-//  if (debug)
-//  std::cout << "Current: " << _seconds << " - Server: " << time << std::endl;
   double diff = time - m_server_seconds;
-  // If the difference is bigger than 1000.0 seconds, then there is a 
-  // problem. Requires checking eris / the server.
-//  assert(abs(diff) < 1000.0);
-  // TODO make this change gradual if too large
-  // Could perhaps use the event manager to throw a series of events?
-  /*
-  if (abs(diff) < 60.0) {
-    _seconds = time;
-  } else {
-    _seconds += (diff > 0.0) ? (60.0) : (-60.0);
-  }
-  */
-//  _seconds = time;
   // Sync calendar values
+  update(diff);
+}
+
+void Calendar::setWorldTime(const WFMath::TimeStamp &ts) {
+  WFMath::TimeDiff df = ts - m_ts;
+  m_ts = ts;
+  double time = (double)df.milliseconds() / 1000.0;
+  double diff = time - m_server_seconds;
   update(diff);
 }
 
@@ -231,8 +220,8 @@ void Calendar::update(double time_elapsed) {
 
 }
 
-void Calendar::readConfig() {
-  varconf::Config &config = System::instance()->getGeneral();
+void Calendar::readConfig(varconf::Config &config) {
+
   varconf::Variable temp;
 
   if (config.findItem(CALENDER, KEY_SECONDS_PER_MINUTE)) {
@@ -320,9 +309,9 @@ void Calendar::readConfig() {
   _current_month_name = _month_names[_months];
 }
 
-void Calendar::writeConfig() {
+void Calendar::writeConfig(varconf::Config &config) {
   assert ((_initialised == true) && "Calender not initialised");
-  varconf::Config &config = System::instance()->getGeneral();
+
   config.setItem(CALENDER, KEY_SECONDS_PER_MINUTE, (int)_seconds_per_minute);
   config.setItem(CALENDER, KEY_MINUTES_PER_HOUR, (int)_minutes_per_hour);
   config.setItem(CALENDER, KEY_HOURS_PER_DAY, (int)_hours_per_day);

@@ -4,6 +4,7 @@ INCLUDES = -I$(top_srcdir)
 
 libRendererGL_a_SOURCES = \
 	Camera.cpp Camera.h \
+	CameraSystem.cpp CameraSystem.h \
 	Graphics.cpp Graphics.h \
 	Render.h \
 	Frustum.cpp Frustum.h \

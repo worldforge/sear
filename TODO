@@ -1,31 +1,45 @@
- * Update TODO
- * Finish migration of rendering code to behing RenderSystem. (Rest of Graphics +  some System stuff)
- * Move all model loader / render code into loaders/ section and create a Global object (like RenderSystem).
-  - Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
-  - Needs models to query and check for updates from associated world entity's
+ TODO
+======
 
+TextureManager
+ * Implement reference counting for textures so they can be unloaded when no 
+   longer required
+ * Automatically resize to 2^N x 2^M
+ * Automatically reduce textures to allowed range in OpenGL
+
+CameraSystem
+ * Create new camera types (e.g. top down, orthographic etc..)
+ * Create smooth transitions between camera's
+
+RenderSystem
+ * Finish moving graphics code into appropriate places
  * Make greater use of vertex buffer objects
- * Improve media efficiency 
-  - run meshes through poly reductioner
-  - Make textures smaller
-
--------------------------------------------------------------------------------
-
- * Rendering Improvements
-  - Support more OpenGL extensions.
-  - Implement shadows (Volumes/Maps)
-  - Implements Per-Pixel lighting and associated techniques
-  - Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
-  - Allow access to cube mapping for sky boxa
-  - Add sun/lens glare effects
-  - Add wavy grass like in ATITD
-  - Add foot prints
+ * Support more OpenGL extensions.
+ * Implement shadows (Volumes/Maps)
+ * Implements Per-Pixel lighting and associated techniques
+ * Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
+ * Add sun/lens glare effects
+ * Add wavy grass like in ATITD
+ * Add foot prints
+ * Add weather effects
+  - Query weather entity
+ * Create a particle engine for special effects
+  - Smoke
+  - Flames
+  - Fog
  
- * Improve memory usage
-   - Unload unused textures and other such data during runtime.
-   - SDL_mixer (or maybe SDL sound subsystem) doesn't clean up properly
-   - Eris doesn't clean up properly
+ModelHandler
+ * Make global instance and hide backend implementation
+ * Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
+ * Needs models to query and check for updates from associated world entity's
 
+Media
+ * Improve media efficiency 
+ * run meshes through poly reductioner ?
+ * Make textures smaller
+ * Symbolic Link to SVN to automatically update
+
+General
  * Add an oct tree or other space partitioning system.
   - Provide basis for collision detection code
   - Reduce number of entities to render
@@ -35,12 +49,9 @@
  * Add support to create custom font textures from say freetype
 
  * Improve Sound/Music System
- Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org
+  - SDL_mixer (or maybe SDL sound subsystem) doesn't clean up properly
+  - Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org
 
- * Include sound/music media in media pack
-
- * Add weather effects
-  - Query weather entity
 
  * Create a texture handling class.
   - Loads and unloads textures as required
@@ -54,10 +65,6 @@
   - Store type/position/emissive info about each light source
   - Determines light priority order (render N most appropriate light sources)
  
- * Create a particle engine for special effects
-  - Smoke
-  - Flames
-  - Fog
 
  * Improve scripting engine
   - Character manipulation

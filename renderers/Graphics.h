@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.2 2005-02-21 14:16:46 simon Exp $
+// $Id: Graphics.h,v 1.3 2005-03-04 17:58:24 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -77,12 +77,10 @@ typedef enum {
   void setRenderer(Render *r) { m_renderer = r; }
   
   Render *getRender() { return m_renderer; }
-  Camera* getCamera() { return m_camera; }
+//  Camera* getCamera() { return m_camera; }
   void setupStates();
-  void readConfig();
-  void writeConfig();
-  void readComponentConfig();
-  void writeComponentConfig();
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config);
 
   WFMath::Quaternion getCameraOrientation() { return m_orient; }
 
@@ -92,8 +90,8 @@ typedef enum {
 protected:
   System *m_system;
   Render *m_renderer;
-  Character *m_character;
-  Camera *m_camera;
+//  Character *m_character;
+//  Camera *m_camera;
 
   WFMath::Quaternion m_orient;
 
