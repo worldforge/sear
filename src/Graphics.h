@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.8 2002-11-12 23:59:22 simon Exp $
+// $Id: Graphics.h,v 1.9 2002-12-24 15:11:33 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -78,12 +78,6 @@ typedef enum {
   float getLightLevel();
   void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &list); 
   void drawScene(const std::string &command ,bool, float);
-  void drawSplash(const std::string &command ,bool, float);
-  void drawServer(const std::string &command ,bool, float);
-  void drawAccount(const std::string &command ,bool, float);
-  void drawLobby(const std::string &command ,bool, float);
-  void drawCharacter(const std::string &command ,bool, float);
-  void drawInventory(const std::string &command ,bool, float);
   void drawWorld(const std::string &command ,bool, float);
   void updateDetailLevels(float);
   
@@ -109,17 +103,6 @@ typedef enum {
 
   ServerGui *sg;  
 protected:
-  typedef enum {
-    SPLASH = 0,
-    SERVER,
-    ACCOUNT,
-    LOBBY,
-    CHARACTER,
-    INVENTORY,
-    WORLD
-  } RenderMode;
-  RenderMode render_mode;
-
   System *_system;
   Render *_renderer;
   Character *_character;
@@ -166,7 +149,6 @@ private:
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;
  
-  static const char * const SWITCH_MODE = "switch_mode";
   
 };
 

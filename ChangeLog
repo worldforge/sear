@@ -1,4 +1,7 @@
 24th December 2002, Simon Goodall
+ * Added console commands to set time and date
+
+24th December 2002, Simon Goodall
  * Calender now has console command, "get_time" which displays current time and date in console
  * Added day and month names to config file
 

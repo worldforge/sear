@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.23 2002-12-20 00:37:14 simon Exp $
+// $Id: Graphics.cpp,v 1.24 2002-12-24 15:11:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,10 +72,10 @@ namespace Sear {
 
 static const std::string GRAPHICS = "graphics";
 	
-static std::string DEFAULT = "default";
-static std::string FONT = "font";
-static std::string STATE = "state";
-static std::string SELECT = "select_state";
+static const std::string DEFAULT = "default";
+static const std::string FONT = "font";
+static const std::string STATE = "state";
+static const std::string SELECT = "select_state";
 	
 Graphics::Graphics(System *system) :
   _system(system),
@@ -88,7 +88,6 @@ Graphics::Graphics(System *system) :
   _frame_time(0),
   _initialised(false)
 {
-  render_mode = SPLASH;
 }
 
 Graphics::~Graphics() {
@@ -153,18 +152,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   if (_camera) _camera->updateCameraPos(time_elapsed);
 
   _renderer->beginFrame();
-//  switch(render_mode) {
-//    case (SPLASH): drawSplash(command, select_mode, time_elapsed); break;
-//    case (SERVER): drawServer(command, select_mode, time_elapsed); break;
-//    case (ACCOUNT): drawAccount(command, select_mode, time_elapsed); break;
-//    case (LOBBY): drawLobby(command, select_mode, time_elapsed); break;
-//    case (CHARACTER): drawCharacter(command, select_mode, time_elapsed); break;
-//    case (INVENTORY): drawInventory(command, select_mode, time_elapsed); break;
-//    case (WORLD): 
   drawWorld(command, select_mode, time_elapsed); 
-//  break;
-//    default: drawSplash(command, select_mode, time_elapsed); break;
-//  }
 
   if (!select_mode) {
     Console *con = _system->getConsole();
@@ -185,63 +173,6 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   updateDetailLevels(_frame_rate);
   if (!select_mode) _renderer->renderActiveName();
   _renderer->endFrame(select_mode);
-}
-
-void Graphics::drawSplash(const std::string& command, bool select_mode, float time_elapsed){
-  _renderer->drawSplashScreen();
-}
-
-void Graphics::drawServer(const std::string &command ,bool, float) {
-  _renderer->drawSplashScreen();
-//  _renderer->stateChange(FONT);
-  //
-//  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-//  _renderer->print(20, 50, "Server Screen", 0);
-#ifdef HAVE_GLGOOEY
-  Gooey::WindowManager::instance().applicationResized(640, 480);
-  Gooey::WindowManager::instance().update();
-#endif
-#if(0)
-  render background
-  render connect button
-  render disconnect button
-  render reconnect button
-  render scroller table of servers
-  render current server details
-
-#endif
-}
-
-void Graphics::drawAccount(const std::string &command ,bool, float) {
-  _renderer->drawSplashScreen();
-  _renderer->stateChange(FONT);
-  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-  _renderer->print(20, 50, "Account Screen", 0);
-  _renderer->print(20, 400, "Username: ", 0);
-  _renderer->print(20, 380, "Password: ", 0);
-  _renderer->print(20, 360, "Fullname: ", 0);
-
-}
-
-void Graphics::drawLobby(const std::string &command ,bool, float) {
-  _renderer->drawSplashScreen();
-  _renderer->stateChange(FONT);
-  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-  _renderer->print(20, 50, "Lobby Screen", 0);
-}
-
-void Graphics::drawCharacter(const std::string &command ,bool, float) {
-  _renderer->drawSplashScreen();
-  _renderer->stateChange(FONT);
-  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-  _renderer->print(20, 50, "Character Screen", 0);
-}
-
-void Graphics::drawInventory(const std::string &command ,bool, float) {
-  _renderer->drawSplashScreen();
-  _renderer->stateChange(FONT);
-  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-  _renderer->print(20, 50, "Inventory Screen", 0);
 }
 
 void Graphics::drawWorld(const std::string& command, bool select_mode, float time_elapsed) {
@@ -442,19 +373,9 @@ void Graphics::updateDetailLevels(float frame_rate) {
 }
 
 void Graphics::registerCommands(Console * console) {
-  console->registerCommand(SWITCH_MODE, this);
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
-  if (command == SWITCH_MODE) {
-    if (args == "splash") render_mode = SPLASH;
-    else if (args == "server") render_mode = SERVER;
-    else if (args == "account") render_mode = ACCOUNT;
-    else if (args == "lobby") render_mode = LOBBY;
-    else if (args == "character") render_mode = CHARACTER;
-    else if (args == "inventory") render_mode = INVENTORY;
-    else if (args == "world") render_mode = WORLD;
-  }
 }
 
 void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
