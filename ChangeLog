@@ -1,3 +1,9 @@
+2005-01-10  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/CacheManager.cpp: Add return values on init/shutdown.
+	* src/FileHandler.cpp:  Fix some namespace issues with mkdir.
+
+
 2005-01-09  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/ModelHandler.cpp: Add loaders that were mistakenly removed

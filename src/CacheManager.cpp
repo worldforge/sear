@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CacheManager.cpp,v 1.1 2005-01-09 16:09:44 simon Exp $
+// $Id: CacheManager.cpp,v 1.2 2005-01-10 11:32:03 simon Exp $
 
 #include <stdlib.h>
 
@@ -54,6 +54,8 @@ int CacheManager::init() {
   }
 
   m_initialised = true;
+
+  return 0;
 }
 
 int CacheManager::shutdown() {
@@ -72,6 +74,8 @@ int CacheManager::shutdown() {
   }
 
   m_initialised = false;
+
+  return 0;
 }
 
 /** 

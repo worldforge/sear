@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.14 2005-01-09 16:09:44 simon Exp $
+// $Id: FileHandler.cpp,v 1.15 2005-01-10 11:32:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -99,12 +99,8 @@ FileHandler::FileHandler() {
     setVariable("SEAR_HOME", getUserDataPath());
     
     if (!exists(getUserDataPath())) {
-        std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
-#ifdef __WIN32__
-        _mkdir(getUserDataPath().c_str()); 
-#else
-        mkdir(getUserDataPath().c_str(), 0755);
-#endif
+      std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
+      mkdir(getUserDataPath());
     }
 }
 
@@ -236,7 +232,7 @@ int err = 0;
 #ifdef __WIN32__
        err =  _mkdir(dirname.c_str()); 
 #else
-       err =  mkdir(dirname.c_str(), 0755);
+       err =  ::mkdir(dirname.c_str(), 0755);
 #endif
   return (err == 0);
 
