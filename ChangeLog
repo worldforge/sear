@@ -1,4 +1,7 @@
 2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>
+	* src/ObjectRecord.h: Fix bug where updated bbox from server would ignore scale_height option in model records
+
+2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>
 	* loaders/3ds.cpp, loader/3ds.h, loaders/3ds_Loader.cpp, loaders/cal3d/Cal3d_Loader.cpp,src/ModelLoader.h,src/ModelRecord.h: Add a scale by height option to model records and use it in the 3ds and cal3d loader
 
 2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>

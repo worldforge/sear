@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.5 2004-06-21 10:18:34 simon Exp $
+// $Id: ObjectRecord.h,v 1.6 2004-06-21 15:56:03 simon Exp $
 
 #ifndef SEAR_OBJECTRECORD_H
 #define SEAR_OBJECTRECORD_H 1
@@ -59,15 +59,15 @@ public:
     std::cout << "Setting Appearance" << std::endl << std::flush;
     for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
       ModelRecord *rec = System::instance()->getModelHandler()->getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setHeight(height);
+      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
     }
     for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
       ModelRecord *rec = System::instance()->getModelHandler()->getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setHeight(height);
+      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
     }
     for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
       ModelRecord *rec = System::instance()->getModelHandler()->getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setHeight(height);
+      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
     }
   }
   void setAppearance(Atlas::Message::Element::MapType &map) {
