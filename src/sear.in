@@ -13,7 +13,7 @@ if [ -x $JAVA ] ; then
   # See if Updater exists in home dir
   if [ ! -e $HOME/.sear/$WFUT_JAR ] ; then
     # Check to see if its in the install dir
-    if [ -e $PREFIX/share/sear/$WFUT_JAR ] ; then
+    if [ -e $prefix/share/sear/$WFUT_JAR ] ; then
       # Install into home dir 
       echo "Installing Updater"
 
@@ -23,11 +23,11 @@ if [ -x $JAVA ] ; then
       fi
 
       # Copy WFUT to home dir
-      cp $PREFIX/share/sear/$WFUT_JAR $HOME/.sear/
+      cp $prefix/share/sear/$WFUT_JAR $HOME/.sear/
 
       # Create startup.script
       echo "/setvar SEAR_MEDIA $HOME/.sear/sear-media/" > $HOME/.sear/startup.script
-      echo "/setvar SEAR_INSTALL $PREFIX/share/sear/" >> $HOME/.sear/startup.script
+      echo "/setvar SEAR_INSTALL $prefix/share/sear/" >> $HOME/.sear/startup.script
     fi
   fi
 
