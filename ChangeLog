@@ -1,4 +1,7 @@
 22nd July 2002, Simon Goodall
+ * Fixed bug where state changes were created in a display list, but the display list was not actually used!
+
+22nd July 2002, Simon Goodall
  * Default texture and font now really xpm files as exported from gimp
 
 22nd July 2002, Simon Goodall

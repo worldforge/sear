@@ -245,12 +245,14 @@ void GL::init() {
   camera = new Camera();
   camera->init();
   camera->registerCommands(_system->getConsole());
-//  CheckError();
   initLighting();
   mh = _system->getModelHandler();
 
   _state_loader = _system->getStateLoader();
   setupStates();
+#ifdef DEBUG  
+  CheckError();
+#endif
 
 }
 
@@ -492,7 +494,6 @@ inline GLuint GL::getTextureID(int texture_id) {
 }
 
 void GL::drawScene(const std::string& command, bool select_mode) {
-	
   // TODO: Move to generic render class
 //select_mode = true;
   if (select_mode) resetColors();
@@ -504,6 +505,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
   this->time = SDL_GetTicks();
   num_frames++;
   frame_time += time_elapsed;
+
 
   if (checkState(RENDER_STENCIL)) {
     glClearStencil(1);
@@ -520,7 +522,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
-  if (select_mode) stateChange("select"); //SELECT
+    if (select_mode) stateChange("select"); //SELECT
 // Function is still unstable!
 //    Eris::World::Instance()->tick(); 
     WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
@@ -673,11 +675,8 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     glPopMatrix(); // Restore The Old Projection Matrix
 
   }
-//  nextState(FONT_TO_PANEL);
   if (!select_mode) {
-    stateChange("console");
    _system->getConsole()->draw(command);
-//  nextState(PANEL_TO_FONT);
 //  Calc FPS
     stateChange("font");
     frame_rate = (float)num_frames /frame_time;
@@ -698,8 +697,9 @@ void GL::drawScene(const std::string& command, bool select_mode) {
   glFlush();
   
   if (!select_mode) SDL_GL_SwapBuffers();
-
-//  CheckError();
+#ifdef DEBUG
+  CheckError();
+#endif
 }
 
 void GL::buildQueues(WorldEntity *we, int depth) {
@@ -741,7 +741,11 @@ void GL::stateChange(StateProperties *sp) {
   if (_cur_state) {
     std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
     GLuint list = _state_map[change];
-    if (!glIsList(list)) stateDisplayList(list, _cur_state, sp);
+    if (!glIsList(list)) {
+      list = glGenLists(1);
+      stateDisplayList(list, _cur_state, sp);
+      _state_map[change] = list;
+    }
     glCallList(list);
     _cur_state = sp;
   } else { 
@@ -808,7 +812,6 @@ void GL::procEvent(int x, int y) {
   stateChange("select"); // SELECT
   glClear(GL_COLOR_BUFFER_BIT);
   drawScene("", true);
-  return;
   y = window_height - y;
   x_pos = x;
   y_pos = y;
@@ -845,7 +848,8 @@ void GL::CheckError() {
     case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
     default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
   }
-  Log::writeLog(msg, Log::ERROR);
+  if (!msg.empty()) Log::writeLog(msg, Log::ERROR);
+  if (!msg.empty()) exit(1);
 }
 
 //TODO should be in general render class
@@ -990,6 +994,7 @@ void GL::writeConfig() {
 // THIS BUILDS A STATE TRANSITION LIST
 void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StateProperties *next_state) {
   // TODO: if textures are disabled then disable them here too
+  if (!previous_state || !next_state) return;
   glNewList(list, GL_COMPILE);
   if (previous_state->alpha_test != next_state->alpha_test) {
     if (next_state->alpha_test) glEnable(GL_ALPHA_TEST);

@@ -72,7 +72,7 @@ void Console::renderConsoleMessages(const std::string &command) {
 //  _renderer->stateChange(Render::CONSOLE);
 //  _renderer->nextState(PANEL_TO_FONT);
   _renderer->stateChange("font");
-  _renderer->setColour(1.0f, 1.0f, 0.0f, 0.85f);
+  _renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   for (I = console_messages.begin(), i = 0; I != console_messages.end(); I++, i++) {
     int j = console_messages.size() - i;
     _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y + j * FONT_HEIGHT - consoleOffset, (char*)(*I).c_str(), 0);
