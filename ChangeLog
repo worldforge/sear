@@ -1,3 +1,8 @@
+2004-06-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* environment/TerrainRenderer.cpp: Re-arrange terrain shaders, for
+	  better looking hills.
+
 2004-06-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* environment/TerrainRenderer.cpp: Be sure to use heap allocation

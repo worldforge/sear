@@ -371,9 +371,9 @@ TerrainRenderer::TerrainRenderer() :
     // TODO these are leaked
     m_terrain.addShader(new Mercator::FillShader());
     m_terrain.addShader(new Mercator::BandShader(-2.f, 1.5f)); // Sandy beach
-    m_terrain.addShader(new Mercator::GrassShader(1.f, 27.f, .5f, 1.f)); // Grass
+    m_terrain.addShader(new Mercator::GrassShader(1.f, 80.f, .5f, 1.f)); // Grass
     m_terrain.addShader(new Mercator::DepthShader(0.f, -10.f)); // Underwater
-    m_terrain.addShader(new Mercator::HighShader(35.f)); // Snow
+    m_terrain.addShader(new Mercator::HighShader(110.f)); // Snow
 }
 
 void TerrainRenderer::render( const PosType & camPos)
