@@ -2,13 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.15 2004-03-02 18:03:33 simon Exp $
+// $Id: main.cpp,v 1.16 2004-04-26 16:01:35 simon Exp $
 
 #include <unistd.h>
 #include <iostream>
 #include <string>
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "conf.h"
 #include "System.h"

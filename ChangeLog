@@ -1,4 +1,7 @@
 26th April 2004, Simon Goodall
+ * Added some config.h checks
+
+26th April 2004, Simon Goodall
  * Added terrain invalidation code
 
 26th April 2004, Simon Goodall
