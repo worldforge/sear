@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.5 2002-10-20 15:50:27 simon Exp $
+// $Id: ActionHandler.cpp,v 1.6 2002-10-21 20:09:59 simon Exp $
 
 #include "ActionHandler.h"
 
@@ -14,9 +14,15 @@
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
+  
 namespace Sear {
 
-static const bool debug = false;
 	
 static const std::string SCRIPT = "script";
 static const std::string ENTITY = "entity_based";

@@ -2,13 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.3 2002-09-08 13:08:21 simon Exp $
+// $Id: FileHandler.cpp,v 1.4 2002-10-21 20:09:59 simon Exp $
 
 #include <stdio.h>
 
 #include "FileHandler.h"
 #include "Console.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 	

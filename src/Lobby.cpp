@@ -2,12 +2,18 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Lobby.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
+// $Id: Lobby.cpp,v 1.7 2002-10-21 20:09:59 simon Exp $
 
 #include "Lobby.h"
 #include <iostream.h>
 #include "Console.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 Lobby::Lobby() :

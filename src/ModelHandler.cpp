@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.25 2002-10-09 17:13:39 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.26 2002-10-21 20:09:59 simon Exp $
 
 #include "System.h"
 #include <set>
@@ -35,6 +35,12 @@
 //#include "StateLoader.h"
 //#include "WorldEntity.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 
 namespace Sear {
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.22 2002-10-20 15:50:27 simon Exp $
+// $Id: Console.cpp,v 1.23 2002-10-21 20:09:59 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -14,14 +14,14 @@
 #include "Graphics.h"
 #include "Render.h"
 
-namespace Sear {
-
 #ifdef DEBUG
-static const bool debug = true;
+  #include "common/mmgr.h"
+  static const bool debug = true;
 #else
-static const bool debug = false;
+  static const bool debug = false;
 #endif
 
+namespace Sear {
 	
 static const std::string TOGGLE_CONSOLE = "toggle_console";
 static const std::string LIST_CONSOLE_COMMANDS = "list_commands";

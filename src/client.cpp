@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.33 2002-10-20 15:50:27 simon Exp $
+// $Id: client.cpp,v 1.34 2002-10-21 20:09:59 simon Exp $
 
 #include "System.h"
 
@@ -40,6 +40,12 @@
 
 #include "gui/ServerGui.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 #ifdef DEBUG
   #define DEBUG_ERIS 1
   #define ERIS_LOG_LEVEL 1
@@ -116,6 +122,7 @@ void Client::shutdown() {
   if (_connection) delete _connection;
   if (_factory) delete _factory;
   if (_meta) delete _meta;
+  if (&Eris::PollDefault::instance()) delete &Eris::PollDefault::instance();
   _initialised = false;
 }
 

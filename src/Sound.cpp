@@ -3,8 +3,16 @@
 #include "Console.h"
 #include "common/Log.h"
 
-// $Id: Sound.cpp,v 1.8 2002-09-08 00:24:53 simon Exp $
+// $Id: Sound.cpp,v 1.9 2002-10-21 20:09:59 simon Exp $
 
+// TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
+
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 Sound::Sound() :

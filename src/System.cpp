@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.42 2002-10-20 15:50:27 simon Exp $
+// $Id: System.cpp,v 1.43 2002-10-21 20:09:59 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,14 +47,14 @@
 #include "glgooey/WindowManager.h"
 #endif
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
-#ifdef DEBUG
-static const bool debug = true;
-#else
-static const bool debug = false;
-#endif
-	
 System *System::_instance = NULL;
 const std::string System::SCRIPTS_DIR = "scripts";
 const std::string System::STARTUP_SCRIPT = "startup.script";
@@ -316,14 +317,15 @@ void System::shutdown() {
     delete _state_loader;
     _state_loader = NULL;
   }
-  
-  if (_icon) delete _icon;
-  if (_cursor_default) SDL_FreeCursor(_cursor_default);
-  if (_cursor_pickup) SDL_FreeCursor(_cursor_pickup);
-  if (_cursor_touch) SDL_FreeCursor(_cursor_touch);
+  // Are these actually needed ? or does SDL clean then up too? 
+//  if (_icon) SDL_FreeSurface(_icon);
+//  if (_cursor_default) SDL_FreeCursor(_cursor_default);
+//  if (_cursor_pickup) SDL_FreeCursor(_cursor_pickup);
+//  if (_cursor_touch) SDL_FreeCursor(_cursor_touch);
   if (sound) {
     sound->shutdown();
     delete sound;
+    sound = NULL;
   }
   SDL_Quit();
   _initialised = false;
@@ -401,7 +403,7 @@ void System::createWindow(bool fullscreen) {
   if (value < 1) _general->setItem("render_options", "use_stencil_buffer", false);
   
  
-  if (!_icon) _icon = IMG_Load(_icon_file.c_str());
+  if (!_icon) _icon = loadImage(_icon_file);
   // Should set the icon transparency but it does not work.
   if (_icon) {
     if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGB(_icon->format, 0x0, 0x0, 0x0)) == -1) {

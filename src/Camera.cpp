@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.9 2002-10-20 15:50:27 simon Exp $
+// $Id: Camera.cpp,v 1.10 2002-10-21 20:09:59 simon Exp $
 
 #include <string>
 
@@ -16,13 +16,14 @@
 #include "conf.h"
 #include "Console.h"
 
-namespace Sear {
-
 #ifdef DEBUG
-static const bool debug = true;
+  #include "common/mmgr.h"
+  static const bool debug = true;
 #else
-static const bool debug = false;
+  static const bool debug = false;
 #endif
+
+namespace Sear {
 	
 static std::string CAMERA = "camera";
 	

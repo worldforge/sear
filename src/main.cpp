@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.10 2002-09-08 00:24:53 simon Exp $
+// $Id: main.cpp,v 1.11 2002-10-21 20:09:59 simon Exp $
 
 #include <unistd.h>
 #include <iostream>
@@ -14,6 +14,12 @@
 #include "System.h"
 #include "Exception.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 int main(int argc, char** argv) {
   bool exit_program = false;
   Sear::System *sys = NULL;

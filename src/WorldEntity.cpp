@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.23 2002-10-20 15:50:27 simon Exp $
+// $Id: WorldEntity.cpp,v 1.24 2002-10-21 20:09:59 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -23,6 +23,12 @@
 
 #include <set>
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 static const std::string ACTION = "action";

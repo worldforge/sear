@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.7 2002-09-26 18:56:16 simon Exp $
+// $Id: Frustum.cpp,v 1.8 2002-10-21 20:09:59 simon Exp $
 
 #include "common/Utility.h"
 
@@ -11,6 +11,12 @@
 #include "WorldEntity.h"
 #include "Frustum.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 void Frustum::getFrustum(float frustum[6][4], float proj[16], float modl[16]) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: StateLoader.cpp,v 1.9 2002-10-20 15:50:27 simon Exp $
+// $Id: StateLoader.cpp,v 1.10 2002-10-21 20:09:59 simon Exp $
 
 #include "StateLoader.h"
 
@@ -13,13 +13,14 @@
 #include "common/Log.h"
 
 
-namespace Sear {
-
 #ifdef DEBUG
-static const bool debug = true;
+  #include "common/mmgr.h"
+  static const bool debug = true;
 #else
-static const bool debug = false;
+  static const bool debug = false;
 #endif
+
+namespace Sear {
 
 // Varconf Key names.
 static const std::string ALPHA_TEST = "alpha_test";

@@ -2,11 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: EventHandler.cpp,v 1.5 2002-10-20 13:22:26 simon Exp $
+// $Id: EventHandler.cpp,v 1.6 2002-10-21 20:09:59 simon Exp $
 
 #include "EventHandler.h"
 #include "Event.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 void EventHandler::addEvent(Event event) {

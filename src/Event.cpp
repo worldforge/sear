@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.11 2002-10-20 13:22:26 simon Exp $
+// $Id: Event.cpp,v 1.12 2002-10-21 20:09:59 simon Exp $
 
 #include "System.h"
 #include <string>
@@ -16,6 +16,12 @@
 #include "Render.h"
 #include "Character.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 Event::Event() :

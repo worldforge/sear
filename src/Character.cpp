@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.16 2002-09-26 22:11:39 simon Exp $
+// $Id: Character.cpp,v 1.17 2002-10-21 20:09:59 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -30,6 +30,12 @@
 #include "Render.h"
 #include "Graphics.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 Character::Character(WorldEntity *self, System *system) :
