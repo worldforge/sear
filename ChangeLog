@@ -1,3 +1,6 @@
+27th April 2004, Al Riddoch
+ * Re-write code that handles model map, so that NULLs never get inserted.
+
 26th April 2004, Simon Goodall
  * Correctly backup default texture and font numbers during an invalidate call
 
