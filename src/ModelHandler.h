@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.10 2002-11-12 23:59:22 simon Exp $
+// $Id: ModelHandler.h,v 1.11 2004-06-15 20:37:05 simon Exp $
 
 #ifndef SEAR_MODELHANDLER_H
 #define SEAR_MODELHANDLER_H 1
@@ -17,6 +17,7 @@ class ModelLoader;
 class ModelRecord;
 class ObjectRecord;
 class Render;
+class WorldEntity;
 	
 class ModelHandler {
 public:
@@ -26,7 +27,7 @@ public:
   void init();
   void shutdown();
   
-  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &model_id);
+  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we = NULL);
 
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
   void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);

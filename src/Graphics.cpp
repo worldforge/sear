@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.51 2004-06-08 23:29:03 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.52 2004-06-15 20:37:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -321,6 +321,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 //        WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
 //        object_record->bbox = WFMath::AxisBox<3>(lc, hc);
       }
+
       // Hmm, might be better to explicity link to object.
       // calls only required if Pos, or orientation changes - how can we tell?
       object_record->position = we->getAbsPos();

@@ -1,3 +1,6 @@
+2004-06-15  Simon Goodall  <simon@simongoodall.co.uk>
+	* Further appearance fixes. Now loads appearance at startup
+
 2004-06-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/System.cpp, src/Character.cpp: Remove debugging output

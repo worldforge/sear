@@ -1038,7 +1038,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
       ObjectRecord *object_record = J->first;
-      ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second);
+      ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second, object_record->entity);
       if (!model_record) {
 //        std::cerr << "No model record!" << std::endl;	      
         continue;

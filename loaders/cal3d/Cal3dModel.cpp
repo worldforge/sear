@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.12 2004-06-13 18:21:01 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.13 2004-06-15 20:37:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -231,9 +231,9 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
     // instantiate defaults
     Atlas::Message::Element::MapType meshes;
     for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
-    std::string name = J->first;
-//    if (name.find("_") != std::string::npos)
-      meshes[name.substr(0, name.find("_") - 1)] = "1";
+      std::string name = J->first;
+      if (name.find("_") != std::string::npos)
+        meshes[name.substr(0, name.find("_"))] = "1";
     }
     map["mesh"] = meshes;
     I = map.find("mesh");   
@@ -259,6 +259,7 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
   for (I = meshes.begin(); I != meshes.end(); ++I) {
     std::string name = I->first;
     std::string value = I->second.asString();
+    std::cout << "Name: " << name << " - Value: " << value << std::endl;
     // Attach mesh
     if (_core_model->_meshes.find(name + "_" + value) 
       != _core_model->_meshes.end()) {

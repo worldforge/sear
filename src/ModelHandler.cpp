@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
+// $Id: ModelHandler.cpp,v 1.36 2004-06-15 20:37:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -11,6 +11,9 @@
 #include "System.h"
 #include <set>
 #include <string.h>
+
+#include <Atlas/Message/Element.h>
+
 
 #include <varconf/Config.h>
 
@@ -31,6 +34,7 @@
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 #include "Render.h"
+#include "WorldEntity.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -112,7 +116,7 @@ void ModelHandler::shutdown() {
   _initialised = false;
 }
   
-ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id) {
+ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
   // Model loaded for this object?
   if (_object_map[record->id + model_id]) return _object_map[record->id + model_id];
   
@@ -143,6 +147,13 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   if (!model) {
     std::cerr << "Error loading model" << std::endl;	 
     return NULL;
+  }
+
+  if (we != NULL) {
+    if (we->hasProperty("guise")) {
+      Atlas::Message::Element::MapType mt = we->getProperty("guise").asMap();
+      model->model->setAppearance(mt);
+    }                                                                          
   }
 	  
   // If model is a generic one, add it to the generic list
