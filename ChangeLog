@@ -1,3 +1,14 @@
+2004-05-23  James Turner  <james@worldforge.org>
+
+	* Add in a Sprite class, including a new config file, and changes
+	  to the TextureManager to interoperate with Sprites. The original
+	  Sprite code was lifted from Al's work in Apogee and modified to
+	  work in sear.
+	* Add a Compass class to the gui files, again taken from Apogee
+	  and modified.
+	* Change Graphics to create a compass and update it's angle.
+	* Add a 'sprite' state to the state config file
+	
 2004-05-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.h, src/Character.cpp: Add a make command that

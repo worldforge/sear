@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.14 2004-04-22 21:38:24 simon Exp $
+// $Id: Graphics.h,v 1.15 2004-05-23 21:28:35 jmt Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -36,6 +36,7 @@ class WorldEntity;
 class System;
 class Character;
 class Console;
+class Compass;
 
 class Graphics : public ConsoleObject, public SigC::Object{
 
@@ -117,7 +118,7 @@ protected:
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
-
+    Compass* m_compass;
   
  TerrainRenderer *tr;
 };

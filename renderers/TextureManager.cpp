@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.24 2004-05-19 17:52:20 simon Exp $
+// $Id: TextureManager.cpp,v 1.25 2004-05-23 21:28:36 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -12,12 +12,6 @@
 
 #include <sage/GL.h>
 #include <sage/GLU.h>
-
-#ifdef __APPLE__
-  extern SDL_Surface *IMG_Load(const char *);
-#else
-  #include <SDL/SDL_image.h>
-#endif
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -38,6 +32,8 @@
 #include "common/mmgr.h"
   
 #endif
+
+#include "Sprite.h"
 
 #ifdef DEBUG
 static const bool debug = true;
@@ -83,6 +79,7 @@ static const std::string FILTER_LINEAR_MIPMAP_NEAREST = "linear_mipmap_nearest";
 static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
 
 static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";
+static const std::string CMD_LOAD_SPRITE_CONFIG = "load_sprites";
 
 // Format strings
 static const std::string ALPHA = "alpha";
@@ -392,6 +389,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     float priority = (double)m_texture_config.getItem(texture_name, KEY_priority);
     glPrioritizeTextures(1, &texture_id, &priority);
   }
+  
   return texture_id;
 }
 
@@ -480,10 +478,12 @@ void TextureManager::setupGLExtensions() {
   
   // Get number of texture units
   // We write to a tempory as m_texture_units is a uint
-  int tex_units;
+  GLint tex_units;
   glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &tex_units);
   m_texture_units = tex_units;
-  std::cout << "We have " << m_texture_units << " texture units" << std::endl;
+  
+  if (debug) std::cout << m_texture_units << " texture units" << std::endl;
+  
   use_arb_multitexture = sage_ext[GL_ARB_MULTITEXTURE];
   use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_ext_texture_filter_anisotropic = sage_ext[GL_EXT_TEXTURE_FILTER_ANISOTROPIC];
@@ -605,6 +605,7 @@ void TextureManager::registerCommands(Console *console) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (debug) std::cout << "Registering commands" << std::endl;
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
+  console->registerCommand(CMD_LOAD_SPRITE_CONFIG, this);
 }
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
@@ -614,6 +615,14 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     System::instance()->getFileHandler()->expandString(a);
     readTextureConfig(a);
   }
+  
+  if (command == CMD_LOAD_SPRITE_CONFIG) {
+    std::string a = arguments;
+    System::instance()->getFileHandler()->expandString(a);
+    std::cout << "reading sprite config at " << a << std::endl;
+    m_spriteConfig.readFromFile(a);
+  }
+
 }
 
 void TextureManager::invalidate() {
@@ -630,6 +639,11 @@ void TextureManager::invalidate() {
   for (int U = m_last_textures.size() - 1; U >= 0; --U){
     m_last_textures[U] = -1;
   }
+  
+  for (SpriteInstanceMap::iterator S=m_sprites.begin(); S != m_sprites.end(); ++S) {
+    S->second->invalidate();
+  }
+  
   setupGLExtensions();
   // Backup texture counter
   int texCount = m_texture_counter;
@@ -731,6 +745,26 @@ GLint TextureManager::getFormat(const std::string &fmt) {
   if (fmt == RGBA16) return GL_RGBA16;
   assert(0);
   return 0;
+}
+
+SpriteData* TextureManager::getSpriteData(const std::string& name)
+{
+    assert(m_initialised);
+    assert(!name.empty());
+    
+    SpriteInstanceMap::iterator S = m_sprites.find(name);
+    if (S == m_sprites.end())
+    {
+        SpriteData* sd = new SpriteData(name);
+        S = m_sprites.insert(S, SpriteInstanceMap::value_type(name, sd));
+    }
+    
+    return S->second;
+}
+
+void TextureManager::clearLastTexture(unsigned int index)
+{
+    m_last_textures[index] = -1;
 }
 
 } /* namespace Sear */

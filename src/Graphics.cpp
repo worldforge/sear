@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.47 2004-05-19 17:52:20 simon Exp $
+// $Id: Graphics.cpp,v 1.48 2004-05-23 21:28:35 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -19,6 +19,7 @@
 #include "common/Utility.h"
 #include "environment/Environment.h"
 #include "renderers/GL.h"
+#include "renderers/Sprite.h"
 #include "Camera.h"
 #include "Character.h"
 #include "Console.h"
@@ -34,6 +35,7 @@
 #include "WorldEntity.h"
 
 #include "renderers/RenderSystem.h"
+#include "gui/Compass.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -83,6 +85,7 @@ Graphics::Graphics(System *system) :
   _num_frames(0),
   _frame_time(0),
   _initialised(false),
+  m_compass(NULL),
   tr(NULL)
 {
 }
@@ -103,6 +106,10 @@ void Graphics::init() {
   _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
+  
+    m_compass = new Compass(580.f, 50.f);
+    m_compass->setup();
+    
   _initialised = true;
 }
 
@@ -114,6 +121,8 @@ void Graphics::shutdown() {
     delete _camera;
     _camera = NULL;
   }
+  
+  delete m_compass;
   _initialised = false;
 }
 
@@ -126,7 +135,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   if (_camera) _camera->updateCameraPos(time_elapsed);
 
   _renderer->beginFrame();
-  drawWorld(command, select_mode, time_elapsed); 
+  drawWorld(command, select_mode, time_elapsed);
 
   if (!select_mode) {
     Console *con = _system->getConsole();
@@ -147,6 +156,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
   }
 //  updateDetailLevels(_frame_rate);
   if (!select_mode) _renderer->renderActiveName();
+
   _renderer->endFrame(select_mode);
 }
 
@@ -239,6 +249,9 @@ Compare D^2 to choose what detail level to use
   Environment::getInstance().renderSea();
   glDisableClientState(GL_VERTEX_ARRAY);
       _renderer->restore();
+    
+    m_compass->update(_camera->getRotation());
+    m_compass->draw(_renderer, select_mode);
   } else {
 
 //    _renderer->applyLighting();

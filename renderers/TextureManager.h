@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.14 2004-05-20 10:57:20 simon Exp $
+// $Id: TextureManager.h,v 1.15 2004-05-23 21:28:36 jmt Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -45,7 +45,8 @@ namespace Sear {
  */ 
 
 class Console;
-  
+class SpriteData;
+
 class TextureManager : public SigC::Object, public ConsoleObject {
 
 public:
@@ -172,6 +173,16 @@ public:
 
   static GLint getFormat(const std::string &fmt);
  
+    /** create a render specific sprite data instance */
+    SpriteData* getSpriteData(const std::string& name);
+
+    varconf::Config& getSpriteConfig()
+    { return m_spriteConfig; }
+    
+    void clearLastTexture(unsigned int index);
+    
+    static SDL_Surface *loadImage(const  std::string &filename);
+    
 private:
   bool m_initialised; ///< Flag indicating whether object has had init called
   varconf::Config m_texture_config; ///< Config object for all texture
@@ -193,8 +204,6 @@ private:
 
   TextureID createDefaultTexture();
   TextureID createDefaultFont();
-
-  static SDL_Surface *loadImage(const  std::string &filename);
   
   /**
    * Returns the OpenGL filter from the name
@@ -203,6 +212,11 @@ private:
    */ 
   static int getFilter(const std::string &filter_name);
 
+    typedef std::map<std::string, SpriteData*> SpriteInstanceMap;
+    SpriteInstanceMap m_sprites;
+    
+    /** sprite configuration file */
+    varconf::Config m_spriteConfig;
 };
   
 } /* namespace Sear */

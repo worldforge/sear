@@ -7,4 +7,6 @@ libRendererGL_a_SOURCES = \
 	StateManager.cpp StateManager.h \
 	default_font.xpm default_image.xpm \
 	RenderSystem.cpp RenderSystem.h \
-	GL.cpp GL.h
+	GL.cpp GL.h \
+	Sprite.cpp Sprite.h
+	
