@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.6 2003-06-11 23:07:57 simon Exp $
+// $Id: StateManager.cpp,v 1.7 2003-07-03 10:25:36 simon Exp $
 
 /*
  * TODO
@@ -102,13 +102,15 @@ void StateManager::init() {
   
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
+  StateProperties *select_state = new StateProperties;
   // Create a default record
   default_state->state = "default";
   default_state->alpha_test = false;
   default_state->blend = false;
   default_state->lighting = false;
   default_state->two_sided_lighting = false;
-  for (unsigned int i = 0; i < MAX_UNITS; ++i)
+  default_state->textures[0] = true;
+  for (unsigned int i = 1; i < MAX_UNITS; ++i)
     default_state->textures[i] = false;
   default_state->colour_material = false;
   default_state->depth_test = false;
@@ -150,6 +152,31 @@ void StateManager::init() {
   _states[_state_counter] = font_state;
   _state_name_map[font_state->state] = _state_counter;
   _name_state_vector[_state_counter] = font_state->state;
+  ++_state_counter;
+ 
+  //Create a font state so we can still see text
+  //even if no files have been loaded into Sear
+  select_state->state = "select";
+  select_state->alpha_test = false;
+  select_state->blend = false;
+  select_state->lighting = false;
+  select_state->two_sided_lighting = false;
+  for (unsigned int  i = 0; i < MAX_UNITS; ++i)
+    select_state->textures[i] = false;
+  select_state->colour_material = false;
+  select_state->depth_test = true;
+  select_state->cull_face = false;
+  select_state->cull_face_cw = false;
+  select_state->stencil = false;
+  select_state->fog = false;
+  select_state->rescale_normals = false;
+  select_state->alpha_function = GL_GREATER;
+  select_state->alpha_value = 0.1f;
+  select_state->blend_src_function = GL_SRC_ALPHA;
+  select_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
+  _states[_state_counter] = select_state;
+  _state_name_map[select_state->state] = _state_counter;
+  _name_state_vector[_state_counter] = select_state->state;
   ++_state_counter;
 
   _initialised = true;
@@ -279,7 +306,7 @@ void StateManager::stateChange(StateID state) {
   assert(sp != NULL);
   // First time round, we have no states
   if (_current_state != -1) {
-    GLuint list = _state_change_vector[_current_state][state];
+    unsigned int list = _state_change_vector[_current_state][state];
     // Check whether we need to generate a display list
     if (!glIsList(list)) {
       list = glGenLists(1);

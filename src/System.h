@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.30 2003-04-23 20:28:27 simon Exp $
+// $Id: System.h,v 1.31 2003-07-03 10:25:36 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -301,6 +301,8 @@ public:
   void varconf_general_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);
   
+  std::string getMediaRoot() const { return _media_root; }
+
 private:
   bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
@@ -309,6 +311,9 @@ private:
   std::list<std::string>::iterator _command_history_iterator;
 
   bool _initialised; ///< Initialisation state of System
+
+  std::string _media_root;
+
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.5 2003-03-06 23:50:38 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.6 2003-07-03 10:25:36 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -45,6 +45,13 @@ void ObjectHandler::init() {
   if (debug) Log::writeLog("Initialising Object Handler", Log::LOG_DEFAULT);
   if (_initialised) shutdown();
   _object_records = ObjectRecordMap();
+  // Create default record
+  ObjectRecord *r = new ObjectRecord();
+  r->name = "default";
+  r->draw_self = true;
+  r->draw_members = true;
+  r->low_quality.push_back("default");
+  _object_records["default"] = r;
   _initialised = true;
 }
 

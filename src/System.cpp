@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.60 2003-06-12 20:34:53 simon Exp $
+// $Id: System.cpp,v 1.61 2003-07-03 10:25:36 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,6 +98,7 @@ namespace Sear {
   static const std::string KEY_render_use_stencil = "render_use_stencil";
   static const std::string KEY_window_width = "width";
   static const std::string KEY_window_height = "height";
+  static const std::string KEY_media_root = "media_root";
   //Config default values
   static const int DEFAULT_window_width = 640;
   static const int DEFAULT_window_height = 480;  
@@ -178,7 +179,7 @@ bool System::init() {
   home_path = std::string(getenv("HOME"));
   if (home_path.empty()) home_path = ".";
   else {
-    home_path += "/.sear";
+    home_path += "/.sear/";
     mkdir(home_path.c_str(), 0755);
   }
 #endif
@@ -220,6 +221,7 @@ bool System::init() {
   _model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
+  Bindings::bind("escape", "/" + QUIT);
   
   _console = new Console(this);
   _console->init();
@@ -709,6 +711,9 @@ void System::readConfig() {
   _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
   temp = _general.getItem(SYSTEM, KEY_window_height);
   _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
+
+  temp = _general.getItem(SYSTEM, KEY_media_root);
+  _media_root = (!temp.is_string()) ? (INSTALLDIR) : ((std::string)temp);
 }
 
 void System::writeConfig() {

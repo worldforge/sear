@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.33 2003-06-12 20:34:53 simon Exp $
+// $Id: GL.h,v 1.34 2003-07-03 10:25:36 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -52,7 +52,7 @@ public:
   void initLighting();
   void initFont();
   void shutdownFont();
-  void print(GLint x, GLint y, const char*, int set);
+  void print(int x, int y, const char*, int set);
   void print3D(const char* string, int set);
   inline void newLine();
 

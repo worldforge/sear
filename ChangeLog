@@ -1,3 +1,9 @@
+3rd July 2003, Simon Goodall
+ * Changed default state to allow textures so default texture is visible regardless of datafiles
+ * Made default key binding of "escape" to "/quit"
+ * Added default records for modelhandler and objecthandler
+ * Started to make use of a "media_root" variable
+
 12th June 2003, Simon Goodall
  * Fixed object selection on imposters
 

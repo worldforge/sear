@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.67 2003-06-12 20:34:53 simon Exp $
+// $Id: GL.cpp,v 1.68 2003-07-03 10:25:36 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -59,7 +59,7 @@ namespace Sear {
   static const int sleep_time = 5000;
 
   static const std::string font_texture = "ui_font";
-  static const std::string TEXTURE_splash_texture = "ui_splash";
+  static const std::string TEXTURE_splash_texture = "ui_splash_screen";
   
   // Config key strings
   
@@ -401,7 +401,7 @@ void GL::shutdownFont() {
   glDeleteLists(base,256); // Delete All 256 Display Lists
 }
 
-void GL::print(GLint x, GLint y, const char * string, int set) {
+void GL::print(int x, int y, const char * string, int set) {
   if (set > 1) set = 1;
   switchTexture(font_id);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
@@ -439,7 +439,7 @@ inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
 
-void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
+void GL::drawTextRect(int x, int y, int width, int height, int texture) {
   switchTexture(texture);
   // TODO should use switchTexture
 //  glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
@@ -829,6 +829,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
     // Change state for this queue
     stateChange(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
+
       ObjectRecord *object_record = J->first;
       ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second);
       if (!model_record) {
@@ -966,6 +967,7 @@ inline void GL::drawFPS(float fps) {
 }
   
 void GL::drawSplashScreen() {
+//  stateChange(getStateID("default"));
   stateChange(getStateID(SPLASH));
   #ifndef _WIN32
     // TODO Need to find a win32 version

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.29 2003-04-30 19:22:45 simon Exp $
+// $Id: Graphics.cpp,v 1.30 2003-07-03 10:25:36 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -306,9 +306,13 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       object_record->orient = we->getAbsOrient();
       // TODO determine what model queue to use.
       // TODO if queue is empty switch to another
+      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
+      // Loop through all models in list
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+        // Check we;re visible
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
           if (!select_mode) {
+            // Add to queue by state, then model record
 	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.32 2003-03-07 12:50:51 simon Exp $
+// $Id: ModelHandler.cpp,v 1.33 2003-07-03 10:25:36 simon Exp $
 
 //#include "config.h"
 
@@ -69,6 +69,12 @@ void ModelHandler::init() {
   if (_initialised) shutdown();
   // TODO another method would be better - or a clean up of the event system
   System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
+  // Add default record
+  varconf::Config &model_config = System::instance()->getModelRecords();
+  model_config.setItem("default", ModelRecord::MODEL_LOADER, "wireframe");
+  model_config.setItem("default", ModelRecord::STATE, "default");
+  model_config.setItem("default", ModelRecord::SELECT_STATE, "select");
+  model_config.setItem("default", ModelRecord::OUTLINE, false);
   _initialised = true;
 }
 
