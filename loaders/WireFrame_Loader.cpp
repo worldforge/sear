@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.8 2002-09-07 23:27:06 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.9 2002-09-08 16:15:01 simon Exp $
 
 #include <string>
 
@@ -33,7 +33,11 @@ Model *WireFrame_Loader::loadModel(Render *render, ModelStruct &ms) {
     WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
-  model->init(bboxCheck(bbox));
+  if (!model->init(bboxCheck(bbox))) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   return model;
 }
 

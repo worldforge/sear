@@ -2,13 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.29 2002-09-08 13:08:20 simon Exp $
+// $Id: GL.cpp,v 1.30 2002-09-08 16:15:01 simon Exp $
 
 /*TODO
  * Allow texture unloading
  * Allow priority textures
- *
- *
  */ 
 
 
@@ -58,19 +56,12 @@ static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
 static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
-//static GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-//static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
 static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
-//static GLfloat whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
-//static GLfloat ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
-//static GLfloat diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
-//static GLfloat specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
 inline GLuint GL::makeMask(GLint bits) {
   return (0xFF >> (8 - bits));
 }
-
 
 inline std::string GL::getSelectedID(unsigned int i) {
   return colour_mapped[i];
@@ -181,12 +172,14 @@ void GL::initWindow(int width, int height) {
   Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
   Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
   Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
- 
+
+  // These will be empty if there was a problem initialising the driver 
   if (vendor.empty() || renderer.empty()) {
     throw Exception("Error with OpenGL system");
   }
   
   glLineWidth(4.0f);
+  
   //TODO: this needs to go into the set viewport method
   //Check for divide by 0
   if (height == 0) height = 1;
@@ -213,7 +206,7 @@ void GL::init() {
   splash_id = requestTexture("ui", splash_texture);
   initFont();
   initLighting();
-  // TODO: initialisation need to go into system
+  // TODO: initialisation need to go into system?
   setupStates();
 #ifdef DEBUG  
   CheckError();
@@ -616,9 +609,9 @@ void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) 
 }
 
 void GL::procEvent(int x, int y) {
-  unsigned int ic;
-  std::string selected_id;
-  GLubyte i[3];
+  static unsigned int ic;
+  static std::string selected_id;
+  static GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
   _graphics->drawScene("", true, 0);
   y = window_height - y;
@@ -857,6 +850,10 @@ inline void GL::translateObject(float x, float y, float z) {
   glTranslatef(x, y, z);
 }
 
+void GL::rotate(float angle, float x, float y, float z) {
+  glRotatef(angle, x, y, z);
+}
+
 void GL::rotateObject(WorldEntity *we, int type) {
   if (!we) return; // THROW ERROR;
   switch (type) {
@@ -998,7 +995,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
 
 unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
   unsigned int texture = 0;
- glGenTextures(1, &texture);
+  glGenTextures(1, &texture);
   // TODO: Check for valid texture generation and return error
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -1009,7 +1006,19 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
   } else {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  } 
+  if (use_ext_texture_filter_anisotropic) {
+    GLfloat largest_supported_anisotropy;
+    glGetFloatv(MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
+    glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
+//  if (use_sgis_generate_mipmap) {
+//    glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+//    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
+//  } else {
+//    gluBuild2DMipmaps(GL_TEXTURE_2D, (depth == 3) ? GL_RGB : GL_RGBA, width, height, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
+//  }
+    
   glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
   return texture;
 }

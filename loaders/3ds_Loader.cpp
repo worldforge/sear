@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.7 2002-09-07 23:27:05 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.8 2002-09-08 16:15:01 simon Exp $
 
 #include "src/System.h"
 
@@ -23,7 +23,11 @@ ThreeDS_Loader::~ThreeDS_Loader() {
 
 Model *ThreeDS_Loader::loadModel(Render *render, ModelStruct &ms) {
   ThreeDS *model = new ThreeDS(render);
-  model->init(ms.file_name);
+  if (!model->init(ms.file_name)) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   model->setInUse(true);
   return model;
 }

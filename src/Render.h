@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.16 2002-09-08 00:24:53 simon Exp $
+// $Id: Render.h,v 1.17 2002-09-08 16:15:01 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -109,6 +109,7 @@ typedef std::list<WorldEntity*> Queue;
   virtual int requestMipMapMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
   
   virtual void translateObject(float x, float y, float z) =0;
+  virtual void rotate(float angle, float x, float y, float z) =0;
   virtual void rotateObject(WorldEntity *we, int type) =0;
   virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;

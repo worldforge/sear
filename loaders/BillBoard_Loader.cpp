@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BillBoard_Loader.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+// $Id: BillBoard_Loader.cpp,v 1.13 2002-09-08 16:15:01 simon Exp $
 
 #include "src/System.h"
 #include <string>
@@ -37,7 +37,11 @@ Model *BillBoard_Loader::loadModel(Render *render, ModelStruct &ms) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, ms.width, ms.height);
+  if (!model->init(type, ms.width, ms.height)) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   return model;
 }
 

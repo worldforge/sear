@@ -2,9 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.19 2002-09-07 23:27:06 simon Exp $
+// $Id: Cal3d.cpp,v 1.20 2002-09-08 16:15:01 simon Exp $
 
-#include <GL/gl.h>
+//#include <GL/gl.h>
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
@@ -121,10 +121,10 @@ int Cal3d::getState()
 // Load and create a texture from a given file                                //
 //----------------------------------------------------------------------------//
 
-GLuint Cal3d::loadTexture(const std::string& strFilename)
+unsigned int Cal3d::loadTexture(const std::string& strFilename)
 {
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  GLuint textureId;
+//  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  unsigned int textureId;
   int width;
   int height;
   int depth;
@@ -167,34 +167,14 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
     {
       memcpy(&pBuffer[(height + y) * width * depth], &pBuffer[(height - y - 1) * width * depth], width * depth);
     }
-  
-    // generate texture
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_2D, textureId);
-  
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, &pBuffer[width * height * depth]);
-  
+    textureId = _render->createTexture(width, height, depth, &pBuffer[width * height * depth], false);
     // free the allocated memory
     delete [] pBuffer;
   } else {
     SDL_Surface * image = System::loadImage(strFilename);
-    width = image->w;
-    height = image->h;
-    depth = image->format->BytesPerPixel;
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_2D, textureId);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+    textureId = _render->createTexture((unsigned int)image->w, (unsigned int)image->h,(unsigned int)image->format->BytesPerPixel,(unsigned char *)image->pixels, false);
     free(image);
   }
-
   return textureId;
 }
 
@@ -441,7 +421,7 @@ bool Cal3d::init(const std::string& strFilename) {
         strFilename = pCoreMaterial->getMapFilename(mapId);
 
         // load the texture from the file
-        GLuint textureId;
+        unsigned int textureId;
         textureId = loadTexture(strPath + strFilename);
 
         // store the opengl texture id in the user data of the map
@@ -582,7 +562,7 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 
 void Cal3d::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
-    glRotatef(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
+    _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
   }
 }

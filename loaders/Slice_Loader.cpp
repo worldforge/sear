@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Slice_Loader.cpp,v 1.4 2002-09-07 23:27:06 simon Exp $
+// $Id: Slice_Loader.cpp,v 1.5 2002-09-08 16:15:01 simon Exp $
 
 #include "src/System.h"
 #include <string>
@@ -37,7 +37,11 @@ Model *Slice_Loader::loadModel(Render *render, ModelStruct &ms) {
 
   }
   Model *trunk_model = System::instance()->getModelHandler()->getModel(System::instance()->getGraphics()->getRender(), type + "_trunk", System::instance()->getObjectLoader()->getObjectProperties(type + "_trunk"));
-  model->init(type, ms.width, ms.height, trunk_model, ms.num_slicings, ms.slices_per_slicing);
+  if (!model->init(type, ms.width, ms.height, trunk_model, ms.num_slicings, ms.slices_per_slicing)) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   return model;
 }
 

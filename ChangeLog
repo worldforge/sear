@@ -1,4 +1,10 @@
 8th September 2002, Simon Goodall
+ * Fixed bug in model loaders where the model was still used even if it failed its init call
+
+8th September 2002, Simon Goodall
+ * Finally removed cal3d usage of opengl. Textures are now handled like every other texture in Sear
+
+8th September 2002, Simon Goodall
  * Removed optionability of lib3ds and cal3d due to  incompatibility problems of the method used
 
 8th September 2002, Simon Goodall

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.15 2002-09-08 00:24:52 simon Exp $
+// $Id: GL.h,v 1.16 2002-09-08 16:15:01 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -89,6 +89,7 @@ public:
   float getLightLevel() { return _light_level; }
 
   void translateObject(float x, float y, float z);
+  void rotate(float angle, float x, float y, float z);
   void rotateObject(WorldEntity *we, int type);
   void scaleObject(float scale);
   void setViewMode(int type);

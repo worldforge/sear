@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.12 2002-09-07 23:27:06 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.13 2002-09-08 16:15:01 simon Exp $
 
 #include "src/System.h"
 
@@ -45,7 +45,11 @@ Model *BoundBox_Loader::loadModel(Render *render, ModelStruct &ms) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(bboxCheck(bbox), type, ms.wrap_texture);
+  if (!model->init(bboxCheck(bbox), type, ms.wrap_texture)) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   model->setInUse(true);
   return model;
 }

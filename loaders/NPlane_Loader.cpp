@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.9 2002-09-07 23:27:06 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.10 2002-09-08 16:15:01 simon Exp $
 
 #include "src/System.h"
 #include <string>
@@ -36,7 +36,11 @@ Model *NPlane_Loader::loadModel(Render *render, ModelStruct &ms) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, ms.num_planes, ms.width, ms.height);
+  if (!model->init(type, ms.num_planes, ms.width, ms.height)) {
+    model->shutdown();
+    delete model;
+    return NULL;
+  }
   return model;
 }
 
