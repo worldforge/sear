@@ -42,7 +42,7 @@ void WorldEntity::handleMove() {
 }
 
 void WorldEntity::handleTalk(const std::string &msg) {
-  Log::writeLog(_id + std::string(": ") + msg, Log::DEFAULT);	
+  Log::writeLog(_id + std::string(": ") + msg, Log::LOG_DEFAULT);	
   System::instance()->pushMessage(_name + ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
 
   if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
@@ -147,21 +147,21 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
 }
 
 void WorldEntity::displayInfo() {
-  Log::writeLog(std::string("Entity ID: ") + getID(), Log::DEFAULT);
-  Log::writeLog(std::string("Entity Name: ") + getName(), Log::DEFAULT);
-  Log::writeLog(std::string("Type: ") + type(), Log::DEFAULT);
-  Log::writeLog(std::string("Parent Type: ") + parent(), Log::DEFAULT);
+  Log::writeLog(std::string("Entity ID: ") + getID(), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Entity Name: ") + getName(), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Type: ") + type(), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
   WFMath::Point<3> pos = GetPos();
-  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::DEFAULT);
+  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   Eris::Entity *e = getContainer();
-  Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::DEFAULT);
-  Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::DEFAULT);
-  Log::writeLog(std::string("Has Bounding Box: ") + string_fmt(hasBBox()), Log::DEFAULT);
+  Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Has Bounding Box: ") + string_fmt(hasBBox()), Log::LOG_DEFAULT);
   WFMath::AxisBox<3> bbox = getBBox();
-  Log::writeLog(std::string("Ux: ") + string_fmt(bbox.lowCorner().x()) + std::string(" Uy: ") + string_fmt(bbox.lowCorner().y()) + std::string(" Uz: ") + string_fmt(bbox.lowCorner().z()), Log::DEFAULT);
-  Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::DEFAULT);
-  Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::DEFAULT);
-  Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::DEFAULT);
+  Log::writeLog(std::string("Ux: ") + string_fmt(bbox.lowCorner().x()) + std::string(" Uy: ") + string_fmt(bbox.lowCorner().y()) + std::string(" Uz: ") + string_fmt(bbox.lowCorner().z()), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::LOG_DEFAULT);
 }
 
 std::string WorldEntity::type() {

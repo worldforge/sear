@@ -68,7 +68,7 @@ bool System::init() {
   _model_handler = new ModelHandler();
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
-    Log::writeLog("Error initializing Eris", Log::ERROR);
+    Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
     throw Exception("ERIS INIT");
   }
   
@@ -113,7 +113,7 @@ bool System::init() {
   _client->registerCommands(_console);
   
   
-  Log::writeLog("Running startup scripts", Log::INFO);
+  Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + STARTUP_SCRIPT;
   std::string home_location = home_path + "/" + STARTUP_SCRIPT;
   std::string current_location = "./" + STARTUP_SCRIPT;
@@ -141,7 +141,7 @@ bool System::init() {
 }
 
 void System::shutdown() {
-  Log::writeLog("Shutting Down Renderer", Log::INFO);
+  Log::writeLog("Shutting Down Renderer", Log::LOG_INFO);
   
   if (_character) {
     _character->shutdown();
@@ -165,7 +165,7 @@ void System::shutdown() {
   }
 
   writeConfig();
-  Log::writeLog("Running shutdown scripts", Log::INFO);
+  Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + SHUTDOWN_SCRIPT;
   std::string home_location = home_path + "/" + SHUTDOWN_SCRIPT;
   std::string current_location = "./" + SHUTDOWN_SCRIPT;
@@ -205,7 +205,7 @@ void System::shutdown() {
 }
 
 bool System::initVideo() {
-  Log::writeLog("Initialising Video", Log::INFO);
+  Log::writeLog("Initialising Video", Log::LOG_INFO);
 #ifdef DEBUG
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
   if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0 ) {
@@ -213,14 +213,14 @@ bool System::initVideo() {
   // We want release versions to die quietly
   if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
 #endif
-    Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::ERROR);
+    Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
     return false;
   } 
   return true;
 }
 
 void System::createWindow(bool fullscreen) {
-  Log::writeLog("Creating Window", Log::INFO);
+  Log::writeLog("Creating Window", Log::LOG_INFO);
   //Request Open GL window attributes
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
@@ -231,19 +231,21 @@ void System::createWindow(bool fullscreen) {
   const SDL_VideoInfo *info;
   info = SDL_GetVideoInfo();
   if (!info) {
-    Log::writeLog("Error quering video", Log::DEFAULT);
+    Log::writeLog("Error quering video", Log::LOG_DEFAULT);
   }
-  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::DEFAULT);
-  Log::writeLog(std::string("wm_available: ") + string_fmt(info->wm_available), Log::DEFAULT);
-  Log::writeLog(std::string("blit_hw: ") + string_fmt(info->blit_hw), Log::DEFAULT);
-  Log::writeLog(std::string("blit_hw_CC: ") + string_fmt(info->blit_hw_CC), Log::DEFAULT);
-  Log::writeLog(std::string("blit_hw_A: ") + string_fmt(info->blit_hw_A), Log::DEFAULT);
-  Log::writeLog(std::string("blit_sw: ") + string_fmt(info->blit_sw), Log::DEFAULT);
-  Log::writeLog(std::string("blit_sw_CC: ") + string_fmt(info->blit_sw_CC), Log::DEFAULT);
-  Log::writeLog(std::string("blit_sw_A: ") + string_fmt(info->blit_sw_A), Log::DEFAULT);
-  Log::writeLog(std::string("video_mem: ") + string_fmt(info->video_mem), Log::DEFAULT);
-  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::DEFAULT);
+#ifndef __WIN32__
 
+  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("wm_available: ") + string_fmt(info->wm_available), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_hw: ") + string_fmt(info->blit_hw), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_hw_CC: ") + string_fmt(info->blit_hw_CC), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_hw_A: ") + string_fmt(info->blit_hw_A), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_sw: ") + string_fmt(info->blit_sw), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_sw_CC: ") + string_fmt(info->blit_sw_CC), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("blit_sw_A: ") + string_fmt(info->blit_sw_A), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("video_mem: ") + string_fmt(info->video_mem), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
+#endif
   
   //Create Window
   int flags = SDL_OPENGL;
@@ -252,7 +254,7 @@ void System::createWindow(bool fullscreen) {
   if (fullscreen) flags |= SDL_FULLSCREEN;
   screen = SDL_SetVideoMode(_width, _height, 0, flags);
   if (screen == NULL ) {
-    Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::ERROR);
+    Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
     _system_running = false;
     exit(1);
   }
@@ -260,33 +262,33 @@ void System::createWindow(bool fullscreen) {
   // Check OpenGL flags
   int value = 0;
   SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
-  Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
-  Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
-  Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
-  Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
 
   if (value < 1) _general->setAttribute("render_use_stencil", "false");
   
-  Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
   SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
-  Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::DEFAULT);
+  Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
  
   if (!_icon) _icon = IMG_Load(_icon_file.c_str());
   // Should set the icon transparency but it does not work.
   if (_icon) {
     if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGB(_icon->format, 0x0, 0x0, 0x0)) == -1) {
-      Log::writeLog("ERROR icon setting transparency", Log::ERROR);
+      Log::writeLog("ERROR icon setting transparency", Log::LOG_ERROR);
     }
     SDL_WM_SetIcon(_icon, NULL);
   } 
   if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
   if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
   if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
-  Log::writeLog("Creating Renderer", Log::INFO);
+  Log::writeLog("Creating Renderer", Log::LOG_INFO);
   if (renderer) {
 //    renderer->initWindow(_width, _height);
     renderer->shutdown();
@@ -326,19 +328,19 @@ void System::mainLoop() {
       _client->poll();
       renderer->drawScene(command, false);
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     } catch (Eris::InvalidOperation io) {
-      Log::writeLog(io._msg, Log::ERROR);
+      Log::writeLog(io._msg, Log::LOG_ERROR);
       pushMessage(io._msg, CONSOLE_MESSAGE);
     } catch (Eris::BaseException be) {
-      Log::writeLog(be._msg, Log::ERROR);
+      Log::writeLog(be._msg, Log::LOG_ERROR);
       pushMessage(be._msg, CONSOLE_MESSAGE);
     } catch (...) {
-      Log::writeLog("Caught Unknown Exception", Log::ERROR);
+      Log::writeLog("Caught Unknown Exception", Log::LOG_ERROR);
       pushMessage("Caught Unknown Exception", CONSOLE_MESSAGE);
     }
   }
@@ -384,14 +386,14 @@ void System::handleEvents(const SDL_Event &event) {
 	}
 	if (event.key.keysym.sym == SDLK_UP) {
           // Previous command
-//	  Log::writeLog("Previous Command", Log::INFO);
+//	  Log::writeLog("Previous Command", Log::LOG_INFO);
 	  if (_command_history_iterator != _command_history.begin()) {
 	    _command_history_iterator--;
             command = (*_command_history_iterator);
 	  }
 	}
 	else if (event.key.keysym.sym == SDLK_DOWN) {
-//	  Log::writeLog("Next Command", Log::INFO);
+//	  Log::writeLog("Next Command", Log::LOG_INFO);
           // next command
 	  if (_command_history_iterator != _command_history.end()) {
 	    _command_history_iterator++;
@@ -496,13 +498,13 @@ SDL_Surface *System::loadImage(const  std::string &filename) {
   int i/*, j*/;
   image = IMG_Load(filename.c_str());
   if ( image == NULL ) { 
-    Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::ERROR);
+    Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::LOG_ERROR);
     return(NULL);
   }
   /* GL surfaces are upsidedown and RGB, not BGR :-) */
   tmpbuf = (Uint8 *)malloc(image->pitch);
   if ( tmpbuf == NULL ) {  
-    Log::writeLog("Out of memory", Log::ERROR);
+    Log::writeLog("Out of memory", Log::LOG_ERROR);
     return(NULL);
   }
   rowhi = (Uint8 *)image->pixels;
@@ -537,15 +539,15 @@ void System::runScript(const std::string &file_name) {
   FILE *script_file = NULL;
   const int MAX_LINE_SIZE = 256;
   char string_data[MAX_LINE_SIZE];
-  Log::writeLog(std::string("System: Running script - ") + file_name, Log::DEFAULT);
+  Log::writeLog(std::string("System: Running script - ") + file_name, Log::LOG_DEFAULT);
   script_file = fopen(processHome(file_name).c_str(), "r");
   char cur_dir[257];
   memset(cur_dir, '\0', 257);
   getcwd(cur_dir, 256);
-  Log::writeLog(std::string("Current Directory: ") + cur_dir, Log::DEFAULT);
+  Log::writeLog(std::string("Current Directory: ") + cur_dir, Log::LOG_DEFAULT);
   bool pre_cwd = _prefix_cwd; // Store current setting
   if (!script_file) {
-    Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::ERROR);
+    Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::LOG_ERROR);
     return;
   }
 //  try {
@@ -555,7 +557,7 @@ void System::runScript(const std::string &file_name) {
     }
 //  } catch (...) {
     // TODO be more discriminate on errors
-//    Log::writeLog("Caught an Exception while running script. Script aborted", Log::ERROR);
+//    Log::writeLog("Caught an Exception while running script. Script aborted", Log::LOG_ERROR);
 //  }
   chdir(cur_dir);
   _prefix_cwd = pre_cwd; // Restore setting
@@ -597,7 +599,7 @@ void System::setCharacter(Character *character) {
 void System::readConfig() {
   std::string temp;
   if (!_general) {
-    Log::writeLog("System: Error - General config object not created", Log::ERROR);
+    Log::writeLog("System: Error - General config object not created", Log::LOG_ERROR);
     return;
   }
   temp = _general->getAttribute(KEY_dawn_time);
@@ -630,7 +632,7 @@ void System::readConfig() {
 
 void System::writeConfig() {
   if (!_general) {
-    Log::writeLog("System: Error- General config object not created", Log::ERROR);
+    Log::writeLog("System: Error- General config object not created", Log::LOG_ERROR);
     return;
   }
   _general->setAttribute(KEY_dawn_time, string_fmt(_dawn_time));
@@ -728,14 +730,14 @@ void System::runCommand(const std::string &command) {
   try {
     _console->runCommand(command);
   } catch (Exception e) {
-    Log::writeLog(e.getMessage(), Log::ERROR);
+    Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }// catch (...) {
-//    Log::writeLog("Caught Console Command Exception", Log::ERROR);
+//    Log::writeLog("Caught Console Command Exception", Log::LOG_ERROR);
 //  }
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {
-  Log::writeLog(command, Log::DEFAULT);
+  Log::writeLog(command, Log::LOG_DEFAULT);
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(args);
   if (command == EXIT || command == QUIT) _system_running = false;
@@ -814,7 +816,7 @@ void System::runCommand(const std::string &command, const std::string &args) {
     WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
     if (we) we->displayInfo();  
   }
-  else Log::writeLog(std::string("Command not found: - ") + command, Log::ERROR);
+  else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }
 
 } /* namespace Sear */

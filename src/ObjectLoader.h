@@ -5,8 +5,8 @@
 #ifndef _OBJECTLOADER_H_
 #define _OBJECTLOADER_H_ 1
 
-#include <string>
 #include <stdio.h>
+#include <string>
 #include <map>
 
 #define OBJECT_LOADER_MAX_SIZE (128)

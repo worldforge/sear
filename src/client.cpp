@@ -2,7 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "client.h"
 
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
@@ -17,6 +16,8 @@
 #include <sigc++/bind.h>
 
 #include "WorldEntity.h"
+#include "client.h"
+
 #include "Console.h"
 #include "Factory.h"
 #include "Character.h"
@@ -63,7 +64,7 @@ Client::Client(System *system, const std::string &client_name) :
 bool Client::init() {
   _connection = new Eris::Connection(_client_name, DEBUG_ERIS);
   if (!_connection) {
-    Log::writeLog("Client - Connection is NULL", Log::ERROR);
+    Log::writeLog("Client - Connection is NULL", Log::LOG_ERROR);
     throw ClientException("Connection is NULL", ClientException::BAD_CONNECTION);
   }
   _connection->Failure.connect(SigC::slot(this, &Client::NetFailure));
@@ -80,42 +81,41 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
-  Log::writeLog("Client::shutdown", Log::METHOD_ENTRY);
   if (_player) delete _player;
   if (_connection) delete _connection;
   // TODO clean up factory
 }
 
 void Client::Log(Eris::LogLevel lvl, const std::string &msg) {
-  Log::writeLog(msg, Log::ERIS);
+  Log::writeLog(msg, Log::LOG_ERIS);
 }
 
 int Client::connect(const std::string &host, int port) {
-  Log::writeLog(std::string("Connecting to ") + host + std::string(" on port ") + string_fmt(port) , Log::DEFAULT);
+  Log::writeLog(std::string("Connecting to ") + host + std::string(" on port ") + string_fmt(port) , Log::LOG_DEFAULT);
   if (!_connection) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (_connection->isConnected()) throw ClientException("Already Connected", ClientException::ALREADY_CONNECTED);
   if (host.empty()) throw ClientException("No hostname given", ClientException::NO_HOSTNAME);
-  Log::writeLog("Calling Connect", Log::INFO);
+  Log::writeLog("Calling Connect", Log::LOG_INFO);
   _system->pushMessage(CLIENT_CONNECTING, CONSOLE_MESSAGE);
   try {
     _connection->connect(host, port);
   } catch (Eris::InvalidOperation io) {
     if (io._msg == "existing connection instance in Connection ctor") {
-      Log::writeLog("Client::connect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::connect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Error connecting", ClientException::ALREADY_CONNECTED);
     } else {
-      Log::writeLog("Client::connect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::connect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Error connecting", ClientException::ERROR_CONNECTING);
     }
   } catch (...) {
-    Log::writeLog("Client::connect: Caught Unknown Exception", Log::INFO);
+    Log::writeLog("Client::connect: Caught Unknown Exception", Log::LOG_INFO);
     throw ClientException("Error connecting", ClientException::ERROR_CONNECTING);
   }
   return 0;
 }
 
 int Client::reconnect() {
-  Log::writeLog("Client::reconnect", Log::INFO);
+  Log::writeLog("Client::reconnect", Log::LOG_INFO);
   _system->pushMessage(CLIENT_RECONNECTING, CONSOLE_MESSAGE);
   if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
@@ -123,48 +123,47 @@ int Client::reconnect() {
     _connection->reconnect();
   } catch (Eris::InvalidOperation io) {
     if (io._msg == "existing connection instance in Connection ctor") {
-      Log::writeLog("Client::reconnect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::reconnect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Error reconnecting", ClientException::ALREADY_CONNECTED);
     } else {
-      Log::writeLog("Client::reconnect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::reconnect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Error reconnecting", ClientException::ERROR_CONNECTING);
     }
   } catch (...) {
-    Log::writeLog("Client::reconnect: Caught Unknown Exception", Log::INFO);
+    Log::writeLog("Client::reconnect: Caught Unknown Exception", Log::LOG_INFO);
     throw ClientException("Error reconnecting", ClientException::ERROR_CONNECTING);
   }
   return 0;
 }
 
 int Client::disconnect() {
-  Log::writeLog("Client::disconnect", Log::INFO);
+  Log::writeLog("Client::disconnect", Log::LOG_INFO);
   _system->pushMessage(CLIENT_DISCONNECTING, CONSOLE_MESSAGE);
   if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
   //Are we logged in?
   if (_player != NULL) {
-    Log::writeLog("Client::disconnect: Logging out first...", Log::INFO);
+    Log::writeLog("Client::disconnect: Logging out first...", Log::LOG_INFO);
     logout();
   }
   try {
     _connection->disconnect();
   } catch (Eris::InvalidOperation io) {
     if (io._msg == "Bad connection state for disconnection") {
-      Log::writeLog("Client::disconnect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::disconnect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Bad disconnection state", ClientException::BAD_STATE);
     } else {
-      Log::writeLog("Client::disconnect: Caught InvalidOperation: " + io._msg, Log::INFO);
+      Log::writeLog("Client::disconnect: Caught InvalidOperation: " + io._msg, Log::LOG_INFO);
       throw ClientException("Error disconnecting", ClientException::ERROR_DISCONNECTING);
     }
   } catch (...) {
-    Log::writeLog("Client::disconnect: Caught Unknown Exception", Log::INFO);
+    Log::writeLog("Client::disconnect: Caught Unknown Exception", Log::LOG_INFO);
     throw ClientException("Error disconnecting", ClientException::ERROR_DISCONNECTING);
   }
   return 0;
 }
 
 int Client::createAccount(const std::string &username, const std::string &fullname, const std::string &password) {
-  Log::writeLog("Client::createAccount", Log::METHOD_ENTRY);
   if (_status != CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::BAD_CONNECTION);
   if (_connection == NULL) throw ClientException("No connection object!", ClientException::BAD_CONNECTION);
   if (!_connection->isConnected()) throw ClientException("Not Connected!", ClientException::BAD_CONNECTION);
@@ -173,7 +172,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   if (password.empty()) throw ClientException("No Password!", ClientException::BAD_PASSWORD);
 
   //Have we already tried logging in?
-  Log::writeLog("Client::createAccount: Creating player", Log::INFO);
+  Log::writeLog("Client::createAccount: Creating player", Log::LOG_INFO);
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
     _player->LoginFailure.connect(SigC::slot(this, &Client::LoginFailure));
@@ -187,22 +186,22 @@ int Client::createAccount(const std::string &username, const std::string &fullna
     _player->createAccount(username, fullname, password);
   } catch (Eris::InvalidOperation e) {
     if (e._msg == "Invalid connection") {
-      Log::writeLog("Error with connection", Log::INFO);
+      Log::writeLog("Error with connection", Log::LOG_INFO);
       throw ClientException("Error with connection", ClientException::BAD_CONNECTION);
     } else if (e._msg.substr(0,19) == "action in progress") {
-      Log::writeLog("Cannot create account, action already in progress", Log::INFO);
+      Log::writeLog("Cannot create account, action already in progress", Log::LOG_INFO);
       throw ClientException("Error with connection", ClientException::BAD_CONNECTION);
     }
     //Reset variables used here
-    Log::writeLog("Client::createAccount: Exception caught", Log::INFO);
-    Log::writeLog("Invalid Operation: " + e._msg, Log::ERROR);
+    Log::writeLog("Client::createAccount: Exception caught", Log::LOG_INFO);
+    Log::writeLog("Invalid Operation: " + e._msg, Log::LOG_ERROR);
     throw Exception("Error creating account");
   }
   return 0;
 }
 
 int Client::login(const std::string &username, const std::string &password) {
-  Log::writeLog("Client::login", Log::INFO);
+  Log::writeLog("Client::login", Log::LOG_INFO);
   if (_status != CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
   if (_connection == NULL) throw ClientException("No Connection Object", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw Exception("Not Connected");
@@ -210,7 +209,7 @@ int Client::login(const std::string &username, const std::string &password) {
   if (password.empty()) throw Exception("No Password");
 //  std::string msg = std::string(CLIENT_LOGGING_IN) + std::string(": ") + username; 
 //  _system->pushMessage(msg);
-  Log::writeLog("Client::login: Creating player", Log::INFO);
+  Log::writeLog("Client::login: Creating player", Log::LOG_INFO);
   
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
@@ -223,12 +222,12 @@ int Client::login(const std::string &username, const std::string &password) {
   try {
     _player->login(username, password);
   } catch (Eris::InvalidOperation e) {
-    Log::writeLog("Client::login: Caught Exception - Login Failed", Log::INFO);
-    Log::writeLog("Invalid Operation: " + e._msg, Log::ERROR);
+    Log::writeLog("Client::login: Caught Exception - Login Failed", Log::LOG_INFO);
+    Log::writeLog("Invalid Operation: " + e._msg, Log::LOG_ERROR);
     throw Exception("ERIS Bad Login");
   } catch(...) {
-    Log::writeLog("Client::login: Caught Exception", Log::INFO);
-    Log::writeLog("Other Error", Log::ERROR);
+    Log::writeLog("Client::login: Caught Exception", Log::LOG_INFO);
+    Log::writeLog("Other Error", Log::LOG_ERROR);
     throw Exception("Bad Login");
   }
   return 0;
@@ -244,7 +243,7 @@ void Client::poll() {
 }
 
 void Client::NetFailure(const std::string &msg)  {
-  Log::writeLog("Client::NetFailure", Log::INFO);
+  Log::writeLog("Client::NetFailure", Log::LOG_INFO);
   _system->pushMessage("Network Failure: " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   _status = CLIENT_STATUS_DISCONNECTED;
   _system->setState(SYS_CONNECTED, false);
@@ -253,7 +252,7 @@ void Client::NetFailure(const std::string &msg)  {
 }
 
 void Client::NetConnected() {
-  Log::writeLog("Client:NetConnected", Log::INFO);
+  Log::writeLog("Client:NetConnected", Log::LOG_INFO);
   _system->pushMessage(CLIENT_CONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   _status = CLIENT_STATUS_CONNECTED;
   try {
@@ -261,33 +260,33 @@ void Client::NetConnected() {
     _lobby->LoggedIn.connect(SigC::slot(this, &Client::LoggedIn));
     _lobby->SightPerson.connect(SigC::slot(this, &Client::SightPerson));
   } catch (Eris::InvalidOperation io) {
-    Log::writeLog("Invalid Operation: "  + io._msg, Log::ERROR);
+    Log::writeLog("Invalid Operation: "  + io._msg, Log::LOG_ERROR);
   }
   _system->setState(SYS_CONNECTED, true);
 }
 
 void Client::NetDisconnected() {
-  Log::writeLog("Client::NetDisconnected", Log::INFO);
+  Log::writeLog("Client::NetDisconnected", Log::LOG_INFO);
   _system->pushMessage(CLIENT_DISCONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   _status = CLIENT_STATUS_DISCONNECTED;
   _system->setState(SYS_CONNECTED, false);
 }
 
 bool Client::NetDisconnecting() {
-  Log::writeLog("Client::Disconnecting", Log::INFO);
+  Log::writeLog("Client::Disconnecting", Log::LOG_INFO);
   _system->pushMessage(CLIENT_DISCONNECTING,1);;
   return false;
 }
 
 void Client::LoggedIn(const Atlas::Objects::Entity::Player &p) {
-  Log::writeLog("Client::LoggedIn", Log::INFO);
+  Log::writeLog("Client::LoggedIn", Log::LOG_INFO);
   _system->pushMessage(CLIENT_LOGGED_IN, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   _status = CLIENT_STATUS_LOGGED_IN;
 //  _system->setState(SYS_LOGGED_IN, true);
 }
 
 void Client::LoginSuccess() {
-  Log::writeLog("Client::LoginSuccess", Log::INFO);
+  Log::writeLog("Client::LoginSuccess", Log::LOG_INFO);
   _system->pushMessage("Login Success", CONSOLE_MESSAGE | SCREEN_MESSAGE);
   _status = CLIENT_STATUS_LOGGED_IN;
 //  _system->setState(SYS_LOGGED_IN, true);
@@ -302,7 +301,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   if (description.empty()) throw Exception ("no description given");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_lobby == NULL) throw Exception ("Lobby is NULL");
-  Log::writeLog("Client: Creating character - Name: " + name + " Type: " + type + " Sex: " + sex + " Description: " + description, Log::DEFAULT);
+  Log::writeLog("Client: Creating character - Name: " + name + " Type: " + type + " Sex: " + sex + " Description: " + description, Log::LOG_DEFAULT);
   _system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
   Atlas::Objects::Entity::GameEntity ch = Atlas::Objects::Entity::GameEntity::Instantiate();
   Atlas::Message::Object::ListType prs(1, Atlas::Message::Object(type));
@@ -314,15 +313,15 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   try {
     world = _player->createCharacter(ch);
   } catch (Eris::InvalidOperation ie) {
-    Log::writeLog("Client::createCharacter: Creation failed", Log::INFO);
+    Log::writeLog("Client::createCharacter: Creation failed", Log::LOG_INFO);
     _system->pushMessage("Character Creation Failed: " +  ie._msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
    throw Exception ("ERIS Bad creation");
   } catch (...){
-    Log::writeLog("Client::createCharacter: Caught Exception", Log::INFO);
+    Log::writeLog("Client::createCharacter: Caught Exception", Log::LOG_INFO);
     _system->pushMessage("Unknown Create Character Error", CONSOLE_MESSAGE | SCREEN_MESSAGE);
     throw Exception("Bad creation");
   }
-  Log::writeLog("Client::createCharacter: Setting up callbacks", Log::INFO);
+  Log::writeLog("Client::createCharacter: Setting up callbacks", Log::LOG_INFO);
   world->Entered.connect(SigC::slot(this, &Client::Entered));
   world->EntityCreate.connect(SigC::slot(this, &Client::EntityCreate));
   world->EntityDelete.connect(SigC::slot(this, &Client::EntityDelete));
@@ -333,7 +332,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
 }
 
 int Client::takeCharacter(const std::string &id) {
-  Log::writeLog("Client::takeCharacter", Log::INFO);
+  Log::writeLog("Client::takeCharacter", Log::LOG_INFO);
   if (_status != CLIENT_STATUS_LOGGED_IN) throw Exception("not logged in");
   if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("not connected");
@@ -341,22 +340,22 @@ int Client::takeCharacter(const std::string &id) {
   if (_lobby == NULL) throw Exception("lobby is NULL");
   if (id.empty()) throw Exception("No ID");
 
-  Log::writeLog("Client::takeCharacter: Taking character - " + id, Log::INFO);
+  Log::writeLog("Client::takeCharacter: Taking character - " + id, Log::LOG_INFO);
   _system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
   
   Eris::World *world = NULL;
   try {
     world = _player->takeCharacter(id);
   } catch (Eris::InvalidOperation ie) {
-    Log::writeLog("Client::takeCharacter: Error", Log::INFO);
+    Log::writeLog("Client::takeCharacter: Error", Log::LOG_INFO);
     _system->pushMessage("Error Taking Character: " + ie._msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
     throw Exception("ERIS Bad take");
   } catch (...) {
-    Log::writeLog("Client::takeCharacter: Unspecified Error", Log::INFO);
+    Log::writeLog("Client::takeCharacter: Unspecified Error", Log::LOG_INFO);
     _system->pushMessage("Unknown Take Character Error", CONSOLE_MESSAGE | SCREEN_MESSAGE);
     throw Exception ("Bad take");
   }
-  Log::writeLog("Client::takeCharacter: Setting up callbacks", Log::INFO);
+  Log::writeLog("Client::takeCharacter: Setting up callbacks", Log::LOG_INFO);
   world->Entered.connect(SigC::slot(this, &Client::Entered));  
   world->EntityCreate.connect(SigC::slot(this, &Client::EntityCreate));
   world->EntityDelete.connect(SigC::slot(this, &Client::EntityDelete));
@@ -368,7 +367,7 @@ int Client::takeCharacter(const std::string &id) {
 
 
 void Client::SightPerson(Eris::Person *person) {
-  Log::writeLog("Client::SightPerson: " + person->getName(), Log::INFO);
+  Log::writeLog("Client::SightPerson: " + person->getName(), Log::LOG_INFO);
   _system->pushMessage(std::string(CLIENT_SIGHTED_PERSON) + " " + person->getName(), CONSOLE_MESSAGE);
 //  Log::writeLog(person->getName());
 //  Log::writeLog(person->getAccount());
@@ -377,13 +376,13 @@ void Client::SightPerson(Eris::Person *person) {
 }
 
 int Client::logout() {
-  Log::writeLog("Client::logout", Log::INFO);
+  Log::writeLog("Client::logout", Log::LOG_INFO);
   if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("Not Connected");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_status == CLIENT_STATUS_LOGGED_IN) {
     _system->pushMessage(CLIENT_LOGGING_OUT,CONSOLE_MESSAGE);
-    Log::writeLog("Client::logout: Logging Out", Log::INFO);
+    Log::writeLog("Client::logout: Logging Out", Log::LOG_INFO);
     _player->logout();
   }
   return 0;
@@ -395,7 +394,7 @@ int Client::getCharacters() {
 }
 
 std::string Client::getStatus() {
-  Log::writeLog("Client::getStatus", Log::INFO);
+  Log::writeLog("Client::getStatus", Log::LOG_INFO);
   if (_connection == NULL) return "NO OBJECT";
   switch(_connection->getStatus()) {
     case 0: return "INVALID_STATUS";
@@ -409,33 +408,33 @@ std::string Client::getStatus() {
 }
 
 int Client::listRooms() {
-  Log::writeLog("Client::listRooms", Log::INFO);
+  Log::writeLog("Client::listRooms", Log::LOG_INFO);
   if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("Not Conncted");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_lobby == NULL) throw Exception("Lobby is NULL");
   _system->pushMessage("Room Listings:", CONSOLE_MESSAGE);
-  Log::writeLog("Client::listRooms: Start of list", Log::INFO);
+  Log::writeLog("Client::listRooms: Start of list", Log::LOG_INFO);
   Eris::StringList i = _lobby->getRooms();
   for (Eris::StringList::iterator I=i.begin(); I != i.end(); I++) {
     _system->pushMessage(I->c_str(), CONSOLE_MESSAGE);
   }
-  Log::writeLog("End of List", Log::INFO);
+  Log::writeLog("End of List", Log::LOG_INFO);
   return 0;
 }
 
 void Client::EntityCreate(Eris::Entity* e) {
-  Log::writeLog("Entity Created: " + e->getName(), Log::INFO);
+  Log::writeLog("Entity Created: " + e->getName(), Log::LOG_INFO);
   // TODO - Is this needed?
   ((WorldEntity *)e)->handleMove();
 }
 
 void Client::EntityDelete(Eris::Entity* e){
-  Log::writeLog("Entity Deleted: " + e->getName(), Log::INFO);
+  Log::writeLog("Entity Deleted: " + e->getName(), Log::LOG_INFO);
 }
 
 void Client::Entered(Eris::Entity* e){
-  Log::writeLog("Entered World", Log::INFO);
+  Log::writeLog("Entered World", Log::LOG_INFO);
   _system->setCharacter(new Character((WorldEntity*)Eris::World::Instance()->getFocusedEntity(), _system));
   _status = CLIENT_STATUS_IN_WORLD;
   _system->setState(SYS_IN_WORLD, true);
@@ -444,7 +443,7 @@ void Client::Entered(Eris::Entity* e){
 }
 
 void Client::Appearance(Eris::Entity *e){
-  Log::writeLog(std::string("Appearance: ") + e->getName(), Log::INFO);
+  Log::writeLog(std::string("Appearance: ") + e->getName(), Log::LOG_INFO);
   ((WorldEntity *)e)->handleMove();
   static ModelHandler *mh =  _system->getModelHandler();
   mh->getModel((WorldEntity*)e)->setInUse(true);
@@ -453,7 +452,7 @@ void Client::Appearance(Eris::Entity *e){
 }
 
 void Client::Disappearance(Eris::Entity *e){
-  Log::writeLog("Disappearance: " + e->getName(), Log::INFO);
+  Log::writeLog("Disappearance: " + e->getName(), Log::LOG_INFO);
   static ModelHandler *mh =  _system->getModelHandler();
   mh->getModel((WorldEntity*)e)->setInUse(false);
   // Delete model after 1 minute
@@ -461,16 +460,16 @@ void Client::Disappearance(Eris::Entity *e){
 }
 
 void Client::RootEntityChanged(Eris::Entity *e) {
-  Log::writeLog("RootEntityChanged: " +  e->getID(), Log::INFO);
+  Log::writeLog("RootEntityChanged: " +  e->getID(), Log::LOG_INFO);
 }
 
 void Client::Timeout(Eris::Connection::Status s) {
   _system->pushMessage("Error: Timeout", 3);
-  Log::writeLog(CLIENT_TIMEOUT, Log::INFO);
+  Log::writeLog(CLIENT_TIMEOUT, Log::LOG_INFO);
 }
 
 void Client::StatusChanged(Eris::Connection::Status s) {
-  Log::writeLog(CLIENT_STATUS_CHANGED, Log::INFO);
+  Log::writeLog(CLIENT_STATUS_CHANGED, Log::LOG_INFO);
 }
 
 void Client::LoginFailure(Eris::LoginFailureType failure_type, const std::string& msg) {
@@ -484,17 +483,16 @@ void Client::LoginFailure(Eris::LoginFailureType failure_type, const std::string
     case 5:  mesg = "Duplicate Connect - Account already active"; break;
     default: mesg = "Unknown Eris::LoginFailureType";             break;
   }
-  Log::writeLog("Login Failure" + mesg, Log::DEFAULT);
+  Log::writeLog("Login Failure" + mesg, Log::LOG_DEFAULT);
 }
 
 void Client::LogoutComplete(bool clean_logout) {
-  Log::writeLog("Client::LogoutComplete", Log::METHOD_ENTRY);
 //  delete _player;
   if (clean_logout) {
-    Log::writeLog("Clean Logout", Log::DEFAULT);
+    Log::writeLog("Clean Logout", Log::LOG_DEFAULT);
     //Logged out cleanly
   }  else {
-    Log::writeLog("Error during Logout", Log::ERROR);
+    Log::writeLog("Error during Logout", Log::LOG_ERROR);
     // Emitted due to timeout or other error
   }
   _system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
@@ -503,11 +501,11 @@ void Client::LogoutComplete(bool clean_logout) {
 }
 
 void Client::GotCharacterInfo(const Atlas::Objects::Entity::GameEntity& ge) {
-  Log::writeLog("Got Char - Name: " + ge.GetName() + " ID: " + ge.GetId(), Log::INFO);
+  Log::writeLog("Got Char - Name: " + ge.GetName() + " ID: " + ge.GetId(), Log::LOG_INFO);
 }
 
 void Client::GotAllCharacters() {
-  Log::writeLog("Client::getCharacters", Log::INFO);
+  Log::writeLog("Client::getCharacters", Log::LOG_INFO);
 //  if (_connection == NULL) throw Exception("Connection is NULL");
 //  if (!_connection->isConnected()) throw Exception("Not Connected");
   if (_player == NULL) throw Exception ("Player is NULL");
@@ -547,10 +545,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
         connect(server, port);
       }
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -558,10 +556,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       reconnect();
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -569,10 +567,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       disconnect();
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -583,10 +581,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       createAccount(user_name, full_name, password);
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -596,10 +594,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       login(user_name, password);
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -607,10 +605,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       logout();
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -618,10 +616,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       getCharacters();
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -633,10 +631,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       createCharacter(name, type, sex, desc);
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
@@ -644,10 +642,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
     try {
       takeCharacter(args);
     } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::ERROR);
+      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::ERROR);
+      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }

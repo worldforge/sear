@@ -27,9 +27,11 @@ dnl Need libtool
 AM_PROG_LIBTOOL
 dnl AC_PROG_LIBTOOL
 
-dnl FLAGS='-Wall -ansi -I/usr/X11R6/include -I/usr/include'
-CXXFLAGS='-Wall -I/usr/include -I/usr/X11R6/include -I/usr/include'
-LIBS='-L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib'
+if test $cross_compiling == no; then
+  dnl FLAGS='-Wall -ansi -I/usr/X11R6/include -I/usr/include'
+  CXXFLAGS='-Wall -I/usr/include -I/usr/X11R6/include -I/usr/include'
+  LIBS='-L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib'
+fi
 
 AC_HEADER_STDC
 
@@ -102,7 +104,7 @@ LIB3DS_VERSION=1.2.0
 AM_PATH_LIB3DS($LIB3DS_VERSION, [
   CFLAGS="$CFLAGS $LIB3DS_CFLAGS"
   CPPFLAGS="$CPPFLAGS $LIB3DS_CFLAGS"
-  CXXFLAGS="$CXXFLAGS $LIB3DS_CFLAGS -DHAVE_LIB3DS"
+  CXXFLAGS="$CXXFLAGS $LIB3DS_CFLAGS"
   LIBS="$LIBS $LIB3DS_LIBS"
 ],
 [

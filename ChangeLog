@@ -1,3 +1,6 @@
+22nd July 2002, Simon Goodall
+ * Some fixes for cross-compiling
+
 22nd July 2002, Al Riddoch
  * src/Utility.cpp: ISO C++ fixes.
 

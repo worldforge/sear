@@ -37,7 +37,7 @@ bool Camera::init() {
 }
 
 void Camera::shutdown() {
-  Log::writeLog("Shutting down camera.", Log::DEFAULT);
+  Log::writeLog("Shutting down camera.", Log::LOG_DEFAULT);
 }
 
 void Camera::updateCameraPos(float time_elapsed) {
@@ -59,7 +59,7 @@ void Camera::readConfig() {
   std::string temp;
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("Camera: Error - General config object not created!", Log::ERROR);
+    Log::writeLog("Camera: Error - General config object not created!", Log::LOG_ERROR);
     return;
   }
   
@@ -86,7 +86,7 @@ void Camera::readConfig() {
 void Camera::writeConfig() {
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("Camera: Error - General config object not created!", Log::ERROR);
+    Log::writeLog("Camera: Error - General config object not created!", Log::LOG_ERROR);
     return;
   }
 

@@ -126,7 +126,7 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
   file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
   if(!file)
   {
-    Log::writeLog(std::string("Texture file '") + strFilename + std::string("' not found."), Log::ERROR);
+    Log::writeLog(std::string("Texture file '") + strFilename + std::string("' not found."), Log::LOG_ERROR);
     return 0;
   }
 
@@ -140,7 +140,7 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
   pBuffer = new unsigned char[2 * width * height * depth];
   if(pBuffer == 0)
   {
-    Log::writeLog(std::string("Memory allocation for texture '") + strFilename + std::string("' failed."), Log::ERROR);
+    Log::writeLog(std::string("Memory allocation for texture '") + strFilename + std::string("' failed."), Log::LOG_ERROR);
     return 0;
   }
 
@@ -171,7 +171,7 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
   delete [] pBuffer;
   } else {
     //SDL IMAGE LOAD - NEEDS TESTING
-	Log::writeLog("Experimental Texture Loader being used", Log::INFO);
+	Log::writeLog("Experimental Texture Loader being used", Log::LOG_INFO);
     SDL_Surface * image = System::loadImage(strFilename);
     width = image->w;
     height = image->h;
@@ -203,7 +203,7 @@ bool Cal3d::init(const std::string& strFilename)
   file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
   if(!file)
   {
-    Log::writeLog(std::string("Failed to open model configuration file '") + strFilename + std::string("'."), Log::ERROR);
+    Log::writeLog(std::string("Failed to open model configuration file '") + strFilename + std::string("'."), Log::LOG_ERROR);
     return false;
   }
 
@@ -235,7 +235,7 @@ bool Cal3d::init(const std::string& strFilename)
     // check if an error happend while reading from the file
     if(!file)
     {
-      Log::writeLog(std::string("Error while reading from the model configuration file '") + strFilename + std::string("'."), Log::ERROR);
+      Log::writeLog(std::string("Error while reading from the model configuration file '") + strFilename + std::string("'."), Log::LOG_ERROR);
       return false;
     }
 
@@ -264,7 +264,7 @@ bool Cal3d::init(const std::string& strFilename)
     pos = strBuffer.find_first_not_of(" \t", pos);
     if((pos == std::string::npos) || (strBuffer[pos] != '='))
     {
-      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::ERROR);
+      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::LOG_ERROR);
       return false;
     }
 
@@ -331,7 +331,7 @@ bool Cal3d::init(const std::string& strFilename)
     }
     else
     {
-      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::ERROR);
+      Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::LOG_ERROR);
       return false;
     }
   }

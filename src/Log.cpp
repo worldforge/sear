@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall
 
 #include "Log.h"
-#include "iostream.h"
+#include <iostream.h>
 
 /* LOG AIMS
  * Will provide  ability to log each type to a different file
@@ -16,14 +16,14 @@ namespace Sear {
 void Log::writeLog(const std::string &msg, LogLevel level) {
   std::string type;
   switch (level) {
-    case DEFAULT: type = "Default"; break;
-    case ERROR: type = "Error"; break;
-    case WARNING: type = "Warning"; break;
-    case METHOD_ENTRY: type = "Method Entry"; break;
-    case METHOD_EXIT: type = "Method Exit"; break;
-    case POSITION: type = "Position"; break;
-    case ERIS: type = "Eris"; break;		
-    case INFO: type = "Info"; break;
+    case LOG_DEFAULT: type = "Default"; break;
+    case LOG_ERROR: type = "Error"; break;
+    case LOG_WARNING: type = "Warning"; break;
+    case LOG_METHOD_ENTRY: type = "Method Entry"; break;
+    case LOG_METHOD_EXIT: type = "Method Exit"; break;
+    case LOG_POSITION: type = "Position"; break;
+    case LOG_ERIS: type = "Eris"; break;		
+    case LOG_INFO: type = "Info"; break;
   }
   std::cout << "TIMESTAMP - " << type << ": " << msg << std::endl << std::flush;
 }

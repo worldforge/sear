@@ -182,19 +182,19 @@ void Bindings::loadBindings(const std::string &file_name) {
 void Bindings::saveBindings() {
   // Save current key bindings to last used file name
   if (_bindings) _bindings->saveConfig();
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 void Bindings::saveBindings(const std::string &file_name) {
   // Save current key bindings to file_name
   if (_bindings) _bindings->saveConfig(file_name);
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
 void Bindings::bind(std::string key, std::string command) {
   if (key.empty()) return; // Check we were sent a key
 //  if (command.empty()) command = "{UNBOUND}"; // If command is empty we are unbinding the key. Need some text to avoid empty string
   if (_bindings) _bindings->setAttribute(key, command); // Store new binding
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
+  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
 }
 
 std::string Bindings::idToString(int key) {
@@ -205,7 +205,7 @@ std::string Bindings::idToString(int key) {
 std::string Bindings::getBinding(const std::string &key) {
   // Check if bindings object has been created
   if (!_bindings) {
-    Log::writeLog("Bindings: Error - bindings config object not created", Log::ERROR);
+    Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
     return "";
   }
   if (key.empty()) return "";

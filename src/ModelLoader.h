@@ -14,8 +14,9 @@
 
 #include <string>
 
-//class ObjectProperties;
-#include "ObjectLoader.h"
+class ObjectProperties;
+//#include "ObjectLoader.h"
+
 namespace Sear {
 
 // Forward Declarationa

@@ -89,7 +89,7 @@ void GL::buildColourSet() {
     ic += indx & (blueMask << blueShift);
     colourSet.insert(ic);
   }
-  Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::DEFAULT);
+  Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_DEFAULT);
 }
 
 std::map<unsigned int, std::string> colour_mapped;
@@ -109,7 +109,7 @@ int nextColour(const std::string &id) {
   unsigned int ic;
   
   if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
-  else Log::writeLog("Out of colours, please increase number available", Log::ERROR);
+  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
   colour_mapped[ic] = id;
   
   GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
@@ -201,12 +201,12 @@ GL::~GL() {
 }
 
 void GL::initWindow(int width, int height) {
-  Log::writeLog("Render: Initilising Renderer", Log::DEFAULT);
+  Log::writeLog("Render: Initilising Renderer", Log::LOG_DEFAULT);
   // TODO: put this into an info method 
-  Log::writeLog(std::string("GL_VENDER: ") + string_fmt(glGetString(GL_VENDOR)), Log::DEFAULT);
-  Log::writeLog(std::string("GL_RENDERER: ") + string_fmt(glGetString(GL_RENDERER)), Log::DEFAULT);
-  Log::writeLog(std::string("GL_VERSION: ") + string_fmt(glGetString(GL_VERSION)), Log::DEFAULT);
-  Log::writeLog(std::string("GL_EXTENSIONS: ") + string_fmt(glGetString(GL_EXTENSIONS)), Log::DEFAULT);
+  Log::writeLog(std::string("GL_VENDER: ") + string_fmt(glGetString(GL_VENDOR)), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_RENDERER: ") + string_fmt(glGetString(GL_RENDERER)), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_VERSION: ") + string_fmt(glGetString(GL_VERSION)), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_EXTENSIONS: ") + string_fmt(glGetString(GL_EXTENSIONS)), Log::LOG_DEFAULT);
   
   glLineWidth(4.0f);
   //TODO: this needs to go into the set viewport method
@@ -233,14 +233,14 @@ void GL::init() {
   splash_id = requestTexture(splash_texture);
   initFont();
   // TODO: initialisation need to go into system
-  Log::writeLog("Initialising Terrain", Log::DEFAULT);
+  Log::writeLog("Initialising Terrain", Log::LOG_DEFAULT);
   terrain = new ROAM(_system, this);
   if (!terrain->init()) {
-    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::ERROR);
+    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
   }
   skybox = new SkyBox(_system, this);
   if (!skybox->init()) {
-    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::ERROR);
+    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::LOG_ERROR);
   }
   camera = new Camera();
   camera->init();
@@ -257,7 +257,7 @@ void GL::init() {
 }
 
 void GL::initLighting() {
-  Log::writeLog("Render: initialising lighting", Log::DEFAULT);
+  Log::writeLog("Render: initialising lighting", Log::LOG_DEFAULT);
   float gambient[4] = {0.1f, 0.1f,0.1f, 1.0f};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT,gambient);
 //  glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Should make this specific to billboard and impostors and not globally relevant
@@ -291,7 +291,7 @@ void GL::initFont() {
   int loop;
   float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
-  Log::writeLog("Render: Initilising Fonts", Log::DEFAULT);
+  Log::writeLog("Render: Initilising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
   font_id = requestTexture(font_texture);
   GLuint texture = getTextureID(font_id);
@@ -320,7 +320,7 @@ void GL::initFont() {
 }
 
 void GL::shutdownFont() {
-  Log::writeLog("Render: Shutting down fonts", Log::DEFAULT);
+  Log::writeLog("Render: Shutting down fonts", Log::LOG_DEFAULT);
   glDeleteLists(base,256); // Delete All 256 Display Lists
 }
 
@@ -377,7 +377,7 @@ int GL::requestTexture(const std::string &texture_name, bool clamp) {
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
-    Log::writeLog("Error loading texture", Log::ERROR);
+    Log::writeLog("Error loading texture", Log::LOG_ERROR);
     return -1;
   }
   createTexture(tmp, texture_id, clamp);
@@ -416,7 +416,7 @@ int GL::requestTextureMask(const std::string &texture_name, bool clamp) {
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
-    Log::writeLog("Error loading texture", Log::ERROR);
+    Log::writeLog("Error loading texture", Log::LOG_ERROR);
     return -1;
   }
   createTextureMask(tmp, texture_id, clamp);
@@ -820,7 +820,7 @@ void GL::procEvent(int x, int y) {
   ic += blue;
   selected_id = getSelectedID(ic);
   if (selected_id != activeID) {
-    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::DEFAULT);
+    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
     activeID = selected_id;
   }
   stateChange("font"); // FONT
@@ -839,7 +839,7 @@ void GL::CheckError() {
     case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
     default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
   }
-  if (!msg.empty()) Log::writeLog(msg, Log::ERROR);
+  if (!msg.empty()) Log::writeLog(msg, Log::LOG_ERROR);
   if (!msg.empty()) exit(1);
 }
 
@@ -847,9 +847,9 @@ void GL::CheckError() {
 void GL::readConfig() {
   std::string temp;
   Config *general = _system->getGeneral();
-  Log::writeLog("Loading Renderer Config", Log::DEFAULT);
+  Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
   if (!general) {
-    Log::writeLog("GL: Error - General config object does not exist!", Log::ERROR);
+    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
     return;
   }
 
@@ -932,7 +932,7 @@ void GL::readConfig() {
 void GL::writeConfig() {
   Config *general = _system->getGeneral();
   if (!general) {
-    Log::writeLog("GL: Error - General config object does not exist!", Log::ERROR);
+    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
     return;
   }
   
@@ -1127,7 +1127,7 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   bool lighting = checkState(RENDER_LIGHTING);
  
   if (!vertex_data) {
-	  Log::writeLog("No Vertex Data", Log::ERROR);
+	  Log::writeLog("No Vertex Data", Log::LOG_ERROR);
 	  return; //throw Exception(""); 
   }
   glVertexPointer(3, GL_FLOAT, 0, vertex_data);
@@ -1142,7 +1142,7 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   }
 
   switch (type) {
-    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
+    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
     case (Models::POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
     case (Models::LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
     case (Models::TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
@@ -1150,7 +1150,7 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
     case (Models::TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
     case (Models::TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
     case (Models::QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
-    default: Log::writeLog("Unknown type", Log::ERROR); break;
+    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
   glDisableClientState(GL_VERTEX_ARRAY);
@@ -1176,7 +1176,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   }
 
   switch (type) {
-    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::ERROR); break;
+    case (Models::INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
     case (Models::POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     case (Models::LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     case (Models::TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
@@ -1184,7 +1184,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     case (Models::TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     case (Models::TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     case (Models::QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    default: Log::writeLog("Unknown type", Log::ERROR); break;
+    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
   glDisableClientState(GL_VERTEX_ARRAY);
@@ -1221,7 +1221,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
       // Get model
       Models *model = mh->getModel(we);
       if (!model) {  // ERROR GETTING MODEL
-	Log::writeLog("Trying to render NULL model", Log::ERROR);
+	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
       }
       
@@ -1254,7 +1254,36 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
     }
   }
 }
+#if(0)
+void GL_Render::drawMessageQueue(bool select_mode) {
+         if (select_mode) return;
+   std::string type, parent;
+  for (std::map<std::string, Queue>::const_iterator I = model_queue.begin(); I != model_queue.end(); I++) {
+           WorldEntity *we = (WorldEntity *)*(I->second.begin());
+     type = we->getType()->getName();
+    parent = *we->getType()->getParentsAsSet().begin();
+    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
+	      glColor3f(1.0f, 1.0f, 1.0f);
+	        WorldEntity *we = (WorldEntity*)*J;
+	          glPushMatrix();
+	        WFMath::Point<3> pos = we->getAbsPos();
+            glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
 
+      float rotation_matrix[4][4];
+      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+      orient2 /= orient; 
+      QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
+
+      glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+      glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+      glScalef(0.025f, 0.025f, 0.025f);
+      glTranslatef(_speech_offset_x, _speech_offset_y, _speech_offset_z);
+      we->renderMessages();
+      glPopMatrix();
+    }
+  }
+}
+#endif
  
 float GL::distFromNear(float x, float y, float z) {
   return Frustum::distFromNear(frustum, x, y, z);
@@ -1292,7 +1321,7 @@ void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
 
 void GL::createDefaults() {
   //Create Default Texture
-  Log::writeLog("Building Default Texture", Log::INFO);
+  Log::writeLog("Building Default Texture", Log::LOG_INFO);
   unsigned int texture_id = 0;
   unsigned int width, height;
   glGenTextures(1, &texture_id);
@@ -1315,7 +1344,7 @@ void GL::createDefaults() {
   texture_map["default"] = next_id++;
   
   //Create Default Font
-  Log::writeLog("Building Default Font Texture", Log::INFO);
+  Log::writeLog("Building Default Font Texture", Log::LOG_INFO);
   texture_id = 0;
   glGenTextures(1, &texture_id);
 

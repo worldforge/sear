@@ -5,9 +5,6 @@
  * Add ability to tokenise on quotes, not just spaces
  * Determine why some models are not properly rotated 
   - Might be how they come from the server so need to check this data
- * Create a default built-in texture to use if others do not exist
-  - i.e. like ATITD has
-  - additionally set up ui to use solid colours + build in font
  * Re-implement model type conversion / downgrading
  * Add a stand alone option -> ModelViewer
  * Allow line editing in console

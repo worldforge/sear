@@ -24,7 +24,7 @@ SkyBox::~SkyBox() {
 }
 
 bool SkyBox::init() {
-  Log::writeLog("SkyBox: Initialising.", Log::DEFAULT);
+  Log::writeLog("SkyBox: Initialising.", Log::LOG_DEFAULT);
   texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_NORTH, true);
   texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_SOUTH, true);
   texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture(CONFIG_SKY_DAY_WEST, true);
@@ -41,7 +41,7 @@ bool SkyBox::init() {
 }
 
 void SkyBox::shutdown() {
-  Log::writeLog("SkyBox: Shutting down", Log::DEFAULT);
+  Log::writeLog("SkyBox: Shutting down", Log::LOG_DEFAULT);
 }
 
 void SkyBox::draw() {

@@ -25,7 +25,7 @@ bool ROAM::init() {
     gLand->Init(hMap, hMapWidth);
   }
   else {
-    Log::writeLog("ROAM: Error creating height map array", Log::ERROR);
+    Log::writeLog("ROAM: Error creating height map array", Log::LOG_ERROR);
     return false;
   }
   Landscape::waterlevel = _water_level;
@@ -33,13 +33,13 @@ bool ROAM::init() {
 }
 
 void ROAM::shutdown() {
-  Log::writeLog("Shutting down ROAM", Log::DEFAULT);
+  Log::writeLog("Shutting down ROAM", Log::LOG_DEFAULT);
   writeConfig();
-  Log::writeLog("Deleting ROAM", Log::DEFAULT);
+  Log::writeLog("Deleting ROAM", Log::LOG_DEFAULT);
   if (gLand) {
     delete gLand;
   }
-  Log::writeLog("Freeing HeightMap", Log::DEFAULT);
+  Log::writeLog("Freeing HeightMap", Log::LOG_DEFAULT);
   if (hMap) free(hMap);
 }
 
@@ -62,15 +62,15 @@ void ROAM::loadHeightMap() {
   
   terrain = IMG_Load(hmap.c_str());
   if (terrain == NULL) {
-    Log::writeLog(std::string("Unable to load heightmap: ") + hmap + std::string(": ") + string_fmt (SDL_GetError()), Log::ERROR);
-    Log::writeLog("Using flat terrain instead", Log::ERROR);
+    Log::writeLog(std::string("Unable to load heightmap: ") + hmap + std::string(": ") + string_fmt (SDL_GetError()), Log::LOG_ERROR);
+    Log::writeLog("Using flat terrain instead", Log::LOG_ERROR);
     hMapHeight = DEFAULT_map_height;
     hMapWidth = DEFAULT_map_width;
     hMap = (unsigned char *)malloc(hMapWidth * hMapHeight * sizeof(unsigned char));
     if (hMap) {
       memset(hMap, DEFAULT_height, hMapHeight * hMapWidth * sizeof(unsigned char));
     } else {
-      Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::ERROR);
+      Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::LOG_ERROR);
     }
     return;
   }
@@ -80,7 +80,7 @@ void ROAM::loadHeightMap() {
   hMapHeight = terrain->h;
   hMap = (unsigned char *)malloc(hMapWidth * hMapHeight * sizeof(unsigned char));
   if (!hMap) {
-    Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::ERROR);
+    Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::LOG_ERROR);
     return;
   }
   i = 0;
@@ -107,7 +107,7 @@ void ROAM::readConfig() {
   std::string temp;
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("ROAM: General config object not created!", Log::ERROR);
+    Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
   }
   temp = general->getAttribute(KEY_height);
@@ -121,10 +121,10 @@ void ROAM::readConfig() {
 }
 
 void ROAM::writeConfig() {
-  Log::writeLog("Writing ROAM Config", Log::DEFAULT);
+  Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
   Config *general = System::instance()->getGeneral();
   if (!general) {
-    Log::writeLog("ROAM: General config object not created!", Log::ERROR);
+    Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
   }
   general->setAttribute(KEY_height, string_fmt(_height));

@@ -26,10 +26,12 @@ draw_members = false
 outline = true
 end_of_record
 object_type = pig
-model_type = 3ds
-state = 3ds
+model_type = billboard
+state = billboard
 draw_self = true
 draw_members = false
+width = 3
+height = 3
 end_of_record
 object_type = sty
 model_type = wireframe

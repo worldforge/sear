@@ -12,7 +12,7 @@
 namespace Sear {
 
 void StateLoader::init() {
-  Log::writeLog("State Loader: Initialising.", Log::DEFAULT);
+  Log::writeLog("State Loader: Initialising.", Log::LOG_DEFAULT);
   _state_properties = std::map<std::string, StateProperties*>();
   StateProperties *sp = (StateProperties*)malloc(sizeof(StateProperties));
   memset(sp, 0, sizeof(StateProperties));
@@ -21,7 +21,7 @@ void StateLoader::init() {
 }
 
 void StateLoader::shutdown() {
-  Log::writeLog("State Loader: Shutting Down", Log::DEFAULT);
+  Log::writeLog("State Loader: Shutting Down", Log::LOG_DEFAULT);
   while (!_state_properties.empty()) {
     if (_state_properties.begin()->second) free(_state_properties.begin()->second);
     _state_properties.erase(_state_properties.begin());
@@ -30,10 +30,10 @@ void StateLoader::shutdown() {
 
 void StateLoader::readFiles(const std::string &file_name) {
   FILE *state_file = NULL;
-  Log::writeLog(std::string("State Loader: Loading file - ") + file_name, Log::DEFAULT);
+  Log::writeLog(std::string("State Loader: Loading file - ") + file_name, Log::LOG_DEFAULT);
   state_file = fopen(file_name.c_str(),"r");
   if (state_file == NULL) {
-    Log::writeLog(std::string("State Loader: Error opening state file - ") + file_name, Log::ERROR);
+    Log::writeLog(std::string("State Loader: Error opening state file - ") + file_name, Log::LOG_ERROR);
     return;
   }
   
@@ -125,7 +125,7 @@ StateProperties *StateLoader::readRecord(FILE *state_file) {
       sp->fog = (std::string(string_data) == "true") ? (true) : (false);
     }
     else {
-      Log::writeLog(std::string("State Loader: Unknown Tag - ") + tag, Log::ERROR);
+      Log::writeLog(std::string("State Loader: Unknown Tag - ") + tag, Log::LOG_ERROR);
     }
   }
   free (sp);

@@ -19,10 +19,10 @@ void Config::shutdown() {
 void Config::loadConfig(const std::string &file_name, bool prefix_cwd) {
   FILE *configfile = NULL;
   char *str = NULL;
-  Log::writeLog(std::string("Config: Loading file - ") + file_name, Log::DEFAULT);
+  Log::writeLog(std::string("Config: Loading file - ") + file_name, Log::LOG_DEFAULT);
   configfile = fopen(file_name.c_str(), READ_ACCESS);
   if (configfile == NULL) {
-    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::ERROR);
+    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::LOG_ERROR);
     return;
   }
   _last_file_name = file_name;
@@ -53,10 +53,10 @@ void Config::saveConfig() {
 
 void Config::saveConfig(const std::string &file_name) {
   FILE *configfile = NULL;
-  Log::writeLog(std::string("Config: Saving file - ") + file_name, Log::DEFAULT);
+  Log::writeLog(std::string("Config: Saving file - ") + file_name, Log::LOG_DEFAULT);
   configfile = fopen(file_name.c_str(), WRITE_ACCESS);
   if (configfile == NULL) {
-    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::ERROR);
+    Log::writeLog(std::string("Config: Error opening config file - ") + file_name, Log::LOG_ERROR);
     return;
   }
   for (std::map<std::string, std::string>::const_iterator I = _attributes.begin(); I != _attributes.end(); I++) {

@@ -31,7 +31,6 @@ ModelHandler::ModelHandler()
   new WireFrame_Loader(this);
   new Impostor_Loader(this);
   new ThreeDS_Loader(this);
-
 }
 
 ModelHandler::~ModelHandler() {
@@ -114,7 +113,7 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   Models *model = NULL;
   if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, op, data_source);
   // TODO: throw Exception instead
-  else Log::writeLog("No ModelLoader available", Log::ERROR); 
+  else Log::writeLog("No ModelLoader available", Log::LOG_ERROR); 
   _models[id] = model;
   if (op->model_by_type) {
     model->setFlag("ModelByType", true);
@@ -140,7 +139,7 @@ void ModelHandler::checkModelTimeout(const std::string &id) {
   if (!model) return;
   if (!model->getInUse()) {
     if (model->getFlag("ModelByType")) return;
-    Log::writeLog(std::string("Unloading model for ") + id, Log::INFO);
+    Log::writeLog(std::string("Unloading model for ") + id, Log::LOG_INFO);
     model->shutdown();
     delete model;
     _models[id] = NULL;

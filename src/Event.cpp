@@ -44,7 +44,7 @@ void Event::doEvent() {
     }
     case (EF_PRINT): {
       char* msg = (char*)_target;
-      Log::writeLog(msg, Log::DEFAULT);
+      Log::writeLog(msg, Log::LOG_DEFAULT);
       free(_target);
       break;
     }	  

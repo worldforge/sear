@@ -5,18 +5,20 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_ 1
 
-#include "conf.h"
+#include <list>
+#include <map>
+#include <string>
+
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
 #include <Eris/World.h>
 #include <Eris/Log.h>
-#include <list>
-#include <map>
-#include <string>
 
 #include <Atlas/Message/DecoderBase.h>
 
+#include "conf.h"
+#include "ConsoleObject.h"
 
 //Client Messages
 #define CLIENT_CONNECTING       "Connecting"
@@ -45,7 +47,6 @@
 #define CLIENT_STATUS_LOGGED_IN    (2)
 #define CLIENT_STATUS_IN_WORLD     (3)
 
-#include "ConsoleObject.h"
 
 namespace Sear {
 

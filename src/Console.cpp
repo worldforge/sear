@@ -20,7 +20,7 @@ bool Console::init() {
 }
 
 void Console::shutdown() {
-  Log::writeLog("Shutting down console.", Log::DEFAULT);
+  Log::writeLog("Shutting down console.", Log::LOG_DEFAULT);
 }
 
 //void Console::PushMessage(const char *message, char* extra) {
@@ -58,7 +58,7 @@ void Console::draw(const std::string &command) {
 
 void Console::renderConsoleMessages(const std::string &command) {
   if (!_renderer) {
-    Log::writeLog("Console: Error - Renderer object not created", Log::ERROR);
+    Log::writeLog("Console: Error - Renderer object not created", Log::LOG_ERROR);
     return;
   }
   std::list<std::string>::const_iterator I;
@@ -113,7 +113,7 @@ void Console::toggleConsole() {
 }
 
 void Console::registerCommand(const std::string &command, ConsoleObject *object) {
-  Log::writeLog(std::string("registering: ") + command, Log::INFO);
+  Log::writeLog(std::string("registering: ") + command, Log::LOG_INFO);
   _registered_commands[command] = object;
 }
 
@@ -127,7 +127,7 @@ void Console::runCommand(const std::string &command_string) {
   if (command != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
   if (con_obj) con_obj->runCommand(command, args);
   else {
-    Log::writeLog(std::string("Unknown command: ") + command, Log::ERROR);
+    Log::writeLog(std::string("Unknown command: ") + command, Log::LOG_ERROR);
     pushMessage("Unknown command" , CONSOLE_MESSAGE, 0);
   }
 }
@@ -138,7 +138,7 @@ void Console::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == LIST_CONSOLE_COMMANDS) {
     for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); I++) {
-      Log::writeLog(I->first, Log::INFO);
+      Log::writeLog(I->first, Log::LOG_INFO);
     }
   }
 }

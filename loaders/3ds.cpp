@@ -36,10 +36,10 @@ ThreeDS::~ThreeDS() {
 
 bool ThreeDS::init(const std::string &file_name) {
   // Load 3ds file
-   Log::writeLog(std::string("Loading: ") + file_name, Log::DEFAULT);
+   Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
    model = lib3ds_file_load(file_name.c_str());
   if (!model) {
-    Log::writeLog(std::string("Unable to load ") + file_name, Log::ERROR);
+    Log::writeLog(std::string("Unable to load ") + file_name, Log::LOG_ERROR);
     return false;
   }
   // Calculate initial positions
@@ -53,7 +53,7 @@ bool ThreeDS::init(const std::string &file_name) {
   _models = (ThreeDSMesh**)malloc(_num_models * sizeof(ThreeDSMesh*));
   if (!_models) {
      _num_models = 0;
-     Log::writeLog("3ds: Error allocating memory for model", Log::ERROR);
+     Log::writeLog("3ds: Error allocating memory for model", Log::LOG_ERROR);
      return false;   
   }
   
@@ -71,7 +71,7 @@ bool ThreeDS::init(const std::string &file_name) {
     float *normal_data = (float *)malloc(mesh->faces * 3 * 3 * sizeof(float));
     float *texture_data = (float *)malloc(mesh->faces * 3 * 2 * sizeof(float));
     if (!(vertex_data && normal_data && texture_data)) {
-      Log::writeLog("3ds: Error allocating memory for model mesh data", Log::ERROR);
+      Log::writeLog("3ds: Error allocating memory for model mesh data", Log::LOG_ERROR);
       if (vertex_data) free(vertex_data);
       if (normal_data) free(normal_data);
       if (texture_data) free(texture_data);
@@ -134,7 +134,7 @@ void ThreeDS::render(bool) {
 void draw3dsFile(Lib3dsFile * node)
 {
   if (!node) {
-    Log::writeLog("No model to render", Log::ERROR);
+    Log::writeLog("No model to render", Log::LOG_ERROR);
     return;
   }
   int num_meshes = 0;

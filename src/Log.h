@@ -22,14 +22,14 @@ public:
    * This enumerates the different log entry types
    */
   typedef enum {
-    DEFAULT = 0,
-    ERROR,
-    WARNING,
-    METHOD_ENTRY,
-    METHOD_EXIT,
-    POSITION,
-    ERIS,
-    INFO
+    LOG_DEFAULT = 0,
+    LOG_ERROR,
+    LOG_WARNING,
+    LOG_METHOD_ENTRY,
+    LOG_METHOD_EXIT,
+    LOG_POSITION,
+    LOG_ERIS,
+    LOG_INFO
   } LogLevel;
 
   /*
@@ -39,7 +39,6 @@ public:
   
   // TODO: add ability to redirect each Log type to a different file
   
-protected:
 };
 
 } /* namespace Sear */
