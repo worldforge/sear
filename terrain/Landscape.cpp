@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.19 2003-03-04 18:56:24 simon Exp $
+// $Id: Landscape.cpp,v 1.20 2003-03-06 21:31:02 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -52,9 +52,11 @@ static const std::string WATER = "water";
 
 float Landscape::waterlevel = 0.0f;
 
-  float Landscape::getHeight(unsigned int x, unsigned int y)  {
-    return m_HeightMap[x + y * (ROAM::map_size + 1)];
-  }
+float Landscape::getHeight(unsigned int x, unsigned int y)  {
+  assert(x <= 200 && "X is out of bounds");
+  assert(y <= 200 && "Y is out of bounds");
+  return m_HeightMap[x + y * (ROAM::map_size + 1)];
+}
 // ---------------------------------------------------------------------
 // Allocate a TriTreeNode from the pool.
 //
@@ -175,11 +177,8 @@ void Landscape::Tessellate() {
 //
 void Landscape::render() {
   if (!m_isVisible) return;
-    //cout << gFrameVariance << endl;
-   //TODO: split into render land, render water
   int nCount;
   Patch *patch = &(m_Patches[0][0]);
-  // Scale the terrain by the terrain scale specified at compile time.
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
   _renderer->translateObject(offset_x, offset_y, 0.0f);
 
@@ -188,8 +187,6 @@ void Landscape::render() {
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange(TERRAIN);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-//    _renderer->switchTexture(_renderer->requestMipMap(TERRAIN, texture_name_id));
-//    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id),0);
     _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id, true), _renderer->requestMipMap(TERRAIN, DETAIL, false));
   } else {
     // Do Nothing
@@ -223,15 +220,13 @@ void Landscape::render() {
 
 void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
   if (min_height == DEF_VAL) {
-    for (int x = 0; x < map_size; x++) {
-      for (int y = 0; y < map_size; y++) {
+    for (int x = 0; x < map_size; ++x) {
+      for (int y = 0; y < map_size; ++y) {
         float h = getHeight(x,y);
 	if (h < min_height) min_height = h;
 	if (h > max_height) max_height = h;
       }
     }
-//    min_height *= _terrain->_terrain_scale;
-//    max_height *= _terrain->_terrain_scale;
   }
   WFMath::Point<3> corner1 = WFMath::Point<3>(offset_x, offset_y, min_height);
   WFMath::Point<3> corner2 = WFMath::Point<3>(offset_x + map_size, offset_y + map_size, max_height);
@@ -239,21 +234,6 @@ void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, in
 
   if (i != 0) m_isVisible = 1;
   else m_isVisible = 0;
-//  m_isVisible = 1;
+}
 
-}
-/*
-float Landscape::getHeight(float x, float y) {
-  float height;
-  float h1 = m_HeightMap[(int)(x) + (int)y * ROAM::map_size];
-  float h2 = m_HeightMap[(int)(x + 1) +  (int)y * ROAM::map_size];
-  float h3 = m_HeightMap[(int)(x + 1) + (int)(y + 1) * ROAM::map_size];
-  float h4 = m_HeightMap[(int)(x)+(int)(y + 1) * ROAM::map_size];
-  float x_m = (float)x - (float)((int)x);
-  float y_m = (float)y - (float)((int)y);
-  float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
-  height = h1 + (h / 2.0f);
-  return height ;// * _terrain->_terrain_scale;
-}
-*/
 } /* namespace Sear */

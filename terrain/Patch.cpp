@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.14 2003-02-25 22:34:25 simon Exp $
+// $Id: Patch.cpp,v 1.15 2003-03-06 21:31:02 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -123,8 +123,7 @@ void Patch::RecursTessellate( TriTreeNode *tri,
                int leftX,  int leftY,
                int rightX, int rightY,
                int apexX,  int apexY,
-               int node )
-{
+               int node ) {
   float TriVariance = 0.0f;
   int centerX = (leftX + rightX)>>1; // Compute X coordinate of center of Hypotenuse
   int centerY = (leftY + rightY)>>1; // Compute Y coord...
@@ -141,6 +140,8 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     float x = v.x() - (centerX + _landscape->offset_x);
     float y = v.y() - (centerY + _landscape->offset_y);
 //    float z = v.z() - _terrain->getHeight(centerX, centerY);
+    assert ((centerX >= 0 && centerX <= 200) && "centerX out of bounds");
+    assert ((centerY >= 0 && centerY <= 200) && "centerY out of bounds");
     float z = v.z() - _landscape->getHeight(centerX, centerY);// * _terrain->_terrain_scale;
     
     x += System::instance()->getGraphics()->getCamera()->getXPos();
@@ -152,25 +153,10 @@ void Patch::RecursTessellate( TriTreeNode *tri,
       
     float distance = sqrt(x * x + y * y + z * z);
 	      
-//    float distance = fabs(_renderer->distFromNear(centerX + _landscape->offset_x, centerY + _landscape->offset_y, _landscape->getHeight(centerX, centerY)));
-
-//    cout << d2 << " " << distance << endl;
-  //  float distance = _renderer->distFromNear(_landscape->offset_x + centerX, _landscape->offset_y + centerY, _landscape->getHeight(centerX, centerY));
-//    distance = fabs(distance);
-//    float distance = _renderer->distFromNear(centerX, centerY, _landscape->getHeight(centerX, centerY));
-//	  float distance =0.0f;//sqrt((float)(centerX * centerX + centerY * centerY));
-//if (_landscape->offset_x + centerX >0)	  cout <<  "X: " << _landscape->offset_x + centerX << endl;
-//if (_landscape->offset_y + centerY >0)	  cout <<  "Y: " << _landscape->offset_y + centerY << endl;
-//	  cout << "Y: " << centerY << endl;
-//	  cout << "D: " << distance << endl;
-    //float distance = _renderer->distFromNear(_landscape->offset_x + centerX, _landscape->offset_y + centerY, _landscape->getHeight(centerX, centerY));
-
     // Egads!  A division too?  What's this world coming to!
     // This should also be replaced with a faster operation.
     TriVariance = ((float)m_CurrentVariance[node] * (float)ROAM::map_size * 2.0f)/distance;  // Take both distance and variance into consideration
   }
-//  cout << "T: " << TriVariance << endl;
-//  cout << "U: " << _landscape->gFrameVariance << endl;
   if ( (node >= var_depth) ||  // IF we do not have variance info for this node, then we must have gotten here by splitting, so continue down to the lowest level.
   (TriVariance > _landscape->gFrameVariance)
   )  // OR if we are not below the variance tree, test for variance.
@@ -484,9 +470,11 @@ void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int ri
 //
 void Patch::Tessellate() {
   // Split each of the base triangles
-  int m_WorldX = this->m_WorldX + _landscape->offset_x;
-  int m_WorldY = this->m_WorldY + _landscape->offset_y;
+//  int m_WorldX = this->m_WorldX + _landscape->offset_x;
+//  int m_WorldY = this->m_WorldY + _landscape->offset_y;
   m_CurrentVariance = m_VarianceLeft;
+  assert((m_WorldY+_landscape->patch_size > 0) && "m_WorldY+_landscape->patch_size less than 0");
+  assert((m_WorldX+_landscape->patch_size > 0) && "m_WorldX+_landscape->patch_size less than 0");
   RecursTessellate (&m_BaseLeft, m_WorldX, m_WorldY+_landscape->patch_size, m_WorldX+_landscape->patch_size, m_WorldY, m_WorldX, m_WorldY, 1);
   m_CurrentVariance = m_VarianceRight;
   RecursTessellate(&m_BaseRight, m_WorldX+_landscape->patch_size, m_WorldY, m_WorldX, m_WorldY+_landscape->patch_size, m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size,1);

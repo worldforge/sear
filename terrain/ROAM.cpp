@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
 // $id: $
 
@@ -41,23 +41,19 @@ namespace Sear {
 float ROAM::_water_level = 0.0f;
 float ROAM::_water_level_base = 0.0f;
  
-  static const int DEFAULT_height = 128;
-  static const float DEFAULT_water_level = 127.0f;
-  static const float DEFAULT_terrain_scale = 0.01f;
-  static const float DEFAULT_texture_detail_scale = 1.0;
+static const int DEFAULT_height = 128;
+static const float DEFAULT_water_level = 127.0f;
+static const float DEFAULT_terrain_scale = 0.01f;
+static const float DEFAULT_texture_detail_scale = 1.0;
 
-  static const std::string KEY_water_level = "terrain_water_level";
-  static const std::string KEY_height = "terrain_height";
-  
-  static const std::string KEY_height_map = "height_map";
-  static const std::string KEY_terrain_scale = "terrain_scale";
- 
-  static const std::string KEY_num_x_landscapes = "num_x_landscapes";
-  static const std::string KEY_num_y_landscapes = "num_y_landscapes";
-
-  static const std::string KEY_texture_detail_scale = "texture_detail_scale";
-  
-  static const std::string KEY_landscape = "landscape_";
+static const std::string KEY_water_level = "terrain_water_level";
+static const std::string KEY_height = "terrain_height";
+static const std::string KEY_height_map = "height_map";
+static const std::string KEY_terrain_scale = "terrain_scale";
+static const std::string KEY_num_x_landscapes = "num_x_landscapes";
+static const std::string KEY_num_y_landscapes = "num_y_landscapes";
+static const std::string KEY_texture_detail_scale = "texture_detail_scale";
+static const std::string KEY_landscape = "landscape_";
   
   
  
@@ -80,7 +76,6 @@ bool ROAM::init() {
   readConfig();
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &ROAM::varconf_callback));
   unsigned int num_landscapes = _num_x_landscapes * _num_y_landscapes;
-  //_height_maps = (unsigned char **)malloc(num_landscapes * sizeof(unsigned char *));
   _height_maps = (float **)malloc(num_landscapes * sizeof(float *));
   _landscapes = (Landscape**)malloc(num_landscapes * sizeof (Landscape*));
   memset(_landscapes, 0, num_landscapes * sizeof (Landscape*));
@@ -110,14 +105,14 @@ bool ROAM::init() {
         _height_maps[i][i1] =  _height_maps[right][i2];
 	}
       }
-       if (l_bottom) {
+
+      if (l_bottom) {
         for (unsigned int yy = 0; yy <= map_size; ++yy) {
 	  int i1 = (map_size) * (map_size+1)+ yy;
 	  int i2 = yy;
 	   _height_maps[bottom][i1] = _height_maps[i][i2];
 	}
       }
-
        
       _landscapes[i] = new Landscape(_renderer, this, l_bottom, l_right);
       _landscapes[i]->Init(_height_maps[i], map_size, offset_x, offset_y);
@@ -141,7 +136,7 @@ void ROAM::shutdown() {
     _landscapes = NULL;
   }
   if (_height_maps) {
-    for (unsigned int i = 0; i < num_landscapes; ++i) if (_height_maps[i]) free (_height_maps[i]);
+    for (unsigned int i = 0; i < num_landscapes; ++i) if (_height_maps[i]) delete _height_maps[i];
     free(_height_maps);
     _height_maps = NULL;
   }
@@ -172,7 +167,8 @@ int ROAM::loadHeightMap(float **h_map, const std::string &heightmap) {
   float *hMap = NULL;
   SDL_Surface *terrain = NULL;
 
-  hMap = (float *)malloc((1+ map_size) * (1+map_size) * sizeof(float));
+  //hMap = (float *)malloc((1+ map_size) * (1+map_size) * sizeof(float));
+  hMap = new float[(1+ map_size) * (1+map_size)];
   if (!hMap) {
     Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::LOG_ERROR);
     return 0;
@@ -216,11 +212,11 @@ void ROAM::update(float time_elapsed) {
 }
 
 float ROAM::getHeight(float x, float y) {
-  float half_x = map_size * _num_x_landscapes / 2;
-  float half_y = map_size * _num_y_landscapes / 2;
+  float half_x = map_size * _num_x_landscapes / 2.0f;
+  float half_y = map_size * _num_y_landscapes / 2.0f;
 	  
-  if (x <= -half_x || x >= half_x) { return 0.0f;}
-  if (y <= -half_y || y >= half_y) { return 0.0f;}
+  if (x <= -half_x || x >= half_x) { return 0.0f; }
+  if (y <= -half_y || y >= half_y) { return 0.0f; }
   
   x += half_x;  
   y += half_y;
@@ -234,11 +230,11 @@ float ROAM::getHeight(float x, float y) {
     --index_y;
     y -= map_size;
   }
-  
-  float h1 =_height_maps[index_x + index_y * _num_x_landscapes][(int)x + (int)y * (map_size+1)];
-  float h2 =_height_maps[index_x + index_y * _num_x_landscapes][(int)(x+1) + (int)y * (map_size+1)];
-  float h3 =_height_maps[index_x + index_y * _num_x_landscapes][(int)(x+1) + (int)(y+1) * (map_size+1)];
-  float h4 =_height_maps[index_x + index_y * _num_x_landscapes][(int)x + (int)(y+1) * (map_size+1)];
+  unsigned int index = index_x + index_y * _num_x_landscapes; 
+  float h1 =_height_maps[index][(int)x + (int)y * (map_size+1)];
+  float h2 =_height_maps[index][(int)(x+1) + (int)y * (map_size+1)];
+  float h3 =_height_maps[index][(int)(x+1) + (int)(y+1) * (map_size+1)];
+  float h4 =_height_maps[index][(int)x + (int)(y+1) * (map_size+1)];
   float x_m = (float)x - (float)((int)x);
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
@@ -251,11 +247,6 @@ void ROAM::readConfig() {
   varconf::Variable temp;
   varconf::Config &general = _system->getGeneral();
   
-//  hmap = general.getItem(TERRAIN, KEY_height_map);
-    
-//  temp = general.getItem(TERRAIN, KEY_height);
-//  _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
-
   temp = general.getItem(TERRAIN, KEY_water_level);
   _water_level_base = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
   _water_level = _water_level_base * _terrain_scale;
