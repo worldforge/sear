@@ -37,6 +37,8 @@
 #include "src/ObjectLoader.h"
 #include "src/WorldEntity.h"
 
+#include "src/Camera.h"
+
 #include "src/Graphics.h"
 #include "src/Render.h"
 
@@ -46,6 +48,7 @@
 Sear::Model *model = NULL;
 Sear::Render *render = NULL;
 Sear::System *sys = NULL;
+Sear::Camera *_camera = NULL;
 
 bool _system_running = true;
 float x_angle = 0.0f;
@@ -53,15 +56,9 @@ float y_angle = 0.0f;
 
 Sear::ObjectProperties *op = NULL;
 
-WFMath::Quaternion q = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
-
 float camera_x = 0.0f;
 float camera_y = 5.0f;
 float camera_z = 0.0f;
-
-float model_x = 0.0f;
-float model_y = 0.0f;
-float model_z = 0.0f;
 
 void reshape(int width, int height) {
   //Check for divide by 0
@@ -86,6 +83,7 @@ void idle() {
   static unsigned int last_time = 0;
   float time = (((float)(sys->getTime() - last_time)) / 1000.0f);
   model->update(time);
+  _camera->updateCameraPos(time);
   last_time = sys->getTime();
 }
 
@@ -94,32 +92,33 @@ void handleEvents(const SDL_Event &event) {
   switch (event.type) {
     case SDL_KEYDOWN: {
       if (event.key.keysym.sym == SDLK_ESCAPE || event.key.keysym.sym == SDLK_q) exit(0);
-      else if (event.key.keysym.sym == SDLK_t) model_x += 0.1f;
-      else if (event.key.keysym.sym == SDLK_y) model_x -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_p) model_y -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_l) model_y += 0.1f;
-      else if (event.key.keysym.sym == SDLK_z) model_z -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_x) model_z += 0.1f;
-      else if (event.key.keysym.sym == SDLK_LEFT) camera_x += 0.1f;
-      else if (event.key.keysym.sym == SDLK_RIGHT) camera_x -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_UP) camera_y -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_DOWN) camera_y += 0.1f;
-      else if (event.key.keysym.sym == SDLK_PAGEUP) camera_z -= 0.1f;
-      else if (event.key.keysym.sym == SDLK_PAGEDOWN) camera_z += 0.1f;
+      else if (event.key.keysym.sym == SDLK_LEFT) _camera->rotate(-1);
+      else if (event.key.keysym.sym == SDLK_RIGHT) _camera->rotate(1);
+      else if (event.key.keysym.sym == SDLK_PAGEUP) _camera->elevate(1);
+      else if (event.key.keysym.sym == SDLK_PAGEDOWN) _camera->elevate(-1);
+      else if (event.key.keysym.sym == SDLK_UP) _camera->zoom(-1);
+      else if (event.key.keysym.sym == SDLK_DOWN) _camera->zoom(1);
       else if (event.key.keysym.sym == SDLK_1) model->action("walk");
       else if (event.key.keysym.sym == SDLK_2) model->action("run");
       else if (event.key.keysym.sym == SDLK_3) model->action("wave");
       else if (event.key.keysym.sym == SDLK_4) model->action("funky");
       break;
     }
+    case SDL_KEYUP: {
+      if (event.key.keysym.sym == SDLK_LEFT) _camera->rotate(1);
+      else if (event.key.keysym.sym == SDLK_RIGHT) _camera->rotate(-1);
+      else if (event.key.keysym.sym == SDLK_PAGEUP) _camera->elevate(-1);
+      else if (event.key.keysym.sym == SDLK_PAGEDOWN) _camera->elevate(1);
+      else if (event.key.keysym.sym == SDLK_UP) _camera->zoom(1);
+      else if (event.key.keysym.sym == SDLK_DOWN) _camera->zoom(-1);
+      break;
+    }
     case SDL_MOUSEBUTTONDOWN: mouse_down = true; break;
     case SDL_MOUSEBUTTONUP: mouse_down = false; break;
     case SDL_MOUSEMOTION: {
       if (!mouse_down) break;
-      x_angle += (float)event.motion.xrel / 5.0f;
-      y_angle += (float)event.motion.yrel / 5.0f;
-//      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), (float)event.motion.xrel / 5.0f);
-//      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), (float)event.motion.yrel / 5.0f);
+      x_angle += (float)event.motion.xrel / 3.0f;
+      y_angle += (float)event.motion.yrel / 3.0f;
       break;
     }			  
   }
@@ -133,8 +132,12 @@ void display() {
 
   render->beginFrame();
   glClear(GL_COLOR_BUFFER_BIT);
-	
-  glTranslatef(camera_x, camera_y, camera_z);
+  WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
+  orient /= WFMath::Quaternion(WFMath::Vector<3>(1.0f, 0.0f, 0.0f), _camera->getElevation());
+  orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), _camera->getRotation());
+  glTranslatef(0.0f, _camera->getDistance(), 0.0f);
+  render->applyQuaternion(orient);
+//  glTranslatef(camera_x, camera_y, camera_z);
 
   render->stateChange("default");
   glBegin(GL_LINES);
@@ -196,10 +199,11 @@ int main(int argc, char** argv) {
   sys->init();
   sys->createWindow(false);
   render = sys->getGraphics()->getRender();
+  _camera = sys->getGraphics()->getCamera();
   Sear::ModelHandler *mh = sys->getModelHandler();
   op = (Sear::ObjectProperties*)malloc(sizeof(Sear::ObjectProperties));
   model = mh->getModel(render, type, op);
-            SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+//            SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
   if (model) loop();
 

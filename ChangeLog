@@ -1,4 +1,7 @@
-19th August 2002, Simon GoodalL
+19th August 2002, Simon Goodall
+ * Improved camera control. Now same as in Sear
+
+19th August 2002, Simon Goodall
  * Model Viewer now updates in real-time instead of a fixed value
  * Better mouse interface for model viewer
 
