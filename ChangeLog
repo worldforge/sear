@@ -1,4 +1,7 @@
 20th August 2002, Simon Goodall
+ * Updated comments for console code
+
+20th August 2002, Simon Goodall
  * Added two new console commands: get_time and set_time. get_time prints the current time on the console. set_time allows you to set the current time.
 
 19th August 2002, Simon Goodall
