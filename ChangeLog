@@ -1,3 +1,6 @@
+2004-06-20  Simon Goodall  <simon@simongoodall.co.uk>
+	* loaders/BoundBox.cpp: Fix incorrect texture bug when using display lists
+
 2004-06-15  Simon Goodall  <simon@simongoodall.co.uk>
 	* loaders/3ds.cpp: Fix segfault on models with no texture through using unitialised values;
  
