@@ -537,37 +537,119 @@ void Client::runCommand(const std::string &command, const std::string &args) {
   if (command == SERVER_CONNECT) {
     std::string server = tokeniser.nextToken();
     std::string port_string = tokeniser.nextToken();
-    if (port_string.empty()) {
-      connect(server, DEFAULT_PORT);
-    } else {
-      int port = 0;
-      cast_stream(port_string, port);
-      connect(server, port);
+    try {
+      if (port_string.empty()) {
+        connect(server, DEFAULT_PORT);
+      } else {
+        int port = 0;
+        cast_stream(port_string, port);
+        connect(server, port);
+      }
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   }
-  else if (command == SERVER_RECONNECT)  reconnect();
-  else if (command == SERVER_DISCONNECT) disconnect();
+  else if (command == SERVER_RECONNECT) {
+    try {
+      reconnect();
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
+  }
+  else if (command == SERVER_DISCONNECT) {
+    try {
+      disconnect();
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
+  }
   else if (command == ACCOUNT_CREATE) {
     std::string user_name = tokeniser.nextToken();
     std::string password = tokeniser.nextToken();
     std::string full_name = tokeniser.remainingTokens();
-    createAccount(user_name, full_name, password);
+    try {
+      createAccount(user_name, full_name, password);
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
   }
   else if (command == ACCOUNT_LOGIN) {
     std::string user_name = tokeniser.nextToken();
     std::string password = tokeniser.nextToken();
-    login(user_name, password);
+    try {
+      login(user_name, password);
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
   }
-  else if (command == ACCOUNT_LOGOUT) logout();
-  else if (command == CHARACTER_LIST) getCharacters();
+  else if (command == ACCOUNT_LOGOUT) {
+    try {
+      logout();
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
+  }
+  else if (command == CHARACTER_LIST) { 
+    try {
+      getCharacters();
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
+  }
   else if (command == CHARACTER_CREATE) {
     std::string name = tokeniser.nextToken();
     std::string type = tokeniser.nextToken();
     std::string sex = tokeniser.nextToken();
     std::string desc = tokeniser.remainingTokens();
-    createCharacter(name, type, sex, desc);
+    try {
+      createCharacter(name, type, sex, desc);
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
   }
-  else if (command == CHARACTER_TAKE) takeCharacter(args);
+  else if (command == CHARACTER_TAKE) {
+    try {
+      takeCharacter(args);
+    } catch (ClientException ce) {
+      Log::writeLog(ce.getMessage(), Log::ERROR);
+      _system->pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
+    } catch (Exception e) {
+      Log::writeLog(e.getMessage(), Log::ERROR);
+      _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
+    }
+  }
 }
 
 } /* namespace Sear */
