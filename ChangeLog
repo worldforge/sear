@@ -1,3 +1,8 @@
+2004-06-23  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Fix the position of entities passed to other
+	  characters.
+
 2004-06-22  Simon Goodall  <simon@simongoodall.co.uk>
 	* renderers/GL.cpp: Fix clamping
 

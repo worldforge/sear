@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.43 2004-06-21 10:18:34 simon Exp $
+// $Id: Character.cpp,v 1.44 2004-06-23 08:00:58 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -396,7 +396,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
-      _avatar->place(we, te, _self->GetPos());
+      _avatar->place(we, te, WFMath::Point<3>(0,0,0));
       quantity--;
     }
   }
