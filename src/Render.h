@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.33 2004-04-17 15:55:45 simon Exp $
+// $Id: Render.h,v 1.34 2004-04-26 15:32:31 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -14,24 +14,15 @@
 #include <utility>
 
 #include <wfmath/axisbox.h>
-//#include "common/types.h"
-//
-//#include "ObjectLoader.h"
 
 #include "common/types.h"
 
 #define RENDER_FOV (45.0f)
-//#define RENDER_FAR_CLIP (100.0f)
 #define RENDER_FAR_CLIP (1000.0f)
 #define RENDER_NEAR_CLIP (0.1f)
 
 namespace Sear {
 
-class Camera;
-class Sky;
-class BoundBox;
-class BillBoard;
-class Impostor;
 class WorldEntity;
 class ModelRecord;
 class ObjectRecord;
@@ -71,7 +62,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void cleanVBOMesh(Mesh &mesh) =0;
 
   virtual void init() =0;
-  virtual void initWindow(int width, int height) =0;
   virtual void shutdown() =0;
 
   virtual void print(int x, int y, const char*, int set) =0;
@@ -105,18 +95,12 @@ typedef std::list<WorldEntity*> MessageList;
   virtual int getWindowWidth() =0;
   virtual int getWindowHeight() =0;
 
-//  virtual void switchTexture(int texture) =0;
-//  virtual void switchTexture(unsigned int, int) =0;
-  virtual void setTextureScale(unsigned int unit, float scale) = 0;
   virtual std::string getActiveID() =0;
 
   virtual int patchInFrustum(WFMath::AxisBox<3>) =0;
   virtual float distFromNear(float,float,float) =0;
 
   virtual void renderActiveName() =0;
-
-//  virtual Camera* getCamera() =0;
- 
 
   virtual void setupStates() =0;
   virtual void readConfig() =0;
@@ -131,7 +115,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
-//  virtual int createTexture(const std::string &texture_name, char **xpm) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
 //  virtual void drawMessageQueue(QueueMap queue) =0;
   virtual void drawMessageQueue(MessageList &list) =0;

@@ -1,3 +1,8 @@
+26th April 2004, Simon Goodall
+ * Some refactoring to allow user def screen sizes again
+ * Moved image loading code from System to TextureManager.
+ * Some GL Context invalidation code for Textures
+
 26th April 2004, Al Riddoch
  * More progress on base classes for gui code
 

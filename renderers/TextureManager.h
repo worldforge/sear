@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.8 2004-04-17 15:55:45 simon Exp $
+// $Id: TextureManager.h,v 1.9 2004-04-26 15:32:30 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -13,7 +13,9 @@
 
 #include <cassert>
 
-#include "SDL.h"
+#include <SDL/SDL.h>
+#include <sage/sage.h>
+#include <sage/GL.h>
 
 #include <sigc++/object_slot.h>
 #include "interfaces/ConsoleObject.h"
@@ -26,7 +28,6 @@
  TODO
 
  Add console commands
- - Flush textures
  - determine max_texture_units from gl query
  - read/write config values
  - add ability to resample image to 2^N by 2^M
@@ -37,7 +38,7 @@
   */ 
 namespace Sear {
 
-  typedef unsigned int TextureObject; ///< OpenGL reference to texture
+//  typedef unsigned int TextureObject; ///< OpenGL reference to texture
 //  typedef int TextureID; ///< TextureManager reference to texture
 /**
  * This class handles everything to do with textures. 
@@ -52,7 +53,7 @@ class TextureManager : public SigC::Object, public ConsoleObject {
 public:
   
   typedef std::map<std::string, TextureID> TextureMap;
-  typedef std::vector<TextureObject> TextureVector;
+  typedef std::vector<GLuint> TextureVector;
   typedef std::vector<std::string> NameVector;
  
   /**
@@ -65,13 +66,15 @@ public:
    */ 
   ~TextureManager() {
     // Call shutdown if it hasn't already been
-    if (_initialised) shutdown();
+    if (m_initialised) shutdown();
   }
 
   /**
    * Initialise a TextureManager object
    */ 
   void init();
+
+  void initGL();
 
   /**
    * Clean up the TextureManager object
@@ -98,13 +101,13 @@ public:
 
   TextureID requestTextureID(const std::string &texture_name, bool mask) {
 //  TextureID requestTextureID(std::string texture_name) {
-    assert(_initialised != false);
+    assert(m_initialised != false);
     std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
-    TextureID id = _texture_map[name];
+    TextureID id = m_texture_map[name];
     if (id == 0) {
-      _texture_map[name] = _texture_counter;
-      _names[_texture_counter] = name;
-      id = _texture_counter++;
+      m_texture_map[name] = m_texture_counter;
+      m_names[m_texture_counter] = name;
+      id = m_texture_counter++;
     }
     return id;
   }
@@ -116,7 +119,7 @@ public:
    * @param texture_name Name of texture to load
    * @return ID for texture.
    */ 
-  TextureObject loadTexture(const std::string &texture_name);
+  GLuint loadTexture(const std::string &texture_name);
 //  TextureObjectloadTexture(TextureID texture_id);
 
   /**
@@ -129,7 +132,7 @@ public:
    * Unloads the specified texture from the OpenGL system
    * @param texture_object TextureObject to unload
    */ 
-  void unloadTexture(TextureObject texture_object);
+  void unloadTexture(GLuint texture_object);
 
   /**
    * Returns the textureID associated with a given texture
@@ -137,7 +140,7 @@ public:
    * @return TextureID of texture. 0 if not loaded, -1 if error during loading
    */ 
 //  TextureID getTextureID(const std::string &texture_name) {
-//    TextureID id = _texture_map[texture_name];
+//    TextureID id = m_texture_map[texture_name];
 //    if (id == 0) id = loadTexture(texture_name);
 //    return id;
 //  }
@@ -148,7 +151,7 @@ public:
    * @return TextureObject of texture
    */
 //  TextureObject getTextureObject(TextureID texture) {
-//    return _textures[texture];
+//    return m_textures[texture];
 //  }
 
   /**
@@ -175,7 +178,7 @@ public:
   }
   void setScale(unsigned int texture_unit, float scale_x, float scale_y);
 
-  unsigned int getNumTextureUnits() const { return _texture_units; }
+  unsigned int getNumTextureUnits() const { return m_texture_units; }
  
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &arguments);
@@ -184,25 +187,27 @@ public:
   void invalidate();
  
 private:
-  bool _initialised; ///< Flag indicating whether object has had init called
-  varconf::Config _texture_config; ///< Config object for all texture
-  TextureMap _texture_map; ///< Mapping between texture name and its TextureID
-  TextureVector _textures; ///< Used to translate a TextureID to a TextureObject
-  NameVector _names; 
-  unsigned int _texture_counter; ///< Keeps track of last allocated TextureID
-  TextureID *_last_textures;
-  unsigned int _texture_units;
+  bool m_initialised; ///< Flag indicating whether object has had init called
+  varconf::Config m_texture_config; ///< Config object for all texture
+  TextureMap m_texture_map; ///< Mapping between texture name and its TextureID
+  TextureVector m_textures; ///< Used to translate a TextureID to a TextureObject
+  NameVector m_names; 
+  unsigned int m_texture_counter; ///< Keeps track of last allocated TextureID
+  std::vector<TextureID> m_last_textures;
+  unsigned int m_texture_units;
+  TextureID m_default_texture;
 
   /**
    * This function is used to setup the required OpenGL texture extensions
    */ 
-  TextureObject loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
+  GLuint loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);  
   void varconf_error_callback(const char *message);
 
   TextureID createDefaultTexture();
   TextureID createDefaultFont();
 
+  static SDL_Surface *loadImage(const  std::string &filename);
   
   /**
    * Returns the OpenGL filter from the name
@@ -211,7 +216,6 @@ private:
    */ 
   static int getFilter(const std::string &filter_name);
 
-  TextureID _default_texture;
 };
   
 } /* namespace Sear */

@@ -2,21 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.77 2004-04-17 15:55:45 simon Exp $
-
-#include <SDL/SDL_image.h>
+#include <SDL/SDL.h>
+#include <sage/sage.h>
+#include <sage/GL.h>
+#include <sage/GLU.h>
 
 #include <unistd.h>
 
-#include <sage/sage.h>
-
-#include <sage/GL.h>
-#include <sage/GLU.h>
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
+
+#include "sear_icon.xpm"
+#include "RenderSystem.h"
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -35,23 +35,13 @@
 #include "src/WorldEntity.h"
 
 #include "environment/Environment.h"
-
 #include "GL.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif
 
-#ifdef DEBUG
-  static const bool debug = true;
-#else
-  static const bool debug = false;
-#endif
-namespace Sear {
   // Consts
   static const int sleep_time = 5000;
 
@@ -172,6 +162,199 @@ static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
 static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+
+namespace Sear {
+
+void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
+  _graphics = System::instance()->getGraphics();
+  // Destroy the existing window
+  if (m_screen != NULL) destroyWindow();
+  
+  if (debug) std::cout << "Creating Window" << std::endl;
+
+  // Set new window size etc..
+  m_width = width;
+  m_height = height;
+  m_fullscreen = fullscreen;
+
+  // TODO check return values
+  SDL_InitSubSystem(SDL_INIT_VIDEO);
+
+  //Request Open GL window attributes
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
+
+  const SDL_VideoInfo *info = SDL_GetVideoInfo();
+  if (!info) {
+    Log::writeLog("Error quering video", Log::LOG_DEFAULT);
+  }                                                                                
+  /* Check is there are any modes available */
+  if (debug) {
+    // TODO is list leaked?
+    SDL_Rect **videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
+    if (videoModes == 0) {
+      printf("No modes available!\n");
+    } else if (videoModes == (SDL_Rect **)-1) {
+      printf("All resolutions available.\n");     } else{
+      /* Print valid modes */         printf("Available Modes\n");
+      for(int i=0; videoModes[i]; ++i) {
+        float aspect = (float)videoModes[i]->w / (float)videoModes[i]->h;
+        printf("  %d x %d -- %f\n", videoModes[i]->w, videoModes[i]->h, aspect);
+      }
+    }
+    fflush(stdout);
+  }
+  //Create Window
+  int flags = SDL_OPENGL;
+  int bpp = info->vfmt->BitsPerPixel;
+  if (m_fullscreen) flags |= SDL_FULLSCREEN;
+  if (!(m_width && m_height)) {
+    std::cerr << "Invalid resolution: " << m_width << " x " << m_height << std::endl;
+    throw;
+  }
+  if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
+                                                                                
+                                                                                
+  //Is this the correct way to free a window?
+  m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
+  if (m_screen == NULL ) {
+    std::cerr << "Unable to set " << m_width << " x " << m_height << " video: " << SDL_GetError() << std::endl;
+    throw ;
+  }
+  // Check OpenGL flags
+  int value;
+  if (debug) {
+    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
+    Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
+    Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
+    Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
+    Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+    Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
+    Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
+  }
+
+  SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+//  if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
+
+//  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+//  SDL_WM_SetIcon(_icon, NULL);
+//  if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
+//  if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP);
+//  if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
+                                                                                
+    std::string vendor = string_fmt(glGetString(GL_VENDOR));
+    std::string renderer = string_fmt(glGetString(GL_RENDERER));
+    // TODO - CHECK OPENGL VERSION
+    std::string version = string_fmt(glGetString(GL_VERSION));
+    std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
+                                                                                
+//  if (debug) {
+    Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
+    Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
+    Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
+    Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
+//  }
+                                                                                
+  // These will be empty if there was a problem initialising the driver
+  if (vendor.empty() || renderer.empty()) {
+    throw Exception("Error with OpenGL system");
+  }
+                                                                                
+  RenderSystem::getInstance().initContext();
+  //RenderSystem::getInstance().getStateManager()->initGL();
+                                                                                
+  initLighting();
+  // TODO: initialisation need to go into system?
+  setupStates();
+  if (debug) checkError();
+  glLineWidth(4.0f);
+                                                                                
+  //TODO: this needs to go into the set viewport method
+  //Check for divide by 0
+  if (height == 0) height = 1;
+//  glLineWidth(2.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
+  glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
+  glClear(GL_DEPTH_BUFFER_BIT);
+  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+ // glDisable(GL_DITHER);
+                                                                                
+  setViewMode(PERSPECTIVE);
+  setupExtensions();
+
+  initFont();
+
+  buildColourSet();
+  if (debug) std::cout << "Window created" << std::endl << std::flush;
+  env->init();
+}
+void GL::destroyWindow() {
+  RenderSystem::getInstance().invalidate();
+  if (m_screen) {
+    SDL_FreeSurface(m_screen);
+    m_screen = NULL;
+  }
+  SDL_QuitSubSystem(SDL_INIT_VIDEO);
+}
+
+void GL::toggleFullscreen() {
+//  m_fullscreen = !m_fullscreen;
+  // If fullscreen fails, create a new window with the fullscreen flag (un)set
+//  if (!SDL_WM_ToggleFullScreen(m_screen)) {
+    destroyWindow();
+    createWindow(m_width, m_height, m_fullscreen);
+//  }
+}
+void GL::checkError() {
+  GLenum err = glGetError();
+  std::string msg;
+  switch (err) {
+    case GL_NO_ERROR: break;
+    case GL_INVALID_ENUM: msg = "GL Error: Invalid enum!"; break;
+    case GL_INVALID_VALUE: msg = "GL Error: Invalid value!"; break;
+    case GL_INVALID_OPERATION: msg = "GL Error: Invalid operation!"; break;
+    case GL_STACK_OVERFLOW: msg = "GL Error: Stack overflow!"; break;
+    case GL_STACK_UNDERFLOW: msg = "GL Error: Stack Underflow!"; break;
+    case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
+    default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break;
+  }
+  if (!msg.empty()) std::cerr << msg << std::endl;
+}   
+
+
+void GL::setupExtensions() {
+  sage_init();
+
+  use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
+  use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
+
+  if (use_multitexturing) {
+    if (debug) std::cout << "Using arb_multitexture" << std::endl;
+  }
+
+  if (use_ext_compiled_vertex_array) {
+    if (debug) std::cout << "Using use_ext_compiled_vertex_array" << std::endl;
+  }
+}
+                                                                                
 inline GLuint GL::makeMask(GLuint bits) {
   // Create an 8-bit mask with 'bits' set to 1
   return (0xFF >> (8 - bits));
@@ -219,132 +402,50 @@ void GL::buildColourSet() {
   }
 }
 
-GL *GL::_instance = NULL;
-
 GL::GL() :
-  _system(NULL),
-  window_width(0),
-  window_height(0),
+  m_width(0), m_height(0),
+  m_fullscreen(false),
+  m_screen(NULL),
+  _system(System::instance()),
   fov(RENDER_FOV),
   near_clip(RENDER_NEAR_CLIP),
   next_id(1), // was 0 error?
   base(0),
   splash_id(-1),
   activeEntity(NULL),
-  _cur_state(NULL),
   _fog_start(100.0f),
   _fog_end(150.0f),
   _light_level(1.0f),
-  _initialised(false),
-	env(NULL)
-//  _texture_manager(NULL),
-//  _state_manager(NULL)
+  m_initialised(false),
+  env(NULL)
 {
-  _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
 
-GL::GL(System *system, Graphics *graphics) :
-  _system(system),
-  _graphics(graphics),
-  window_width(0),
-  window_height(0),
-  fov(RENDER_FOV),
-  near_clip(RENDER_NEAR_CLIP),
-  next_id(1),
-  base(0),
-  splash_id(-1),
-  activeEntity(NULL),
-  _cur_state(NULL),
-  _fog_start(100.0f),
-  _fog_end(150.0f),
-  _light_level(1.0f),
-  _initialised(false),
-	env(NULL)
-//  _texture_manager(NULL),
-//  _state_manager(NULL)
-{
-  _instance = this;
-  memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
-}
 
 GL::~GL() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
 }
 
 void GL::shutdown() {
   writeConfig();
   shutdownFont();
-//  _texture_manager->shutdown();
-//  delete _texture_manager;
-//  _texture_manager = NULL;
-//  _state_manager->shutdown();
-//  delete _state_manager;
-//  _state_manager = NULL;
-  _initialised = false;
+  m_initialised = false;
 }
 
-void GL::initWindow(int width, int height) {
-  if (debug) Log::writeLog("Render: Initialising Renderer", Log::LOG_DEFAULT);
-  // TODO: put this into an info method 
-  
-    std::string vendor = string_fmt(glGetString(GL_VENDOR));
-    std::string renderer = string_fmt(glGetString(GL_RENDERER));
-    // TODO - CHECK OPENGL VERSION
-    std::string version = string_fmt(glGetString(GL_VERSION));
-    std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
-  
-//  if (debug) {
-    Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
-//  }
-
-  // These will be empty if there was a problem initialising the driver 
-  if (vendor.empty() || renderer.empty()) {
-    throw Exception("Error with OpenGL system");
-  }
-  
-  glLineWidth(4.0f);
-  
-  //TODO: this needs to go into the set viewport method
-  //Check for divide by 0
-  if (height == 0) height = 1;
-//  glLineWidth(2.0f); 
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
-  glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
-  glClear(GL_DEPTH_BUFFER_BIT);
-  glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
- // glDisable(GL_DITHER); 
-  
-  //Store window size
-  window_width = width;
-  window_height = height;
-
-  setViewMode(PERSPECTIVE);
-  setupExtensions();
-//  _texture_manager->init();
-//  _state_manager->init();
-  //splash_id = requestTexture(TEXTURE_splash_texture);
-  RenderSystem::getInstance().init();
-  Environment::getInstance().init();
-  initFont();
-}
-  
 void GL::init() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
   env = &Environment::getInstance();
-
-  
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
-  readConfig();
-  initLighting();
-  // TODO: initialisation need to go into system?
-  setupStates();
-  if (debug) CheckError();
-  _initialised = true;
+
+  m_initialised = true;
+}
+
+void GL::invalidate() {
+  // Clear font display list
+  shutdownFont();
+  //
 }
 
 void GL::initLighting() {
@@ -396,20 +497,23 @@ void GL::initFont() {
     glTranslated(10,0,0); // Move To The Right Of The Character
     glEndList(); // Done Building The Display List
   }// Loop Until All 256 Are Built
+  m_fontInitialised = true;
 }
 
 void GL::shutdownFont() {
   if (debug) Log::writeLog("Render: Shutting down fonts", Log::LOG_DEFAULT);
   glDeleteLists(base,256); // Delete All 256 Display Lists
+  m_fontInitialised = false;
 }
 
 void GL::print(int x, int y, const char * string, int set) {
+  if (!m_fontInitialised) initFont();
   if (set > 1) set = 1;
   RenderSystem::getInstance().switchTexture(font_id);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
   glPushMatrix();
   glLoadIdentity(); // Reset The Projection Matrix
-  glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
+  glOrtho(0, m_width, 0 , m_height, -1, 1); // Set Up An Ortho Screen
   glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
   glPushMatrix();
   glLoadIdentity(); // Reset The Modelview Matrix
@@ -423,6 +527,7 @@ void GL::print(int x, int y, const char * string, int set) {
 }
 
 void GL::print3D(const char *string, int set) {
+  if (!m_fontInitialised) initFont();
   if (set > 1) set = 1;
 //  int texture = requestTexture(font_id);
 //  if (!glIsTexture(texture)) {
@@ -459,11 +564,13 @@ void GL::drawTextRect(int x, int y, int width, int height, int texture) {
 }
 
 void GL::procEvent(int x, int y) {
+  // No need to perform checks until we are in the game world
+  if (!_system->checkState(SYS_IN_WORLD)) return;
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
-  _graphics->drawScene("", true, 0);
+  System::instance()->getGraphics()->drawScene("", true, 0);
   x_pos = x;
-  y = window_height - y;
+  y = m_height - y;
   y_pos = y;
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
@@ -486,26 +593,10 @@ void GL::procEvent(int x, int y) {
   }
 }
 
-void GL::CheckError() {
-  GLenum err = glGetError();
-  std::string msg;
-  switch (err) {
-    case GL_NO_ERROR: break;
-    case GL_INVALID_ENUM: msg = "GL Error: Invalid enum!"; break;
-    case GL_INVALID_VALUE: msg = "GL Error: Invalid value!"; break;
-    case GL_INVALID_OPERATION: msg = "GL Error: Invalid operation!"; break;
-    case GL_STACK_OVERFLOW: msg = "GL Error: Stack overflow!"; break;
-    case GL_STACK_UNDERFLOW: msg = "GL Error: Stack Underflow!"; break;
-    case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
-    default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break; 
-  }
-  if (!msg.empty()) Log::writeLog(msg, Log::LOG_ERROR);
-}
-
 //TODO should be in general render class
 void GL::readConfig() {
   varconf::Variable temp;
-  varconf::Config &general = _system->getGeneral();
+  varconf::Config general = System::instance()->getGeneral();
   if (debug) Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
 
   // Setup character light source
@@ -575,8 +666,6 @@ void GL::readConfig() {
 
   temp = general.getItem(RENDER, KEY_far_clip_dist);
   _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
-  temp = general.getItem(RENDER, KEY_texture_scale);
-  _texture_scale = (!temp.is_double()) ? (DEFAULT_texture_scale) : ((double)(temp));
 }
 
 void GL::writeConfig() {
@@ -628,9 +717,8 @@ void GL::writeConfig() {
 
 void GL::setupStates() {
   // TODO: should this be in the init?
-
-glDepthFunc(GL_LEQUAL);
-glAlphaFunc(GL_GREATER, 0.1f);
+  glDepthFunc(GL_LEQUAL);
+  glAlphaFunc(GL_GREATER, 0.1f);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
   GLfloat fog_colour[] = {0.50f, 0.50f, 0.50f, 0.50f};
@@ -679,15 +767,15 @@ inline void GL::scaleObject(float scale) {
 
 void GL::setViewMode(int type) {
 //  Perspective
-  glViewport(0, 0, window_width, window_height);
+  glViewport(0, 0, m_width, m_height);
   switch (type) {
     case PERSPECTIVE: {
-      if (window_height == 0) window_height = 1;
+      if (m_height == 0) m_height = 1;
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity(); // Reset The Projection Matrix
   
       // Calculate The Aspect Ratio Of The Window
-      gluPerspective(fov,(GLfloat)window_width/(GLfloat)window_height, near_clip, _far_clip_dist);
+      gluPerspective(fov,(GLfloat)m_width/(GLfloat)m_height, near_clip, _far_clip_dist);
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       break;
@@ -695,7 +783,7 @@ void GL::setViewMode(int type) {
     case ORTHOGRAPHIC: {
       glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
       glLoadIdentity(); // Reset The Projection Matrix
-      glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
+      glOrtho(0, m_width, 0 , m_height, -1, 1); // Set Up An Ortho Screen
       glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
       glLoadIdentity();
       break;
@@ -848,7 +936,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
       // Translate Model
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
-      translateObject(pos.x(), pos.y(), pos.z() );//+ env->getHeight(pos.x(), pos.y()));
+      translateObject(pos.x(), pos.y(), pos.z() );
       // Move object to correct position
       translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
       // Rotate Model
@@ -887,7 +975,7 @@ void GL::drawMessageQueue(MessageList &list) {
     WorldEntity *we = (WorldEntity*)*I;
     glPushMatrix();
     WFMath::Point<3> pos = we->getAbsPos();
-    glTranslatef(pos.x(), pos.y(), pos.z());// + env->getHeight(pos.x(), pos.y()));
+    glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= _graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
@@ -908,7 +996,6 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 }
 
 void GL::drawOutline(ModelRecord *model_record) {
-//  StateProperties *sp = _cur_state; // Store current state
   StateID cur_state = RenderSystem::getInstance().getCurrentState();
   Model *model = model_record->model;
   bool use_stencil = checkState(RENDER_STENCIL) && model_record->outline;
@@ -960,7 +1047,7 @@ inline void GL::beginFrame() {
 inline void GL::endFrame(bool select_mode) {
   glFlush();
   if (!select_mode) SDL_GL_SwapBuffers();
-  if (debug) CheckError();
+  if (debug) checkError();
 }
   
 inline void GL::drawFPS(float fps) {
@@ -974,21 +1061,21 @@ void GL::drawSplashScreen() {
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(SPLASH));
   #ifndef _WIN32
     // TODO Need to find a win32 version
-//    usleep(sleep_time);
+    usleep(sleep_time);
   #endif
   setViewMode(ORTHOGRAPHIC);
   
   glColor4fv(white);
-//  std::cout << splash_id << std::endl;
+
   if (splash_id == -1) splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
-//  std::cout << splash_id << std::endl;
   RenderSystem::getInstance().switchTexture(splash_id);
+
   // TODO into vertex array?
   glBegin(GL_QUADS); 
     glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
-    glTexCoord2i(0, 1); glVertex2f(0.0f, window_height);
-    glTexCoord2i(1, 1); glVertex2f(window_width, window_height);
-    glTexCoord2i(1, 0); glVertex2f(window_width, 0.0f);
+    glTexCoord2i(0, 1); glVertex2f(0.0f, m_height);
+    glTexCoord2i(1, 1); glVertex2f(m_width, m_height);
+    glTexCoord2i(1, 0); glVertex2f(m_width, 0.0f);
   glEnd(); 
   setViewMode(PERSPECTIVE);
 }
@@ -1075,19 +1162,6 @@ inline void GL::getFrustum(float frust[6][4]) {
     for (int j = 0; j < 4; ++j) {
       frustum[i][j] = frust[i][j];
     }
-  }
-}
-
-void GL::setupExtensions() {
-  sage_init();
-  use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
-  use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
-  if (use_multitexturing) {
-    std::cout << "Using arb_multitexture" << std::endl;
-  }
-//  use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
-  if (use_ext_compiled_vertex_array) {
-    std::cout << "Using use_ext_compiled_vertex_array" << std::endl; 
   }
 }
 
@@ -1209,24 +1283,12 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
       temp = config.getItem(RENDER, KEY_far_clip_dist);
       _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
     }
-    else if (key == KEY_texture_scale) {
-      temp = config.getItem(RENDER, KEY_texture_scale);
-      _texture_scale = (!temp.is_double()) ? (DEFAULT_texture_scale) : ((double)(temp));
-    }
   }
 }
 
 std::string GL::getActiveID() {
   return (activeEntity) ? (activeEntity->getID()) : ("");
 } 
-void GL::setTextureScale(unsigned int unit, float scale) {
-  glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  glMatrixMode(GL_TEXTURE);
-  glLoadIdentity();
-  glScalef(scale, scale, 1.0f);
-  glMatrixMode(GL_MODELVIEW);
-  glActiveTextureARB(GL_TEXTURE0_ARB);
-}
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
@@ -1335,4 +1397,4 @@ void GL::cleanVBOMesh(Mesh &mesh) {
   }
 }
 
-} /* namespace Sear */
+} // namespace Sear

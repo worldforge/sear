@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.41 2004-04-23 10:33:02 simon Exp $
+// $Id: Graphics.cpp,v 1.42 2004-04-26 15:32:31 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -93,8 +93,6 @@ void Graphics::init() {
   if (_initialised) shutdown();
   readConfig();
   _system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
-  _renderer = new GL(_system, this);
-  _renderer->init();
   
   RenderSystem::getInstance().registerCommands(_system->getConsole());
 
@@ -109,12 +107,6 @@ void Graphics::init() {
 void Graphics::shutdown() {
   writeConfig();
 
-  if (_renderer) {
-    _renderer->shutdown();
-    delete _renderer;
-    _renderer = NULL;
-  }
-    
   if (_camera) {
     _camera->shutdown();
     delete _camera;
@@ -124,7 +116,10 @@ void Graphics::shutdown() {
 }
 
 void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {
-  if (!_renderer) throw Exception("No Render object to render with!");
+  if (!_renderer) {
+    std::cerr << "No Render object to render with!" << std::endl;
+    return;
+  }
   if (select_mode) _renderer->resetSelection();
   if (_camera) _camera->updateCameraPos(time_elapsed);
 

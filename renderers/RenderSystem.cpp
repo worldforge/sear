@@ -2,11 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
+#include <SDL/SDL.h>
+
 #include "RenderSystem.h"
 #include "TextureManager.h"
 #include "StateManager.h"
-
-#include "src/System.h"
+#include "src/Render.h"
+#include "renderers/GL.h"
 
 namespace Sear {
 
@@ -15,15 +17,26 @@ RenderSystem RenderSystem::m_instance;
 void RenderSystem::init() {
   if (m_initialised) shutdown();
 
+  m_renderer = new GL();
+  m_renderer->init();
+
   m_stateManager = new StateManager();
   m_stateManager->init();
 
   m_textureManager = new TextureManager();
   m_textureManager->init();
 
-  m_textureManager->registerCommands(System::instance()->getConsole());
-  m_stateManager->registerCommands(System::instance()->getConsole());
   m_initialised = true;
+}
+
+void RenderSystem::registerCommands(Console *console) {
+  dynamic_cast<GL*>(m_renderer)->registerCommands(console);
+  m_textureManager->registerCommands(console);
+  m_stateManager->registerCommands(console);
+}
+
+void RenderSystem::initContext() {
+  m_textureManager->initGL();
 }
 
 void RenderSystem::shutdown() {
@@ -69,9 +82,28 @@ StateID RenderSystem::getCurrentState() {
   return m_stateManager->getCurrentState();
 }
 
-void RenderSystem::registerCommands(Console *con) {
-  m_textureManager->registerCommands(con);
-  m_stateManager->registerCommands(con);
+
+void RenderSystem::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
+  dynamic_cast<GL*>(m_renderer)->createWindow(width, height, fullscreen);
 }
+void RenderSystem::destroyWindow() {
+  dynamic_cast<GL*>(m_renderer)->destroyWindow();
+}
+
+void RenderSystem::toggleFullscreen() {
+  dynamic_cast<GL*>(m_renderer)->toggleFullscreen();
+}
+
+void RenderSystem::readConfig() {
+  m_renderer->readConfig();
+//  m_textureManager->readConfig();
+//  m_stateManager->readConfig();
+} 
+
+void RenderSystem::writeConfig() {
+  m_renderer->writeConfig();
+//  m_textureManager->writeConfig();
+//  m_stateManager->writeConfig();
+} 
 
 } // namespace Sear

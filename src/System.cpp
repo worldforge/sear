@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.75 2004-04-22 10:51:33 simon Exp $
+// $Id: System.cpp,v 1.76 2004-04-26 15:32:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,9 +41,10 @@
 #include "Render.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
-//#include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
+#include "renderers/RenderSystem.h"
+
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -266,9 +267,14 @@ bool System::init() {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
   
-  //_width = 640; _height = 480;
-  _width = 800; _height = 600;
-  createWindow(false);
+  RenderSystem::getInstance().init();
+  renderer = RenderSystem::getInstance().getRenderer();
+  _graphics = new Graphics(this);
+  _graphics->init();
+  _graphics->registerCommands(_console);
+  _graphics->setRenderer(renderer);
+
+
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
@@ -278,6 +284,9 @@ bool System::init() {
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();
+
+  RenderSystem::getInstance().createWindow(_width, _height, false);
+
   _system_running = true;
   _initialised = true;
   return true;
@@ -388,7 +397,7 @@ bool System::initVideo() {
   } 
   return true;
 }
-
+#if(0)
 void System::createWindow(bool fullscreen) {
   if (debug) Log::writeLog("Creating Window", Log::LOG_INFO);
   //Request Open GL window attributes
@@ -483,7 +492,7 @@ float aspect = (float)videoModes[i]->w / (float)videoModes[i]->h;
 //  _graphics->drawScene("", false, 0); // Render scene one before producing colour set
   renderer->buildColourSet();
 }
-
+#endif
 void System::mainLoop() {
   SDL_Event event;
   static float last_time = 0.0f;
@@ -804,7 +813,7 @@ void System::setCaption(const std::string &title, const std::string &icon) {
 void System::toggleFullscreen() {
   fullscreen = ! fullscreen;
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
-  if (!SDL_WM_ToggleFullScreen(screen)) createWindow(fullscreen);
+  if (!SDL_WM_ToggleFullScreen(screen)) ;//createWindow(fullscreen);
 }
 
 void System::toggleMouselook() {
@@ -838,47 +847,6 @@ Uint32 System::getPixel(SDL_Surface *surface, int x, int y) {
     default:
        return 0;       /* shouldn't happen, but avoids warnings */
   }
-}
-
-
-SDL_Surface *System::loadImage(const  std::string &filename) {
-  Uint8 *rowhi, *rowlo;
-  Uint8 *tmpbuf /*, tmpch*/;
-  SDL_Surface *image;
-  int i/*, j*/;
-  image = IMG_Load(filename.c_str());
-  if ( image == NULL ) { 
-    Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::LOG_ERROR);
-    return(NULL);
-  }
-  /* GL surfaces are upsidedown and RGB, not BGR :-) */
-  tmpbuf = (Uint8 *)malloc(image->pitch);
-  if ( tmpbuf == NULL ) {  
-    Log::writeLog("Out of memory", Log::LOG_ERROR);
-    return(NULL);
-  }
-  rowhi = (Uint8 *)image->pixels;
-  rowlo = rowhi + (image->h * image->pitch) - image->pitch;
-  for ( i=0; i<image->h/2; ++i ) {
-    //commented out for use with png
-/*
-    for ( j=0; j<image->w; ++j ) {
-      tmpch = rowhi[j*3];
-      rowhi[j*3] = rowhi[j*3+2];
-      rowhi[j*3+2] = tmpch;
-      tmpch = rowlo[j*3];
-      rowlo[j*3] = rowlo[j*3+2];
-      rowlo[j*3+2] = tmpch;
-    }
-*/
-    memcpy(tmpbuf, rowhi, image->pitch);
-    memcpy(rowhi, rowlo, image->pitch);
-    memcpy(rowlo, tmpbuf, image->pitch);
-    rowhi += image->pitch;
-    rowlo -= image->pitch;
-  }
-  free(tmpbuf);
-  return(image);
 }
 
 void System::pushMessage(const std::string &msg, int type, int duration) {

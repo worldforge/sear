@@ -2,12 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.37 2004-04-17 15:55:45 simon Exp $
-
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
 
+#include <sage/sage.h>
 #include <sage/GL.h>
+
 #include <SDL/SDL.h>
 #include <string>
 #include <vector>
@@ -23,6 +23,7 @@
 #include "src/Light.h"
 #include "src/Render.h"
 
+
 #include "StateManager.h"
 
 namespace Sear {
@@ -35,22 +36,37 @@ class Model;
 class Graphics;
 class ObjectRecord;
 class ModelRecord;
+class Console;
 
 class GL : public Render, public SigC::Object {
+public:GL();
+~GL();
+  void init();
+  void initContext();
+  void shutdown();
+  void invalidate();
+  void createWindow(unsigned int width, unsigned int height, bool fullscreen);
+  void destroyWindow();
+  void toggleFullscreen();
+
+  void registerCommands(Console *console) {}
+  void runCommands(const std::string &command) {}
+
+private:
+
+  unsigned int m_width, m_height;
+  bool m_fullscreen;
+  bool m_windowExists;
+  SDL_Surface *m_screen;
+
+  static void checkError();
+
 
 public:
-  GL();
-  GL(System *, Graphics *);
-
-   
   void renderMeshArrays( Mesh &mesh, unsigned int offset, bool multitexture);
   void vboMesh( Mesh &mesh);
   void cleanVBOMesh(Mesh &mesh);
   
-  ~GL();
-  void init();
-  void initWindow(int width, int height);
-  void shutdown();
 
   void initLighting();
   void initFont();
@@ -59,7 +75,6 @@ public:
   void print3D(const char* string, int set);
   inline void newLine();
 
-  static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
   float distFromNear(float,float,float);  
@@ -68,8 +83,8 @@ public:
   int patchInFrustum(WFMath::AxisBox<3>);
   
   void procEvent(int, int);
-  int getWindowWidth() { return window_width; }
-  int getWindowHeight() { return window_height; }
+  int getWindowWidth() { return m_width; }
+  int getWindowHeight() { return m_height; }
 
   std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}
@@ -112,24 +127,19 @@ public:
   void playList(unsigned int list) { glCallList(list); }
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
-  void setTextureScale(unsigned int unit, float scale);
 protected:
   System *_system;
   Graphics *_graphics;
-  int window_width;
-  int window_height;
 
   const float fov;
   const float near_clip;
   float _far_clip_dist;
-  float _texture_scale;
 
   int next_id;
   GLuint base;
 
   int font_id;
   int splash_id;
-  static GL *_instance;
 
   float frustum[6][4];
   
@@ -153,10 +163,6 @@ protected:
   float _speech_offset_x;
   float _speech_offset_y;
   float _speech_offset_z;
- 
-  void CheckError();
-
-  StateProperties *_cur_state;
 
   void stateDisplayList(GLuint &, StateProperties *previous_state, StateProperties *next_state);
 
@@ -184,13 +190,16 @@ protected:
   void setupExtensions();
   bool use_ext_texture_filter_anisotropic;
   bool use_sgis_generate_mipmap;
-  bool _initialised;
   bool _multi_texture_mode;
+  bool m_initialised;
+  bool m_fontInitialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 
   Environment *env;
 };
 
-} /* namespace Sear */
-#endif /* SEAR_GL_RENDER_H */
+
+} // namespace Sear
+
+#endif
