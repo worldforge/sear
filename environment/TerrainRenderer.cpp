@@ -4,7 +4,7 @@
 
 #include "TerrainRenderer.h"
 
-#include "Texture.h"
+//#include "Texture.h"
 #include <sage/GLU.h>
 
 
@@ -16,6 +16,13 @@
 #include <Mercator/Surface.h>
 
 #include <iostream>
+
+
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
+
+
 namespace Sear {
 
 static const bool debug_flag = false;
@@ -288,70 +295,6 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
     glDisable(GL_BLEND);
 }
 
-void TerrainRenderer::drawShadow(const WFMath::Point<2> & pos, float radius)
-{
-    int nx = lrintf(floor(pos.x() - radius)),
-        ny = lrintf(floor(pos.y() - radius)),
-        fx = lrintf(ceil(pos.x() + radius)),
-        fy = lrintf(ceil(pos.y() + radius));
-    unsigned dx = fx - nx,
-             dy = fy - ny,
-             diameter = std::max(dx, dy),
-             size = diameter + 1;
-    fx = nx + diameter;
-    fy = ny + diameter;
-    float * vertices = new float[size * size * 3];
-    float * texcoords = new float[size * size * 2];
-    float * vptr = vertices - 1;
-    float * tptr = texcoords - 1;
-    for(int y = ny; y <= fy; ++y) {
-        for(int x = nx; x <= fx; ++x) {
-            *++vptr = x;
-            *++vptr = y;
-            *++vptr = m_terrain.get(x, y);
-            *++tptr = ((float)x - pos.x() + radius) / (radius * 2);
-            *++tptr = ((float)y - pos.y() + radius) / (radius * 2);
-        }
-    }
-    GLushort * indices = new GLushort[diameter * size * 2];
-    GLushort * iptr = indices - 1;
-    int numind = 0;
-    for(GLuint i = 0; i < diameter; ++i) {
-        // This ensures that we are drawing the same triangles
-        // in the same order as they are done in the original terrain
-        // passes
-        if ((i + nx) & 1) {
-            for(GLshort j = diameter; j >= 0; --j) {
-                *++iptr = j * size + i + 1;
-                *++iptr = j * size + i;
-                numind += 2;
-            }
-        } else {
-            for(GLuint j = 0; j <= diameter; ++j) {
-                *++iptr = j * size + i;
-                *++iptr = j * size + i + 1;
-                numind += 2;
-            }
-        }
-    }
-    GLuint shTexture = Texture::get("shadow.png", false);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBindTexture(GL_TEXTURE_2D, shTexture);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
-    glDrawElements(GL_TRIANGLE_STRIP, numind, GL_UNSIGNED_SHORT, indices);
-
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_BLEND);
-    glDisable(GL_TEXTURE_2D);
-        
-        
-}
-
-
 TerrainRenderer::TerrainRenderer() :
 m_terrain(Terrain::SHADED),
     m_numLineIndeces(0),
@@ -359,11 +302,17 @@ m_terrain(Terrain::SHADED),
     m_landscapeList(0), m_haveTerrain(false)
 
 {
-    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
-    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
-    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);
-    m_textures[3] = Texture::get("dark.png", true, GL_LINEAR_MIPMAP_NEAREST);
-    m_textures[4] = Texture::get("snow.png", true, GL_LINEAR_MIPMAP_NEAREST);
+
+m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("granite.png");
+m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("sand.png");
+m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("rabbithill_grass_hh.png");
+m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("dark.png");
+m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("snow.png");
+//    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
+//    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
+//    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);
+//    m_textures[3] = Texture::get("dark.png", true, GL_LINEAR_MIPMAP_NEAREST);
+//    m_textures[4] = Texture::get("snow.png", true, GL_LINEAR_MIPMAP_NEAREST);
 
     int idx = -1;
     for (unsigned int i = 0; i < (segSize + 1) - 1; ++i) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.35 2004-01-26 22:06:59 simon Exp $
+// $Id: GL.h,v 1.36 2004-04-01 21:24:26 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -29,8 +29,7 @@
 namespace Sear {
 
 class System;
-class Terrain;
-class Sky;
+class Environment;
 class Camera;
 class WorldEntity;
 class Model;
@@ -173,7 +172,6 @@ protected:
   int x_pos;
   int y_pos;
   
-  Terrain *terrain;
   
   void buildQueues(WorldEntity*, int, bool);
 
@@ -223,6 +221,8 @@ protected:
   bool _multi_texture_mode;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+
+  Environment *env;
 
 
   TextureManager *_texture_manager;

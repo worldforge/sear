@@ -1,3 +1,6 @@
+1st April 2004, Simon Goodall
+ * More changes for Mercator integration. commpiles, but not tested.
+
 30th March 2004, Simon Goodall
  * Initial mercator support - imported code from apogee - prob wont compile
 

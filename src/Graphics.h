@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.12 2003-04-23 20:28:27 simon Exp $
+// $Id: Graphics.h,v 1.13 2004-04-01 21:24:26 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -25,15 +25,13 @@ class Config;
 }
 
 namespace Sear {
-
+class TerrainRenderer;
 class ModelHandler;
 class BillBoard;
 class BoundBox;
 class Camera;
 class Impostor;
 class Render;
-class Sky;
-class Terrain;
 class WorldEntity;
 class System;
 class Character;
@@ -84,8 +82,6 @@ typedef enum {
   
   Render *getRender() { return _renderer; }
   Camera* getCamera() { return _camera; }
-  Terrain* getTerrain() { return _terrain; }
-  Sky* getSky() { return _sky; }
 void initST(); 
   void setupStates();
   void readConfig();
@@ -98,13 +94,12 @@ void initST();
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
+  TerrainRenderer *getTerrainRenderer() const { return tr; }
 protected:
   System *_system;
   Render *_renderer;
   Character *_character;
   Camera *_camera;
-  Terrain *_terrain;
-  Sky *_sky;
   ModelHandler *_model_handler;
 
   WFMath::Quaternion orient;
@@ -122,10 +117,10 @@ protected:
   bool _initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
-  
 private:
 
   
+ TerrainRenderer *tr;
 };
 
 } /* namespace Sear */

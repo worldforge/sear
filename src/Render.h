@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.31 2004-01-26 22:06:59 simon Exp $
+// $Id: Render.h,v 1.32 2004-04-01 21:24:26 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -28,7 +28,6 @@
 namespace Sear {
 
 class Camera;
-class Terrain;
 class Sky;
 class BoundBox;
 class BillBoard;
@@ -117,8 +116,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void renderActiveName() =0;
 
 //  virtual Camera* getCamera() =0;
-//  virtual Terrain* getTerrain() =0;
-//  virtual Sky* getSkyBox() =0;
  
 
   virtual void setupStates() =0;

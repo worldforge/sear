@@ -2,7 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.32 2003-11-09 12:59:13 simon Exp $
+// $Id: Graphics.cpp,v 1.33 2004-04-01 21:24:26 simon Exp $
+#include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -16,11 +17,9 @@
 
 #include "common/Log.h"
 #include "common/Utility.h"
-
+#include "environment/TerrainRenderer.h"
+#include "environment/SkyDome.h"
 #include "renderers/GL.h"
-#include "sky/SkyBox.h"
-#include "terrain/ROAM.h"
-
 #include "Camera.h"
 #include "Character.h"
 #include "Console.h"
@@ -32,10 +31,10 @@
 #include "ObjectRecord.h"
 #include "ObjectHandler.h"
 #include "Render.h"
-#include "Sky.h"
 #include "System.h"
-#include "Terrain.h"
 #include "WorldEntity.h"
+
+#include "environment/Environment.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -49,6 +48,7 @@
 
 namespace Sear {
 
+ extern void renderDome(float, int, int);
 static const std::string GRAPHICS = "graphics";
 	
 static const std::string DEFAULT = "default";
@@ -81,11 +81,10 @@ Graphics::Graphics(System *system) :
   _renderer(NULL),
   _character(NULL),
   _camera(NULL),
-  _terrain(NULL),
-  _sky(NULL),
   _num_frames(0),
   _frame_time(0),
-  _initialised(false)
+  _initialised(false),
+  tr(NULL)
 {
 }
 
@@ -116,16 +115,6 @@ void Graphics::shutdown() {
     _renderer = NULL;
   }
     
-  if (_terrain) {
-    _terrain->shutdown();
-    delete _terrain;
-    _terrain = NULL;
-  }
-  if (_sky) {
-    _sky->shutdown();
-    delete _sky;
-    _sky = NULL;
-  }
   if (_camera) {
     _camera->shutdown();
     delete _camera;
@@ -133,16 +122,21 @@ void Graphics::shutdown() {
   }
   _initialised = false;
 }
+
+
+
 void Graphics::initST() {
-  _terrain = new ROAM(_system, _renderer);
-  if (!_terrain->init()) {
-    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
-  }
-  _sky = new SkyBox(_system, _renderer);
-  if (!_sky->init()) {
-    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::LOG_ERROR);
-  }
+tr = new TerrainRenderer();
+  int X = 16;
+int Y = 16;
+   for (int x = -X; x < X; ++x) {
+     for (int y = -Y; y < Y; ++y) {
+//       tr->m_terrain.setBasePoint(x, y, ((float)rand() / (float)RAND_MAX * 60.0f) - 20.0f);
+     }
+   }
 }
+
+
 void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {
   if (!_renderer) throw Exception("No Render object to render with!");
   if (select_mode) _renderer->resetSelection();
@@ -161,7 +155,6 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
     // Only update on a viewable frame
     _frame_time += time_elapsed;
     _frame_rate = (float)_num_frames++ /_frame_time;
-//    if (_renderer->checkState(Render::RENDER_FPS))  _renderer->drawFPS(_frame_rate);
     if (_frame_time > 1.0f) {
       std::string fr = string_fmt(_frame_rate);
       SDL_WM_SetCaption(fr.c_str(), fr.c_str());
@@ -169,7 +162,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
       _frame_time = 0.0f;
     }
   }
-  updateDetailLevels(_frame_rate);
+//  updateDetailLevels(_frame_rate);
   if (!select_mode) _renderer->renderActiveName();
   _renderer->endFrame(select_mode);
 }
@@ -213,18 +206,19 @@ Compare D^2 to choose what detail level to use
       if (_character) orient /= WFMath::Quaternion(z_vector,  _character->getAngle());
 
       // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
-      if (!select_mode && _sky) {
-	_renderer->store();
-        _renderer->applyQuaternion(orient);
-        _sky->draw(); //Draw the sky box
-	_renderer->restore();
-      }
+//      if (!select_mode) {
+//	_renderer->store();
+//        _renderer->applyQuaternion(orient);
+//renderDome(1.0f, 30,30);
+//        _sky->draw(); //Draw the sky box
+//	_renderer->restore();
+//      }
 
       // Translate camera getDist() units away from the character. Allows closups or large views
       _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
       _renderer->applyQuaternion(orient);
       
-      if (_terrain) z -= _terrain->getHeight(-x, -y);
+//      if (_terrain) z -= _terrain->getHeight(-x, -y);
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
       _renderer->translateObject(x, y, z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
@@ -235,11 +229,18 @@ Compare D^2 to choose what detail level to use
 
     _renderer->applyLighting();
 
-    if (!select_mode && _terrain) {
+    if (!select_mode ) {
       _renderer->store();
-      _terrain->draw();
+  //    _terrain->draw();
+
+_renderer->stateChange(_renderer->getStateID("terrain"));
+  glEnableClientState(GL_VERTEX_ARRAY);
+  tr->render(WFMath::Point<3>(0,0,0));//x_pos, y_pos, z_pos));
+  glDisableClientState(GL_VERTEX_ARRAY);
+
       _renderer->restore();
     }
+#if(1)
     WorldEntity *root = NULL; 
     if ((root = (WorldEntity *)world->getRootEntity())) {
       if (_character) _character->updateLocals(false);
@@ -249,11 +250,21 @@ Compare D^2 to choose what detail level to use
       _renderer->drawQueue(_render_queue, select_mode, time_elapsed);
       if (!select_mode) _renderer->drawMessageQueue(_message_list);
     }
+#endif
   } else {
+
+//    _renderer->applyLighting();
+//_renderer->stateChange(_renderer->getStateID("terrain"));
+  //    _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
+//  glEnableClientState(GL_VERTEX_ARRAY);
+//  tr->render(WFMath::Point<3>(0,0,0));//x_pos, y_pos, z_pos));
+  //glDisableClientState(GL_VERTEX_ARRAY);
     _renderer->drawSplashScreen();
-//    _renderer->stateChange(FONT);
-//    _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-//    _renderer->print(20, 50, "World Screen", 0);
+//      _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
+//    _renderer->applyLighting();
+//  glEnableClientState(GL_VERTEX_ARRAY);
+//  tr->render(WFMath::Point<3>(0,0,0));//x_pos, y_pos, z_pos));
+//  glDisableClientState(GL_VERTEX_ARRAY);
   }
 }
 
@@ -312,9 +323,9 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       // TODO if queue is empty switch to another
 //      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
       // Loop through all models in list
-      for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+      for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
         // Check we;re visible
-        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
+        if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, &Environment::getInstance())) {
           if (!select_mode) {
             // Add to queue by state, then model record
 	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
@@ -356,15 +367,11 @@ void Graphics::readComponentConfig() {
   if (_renderer) _renderer->readConfig();
   if (_camera) _camera->readConfig();
   if (_camera) _camera->writeConfig();
-  if (_terrain) _terrain->readConfig();
-  if (_sky) _sky->readConfig();
 }
 
 void Graphics::writeComponentConfig() {
   if (_renderer) _renderer->writeConfig();
 //  if (_camera) _camera->writeConfig();
-  if (_terrain) _terrain->writeConfig();
-  if (_sky) _sky->writeConfig();
 }
 
 void Graphics::updateDetailLevels(float frame_rate) {

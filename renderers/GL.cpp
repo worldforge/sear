@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.72 2004-01-28 19:52:59 simon Exp $
+// $Id: GL.cpp,v 1.73 2004-04-01 21:24:26 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -31,13 +31,10 @@
 #include "src/ModelHandler.h"
 #include "src/ModelRecord.h"
 #include "src/ObjectRecord.h"
-#include "src/Sky.h"
 #include "src/System.h"
-#include "src/Terrain.h"
 #include "src/WorldEntity.h"
 
-#include "terrain/ROAM.h"
-#include "sky/SkyBox.h"
+#include "environment/Environment.h"
 
 #include "GL.h"
 
@@ -234,12 +231,12 @@ GL::GL() :
   base(0),
   splash_id(-1),
   activeEntity(NULL),
-  terrain(NULL),
   _cur_state(NULL),
   _fog_start(20.0f),
   _fog_end(35.0f),
   _light_level(1.0f),
   _initialised(false),
+	env(NULL),
   _texture_manager(NULL),
   _state_manager(NULL)
 {
@@ -258,12 +255,12 @@ GL::GL(System *system, Graphics *graphics) :
   base(0),
   splash_id(-1),
   activeEntity(NULL),
-  terrain(NULL),
   _cur_state(NULL),
   _fog_start(20.0f),
   _fog_end(35.0f),
   _light_level(1.0f),
   _initialised(false),
+	env(NULL),
   _texture_manager(NULL),
   _state_manager(NULL)
 {
@@ -319,7 +316,7 @@ void GL::initWindow(int width, int height) {
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-  glDisable(GL_DITHER); 
+ // glDisable(GL_DITHER); 
   
   //Store window size
   window_width = width;
@@ -336,6 +333,8 @@ void GL::initWindow(int width, int height) {
   
 void GL::init() {
   if (_initialised) shutdown();
+  env = &Environment::getInstance();
+
   
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
@@ -634,8 +633,10 @@ void GL::writeConfig() {
 
 void GL::setupStates() {
   // TODO: should this be in the init?
-  //glAlphaFunc(GL_GREATER, 0.1f);
-//  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+glDepthFunc(GL_LEQUAL);
+glAlphaFunc(GL_GREATER, 0.1f);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
   GLfloat fog_colour[] = {0.50f, 0.50f, 0.50f, 0.50f};
   glFogfv(GL_FOG_COLOR, fog_colour);
@@ -852,8 +853,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
       // Translate Model
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
-      // TODO remove terrain->getHeight when server handles its own z coords
-      translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+      translateObject(pos.x(), pos.y(), pos.z() + env->getHeight(pos.x(), pos.y()));
       // Move object to correct position
       translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
       // Rotate Model
@@ -892,7 +892,7 @@ void GL::drawMessageQueue(MessageList &list) {
     WorldEntity *we = (WorldEntity*)*I;
     glPushMatrix();
     WFMath::Point<3> pos = we->getAbsPos();
-    glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+    glTranslatef(pos.x(), pos.y(), pos.z() + env->getHeight(pos.x(), pos.y()));
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= _graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
@@ -948,14 +948,15 @@ inline void GL::restore() { glPopMatrix(); }
 
 inline void GL::beginFrame() {
   // TODO into display list
-  terrain = _graphics->getTerrain();
   active_name = "";
   if (checkState(RENDER_STENCIL)) {
     glClearStencil(1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
-    } else {
-      glClear(GL_DEPTH_BUFFER_BIT);
-    }
+  } else {
+    glClear(GL_DEPTH_BUFFER_BIT);
+  }
+// TODO remove
+  glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity(); // Reset The View
   //Rotate Coordinate System so Z points upwards and Y points into the screen. 
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
