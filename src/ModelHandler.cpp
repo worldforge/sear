@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.33 2003-07-03 10:25:36 simon Exp $
+// $Id: ModelHandler.cpp,v 1.34 2004-04-26 14:01:47 simon Exp $
 
 //#include "config.h"
 
@@ -19,7 +19,6 @@
 #include "loaders/BoundBox_Loader.h"
 #include "loaders/NPlane_Loader.h"
 #include "loaders/WireFrame_Loader.h"
-#include "loaders/Slice_Loader.h"
 
 
 #include "src/Event.h"
@@ -57,7 +56,6 @@ ModelHandler::ModelHandler() :
   new BoundBox_Loader(this);
   new WireFrame_Loader(this);
   new NPlane_Loader(this);
-  new Slice_Loader(this);
   new ThreeDS_Loader(this);
 }
 
