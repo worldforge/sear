@@ -25,7 +25,6 @@ sear_LDADD = \
 	../renderers/libRendererGL.a \
 	../terrain/libTerrainROAM.a \
 	../sky/libSkyBox.a \
-	../gui/libGui.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderNPlane.a \
