@@ -142,7 +142,7 @@ int main(int argc, char**argv) {
 } 
 ], [
   AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 1, [We need the stringstreeam workaround])
-  AC_MSG_WARN(Using sstream workaround.)
+#  AC_MSG_WARN(Using sstream workaround.)
 ],[
   AC_MSG_WARN(Not using sstream workaround.)
 ],[
@@ -252,7 +252,5 @@ AC_OUTPUT([
 	scripts/Makefile
 	sear.spec
 	sear-media.spec
-	scripts/startup.script
-	scripts/shutdown.script
 	Sear.iss
 ])

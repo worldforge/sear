@@ -2,7 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.5 2003-03-06 23:50:38 simon Exp $
+// $Id: FileHandler.cpp,v 1.6 2003-12-06 22:29:53 simon Exp $
+
+#include <algorithm>
 
 #include <stdio.h>
 
@@ -83,4 +85,20 @@ void FileHandler::runCommand(const std::string &command, const std::string &args
     removeSearchPath(args);
   }
 }
+
+void FileHandler::expandString(std::string &str) {
+  for (VarMap::const_iterator I = varMap.begin(); I != varMap.end(); ++I) {
+    std::string var = I->first;
+    std::string value = I->second;
+    var = "${" + var + "}";
+    for (std::string::size_type p=str.find(var); p != str.npos; p=str.find(var, p))
+   {
+      str.replace(p, var.length(), value);
+      p += value.length();
+   }
+
+//    replace(str.begin(), str.end(), "${" + var + "}", value);
+  }
+}
+
 } /* namespace Sear */

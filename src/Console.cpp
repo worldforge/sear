@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.27 2003-06-11 23:07:57 simon Exp $
+// $Id: Console.cpp,v 1.28 2003-12-06 22:29:53 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -12,6 +12,7 @@
 #include "System.h"
 #include "Graphics.h"
 #include "Render.h"
+#include "FileHandler.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -200,9 +201,11 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
   _registered_commands[command] = object;
 }
 
-void Console::runCommand(const std::string &command) {
+void Console::runCommand(const std::string &comd) {
   assert ((_initialised == true) && "Console not initialised");
-  if (command.empty()) return; // Ignore empty string
+  if (comd.empty()) return; // Ignore empty string
+  std::string command = comd;
+  System::instance()->getFileHandler()->expandString(command);
   // Grab first character of command string
   char c = command.c_str()[0];
   // Check to see if command is a command, or a speech string

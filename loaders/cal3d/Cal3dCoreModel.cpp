@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.14 2003-07-17 16:41:01 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.15 2003-12-06 22:29:52 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -14,10 +14,13 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
+#include "src/FileHandler.h"
 #include "common/Utility.h"
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
+
+#include "src/Exception.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -107,10 +110,12 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   
   if (config.findItem(SECTION_model, KEY_path)) {
     path = (std::string)config.getItem(SECTION_model, KEY_path);
+    System::instance()->getFileHandler()->expandString(path);
   }
   // Load skeleton
-  if (!_core_model->loadCoreSkeleton(path + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
+  if (!_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
     CalError::printLastError();
+   throw Exception();
     return;
   }
   // Get scale

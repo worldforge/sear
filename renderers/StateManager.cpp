@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.8 2003-12-03 11:08:18 simon Exp $
+// $Id: StateManager.cpp,v 1.9 2003-12-06 22:29:52 simon Exp $
 
 /*
  * TODO
@@ -21,6 +21,8 @@
 #include "common/Utility.h"
 
 #include "src/Console.h"
+#include "src/System.h"
+#include "src/FileHandler.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -426,7 +428,9 @@ void StateManager::registerCommands(Console *console) {
 
 void StateManager::runCommand(const std::string &command, const std::string &arguments) {
   if (command == CMD_LOAD_STATE_CONFIG) {
-    readFiles(arguments);
+    std::string a = arguments;
+    System::instance()->getFileHandler()->expandString(a);
+    readFiles(a);
   }
 }
 

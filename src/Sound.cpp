@@ -3,7 +3,7 @@
 #include "Console.h"
 #include "common/Log.h"
 
-// $Id: Sound.cpp,v 1.11 2003-12-03 17:40:32 simon Exp $
+// $Id: Sound.cpp,v 1.12 2003-12-06 22:29:53 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 
@@ -82,17 +82,7 @@ Mix_Music *Sound::getMusic(const std::string &file_name) {
   Mix_Music *music = NULL;
   music = music_map[file_name];
   if (music) return music;
-  if (file_name.c_str()[0] != '/') {
-    char cwd[256];
-    memset(cwd, '\0', 256);
-    getcwd(cwd, 255);
-    std::string val = std::string(cwd) + "/" + file_name;
-  music=Mix_LoadMUS(val.c_str());
-  } else {
-
   music=Mix_LoadMUS(file_name.c_str());
-  }
-//  music=Mix_LoadMUS(file_name.c_str());
   if (music) {
     music_map[file_name] = music;
     return music;

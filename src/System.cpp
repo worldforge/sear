@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.65 2003-12-03 17:40:32 simon Exp $
+// $Id: System.cpp,v 1.66 2003-12-06 22:29:53 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -184,7 +184,7 @@ bool System::init() {
   }
 #endif
   // This should not be hardcoded!!
-  install_path = std::string(INSTALLDIR) + std::string("/share/sear");
+  install_path = std::string(INSTALLDIR) + std::string("/share/sear/");
  
   _action_handler = new ActionHandler(this);
   _action_handler->init();
@@ -194,6 +194,10 @@ bool System::init() {
   _file_handler->addSearchPath(install_path + "/scripts");
   _file_handler->addSearchPath(home_path);
   _file_handler->addSearchPath(".");
+
+  _file_handler->setVariable("SEAR_INSTALL", install_path);
+  _file_handler->setVariable("SEAR_MEDIA", install_path + "/sear-media/");
+  _file_handler->setVariable("SEAR_HOME", home_path);
 
   for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); ++I) {
     _file_handler->addSearchPath(*I);
@@ -797,6 +801,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(IDENTIFY_ENTITY, this);
   console->registerCommand("normalise_on", this);
   console->registerCommand("normalise_off", this);
+  console->registerCommand("setvar", this);
+  console->registerCommand("getvar", this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -810,8 +816,10 @@ void System::runCommand(const std::string &command) {
 //  }
 }
 
-void System::runCommand(const std::string &command, const std::string &args) {
+void System::runCommand(const std::string &command, const std::string &args_t) {
   Tokeniser tokeniser;
+  std::string args = args_t;
+  _file_handler->expandString(args);
   tokeniser.initTokens(args);
   if (command == EXIT || command == QUIT) _system_running = false;
   else if (command == GET_ATTRIBUTE) {
@@ -897,6 +905,16 @@ void System::runCommand(const std::string &command, const std::string &args) {
 
   else if (command == "normalise_on") glEnable(GL_NORMALIZE);
   else if (command == "normalise_off") glDisable(GL_NORMALIZE);
+
+  else if (command == "setvar") {
+    std::string key = tokeniser.nextToken();
+    std::string value = tokeniser.remainingTokens();
+    _file_handler->setVariable(key, value);
+  }
+  else if (command == "getvar") {
+    std::string key = tokeniser.nextToken();
+    pushMessage(_file_handler->getVariable(key), CONSOLE_MESSAGE);
+  }
   
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }
@@ -922,11 +940,8 @@ void System::processRecords() {
   while (!record_list.empty()) {
     VarconfRecord *r = *record_list.begin();
     std::string value = r->config->getItem(r->section, r->key);
-    char cwd[256];
-    memset(cwd, '\0', 256);
-    getcwd(cwd, 255);
-    std::string val = std::string(cwd) + "/" + std::string(value);
-    r->config->setItem(r->section, r->key, val);
+    _file_handler->expandString(value);
+    r->config->setItem(r->section, r->key, value);
     delete r;
     record_list.erase(record_list.begin());
   }

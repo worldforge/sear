@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.11 2003-12-03 11:08:18 simon Exp $
+// $Id: TextureManager.cpp,v 1.12 2003-12-06 22:29:52 simon Exp $
 
 #include "TextureManager.h"
 
@@ -17,6 +17,8 @@
 
 #include "src/System.h"
 #include "src/Console.h"
+
+#include "src/FileHandler.h"
 
 #include <unistd.h>
 
@@ -177,7 +179,8 @@ TextureObject TextureManager::loadTexture(const std::string &texture_name) {
   if (!path.empty()) {
     filename = path + "/" + filename;
   }
-  
+ 
+  System::instance()->getFileHandler()->expandString(filename);
   // Load texture into memory
   SDL_Surface *surface = System::loadImage(filename);
   if (!surface) {
@@ -342,13 +345,13 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
 }
 
 void TextureManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  if (!config.findItem(section, KEY_path)) {
-    if (debug) std::cout << "New Texture: " << section << std::endl;
-    char cwd[256];
-    memset(cwd, '\0', 256);
-    getcwd(cwd, 355);
-    config.setItem(section, KEY_path, cwd);
-  }
+//  if (!config.findItem(section, KEY_path)) {
+//    if (debug) std::cout << "New Texture: " << section << std::endl;
+//    char cwd[256];
+//    memset(cwd, '\0', 256);
+//    getcwd(cwd, 355);
+//    config.setItem(section, KEY_path, cwd);
+//  }
 }
 
 void TextureManager::varconf_error_callback(const char *message) {
@@ -596,7 +599,9 @@ void TextureManager::registerCommands(Console *console) {
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
   if (command == CMD_LOAD_TEXTURE_CONFIG) {
-    readTextureConfig(arguments);
+    std::string a = arguments;
+    System::instance()->getFileHandler()->expandString(a);
+    readTextureConfig(a);
   }
 }
 } /* namespace Sear */

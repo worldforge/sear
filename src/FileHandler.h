@@ -2,13 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.5 2003-03-23 19:51:49 simon Exp $
+// $Id: FileHandler.h,v 1.6 2003-12-06 22:29:53 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
 
 #include <string>
 #include <list>
+#include <map>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -42,11 +43,23 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
   
+  void setVariable(const std::string &var, const std::string &value) {
+    varMap[var] = value;
+  }
+
+  std::string getVariable(const std::string &var) {
+    return varMap[var];
+  }
+
+  void expandString(std::string &str);
+
 protected:
   FileList  _searchpaths;
 
 private:
   
+  typedef std::map<std::string, std::string> VarMap; 
+  VarMap varMap; 
 };
 
 } /* namespace Sear */

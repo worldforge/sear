@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.7 2003-07-17 16:41:01 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.8 2003-12-06 22:29:52 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -51,7 +51,7 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
   std::string file_name = System::instance()->getModel().getItem(CAL3D, model_record->data_file_id);
   
 //  std::cerr << "Loading Cally model " << file_name << std::endl;
-
+try {
   Cal3dModel *model = _core_model_handler->instantiateModel(file_name);
   
   if (!model) {
@@ -92,7 +92,9 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
   model_record->model = model;
 
  // std::cerr << "Model Created" << std::endl << std::flush;
-  
+  } catch (...) {
+return NULL;
+}
   return model_record;
 }
 
