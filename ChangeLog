@@ -1,3 +1,8 @@
+2004-11-03  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Add objtype to args of Use and Wield ops.
+	  Find tool by type as well as by name.
+
 2004-10-28  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/3ds.cpp: Fix segfault on objects with no texture/normal data

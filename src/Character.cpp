@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.47 2004-06-30 18:50:16 alriddoch Exp $
+// $Id: Character.cpp,v 1.48 2004-11-03 20:07:08 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -324,11 +324,13 @@ void Character::touchEntity(const std::string &id) {
 void Character::wieldEntity(const std::string &name) {
   for (unsigned int i = 0; i < _self->getNumMembers(); ++i) {
     WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
-    if (we->getName() == name) {
+    Eris::StringSet wep = we->getInherits();
+    if ((we->getName() == name) || (wep.find(name) != wep.end())) {
       Atlas::Objects::Operation::Wield w;
       w.setFrom(_self->getID());
       Atlas::Message::Element::MapType arg;
       arg["id"] = we->getID();
+      arg["objtype"] = "obj";
       Atlas::Message::Element::ListType & args = w.getArgs();
       args.push_back(arg);
       _avatar->getWorld()->getConnection()->send(w);
@@ -345,6 +347,7 @@ void Character::useToolOnEntity(const std::string & id) {
   u.setFrom(_self->getID());
   Atlas::Message::Element::MapType arg;
   arg["id"] = e->getID();
+  arg["objtype"] = "obj";
   Atlas::Message::Element::ListType & args = u.getArgs();
   args.push_back(arg);
   _avatar->getWorld()->getConnection()->send(u);
