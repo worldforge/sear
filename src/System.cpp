@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.46 2002-12-11 22:19:26 simon Exp $
+// $Id: System.cpp,v 1.47 2002-12-12 16:52:18 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -383,8 +383,11 @@ void System::createWindow(bool fullscreen) {
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
   if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
   
- 
+#ifndef __WIN32__ 
+  // Not required on windows as icon gets compiled in
   if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);//loadImage(_icon_file);
+#endif
+  
   // Should set the icon transparency but it does not work.
   if (_icon) {
     if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGBA(_icon->format, 0x0, 0x0, 0x0, 0xFF)) == -1) {
