@@ -27,6 +27,10 @@ public:
     return m_content;
   }
 
+  std::string & content() {
+    return m_content;
+  }
+
   void setContent(const std::string &);
 
   virtual void render(Render *);

@@ -16,8 +16,14 @@ Window::~Window() {
 
 void Window::addChild(Window * w)
 {
-    m_children.insert(w);
-    w->m_parent = this;
+  m_children.insert(w);
+  w->m_parent = this;
+}
+
+void Window::removeChild(Window * w)
+{
+  m_children.erase(w);
+  w->m_parent = 0;
 }
 
 void Window::setPos(int x, int y)
@@ -37,7 +43,7 @@ void Window::setEvents(unsigned int ev)
   m_eventMask = ev;
 }
 
-void Window::mouseMotion(short x, short y)
+void Window::mouseMotion(short x, short y, short ox, short oy)
 {
   if (m_parent != 0) {
     std::cout << "CHILD " << x << " " << y << std::endl << std::flush;
@@ -46,12 +52,24 @@ void Window::mouseMotion(short x, short y)
   for(; I != m_children.end(); ++I) {
     Window & w = **I;
     short rx = x - w.m_x,
-          ry = y - w.m_y;
-    if ((rx < 0) || (rx >= w.m_w) ||
-        (ry < 0) || (ry >= w.m_h)) {
-      continue;
+          ry = y - w.m_y,
+          rox = ox - w.m_x,
+          roy = oy - w.m_y;
+    if ((rx >= 0) && (rx < w.m_w) && (ry >= 0) && (ry < w.m_h) ||
+        (rox >= 0) && (rox < w.m_w) && (roy >= 0) && (roy < w.m_h)) {
+      w.mouseMotion(rx, ry, rox, roy);
     }
-    w.mouseMotion(rx, ry);
+  }
+  if (x < 0 || y < 0 || x >= m_w || y >= m_h) {
+    std::cout << "EXIT" << std::endl << std::flush;
+    if (m_eventMask & MOUSE_LEAVE) {
+      MouseLeave.emit();
+    }
+  } else if (ox < 0 || oy < 0 || ox >= m_w || oy >= m_h) {
+    std::cout << "ENTER" << std::endl << std::flush;
+    if (m_eventMask & MOUSE_ENTER) {
+      MouseEnter.emit();
+    }
   }
 }
 
@@ -97,24 +115,10 @@ void Window::mouseUp(short x, short y)
   }
 }
 
-void Window::keyPress(short x, short y, SDLKey ks, Uint16 ch)
+void Window::keyPress(SDLKey ks, Uint16 ch)
 {
-  if (m_parent != 0) {
-    std::cout << "CHILD K " << x << " " << y << std::endl << std::flush;
-  }
-  std::set<Window *>::const_iterator I = m_children.begin();
-  for(; I != m_children.end(); ++I) {
-    Window & w = **I;
-    short rx = x - w.m_x,
-          ry = y - w.m_y;
-    if ((rx < 0) || (rx >= w.m_w) ||
-        (ry < 0) || (ry >= w.m_h)) {
-      continue;
-    }
-    w.keyPress(rx, ry, ks, ch);
-  }
   if (m_eventMask & KEY_PRESS) {
-    // MouseUp.emit();
+    KeyPress.emit(ks, ch);
   }
 }
 

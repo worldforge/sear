@@ -6,6 +6,7 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    RootWindow.cpp RootWindow.h \
                    Frame.cpp Frame.h \
                    String.cpp String.h \
+                   Caret.cpp Caret.h \
                    Widget.cpp Widget.h \
                    Label.cpp Label.h \
                    Container.cpp Container.h \
@@ -16,4 +17,5 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    TextEntry.cpp TextEntry.h \
                    Graphic.cpp Graphic.h \
                    Compass.cpp Compass.h \
+                   focus.cpp focus.h \
                    event.h

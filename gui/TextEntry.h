@@ -9,10 +9,13 @@
 
 #include <sigc++/signal.h>
 
+#include <SDL/SDL.h>
+
 namespace Sear {
 
 class String;
 class Frame;
+class Caret;
 
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
@@ -24,8 +27,10 @@ private:
 protected:
   Frame * m_frame;
   String * m_text;
+  Caret * m_caret;
   int m_size;
   unsigned int m_border;
+  unsigned int m_caretPos;
 
 public:
   explicit TextEntry(int size, const std::string & text);
@@ -33,6 +38,10 @@ public:
 
   virtual void show();
   virtual void map(Window * win, int x, int y, int & w, int & h);
+
+  void onKeyPress(SDLKey, Uint16);
+  void onPressed();
+  void onFocus(Window *);
 };
 
 } // namespace Sear

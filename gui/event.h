@@ -10,7 +10,9 @@ namespace Sear {
 static const unsigned int MOUSE_MOTION        = 1 <<  0;
 static const unsigned int MOUSE_BUTTON_DOWN   = 1 <<  1;
 static const unsigned int MOUSE_BUTTON_UP     = 1 <<  2;
-static const unsigned int KEY_PRESS           = 1 <<  3;
+static const unsigned int MOUSE_ENTER         = 1 <<  3;
+static const unsigned int MOUSE_LEAVE         = 1 <<  4;
+static const unsigned int KEY_PRESS           = 1 <<  5;
 
 } // namespace Sear
 

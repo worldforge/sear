@@ -1,5 +1,29 @@
 2004-10-18  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Button.cpp, gui/Button.h, gui/Window.cpp, gui/Window.h,
+	  gui/Workspace.cpp, gui/Workspace.h, gui/event.h:
+	  Re-work mouseMotion() so we can track entering and leaving
+	  a window. Add the necessary signals, and add support into
+	  Button for cancelling Button press by leaving the window.
+
+	* gui/String.h: Add non-const accessor for contents.
+
+	* gui/Window.cpp, gui/Window.h: Include support for removing
+	  child Windows as well as adding them. Simplify keypress
+	  model to be based on widget focus rather than mouse
+	  position.
+
+	* gui/Workspace.cpp, gui/focus.h gui/focus.cpp: Add support
+	  for window focus.
+
+	* gui/TextEntry.cpp, gui/TextEntry.h, gui/Caret.cpp gui/Caret.h:
+	  Add support for a text cursor using Caret, and use focus
+	  to determine if it should be displayed. Use new focus based
+	  text input and improved special keypress to make text entry
+	  more usable.
+
+2004-10-18  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/Workspace.h, gui/Workspace.cpp, gui/Window.h, gui/Window.cpp:
 	  Add event handler for keypress events.
 

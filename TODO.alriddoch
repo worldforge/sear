@@ -1,3 +1,5 @@
+Handle disconnection cleanly. May be attempt a re-connect.
+
  Idea:
 
    Keep track in System of the last time mouse or joystick modified view.

@@ -6,6 +6,7 @@
 
 #include "gui/RootWindow.h"
 #include "gui/Toplevel.h"
+#include "gui/focus.h"
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -22,7 +23,8 @@ static const std::string WORKSPACE = "workspace";
 
 Workspace::Workspace(System * system) : m_system(system),
                                         m_rootWindow(new RootWindow()),
-                                        m_focusPolicy(FOCUS_CLICK)
+                                        m_focusPolicy(FOCUS_CLICK),
+                                        m_oldx(-1), m_oldy(-1)
 {
 }
 
@@ -47,20 +49,22 @@ void Workspace::draw()
   renderer->setViewMode(PERSPECTIVE);
 }
 
-void Workspace::mouseMotion(Window & w, short x, short y)
+void Workspace::mouseMotion(Window & w, short x, short y, short ox, short oy)
 {
   const std::set<Window *> & children = w.getChildren();
   std::set<Window *>::const_iterator I = children.begin();
   for(; I != children.end(); ++I) {
     Window & c = **I;
     short rx = x - c.x(),
-          ry = y - c.y();
+          ry = y - c.y(),
+          rox = ox - c.x(),
+          roy = oy - c.y();
     if ((rx < 0) || (rx >= c.w()) ||
         (ry < 0) || (ry >= c.h())) {
       continue;
     }
     // mouseMotion(c, rx, ry);
-    c.mouseMotion(rx, ry);
+    c.mouseMotion(rx, ry, rox, roy);
   }
 }
 
@@ -80,6 +84,7 @@ void Workspace::mouseDown(Window & w, short x, short y)
   }
 }
 
+// FIXME Why pass in the window? Its always rootWindow.
 void Workspace::mouseUp(Window & w, short x, short y)
 {
   const std::set<Window *> & children = w.getChildren();
@@ -96,12 +101,14 @@ void Workspace::mouseUp(Window & w, short x, short y)
   }
 }
 
-// FIXME Why pass in the window? Its always rootWindow.
+#if 0
 void Workspace::keyPress(Window & w, short x, short y, SDLKey ks, Uint16 ch)
 {
+  std::cout << "Key down" << std::endl << std::flush;
   const std::set<Window *> & children = w.getChildren();
   std::set<Window *>::const_iterator I = children.begin();
   for(; I != children.end(); ++I) {
+    std::cout << "Key down 1" << std::endl << std::flush;
     Window & c = **I;
     short rx = x - c.x(),
           ry = y - c.y();
@@ -109,34 +116,47 @@ void Workspace::keyPress(Window & w, short x, short y, SDLKey ks, Uint16 ch)
         (ry < 0) || (ry >= c.h())) {
       continue;
     }
+    std::cout << "Key down 2" << std::endl << std::flush;
     c.keyPress(rx, ry, ks, ch);
   }
 }
+#endif
 
 void Workspace::handleEvent(const SDL_Event & event)
 {
   assert(m_rootWindow != 0);
   Render *renderer = m_system->getGraphics()->getRender();
 
-  short x = event.motion.x;
-  short y = renderer->getWindowHeight() - event.motion.y;
-
   switch (event.type) {
     case SDL_MOUSEMOTION: {
-        mouseMotion(*m_rootWindow, x, y);
+        short x = event.motion.x;
+        short y = renderer->getWindowHeight() - event.motion.y;
+
+        mouseMotion(*m_rootWindow, x, y, m_oldx, m_oldy);
+        m_oldx = x;
+        m_oldy = y;
       }
       break;
     case SDL_MOUSEBUTTONDOWN: {
+        short x = event.button.x;
+        short y = renderer->getWindowHeight() - event.button.y;
+
         mouseDown(*m_rootWindow, x, y);
       }
       break;
     case SDL_MOUSEBUTTONUP: {
+        short x = event.button.x;
+        short y = renderer->getWindowHeight() - event.button.y;
+
         mouseUp(*m_rootWindow, x, y);
       }
       break;
     case SDL_KEYDOWN: {
-        keyPress(*m_rootWindow, x, y, event.key.keysym.sym,
-                                      event.key.keysym.unicode);
+        // FIXME This should be focus based.
+        Window * focus = queryFocus();
+        if (focus != 0) {
+          focus->keyPress(event.key.keysym.sym, event.key.keysym.unicode);
+        }
       }
       break;
     case SDL_KEYUP:

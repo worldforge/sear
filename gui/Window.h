@@ -57,20 +57,24 @@ public:
   }
   
   void addChild(Window *);
+  void removeChild(Window *);
   void setPos(int, int);
   void setSize(int, int);
 
   void setEvents(unsigned int ev);
 
-  void mouseMotion(short, short);
+  void mouseMotion(short, short, short, short);
   void mouseDown(short, short);
   void mouseUp(short, short);
-  void keyPress(short, short, SDLKey, Uint16);
+  void keyPress(SDLKey, Uint16);
 
   virtual void render(Render *) = 0;
 
   SigC::Signal0<void> MouseDown;
   SigC::Signal0<void> MouseUp;
+  SigC::Signal0<void> MouseEnter;
+  SigC::Signal0<void> MouseLeave;
+  SigC::Signal2<void, SDLKey, Uint16> KeyPress;
 };
 
 } // namespace Sear

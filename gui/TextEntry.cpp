@@ -6,6 +6,8 @@
 
 #include "gui/Frame.h"
 #include "gui/String.h"
+#include "gui/Caret.h"
+#include "gui/focus.h"
 
 #include <sigc++/object_slot.h>
 
@@ -15,9 +17,10 @@ namespace Sear {
 
 TextEntry::TextEntry(int size, const std::string & text) :
            m_frame(new Frame()), m_text(new String(text)),
-           m_size(size), m_border(4)
+           m_caret(new Caret(16)), m_size(size), m_border(4)
 {
   m_frame->down();
+  m_caretPos = m_text->content().size();
 }
 
 TextEntry::~TextEntry()
@@ -36,13 +39,56 @@ void TextEntry::map(Window * win, int x, int y, int & w, int & h)
   m_frame->addChild(m_text);
   m_frame->setPos(x, y);
   m_frame->setSize(m_border * 2 + cw, m_border * 2 + ch);
-  // m_frame->MouseDown.connect(SigC::slot(*this, &TextEntry::onPressed));
-  // m_frame->MouseUp.connect(SigC::slot(*this, &TextEntry::onRelease));
+  m_frame->MouseDown.connect(SigC::slot(*this, &TextEntry::onPressed));
+  m_frame->KeyPress.connect(SigC::slot(*this, &TextEntry::onKeyPress));
+  focusSignal().connect(SigC::slot(*this, &TextEntry::onFocus));
   m_frame->setEvents(MOUSE_BUTTON_DOWN | KEY_PRESS);
+  m_caret->setPos(m_caretPos * 10 + m_border + 4, m_border);
   win->addChild(m_frame);
   w = m_frame->w();
   h = m_frame->h();
   std::cout << "TextEntry::map return " << w << "," << h << std::endl << std::flush;
+}
+
+void TextEntry::onKeyPress(SDLKey ks, Uint16 ch)
+{
+  if (ks == SDLK_BACKSPACE) {
+    if(m_caretPos > 0) {
+      m_text->content() = m_text->content().erase(m_caretPos - 1, 1);
+      --m_caretPos;
+    }
+  } else if (ks == SDLK_LEFT) {
+    if(m_caretPos > 0) {
+      --m_caretPos;
+    }
+  } else if (ks == SDLK_RIGHT) {
+    if(m_caretPos < m_text->content().length()) {
+      ++m_caretPos;
+    }
+  } else if (ks == SDLK_RETURN || ks == SDLK_ESCAPE) {
+    // nothing
+  } else if (ch > 0 && ch < 0x80) {
+    std::cout << "Key press" << std::endl << std::flush;
+    m_text->content().insert(m_caretPos, 1, ch);
+    ++m_caretPos;
+  }
+  m_caret->setPos(m_caretPos * 10 + m_border + 4, m_border);
+}
+
+void TextEntry::onPressed()
+{
+  std::cout << "TEXTENTRY PRESSED" << std::endl << std::flush;
+  grabFocus(m_frame);
+}
+
+void TextEntry::onFocus(Window * w)
+{
+  std::cout << "FOCUS CHANGE" << std::endl << std::flush;
+  if (w == m_frame) {
+    m_frame->addChild(m_caret);
+  } else {
+    m_frame->removeChild(m_caret);
+  }
 }
 
 } // namespace Sear

@@ -26,8 +26,9 @@ protected:
   System * m_system;
   RootWindow * m_rootWindow;
   FocusPolicy m_focusPolicy;
+  short m_oldx, m_oldy;
 
-  void mouseMotion(Window &, short, short);
+  void mouseMotion(Window &, short, short, short, short);
   void mouseDown(Window &, short, short);
   void mouseUp(Window &, short, short);
   void keyPress(Window &, short, short, SDLKey, Uint16);

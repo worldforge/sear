@@ -38,6 +38,7 @@ public:
   // Called by event callbacks
   void onPressed();
   void onRelease();
+  void onLeave();
 
   SigC::Signal0<void> Clicked;
 };
