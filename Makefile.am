@@ -1,34 +1,10 @@
-## Process this file with automake to produce Makefile.in
-## For top-level sear directory
+SUBDIRS = interfaces script engine src
 
-SUBDIRS = data scripts common loaders renderers terrain sky gui src tools
-
-## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \
-	autogen.sh sear.spec
-
-##manual copy game data to target dir
-##and spit out some infos
-install-data-local:
-	mkdir -p $(DESTDIR)$(datadir)/sear
-	mkdir -p $(DESTDIR)$(datadir)/sear/data
-	mkdir -p $(DESTDIR)$(datadir)/sear/scripts
-	cp -f data/*.png $(DESTDIR)$(datadir)/sear/data
-	cp -f data/*.cfg $(DESTDIR)$(datadir)/sear/data
-	cp -f scripts/*.script $(DESTDIR)$(datadir)/sear/scripts
-
-	@echo 
-	@echo "Sear is now installed in "$(prefix)
-	@echo
-	@echo "Using:"
-	@echo "----------------------------"
-	@echo "$> "$(prefix)"/bin/sear"
-	@echo
-
+	autogen.sh
 
 # Rule to build tar-gzipped distribution package
 $(PACKAGE)-$(VERSION).tar.gz: dist
 
-# Rule to build RPM distribution package
-rpm: $(PACKAGE)-$(VERSION).tar.gz
-	rpm -ta $(PACKAGE)-$(VERSION).tar.gz
+docs: sear.dox
+	doxygen sear.dox
