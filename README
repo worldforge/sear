@@ -24,6 +24,9 @@ http://www.libsdl.org/
 SDL_image 1.2.2
 http://www.libsdl.org/projects/SDL_image
 
+SDL_sound 0.1.5
+http://icculus.org/SDL_sound/
+
 SigC 1.0.3
 http://sourceforge.net/projects/libsigc/
 
