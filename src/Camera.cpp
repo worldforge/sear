@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.14 2003-03-23 19:51:49 simon Exp $
+// $Id: Camera.cpp,v 1.15 2004-04-12 15:28:50 alriddoch Exp $
 
 #include <string>
 
@@ -138,6 +138,22 @@ void Camera::updateCameraPos(float time_elapsed) {
     _y_pos = dist_sqr * cos(_elevation) * sin(_rotation);
     _z_pos = _distance * sin(_elevation);
   }
+}
+
+void Camera::rotateImmediate(float rot) {
+  _rotation  += deg_to_rad(rot);
+  float dist_sqr = _distance * _distance;
+  _x_pos = dist_sqr * cos(_elevation) * cos(_rotation);
+  _y_pos = dist_sqr * cos(_elevation) * sin(_rotation);
+  _z_pos = _distance * sin(_elevation);
+}
+
+void Camera::elevateImmediate(float elev) {
+  _elevation += deg_to_rad(elev);
+  float dist_sqr = _distance * _distance;
+  _x_pos = dist_sqr * cos(_elevation) * cos(_rotation);
+  _y_pos = dist_sqr * cos(_elevation) * sin(_rotation);
+  _z_pos = _distance * sin(_elevation);
 }
 
 void Camera::readConfig() {

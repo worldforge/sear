@@ -1,3 +1,7 @@
+12th April 2004, Al Riddoch
+ * Add support to camera for immediate changes, and implement mouse controlled
+   camera.
+
 7th April 2004, Simon Goodall
  * More terrain tracking stuff
 

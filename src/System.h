@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.33 2004-04-05 13:39:38 alriddoch Exp $
+// $Id: System.h,v 1.34 2004-04-12 15:28:50 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -99,6 +99,11 @@ public:
    * This toggles the fullscreen flag of the window
    */ 
   void toggleFullscreen();
+
+  /**
+   * This toggles the mlook flag
+   */
+  void toggleMouselook();
 
   /**
    * This passes a command string to the console to run. The first word encountered
@@ -232,6 +237,7 @@ protected:
   void handleAnalogueControllers();
 
   bool fullscreen;
+  bool mouseLook;
   SDL_Surface *screen;
   Graphics *_graphics;
   Render *renderer;

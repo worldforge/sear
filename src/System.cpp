@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.71 2004-04-07 00:54:18 alriddoch Exp $
+// $Id: System.cpp,v 1.72 2004-04-12 15:28:50 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,6 +85,7 @@ namespace Sear {
   static const std::string BIND_KEY = "bind";
   static const std::string KEY_PRESS = "keypress";
   static const std::string TOGGLE_FULLSCREEN = "toggle_fullscreen";
+  static const std::string TOGGLE_MLOOK = "toggle_mlook";
   static const std::string ADD_EVENT = "event";
   static const std::string IDENTIFY_ENTITY = "identify";
 
@@ -106,6 +107,7 @@ System::System() :
   repeat(false),
   action(ACTION_DEFAULT),
   fullscreen(0),
+  mouseLook(0),
   screen(NULL),
   _graphics(NULL),
   renderer(NULL),
@@ -531,7 +533,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_MOUSEMOTION: {
-      if (_mouse_move_select) renderer->procEvent(event.button.x, event.button.y);
+      if (_mouse_move_select && !mouseLook) renderer->procEvent(event.button.x, event.button.y);
       break;
     } 
     case SDL_KEYDOWN: {
@@ -666,6 +668,37 @@ void System::handleEvents(const SDL_Event &event) {
 }
 
 void System::handleAnalogueControllers() {
+  if (mouseLook) {
+    // We should still be ok if the user wants to drag something
+    int mx = _width / 2,
+        my = _height / 2;
+    int dx, dy;
+    SDL_GetMouseState(&dx, &dy);
+    dx -= mx;
+    dy -= my;
+    Graphics * g = getGraphics();
+    Camera * c = NULL;
+    if (g != NULL) {
+      c = g->getCamera();
+    }
+    if (dx != 0) {
+      float rotation = dx / 4.f;
+      if (c != NULL) {
+        c->rotateImmediate(rotation);
+      }
+    }
+    if (dy != 0) {
+      float elevation = -dy / 4.f;
+      std::cout << "E: " << elevation << std::endl << std::flush;
+      if (c != NULL) {
+        c->elevateImmediate(elevation);
+      }
+    }
+    
+    if ((dx != 0) || (dy != 0)) {
+      SDL_WarpMouse(mx, my);
+    }
+  }
 #if 0
   if (_controller != NULL) {
     Graphics * g = getGraphics();
@@ -709,6 +742,17 @@ void System::toggleFullscreen() {
   fullscreen = ! fullscreen;
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
   if (!SDL_WM_ToggleFullScreen(screen)) createWindow(fullscreen);
+}
+
+void System::toggleMouselook() {
+  std::cout << "System::toggleMouselook()" << std::endl << std::flush;
+  mouseLook = ! mouseLook;
+  if (mouseLook) {
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_WarpMouse(_width / 2, _height / 2);
+  } else {
+    SDL_ShowCursor(SDL_ENABLE);
+  }
 }
 
 
@@ -895,6 +939,7 @@ void System::registerCommands(Console *console) {
   console->registerCommand(BIND_KEY, this);
   console->registerCommand(KEY_PRESS, this);
   console->registerCommand(TOGGLE_FULLSCREEN, this);
+  console->registerCommand(TOGGLE_MLOOK, this);
   console->registerCommand(ADD_EVENT, this);
   console->registerCommand(IDENTIFY_ENTITY, this);
   console->registerCommand("normalise_on", this);
@@ -987,6 +1032,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     runCommand(Bindings::getBinding(args));
   }
   else if (command == TOGGLE_FULLSCREEN) toggleFullscreen();
+  else if (command == TOGGLE_MLOOK) toggleMouselook();
   else if (command == ADD_EVENT) {
     std::string event_function = tokeniser.nextToken();
     std::string extra = tokeniser.nextToken();

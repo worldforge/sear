@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.31 2004-04-07 00:54:18 alriddoch Exp $
+// $Id: Character.cpp,v 1.32 2004-04-12 15:28:50 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -47,12 +47,12 @@ namespace Sear {
   static const std::string MOVE_BACKWARD = "+character_move_backward";
   static const std::string MOVE_STOP_FORWARD = "-character_move_forward";
   static const std::string MOVE_STOP_BACKWARD = "-character_move_backward";
- 
+
   static const std::string ROTATE_LEFT = "+character_rotate_left";
   static const std::string ROTATE_RIGHT = "+character_rotate_right";
   static const std::string ROTATE_STOP_LEFT = "-character_rotate_left";
   static const std::string ROTATE_STOP_RIGHT = "-character_rotate_right";
- 
+
   static const std::string STRAFE_LEFT = "+character_strafe_left";
   static const std::string STRAFE_RIGHT = "+character_strafe_right";
   static const std::string STRAFE_STOP_LEFT = "-character_strafe_left";
@@ -61,13 +61,13 @@ namespace Sear {
   static const std::string RUN = "+run";
   static const std::string STOP_RUN = "-run";
   static const std::string TOGGLE_RUN = "toggle_run";
-  
+
   static const std::string SAY = "say";
   static const std::string PICKUP = "pickup";
   static const std::string TOUCH = "touch";
   static const std::string DROP = "drop";
   static const std::string GIVE = "give";
-  static const std::string DISPLAY_INVENTORY = "inventory"; 
+  static const std::string DISPLAY_INVENTORY = "inventory";
 
   static const std::string SET_MATERIAL ="set_material";
   static const std::string SET_MESH ="set_mesh";
@@ -194,7 +194,7 @@ void Character::setRotationRate(float rate) {
 }
 
 void Character::updateLocals(bool send_to_server) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((_initialised == true) && "Character not initialised");
   float x, y, z;
   float mod_speed;
   float angle;
@@ -225,7 +225,7 @@ void Character::updateLocals(bool send_to_server) {
   mod_speed = (_run_modifier) ? (_speed * _run_speed) : (_speed * _walk_speed);
   z = 0.0f;
   y = mod_speed * -sin(_angle);
-  x = mod_speed * cos(_angle);  
+  x = mod_speed * cos(_angle);
   mod_speed = (_run_modifier) ? (_strafe_speed * _run_speed) : (_strafe_speed * _walk_speed);
   z += 0.0f;
   static const float PI_BY_2 = WFMath::Pi / 2.0f;
@@ -243,7 +243,7 @@ void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient)
 
 void Character::getEntity(const std::string &id) {
   assert ((_initialised == true) && "Character not initialised");
-  
+
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
   _avatar->place(e, _avatar->getEntity());
@@ -284,7 +284,7 @@ void Character::displayInventory() {
   std::string name = I->first;
     System::instance()->pushMessage(std::string(name + std::string(" - ") + std::string(quantity)), 3);
   }
- 
+
 }
 
 void Character::say(const std::string &msg) {
@@ -327,7 +327,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
   }
-  
+
   Eris::EntityPtr te = Eris::World::Instance()->lookup(target);
   if(!te) {
     Log::writeLog("No target " + target + " to give " + string_fmt(quantity) + " items of " + name + " to", Log::LOG_DEFAULT);
@@ -382,7 +382,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == MOVE_BACKWARD) moveForward(-1);
    else if (command == MOVE_STOP_FORWARD) moveForward(-1);
    else if (command == MOVE_STOP_BACKWARD) moveForward( 1);
-   
+
    else if (command == ROTATE_LEFT) rotate(-1);
    else if (command == ROTATE_RIGHT) rotate( 1);
    else if (command == ROTATE_STOP_LEFT) rotate( 1);
@@ -391,7 +391,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == STRAFE_LEFT) strafe(-1);
    else if (command == STRAFE_RIGHT) strafe( 1);
    else if (command == STRAFE_STOP_LEFT) strafe( 1);
-   else if (command == STRAFE_STOP_RIGHT) strafe(-1); 
+   else if (command == STRAFE_STOP_RIGHT) strafe(-1);
 
    else if (command == RUN || command == STOP_RUN || command == TOGGLE_RUN) toggleRunModifier();
 
@@ -400,14 +400,14 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      std::string quantity_str = tokeniser.nextToken();
      std::string item = tokeniser.remainingTokens();
      int quantity = 0;
-     cast_stream(quantity_str, quantity); 
+     cast_stream(quantity_str, quantity);
      giveEntity(item, quantity, System::instance()->getGraphics()->getRender()->getActiveID());
    }
    else if (command == DROP) {
      std::string quantity_str = tokeniser.nextToken();
      std::string item = tokeniser.remainingTokens();
      int quantity = 0;
-     cast_stream(quantity_str, quantity); 
+     cast_stream(quantity_str, quantity);
      dropEntity(item, quantity);
    }
    else if (command == PICKUP) System::instance()->setAction(ACTION_PICKUP);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.13 2004-04-07 00:54:18 alriddoch Exp $
+// $Id: Camera.h,v 1.14 2004-04-12 15:28:50 alriddoch Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -77,6 +77,18 @@ public:
    * @param dir Direction of elevation. -1 is elevate --, 0 is stationary, 1 is elevate --
    */ 
   void elevate(int dir) { _elevation_dir += dir; }
+
+  /**
+   * Make an immediate change to the rotation
+   * @param rot Ammount of change in rotation.
+   */
+  void rotateImmediate(float rot);
+
+  /**
+   * Make an immediate change to the elevation
+   * @param elev Ammount of change in elevation.
+   */
+  void elevateImmediate(float elev);
 
   /**
    * Set the rotate state
