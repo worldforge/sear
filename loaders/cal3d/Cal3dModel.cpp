@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.1 2003-03-05 23:39:04 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.2 2003-03-06 21:04:14 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -63,7 +63,7 @@ Cal3dModel::Cal3dModel(Render *render) :
   m_lodLevel = 1.0f;
 //  _use_textures = false;
 //  grip = false;
-//  _height = 1.0f;
+  _height = 1.0f;
 }
 
 Cal3dModel::~Cal3dModel() {
@@ -183,7 +183,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
 void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
-    float scale = /*_height * */getScale();
+    float scale = _height * getScale();
     _render->scaleObject(scale);
     _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
@@ -272,4 +272,14 @@ void Cal3dModel::action(const std::string &action) {
     m_calModel.getMixer()->clearCycle(animations[STANDING],  0.1f);
   } 
 }
+
+void Cal3dModel::setMaterialSet(unsigned int set) {
+  m_calModel.setMaterialSet(set);
+}
+
+void Cal3dModel::setMaterialPartSet(unsigned int set, unsigned int part) {
+  //TODO make this do the correct thing!
+  m_calModel.setMaterialSet(set);
+}
+
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.3 2003-03-06 12:52:08 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.4 2003-03-06 21:04:14 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H 1
@@ -42,7 +42,7 @@ public:
   void shutdown();
 
   CalCoreModel *getCalCoreModel() const { return _core_model; }
-  Cal3dModel *instantiate(float height, varconf::Config &config);
+  Cal3dModel *instantiate(varconf::Config &config);
  
   //Accessors
   float getScale() const { return _scale; }

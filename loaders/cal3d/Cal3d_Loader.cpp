@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.2 2003-03-06 12:52:08 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.3 2003-03-06 21:04:14 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -28,7 +28,9 @@
 #else
   static const bool debug = false;
 #endif
+
 namespace Sear {
+	
 const std::string Cal3d_Loader::CAL3D = "cal3d";
 	
 Cal3d_Loader::Cal3d_Loader(ModelHandler *mh) {
@@ -41,22 +43,23 @@ Cal3d_Loader::~Cal3d_Loader() {
 }
 
 ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
+
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
   
   std::string file_name = System::instance()->getModel().getItem(CAL3D, model_record->data_file_id);
-  float height = 1.0f;
-//  if (ms.hasBBox) {
-    height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
-//  }
-  Cal3dModel *model = _core_model_handler->instantiateModel(file_name, height, model_config);
-//  std::string default_skin = System::instance()->getModel().getItem(CAL3D, model_record->default_skin);
   
-//  if (!model->init()) {
-//    model->shutdown();
-//    delete (model);
-//    return NULL;
-//  }
-  if (!model) return NULL;
+  std::cerr << "Loading Cally model " << file_name << std::endl;
+
+  Cal3dModel *model = _core_model_handler->instantiateModel(file_name, model_config);
+  
+  if (!model) {
+    std::cerr << "Unable to load model" << std::endl;	  
+    return NULL;
+  }
+    
+  float height = 1.0f;
+  height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
+  model->setHeight(height);
   model_record->model = model;
   return model_record;
 }

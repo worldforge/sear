@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.3 2003-03-06 12:52:08 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.4 2003-03-06 21:04:14 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -76,7 +76,9 @@ void Cal3dCoreModel::init(const std::string &filename) {
     CalError::printLastError();
     return;
   }
+  std::cerr << "reading config" << std::endl << std::flush;
   readConfig(filename);
+  std::cerr << "done reading config" << std::endl << std::flush;
 }
 
 void Cal3dCoreModel::shutdown() {
@@ -155,8 +157,8 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
       _sets[set] = set_counter++;
       std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
     }
-     //_core_model->createCoreMaterialThread(_parts[part]);
-     _core_model->createCoreMaterialThread(material);
+     _core_model->createCoreMaterialThread(_parts[part]);
+//     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
     _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);    
   }
@@ -171,15 +173,19 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
       // Check all keys
       if (config.findItem(section, KEY_ambient_red)) {
         material->getAmbientColor().red = (int)config.getItem(section, KEY_ambient_red);
+	std::cout << "Setting ambient red to " << (int)material->getAmbientColor().red << std::endl;
       }
       if (config.findItem(section, KEY_ambient_green)) {
         material->getAmbientColor().green = (int)config.getItem(section, KEY_ambient_green);
+	std::cout << "Setting ambient green to " << (int)material->getAmbientColor().green << std::endl;
       }
       if (config.findItem(section, KEY_ambient_blue)) {
         material->getAmbientColor().blue = (int)config.getItem(section, KEY_ambient_blue);
+	std::cout << "Setting ambient blue to " << (int)material->getAmbientColor().blue << std::endl;
       }
       if (config.findItem(section, KEY_ambient_alpha)) {
         material->getAmbientColor().alpha = (int)config.getItem(section, KEY_ambient_alpha);
+	std::cout << "Setting ambient alpha to " << (int)material->getAmbientColor().alpha << std::endl;
       } 
       if (config.findItem(section, KEY_diffuse_red)) {
         material->getDiffuseColor().red = (int)config.getItem(section, KEY_diffuse_red);
@@ -227,14 +233,18 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 }
 
 void Cal3dCoreModel::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  std::cout << section << " - " << key << std::endl << std::flush;
   if (section == SECTION_model) {
-    if (key.substr(0, KEY_mesh.size()) == KEY_mesh) {
+    if (key == KEY_mesh) {}
+    else if (key.substr(0, KEY_mesh.size()) == KEY_mesh) {
       _meshes[key.substr(KEY_mesh.size() + 1)] = 0;
     }
-    if (key.substr(0, KEY_animation.size()) == KEY_animation) {
+    if (key == KEY_animation) {}
+    else if (key.substr(0, KEY_animation.size()) == KEY_animation) {
       _animations[key.substr(KEY_animation.size() + 1)] = 0;
     }
-    if (key.substr(0, KEY_material.size()) == KEY_material) {
+    if (key == KEY_material) {}
+    else if (key.substr(0, KEY_material.size()) == KEY_material) {
       _material_list.push_back(key.substr(KEY_material.size() + 1));;
     }
   }
@@ -296,12 +306,11 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   return textureId;
 }
 
-Cal3dModel *Cal3dCoreModel::instantiate(float height, varconf::Config &config) {
+Cal3dModel *Cal3dCoreModel::instantiate(varconf::Config &config) {
   Cal3dModel *model = new Cal3dModel(System::instance()->getGraphics()->getRender());
   model->init(this);
-  model->setHeight(height);
   if (config.findItem("model", "default_set")) {
-    varconf::Variable v = config.getItem("model", "height");
+    varconf::Variable v = config.getItem("model", "default_set");
     if (v.is_int()) {
       model->setMaterialSet((int)v);
     } else { // Assume we have a string
