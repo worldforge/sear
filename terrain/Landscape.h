@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.2 2002-09-08 00:24:54 simon Exp $
+// $Id: Landscape.h,v 1.3 2002-11-26 18:03:33 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -63,13 +63,17 @@ protected:
 
   static void SetNextTriNode( int nNextNode ) { m_NextTriNode = nNextNode; }
 
+  Landscape *_right,  *_bottom;
+  
 public:
-  Landscape(Render *renderer, ROAM *terrain) :
+  Landscape(Render *renderer, ROAM *terrain, Landscape *right, Landscape *bottom) :
     gFrameVariance(50.0f),
     gNumTrisRendered(0),
     gDesiredTris(10000),
     _renderer(renderer),
-    _terrain(terrain)
+    _terrain(terrain),
+    _right(right),
+    _bottom(bottom)
   {}
   virtual ~Landscape() {}
   static TriTreeNode *AllocateTri();
@@ -102,6 +106,11 @@ public:
   void lowerDetail() {
     gDesiredTris -= 100;
     if (gDesiredTris > 60000) gDesiredTris = 60000;
+  }
+
+  Patch *getPatch(unsigned int x, unsigned int y) {
+    if (x < NUM_PATCHES_PER_SIDE && y < NUM_PATCHES_PER_SIDE) return &m_Patches[x][y];
+    else return NULL;
   }
 };
 

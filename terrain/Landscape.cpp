@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.9 2002-11-26 15:20:11 simon Exp $
+// $Id: Landscape.cpp,v 1.10 2002-11-26 18:03:33 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -106,10 +106,31 @@ void Landscape::Reset() {
 	if ( X > 0 ) patch->GetBaseLeft()->LeftNeighbor = m_Patches[Y][X-1].GetBaseRight();
 	else patch->GetBaseLeft()->LeftNeighbor = NULL;	// Link to bordering Landscape here..
         if ( X < (NUM_PATCHES_PER_SIDE-1) ) patch->GetBaseRight()->LeftNeighbor = m_Patches[Y][X+1].GetBaseLeft();
-	else patch->GetBaseRight()->LeftNeighbor = NULL; // Link to bordering Landscape here..
+	else {
+	  if (_right) {
+            Patch *p = _right->getPatch(0, Y);
+	    if (p) p = p->GetBaseLeft();
+            patch->GetBaseRight()->LeftNeighbor = p;
+	  }
+	  else {
+            patch->GetBaseRight()->LeftNeighbor = NULL; // Link to bordering Landscape here..
+	  }
+
+	}
 	if ( Y > 0 ) patch->GetBaseLeft()->RightNeighbor = m_Patches[Y-1][X].GetBaseRight();
 	else patch->GetBaseLeft()->RightNeighbor = NULL; // Link to bordering Landscape here..
 	if ( Y < (NUM_PATCHES_PER_SIDE-1) ) patch->GetBaseRight()->RightNeighbor = m_Patches[Y+1][X].GetBaseLeft();
+	else {
+	  if (_bottom) {
+            Patch *p = _bottom->getPatch(X, 0);
+	    if (p) p = p->GetBaseLeft();
+            patch->GetBaseRight()->RightNeighbor = p;
+	  }
+	  else {
+            patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
+	  }
+
+
         else patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
       }
     }
@@ -136,7 +157,7 @@ void Landscape::render() {
   Patch *patch = &(m_Patches[0][0]);
   // Scale the terrain by the terrain scale specified at compile time.
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
-  _renderer->translateObject(_terrain->getMapWidth() >> 1, _getMapHeight() >> 1, 0.0f);
+  _renderer->translateObject(Terrain::map_size >> 1, Terrain::map_size >> 1, 0.0f);
 
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
 
@@ -169,13 +190,13 @@ void Landscape::render() {
 
 float Landscape::getHeight(float x, float y) {
   float height;
-  float mod_x = x + _terrain->getMapHeight() >> 1;
-  float mod_y = y + _terrain->getMapWidth() >> 1;
-  if (mod_x < 0 || mod_x >= _terrain->getMapWidth() || mod_y < 0 || mod_y >= _terrain->getMapHeight()) return 0.0f;
-  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * _terrain->getMapHeight()];
-  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * _terrain->getMapHeight()];
-  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * _terrain->getMapHeight()];
-  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * _terrain->getMapHeight()];
+  float mod_x = x + Terrain::map_size >> 1;
+  float mod_y = y + Terrain::map_size >> 1;
+  if (mod_x < 0 || mod_x >= Terrain::map_size || mod_y < 0 || mod_y >= Terrain::map_size) return 0.0f;
+  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * Terrain::map_size];
+  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * Terrain::map_size];
+  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * Terrain::map_size];
+  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * Terrain::map_size];
   float x_m = (float)x - (float)((int)x);
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
