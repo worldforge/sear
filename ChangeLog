@@ -1,3 +1,6 @@
+16th September 2003, Simon Goodall
+ * Added ^ in addition to ` for default binding for console toggle. This is for German keyboard layouts.
+
 7th August 2003, Simon Goodall
  * Changed configure.in so it throws an error if lib3ds in not found
 

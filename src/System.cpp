@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.62 2003-07-15 11:11:22 simon Exp $
+// $Id: System.cpp,v 1.63 2003-09-16 11:01:39 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -222,6 +222,8 @@ bool System::init() {
   
   Bindings::init();
   Bindings::bind("escape", "/" + QUIT);
+  Bindings::bind("backquote", "/toggle_console");
+  Bindings::bind("caret", "/toggle_console");
   
   _console = new Console(this);
   _console->init();
