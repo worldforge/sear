@@ -1,3 +1,9 @@
+29th April 2004, Simon Goodall
+ * Some preliminary use findItem to verify config item exists before querying it(only in GL class for now)
+ * Actually tell the renderer to read the configuration
+ * Fix Light initialisation
+ * Remove some unneeded default general configs
+
 28th April 2004, James Turner
  * Move all the file-related and path-related code out of System
    and into the FileHandler

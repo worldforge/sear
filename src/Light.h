@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Light.h,v 1.1 2002-12-24 16:17:12 simon Exp $
+// $Id: Light.h,v 1.2 2004-04-29 10:33:26 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1
@@ -29,9 +29,9 @@ public:
     enabled(false)
   {
     // Init light components to black
-    memset(ambient, 0, 4);
-    memset(diffuse, 0, 4);
-    memset(specular, 0, 4);
+    memset(ambient, 0, 4 * sizeof(float));
+    memset(diffuse, 0, 4 * sizeof(float));
+    memset(specular, 0, 4 * sizeof(float));
   }
 
   ~Light() {}

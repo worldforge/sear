@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.36 2004-04-28 14:06:03 simon Exp $
+// $Id: Render.h,v 1.37 2004-04-29 10:33:26 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -39,7 +39,6 @@ typedef enum {
   RENDER_LIGHTING,
   RENDER_TEXTURES,
   RENDER_SHADOWS,
-  RENDER_FPS,
   RENDER_STENCIL,
   RENDER_LAST_STATE
 } RenderState;

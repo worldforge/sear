@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.81 2004-04-28 22:02:44 jmt Exp $
+// $Id: System.cpp,v 1.82 2004-04-29 10:33:26 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -240,6 +240,7 @@ bool System::init() {
     _script_engine->runScript(*I);
   }
   readConfig();
+  RenderSystem::getInstance().readConfig();
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();

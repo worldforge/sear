@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.18 2004-04-28 22:02:44 jmt Exp $
+// $Id: main.cpp,v 1.19 2004-04-29 10:33:26 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -76,7 +76,7 @@ int main(int argc, char** argv) {
   }
   if (exit_program) exit(0);
 /*
-Sear version VERSION, Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+Sear version VERSION, Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 Sear comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
 This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
