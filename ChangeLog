@@ -1,3 +1,6 @@
+22nd December 2002, Simon Goodall
+ * Guard against possible seg fault if we request a colour id greater than allowed
+
 21st December 2002, Simon Goodall
  * Precompute all selection colours so we can put array straight into renderer
  * Entities now directly stored in array for selection

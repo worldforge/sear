@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.50 2002-12-20 00:37:14 simon Exp $
+// $Id: GL.cpp,v 1.51 2002-12-22 14:19:12 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -85,6 +85,7 @@ inline GLuint GL::makeMask(GLuint bits) {
 }
 
 inline WorldEntity *GL::getSelectedID(unsigned int i) {
+  if (i >= NUM_COLOURS) return NULL;
   return entityArray[i];
 }
 
