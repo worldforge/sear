@@ -1,0 +1,63 @@
+Textures are described in the following format. Each texture has an entry like this;
+
+[texture_name]
+filename = "string"
+mipmap = "bool"
+mask = "bool"
+mag_filter = "string"
+min_filter = "string"
+priority = "double"
+
+Where:
+texture_name is the identifier for the texture.
+filename is the filename of the texture (and path if applicable)
+mipmap is true/false to enable mipmapping on this texture
+mask is true/false whether to load this in a mask
+mag_filter is the magnification filter (see below)
+min_filter is the minification filter (see below)
+priority is an optional value for the texture priority
+
+texture_name and filename are the only required parameters. Default values will be used for missing values.
+
+Available filters
+-----------------
+Filters are used to determine the colour of a pixel when it does not map directly to a pixel on the texture map. This happens when the texture is enlarged (magnification) or shrunk (minification).
+These values correspond to the OpenGL parameter of the same name. For none mip-mapped textures, linear and nearest are the only available options. When mipmapping is enabled, the remaining filters can be applied to the minification filter.
+
+nearest
+This filter chooses the colour from the nearest pixel in the texture map. This is a fast filter, but lacks in quality.
+
+linear
+This filter interpolates the colour from the nearest pixels in the texturemap. This produces good quality results, but at the cost of speed.
+
+nearest_mipmap_nearest
+This filter uses the nearest pixel in the clostest mipmap.
+
+linear_mipmap_nearest
+This filter interpolates the colour in the clostest mipmap.
+
+nearest_mipmap_linear
+This selects the nearest pixel in both maps and interpolates between them.
+
+linear_mipmap_linear
+This filter interpolates the colour in each map, the interpolates between them.
+
+Available formats
+-----------------
+The available file formats are the ones supported by SDL_image. They are as follows;
+BMP, PNM, XPM, LBM, PCX, GIF, JPEG, PNG, TGA.
+
+Image sizes
+----------
+Images sizes need to be powers of 2, i.e 2^N x 2^M.
+recommended size 256x256 -> 512x512 
+Larger formats become less supported and reduce performace
+
+Pixel format
+-----------
+Currently only support RGB or RGBA formats
+
+
+Future Work
+Allow other pixel formats
+Allow image resampling to avoid 2^n by 2^m limitation

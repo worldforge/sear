@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.12 2003-03-23 19:51:49 simon Exp $
+// $Id: SkyBox.cpp,v 1.13 2003-04-23 20:28:27 simon Exp $
 
 #include "common/Log.h"
 
@@ -36,7 +36,9 @@ Normal SkyBox::normal_coords[] = NORMAL_COORDS;
 SkyBox::SkyBox(System *system, Render *renderer) :
   _system(system),
   _renderer(renderer),
-  _initialised(false)
+  _initialised(false),
+  _sky_state_1(-1),
+  _sky_state_2(-1)
 {}
 
 SkyBox::~SkyBox() {
@@ -74,12 +76,18 @@ void SkyBox::draw() {
 
 void SkyBox::render() {
   float val = 1.0f - _renderer->getLightLevel();
-  _renderer->stateChange("sky_0");
+  if (_sky_state_1 == -1) {
+    _sky_state_1 = _renderer->getStateID("sky_0");
+  }
+  _renderer->stateChange(_sky_state_1);
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
   renderTextureSet(0);
 //  float val = 1.0f - System::instance()->getNormalTime();
   _renderer->setColour(1.0f, 1.0f, 1.0f, val);
-  _renderer->stateChange("sky_1");
+  if (_sky_state_2 == -1) {
+    _sky_state_2 = _renderer->getStateID("sky_1");
+  }
+  _renderer->stateChange(_sky_state_2);
   renderTextureSet(1);
 }
 

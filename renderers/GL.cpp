@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.62 2003-04-23 19:41:57 simon Exp $
+// $Id: GL.cpp,v 1.63 2003-04-23 20:28:27 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -38,10 +38,6 @@
 
 #include "terrain/ROAM.h"
 #include "sky/SkyBox.h"
-
-#include "src/default_image.xpm"
-#include "src/default_font.xpm"
-#include "TextureManager.h"
 
 #include "GL.h"
 
@@ -237,13 +233,14 @@ GL::GL() :
   near_clip(RENDER_NEAR_CLIP),
   next_id(1), // was 0 error?
   base(0),
+  splash_id(-1),
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false),
   _multi_texture_mode(false),
   _texture_manager(NULL),
-  splash_id(-1)
+  _state_manager(NULL)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -262,8 +259,8 @@ GL::GL(System *system, Graphics *graphics) :
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false),
-	
-  _texture_manager(NULL)
+  _texture_manager(NULL),
+  _state_manager(NULL)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -320,6 +317,7 @@ void GL::initWindow(int width, int height) {
   setViewMode(PERSPECTIVE);
   setupExtensions();
   _texture_manager->init();
+  _state_manager->init();
   splash_id = requestTexture(TEXTURE_splash_texture);
   initFont();
 
@@ -331,6 +329,7 @@ void GL::init() {
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
   _texture_manager = new TextureManager();
+  _state_manager = new StateManager();
   readConfig();
 //  splash_id = requestTexture(TEXTURE_splash_texture);
 //  initFont();
@@ -434,57 +433,6 @@ void GL::print3D(const char *string, int set) {
 inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
-
-void GL::stateChange(const std::string &state) {
-  assert(_system->getStateLoader() != NULL);
-  stateChange(_system->getStateLoader()->getStateProperties(state));
-}
-
-void GL::stateChange(StateProperties *sp) {
-  if (!sp) {
-    Log::writeLog("NULL State", Log::LOG_ERROR);
-    return;
-    // throw Exception("StateProperties is NULL");
-  }
-  if (_cur_state == sp) return;
-  if (_cur_state) {
-    std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
-    GLuint list = _state_map[change];
-    if (!glIsList(list)) {
-      list = glGenLists(1);
-      stateDisplayList(list, _cur_state, sp);
-      _state_map[change] = list;
-    }
-    glCallList(list);
-  } else { 
-    if (sp->alpha_test) glEnable(GL_ALPHA_TEST);
-    else glDisable(GL_ALPHA_TEST);
-    if (sp->blend) glEnable(GL_BLEND);
-    else glDisable(GL_BLEND);
-    if (sp->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
-    else glDisable(GL_LIGHTING);
-    if (sp->two_sided_lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-    if (sp->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
-    else glDisable(GL_TEXTURE_2D);
-    if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
-    else glDisable(GL_COLOR_MATERIAL);
-    if (sp->depth_test) glEnable(GL_DEPTH_TEST);
-    else glDisable(GL_DEPTH_TEST);
-    if (sp->cull_face) glEnable(GL_CULL_FACE);
-    else glDisable(GL_CULL_FACE);
-    if (sp->cull_face_cw) glFrontFace(GL_CW);
-    else glFrontFace(GL_CCW);
-    if (sp->stencil) glEnable(GL_STENCIL_TEST);
-    else glDisable(GL_STENCIL_TEST);
-    if (sp->fog) glEnable(GL_FOG);
-    else glDisable(GL_FOG);
-    if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
-    else glDisable(GL_RESCALE_NORMAL);
-  }
-  _cur_state = sp;
-}
-
 
 void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
   switchTexture(texture);
@@ -670,66 +618,12 @@ void GL::writeConfig() {
 }  
 
 
-// THIS BUILDS A STATE TRANSITION LIST
-void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StateProperties *next_state) {
-  if (!previous_state || !next_state) return;
-  glNewList(list, GL_COMPILE);
-  if (previous_state->alpha_test != next_state->alpha_test) {
-    if (next_state->alpha_test) glEnable(GL_ALPHA_TEST);
-    else glDisable(GL_ALPHA_TEST);
-  }
-  if (previous_state->blend != next_state->blend) {
-    if (next_state->blend) glEnable(GL_BLEND);
-    else glDisable(GL_BLEND);
-  }
-  if (previous_state->lighting != next_state->lighting) {
-    if (next_state->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
-    else glDisable(GL_LIGHTING);
-  }
-  if (previous_state->two_sided_lighting != next_state->two_sided_lighting) {
-    if (next_state->lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-  }
-  if (previous_state->textures != next_state->textures) {
-    if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
-    else glDisable(GL_TEXTURE_2D);
-  }
-  if (previous_state->colour_material != next_state->colour_material) {
-    if (next_state->colour_material) glEnable(GL_COLOR_MATERIAL);
-    else glDisable(GL_COLOR_MATERIAL);
-  }
-  if (previous_state->depth_test != next_state->depth_test) {
-    if (next_state->depth_test) glEnable(GL_DEPTH_TEST);
-    else glDisable(GL_DEPTH_TEST);
-  }
-  if (previous_state->cull_face != next_state->cull_face) {
-    if (next_state->cull_face) glEnable(GL_CULL_FACE);
-    else glDisable(GL_CULL_FACE);
-  }
-  if (previous_state->cull_face_cw != next_state->cull_face_cw) {
-    if (next_state->cull_face_cw) glFrontFace(GL_CW);
-    else glFrontFace(GL_CCW);
-  }
-  if (previous_state->stencil != next_state->stencil) {
-    if (next_state->stencil) glEnable(GL_STENCIL_TEST);
-    else glDisable(GL_STENCIL_TEST);
-  }
-  if (previous_state->fog != next_state->fog) {
-    if (next_state->fog) glEnable(GL_FOG);
-    else glDisable(GL_FOG);
-  }
-  if (previous_state->rescale_normals != next_state->rescale_normals) {
-    if (next_state->rescale_normals) glEnable(GL_RESCALE_NORMAL);
-    else glDisable(GL_RESCALE_NORMAL);
-  }
-  glEndList();
-}
 
 
 void GL::setupStates() {
   // TODO: should this be in the init?
-  glAlphaFunc(GL_GREATER, 0.1f);
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+//  glAlphaFunc(GL_GREATER, 0.1f);
+//  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
   GLfloat fog_colour[] = {0.50f, 0.50f, 0.50f, 0.50f};
   glFogfv(GL_FOG_COLOR, fog_colour);
@@ -922,11 +816,10 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
-  static StateLoader *state_loader = System::instance()->getStateLoader();
-//  static ModelHandler *model_handler = _system->getModelHandler();
+//  static MoelHandler *model_handler = _system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
-    stateChange(state_loader->getStateProperties(I->first));
+    stateChange(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
       ObjectRecord *object_record = J->first;
       ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second);
@@ -977,7 +870,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
 void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
-  stateChange(FONT);
+  stateChange(getStateID(FONT));
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
     WorldEntity *we = (WorldEntity*)*I;
     glPushMatrix();
@@ -1006,7 +899,8 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 }
 
 void GL::drawOutline(ModelRecord *model_record) {
-  StateProperties *sp = _cur_state; // Store current state
+//  StateProperties *sp = _cur_state; // Store current state
+  StateID cur_state = _state_manager->getCurrentState();
   Model *model = model_record->model;
   bool use_stencil = checkState(RENDER_STENCIL) && model_record->outline;
   if (use_stencil) { // Using Stencil Buffer
@@ -1017,7 +911,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     model->render(false);
     glPopMatrix();
     //TODO hard code halo in static const variable
-    stateChange(HALO);
+    stateChange(getStateID(HALO));
     glStencilFunc(GL_NOTEQUAL, -1, 1);
     glColor4fv(_halo_colour);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -1031,7 +925,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     model->render(true);
     glColor4fv(white);
   }
-  stateChange(sp); // Restore state
+  stateChange(cur_state); // Restore state
 }
 
 
@@ -1061,16 +955,16 @@ inline void GL::endFrame(bool select_mode) {
   
 inline void GL::drawFPS(float fps) {
   std::string frame_rate_string = string_fmt(fps).substr(0, 4);
-  stateChange(FONT);
+  stateChange(getStateID(FONT));
   glColor4fv(red);
   print(10, 100, frame_rate_string.c_str(), 0);
 }
   
 void GL::drawSplashScreen() {
-  stateChange(SPLASH);
+  stateChange(getStateID(SPLASH));
   #ifndef _WIN32
     // TODO Need to find a win32 version
-    //usleep(sleep_time);
+//    usleep(sleep_time);
   #endif
   setViewMode(ORTHOGRAPHIC);
   
@@ -1151,7 +1045,7 @@ inline void GL::resetSelection() {
 }
 
 inline void GL::renderActiveName() {
-  stateChange(FONT);
+  stateChange(getStateID(FONT));
   glColor4fv(activeNameColour);
   print(x_pos, y_pos, active_name.c_str(), 1);
 }

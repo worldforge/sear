@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.22 2003-03-23 19:51:49 simon Exp $
+// $Id: Landscape.cpp,v 1.23 2003-04-23 20:28:27 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -185,7 +185,10 @@ void Landscape::render() {
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f) * _terrain->_terrain_scale;
   _renderer->setTextureScale(1, _terrain->_detail_scale);
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
-  _renderer->stateChange(TERRAIN);
+  if (_terrain_state == -1) {
+    _terrain_state = _renderer->getStateID(TERRAIN);
+  }
+  _renderer->stateChange(_terrain_state);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
     _renderer->switchTexture(0, _renderer->requestTexture(texture_name_id));
     _renderer->switchTexture(1, _renderer->requestTexture(DETAIL));
@@ -198,7 +201,10 @@ void Landscape::render() {
   patch = &(m_Patches[0][0]);
   
   _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
-  _renderer->stateChange(WATER);
+  if (_water_state == -1) {
+    _water_state = _renderer->getStateID(WATER);
+  }
+  _renderer->stateChange(_water_state);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
     _renderer->switchTexture(0, _renderer->requestTexture(WATER));
     _renderer->switchTexture(1, _renderer->requestTexture(DETAIL));

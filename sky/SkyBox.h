@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.h,v 1.5 2003-03-06 23:50:38 simon Exp $
+// $Id: SkyBox.h,v 1.6 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_SKYBOX_H
 #define SEAR_SKYBOX_H 1
@@ -126,6 +126,9 @@ protected:
   System *_system; 
   Render *_renderer;
   bool _initialised;
+
+  int _sky_state_1;
+  int _sky_state_2;
 };
 
 } /* namespace Sear */

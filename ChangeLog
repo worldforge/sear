@@ -1,36 +1,40 @@
-23rd March 2002, Simon Goodall
+23rd April 2003, Simon Goodall
+ * Added state manager to GL class
+ * fps now displayed in title
+
+23rd March 2003, Simon Goodall
  * Intergrated texturemanager into GL class.
  * Added docs for new texture config format
 
-11th March 2002, Simon Goodall
+11th March 2003, Simon Goodall
  * Added base code for texture manager class
 
-11th March 2002, Simon Goodall
+11th March 2003, Simon Goodall
  * Cally models can now specify additional textures to those that were specified on material createion
 
-8th March 2002, Simon Goodall
+8th March 2003, Simon Goodall
  * Fixed possible NULL ptr exception in Character.cpp when calling entity->getContainer()
 
-7th March 2002, Simon Goodall
+7th March 2003, Simon Goodall
  * RC file is now built as part of autoconf
  * Merged some minors diffs between some sear versions
 
-6th March 2002, Simon Goodall
+6th March 2003, Simon Goodall
  * added file defining basic geometric types (vertex, normal, texel etc)
  * added enable-mmgr flag to configure
 
-6th March 2002, Simon Goodall
+6th March 2003, Simon Goodall
  * Fixed terrain bug caused by array out of bounds. (might have broken something else though who thought comments were a bad idea?)
  * Fixed bug on cally re-write where first material was not loaded properly
 
-6th March 2002, Simon Goodall
+6th March 2003, Simon Goodall
  * Updated cal3d loader to take height and default material set def
 
-5th March 2002, Simon Goodall
+5th March 2003, Simon Goodall
  * Re-write of cal3d loader code. uses varconf format file for configuration and will allow material properties to be over-ridden
  * Fixed changelog dates - mix up in years and dates (oops)
 
-4th March 2002, Simon Goodall
+4th March 2003, Simon Goodall
  * Changed terrain texture to use clamping to avoid problems on landscape boundaries
  * Removed landscape texture name output
 

@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.9 2003-03-23 19:51:49 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.10 2003-04-23 20:28:26 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -218,7 +218,7 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
         material->setShininess((double)config.getItem(section, KEY_shininess));
       }
       // Load textures
-      for (unsigned int i = 0; i < 2; ++i) {
+      for (int i = 0; i < 2; ++i) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
           std::string texture = (std::string)config.getItem(section, key);

@@ -40,9 +40,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{prefix}/share/%{name}/*
-%{prefix}/bin/sear
-%{prefix}/bin/model_viewer
+%{prefix}/%{datadir}/%{name}/*
+%{prefix}/%{bindir}/sear
+%{prefix}/%{bindir}/model_viewer
 %doc README COPYING AUTHORS
 
 %ChangeLog

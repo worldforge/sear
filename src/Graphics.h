@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.11 2003-03-23 19:51:49 simon Exp $
+// $Id: Graphics.h,v 1.12 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -19,7 +19,6 @@
 #include "Render.h"
 #include "interfaces/ConsoleObject.h"
 
-//#include "gui/ServerGui.h"
 namespace varconf {
 class Config;
 
@@ -39,8 +38,6 @@ class WorldEntity;
 class System;
 class Character;
 class Console;
-
-class ServerGui;
 
 class Graphics : public ConsoleObject, public SigC::Object{
 
@@ -101,7 +98,6 @@ void initST();
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-  ServerGui *sg;  
 protected:
   System *_system;
   Render *_renderer;

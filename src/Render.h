@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.28 2003-03-23 19:51:49 simon Exp $
+// $Id: Render.h,v 1.29 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -58,7 +58,7 @@ typedef enum {
 typedef std::pair<ObjectRecord*, std::string> QueueItem;
 //typedef std::pair<std::string, std::string> QueueItem;
 typedef std::list<QueueItem> Queue;
-typedef std::map<std::string, Queue> QueueMap;
+typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
 
   Render() {
@@ -90,7 +90,8 @@ typedef std::list<WorldEntity*> MessageList;
 //  virtual unsigned int getTextureID(unsigned int texture_id)=0;
 //  virtual void drawScene(const std::string &,bool, float) =0;
   virtual void drawTextRect(int, int, int, int, int) =0;
-  virtual void stateChange(const std::string &state) =0;
+  virtual void stateChange(int) = 0;
+  virtual int getStateID(const std::string &state) = 0;
   virtual void setColour(float red, float blue , float green, float alpha) =0;
 	  
   virtual void procEvent(int, int) =0;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: StateManager.h,v 1.1 2003-03-15 17:18:49 simon Exp $
+// $Id: StateManager.h,v 1.2 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -12,6 +12,8 @@
 #include <vector>
 
 #include <sigc++/object_slot.h>
+#include "interfaces/ConsoleObject.h"
+
 
 
 namespace varconf {
@@ -20,6 +22,8 @@ namespace varconf {
 
 namespace Sear {
 
+class Console;
+	
 typedef struct {
   std::string state;
   bool alpha_test;
@@ -35,9 +39,9 @@ typedef struct {
   bool fog;
   bool rescale_normals;
   float alpha_value;
-  unsigned int alpha_function;
-  unsigned int blend_src_function;
-  unsigned int blend_dest_function;
+  int alpha_function;
+  int blend_src_function;
+  int blend_dest_function;
 } StateProperties;
 
 typedef int StateID;
@@ -46,7 +50,7 @@ typedef std::vector<std::string> NameStateVector;
 typedef std::vector<StateProperties*> StateVector;
 typedef std::vector<std::vector<unsigned int> > StateChangeVector;
 
-class StateManager : public SigC::Object {
+class StateManager : public SigC::Object, public ConsoleObject {
 public:
   StateManager();
   ~StateManager();
@@ -66,13 +70,17 @@ public:
 //    StateProperties *sp = _state_properties[state];
 //    return ((sp) ? (sp) : (_state_properties["default"]));
 //  }
+
+  void registerCommands(Console *console);
+  void runCommand(const std::string &command, const std::string &arguments);
   
+  StateID getCurrentState() const { return _current_state; }
 private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
 
-  unsigned int getAlphaFunction(const std::string &alpha_function);
-  unsigned int getBlendFunction(const std::string &blend_function);
+  int getAlphaFunction(const std::string &alpha_function);
+  int getBlendFunction(const std::string &blend_function);
  
   void buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state);
   

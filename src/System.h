@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.29 2003-03-23 19:51:49 simon Exp $
+// $Id: System.h,v 1.30 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -28,7 +28,7 @@ class FileHandler;
 class ModelHandler;
 class ObjectHandler;
 class ScriptEngine;
-class StateLoader;
+//class StateLoader;
 class Console;
 class Character;
 class Graphics;
@@ -199,7 +199,7 @@ public:
   varconf::Config &getObjectRecords() { return _object_records; }
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
-  StateLoader *getStateLoader() const { return _state_loader; }
+//  StateLoader *getStateLoader() const { return _state_loader; }
   EventHandler *getEventHandler() const { return _event_handler; }
   ModelHandler *getModelHandler() const { return _model_handler; }
   ActionHandler *getActionHandler() const { return _action_handler; }
@@ -247,7 +247,7 @@ protected:
   EventHandler *_event_handler; ///< Pointer to event handler object
   FileHandler *_file_handler; ///< Pointer to file handler object
   ModelHandler *_model_handler; ///< Pointer to model handler object
-  StateLoader *_state_loader; ///< Pointer to state loader object
+//  StateLoader *_state_loader; ///< Pointer to state loader object
   ActionHandler *_action_handler; ///< Pointer to action handler object
   ObjectHandler *_object_handler; ///< Pointer to object handler object
   Calendar *_calendar; ///< Pointer to calender object

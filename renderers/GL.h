@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.31 2003-04-23 19:41:57 simon Exp $
+// $Id: GL.h,v 1.32 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -21,10 +21,10 @@
 #include <wfmath/quaternion.h>
 
 #include "src/Light.h"
-#include "src/StateLoader.h"
 #include "src/Render.h"
 
 #include "TextureManager.h"
+#include "StateManager.h"
 
 namespace Sear {
 
@@ -64,8 +64,14 @@ public:
   static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
-  void stateChange(const std::string &state);
-  void stateChange(StateProperties *state);
+//  void stateChange(const std::string &state);
+//  void stateChange(StateProperties *state);
+  void stateChange(StateID state) {
+    _state_manager->stateChange(state);
+  }
+  StateID getStateID(const std::string &state) {
+    return _state_manager->getState(state);
+  } 
   float distFromNear(float,float,float);  
   void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
 
@@ -127,6 +133,7 @@ public:
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void setTextureScale(unsigned int unit, float scale);
   TextureManager *getTextureManager() const { return _texture_manager; }
+  StateManager *getStateManager() const { return _state_manager; }
 protected:
   System *_system;
   Graphics *_graphics;
@@ -209,6 +216,7 @@ protected:
 
 
   TextureManager *_texture_manager;
+  StateManager *_state_manager;
 };
 
 } /* namespace Sear */

@@ -69,8 +69,6 @@ libSear_a_SOURCES = \
 	Sound.cpp \
 	Sound.h \
 	Sky.h \
-	StateLoader.cpp \
-	StateLoader.h \
 	System.cpp \
 	System.h \
 	Terrain.h \

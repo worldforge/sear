@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.9 2003-02-17 16:14:03 simon Exp $
+// $Id: Landscape.h,v 1.10 2003-04-23 20:28:27 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -51,22 +51,14 @@ class Render;
 
 class Landscape {
 protected:
-
-  float *m_HeightMap;										// HeightMap of the Landscape
+  float *m_HeightMap; // HeightMap of the Landscape
   Patch m_Patches[NUM_PATCHES_PER_SIDE][NUM_PATCHES_PER_SIDE];	// Array of patches
   
-//  static 
-	  int	m_NextTriNode;										// Index to next free TriTreeNode
-//  static 
-	  TriTreeNode m_TriPool[POOL_SIZE];						// Pool of TriTree nodes for splitting
+  int m_NextTriNode; // Index to next free TriTreeNode
+  TriTreeNode m_TriPool[POOL_SIZE]; // Pool of TriTree nodes for splitting
 
-
-//  static
-	  int GetNextTriNode() { return m_NextTriNode; }
-
-//  static
-	  void SetNextTriNode( int nNextNode ) { m_NextTriNode = nNextNode; }
-
+  int GetNextTriNode() { return m_NextTriNode; }
+  void SetNextTriNode( int nNextNode ) { m_NextTriNode = nNextNode; }
   
 public:
   Landscape(Render *renderer, ROAM *terrain, Landscape *right, Landscape *bottom) :
@@ -78,19 +70,18 @@ public:
     _right(right),
     _bottom(bottom),
     min_height(9999.0f),
-    max_height(9999.0f)
+    max_height(9999.0f),
+    _terrain_state(-1),
+    _water_state(-1)
   {}
   virtual ~Landscape() {}
-//  static
-	  TriTreeNode *AllocateTri();
+  TriTreeNode *AllocateTri();
  
   virtual void Init(float *hMap, int size, int offset_x, int offset_y);
   virtual void Reset();
   virtual void Tessellate();
   virtual void render();
 
-  //static Landscape *_instance;
-  
   float gFrameVariance;
   int gNumTrisRendered;
   int gDesiredTris;
@@ -107,7 +98,6 @@ public:
   int offset_x;
   int offset_y;
   
-//  float getHeight(float x, float y);
   float getHeight(unsigned int x, unsigned int y) ;
 
   void raiseDetail() {
@@ -130,7 +120,8 @@ public:
 
   unsigned int texture_id;
   std::string texture_name_id;
-  
+  int _terrain_state;
+  int _water_state;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.42 2003-03-23 19:51:49 simon Exp $
+// $Id: client.cpp,v 1.43 2003-04-23 20:28:27 simon Exp $
 
 #include "System.h"
 
@@ -796,7 +796,6 @@ void Client::receivedServerInfo(const Eris::ServerInfo & sInfo) {
   << " Ping: "<< sInfo.getPing()
   << " Uptime: "<< sInfo.getUptime()
   << std::endl;
-  System::instance()->getGraphics()->sg->addServer(sInfo);
 }
 
 void Client::completedServerList() {

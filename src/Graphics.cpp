@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.27 2003-04-23 19:41:58 simon Exp $
+// $Id: Graphics.cpp,v 1.28 2003-04-23 20:28:27 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,30 +36,6 @@
 #include "System.h"
 #include "Terrain.h"
 #include "WorldEntity.h"
-
-#include "gui/ServerGui.h"
-
-#ifdef HAVE_GLGOOEY
-
-#include "glgooey/WindowManager.h"
-#include "glgooey/Rectangle.h"
-#include "glgooey/FrameWindow.h"
-#include "glgooey/CheckBox.h"
-#include "glgooey/CheckBoxGroup.h"
-#include "glgooey/Button.h"
-#include "glgooey/Panel.h"
-#include "glgooey/EditField.h"
-#include "glgooey/MultiTextButton.h"
-#include "glgooey/Font.h"
-#include "glgooey/ScrollBar.h"
-#include "glgooey/ListBox.h"
-#include "glgooey/ListControl.h"
-#include "glgooey/StaticText.h"
-#include "glgooey/ProgressBar.h"
-#include "glgooey/ComplexGridLayouter.h"
-#include "glgooey/StaticBitmap.h"
-#include "glgooey/TimeManager.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -124,10 +100,10 @@ void Graphics::init() {
   _renderer = new GL(_system, this);
   _renderer->init();
   ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
+  ((GL*)_renderer)->getStateManager()->registerCommands(_system->getConsole());
  _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
-  sg = new ServerGui();
   _initialised = true;
 }
 
@@ -154,10 +130,6 @@ void Graphics::shutdown() {
     _camera->shutdown();
     delete _camera;
     _camera = NULL;
-  }
-  if (sg) {
-    delete sg;
-    sg = NULL;
   }
   _initialised = false;
 }
@@ -194,7 +166,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
       std::string fr = string_fmt(_frame_rate);
       SDL_WM_SetCaption(fr.c_str(), fr.c_str());
       _num_frames = 0;
-      _frame_time = 0;
+      _frame_time = 0.0f;
     }
   }
   updateDetailLevels(_frame_rate);

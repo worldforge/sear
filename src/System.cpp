@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.56 2003-04-23 19:41:58 simon Exp $
+// $Id: System.cpp,v 1.57 2003-04-23 20:28:27 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,7 +41,7 @@
 #include "Render.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
-#include "StateLoader.h"
+//#include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
 #ifdef HAVE_GLGOOEY
@@ -79,7 +79,7 @@ namespace Sear {
 
   static const std::string LOAD_MODEL_RECORDS = "load_model_records";
   static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
-  static const std::string LOAD_STATE_FILE = "load_state_file";
+//  static const std::string LOAD_STATE_FILE = "load_state_file";
   static const std::string LOAD_GENERAL_CONFIG = "load_general";
   static const std::string LOAD_KEY_BINDINGS = "load_bindings";
   static const std::string LOAD_MODEL_CONFIG = "load_models";
@@ -120,7 +120,7 @@ System::System() :
   _event_handler(NULL),
   _file_handler(NULL),
   _model_handler(NULL),
-  _state_loader(NULL),
+//  _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
   _calendar(NULL),
@@ -198,8 +198,8 @@ bool System::init() {
     _file_handler->addSearchPath(*I);
   }
   
-  _state_loader = new StateLoader();
-  _state_loader->init();
+//  _state_loader = new StateLoader();
+//  _state_loader->init();
   
   _object_handler = new ObjectHandler();
   _object_handler->init();
@@ -325,11 +325,11 @@ void System::shutdown() {
     _console = NULL;
   }
  
-  if (_state_loader) {
-    _state_loader->shutdown();
-    delete _state_loader;
-    _state_loader = NULL;
-  }
+//  if (_state_loader) {
+//    _state_loader->shutdown();
+//    delete _state_loader;
+//    _state_loader = NULL;
+//  }
 
   // Are these actually needed ? or does SDL clean then up too? 
 //  if (_icon) SDL_FreeSurface(_icon);
@@ -774,7 +774,7 @@ void System::registerCommands(Console *console) {
   console->registerCommand(GET_ATTRIBUTE, this);
   console->registerCommand(SET_ATTRIBUTE, this);
   console->registerCommand(LOAD_MODEL_RECORDS, this);
-  console->registerCommand(LOAD_STATE_FILE, this);
+//  console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
   console->registerCommand(LOAD_KEY_BINDINGS, this);
   console->registerCommand(LOAD_MODEL_CONFIG, this);
@@ -816,9 +816,9 @@ void System::runCommand(const std::string &command, const std::string &args) {
     std::string value = tokeniser.remainingTokens();
     _general.setItem(section, key, value);
   }
-  else if (command == LOAD_STATE_FILE) {
-    if (_state_loader) _state_loader->readFiles(processHome(args));
-  }
+//  else if (command == LOAD_STATE_FILE) {
+//    if (_state_loader) _state_loader->readFiles(processHome(args));
+//  }
   else if (command == LOAD_GENERAL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
     _general.readFromFile(processHome(args));

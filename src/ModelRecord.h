@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.5 2003-03-07 12:50:51 simon Exp $
+// $Id: ModelRecord.h,v 1.6 2003-04-23 20:28:27 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -17,8 +17,8 @@ class ModelRecord {
 public:
   ModelRecord() :
     scale(1.0),
-    state("default"),
-    select_state("select"),
+    state_name("default"),
+    select_state_name("select"),
     model_by_type(false),
     rotation_style(Graphics::ROS_NONE)
   {}
@@ -28,8 +28,10 @@ public:
   float scale;
   float offset[3];
   std::string id;
-  std::string state;
-  std::string select_state;
+  int state;
+  std::string state_name;
+  int select_state;
+  std::string select_state_name;
   std::string model_loader;
   std::string data_file_id;
   std::string default_skin;
