@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.17 2004-09-24 21:25:02 jmt Exp $
+// $Id: WorldEntity.h,v 1.18 2004-09-29 10:50:25 jmt Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -26,15 +26,10 @@ class WorldEntity : public Eris::Entity {
 public:
  WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world);
   ~WorldEntity();
- 
- // void SetVelocity();
- // WFMath::Point<3> GetPos(); 
   
   void handleMove();
   void handleTalk(const std::string &);
 
-  void translateAbsPos(const WFMath::Point<3> &);
-  void rotateAbsOrient(const WFMath::Quaternion &);
   const WFMath::Quaternion getAbsOrient();
   const WFMath::Point<3> getAbsPos();
 
@@ -58,7 +53,6 @@ protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
-  WFMath::Quaternion abs_orient;
   std::list<message> messages;
   //ObjectProperties *_op;
 

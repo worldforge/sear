@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.42 2004-09-24 22:11:51 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.43 2004-09-29 10:50:25 jmt Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -53,9 +53,8 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
    Eris::Entity(ge, world),
-   m_lastMoveTime(0),
-   abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
-   messages(std::list<message>())
+   messages(std::list<message>()),
+   m_lastMoveTime(0)
 {
   Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
 }
@@ -71,14 +70,6 @@ void WorldEntity::handleMove()
     // record the time this data was updated, so we can interpolate pos
     m_lastMoveTime = System::instance()->getTime();
     
-  WorldEntity *we = (WorldEntity*)getContainer();
-  if (we != NULL) {
-    translateAbsPos(we->getAbsPos());
-    rotateAbsOrient(we->getAbsOrient());
-  } else {
-    translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
-    rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
-  }
   rotateBBox(getAbsOrient());
 }
 
@@ -137,24 +128,11 @@ void WorldEntity::renderMessages() {
   }
 }
 
-void WorldEntity::translateAbsPos(const WFMath::Point<3> & p) {
-
-  WFMath::Point<3> pos = _position;
-  WFMath::Point<3> child_pos = WFMath::Point<3>(p.x() + pos.x(), p.y() + pos.y(), p.z() + pos.z());
-  for (unsigned int i = 0; i < getNumMembers(); ++i)
-    ((WorldEntity*)getMember(i))->translateAbsPos(child_pos);
-}
-
-void WorldEntity::rotateAbsOrient(const WFMath::Quaternion & q) {
-  abs_orient = q;
-  WFMath::Quaternion child_orient = q / getOrientation();
-  for (unsigned int i = 0; i < getNumMembers(); ++i)
-    ((WorldEntity*)getMember(i))->rotateAbsOrient(child_orient);
-}
-
-const WFMath::Quaternion WorldEntity::getAbsOrient() {
-  WFMath::Quaternion new_orient =  abs_orient / getOrientation();
-  return new_orient;
+const WFMath::Quaternion WorldEntity::getAbsOrient() 
+{
+    WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
+    if (getContainer()) parentOrient = static_cast<WorldEntity*>(getContainer())->getAbsOrient();
+    return parentOrient / getOrientation();
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos()
@@ -312,25 +290,10 @@ std::cout << "Changing Height;" << std::endl;
   }
 }
 
-void WorldEntity::rotateBBox(const WFMath::Quaternion &q) {
-  WFMath::AxisBox<3> bbox = getBBox();
-
-  WFMath::Point<3> high = bbox.highCorner();
-  WFMath::Point<3> low = bbox.lowCorner();
-
-  m_orientBBox.points[UPPER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), high.z());
-  m_orientBBox.points[UPPER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), high.z());
-  m_orientBBox.points[UPPER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), high.z());
-  m_orientBBox.points[UPPER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), high.z());
-
-  m_orientBBox.points[LOWER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), low.z());
-  m_orientBBox.points[LOWER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), low.z());
-  m_orientBBox.points[LOWER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), low.z());
-  m_orientBBox.points[LOWER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), low.z());
-
-  for (int i = 0; i < LAST_POSITION; ++i) {
-    m_orientBBox.points[i] = m_orientBBox.points[i].rotate(q);
-  }
+void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
+{
+  m_orientBBox = OrientBBox(getBBox());
+  m_orientBBox.rotate(q);
 }
   
 WFMath::Vector<3> WorldEntity::getInterpolatedPos() const

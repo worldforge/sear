@@ -1,3 +1,15 @@
+2004-09-29  James Turner  <james@worldforge.org>
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: further code cleans-ups,
+	  removing 'abs_pos' and 'abs_orient' members (and hence the code to
+	  update them) in favour of just computing the value directly. abs_pos
+	  in particular was not being used by the old code at all.
+	  
+	* common/types.h, src/Utility.cpp: turn OrientBBox into a class, and
+	  add some helper methods for constructing and rotating it, which
+	  makes code in WorldEntity more readable. This should probably all be
+	  changed to use WFMath oriented bboxs, but that's a much bigger job.
+
 2004-09-24  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/WorldEntity.cpp: Fix direction of orientation calculation.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.9 2004-07-29 18:27:01 simon Exp $
+// $Id: Utility.cpp,v 1.10 2004-09-29 10:50:25 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -26,6 +26,9 @@
 #else
   static const bool debug = false;
 #endif
+
+#include "common/types.h"
+
 namespace Sear {
 
 void ReduceToUnit(float vector[3]) {
@@ -196,6 +199,36 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
     }	
   } 
   return data;  
+}
+
+OrientBBox::OrientBBox()
+{
+    for (unsigned int P=0; P < LAST_POSITION; ++P) {
+      points[P] = WFMath::Vector<3>(0,0,0);
+    }
+}
+
+OrientBBox::OrientBBox(const WFMath::AxisBox<3>& ab)
+{
+  WFMath::Point<3> high = ab.highCorner();
+  WFMath::Point<3> low = ab.lowCorner();
+
+  points[UPPER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), high.z());
+  points[UPPER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), high.z());
+  points[UPPER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), high.z());
+  points[UPPER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), high.z());
+
+  points[LOWER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), low.z());
+  points[LOWER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), low.z());
+  points[LOWER_LEFT_BACK]   = WFMath::Vector<3>(high.x(), low.y(), low.z());
+  points[LOWER_RIGHT_BACK]  = WFMath::Vector<3>(low.x(), low.y(), low.z());
+}
+
+void OrientBBox::rotate(const WFMath::Quaternion& q)
+{
+  for (unsigned int P=0; P < LAST_POSITION; ++P) {
+    points[P] = points[P].rotate(q);
+  }
 }
 
 } /* namespace Sear */

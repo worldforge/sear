@@ -2,12 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: types.h,v 1.6 2004-06-20 18:43:35 simon Exp $
+// $Id: types.h,v 1.7 2004-09-29 10:50:25 jmt Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1
 
 #include <wfmath/vector.h>
+#include <wfmath/quaternion.h>
+#include <wfmath/axisbox.h>
 
 namespace Sear {
 
@@ -76,9 +78,17 @@ typedef struct {
   unsigned int disp_list;
 } Mesh;
 
-typedef struct {
-  WFMath::Vector<3> points[8];
-} OrientBBox;
+class OrientBBox
+{
+public:
+    OrientBBox(const WFMath::AxisBox<3>& axisBox);
+    
+    OrientBBox();
+    
+    void rotate(const WFMath::Quaternion& q);
+    
+    WFMath::Vector<3> points[8];
+};
 
 typedef enum {
   UPPER_LEFT_FRONT = 0,
