@@ -18,4 +18,16 @@ void Window::addChild(Window * w)
     w->m_parent = this;
 }
 
+void Window::setPos(int x, int y)
+{
+  m_x = x;
+  m_y = y;
+}
+
+void Window::setSize(int w, int h)
+{
+  m_w = w;
+  m_h = h;
+}
+
 } // namespace Sear

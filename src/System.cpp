@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.91 2004-05-30 18:52:04 jmt Exp $
+// $Id: System.cpp,v 1.92 2004-06-04 01:54:23 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,6 +47,7 @@
 #include "environment/Environment.h"
 
 #include "gui/Workspace.h"
+#include "gui/Toplevel.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -213,6 +214,10 @@ bool System::init(int argc, char *argv[]) {
   _calendar->registerCommands(_console);
 
   _workspace = new Workspace(this);
+  Toplevel * t = new Toplevel("Panel");
+  t->setPos(50, 50);
+  _workspace->addToplevel(t);
+  _workspace->showAll();
   // _workspace->registerCommands(_console);
 
   int sticks = SDL_NumJoysticks();

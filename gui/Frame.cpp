@@ -13,10 +13,6 @@ namespace Sear {
 
 Frame::Frame()
 {
-    m_x = 200;
-    m_y = 100;
-    m_w = 10;
-    m_h = 10;
 }
 
 Frame::~Frame()

@@ -28,10 +28,12 @@ private:
   const Window & operator=(const Window &);
 public:
   virtual ~Window();
-
-  virtual void render(Render *) = 0;
   
   void addChild(Window *);
+  void setPos(int, int);
+  void setSize(int, int);
+
+  virtual void render(Render *) = 0;
 };
 
 } // namespace Sear

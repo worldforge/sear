@@ -14,9 +14,18 @@ Container::~Container()
 {
 }
 
+void Container::addChild(Widget * w)
+{
+  w->setParent(this);
+  m_children.insert(w);
+}
+
 void Container::showAll()
 {
-  // Iterate over the contents showing all of them.
+  std::set<Widget *>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    (*I)->show();
+  }
 }
 
 } // namespace Sear

@@ -7,7 +7,11 @@
 
 #include "gui/Container.h"
 
+#include <string>
+
 namespace Sear {
+
+class Window;
 
 /// Widget at the level below the Root.
 class Toplevel : public Container {
@@ -18,17 +22,20 @@ private:
 protected:
   Widget * m_contents;
   Window * m_frame;
-  Window * m_title;
+  std::string m_title;
 
 public:
   explicit Toplevel(const std::string & title);
   virtual ~Toplevel();
 
-  Window * getContents() const {
+  Widget * getContents() const {
     return m_contents;
   }
 
   void setContents(Widget *);
+  void setPos(int x, int y);
+
+  virtual void show();
 };
 
 } // namespace Sear

@@ -5,7 +5,7 @@
 #include "gui/Workspace.h"
 
 #include "gui/RootWindow.h"
-#include "gui/Frame.h"
+#include "gui/Toplevel.h"
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -23,9 +23,6 @@ static const std::string WORKSPACE = "workspace";
 Workspace::Workspace(System * system) : m_system(system),
                                         m_rootWindow(new RootWindow())
 {
-    Frame * f = new Frame();
-
-    m_rootWindow->addChild(f);
 }
 
 Workspace::~Workspace()
@@ -63,6 +60,11 @@ void Workspace::draw()
 
 void Workspace::show()
 {
+}
+
+void Workspace::addToplevel(Toplevel * t)
+{
+  addChild(t);
 }
 
 } // namespace Sear

@@ -11,8 +11,7 @@ namespace Sear {
 Button::Button(const std::string & text)
 {
     Label * l = new Label(text);
-    l->setParent(this);
-    m_children.insert(l);
+    addChild(l);
 }
 
 void Button::show()

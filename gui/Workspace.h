@@ -10,6 +10,7 @@
 namespace Sear {
 
 class RootWindow;
+class Toplevel;
 class System;
 
 class Workspace : public Container {
@@ -20,8 +21,13 @@ public:
   Workspace(System *);
   virtual ~Workspace();
 
+  RootWindow * getRootWindow() const {
+    return m_rootWindow;
+  }
+
   void draw();
   void show();
+  void addToplevel(Toplevel *);
 };
 
 } // namespace Sear

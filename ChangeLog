@@ -1,5 +1,22 @@
 2004-06-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Container.cpp: Implement addChild() and showAll().
+
+	* gui/Button.cpp: Use addChild for adding child widget.
+
+	* gui/Frame.cpp: Get rid of default size.
+
+	* gui/Toplevel.cpp, gui/Toplevel.h: Implement top level widget.
+
+	* gui/Window.cpp, gui/Window.h: Add methods to change geometry.
+
+	* gui/Workspace.cpp, gui/Workspace.h: Remove test widget,
+	  and add methods to allow widgets to install stuff.
+
+	* src/System.cpp: Test out new Toplevel.
+
+2004-06-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/Button.cpp, gui/Button.h, gui/Container.cpp, gui/Container.h,
 	  gui/Graphic.h, gui/Label.cpp, gui/Label.h, gui/Widget.h,
 	  gui/Workspace.cpp, gui/Workspace.h: Add show interface to widgets
