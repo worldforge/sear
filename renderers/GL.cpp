@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.68 2003-07-03 10:25:36 simon Exp $
+// $Id: GL.cpp,v 1.69 2003-08-05 14:31:33 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -236,6 +236,9 @@ GL::GL() :
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
+  _fog_start(20.0f),
+  _fog_end(35.0f),
+  _light_level(1.0f),
   _initialised(false),
   _texture_manager(NULL),
   _state_manager(NULL)
@@ -257,6 +260,9 @@ GL::GL(System *system, Graphics *graphics) :
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
+  _fog_start(20.0f),
+  _fog_end(35.0f),
+  _light_level(1.0f),
   _initialised(false),
   _texture_manager(NULL),
   _state_manager(NULL)
@@ -858,9 +864,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
-      model->update(time_elapsed);
-      model->setLastTime(System::instance()->getTimef());
-      
+      if (!select_mode) { // Onl needs to be done once a frame
+        model->update(time_elapsed);
+        model->setLastTime(System::instance()->getTimef());
+      }      
       // Draw Model
       if (select_mode) {
         nextColour(object_record->entity);
