@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.28 2004-01-19 12:15:17 simon Exp $
+// $Id: Character.cpp,v 1.29 2004-01-26 14:08:49 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -326,7 +326,6 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
       Atlas::Objects::Operation::Move move;
       Atlas::Message::Element::MapType args;
       Atlas::Message::Element::ListType pos;
-      move = Atlas::Objects::Operation::Move::Instantiate();
       pos.push_back(_self->GetPos().x());
       pos.push_back(_self->GetPos().y());
       pos.push_back(_self->GetPos().z());

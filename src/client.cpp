@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.50 2004-01-19 12:15:17 simon Exp $
+// $Id: client.cpp,v 1.51 2004-01-26 14:08:49 alriddoch Exp $
 
 #include "System.h"
 
@@ -19,6 +19,7 @@
 #include <Eris/PollDefault.h>
 #include <Eris/Metaserver.h>
 #include <Eris/ServerInfo.h>
+#include <Eris/Exceptions.h>
 #include <sigc++/object.h>
 #include <sigc++/slot.h>
 #include <sigc++/object_slot.h>
@@ -392,7 +393,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   if (_lobby == NULL) throw Exception ("Lobby is NULL");
   Log::writeLog("Client: Creating character - Name: " + name + " Type: " + type + " Sex: " + sex + " Description: " + description, Log::LOG_DEFAULT);
   _system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
-  Atlas::Objects::Entity::GameEntity ch = Atlas::Objects::Entity::GameEntity::Instantiate();
+  Atlas::Objects::Entity::GameEntity ch;
   Atlas::Message::Element::ListType prs(1, Atlas::Message::Element(type));
   ch.setParents(prs);
   ch.setName(name);

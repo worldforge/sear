@@ -1,3 +1,6 @@
+26th January 2004, Al Riddoch
+ * Fixed includes and code to work with latest Atlas-C++ and eris changes.
+
 19th January 2004, Simon Goodall
  * Replaced Atlas specific code with calls to Avatar->*
 
