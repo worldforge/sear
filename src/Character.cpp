@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.20 2003-03-06 23:50:38 simon Exp $
+// $Id: Character.cpp,v 1.21 2003-03-08 13:52:58 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -214,7 +214,7 @@ void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient)
   vel.push_back(z);
   args["velocity"] = vel;
   args["orientation"] = orient.toAtlas();
-  args["loc"] = _self->getContainer()->getID();
+  args["loc"] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
   args["id"] = _self->getID();
   move.SetFrom(_self->getID());
   move.SetArgs(Atlas::Message::Object::ListType(1, args));
@@ -263,7 +263,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
       pos.push_back(_self->GetPos().y());
       pos.push_back(_self->GetPos().z());
       args["pos"] = pos;
-      args["loc"] = _self->getContainer()->getID();
+      args["loc"] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
       args["id"] = we->getID();
       move.SetFrom(_self->getID());
       move.SetArgs(Atlas::Message::Object::ListType(1, args));
