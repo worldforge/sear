@@ -1,3 +1,6 @@
+10th July, Simon Goodall
+ * Moved state code to separate class and read settings from a file instead of hardcoding them.
+
 8th July 2002, Simon Goodall
  * Basis for Sear Model Viewer
  * OpenGL renderer code moved to separate dir than main source

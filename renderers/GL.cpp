@@ -2,6 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+/*TODO
+ * Allow texture unloading
+ * Allow priority textures
+ *
+ *
+ */ 
+
+
 #include "GL.h"
 
 #include <GL/glu.h>
@@ -17,8 +25,6 @@
 #include "../src/Utility.h"
 #include <Eris/Entity.h>
 #include <Eris/World.h>
-//#include <Eris/TypeInfo.h>
-//#include "model.h"
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include "../src/Character.h"
@@ -30,8 +36,6 @@
 #include "../src/ModelHandler.h"
 
 #include "../src/Log.h"
-
-#include "../src/conf.h"
 
 namespace Sear {
 
@@ -178,10 +182,6 @@ GL::~GL() {
   for (std::map<std::string, ModelStruct*>::iterator I = _entity_models.begin(); I != _entity_models.end(); I++) {
     if (I->second) {
       ModelStruct *ms = I->second;
-//      if (ms->model) {
-//        ms->model->hutdown();
-//	delete ms->model;
-//      }
       if (ms->models) {
         ms->models->shutdown();
 	delete ms->models;
@@ -208,12 +208,14 @@ GL::~GL() {
 
 void GL::initWindow(int width, int height) {
   Log::writeLog("Render: Initilising Renderer", Log::DEFAULT);
+  // TODO: put this into an info method 
   Log::writeLog(std::string("GL_VENDER: ") + string_fmt(glGetString(GL_VENDOR)), Log::DEFAULT);
   Log::writeLog(std::string("GL_RENDERER: ") + string_fmt(glGetString(GL_RENDERER)), Log::DEFAULT);
   Log::writeLog(std::string("GL_VERSION: ") + string_fmt(glGetString(GL_VERSION)), Log::DEFAULT);
   Log::writeLog(std::string("GL_EXTENSIONS: ") + string_fmt(glGetString(GL_EXTENSIONS)), Log::DEFAULT);
   
   glLineWidth(4);
+  //TODO: this needs to go into the set viewport method
   //Check for divide by 0
   if (height == 0) height = 1;
   glLineWidth(2.0f); 
@@ -238,9 +240,10 @@ void GL::initWindow(int width, int height) {
   
 void GL::init() {
   readConfig();
-  setupStates();
+  //setupStates();
   splash_id = requestTexture(splash_texture);
   initFont();
+  // TODO: initialisation need to go into system
   Log::writeLog("Initialising Terrain", Log::DEFAULT);
   terrain = new Terrain(_system, this);
   if (!terrain->init()) {
@@ -255,6 +258,11 @@ void GL::init() {
 //  CheckError();
   initLighting();
   mh = new ModelHandler();
+
+  _state_loader = new StateLoader();
+  _state_loader->init();
+  _state_loader->readFiles("/opt/worldforge/cvs/forge/clients/sear/data/states.cfg");
+
 }
 
 void GL::initLighting() {
@@ -478,12 +486,13 @@ inline GLuint GL::getTextureID(int texture_id) {
 }
 
 void GL::drawScene(const std::string& command, bool select_mode) {
+  // TODO: Move to generic render class
 //	select_mode = true;
   if (select_mode) resetColors();
   active_name = "";
   // This clears the currently loaded texture
   if (select_mode) glBindTexture(GL_TEXTURE_2D, 0);
-  
+ // Calculate in system 
   float time_elapsed =  (SDL_GetTicks() - this->time) / 1000.0f;
   this->time = SDL_GetTicks();
   num_frames++;
@@ -504,7 +513,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
-  if (select_mode) stateChange(SELECT);
+  if (select_mode) stateChange("select"); //SELECT
 // Function is still unstable!
 //    Eris::World::Instance()->tick(); 
     WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
@@ -531,7 +540,8 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       if (!select_mode) {
         glPushMatrix();
           glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-          nextState(FONT_TO_SKYBOX);
+//          nextState(FONT_TO_SKYBOX);
+	  stateChange("skybox");
           skybox->draw(); //Draw the sky box
         glPopMatrix();
       }
@@ -547,7 +557,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       glLightfv(GL_LIGHT0,GL_POSITION,ps);
 
 //      if (_entity_models[id]) player_model = _entity_models[id]->model;
-
+        // TODO: make use of Frustum class here
 //      extractFrustum();
     }
     // Setup Sun
@@ -595,7 +605,8 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     }
     if (!select_mode) {
       glPushMatrix();
-        nextState(SKYBOX_TO_TERRAIN);
+//        nextState(SKYBOX_TO_TERRAIN);
+	  stateChange("terrain");
         terrain->draw();
       glPopMatrix();
     }
@@ -608,27 +619,9 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     }
       if (_character) _character->updateLocals(false);
       render_queue = std::map<std::string, Queue>();
-      model_queue = std::map<std::string, Queue>();
-      billboard_queue = std::map<std::string, Queue>();
-      imposter_queue = std::map<std::string, Queue>();
-      wireframe_queue = std::map<std::string, Queue>();
       buildQueues(root, 0);
-      if (!select_mode) nextState(TERRAIN_TO_WIREFRAME);
-//      drawWireFrameQueue(select_mode);
-      if (!select_mode) nextState(WIREFRAME_TO_CHARACTERS);
-      drawQueue(model_queue, select_mode, time_elapsed);
-//      drawModelQueue(select_mode);
-      if (!select_mode) nextState(CHARACTERS_TO_MODELS);
       drawQueue(render_queue, select_mode, time_elapsed);
-///      drawRenderQueue(select_mode);
-      if (!select_mode) nextState(MODELS_TO_BILLBOARD);
-      glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-//      drawBBoardQueue(select_mode);
-//      drawImpostorQueue(select_mode);
-//      drawModelsQueue(select_mode);
-      glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
-      if (!select_mode) nextState(BILLBOARD_TO_FONT);
-//      drawMessageQueue(select_mode);
+      // TODO: make into rasieDetail and lowerDetail methods
       if (!select_mode) {
         if (frame_rate < _lower_frame_rate_bound) {
           model_detail -= 0.1f;
@@ -650,9 +643,8 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       }
     }
   } else {
-//    stateChange(FONT);	  
     #ifndef _WIN32
-      // Need to find a win32 version
+      // TODO Need to find a win32 version
       usleep(sleep_time);
     #endif
     glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
@@ -680,9 +672,11 @@ void GL::drawScene(const std::string& command, bool select_mode) {
 
   }
 //  nextState(FONT_TO_PANEL);
+  stateChange("console");
 if (!select_mode) _system->getConsole()->draw(command);
 //  nextState(PANEL_TO_FONT);
 //  Calc FPS
+  stateChange("font");
   frame_rate = (float)num_frames /frame_time;
   if (checkState(RENDER_FPS)) {
     std::string frame_rate_string = string_fmt(frame_rate).substr(0, 4);
@@ -699,8 +693,7 @@ if (!select_mode) _system->getConsole()->draw(command);
   
   glFlush();
   
-  if (!select_mode)
-   SDL_GL_SwapBuffers();
+  if (!select_mode) SDL_GL_SwapBuffers();
 
 //  CheckError();
 }
@@ -708,25 +701,20 @@ if (!select_mode) _system->getConsole()->draw(command);
 void GL::buildQueues(WorldEntity *we, int depth) {
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
-      std::string type = we->type();
-      std::string parent = we->parent();
-      ObjectLoader *ol = _system->getObjectLoader();
-      ObjectProperties *op = NULL;
-      if (!type.empty()) op = ol->getObjectProperties(type);
-      if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-      if (op == NULL) op = ol->getObjectProperties("default");
+      ObjectProperties *op = we->getObjectProperties();
+      if (!op) {
+        std::string type = we->type();
+        std::string parent = we->parent();
+        ObjectLoader *ol = _system->getObjectLoader();
+        if (!type.empty()) op = ol->getObjectProperties(type);
+        if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
+        if (op == NULL) op = ol->getObjectProperties("default");
+	we->setObjectProperties(op);
+      }
       
       std::string model_type = std::string(op->model_type);
 
-      if (op->draw_self) { 
-//        if (model_type == "boundbox") 
-	              render_queue[type].push_back(we);
-//        else if (model_type == "wire_frame") wireframe_queue[type].push_back(we);
-//        else if (model_type == "billboard") billboard_queue[type].push_back(we);
-//      	else if (model_type == "imposter") imposter_queue[type].push_back(we); 
-//      	else if (model_type == "model3ds") model3ds_queue[type].push_back(we); 
-//        else model_queue[type].push_back(we);
-      }
+      if (op->draw_self) render_queue[op->state].push_back(we);
       if (op->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); i++) {
           buildQueues((WorldEntity*)we->getMember(i), depth + 1);
@@ -736,34 +724,51 @@ void GL::buildQueues(WorldEntity *we, int depth) {
   }
 }
 
-void GL::stateChange(State state) {
-  if (state == current_state) return; 
-  current_state = state;
-  if (stateProperties[state].alpha_test) glEnable(GL_ALPHA_TEST);
-  else glDisable(GL_ALPHA_TEST);
-  if (stateProperties[state].blend) glEnable(GL_BLEND);
-  else glDisable(GL_BLEND);
-  if (stateProperties[state].lighting) glEnable(GL_LIGHTING);
-  else glDisable(GL_LIGHTING);
-  if (stateProperties[state].textures) glEnable(GL_TEXTURE_2D);
-  else glDisable(GL_TEXTURE_2D);
-  if (stateProperties[state].colour_material) glEnable(GL_COLOR_MATERIAL);
-  else glDisable(GL_COLOR_MATERIAL);
-  if (stateProperties[state].depth_test) glEnable(GL_DEPTH_TEST);
-  else glDisable(GL_DEPTH_TEST);
-  if (stateProperties[state].cull_face) glEnable(GL_CULL_FACE);
-  else glDisable(GL_CULL_FACE);
-  if (stateProperties[state].cull_face_cw) glFrontFace(GL_CW);
-  else glFrontFace(GL_CCW);
-  if (stateProperties[state].stencil) glEnable(GL_STENCIL_TEST);
-  else glDisable(GL_STENCIL_TEST);
-  if (stateProperties[state].fog) glEnable(GL_FOG);
-  else glDisable(GL_FOG);
+void GL::stateChange(const std::string &state) {
+  stateChange(_state_loader->getStateProperties(state));
+}
+
+void GL::stateChange(StateProperties *sp) {
+  if (!sp) {
+    return;
+    // throw Exception("StateProperties is NULL");
+  }
+  if (_cur_state == sp) return;
+  if (_cur_state) {
+    std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
+    GLuint list = _state_map[change];
+    if (!glIsList(list)) stateDisplayList(list, _cur_state, sp);
+    glCallList(list);
+    _cur_state = sp;
+  } else { 
+    if (sp->alpha_test) glEnable(GL_ALPHA_TEST);
+    else glDisable(GL_ALPHA_TEST);
+    if (sp->blend) glEnable(GL_BLEND);
+    else glDisable(GL_BLEND);
+    if (sp->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
+    else glDisable(GL_LIGHTING);
+    if (sp->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
+    else glDisable(GL_TEXTURE_2D);
+    if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
+    else glDisable(GL_COLOR_MATERIAL);
+    if (sp->depth_test) glEnable(GL_DEPTH_TEST);
+    else glDisable(GL_DEPTH_TEST);
+    if (sp->cull_face) glEnable(GL_CULL_FACE);
+    else glDisable(GL_CULL_FACE);
+    if (sp->cull_face_cw) glFrontFace(GL_CW);
+    else glFrontFace(GL_CCW);
+    if (sp->stencil) glEnable(GL_STENCIL_TEST);
+    else glDisable(GL_STENCIL_TEST);
+    if (sp->fog) glEnable(GL_FOG);
+    else glDisable(GL_FOG);
+  }
+  _current_state = std::string(sp->state);
+  
 }
 
 
 void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
-
+  // TODO should use switchTexture
   glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
 
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
@@ -773,7 +778,7 @@ void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) 
   glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
   glPushMatrix(); // Store The Modelview Matrix
   glLoadIdentity(); // Reset The Modelview Matrix
-
+  // TODO: make into arrays?
   glBegin(GL_QUADS);
     glTexCoord2i(0, 0);
     glVertex2i(x, y);
@@ -796,7 +801,7 @@ void GL::procEvent(int x, int y) {
   unsigned int ic;
   std::string selected_id;
   GLubyte i[3];
-  stateChange(SELECT);
+  stateChange("select"); // SELECT
   glClear(GL_COLOR_BUFFER_BIT);
   drawScene("", true);
   y = window_height - y;
@@ -819,10 +824,10 @@ void GL::procEvent(int x, int y) {
     if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::DEFAULT);
     activeID = selected_id;
   }
-  stateChange(FONT);
+  stateChange("font"); // FONT
 }
 
-
+//TODO should be in Frustum class
 int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {  
   return true;
 }
@@ -831,32 +836,6 @@ float GL::distFromNear(float x, float y, float z) {
   return 1.0f;//(frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-void GL::setCallyState(int i) {
-}
-
-void GL::setCallyMotion(float f1, float f2, float f3) {
-}
-
-
-void GL::executeCallyAction(int action) {
-}
-
-WFMath::AxisBox<3> GL::bboxCheck(WFMath::AxisBox<3> bbox) {
-  int count = 0;
-  if (bbox.lowCorner().x() + bbox.lowCorner().y() + bbox.lowCorner().z() + bbox.highCorner().x() + bbox.highCorner().y() + bbox.highCorner().z()  == 0.0f) {
-    // BBOX has no size!! or is equidistant sround origin!!!!!
-    WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-    bbox = WFMath::AxisBox<3>(lc, hc);
- }
- if (bbox.highCorner().x() > bbox.lowCorner().x()) count++;
- if (bbox.highCorner().y() < bbox.lowCorner().y()) count++;
- if (bbox.highCorner().z() < bbox.lowCorner().z()) count++;
- 
- if (count == 0 || count == 2) return bbox;
- else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
-//  return bbox;
-}
 
 void GL::CheckError() {
   GLenum err = glGetError();
@@ -880,7 +859,8 @@ void GL::buildDisplayLists() {
   states = glGenLists(LAST_STATE);
   for (State state = (State)0; state != LAST_STATE; ((int)state)++) {
     Log::writeLog("Building list for state: " + string_fmt(state), Log::DEFAULT);
-    glNewList(states + state, GL_COMPILE);
+    // THIS BUILDS A DISP LIST TO CHANGE TO A STATE FROM ANYWHERE
+/*    glNewList(states + state, GL_COMPILE);
       if (stateProperties[state].alpha_test) glEnable(GL_ALPHA_TEST);
       else glDisable(GL_ALPHA_TEST);
       if (stateProperties[state].blend) glEnable(GL_BLEND);
@@ -901,10 +881,13 @@ void GL::buildDisplayLists() {
       else glDisable(GL_STENCIL_TEST);
       if (stateProperties[state].fog) glEnable(GL_FOG);
       else glDisable(GL_FOG);
+      */
     glEndList();
   }
 }
 
+
+//TODO should be in general render class
 void GL::readConfig() {
   std::string temp;
   Config *general = _system->getGeneral();
@@ -1042,44 +1025,47 @@ void GL::writeConfig() {
   general->setAttribute(KEY_far_clip_dist, string_fmt(_far_clip_dist));
 }  
 
-void GL::stateDisplayList(GLuint list, State previous_state, State next_state) {
+
+// THIS BUILDS A STATE TRANSITION LIST
+void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StateProperties *next_state) {
+  // TODO: if textures are disabled then disable them here too
   glNewList(list, GL_COMPILE);
-  if (stateProperties[previous_state].alpha_test != stateProperties[next_state].alpha_test) {
-    if (stateProperties[next_state].alpha_test) glEnable(GL_ALPHA_TEST);
+  if (previous_state->alpha_test != next_state->alpha_test) {
+    if (next_state->alpha_test) glEnable(GL_ALPHA_TEST);
     else glDisable(GL_ALPHA_TEST);
   }
-  if (stateProperties[previous_state].blend != stateProperties[next_state].blend) {
-    if (stateProperties[next_state].blend) glEnable(GL_BLEND);
+  if (previous_state->blend != next_state->blend) {
+    if (next_state->blend) glEnable(GL_BLEND);
     else glDisable(GL_BLEND);
   }
-  if (stateProperties[previous_state].lighting != stateProperties[next_state].lighting) {
-    if (stateProperties[next_state].lighting) glEnable(GL_LIGHTING);
+  if (previous_state->lighting != next_state->lighting) {
+    if (next_state->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
     else glDisable(GL_LIGHTING);
   }
-  if (stateProperties[previous_state].textures != stateProperties[next_state].textures) {
-    if (stateProperties[next_state].textures) glEnable(GL_TEXTURE_2D);
+  if (previous_state->textures != next_state->textures) {
+    if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
     else glDisable(GL_TEXTURE_2D);
   }
-  if (stateProperties[previous_state].colour_material != stateProperties[next_state].colour_material) {
-    if (stateProperties[next_state].colour_material) glEnable(GL_COLOR_MATERIAL);
+  if (previous_state->colour_material != next_state->colour_material) {
+    if (next_state->colour_material) glEnable(GL_COLOR_MATERIAL);
     else glDisable(GL_COLOR_MATERIAL);
   }
-  if (stateProperties[previous_state].depth_test != stateProperties[next_state].depth_test) {
-    if (stateProperties[next_state].depth_test) glEnable(GL_DEPTH_TEST);
+  if (previous_state->depth_test != next_state->depth_test) {
+    if (next_state->depth_test) glEnable(GL_DEPTH_TEST);
     else glDisable(GL_DEPTH_TEST);
   }
-  if (stateProperties[previous_state].cull_face != stateProperties[next_state].cull_face) {
-    if (stateProperties[next_state].cull_face) glEnable(GL_CULL_FACE);
+  if (previous_state->cull_face != next_state->cull_face) {
+    if (next_state->cull_face) glEnable(GL_CULL_FACE);
     else glDisable(GL_CULL_FACE);
-    if (stateProperties[next_state].cull_face_cw) glFrontFace(GL_CW);
+    if (next_state->cull_face_cw) glFrontFace(GL_CW);
     else glFrontFace(GL_CCW);
   }
-  if (stateProperties[previous_state].stencil != stateProperties[next_state].stencil) {
-    if (stateProperties[next_state].stencil) glEnable(GL_STENCIL_TEST);
+  if (previous_state->stencil != next_state->stencil) {
+    if (next_state->stencil) glEnable(GL_STENCIL_TEST);
     else glDisable(GL_STENCIL_TEST);
   }
-  if (stateProperties[previous_state].fog != stateProperties[next_state].fog) {
-    if (stateProperties[next_state].fog) glEnable(GL_FOG);
+  if (previous_state->fog != next_state->fog) {
+    if (next_state->fog) glEnable(GL_FOG);
     else glDisable(GL_FOG);
   }
   glEndList();
@@ -1087,6 +1073,7 @@ void GL::stateDisplayList(GLuint list, State previous_state, State next_state) {
 
 
 void GL::setupStates() {
+  // TODO: should this be in the init?
   glAlphaFunc(GL_GREATER, 0.1f);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -1094,117 +1081,7 @@ void GL::setupStates() {
   glFogfv(GL_FOG_COLOR, fog_colour);
   glFogf(GL_FOG_START, _fog_start);
   glFogf(GL_FOG_END, _fog_end);
-
-  stateProperties[SKYBOX].alpha_test = false;
-  stateProperties[SKYBOX].blend = false;
-  stateProperties[SKYBOX].lighting = false;
-  stateProperties[SKYBOX].textures = checkState(RENDER_TEXTURES);
-  stateProperties[SKYBOX].colour_material = false;
-  stateProperties[SKYBOX].depth_test = false;
-  stateProperties[SKYBOX].cull_face = false;
-  stateProperties[SKYBOX].cull_face_cw = false;
-  stateProperties[SKYBOX].stencil = false;
-  stateProperties[SKYBOX].fog = false;
-  
-  stateProperties[TERRAIN].alpha_test = false;
-  stateProperties[TERRAIN].blend = false;
-  stateProperties[TERRAIN].lighting = checkState(RENDER_LIGHTING);
-  stateProperties[TERRAIN].textures = checkState(RENDER_TEXTURES);
-  stateProperties[TERRAIN].colour_material = false;//!checkState(RENDER_LIGHTING);
-  stateProperties[TERRAIN].depth_test = true;
-  stateProperties[TERRAIN].cull_face = true;
-  stateProperties[TERRAIN].cull_face_cw = true;
-  stateProperties[TERRAIN].stencil = false;
-  stateProperties[TERRAIN].fog = true;
-  
-  stateProperties[WIREFRAME].alpha_test = false;
-  stateProperties[WIREFRAME].blend = false;
-  stateProperties[WIREFRAME].lighting = false;
-  stateProperties[WIREFRAME].textures = false;
-  stateProperties[WIREFRAME].colour_material = false;
-  stateProperties[WIREFRAME].depth_test = true;
-  stateProperties[WIREFRAME].cull_face = false;
-  stateProperties[WIREFRAME].cull_face_cw = false;
-  stateProperties[WIREFRAME].stencil = false;
-  stateProperties[WIREFRAME].fog = true;
-
-  stateProperties[CHARACTERS].alpha_test = false;
-  stateProperties[CHARACTERS].blend = false;
-  stateProperties[CHARACTERS].lighting = checkState(RENDER_LIGHTING);
-  stateProperties[CHARACTERS].textures = false;
-  stateProperties[CHARACTERS].colour_material = false;
-  stateProperties[CHARACTERS].depth_test = true;
-  stateProperties[CHARACTERS].cull_face = false;
-  stateProperties[CHARACTERS].cull_face_cw = false;
-  stateProperties[CHARACTERS].stencil = false;
-  stateProperties[CHARACTERS].fog = true;
-
-  stateProperties[MODELS].alpha_test = false;
-  stateProperties[MODELS].blend = false;
-  stateProperties[MODELS].lighting = checkState(RENDER_LIGHTING);
-  stateProperties[MODELS].textures = checkState(RENDER_TEXTURES);
-  stateProperties[MODELS].colour_material = !checkState(RENDER_LIGHTING);
-  stateProperties[MODELS].depth_test = true;
-  stateProperties[MODELS].cull_face = true;
-  stateProperties[MODELS].cull_face_cw = true;
-  stateProperties[MODELS].stencil = false;
-  stateProperties[MODELS].fog = true;
-
-  stateProperties[BILLBOARD].alpha_test = true;
-  stateProperties[BILLBOARD].blend = false;
-  stateProperties[BILLBOARD].lighting = checkState(RENDER_LIGHTING);
-  stateProperties[BILLBOARD].textures = checkState(RENDER_TEXTURES);
-  stateProperties[BILLBOARD].colour_material = !checkState(RENDER_LIGHTING);
-  stateProperties[BILLBOARD].depth_test = true;
-  stateProperties[BILLBOARD].cull_face = false;
-  stateProperties[BILLBOARD].cull_face_cw = false;
-  stateProperties[BILLBOARD].stencil = false;
-  stateProperties[BILLBOARD].fog = true;
-
-  stateProperties[FONT].alpha_test = true;
-  stateProperties[FONT].blend = false;
-  stateProperties[FONT].lighting = false;
-  stateProperties[FONT].textures = true;
-  stateProperties[FONT].colour_material = false;
-  stateProperties[FONT].depth_test = false;
-  stateProperties[FONT].cull_face = false;
-  stateProperties[FONT].cull_face_cw = false;
-  stateProperties[FONT].stencil = false;
-  stateProperties[FONT].fog = false;
-
-  stateProperties[PANEL].alpha_test = false;
-  stateProperties[PANEL].blend = true;
-  stateProperties[PANEL].lighting = false;
-  stateProperties[PANEL].textures = checkState(RENDER_TEXTURES);
-  stateProperties[PANEL].colour_material = false;
-  stateProperties[PANEL].depth_test = false;
-  stateProperties[PANEL].cull_face = false;
-  stateProperties[PANEL].cull_face_cw = false;
-  stateProperties[PANEL].stencil = false;
-  stateProperties[PANEL].fog = false;
-
-  stateProperties[SELECT].alpha_test = true;
-  stateProperties[SELECT].blend = false;
-  stateProperties[SELECT].lighting = false;
-  stateProperties[SELECT].textures = true;
-  stateProperties[SELECT].colour_material = true;
-  stateProperties[SELECT].depth_test = true;
-  stateProperties[SELECT].cull_face = false;
-  stateProperties[SELECT].cull_face_cw = false;
-  stateProperties[SELECT].stencil = false;
-  stateProperties[SELECT].fog = false;
-
-  stateProperties[HALO].alpha_test = false;
-  stateProperties[HALO].blend = false;
-  stateProperties[HALO].lighting = false;
-  stateProperties[HALO].textures = false;
-  stateProperties[HALO].colour_material = false;
-  stateProperties[HALO].depth_test = true;
-  stateProperties[HALO].cull_face = false;
-  stateProperties[HALO].cull_face_cw = false;
-  stateProperties[HALO].stencil = false;
-  stateProperties[HALO].fog = true;
-  
+/*
   _states = glGenLists(LAST_CHANGE);
   stateDisplayList(_states + SKYBOX_TO_TERRAIN, SKYBOX, TERRAIN);         // 0
   stateDisplayList(_states + TERRAIN_TO_WIREFRAME, TERRAIN, WIREFRAME); // 1
@@ -1219,20 +1096,21 @@ void GL::setupStates() {
   stateDisplayList(_states + FONT_TO_PANEL, FONT, PANEL);                 // 5
   stateDisplayList(_states + PANEL_TO_FONT, PANEL, FONT);                 // 6
   stateDisplayList(_states + FONT_TO_SKYBOX, FONT, SKYBOX);               // 7
-
+*/
   _current_state = FONT_TO_PANEL;
-  stateChange(FONT);
+  stateChange("font"); //font
 }
 
 void GL::nextState(int desired_state) {
-  if (desired_state == _current_state) return;
-  if ((_current_state == BILLBOARD_TO_FONT) && (desired_state == FONT_TO_SKYBOX)) _current_state = PANEL_TO_FONT; // Skip states if required!
-  if ((_current_state == PANEL_TO_FONT) && (desired_state == FONT_TO_PANEL)) _current_state = BILLBOARD_TO_FONT; // Skip states if required!
-  _current_state++;
-  if (_current_state >= LAST_CHANGE) _current_state = 0;
-  if (_current_state != desired_state) {
+//  if (desired_state == _current_state) return;
+//  if ((_current_state == BILLBOARD_TO_FONT) && (desired_state == FONT_TO_SKYBOX)) _current_state = PANEL_TO_FONT; // Skip states if required!
+//  if ((_current_state == PANEL_TO_FONT) && (desired_state == FONT_TO_PANEL)) _current_state = BILLBOARD_TO_FONT; // Skip states if required!
+//  _current_state++;
+//  if (_current_state >= LAST_CHANGE) _current_state = 0;
+//  if (_current_state != desired_state) {
     // Do not want to be here if at all possible
     // Force change to required state
+/*	  // 
     switch(desired_state) {
       case FONT_TO_SKYBOX: stateChange(SKYBOX); break;
       case SKYBOX_TO_TERRAIN: stateChange(TERRAIN); break;
@@ -1244,8 +1122,9 @@ void GL::nextState(int desired_state) {
       case FONT_TO_PANEL: stateChange(PANEL); break;
       case PANEL_TO_FONT: stateChange(FONT); break;
     }
-    _current_state = desired_state;  
-  } else glCallList(_states + _current_state);
+  */
+//    _current_state = desired_state;  
+//  } else glCallList(_states + _current_state);
 }
 
 
@@ -1262,6 +1141,11 @@ void GL::rotateObject(WorldEntity *we, int type) {
   if (!we) return; // THROW ERROR;
   switch (type) {
     case Models::NONE: return; break;
+    case Models::POSITION: {
+       WFMath::Point<3> pos = we->getPosition();
+       glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
+       break;
+    }       
     case Models::NORMAL: {
       WFMath::Quaternion q = we->getAbsOrient();
       float rotation_matrix[4][4];
@@ -1269,7 +1153,7 @@ void GL::rotateObject(WorldEntity *we, int type) {
       glMultMatrixf(&rotation_matrix[0][0]);
       break;
     }
-    case Models::BILLBOARD: 
+    case Models::BILLBOARD: // Same as HALO, but does not rotate with camera elevation
     case Models::HALO: {
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
@@ -1291,12 +1175,13 @@ void GL::setViewMode(int type) {
 }
 
 void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
-	return;
-  if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   (float[4])ambient);
-  if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   (float[4])diffuse);
-  if (specular)          glMaterialfv (GL_FRONT, GL_SPECULAR,  (float[4])specular);
+  return;
+  // TODO: set up missing values
+  if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   ambient);
+  if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   diffuse);
+  if (specular)          glMaterialfv (GL_FRONT, GL_SPECULAR,  specular);
   if (shininess >= 0.0f) glMaterialf  (GL_FRONT, GL_SHININESS, shininess);
-  if (emissive)          glMaterialfv (GL_FRONT, GL_EMISSION,  (float[4])emissive);
+  if (emissive)          glMaterialfv (GL_FRONT, GL_EMISSION,  emissive);
   else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
 }
 
@@ -1391,42 +1276,40 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
 
 void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
+    // Change staet for this queue
+    stateChange(_state_loader->getStateProperties((std::string)I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 
       WorldEntity *we = (WorldEntity *)*J;
       std::string type = we->type();
       // Get model
       Models *model = mh->getModel(we);
-      if (!model) {
-        // ERROR GETTING MODEL
+      if (!model) {  // ERROR GETTING MODEL
 	Log::writeLog("Trying to render NULL model", Log::ERROR);
         continue;
       }
-      glEnable(GL_TEXTURE_2D);
-      if (!model->useTextures()) glDisable(GL_TEXTURE_2D);
+      
       glPushMatrix();
+
       // Translate Model
       WFMath::Point<3> pos = we->getAbsPos();
       translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
      
       // Rotate Model
-      
       // TODO: Is this broken or is it to do with the server?
       if (model->rotationStyle()) rotateObject(we, model->rotationStyle());
 
       // Scale Object
       float scale = model->getScale();
       glScalef(scale, scale, scale);
+
       // Update Model
       model->update(time_elapsed);
-
+      
       // Draw Model
-      // TODO: These needs to be done automatically
-      glDisable(GL_CULL_FACE);
-      glDisable(GL_LIGHTING);
       model->render(select_mode);
+      
       glPopMatrix();
-      if (!model->useTextures()) glEnable(GL_TEXTURE_2D);
     }
   }
 }

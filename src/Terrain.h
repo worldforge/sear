@@ -6,7 +6,6 @@
 #define _TERRAIN_H_ 1
 
 #include <stdlib.h>
-#include <GL/gl.h>
 #include "Landscape.h"
 
 namespace Sear {

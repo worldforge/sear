@@ -284,7 +284,7 @@ void System::createWindow(bool fullscreen) {
     renderer->init();
     renderer->initWindow(_width, _height);
     renderer->buildDisplayLists();
-    pushMessage("Loading Please wait...", 2, 100);
+    pushMessage("Loading, Please wait...", 2, 100);
     renderer->drawScene("", false); // Render scene one before producing colour set
     renderer->buildColourSet();
 //  }
@@ -293,24 +293,28 @@ void System::createWindow(bool fullscreen) {
 void System::mainLoop() {
   SDL_Event event;
   while (_system_running) {
-    _seconds = (float)SDL_GetTicks() / 1000.0f;
-    _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
-    while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
-    _current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
-    if (_current_time < _dawn_time) _time_area = NIGHT;
-    else if (_current_time < _day_time) _time_area = DAWN;
-    else if (_current_time < _dusk_time) _time_area = DAY;
-    else if (_current_time < _night_time) _time_area = DUSK;
-    else if (_current_time < _hours_per_day) _time_area = NIGHT;
+    try {
+      _seconds = (float)SDL_GetTicks() / 1000.0f;
+      _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
+      while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
+      _current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
+      if (_current_time < _dawn_time) _time_area = NIGHT;
+      else if (_current_time < _day_time) _time_area = DAWN;
+      else if (_current_time < _dusk_time) _time_area = DAY;
+      else if (_current_time < _night_time) _time_area = DUSK;
+      else if (_current_time < _hours_per_day) _time_area = NIGHT;
       
-    while (SDL_PollEvent(&event)  ) {
-      handleEvents(event);
-      // Stop processing events if we are quiting
-      if (!_system_running) break;
+      while (SDL_PollEvent(&event)  ) {
+        handleEvents(event);
+        // Stop processing events if we are quiting
+        if (!_system_running) break;
+      }
+      _event_handler->poll();
+      _client->poll();
+      renderer->drawScene(command, false);
+    } catch (...) {
+      Log::writeLog("Caught Something", Log::ERROR);
     }
-    _event_handler->poll();
-    _client->poll();
-    renderer->drawScene(command, false);
   }
 }
 

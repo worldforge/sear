@@ -24,6 +24,7 @@ void ObjectLoader::init() {
   op->wrap_texture = false;
   op->draw_self = true;
   op->draw_members = true;
+  strcat(op->state, "default\0");
   op->width = 1.0f;
   op->height = 1.0f;	 
   op->texture_scale = 1.0f;
@@ -124,6 +125,9 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     tag = std::string(string_data);
     if (tag == "object_type") {
       sscanf(str, "%*s = %s\n", &op->object_type[0]);  
+    }
+    else if (tag == "state") {
+      sscanf(str, "%*s = %s\n", &op->state[0]);
     }
     else if (tag == "model_type") {
       sscanf(str, "%*s = %s\n", &op->model_type[0]);

@@ -21,9 +21,7 @@
 
 namespace Sear {
 
-ModelHandler::ModelHandler() :
-  _model_loaders(std::map<std::string, ModelLoader*>()),
-  _models(std::map<std::string, Models*>())	
+ModelHandler::ModelHandler()
 {
   // TODO: this is not the place
   new Cal3d_Loader(this);
@@ -34,10 +32,14 @@ ModelHandler::ModelHandler() :
 
 }
 
-ModelHandler::~ModelHandler() {}
+ModelHandler::~ModelHandler() {
+  //TODO: Check that clean up has been performed
+}
 
 void ModelHandler::init() {
-
+  // TODO: Do  clean up if required
+  _model_loaders = std::map<std::string, ModelLoader*>();
+  _models = std::map<std::string, Models*>();
 }
 
 void ModelHandler::shutdown() {
@@ -85,6 +87,7 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute("default");
   Models *model = NULL;
   if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, op, data_source);
+  // TODO: throw Exception instead
   else Log::writeLog("No ModelLoader available", Log::ERROR); 
   _models[id] = model;
   

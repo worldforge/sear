@@ -49,11 +49,9 @@ void Terrain::draw() {
 }
 
 void Terrain::render() {
-//  glPolygonMode(GL_FRONT, GL_LINE);
   gLand->Reset();
   gLand->Tessellate();
   gLand->render();
-//  glPolygonMode(GL_FRONT, GL_FILL);
 }
 
 void Terrain::loadHeightMap() {

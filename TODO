@@ -1,3 +1,11 @@
+Convert to new state loader system.
+Need to assign a number to each state
+On load
+* read the state order file for the order of state switches for render queues
+* build display lists based on values.
+
+
+
 Convert 3ds code to new format
 Determine why some characters are not properly rotated 
 Re-implement Object Selected
@@ -5,8 +13,9 @@ Re-implement Model un-loading
 Re-implement per type models
 Create a default built-in texture to use if others do not exist
 Re-implement model type conversion / downgrading
+REMOVE GL_RENDER from loaders, should only be using the render interface
 
-
+ * Move terrain and skybox code to separate dir's / libs
  * Add a stand alone option
  * Add a command history
  * Check for OpenGL hardware -> ie if vendor == NONE report error

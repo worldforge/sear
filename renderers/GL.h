@@ -11,6 +11,8 @@
 #include <list>
 #include <map>
 
+#include "../src/StateLoader.h"
+
 #include "../src/Render.h"
 
 #include <wfmath/axisbox.h>
@@ -67,7 +69,8 @@ public:
   void buildColourSet();
   void drawScene(const std::string &,bool);
   void drawTextRect(int, int, int, int, int);
-  void stateChange(State);
+  void stateChange(const std::string &state);
+  void stateChange(StateProperties *state);
   float distFromNear(float,float,float);  
   void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
 
@@ -82,9 +85,6 @@ public:
 
   
   std::string getActiveID() { return activeID; }
-  void setCallyMotion(float, float, float);
-  void setCallyState(int);
-  void executeCallyAction(int);
   Camera* getCamera() { return camera; }
   Terrain* getTerrain() { return terrain; }
   SkyBox* getSkyBox() { return skybox; }
@@ -110,7 +110,7 @@ public:
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
 
-  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
+//  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
   
 protected:
@@ -158,7 +158,7 @@ protected:
   std::map<std::string, Queue> wireframe_queue;
 
   void buildQueues(WorldEntity*, int);
-  
+  StateLoader *_state_loader; 
   float frame_rate;
   float model_detail;
 
@@ -212,24 +212,10 @@ protected:
   
   void CheckError();
 
-  State current_state;
-  int _current_state;
+  std::string _current_state;
+  StateProperties *_cur_state;
 
-  typedef struct {
-    bool alpha_test;
-    bool blend;
-    bool lighting;
-    bool textures;
-    bool colour_material;
-    bool depth_test;
-    bool cull_face;
-    bool cull_face_cw;
-    bool stencil;
-    bool fog;
-  } stateProperty;
-  
-  stateProperty stateProperties[LAST_STATE];
-  void stateDisplayList(GLuint, State, State);
+  void stateDisplayList(GLuint &, StateProperties *previous_state, StateProperties *next_state);
 
   float _fog_start;
   float _fog_end;
@@ -245,6 +231,7 @@ protected:
 
 
   ModelHandler *mh;
+  std::map<std::string, GLuint> _state_map;
 private:
   // Consts
   static const int sleep_time = 5000;

@@ -44,6 +44,7 @@ typedef struct {
   bool wrap_texture;
   bool draw_self;
   bool draw_members;
+  char state[OBJECT_LOADER_MAX_SIZE];
   float width;
   float height;
   float texture_scale;

@@ -9,6 +9,7 @@
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
 
+#include "ObjectLoader.h"
 
 #define WORLD_ENTITY_MESSAGE_LIFE (5000)
 #define WORLD_ENTITY_STRING_SIZE  (40)
@@ -19,13 +20,14 @@ typedef std::pair<std::string, unsigned int> message;
 
 class WorldEntity : public Eris::Entity {
 public:
-
+// TODO: move code to .cpp file
  WorldEntity(const Atlas::Objects::Entity::GameEntity &ge):
    Eris::Entity(ge),
    time(0),
    abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
    abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
-   messages(std::list<message>())
+   messages(std::list<message>()),
+   _op(NULL)
    {}
   ~WorldEntity() {}
   void SetVelocity();
@@ -37,11 +39,14 @@ public:
   void rotateAbsOrient(WFMath::Quaternion);
   WFMath::Quaternion getAbsOrient();
   WFMath::Point<3> getAbsPos();
- void renderMessages();
- void displayInfo();
+  void renderMessages();
+  void displayInfo();
 
- std::string type();
- std::string parent();
+  std::string type();
+  std::string parent();
+
+  ObjectProperties *getObjectProperties() { return _op; }
+  void setObjectProperties(ObjectProperties *op) { _op = op; }
 
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -49,6 +54,7 @@ protected:
   WFMath::Quaternion abs_orient;
   WFMath::Point<3> abs_pos;
   std::list<message> messages;
+  ObjectProperties *_op;
 
   static int message_life;
   static int string_size;

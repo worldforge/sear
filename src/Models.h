@@ -22,6 +22,7 @@ public:
   typedef enum {
     NONE = 0,
     NORMAL,
+    POSITION,
     BILLBOARD,
     HALO
   } RotationStyle;

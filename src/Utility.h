@@ -7,6 +7,7 @@
 
 #include <wfmath/const.h>
 #include <wfmath/quaternion.h>
+#include <wfmath/axisbox.h>
 //class Quaternion;
 #include <string>
 #include "config.h"
@@ -78,6 +79,8 @@ WFMath::Quaternion EulerToQuat(float roll, float pitch, float yaw);
 WFMath::Quaternion QuatMul(const WFMath::Quaternion &q1, const WFMath::Quaternion &q2);
 
 WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, float t);
+
+WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
 } /* namespace Sear */
 #endif /* _UTILITY_H_ */

@@ -124,6 +124,8 @@ void Landscape::Tessellate() {
 // Render each patch of the landscape & adjust the frame variance.
 //
 void Landscape::render() {
+
+   //TODO: split into render land, render water
   int nCount;
   Patch *patch = &(m_Patches[0][0]);
   // Scale the terrain by the terrain scale specified at compile time.

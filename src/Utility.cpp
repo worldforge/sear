@@ -223,4 +223,19 @@ WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, flo
   return WFMath::Quaternion(w, x, y, z);
 }
 
+WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
+  int count = 0;
+  if (bbox.lowCorner().x() + bbox.lowCorner().y() + bbox.lowCorner().z() + bbox.highCorner().x() + bbox.highCorner().y() + bbox.highCorner().z()  == 0.0f) {
+    // BBOX has no size!! or is equidistant sround origin!!!!!
+    WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
+    bbox = WFMath::AxisBox<3>(lc, hc);
+ }
+ if (bbox.highCorner().x() > bbox.lowCorner().x()) count++;
+ if (bbox.highCorner().y() < bbox.lowCorner().y()) count++;
+ if (bbox.highCorner().z() < bbox.lowCorner().z()) count++;
+ 
+ if (count == 0 || count == 2) return bbox;
+ else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
+}
 } /* namespace Sear */

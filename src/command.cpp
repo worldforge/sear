@@ -217,7 +217,7 @@ void System::runCommand(const std::string &command) {
       int i = atoi(arg1.c_str());
       renderer->setCallyState(i);
     }
-    else if (strcasecmp(tok, CMD_CALLY_SET_MOTION) == 0) {
+/*    else if (strcasecmp(tok, CMD_CALLY_SET_MOTION) == 0) {
       std::string arg1 = nextToken();
       std::string arg2 = nextToken();
       std::string arg3 = nextToken();
@@ -230,7 +230,7 @@ void System::runCommand(const std::string &command) {
       int action = atoi(nextToken().c_str());
       renderer->executeCallyAction(action);
     }
-    else if (strcasecmp(tok, CMD_KEY_PRESS) == 0) {
+*/    else if (strcasecmp(tok, CMD_KEY_PRESS) == 0) {
       std::string arg1 = nextToken();
       runCommand(Bindings::getBinding(arg1));
     }

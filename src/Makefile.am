@@ -55,4 +55,6 @@ sear_SOURCES = \
 	WorldEntity.h \
 	ModelHandler.cpp \
 	ModelHandler.h \
-	ModelLoader.h 
+	ModelLoader.h \
+	StateLoader.cpp \
+	StateLoader.h
