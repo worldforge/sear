@@ -2,15 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.4 2002-09-26 20:23:03 simon Exp $
+//$Id: Model.h,v 1.5 2002-09-26 21:16:38 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
 
 #include <map>
 #include <string>
-
-#include "StateLoader.h"
 
 #include "Render.h"
 #include "Graphics.h"
@@ -41,9 +39,6 @@ public:
   
   virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NONE; }
 
-  void setSelectState(StateProperties *sp) { _select_state = sp; }
- 
-  StateProperties *getSelectState() { return _select_state; }
   float getLastTime() { return _last_time; }
   void setLastTime(float t) { _last_time = t; }
   
@@ -53,8 +48,6 @@ protected:
 private:
   bool _in_use;
   std::map<std::string, bool> _flag_map;
-  StateProperties *_select_state;
-  
   
 };
 

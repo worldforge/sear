@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.34 2002-09-26 20:23:03 simon Exp $
+// $Id: GL.cpp,v 1.35 2002-09-26 21:16:38 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -544,6 +544,7 @@ inline GLuint GL::getTextureID(int texture_id) {
 void GL::stateChange(const std::string &state) {
   StateLoader *state_loader = _system->getStateLoader();
   if (state_loader) stateChange(state_loader->getStateProperties(state));
+
 }
 
 void GL::stateChange(StateProperties *sp) {
@@ -1074,7 +1075,7 @@ void GL::drawQueue(QueueMap queue, bool select_mode, float time_elapsed) {
       } else {
         if (object_record->id == activeID) {
           active_name = object_record->name;
-	  drawOutline(model, checkState(RENDER_STENCIL) && model_record->outline);
+	  drawOutline(model_record);
 	}
 	else model->render(false);
       }
@@ -1118,15 +1119,18 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
   return Frustum::patchInFrustum(frustum, bbox);
 }
 
-void GL::drawOutline(Model *model, bool use_stencil) {
+void GL::drawOutline(ModelRecord *model_record) {
   StateProperties *sp = _cur_state; // Store current state
-  if (checkState(RENDER_STENCIL) && use_stencil) { // Using Stencil Buffer
+  Model *model = model_record->model;
+  bool use_stencil = checkState(RENDER_STENCIL) && model_record->outline;
+  if (use_stencil) { // Using Stencil Buffer
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, -1, 1);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glPushMatrix();
     model->render(false);
     glPopMatrix();
+    //TODO hard code halo in static const variable
     stateChange("halo");
     glStencilFunc(GL_NOTEQUAL, -1, 1);
     glColor4fv(_halo_colour);
@@ -1136,7 +1140,7 @@ void GL::drawOutline(Model *model, bool use_stencil) {
     glDisable(GL_STENCIL_TEST);
     glColor4fv(white);
   } else { // Just use solid colour on object 
-    stateChange(model->getSelectState());
+    stateChange(model_record->select_state);
     glColor4fv(_halo_colour);  
     model->render(true);
     glColor4fv(white);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.17 2002-09-26 17:17:46 simon Exp $
+// $Id: GL.h,v 1.18 2002-09-26 21:16:38 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -100,7 +100,7 @@ public:
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(QueueMap queue, bool select_mode, float time_elapsed);
   void drawMessageQueue(QueueMap queue);
-  void drawOutline(Model *, bool);
+  void drawOutline(ModelRecord *);
  
   inline void store();
   inline void restore();

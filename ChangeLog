@@ -1,4 +1,8 @@
 26th September 2002, Simon Goodall 
+ * Fixes to outline code which was using wrong values for states
+ * Removed some now unused members from Model class
+
+26th September 2002, Simon Goodall 
  * Re-implemented model unloading
  * Fixed bug where model was selected upon available record, but texture was selected upon its original type.
 
