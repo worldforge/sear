@@ -77,7 +77,7 @@ public:
   float distFromNear(float,float,float);  
   void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
 
-  int patchInFrustum(WFMath::AxisBox<3>);
+  int patchInFrustum(const WFMath::AxisBox<3> &);
   
   void procEvent(int, int);
   int getWindowWidth() { return m_width; }
@@ -111,7 +111,7 @@ public:
   void beginFrame();
   void endFrame(bool select_mode);
   void drawSplashScreen();
-  void applyQuaternion(WFMath::Quaternion quaternion);
+  void applyQuaternion(const WFMath::Quaternion & quaternion);
   void applyLighting();
   inline void resetSelection();
   inline void renderActiveName();

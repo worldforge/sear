@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.7 2004-04-27 15:07:01 simon Exp $
+// $Id: Utility.cpp,v 1.8 2004-06-11 00:53:13 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -72,7 +72,7 @@ void calcNormal(float v[3][3], float out[3]) {
   ReduceToUnit(out);
 }
 
-void QuatToMatrix(WFMath::Quaternion quat, float m[4][4]) {
+void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]) {
   float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
   // calculate coefficients
   x2 = quat.vector().x() + quat.vector().x();

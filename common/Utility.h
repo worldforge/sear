@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.13 2004-05-26 21:57:57 jmt Exp $
+// $Id: Utility.h,v 1.14 2004-06-11 00:53:13 alriddoch Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -117,7 +117,7 @@ const T SQR(const T &t) { return t * t; }
 void reduceToUnit(float vector[3]);
 void calcNormal(float v[3][3], float out[3]);
 
-void QuatToMatrix(WFMath::Quaternion quat, float m[4][4]);
+void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]);
 
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 

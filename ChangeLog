@@ -1,3 +1,10 @@
+2004-06-11  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Render.h, renderers/GL.h, renderers/GL.cpp,
+	  common/Utility.h, common/Utility.cpp:
+	  Change some pass by value arguments to pass by reference
+	  for efficiency.
+
 2004-06-10  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/WorldEntity.h, src/WorldEntity.cpp,

@@ -1108,7 +1108,7 @@ inline float GL::distFromNear(float x, float y, float z) {
   return Frustum::distFromNear(frustum, x, y, z);
 }
 	
-inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
+inline int GL::patchInFrustum(const WFMath::AxisBox<3> & bbox) {
   return Frustum::patchInFrustum(frustum, bbox);
 }
 
@@ -1190,7 +1190,7 @@ void GL::drawSplashScreen() {
   setViewMode(PERSPECTIVE);
 }
   
-inline void GL::applyQuaternion(WFMath::Quaternion quaternion) {
+inline void GL::applyQuaternion(const WFMath::Quaternion & quaternion) {
   float rotation_matrix[4][4];
   QuatToMatrix(quaternion, rotation_matrix); //Get the rotation matrix for base rotation
   glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
