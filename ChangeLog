@@ -1,3 +1,7 @@
+2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/client.cpp: Update for eris connect / disconnect API changes.
+
 2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/client.cpp, src/client.h: Re-write to handle changes between 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.63 2005-04-05 21:56:09 simon Exp $
+// $Id: client.cpp,v 1.64 2005-04-06 09:51:41 simon Exp $
 
 #include "System.h"
 
@@ -158,7 +158,7 @@ int Client::connect(const std::string &host, int port) {
   assert(m_connection == NULL);
 
   // Create new eris connection object
-  m_connection = new Eris::Connection(m_client_name, DEBUG_ERIS);
+  m_connection = new Eris::Connection(m_client_name, host, port, DEBUG_ERIS);
 
   // Set up connection callbacks
   m_connection->Failure.connect(SigC::slot(*this, &Client::NetFailure));
@@ -169,17 +169,10 @@ int Client::connect(const std::string &host, int port) {
   
   m_system->pushMessage(CLIENT_CONNECTING, CONSOLE_MESSAGE);
 
-  try {
-    m_status = CLIENT_STATUS_CONNECTING;
-    m_connection->connect(host, port);
-  } catch (Eris::InvalidOperation io) {
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    m_status = CLIENT_STATUS_DISCONNECTED;
-    delete m_connection;
-    m_connection = NULL;
-    return 1;
-  } catch (...) {
-    printf("Unknown Exception\n");
+  m_status = CLIENT_STATUS_CONNECTING;
+  if (m_connection->connect()  != 0) {
+    printf("Error: Connection Error\n");
+    m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
     m_status = CLIENT_STATUS_DISCONNECTED;
     delete m_connection;
     m_connection = NULL;
@@ -204,22 +197,11 @@ int Client::disconnect() {
   assert(m_connection);
   assert(m_connection->isConnected());
 
-  try {
-    m_status = CLIENT_STATUS_DISCONNECTING;
-    m_connection->disconnect();
-  } catch (Eris::InvalidOperation io) {
+  m_status = CLIENT_STATUS_DISCONNECTING;
+  if (m_connection->disconnect() != 0) {
     m_status = CLIENT_STATUS_CONNECTED;
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    delete m_connection;
-    m_connection = NULL;
-    m_status = CLIENT_STATUS_DISCONNECTED;
-    m_system->setState(SYS_IN_WORLD, false); 
-    m_system->setState(SYS_CONNECTED, false);
-    m_system->setState(SYS_LOGGED_IN, false);
-    return 1;
-  } catch (...) {
-    m_status = CLIENT_STATUS_CONNECTED;
-    printf("Unknown Exception\n");
+    printf("Error: Disconnect Error\n");
+    m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
     delete m_connection;
     m_connection = NULL;
     m_status = CLIENT_STATUS_DISCONNECTED;
@@ -362,7 +344,6 @@ int Client::login(const std::string &username, const std::string &password) {
 void Client::poll() {
   assert ((m_initialised == true) && "Client not initialised");
   try {
-//    if (m_connection != NULL) m_connection->poll();
     Eris::PollDefault::poll();   
   } catch (Eris::InvalidOperation io) {
     printf("Eris Exception: %s\n", io._msg.c_str());
