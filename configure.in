@@ -270,5 +270,5 @@ AC_OUTPUT([
 	scripts/startup.script
 	scripts/shutdown.script
 	Sear.iss
-dnl	tools/Makefile
+	tools/Makefile
 ])
