@@ -10,7 +10,7 @@ echo aclocal...
 
 libtoolize --force --copy
 
-aclocal -I /usr/local/share/aclocal
+aclocal -I /usr/local/share/aclocal $ACLOCAL_FLAGS
 
 echo autoheader...
 (autoheader --version) < /dev/null > /dev/null 2>&1 || {
@@ -35,7 +35,11 @@ echo autoconf...
 }
 
 autoconf
+
 # Default install is /opt/worldforge
-./configure --prefix=/opt/worldforge --enable-debug=yes $@
+
+CONFIGUREFLAGS="--prefix=/opt/worldforge --enable-debug=yes"
+echo Running: configure $CONFIGUREFLAGS
+./configure $CONFIGUREFLAGS $@
 
 exit 0

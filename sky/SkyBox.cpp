@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.6 2002-09-08 00:24:53 simon Exp $
+// $Id: SkyBox.cpp,v 1.7 2002-10-20 15:50:27 simon Exp $
 
 #include "common/Log.h"
 
@@ -12,6 +12,13 @@
 #include "SkyBox.h"
 namespace Sear {
 
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+
+	
 // Setup static data items
 float SkyBox::vertex_coords[] = VERTEX_COORDS;
 float SkyBox::texture_coords[] = TEXTURE_COORDS;
@@ -29,7 +36,7 @@ SkyBox::~SkyBox() {
 
 bool SkyBox::init() {
   if (_initialised) shutdown();
-  Log::writeLog("SkyBox: Initialising.", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("SkyBox: Initialising.", Log::LOG_DEFAULT);
   texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_NORTH, true);
   texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_SOUTH, true);
   texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_WEST, true);
@@ -47,7 +54,7 @@ bool SkyBox::init() {
 }
 
 void SkyBox::shutdown() {
-  Log::writeLog("SkyBox: Shutting down", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("SkyBox: Shutting down", Log::LOG_DEFAULT);
   _initialised = false;
 }
 

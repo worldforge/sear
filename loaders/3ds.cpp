@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.14 2002-10-09 17:13:38 alriddoch Exp $
+// $Id: 3ds.cpp,v 1.15 2002-10-20 15:50:26 simon Exp $
 
 
 #include <iostream>
@@ -30,9 +30,13 @@
 #include <iostream>
 
 namespace Sear {
-
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+	
 ThreeDS::ThreeDS(Render *render) : Model(render),
-  _model (NULL),
   _initialised(false)
 {
 
@@ -44,8 +48,8 @@ ThreeDS::~ThreeDS() {
 
 bool ThreeDS::init(const std::string &file_name) {
   // Load 3ds file
-  Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
-  _model = lib3ds_file_load(file_name.c_str());
+  if (debug) Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
+  Lib3dsFile *_model = lib3ds_file_load(file_name.c_str());
   if (!_model) {
     Log::writeLog(std::string("Unable to load ") + file_name, Log::LOG_ERROR);
     return false;
@@ -55,7 +59,7 @@ bool ThreeDS::init(const std::string &file_name) {
   Lib3dsNode *p = NULL;
   render_file(_model);
   for (p=_model->nodes; p!=0; p=p->next) {
-    std::cout << "Rendering Node" << std::endl;
+    if (debug) std::cout << "Rendering Node" << std::endl;
     render_node(p, _model);
   }
   lib3ds_file_free(_model);
@@ -66,6 +70,21 @@ bool ThreeDS::init(const std::string &file_name) {
 
 void ThreeDS::shutdown() {
   //TODO Clean up 
+  while (!render_objects.empty()) {
+    RenderObject *ro = *render_objects.begin();
+    if (ro) {
+      if (ro->vertex_data) free (ro->vertex_data);
+      if (ro->texture_data) free (ro->texture_data);
+      if (ro->normal_data) free (ro->normal_data);
+      delete ro;
+    }
+    render_objects.erase(render_objects.begin());
+  }
+  while (!material_map.empty()) {
+    Material *m = material_map.begin()->second;
+    if (m) free (m);
+    material_map.erase(material_map.begin());
+  }
   _initialised = false;
 }
 
@@ -83,7 +102,7 @@ void ThreeDS::render(bool select_mode) {
     for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
       RenderObject *ro = *I;
       if (ro) {
-        if (ro->material_name && std::string(ro->material_name) != current_material) {
+        if (!ro->material_name.empty() && ro->material_name != current_material) {
           Material *m = material_map[ro->material_name];
           if (m) {
             _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
@@ -122,7 +141,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
       unsigned int v_counter = 0;
       unsigned int n_counter = 0;
       unsigned int t_counter = 0;
-      RenderObject *ro = (RenderObject*)malloc(sizeof(RenderObject));
+      RenderObject *ro = new RenderObject;
       memset(ro, 0, sizeof(RenderObject));
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
@@ -135,10 +154,10 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
         Lib3dsMaterial *mat=0;
         if (f->material[0]) {
           mat=lib3ds_file_material_by_name(file, f->material);
-	  ro->material_name = NULL;
+	  ro->material_name = "";
         }
         if (mat) {
-	  ro->material_name = std::string(f->material).c_str();
+	  ro->material_name = std::string(f->material);
           if (!material_map[std::string(f->material)]) {
 	    Material *m = (Material*)malloc(sizeof(Material));
 	    m->ambient[0] = 0.0f;
@@ -192,7 +211,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	      
               v_counter = n_counter = t_counter = 0;
 	      
-              ro = (RenderObject*)malloc(sizeof(RenderObject));
+              ro = new RenderObject;
               memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
@@ -262,10 +281,10 @@ void ThreeDS::render_file(Lib3dsFile *file) {
         Lib3dsMaterial *mat=0;
         if (f->material[0]) {
           mat=lib3ds_file_material_by_name(file, f->material);
-	  ro->material_name = NULL;
+	  ro->material_name = "";
         }
         if (mat) {
-	  ro->material_name = std::string(f->material).c_str();
+	  ro->material_name = std::string(f->material);
           if (!material_map[std::string(f->material)]) {
 	    Material *m = (Material*)malloc(sizeof(Material));
 	    m->ambient[0] = 0.0f;

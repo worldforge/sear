@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.4 2002-10-20 13:22:26 simon Exp $
+// $Id: ActionHandler.cpp,v 1.5 2002-10-20 15:50:27 simon Exp $
 
 #include "ActionHandler.h"
 
@@ -16,26 +16,28 @@
 
 namespace Sear {
 
+static const bool debug = false;
+	
 static const std::string SCRIPT = "script";
 static const std::string ENTITY = "entity_based";
 
 ActionHandler::ActionHandler(System *system) :
   _system(system),
   _initialised(false)
-{
-
-}
+{}
 
 ActionHandler::~ActionHandler() {
   if (_initialised) shutdown();
 }
 
 void ActionHandler::init() {
+  if (debug) Log::writeLog("Initialising Action Handler", Log::LOG_DEFAULT);
   if (_initialised) shutdown();
   _initialised = true;
 }
 
 void ActionHandler::shutdown() {
+  if (debug) Log::writeLog("Shutting down Action Handler", Log::LOG_DEFAULT);
   while(!action_map.empty()) {
     ActionStruct *as = action_map.begin()->second;
     if (as) delete (as);
@@ -66,7 +68,7 @@ void ActionHandler::varconf_callback(const std::string &section, const std::stri
     record->action = section;
     record->entity_based = false;
     action_map[section] = record;
-    Log::writeLog(std::string("Adding Action: ") + section, Log::LOG_INFO);
+    if (debug) Log::writeLog(std::string("Adding Action: ") + section, Log::LOG_INFO);
   } 
   if (key == SCRIPT) record->script = (std::string)config.getItem(section, key);
   else if (key == ENTITY) record->entity_based = (bool)config.getItem(section, key);

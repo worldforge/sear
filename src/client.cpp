@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.32 2002-10-20 13:22:26 simon Exp $
+// $Id: client.cpp,v 1.33 2002-10-20 15:50:27 simon Exp $
 
 #include "System.h"
 
@@ -42,7 +42,7 @@
 
 #ifdef DEBUG
   #define DEBUG_ERIS 1
-  #define ERIS_LOG_LEVEL 4
+  #define ERIS_LOG_LEVEL 1
 #elif defined(NDEBUG)
   #define DEBUG_ERIS 0
   #define ERIS_LOG_LEVEL 0
@@ -52,6 +52,20 @@
 #endif
 
 namespace Sear {
+
+// Console Command strings
+static std::string SERVER_CONNECT = "connect";
+static std::string SERVER_RECONNECT = "reconnect";
+static std::string SERVER_DISCONNECT = "disconnect";
+static std::string ACCOUNT_CREATE = "create";
+static std::string ACCOUNT_LOGIN = "login";
+static std::string ACCOUNT_LOGOUT = "logout";
+static std::string CHARACTER_LIST = "get";
+static std::string CHARACTER_CREATE = "add";
+static std::string CHARACTER_TAKE = "take";
+static std::string GET_SERVERS = "get_servers";
+static std::string STOP_SERVERS = "stop_servers";
+
 
 /*
  * The Constructor. Creates the initial Eris Connection object and
@@ -65,6 +79,7 @@ Client::Client(System *system, const std::string &client_name) :
   _lobby(NULL),
   the_lobby(NULL),
   _meta(NULL),
+  _factory(NULL),
   _status(CLIENT_STATUS_DISCONNECTED),
   _client_name(client_name),
   _initialised(false)
@@ -96,12 +111,11 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
-//  if (_meta) delete _meta;
   if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
-  // TODO THIS IS CURRENTLY BUGGY
   if (_connection) delete _connection;
-  // TODO clean up factory
+  if (_factory) delete _factory;
+  if (_meta) delete _meta;
   _initialised = false;
 }
 
@@ -258,13 +272,13 @@ void Client::poll() {
 //    if (_connection != NULL) _connection->poll();
     Eris::PollDefault::poll();   
   } catch (Eris::InvalidOperation io) {
-  Log::writeLog(io._msg, Log::LOG_ERROR);
+    Log::writeLog(io._msg, Log::LOG_ERROR);
   } catch (Eris::BaseException be) {
-  Log::writeLog(be._msg, Log::LOG_ERROR);
+    Log::writeLog(be._msg, Log::LOG_ERROR);
   } catch (std::runtime_error re) {
-  Log::writeLog("STD::RUNTIME ERROR", Log::LOG_ERROR);
+    Log::writeLog("STD::RUNTIME ERROR", Log::LOG_ERROR);
   } catch (...) {
-  Log::writeLog("Caught some error - ignoring", Log::LOG_ERROR);
+    Log::writeLog("Caught some error - ignoring", Log::LOG_ERROR);
   }
 }
 
@@ -359,7 +373,9 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
   world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
   world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
-  world->registerFactory(new Factory());
+  if (_factory) delete _factory;
+  _factory = new Factory();
+  world->registerFactory(_factory);
   return 0;
 }
 
@@ -565,6 +581,7 @@ void Client::registerCommands(Console *console) {
   console->registerCommand(CHARACTER_CREATE, this);
   console->registerCommand(CHARACTER_TAKE, this);
   console->registerCommand(GET_SERVERS, this);
+  console->registerCommand(STOP_SERVERS, this);
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
@@ -686,9 +703,8 @@ void Client::runCommand(const std::string &command, const std::string &args) {
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
   } 
-  else if (command == GET_SERVERS) {
-    getServers();
-  }
+  else if (command == GET_SERVERS) getServers();
+  else if (command == STOP_SERVERS) stopServers();
 }
 
 void Client::getServers() {
@@ -702,6 +718,10 @@ void Client::getServers() {
     _meta->CompletedServerList.connect(SigC::slot(*this, &Client::completedServerList));
   }
   _meta->refresh();
+}
+
+void Client::stopServers() {
+  if (_meta) _meta->cancel();
 }
 
 void Client::gotServerCount(int count) {

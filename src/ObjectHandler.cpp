@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.2 2002-10-20 13:22:26 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.3 2002-10-20 15:50:27 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -14,7 +14,9 @@
 
 namespace Sear {
 
-const std::string ObjectHandler::LOAD_OBJECT_RECORDS = "load_object_records";
+static const bool debug = false;
+	
+static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
 	
 ObjectHandler::ObjectHandler() :
   _initialised(false)	
@@ -27,12 +29,14 @@ ObjectHandler::~ObjectHandler() {
 }
 
 void ObjectHandler::init() {
+  if (debug) Log::writeLog("Initialising Object Handler", Log::LOG_DEFAULT);
   if (_initialised) shutdown();
   _object_records = ObjectRecordMap();
   _initialised = true;
 }
 
 void ObjectHandler::shutdown() {
+  if (debug) Log::writeLog("Shutting down Object Handler", Log::LOG_DEFAULT);
   // Clean up object records	
   while (!_object_records.empty()) {
     ObjectRecord *record = _object_records.begin()->second;
@@ -87,7 +91,7 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
     record->draw_self = true;
     record->draw_members = true;
     _object_records[section] = record;
-    Log::writeLog(std::string("Adding ObjectRecord: ") + section, Log::LOG_INFO);
+    if (debug) Log::writeLog(std::string("Adding ObjectRecord: ") + section, Log::LOG_INFO);
   }
   if (key == "draw_self") record->draw_self = (bool)config.getItem(section, key);
   else if (key == "draw_members") record->draw_members = (bool)config.getItem(section, key);

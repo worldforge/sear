@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.22 2002-10-20 13:22:26 simon Exp $
+// $Id: WorldEntity.cpp,v 1.23 2002-10-20 15:50:27 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -191,7 +191,7 @@ void WorldEntity::checkActions() {
   if (hasProperty(ACTION)) {
     std::string action = getProperty(ACTION).AsString();
     if (action != last_action) {
-      ObjectRecord *record;
+      ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
       if (record) record->action(action);
       last_action = action;
@@ -203,7 +203,7 @@ void WorldEntity::checkActions() {
   if (hasProperty(MODE)) {
     std::string mode = getProperty(MODE).AsString();
     if (mode != last_mode) {
-      ObjectRecord *record;
+      ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getID());
       if (record) record->action(mode);
       last_mode = mode;

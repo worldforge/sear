@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.21 2002-09-08 13:08:21 simon Exp $
+// $Id: Console.cpp,v 1.22 2002-10-20 15:50:27 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -16,6 +16,20 @@
 
 namespace Sear {
 
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+
+	
+static const std::string TOGGLE_CONSOLE = "toggle_console";
+static const std::string LIST_CONSOLE_COMMANDS = "list_commands";
+
+static const std::string UI = "ui";
+static const std::string PANEL = "panel";
+static const std::string FONT = "font";
+	
 Console::Console(System *system) :
   animateConsole(0),
   showConsole(0),
@@ -23,7 +37,6 @@ Console::Console(System *system) :
   console_messages(std::list<std::string>()),
   screen_messages(std::list<screenMessage>()),
   _system(system),
-  _renderer(NULL),
   _initialised(false)
 { }
 
@@ -33,11 +46,6 @@ Console::~Console() {
 
 bool Console::init() {
   if (_initialised) shutdown();
-  // Grab the render object. This is not available when console is created
-  // and cannot be passed into the constructor.
-  _renderer = _system->getGraphics()->getRender();
-  // Preload texture
-  panel_id = _renderer->requestTexture("ui", "panel");
   // Register console commands
   registerCommand(TOGGLE_CONSOLE, this);
   registerCommand(LIST_CONSOLE_COMMANDS, this);
@@ -48,7 +56,10 @@ bool Console::init() {
 }
 
 void Console::shutdown() {
-  Log::writeLog("Shutting down console.", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("Shutting down console.", Log::LOG_DEFAULT);
+  while (!_registered_commands.empty()) _registered_commands.erase(_registered_commands.begin());
+  while (!console_messages.empty()) console_messages.erase(console_messages.begin());
+  while (!screen_messages.empty()) screen_messages.erase(screen_messages.begin());
   _initialised = false;
 }
 
@@ -99,7 +110,8 @@ void Console::draw(const std::string &command) {
 }
 
 void Console::renderConsoleMessages(const std::string &command) {
-  if (!_renderer) {
+  Render *renderer = _system->getGraphics()->getRender();
+  if (!renderer) {
     Log::writeLog("Console: Error - Renderer object not created", Log::LOG_ERROR);
     return;
   }
@@ -107,36 +119,37 @@ void Console::renderConsoleMessages(const std::string &command) {
   int i;
   //Render console panel
   int consoleOffset = CONSOLE_HEIGHT - consoleHeight;
-  _renderer->stateChange("panel");
+  renderer->stateChange(PANEL);
   //Make panel slightly transparent
-  _renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  _renderer->drawTextRect(0, 0, _renderer->getWindowWidth(), consoleHeight, panel_id);
-  _renderer->stateChange("font");
-  _renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
+  renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
+  renderer->drawTextRect(0, 0, renderer->getWindowWidth(), consoleHeight, renderer->requestTexture(UI, PANEL));
+  renderer->stateChange(FONT);
+  renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
   for (I = console_messages.begin(), i = 0; I != console_messages.end(); ++I, ++i) {
     int j = console_messages.size() - i;
-    _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y + j * FONT_HEIGHT - consoleOffset, (char*)(*I).c_str(), 0);
+    renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y + j * FONT_HEIGHT - consoleOffset, (char*)(*I).c_str(), 0);
   }
   //Render current command string
   std::string str = CONSOLE_PROMPT_STRING + command + CONSOLE_CURSOR_STRING;
-  _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y - consoleOffset, const_cast<char *>(str.c_str()), 0);
+  renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y - consoleOffset, const_cast<char *>(str.c_str()), 0);
 }
 
 void Console::renderScreenMessages() {
+  Render *renderer = _system->getGraphics()->getRender();
   if (screen_messages.empty()) return;	
   std::list<screenMessage>::const_iterator I;
   int i;
-  _renderer->stateChange("font");
-  _renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
+  renderer->stateChange(FONT);
+  renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   // Get screen height so we can calculate offset correctly
-  int height = _renderer->getWindowHeight();
+  int height = renderer->getWindowHeight();
   //Get time so we can remove expired messages
   unsigned int current_time = _system->getTime();
   //Render messges
   for (I = screen_messages.begin(), i = 0; I != screen_messages.end(); ++I, ++i) {
     const std::string str = (const std::string)((*I).first);
-    _renderer->print(CONSOLE_TEXT_OFFSET_X, height - ((i + 1) * FONT_HEIGHT ), const_cast<char*>(str.c_str()), 0);
+    renderer->print(CONSOLE_TEXT_OFFSET_X, height - ((i + 1) * FONT_HEIGHT ), const_cast<char*>(str.c_str()), 0);
   }
   //Remove expired messages
   //TODO this currently only removes the messges from  the top of the list
@@ -164,7 +177,7 @@ void Console::toggleConsole() {
 }
 
 void Console::registerCommand(const std::string &command, ConsoleObject *object) {
-  Log::writeLog(std::string("registering: ") + command, Log::LOG_INFO);
+  if (debug) Log::writeLog(std::string("registering: ") + command, Log::LOG_INFO);
   // Assign the ConsoleObject to the command
   _registered_commands[command] = object;
 }
@@ -180,7 +193,7 @@ void Console::runCommand(const std::string &command) {
     if (_registered_commands["say"]) {
       runCommand(std::string("/say ") + command);
     } else {
-      Log::writeLog(std::string("Cannot SAY, not in game yet: ") + command, Log::LOG_ERROR);
+      if (debug) Log::writeLog(std::string("Cannot SAY, not in game yet: ") + command, Log::LOG_ERROR);
       pushMessage("Cannot SAY, not it game yet" , CONSOLE_MESSAGE, 0);
     }
     return; 
@@ -199,7 +212,7 @@ void Console::runCommand(const std::string &command) {
   // If object exists, run the command
   if (con_obj) con_obj->runCommand(cmd, args);
   else { // Else print error message
-    Log::writeLog(std::string("Unknown command: ") + command, Log::LOG_ERROR);
+    if (debug) Log::writeLog(std::string("Unknown command: ") + command, Log::LOG_ERROR);
     pushMessage("Unknown command" , CONSOLE_MESSAGE, 0);
   }
 }
@@ -213,7 +226,7 @@ void Console::runCommand(const std::string &command, const std::string &args) {
   else if (command == LIST_CONSOLE_COMMANDS) {
     for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); ++I) {
       // TODO - should we check to see if I->second is valid?
-      Log::writeLog(I->first, Log::LOG_INFO);
+      if (debug) Log::writeLog(I->first, Log::LOG_INFO);
     }
   }
 }

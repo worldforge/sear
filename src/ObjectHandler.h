@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.1 2002-09-26 17:17:46 simon Exp $
+// $Id: ObjectHandler.h,v 1.2 2002-10-20 15:50:27 simon Exp $
 
 #ifndef SEAR_OBJECTHANDLER_H
 #define SEAR_OBJECTHANDLER_H 1
@@ -47,8 +47,6 @@ protected:
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
-  
-  static const std::string LOAD_OBJECT_RECORDS;
   
 };
 	

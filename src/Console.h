@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+// $Id: Console.h,v 1.11 2002-10-20 15:50:27 simon Exp $
 
 #ifndef SEAR_CONSOLE_H
 #define SEAR_CONSOLE_H 1
@@ -32,7 +32,6 @@ namespace Sear {
 // Forward Declarations
 class ConsoleObject;
 class System;
-class Render;
 
 /**
  * The console class handles the onscreen console, the screen messages and keeps track of all the console commands in use.
@@ -106,15 +105,10 @@ protected:
   std::list<screenMessage> screen_messages; // Current screen messages
   int panel_id; // The texture id of the console's panel texture
   System *_system;
-  Render *_renderer;
 
   // Mapping of registered commands to assoicated object
   std::map<std::string, ConsoleObject*> _registered_commands;
  
-  // List of Console's console commands
-  static const char * const TOGGLE_CONSOLE = "toggle_console";
-  static const char * const LIST_CONSOLE_COMMANDS = "list_commands";
-  
   bool _initialised;
   
 };

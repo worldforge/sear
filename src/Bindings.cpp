@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.10 2002-09-08 00:24:53 simon Exp $
+// $Id: Bindings.cpp,v 1.11 2002-10-20 15:50:27 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -167,7 +167,7 @@ void Bindings::shutdown() {
     delete _bindings;
     _bindings = NULL;
   }
-  // Delete keymap - is this necessary?
+  // Delete keymap
   while (!keymap.empty()) {
     keymap.erase(keymap.begin());
   }
@@ -211,7 +211,6 @@ std::string Bindings::getBinding(const std::string &key) {
   _bindings->clean(the_key);
   std::string cmd = _bindings->getItem("key_bindings", the_key);
   if (cmd.empty()) { // Retrieved command should not be the empty string
-//    _bindings->setAttribute(key, "{UNBOUND}");
     return "";
   }
   return cmd; // Return retrieved binding

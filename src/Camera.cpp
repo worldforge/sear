@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.8 2002-09-08 00:24:53 simon Exp $
+// $Id: Camera.cpp,v 1.9 2002-10-20 15:50:27 simon Exp $
 
 #include <string>
 
@@ -18,6 +18,14 @@
 
 namespace Sear {
 
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+	
+static std::string CAMERA = "camera";
+	
 Camera::Camera() :
   _distance(0.0f),
   _rotation(0.0f),
@@ -45,7 +53,7 @@ bool Camera::init() {
 }
 
 void Camera::shutdown() {
-  Log::writeLog("Shutting down camera.", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("Shutting down camera.", Log::LOG_DEFAULT);
   _initialised = false;
 }
 
@@ -58,12 +66,6 @@ void Camera::updateCameraPos(float time_elapsed) {
   _elevation += deg_to_rad(_elevation_speed * (float)_elevation_dir * time_elapsed);
 }
 
-void Camera::zoom  (int dir) { _zoom_dir += dir; }
-
-void Camera::rotate (int dir) { _rotation_dir += dir; }
-
-void Camera::elevate  (int dir) { _elevation_dir += dir; }
-
 void Camera::readConfig() {
   varconf::Variable temp;
   varconf::Config *general = System::instance()->getGeneral();
@@ -72,23 +74,23 @@ void Camera::readConfig() {
     return;
   }
   
-  temp = general->getItem("camera", KEY_camera_distance);
+  temp = general->getItem(CAMERA, KEY_camera_distance);
   _distance = (!temp.is_double()) ? (DEFAULT_camera_distance) : ((double)(temp));
-  temp = general->getItem("camera", KEY_camera_rotation);
+  temp = general->getItem(CAMERA, KEY_camera_rotation);
   _rotation = (!temp.is_double()) ? (DEFAULT_camera_rotation) : ((double)(temp));
-  temp = general->getItem("camera", KEY_camera_elevation);
+  temp = general->getItem(CAMERA, KEY_camera_elevation);
   _elevation = (!temp.is_double()) ? (DEFAULT_camera_elevation) : ((double)(temp));
   
-  temp = general->getItem("camera", KEY_camera_zoom_speed);
+  temp = general->getItem(CAMERA, KEY_camera_zoom_speed);
   _zoom_speed = (!temp.is_double()) ? (DEFAULT_camera_zoom_speed) : ((double)(temp));
-  temp = general->getItem("camera", KEY_camera_rotation_speed);
+  temp = general->getItem(CAMERA, KEY_camera_rotation_speed);
   _rotation_speed = (!temp.is_double()) ? (DEFAULT_camera_rotation_speed) : ((double)(temp));
-  temp = general->getItem("camera", KEY_camera_elevation_speed);
+  temp = general->getItem(CAMERA, KEY_camera_elevation_speed);
   _elevation_speed = (!temp.is_double()) ? (DEFAULT_camera_elevation_speed) : ((double)(temp));
   
-  temp = general->getItem("camera", KEY_camera_min_distance);
+  temp = general->getItem(CAMERA, KEY_camera_min_distance);
   _min_distance = (!temp.is_double()) ? (DEFAULT_camera_min_distance) : ((double)(temp));
-  temp = general->getItem("camera", KEY_camera_max_distance);
+  temp = general->getItem(CAMERA, KEY_camera_max_distance);
   _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
 }
 
@@ -99,16 +101,16 @@ void Camera::writeConfig() {
     return;
   }
 
-  general->setItem("camera", KEY_camera_distance, _distance);
-  general->setItem("camera", KEY_camera_rotation, _rotation);
-  general->setItem("camera", KEY_camera_elevation, _elevation);
+  general->setItem(CAMERA, KEY_camera_distance, _distance);
+  general->setItem(CAMERA, KEY_camera_rotation, _rotation);
+  general->setItem(CAMERA, KEY_camera_elevation, _elevation);
 
-  general->setItem("camera", KEY_camera_zoom_speed, _zoom_speed);
-  general->setItem("camera", KEY_camera_rotation_speed, _rotation_speed);
-  general->setItem("camera", KEY_camera_elevation_speed, _elevation_speed);
+  general->setItem(CAMERA, KEY_camera_zoom_speed, _zoom_speed);
+  general->setItem(CAMERA, KEY_camera_rotation_speed, _rotation_speed);
+  general->setItem(CAMERA, KEY_camera_elevation_speed, _elevation_speed);
   
-  general->setItem("camera", KEY_camera_min_distance, _min_distance);
-  general->setItem("camera", KEY_camera_max_distance, _max_distance);
+  general->setItem(CAMERA, KEY_camera_min_distance, _min_distance);
+  general->setItem(CAMERA, KEY_camera_max_distance, _max_distance);
 }
 
 void Camera::registerCommands(Console *console) {

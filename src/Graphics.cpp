@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.17 2002-10-20 13:22:26 simon Exp $
+// $Id: Graphics.cpp,v 1.18 2002-10-20 15:50:27 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,7 +63,18 @@
 
 namespace Sear {
 
-Graphics::Graphics(System * system) :
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+	
+static std::string DEFAULT = "default";
+static std::string FONT = "font";
+static std::string STATE = "state";
+static std::string SELECT = "select_state";
+	
+Graphics::Graphics(System *system) :
   _system(system),
   _renderer(NULL),
   _character(NULL),
@@ -74,8 +85,7 @@ Graphics::Graphics(System * system) :
   _frame_time(0),
   _initialised(false)
 {
-render_mode = SPLASH;
-
+  render_mode = SPLASH;
 }
 
 Graphics::~Graphics() {
@@ -85,7 +95,6 @@ Graphics::~Graphics() {
 void Graphics::init() {
   if (_initialised) shutdown();
   readConfig();
-  Log::writeLog("Initialising Terrain", Log::LOG_DEFAULT);
   _renderer = new GL(_system, this);
   _renderer->init();
   _terrain = new ROAM(_system, _renderer);
@@ -126,6 +135,10 @@ void Graphics::shutdown() {
     _camera->shutdown();
     delete _camera;
     _camera = NULL;
+  }
+  if (sg) {
+    delete sg;
+    sg = NULL;
   }
   _initialised = false;
 }
@@ -174,7 +187,7 @@ void Graphics::drawSplash(const std::string& command, bool select_mode, float ti
 
 void Graphics::drawServer(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-//  _renderer->stateChange("font");
+//  _renderer->stateChange(FONT);
   //
 //  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
 //  _renderer->print(20, 50, "Server Screen", 0);
@@ -195,7 +208,7 @@ void Graphics::drawServer(const std::string &command ,bool, float) {
 
 void Graphics::drawAccount(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-  _renderer->stateChange("font");
+  _renderer->stateChange(FONT);
   _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
   _renderer->print(20, 50, "Account Screen", 0);
   _renderer->print(20, 400, "Username: ", 0);
@@ -206,26 +219,29 @@ void Graphics::drawAccount(const std::string &command ,bool, float) {
 
 void Graphics::drawLobby(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-  _renderer->stateChange("font");
+  _renderer->stateChange(FONT);
   _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
   _renderer->print(20, 50, "Lobby Screen", 0);
 }
 
 void Graphics::drawCharacter(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-  _renderer->stateChange("font");
+  _renderer->stateChange(FONT);
   _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
   _renderer->print(20, 50, "Character Screen", 0);
 }
 
 void Graphics::drawInventory(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-  _renderer->stateChange("font");
+  _renderer->stateChange(FONT);
   _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
   _renderer->print(20, 50, "Inventory Screen", 0);
 }
 
 void Graphics::drawWorld(const std::string& command, bool select_mode, float time_elapsed) {
+  static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
+  static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
+	
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
@@ -233,18 +249,19 @@ void Graphics::drawWorld(const std::string& command, bool select_mode, float tim
     if (focus) {
       float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
       std::string id = focus->getID();
+      static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
       orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), WFMath::Pi / 2.0f); // Rotate by 90 degrees as WF 0 degrees is East
+      orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
       WFMath::Point<3> pos = focus->getAbsPos();
       x = -pos.x();
       y = -pos.y();
       z = -pos.z();
       
       // Apply camera rotations
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), _camera->getElevation());
-      orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), _camera->getRotation());
+      orient /= WFMath::Quaternion(y_vector, _camera->getElevation());
+      orient /= WFMath::Quaternion(z_vector, _camera->getRotation());
       
-      if (_character) orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f),  _character->getAngle());
+      if (_character) orient /= WFMath::Quaternion(z_vector,  _character->getAngle());
 
       // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
       if (!select_mode && _sky) {
@@ -285,7 +302,7 @@ void Graphics::drawWorld(const std::string& command, bool select_mode, float tim
     }
   } else {
     _renderer->drawSplashScreen();
-    _renderer->stateChange("font");
+    _renderer->stateChange(FONT);
     _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
     _renderer->print(20, 50, "World Screen", 0);
   }
@@ -314,10 +331,10 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         if (object_record) object_record->type = we->parent();
       }
       if (!object_record) {
-        object_record = object_handler->getObjectRecord("default");
+        object_record = object_handler->getObjectRecord(DEFAULT);
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
-        if (object_record) object_record->type = "default";
+        if (object_record) object_record->type = DEFAULT;
       }
       if (!object_record) {
         std::cout << "No Record found" << std::endl;	      
@@ -342,10 +359,10 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
           if (!select_mode) {
-	    render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
+	    render_queue[_system->getModelRecords()->getItem(*I, STATE)].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }
-          else render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
+          else render_queue[_system->getModelRecords()->getItem(*I, SELECT)].push_back(Render::QueueItem(object_record, *I));
 	}
       }
       if (object_record->draw_members) {
@@ -360,7 +377,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 void Graphics::readConfig() {
   varconf::Variable temp;
   varconf::Config *general = _system->getGeneral();
-  Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("Loading Graphics Config", Log::LOG_DEFAULT);
   if (!general) {
     Log::writeLog("Graphics: Error - General config object does not exist!", Log::LOG_ERROR);
     return;

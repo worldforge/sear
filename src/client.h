@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+// $Id: client.h,v 1.11 2002-10-20 15:50:27 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -55,7 +55,7 @@ namespace Eris {
 }
 
 namespace Sear {
-class MetaserverService;
+class Factory;
 class WorldEntity;
 class Console;
 class Lobby;
@@ -87,11 +87,10 @@ public:
   
   int listRooms();
 
-  void updateSystem();
-  
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
   void getServers();
+  void stopServers();
   
 protected:
   //Callbacks
@@ -137,24 +136,12 @@ protected:
   Eris::Lobby* _lobby;
   Lobby *the_lobby;
   Eris::Meta *_meta;
+
+  Factory *_factory;
   
   int _status;
   std::string _client_name;
   bool _initialised;
-  
-private:
-  static const char * const SERVER_CONNECT = "connect";
-  static const char * const SERVER_RECONNECT = "reconnect";
-  static const char * const SERVER_DISCONNECT = "disconnect";
-  static const char * const ACCOUNT_CREATE = "create";
-  static const char * const ACCOUNT_LOGIN = "login";
-  static const char * const ACCOUNT_LOGOUT = "logout";
-  static const char * const CHARACTER_LIST = "get";
-  static const char * const CHARACTER_CREATE = "add";
-  static const char * const CHARACTER_TAKE = "take";
-
-  static const char * const GET_SERVERS = "get_servers";
-  
 };
 
 } /* namespace Sear */

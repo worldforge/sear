@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+// $Id: Camera.h,v 1.7 2002-10-20 15:50:27 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -39,9 +39,9 @@ public:
   void updateCameraPos(float);
 
   // Change direction / rate of camera value
-  void zoom(int dir);
-  void rotate(int dir);
-  void elevate(int dir);
+  void zoom(int dir) { _zoom_dir += dir; }
+  void rotate(int dir) { _rotation_dir += dir; }
+  void elevate(int dir) { _elevation_dir += dir; }
 
   // Accessor functions
   const float getRotation()  { return _rotation;  }

@@ -280,16 +280,17 @@ else
   fi
 fi
 
-  AC_CHECK_HEADER(ftgl/FTGL.h,
-	[found_ftgl=yes break],
-	[found_ftgl=no])
-
-  if test $found_ftgl == yes; then
-	LIBS="$LIBS -lftgl"
-  else
-	AC_MSG_ERROR(Error could not find FTGL)
-  fi
   if test x$with_glgooey = xyes; then
+    AC_CHECK_HEADER(ftgl/FTGL.h,
+  	[found_ftgl=yes break],
+  	[found_ftgl=no])
+
+    if test $found_ftgl == yes; then
+  	LIBS="$LIBS -lftgl"
+    else
+  	AC_MSG_ERROR(Error could not find FTGL)
+    fi
+
     AC_CHECK_HEADER(glgooey/Window.h,
   	[found_glgooey=yes break],
   	[found_glgooey=no])

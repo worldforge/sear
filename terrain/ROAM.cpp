@@ -19,6 +19,12 @@
 
 namespace Sear {
 
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+	
 float ROAM::_water_level = 0.0f;
 
 ROAM::ROAM(System *system, Render *renderer) :
@@ -53,14 +59,12 @@ bool ROAM::init() {
 }
 
 void ROAM::shutdown() {
-  Log::writeLog("Shutting down ROAM", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("Shutting down ROAM", Log::LOG_DEFAULT);
   writeConfig();
-  Log::writeLog("Deleting ROAM", Log::LOG_DEFAULT);
   if (gLand) {
     delete gLand;
     gLand = NULL;
   }
-  Log::writeLog("Freeing HeightMap", Log::LOG_DEFAULT);
   if (hMap) {
     free(hMap);
     hMap = NULL;
@@ -154,7 +158,7 @@ void ROAM::readConfig() {
 }
 
 void ROAM::writeConfig() {
-  Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
   varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);

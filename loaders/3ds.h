@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.7 2002-09-07 23:27:05 simon Exp $
+// $Id: 3ds.h,v 1.8 2002-10-20 15:50:26 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -49,7 +49,7 @@ protected:
     float *texture_data;
     unsigned int num_points;
     int texture_id;
-    const char *material_name;
+    std::string material_name;
   } RenderObject;
 
   typedef struct {
@@ -63,8 +63,6 @@ protected:
   void render_mesh(Lib3dsMesh * mesh, Lib3dsFile * file);
   void render_file(Lib3dsFile * file);
   
-  Lib3dsFile* _model;
-
   std::list<RenderObject*> render_objects;
   std::map<std::string, Material*> material_map;
   bool _initialised;

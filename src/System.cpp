@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.41 2002-10-20 13:22:26 simon Exp $
+// $Id: System.cpp,v 1.42 2002-10-20 15:50:27 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,10 +48,22 @@
 
 namespace Sear {
 
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
+	
 System *System::_instance = NULL;
 const std::string System::SCRIPTS_DIR = "scripts";
 const std::string System::STARTUP_SCRIPT = "startup.script";
 const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
+
+static std::string DAWN_STR  = "dawn";
+static std::string DAY_STR   = "day";
+static std::string DUSK_STR  = "dusk";
+static std::string NIGHT_STR = "night";
+
 
 System::System() :
   repeat(false),
@@ -186,6 +198,7 @@ bool System::init() {
   Bindings::init();
   
   _console = new Console(this);
+  _console->init();
 
   registerCommands(_console);
   _client->registerCommands(_console);
@@ -202,7 +215,7 @@ bool System::init() {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
   
-  Log::writeLog("Running startup scripts", Log::LOG_INFO);
+  if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
 
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
@@ -218,8 +231,6 @@ bool System::init() {
 }
 
 void System::shutdown() {
-  Log::writeLog("Shutting Down Renderer", Log::LOG_INFO);
-  
   if (_character) {
     _character->shutdown();
     delete _character;
@@ -251,7 +262,7 @@ void System::shutdown() {
   }
 
   writeConfig();
-  Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
+  if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   std::list<std::string> shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
   for (std::list<std::string>::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
     _script_engine->runScript(*I);
@@ -319,7 +330,7 @@ void System::shutdown() {
 }
 
 bool System::initVideo() {
-  Log::writeLog("Initialising Video", Log::LOG_INFO);
+  if (debug) Log::writeLog("Initialising Video", Log::LOG_INFO);
 #ifdef DEBUG
 #warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
@@ -335,7 +346,7 @@ bool System::initVideo() {
 }
 
 void System::createWindow(bool fullscreen) {
-  Log::writeLog("Creating Window", Log::LOG_INFO);
+  if (debug) Log::writeLog("Creating Window", Log::LOG_INFO);
   //Request Open GL window attributes
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
@@ -348,18 +359,6 @@ void System::createWindow(bool fullscreen) {
   if (!info) {
     Log::writeLog("Error quering video", Log::LOG_DEFAULT);
   }
-/*
-  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("wm_available: ") + string_fmt(info->wm_available), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_hw: ") + string_fmt(info->blit_hw), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_hw_CC: ") + string_fmt(info->blit_hw_CC), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_hw_A: ") + string_fmt(info->blit_hw_A), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_sw: ") + string_fmt(info->blit_sw), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_sw_CC: ") + string_fmt(info->blit_sw_CC), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("blit_sw_A: ") + string_fmt(info->blit_sw_A), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("video_mem: ") + string_fmt(info->video_mem), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
- */ 
   //Create Window
   int flags = SDL_OPENGL;
   int bpp = 0;
@@ -370,7 +369,7 @@ void System::createWindow(bool fullscreen) {
     _system_running = false;
     exit(1);
   }
-  Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
+  if (debug) Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
 
   //Is this the correct way to free a window?
   if (screen) SDL_FreeSurface(screen);
@@ -383,21 +382,24 @@ void System::createWindow(bool fullscreen) {
 
   // Check OpenGL flags
   int value = 0;
-  SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
-  Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-  SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
-  Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-  SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
-  Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-  SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
-  Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-  SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+  if (debug) {
+    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
+    Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
+    Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
+    Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
+    Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+    Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
+    Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
+  }
 
+  SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
   if (value < 1) _general->setItem("render_options", "use_stencil_buffer", false);
   
-  Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-  SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
-  Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
  
   if (!_icon) _icon = IMG_Load(_icon_file.c_str());
   // Should set the icon transparency but it does not work.
@@ -410,29 +412,24 @@ void System::createWindow(bool fullscreen) {
   if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
   if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
   if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
-  Log::writeLog("Creating Renderer", Log::LOG_INFO);
-//  if (renderer) {
-//    renderer->initWindow(_width, _height);
-//    renderer->shutdown();
-//    delete renderer;
-//  }// else {a
+  if (debug) Log::writeLog("Creating Renderer", Log::LOG_INFO);
+  
+  // Delete grpahics object if it already exists
   if (_graphics) {
     _graphics->shutdown();
     delete _graphics;
   }
-    _graphics = new Graphics(this);
-    _graphics->init();
- //   renderer = new GL(this);
-    _console->init();
-    _graphics->registerCommands(_console);
-//    renderer->init();
-    _graphics->getRender()->initWindow(_width, _height);
-    renderer = _graphics->getRender();
-//    renderer->buildDisplayLists();
-    pushMessage("Loading, Please wait...", 2, 100);
-    _graphics->drawScene("", false, 0); // Render scene one before producing colour set
-    renderer->buildColourSet();
-//  }
+  _graphics = new Graphics(this);
+  _graphics->init();
+
+  _graphics->registerCommands(_console);
+  _graphics->getRender()->initWindow(_width, _height);
+
+  renderer = _graphics->getRender();
+  pushMessage("Loading, Please wait...", 2, 100);
+
+  _graphics->drawScene("", false, 0); // Render scene one before producing colour set
+  renderer->buildColourSet();
 }
 
 void System::mainLoop() {
@@ -460,10 +457,10 @@ void System::mainLoop() {
       
         if (ta != _time_area) {
           switch(_time_area) {
-            case NIGHT: _action_handler->handleAction("night", NULL); break;
-            case DAWN: _action_handler->handleAction("dawn", NULL); break;
-            case DAY: _action_handler->handleAction("day", NULL); break;
-            case DUSK: _action_handler->handleAction("dusk", NULL); break;
+            case NIGHT: _action_handler->handleAction(NIGHT_STR, NULL); break;
+            case DAWN: _action_handler->handleAction(DAWN_STR, NULL); break;
+            case DAY: _action_handler->handleAction(DAY_STR, NULL); break;
+            case DUSK: _action_handler->handleAction(DUSK_STR, NULL); break;
           }
         }
       }
@@ -855,7 +852,7 @@ void System::registerCommands(Console *console) {
 }
 
 void System::runCommand(const std::string &command) {
-  Log::writeLog(command, Log::LOG_INFO);
+  if (debug) Log::writeLog(command, Log::LOG_INFO);
   try {
     _console->runCommand(command);
   } catch (Exception e) {

@@ -2,11 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: StateLoader.cpp,v 1.8 2002-10-20 13:22:26 simon Exp $
+// $Id: StateLoader.cpp,v 1.9 2002-10-20 15:50:27 simon Exp $
 
 #include "StateLoader.h"
 
-#include <string.h>
+//#include <string.h>
 
 #include <varconf/varconf.h>
 
@@ -14,6 +14,12 @@
 
 
 namespace Sear {
+
+#ifdef DEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
 
 // Varconf Key names.
 static const std::string ALPHA_TEST = "alpha_test";
@@ -39,7 +45,7 @@ StateLoader::~StateLoader() {
 
 void StateLoader::init() {
   if (_initialised) shutdown();
-  Log::writeLog("State Loader: Initialising.", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("State Loader: Initialising.", Log::LOG_DEFAULT);
   _state_properties = std::map<std::string, StateProperties*>();
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
@@ -81,7 +87,7 @@ void StateLoader::init() {
 
 
 void StateLoader::shutdown() {
-  Log::writeLog("State Loader: Shutting Down", Log::LOG_DEFAULT);
+  if (debug) Log::writeLog("State Loader: Shutting Down", Log::LOG_DEFAULT);
   while (!_state_properties.empty()) {
     if (_state_properties.begin()->second) delete(_state_properties.begin()->second);
     _state_properties.erase(_state_properties.begin());
@@ -116,7 +122,7 @@ void StateLoader::varconf_callback(const std::string &section, const std::string
       record->fog = false;
       record->rescale_normals = false;
       _state_properties[section] = record;
-      Log::writeLog(std::string("Adding State: ") + section, Log::LOG_INFO);
+      if (debug) Log::writeLog(std::string("Adding State: ") + section, Log::LOG_INFO);
   }
 
   if (key == ALPHA_TEST) record->alpha_test = (bool)config.getItem(section, key);
