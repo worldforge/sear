@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.16 2004-05-27 22:58:34 jmt Exp $
+// $Id: TextureManager.h,v 1.17 2004-05-30 18:52:04 jmt Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -79,18 +79,6 @@ public:
    * Clean up the TextureManager object
    */ 
   void shutdown();
-
-  /**
-   * Reads the texture manager config from the specified config object
-   * @param config Config object containing config data
-   */ 
-  void readConfig(varconf::Config &config);
-
-  /**
-   * Writes the texture manager config to the specified config object
-   * @param config Config object to write config data to
-   */ 
-  void writeConfig(varconf::Config &config);
   
   /**
    * This reads in texture configuration data from the specified file
@@ -98,25 +86,20 @@ public:
    */ 
   void readTextureConfig(const std::string &filename);
 
-  TextureID requestTextureID(const std::string &texture_name, bool mask) {
-//  TextureID requestTextureID(std::string texture_name) {
-    assert(m_initialised != false);
+  TextureID requestTextureID(const std::string &texture_name, bool mask)
+  {
+    assert(m_initialised);
     std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
-    TextureID id = m_texture_map[name];
-    if (id == 0) {
-      m_texture_map[name] = m_texture_counter;
-      m_names[m_texture_counter] = name;
-      id = m_texture_counter++;
-      // If we have run out of space, allocate some more
-
-      if (m_texture_counter >= (int)m_textures.size()) {
-        // Double size allocation
-        int new_size = 2 * m_textures.size();
-        m_textures.resize(new_size);
-        m_names.resize(new_size);
-      }
+    TextureID texId = m_texture_map[name];
+    
+    if (texId == 0) {
+        texId = m_names.size(); // we already made m_texture_map bigger
+        m_texture_map[name] = texId;
+        m_names.push_back(name);
+        m_textures.push_back(0);
     }
-    return id;
+    
+    return texId;
   }
 
   /** 
@@ -181,15 +164,14 @@ public:
     
     void clearLastTexture(unsigned int index);
     
-    static SDL_Surface *loadImage(const  std::string &filename);
-    
 private:
   bool m_initialised; ///< Flag indicating whether object has had init called
+  bool m_initGL; ///< flag indicating if initGL has been done or not
+  
   varconf::Config m_texture_config; ///< Config object for all texture
   TextureMap m_texture_map; ///< Mapping between texture name and its TextureID
   TextureVector m_textures; ///< Used to translate a TextureID to a TextureObject
   NameVector m_names; 
-  int m_texture_counter; ///< Keeps track of last allocated TextureID
   std::vector<TextureID> m_last_textures;
   int m_texture_units;
   TextureID m_default_texture;
@@ -201,8 +183,7 @@ private:
    * This function is used to setup the required OpenGL texture extensions
    */ 
   GLuint loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
-  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);  
-  void varconf_error_callback(const char *message);
+  void generalConfigChanged(const std::string &section, const std::string &key, varconf::Config &config);  
 
   TextureID createDefaultTexture();
   TextureID createDefaultFont();
@@ -213,7 +194,7 @@ private:
    * @return The filter, or 0 is a wrong name was specified
    */ 
   static int getFilter(const std::string &filter_name);
-
+    
     typedef std::map<std::string, SpriteData*> SpriteInstanceMap;
     SpriteInstanceMap m_sprites;
     

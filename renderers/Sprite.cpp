@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include "TextureManager.h"
 #include "RenderSystem.h"
+#include "ImageUtils.h"
 
 #include <iostream>
 
@@ -64,11 +65,8 @@ SpriteData::SpriteData(const std::string& spriteName) :
     // Check if the texture has a filename specified
     if (!getSpriteConfig().findItem(spriteName, "filename")) {
         cerr << "Sprite " << spriteName << " has no filename defined" << endl;
-        
         return;
     }
-  
-    
 }
 
 SpriteData::~SpriteData()
@@ -106,9 +104,8 @@ void SpriteData::load()
     System::instance()->getFileHandler()->expandString(filename);
 
 // read in image data
-    SDL_Surface *img = TextureManager::loadImage(filename.c_str());
+    SDL_Surface *img = loadImageFromPath(filename);
     if (img == NULL) {
-        cerr << "sprite '" << m_name << "' failed to load src image at " << filename << endl;
         loadFail();
         return;
     }

@@ -1,3 +1,36 @@
+2004-05-30  James Turner  <james@worldforge.org>
+
+	* Refactor texture ID generation, to avoid manual resizing of the
+	  STL containers (they behave smartly anyway). As a result, got
+	  rid of m_texture_counter completely (use m_names.size() instead)
+	  
+	* Added a general config option, base_texture_level, and a console
+	  command, /set_texture_detail, to allow playing with texture
+	  detail at runtime.
+	  
+	* Cleaned up the TextureManager's interactions (or lack of) with 
+	  the config system.
+	  
+	* Factored the image load code into a helper file, ImageUtils.cpp
+	
+	* Rewrote the mip-mapping to never use SGIS_GENERATE_MIPMAPS,
+	  since it is hard to integrate with dynamic texture detail reduction.
+	  This also allows us to use arbitrary texture storage formats in
+	  the future, since the only call we make to load textures is
+	  glTexImage2D diurectly.
+	  
+	* Added custom mip-mapping code to ImageUtils.cpp : not the nicest
+	  code ever, but pretty simple and it seems to work.
+
+	* Found a latent bug in the texture loader, where 8-bit (single channel)
+	  surfaces were being treated as 32-bit. I have default these to
+	  GL_ALPHA for the moment, but perhaps they should default to
+	  GL_LUMINANCE? Need to ask Al and Simon.
+	  
+	* Removed the include of SDL_image.h from System.h, since only two
+	  source files (System.cpp and ImageUtils.cpp) ever call SDL_image
+	  functions.
+
 2004-05-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Workspace.h, gui/Workspace.cpp: Hold reference to system object

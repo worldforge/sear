@@ -8,5 +8,7 @@ libRendererGL_a_SOURCES = \
 	default_font.xpm default_image.xpm \
 	RenderSystem.cpp RenderSystem.h \
 	GL.cpp GL.h \
-	Sprite.cpp Sprite.h
+	Sprite.cpp Sprite.h \
+	ImageUtils.h ImageUtils.cpp
+	
 	

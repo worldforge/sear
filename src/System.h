@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.45 2004-05-28 15:08:19 alriddoch Exp $
+// $Id: System.h,v 1.46 2004-05-30 18:52:05 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -10,12 +10,6 @@
 #include <string>
 #include <list>
 #include <SDL/SDL.h>
-
-#ifdef __APPLE__
-    #include <SDL_image/SDL_image.h>
-#else
-    #include <SDL/SDL_image.h>
-#endif
 
 #include <sigc++/object_slot.h>
 

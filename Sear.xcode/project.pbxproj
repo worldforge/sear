@@ -259,6 +259,34 @@
 			settings = {
 			};
 		};
+		C44D98920669D4F50006A176 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = ImageUtils.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C44D98930669D4F50006A176 = {
+			fileRef = C44D98920669D4F50006A176;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		C44D98940669D6310006A176 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.cpp.cpp;
+			path = ImageUtils.cpp;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C44D98950669D6310006A176 = {
+			fileRef = C44D98940669D6310006A176;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		C454C7DA0653F5EB00F7F1BD = {
 			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
@@ -850,6 +878,7 @@
 				C48C8C410664E60E0065C287,
 				C48C8C430664E61C0065C287,
 				C46B3EA40664EDC60096C26A,
+				C44D98930669D4F50006A176,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -914,6 +943,7 @@
 				C48C8C3E0664E60E0065C287,
 				C48C8C400664E60E0065C287,
 				C46B3EA30664EDC60096C26A,
+				C44D98950669D6310006A176,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1518,6 +1548,7 @@
 		};
 		C4939B31057BB18F000CAC07 = {
 			children = (
+				C44D98940669D6310006A176,
 				C48C8C420664E61C0065C287,
 				C42B5A64065C1DAF0081425B,
 				C42B5A65065C1DAF0081425B,
@@ -1531,6 +1562,7 @@
 				C4939B39057BB18F000CAC07,
 				C4939B3A057BB18F000CAC07,
 				C4939B3B057BB18F000CAC07,
+				C44D98920669D4F50006A176,
 			);
 			isa = PBXGroup;
 			path = renderers;

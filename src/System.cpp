@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.90 2004-05-28 15:08:19 alriddoch Exp $
+// $Id: System.cpp,v 1.91 2004-05-30 18:52:04 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,11 @@
   #include "common/mmgr.h"
 #endif
 
+#ifdef __APPLE__
+    #include <SDL_image/SDL_image.h>
+#else
+    #include <SDL/SDL_image.h>
+#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -98,6 +103,7 @@ namespace Sear {
   static const std::string KEY_window_width = "width";
   static const std::string KEY_window_height = "height";
   static const std::string KEY_media_root = "media_root";
+  
   //Config default values
   static const int DEFAULT_window_width = 640;
   static const int DEFAULT_window_height = 480;  
@@ -105,7 +111,7 @@ namespace Sear {
   static const double DEFAULT_max_click_time = 0.3;
   static const int DEFAULT_joystick_touch_button = 1;
   static const int DEFAULT_joystick_pickup_button = 2;
-
+  
 System *System::_instance = NULL;
 
 System::System() :

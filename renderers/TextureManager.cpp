@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.27 2004-05-27 22:58:34 jmt Exp $
+// $Id: TextureManager.cpp,v 1.28 2004-05-30 18:52:04 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,7 +34,6 @@ int ilogb(double x)
 
 // Default texture maps
 #include "default_image.xpm"
-#include "default_font.xpm"
 #include "default_font.h"
 
 
@@ -44,6 +43,7 @@ int ilogb(double x)
 #endif
 
 #include "Sprite.h"
+#include "ImageUtils.h"
 
 #ifdef DEBUG
 static const bool debug = true;
@@ -69,6 +69,7 @@ static const std::string KEY_mask = "mask";
 static const std::string KEY_min_filter = "min_filter";
 static const std::string KEY_mag_filter = "mag_filter";
 static const std::string KEY_internal_format = "internal_format";
+static const std::string KEY_base_texture_level = "base_texture_level";
 
 // config defaults
 static const bool DEFAULT_clamp = false;
@@ -90,6 +91,7 @@ static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
 
 static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";
 static const std::string CMD_LOAD_SPRITE_CONFIG = "load_sprites";
+static const std::string CMD_SET_TEXTURE_BASE_LEVEL = "set_texture_detail";
 
 // Format strings
 static const std::string ALPHA = "alpha";
@@ -143,30 +145,35 @@ bool use_ext_texture_filter_anisotropic = false;
 
 TextureManager::TextureManager() :
   m_initialised(false),
-  m_texture_counter(1),
+  m_initGL(false),
   m_texture_units(1),
-  m_baseMipmapLevel(1)
+  m_baseMipmapLevel(0)
 {  
-  m_texture_config.sigsv.connect(SigC::slot(*this, &TextureManager::varconf_callback));
-  m_texture_config.sige.connect(SigC::slot(*this, &TextureManager::varconf_error_callback));
+    varconf::Config& cfg(System::instance()->getGeneral());
+    cfg.sigsv.connect(SigC::slot(*this, &TextureManager::generalConfigChanged));
 }
 
-void TextureManager::init() {
+void TextureManager::init()
+{
   if (m_initialised) shutdown();
   if (debug) std::cout << "Initialising TextureManager" << std::endl;
-  // Default size, can be bigger if required
-  m_textures.resize(256);
-  m_names.resize(256);
 
+  m_textures.resize(1); // we need to leave texture ID zero free
+  m_names.resize(1); // ditto
+
+  m_texture_map.clear();
+  
   m_initialised = true;
- 
-  //readConfig(System::instance()->getGeneral());
 }
 
-void TextureManager::initGL() {
+void TextureManager::initGL()
+{
   assert((m_initialised == true) && "TextureManager not initialised");
+  assert(m_initGL == false);
+  
   // Determine available OpenGL extensions
   setupGLExtensions();
+  
   // Initialise our current texture cache
   m_last_textures.resize(m_texture_units);
   for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
@@ -178,39 +185,21 @@ void TextureManager::initGL() {
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
 
+  m_initGL = true;
 }
 
-void TextureManager::shutdown() {
+void TextureManager::shutdown()
+{
   if (!m_initialised) return;
   if (debug) std::cout << "TextureManager: Shutdown" << std::endl;
 
   // Unload all textures
-  for (int i = 1; i < m_texture_counter; ++i) {
+  for (unsigned int i = 1; i < m_textures.size(); ++i) {
     unloadTexture(m_textures[i]);
   }
-  // Clear map and vector
-  m_textures.clear();
-  m_texture_map.clear();
-  // Reset counter
-  m_texture_counter = 1;
 
   m_last_textures.clear();
-
   m_initialised = false;
-}
-
-void TextureManager::readConfig(varconf::Config &config) {
-  assert((m_initialised == true) && "TextureManager not initialised");
-  
-  // Read in max number of textures for multitexturing
-  // Read in pixel format settings
-
-  // Read in default texture properties
-}
-
-void TextureManager::writeConfig(varconf::Config &config) {
-  assert((m_initialised == true) && "TextureManager not initialised");
-  // Nothing to write here
 }
 
 void TextureManager::readTextureConfig(const std::string &filename) {
@@ -237,36 +226,30 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
     std::cerr << "Texture " << texture_name << " not defined." << std::endl;
     return 0;
   }
-  // Check if the texture has a filename specified
+ 
   if (!m_texture_config.findItem(clean_name, KEY_filename)) {
-    std::cerr << "Error " << texture_name << " has no filename" << std::endl;
+    std::cerr << "Texture " << clean_name << " has no filename" << std::endl;
     return 0;
   }
-  // Get filename of texture
+
   std::string filename = (std::string)m_texture_config.getItem(clean_name, KEY_filename);
   // Get path to prefix to filename 
   if (m_texture_config.findItem(clean_name, KEY_path)) {
     std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
-    if (!path.empty()) {
-      filename = path + "/" + filename;
-    }
+    filename = path + "/" + filename;
   }
-  // Expand variables in filename
+  
   System::instance()->getFileHandler()->expandString(filename);
-  // Load texture into memory
-  SDL_Surface *surface = loadImage(filename);
-  if (!surface) {
-    std::cerr << "Error loading texture: " << filename << std::endl;
-    return 0;
-  }
-  GLuint texture_id = loadTexture(clean_name, surface, mask);
-  // Free image
-  SDL_FreeSurface(surface);
-
+  SDL_Surface* image = loadImageFromPath(filename);
+  if (!image) return 0;
+  
+  GLuint texture_id = loadTexture(clean_name, image, mask);
+  SDL_FreeSurface(image);
   return texture_id;
 }
 
-GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface, bool mask) {
+GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface, bool mask)
+{
   assert((m_initialised == true) && "TextureManager not initialised");
   // Copy name so we can change it
   std::string texture_name(name);
@@ -299,11 +282,8 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
   
   // build image - use mip mapping if requested
   bool mipmap = true;
-  if (m_texture_config.findItem(texture_name, KEY_mipmap))
-  {
+  if (m_texture_config.findItem(texture_name, KEY_mipmap)) {
     mipmap = (bool)m_texture_config.getItem(texture_name, KEY_mipmap);
-    std::cout << "custom mipmap value for texture " << texture_name << " is "
-     << (mipmap ? "true" : "false") << std::endl;
   }
 
   // Set texture filters
@@ -311,7 +291,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
   if (m_texture_config.findItem(texture_name, KEY_min_filter)) {
     minFilter = getFilter((std::string)m_texture_config.getItem(texture_name, KEY_min_filter));
   } else if (mipmap) {
-    minFilter = GL_LINEAR_MIPMAP_LINEAR;
+    minFilter = GL_LINEAR_MIPMAP_LINEAR; // trilinear
   }
   
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
@@ -320,7 +300,6 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     int filter = getFilter((std::string) m_texture_config.getItem(texture_name, KEY_mag_filter));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
   } else {
-    std::cout << "using default mag filter" << std::endl;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DEFAULT_mag_filter);
   }
 
@@ -379,47 +358,52 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     } else {
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }
-//    fmt = (bpp == 24) ? 3 : 4;
+    
+    if (bpp == 8) format = GL_ALPHA;
+    
     if (m_texture_config.findItem(texture_name, KEY_internal_format)) {
       fmt = getFormat((std::string)m_texture_config.getItem(texture_name, KEY_internal_format));
     } else {
-      fmt = (bpp == 24) ? GL_RGB5 : GL_RGB5_A1;
+        switch (bpp) {
+        case 32:    fmt = GL_RGB5_A1; break;
+        case 24:    fmt = GL_RGB5; break;
+        case 8:     fmt = GL_ALPHA; break; // GL_LUMINANCE?
+        default:
+            std::cerr << "unsupported image depth" << std::endl;
+        }
     }
-/*
-  // TODO make this support more texture formats
-//  int type = (int)m_texture_config.getItem(texture_name, KEY_type);
-  int depth = surface->format->BytesPerPixel;
-  switch (depth) {
-    case 1: depth = GL_ALPHA; break;
-    case 2: depth = GL_ALPHA; break;
-    case 3: depth = 3;break;//GL_RGB; break;
-    case 4: depth = 4;break;//GL_RGBA; break;
-    default: depth = GL_RGBA; break;
-  }
-*/
   
   if (mipmap) {
+    if (m_baseMipmapLevel == 0)
+        glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, m_baseMipmapLevel);
+    SDL_Surface* mip = surface;
+    int max = ilogb(std::max(surface->w, surface->h));
     
-    if (use_sgis_generate_mipmap) {
-      
-      glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0,fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
-    } else {
-      int maxMipmapLevel = ilogb(std::max(surface->w, surface->h));
-      std::cout << "max mip level is " << maxMipmapLevel << std::endl;
-      
-      assert(glGetError() == 0);
-      
-      gluBuild2DMipmapLevels(GL_TEXTURE_2D, fmt, surface->w, surface->h, 
-        format, GL_UNSIGNED_BYTE, 
-        0, m_baseMipmapLevel, maxMipmapLevel,
-        surface->pixels);
+    /* mipmap generation loop. This is pretty straight forward, one 
+    complication is we need to free previous mipmaps, but not free the
+    original surface (level 0), becuase that will be freed by the caller. */
+    for (int level = 1; level <= max; ++level) {
+        SDL_Surface* newMip = mipmapSurface(mip);
+        if (!newMip) {
+            std::cerr << "failed to created mipmap at level " << (level + 1) << std::endl;
+            break;
+        }
         
-      assert(glGetError() == 0);
-    }
+        if (mip != surface) SDL_FreeSurface(mip);
+        mip = newMip;
+        
+        if (level >= m_baseMipmapLevel) {
+            /* the -m_baseMipmapLevel term here is because ATI drivers seem
+            to break if level zero isn't defined. So we shift all the mipmaps
+            down if baseMipmapLevel > 0 */
+            glTexImage2D(GL_TEXTURE_2D, level - m_baseMipmapLevel, fmt, mip->w, mip->h, 0, format, GL_UNSIGNED_BYTE, mip->pixels);
+            assert(glGetError() == 0);
+        }
+    } // of mipmap generation loop
     
+    // don't leak the final mipmap
+    if (mip != surface) SDL_FreeSurface(mip);
   } else {
     glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
   }
@@ -434,7 +418,8 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
 }
 
 
-void TextureManager::unloadTexture(const std::string &texture_name) {
+void TextureManager::unloadTexture(const std::string &texture_name)
+{
   assert((m_initialised == true) && "TextureManager not initialised");
   unsigned int texture_id = m_texture_map[texture_name];
   unloadTexture(m_textures[texture_id]);
@@ -486,20 +471,22 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
   glActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
-void TextureManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  assert((m_initialised == true) && "TextureManager not initialised");
-//  if (!config.findItem(section, KEY_path)) {
-//    if (debug) std::cout << "New Texture: " << section << std::endl;
-//    char cwd[256];
-//    memset(cwd, '\0', 256);
-//    getcwd(cwd, 355);
-//    config.setItem(section, KEY_path, cwd);
-//  }
+void TextureManager::generalConfigChanged(const std::string &section, const std::string &key, varconf::Config &config)
+{
+    assert((m_initialised == true) && "TextureManager not initialised");
+
+    if (section != "graphics") return;
+    
+    if (key == KEY_base_texture_level) {
+        m_baseMipmapLevel = config.getItem(section, key);
+        std::cout << "set base mipmap level to " << m_baseMipmapLevel << std::endl;
+        
+        // restart stuff as necessary
+        if (m_initGL)
+            invalidate();
+    }
 }
 
-void TextureManager::varconf_error_callback(const char *message) {
-  std::cerr << "Error reading texture config: " << message << std::endl;
-}
 
 int TextureManager::getFilter(const std::string &filter_name) {
   int filter = -1;
@@ -513,7 +500,8 @@ int TextureManager::getFilter(const std::string &filter_name) {
   return filter;
 }
 
-void TextureManager::setupGLExtensions() {
+void TextureManager::setupGLExtensions()
+{
   assert((m_initialised == true) && "TextureManager not initialised");
   
   // Get number of texture units
@@ -588,12 +576,9 @@ TextureID TextureManager::createDefaultTexture() {
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
   delete []data;
 
-
-  // store into texture array
-  m_textures[m_texture_counter] = texture;
-  // assign name to texture array loc
-  m_texture_map[texture_name] = m_texture_counter;
-  return m_texture_counter++;
+  TextureID texId = requestTextureID(texture_name, false);
+  m_textures[texId] = texture;
+  return texId;
 }
 
 TextureID TextureManager::createDefaultFont() {
@@ -655,12 +640,9 @@ TextureID TextureManager::createDefaultFont() {
 
 #endif
 
-
-  // store into texture array
-  m_textures[m_texture_counter] = texture;
-  // assign name to texture array loc
-  m_texture_map[texture_name] = m_texture_counter;
-  return m_texture_counter++;
+  TextureID texId = requestTextureID(texture_name, false);
+  m_textures[texId] = texture;
+  return texId;
 }
 
 
@@ -669,6 +651,7 @@ void TextureManager::registerCommands(Console *console) {
   if (debug) std::cout << "Registering commands" << std::endl;
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
   console->registerCommand(CMD_LOAD_SPRITE_CONFIG, this);
+  console->registerCommand(CMD_SET_TEXTURE_BASE_LEVEL, this);
 }
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
@@ -685,11 +668,25 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     std::cout << "reading sprite config at " << a << std::endl;
     m_spriteConfig.readFromFile(a);
   }
+  
+  if (command == CMD_SET_TEXTURE_BASE_LEVEL) {
+    int level = strtol(arguments.c_str(), NULL, 0);
+    if ((level < 0) || (level > 10)) {
+        std::cerr << CMD_SET_TEXTURE_BASE_LEVEL << " specified bad level: " << level << std::endl;
+        return;
+    }
+    
+    varconf::Config& cfg(System::instance()->getGeneral());
+    cfg.setItem("graphics", KEY_base_texture_level, level);
+  }
 
 }
 
-void TextureManager::invalidate() {
+void TextureManager::invalidate()
+{
   assert((m_initialised == true) && "TextureManager not initialised");
+  assert(m_initGL);
+  
   // TODO unload textures first.
   for (unsigned int i = 0; i < m_textures.size(); i++) {
     // Unload texture if its still valid
@@ -699,69 +696,23 @@ void TextureManager::invalidate() {
     m_textures[i] = 0;
   }
 
-  for (int U = m_last_textures.size() - 1; U >= 0; --U){
-    m_last_textures[U] = -1;
-  }
-  
   for (SpriteInstanceMap::iterator S=m_sprites.begin(); S != m_sprites.end(); ++S) {
     S->second->invalidate();
   }
-  
+
+  // Determine available OpenGL extensions
   setupGLExtensions();
-  // Backup texture counter
-  int texCount = m_texture_counter;
-  // reset so default textures are assigned correctly
-  m_texture_counter = m_default_texture;
+  
+  // Initialise our current texture cache
+  for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
+  // Setup default texture properties
   m_default_texture = createDefaultTexture();
   if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
-  
-  m_texture_counter = m_default_font;
+
+  // create default font
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
-  // restore texture counter
-  m_texture_counter = texCount;
 }
-
-SDL_Surface *TextureManager::loadImage(const  std::string &filename) {
-  Uint8 *rowhi, *rowlo;
-  Uint8 *tmpbuf /*, tmpch*/;
-  SDL_Surface *image;
-  int i/*, j*/;
-  image = IMG_Load(filename.c_str());
-  if ( image == NULL ) {
-    Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::LOG_ERROR);
-    return(NULL);
-  }
-  /* GL surfaces are upsidedown and RGB, not BGR :-) */
-  tmpbuf = (Uint8 *)malloc(image->pitch);
-  if ( tmpbuf == NULL ) {
-    Log::writeLog("Out of memory", Log::LOG_ERROR);
-    return(NULL);
-  }
-  rowhi = (Uint8 *)image->pixels;
-  rowlo = rowhi + (image->h * image->pitch) - image->pitch;
-  for ( i=0; i<image->h/2; ++i ) {
-    //commented out for use with png
-/*
-     for ( j=0; j<image->w; ++j ) {
-       tmpch = rowhi[j*3];
-       rowhi[j*3] = rowhi[j*3+2];
-      rowhi[j*3+2] = tmpch;
-       tmpch = rowlo[j*3];
-      rowlo[j*3] = rowlo[j*3+2];
-       rowlo[j*3+2] = tmpch;
-     }
-*/
-    memcpy(tmpbuf, rowhi, image->pitch);
-    memcpy(rowhi, rowlo, image->pitch);
-    memcpy(rowlo, tmpbuf, image->pitch);
-    rowhi += image->pitch;
-    rowlo -= image->pitch;
-  }
-  free(tmpbuf);
-  return(image);
-}
-
 
 GLint TextureManager::getFormat(const std::string &fmt) {
   if (fmt == ALPHA) return GL_ALPHA;
