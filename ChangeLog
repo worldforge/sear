@@ -1,5 +1,9 @@
 2005-01-07  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Text.cpp: Sort out some float to int conversion warnings.
+
+2005-01-07  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/TextEntry.cpp: Sort out some float to int conversion warnings.
 
 2005-01-06  Simon Goodall  <sear@simongoodall.co.uk>

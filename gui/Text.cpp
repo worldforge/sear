@@ -28,7 +28,7 @@ Text::~Text()
 void Text::setContent(const std::string & s)
 {
   m_content = s;
-  setSize((s.size() + 1) * 10 * m_scale, 16 * m_scale);
+  setSize((int)((s.size() + 1) * 10 * m_scale), (int)(16 * m_scale));
 }
 
 void Text::render(Render * renderer)
