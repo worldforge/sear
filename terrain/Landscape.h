@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.10 2003-04-23 20:28:27 simon Exp $
+// $Id: Landscape.h,v 1.11 2004-02-25 11:53:29 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -69,6 +69,7 @@ public:
     _terrain(terrain),
     _right(right),
     _bottom(bottom),
+    map_size(0),
     min_height(9999.0f),
     max_height(9999.0f),
     _terrain_state(-1),
