@@ -132,6 +132,8 @@ Model *ModelHandler::getModel(Render *render, WorldEntity *we) {
       ms->wrap_texture = op->wrap_texture;
       ms->scale = op->scale;
       ms->num_planes = op->num_planes;
+      ms->num_slicings = op->num_slicings;
+      ms->slices_per_slicing = op->slices_per_slicing;
       ms->hasBBox = we->hasBBox();
       ms->bbox = we->getBBox();
       ms->multi_textures = op->multi_textures;
@@ -186,6 +188,8 @@ Model *ModelHandler::getModel(Render *render, const std::string &object_type, Ob
     ms->wrap_texture = op->wrap_texture;
     ms->scale = op->scale;
     ms->num_planes = op->num_planes;
+    ms->num_slicings = op->num_slicings;
+    ms->slices_per_slicing = op->slices_per_slicing;
     ms->hasBBox = false;
     ms->bbox = WFMath::AxisBox<3>();
     ms->multi_textures = op->multi_textures;

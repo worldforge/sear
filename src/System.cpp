@@ -262,8 +262,7 @@ void System::createWindow(bool fullscreen) {
   if (!info) {
     Log::writeLog("Error quering video", Log::LOG_DEFAULT);
   }
-#ifndef __WIN32__
-
+/*
   Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
   Log::writeLog(std::string("wm_available: ") + string_fmt(info->wm_available), Log::LOG_DEFAULT);
   Log::writeLog(std::string("blit_hw: ") + string_fmt(info->blit_hw), Log::LOG_DEFAULT);
@@ -274,8 +273,7 @@ void System::createWindow(bool fullscreen) {
   Log::writeLog(std::string("blit_sw_A: ") + string_fmt(info->blit_sw_A), Log::LOG_DEFAULT);
   Log::writeLog(std::string("video_mem: ") + string_fmt(info->video_mem), Log::LOG_DEFAULT);
   Log::writeLog(std::string("hw_available: ") + string_fmt(info->hw_available), Log::LOG_DEFAULT);
-#endif
-  
+ */ 
   //Create Window
   int flags = SDL_OPENGL;
   int bpp = 0;

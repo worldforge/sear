@@ -86,7 +86,7 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
-  if (_meta) delete _meta;
+//  if (_meta) delete _meta;
   if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
   // TODO THIS IS CURRENTLY BUGGY

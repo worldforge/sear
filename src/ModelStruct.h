@@ -19,6 +19,8 @@ typedef struct {
   bool wrap_texture;
   bool multi_textures;
   int num_planes;
+  int num_slicings;
+  int slices_per_slicing;
   WFMath::AxisBox<3> bbox;
   bool hasBBox;
 } ModelStruct;

@@ -35,7 +35,7 @@ Model *Slice_Loader::loadModel(Render *render, ModelStruct &ms) {
 
   }
   Model *trunk_model = System::instance()->getModelHandler()->getModel(System::instance()->getGraphics()->getRender(), type + "_trunk", System::instance()->getObjectLoader()->getObjectProperties(type + "_trunk"));
-  model->init(type, ms.width, ms.height, trunk_model);
+  model->init(type, ms.width, ms.height, trunk_model, ms.num_slicings, ms.slices_per_slicing);
   return model;
 }
 

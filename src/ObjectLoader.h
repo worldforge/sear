@@ -55,6 +55,8 @@ typedef struct {
   float width;
   float height;
   int num_planes;
+  int num_slicings;
+  int slices_per_slicing;
   float texture_scale;
   float detail;
   MaterialProperties *material_properties;

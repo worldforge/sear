@@ -28,7 +28,7 @@ public:
   Slice(Render*);
   ~Slice();
   
-  bool init(const std::string &, float width, float height, Model *trunk_model);
+  bool init(const std::string &, float width, float height, Model *trunk_model, unsigned int num_slicings, unsigned int slices_per_slicing);
   void shutdown();
   
   void render(bool); 
@@ -41,6 +41,8 @@ private:
   std::string _type;
   Slicing **slicings;
   Model *_trunk_model;
+  unsigned int _num_slicings;
+  unsigned int _slices_per_slicing;
 };
 
 } /* namespace Sear */ 

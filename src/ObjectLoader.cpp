@@ -179,6 +179,12 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     else if (tag == "num_planes") {
       sscanf(str, "%*s = %d", &op->num_planes);
     }
+    else if (tag == "num_slicings") {
+      sscanf(str, "%*s = %d", &op->num_slicings);
+    }
+    else if (tag == "slices_per_slicing") {
+      sscanf(str, "%*s = %d", &op->slices_per_slicing);
+    }
     else if (tag == "texture_scale") {
       sscanf(str, "%*s = %f", &op->texture_scale);
     }

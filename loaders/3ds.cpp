@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
+#include <iostream>
 #include <list>
 #include <map>
 #include <GL/gl.h>
@@ -50,7 +51,7 @@ bool ThreeDS::init(const std::string &file_name) {
   Lib3dsNode *p = NULL;
   render_file(_model);
   for (p=_model->nodes; p!=0; p=p->next) {
-    cout << "Rendering Node" << endl;
+    std::cout << "Rendering Node" << std::endl;
     render_node(p, _model);
   }
   lib3ds_file_free(_model);

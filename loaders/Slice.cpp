@@ -11,12 +11,17 @@
 
 #include "Slice.h"
 
-#include <GL/gl.h>
+/**
+ * TODO
+ * Fix brightness balance due to blending
+ * Check lighting is okay
+ * Add option for a vertical slicing for viewing from above
+ */ 
 
 namespace Sear {
 
-  const unsigned int num_slicings = 6;
-  const unsigned int slices_per_slicing = 5;
+
+	
   
 Slice::Slice(Render *render) : Model(render),
   _use_textures(true),
@@ -28,17 +33,19 @@ Slice::~Slice() {
 
 }
   
-bool Slice::init(const std::string &type, float width, float height, Model *trunk_model) {
+bool Slice::init(const std::string &type, float width, float height, Model *trunk_model, unsigned int num_slicings, unsigned int slices_per_slicing) {
   _type = type;
   _trunk_model = trunk_model;
-  slicings = (Slicing**)malloc(num_slicings * sizeof(Slicing*));
-  memset(slicings, 0, num_slicings * sizeof(Slicing*));
-  for (unsigned int i = 0; i < num_slicings; i++) {
+  _num_slicings = num_slicings;
+  _slices_per_slicing = slices_per_slicing;
+  slicings = (Slicing**)malloc(_num_slicings * sizeof(Slicing*));
+  memset(slicings, 0, _num_slicings * sizeof(Slicing*));
+  for (unsigned int i = 0; i < _num_slicings; i++) {
     Slicing *slicing = slicings[i] = new Slicing();
-    float angle = ((1 * WFMath::Pi) / (num_slicings)) * i;
-    for (unsigned int j = 0; j < slices_per_slicing; j++) {
-      int m = j - (slices_per_slicing / 2);
-      float mod = (width / slices_per_slicing) * m;
+    float angle = ((1 * WFMath::Pi) / (_num_slicings)) * i;
+    for (unsigned int j = 0; j < _slices_per_slicing; j++) {
+      int m = j - (_slices_per_slicing / 2);
+      float mod = (width / _slices_per_slicing) * m;
       float x = (width / 2) * sin(angle);
       float y = ((width / 2)) * cos(angle);
       float mod_x = sin(angle + (WFMath::Pi / 2.0f));
@@ -81,7 +88,7 @@ bool Slice::init(const std::string &type, float width, float height, Model *trun
 
 void Slice::shutdown() {
   if (slicings) {
-//    for (unsigned int i = 0; i < num_slicings; i++) {
+//    for (unsigned int i = 0; i < _num_slicings; i++) {
 //    }	    
     free(slicings);
     slicings = NULL;
@@ -110,9 +117,9 @@ void Slice::render(bool select_mode) {
   while (camera_angle > WFMath::Pi * 2) camera_angle -= WFMath::Pi * 2;
   
   unsigned int index_1, index_2;
-  float angle = WFMath::Pi / num_slicings;
+  float angle = WFMath::Pi / _num_slicings;
   float transparency = 1.0f;
-  for (unsigned int i = 0; i < 2 * num_slicings; i++) {
+  for (unsigned int i = 0; i < 2 * _num_slicings; i++) {
     if (camera_angle >= i * angle && camera_angle <= (i + 1) * angle) {
       index_1 = i;
       index_2 = i + 1;
@@ -120,10 +127,12 @@ void Slice::render(bool select_mode) {
 //      if (transparency < 0.5f) transparency = 1.0f - transparency;
     }
   }
-  while (index_1 >= num_slicings) index_1 -= num_slicings;
-  while (index_2 >= num_slicings) index_2 -= num_slicings;
+  while (index_1 >= _num_slicings) index_1 -= _num_slicings;
+  while (index_2 >= _num_slicings) index_2 -= _num_slicings;
+  while (index_1 < 0) index_1 += _num_slicings;
+  while (index_2 < 0) index_2 += _num_slicings;
   //cout << index_1 << " " << index_2 << " " << transparency << endl; 
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
+  _render->setColour(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
   int i = 0;
   int index;
 //  if (transparency < 0.5) index = index_1;
@@ -140,17 +149,19 @@ void Slice::render(bool select_mode) {
   }
 //  if (transparency < 0.5) index = index_2;
 //  else index = index_1;
-  index = index_2;
-  i = 0;
-  glColor4f(1.0f, 1.0f, 1.0f,  transparency);
-  for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
-    ASlice *slice = *I;
-    if (select_mode) {
-      _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
-    } else {
-      _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+  if (transparency != 0.0f) {
+    index = index_2;
+    i = 0;
+    _render->setColour(1.0f, 1.0f, 1.0f,  transparency);
+    for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
+      ASlice *slice = *I;
+      if (select_mode) {
+        _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+      } else {
+        _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+      }
+      _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
     }
-    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
   }
 }
 

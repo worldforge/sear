@@ -1,3 +1,7 @@
+6th September 2002, Simon Goodall
+ * Added options to Slice loader for number of slices per slicing and number of slicings in the model
+ * Commented out the printing of redundant SDL info that caused problems on some older compilers.
+
 5th September 2002, Simon Goodall
  * Fixed problems in Object/Stae/Action Loader code which caused an error message to be printed when the end of file was reached. Also now allows use of the # character in the first position in a line to denote a comment.
  * Minor changes to Slice code
