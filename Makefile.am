@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## For top-level sear directory
 
-SUBDIRS = data scripts interfaces common loaders renderers environment  src 
+SUBDIRS = data scripts interfaces common loaders renderers environment gui src 
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \

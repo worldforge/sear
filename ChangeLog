@@ -1,3 +1,6 @@
+25th April 2004, Al Riddoch
+ * Started work on new gui code.
+
 23rd April 2004, Simon Goodall
  * Further work on texture invalidation code
  * Added console command to call invalidate
