@@ -355,7 +355,6 @@ AC_OUTPUT([
 	data/bindings.cfg
 	data/general.cfg
 	data/general_files.cfg
-	data/object_file.cfg
 	data/states.cfg
 	scripts/startup.script
 	scripts/shutdown.script
