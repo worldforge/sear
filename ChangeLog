@@ -1,3 +1,8 @@
+2004-06-03  James Turner  <james@worldforge.org>
+
+	* XCode project updates - want to be able to revert to this
+	  version if I break stuff.
+
 2004-06-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Window.h, gui/Window.cpp: Add coords and size, adding children,

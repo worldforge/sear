@@ -803,6 +803,16 @@
 			mainGroup = C4939AB9057BB0E4000CAC07;
 			productRefGroup = C4939ACD057BB0F3000CAC07;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C4A64BA3066BFB5300A7FDFC;
+					ProjectRef = C4A64BA2066BFB5300A7FDFC;
+				},
+				{
+					ProductGroup = C4A64BA8066BFB6600A7FDFC;
+					ProjectRef = C4A64BA7066BFB6600A7FDFC;
+				},
+			);
 			targets = (
 				C4939ACB057BB0F3000CAC07,
 			);
@@ -1002,6 +1012,8 @@
 				WARNING_CFLAGS = "-Wall";
 			};
 			dependencies = (
+				C4A64BBC066BFB8F00A7FDFC,
+				C4A64BBE066BFB9300A7FDFC,
 			);
 			isa = PBXNativeTarget;
 			name = sear;
@@ -2492,6 +2504,8 @@
 		};
 		C4939BF2057BB21E000CAC07 = {
 			children = (
+				C4A64BA7066BFB6600A7FDFC,
+				C4A64BA2066BFB5300A7FDFC,
 				C4DCA2E10664EAAD0092103C,
 				C4DCA2C90664EA970092103C,
 				C4DCA2A20664EA800092103C,
@@ -2695,6 +2709,206 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
+		};
+		C4A64BA2066BFB5300A7FDFC = {
+			isa = PBXFileReference;
+			lastKnownFileType = "wrapper.pb-project";
+			name = Eris.pbproj;
+			path = /Users/jmt/Worldforge/forge/libs/eris_transitional/Eris.pbproj;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		C4A64BA3066BFB5300A7FDFC = {
+			children = (
+				C4A64BA6066BFB5300A7FDFC,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C4A64BA6066BFB5300A7FDFC = {
+			fileType = wrapper.framework;
+			isa = PBXReferenceProxy;
+			path = Eris.framework;
+			refType = 3;
+			remoteRef = C4A64BB2066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BA7066BFB6600A7FDFC = {
+			isa = PBXFileReference;
+			lastKnownFileType = "wrapper.pb-project";
+			name = Mercator.pbproj;
+			path = /Users/jmt/Worldforge/forge/libs/mercator/Mercator.pbproj;
+			refType = 0;
+			sourceTree = "<absolute>";
+		};
+		C4A64BA8066BFB6600A7FDFC = {
+			children = (
+				C4A64BAA066BFB6700A7FDFC,
+				C4A64BAB066BFB6700A7FDFC,
+				C4A64BAC066BFB6700A7FDFC,
+				C4A64BAD066BFB6700A7FDFC,
+				C4A64BAE066BFB6700A7FDFC,
+				C4A64BAF066BFB6700A7FDFC,
+				C4A64BB0066BFB6700A7FDFC,
+				C4A64BB1066BFB6700A7FDFC,
+			);
+			isa = PBXGroup;
+			name = Products;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C4A64BAA066BFB6700A7FDFC = {
+			fileType = wrapper.framework;
+			isa = PBXReferenceProxy;
+			path = Mercator.framework;
+			refType = 3;
+			remoteRef = C4A64BB3066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BAB066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testTerrain;
+			refType = 3;
+			remoteRef = C4A64BB4066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BAC066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testTerrainMod;
+			refType = 3;
+			remoteRef = C4A64BB5066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BAD066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testForrest;
+			refType = 3;
+			remoteRef = C4A64BB6066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BAE066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testPlant;
+			refType = 3;
+			remoteRef = C4A64BB7066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BAF066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testQRNG;
+			refType = 3;
+			remoteRef = C4A64BB8066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BB0066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testShader;
+			refType = 3;
+			remoteRef = C4A64BB9066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BB1066BFB6700A7FDFC = {
+			fileType = "compiled.mach-o.executable";
+			isa = PBXReferenceProxy;
+			path = testIntersect;
+			refType = 3;
+			remoteRef = C4A64BBA066BFB8500A7FDFC;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C4A64BB2066BFB8500A7FDFC = {
+			containerPortal = C4A64BA2066BFB5300A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C45DC4310562F83D00D8F8F4;
+			remoteInfo = eris;
+		};
+		C4A64BB3066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C496A1590576AD7E005225FB;
+			remoteInfo = mercator;
+		};
+		C4A64BB4066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C48D3D7805774DD3006979E1;
+			remoteInfo = testTerrain;
+		};
+		C4A64BB5066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C48D3DF005774EA0006979E1;
+			remoteInfo = testTerrainMod;
+		};
+		C4A64BB6066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C485B27405B7456D002F2D80;
+			remoteInfo = testForest;
+		};
+		C4A64BB7066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C485B27F05B745A7002F2D80;
+			remoteInfo = testPlant;
+		};
+		C4A64BB8066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C485B28805B745B1002F2D80;
+			remoteInfo = testQRNG;
+		};
+		C4A64BB9066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C485B29305B74647002F2D80;
+			remoteInfo = testShader;
+		};
+		C4A64BBA066BFB8500A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 2;
+			remoteGlobalIDString = C485B29D05B74694002F2D80;
+			remoteInfo = testIntersect;
+		};
+		C4A64BBB066BFB8F00A7FDFC = {
+			containerPortal = C4A64BA2066BFB5300A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = C45DC3E60562F83D00D8F8F4;
+			remoteInfo = eris;
+		};
+		C4A64BBC066BFB8F00A7FDFC = {
+			isa = PBXTargetDependency;
+			name = "eris (from Eris.pbproj)";
+			targetProxy = C4A64BBB066BFB8F00A7FDFC;
+		};
+		C4A64BBD066BFB9300A7FDFC = {
+			containerPortal = C4A64BA7066BFB6600A7FDFC;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = C496A1350576AD7D005225FB;
+			remoteInfo = mercator;
+		};
+		C4A64BBE066BFB9300A7FDFC = {
+			isa = PBXTargetDependency;
+			name = "mercator (from Mercator.pbproj)";
+			targetProxy = C4A64BBD066BFB9300A7FDFC;
 		};
 		C4AD6913063DCCCF00E9DAC5 = {
 			fileEncoding = 30;
