@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.18 2002-10-21 20:12:04 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.19 2002-11-12 23:59:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -40,21 +40,8 @@ BoundBox_Loader::~BoundBox_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-/*	  new ModelRecord();
-  model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);
-  model_record->state = model_config->getItem(model_id, ModelRecord::STATE);
-  model_record->select_state = model_config->getItem(model_id, ModelRecord::SELECT_STATE);
-  model_record->model_by_type = model_config->getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-  model_record->outline =  model_config->getItem(model_id, ModelRecord::OUTLINE);
-  std::string rotation_style = model_config->getItem(model_id, ModelRecord::ROTATION_STYLE);
-  if (rotation_style == "none") model_record->rotation_style = Graphics::ROS_NONE;
-  else if (rotation_style == "normal") model_record->rotation_style = Graphics::ROS_NORMAL;
-  else if (rotation_style == "position") model_record->rotation_style = Graphics::ROS_POSITION;
-  else if (rotation_style == "billboard") model_record->rotation_style = Graphics::ROS_BILLBOARD;
-  else if (rotation_style == "halo") model_record->rotation_style = Graphics::ROS_HALO;
-  */
   BoundBox *model = new BoundBox(render);
 
   WFMath::AxisBox<3> bbox = record->bbox;
@@ -76,7 +63,7 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
 //  }
  
   std::string type = record->type;
-  if (!model->init(bboxCheck(bbox), type, (bool)model_config->getItem(model_id, "wrap_texture"))) {
+  if (!model->init(bboxCheck(bbox), type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
     std::cerr<< "error initing model" << std::endl;
     model->shutdown();
     delete model;

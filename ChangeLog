@@ -1,4 +1,14 @@
-29th October 2002, Simon Goodall
+12th November 2002, Simon Goodall
+ * Fixed up model_viewer so it now compiles again. still a few got problems.
+ * System's varconf config objects now actual objects and not pointers
+ * All objects that read config data from general, now update variables when general updates.
+
+30th October 2002, Simon Goodall
+ * Removed obsolete model unloading code
+ * Camera code now only performs update calculations if required 
+ * Camera code now calculates its position vector from focus
+
+30th October 2002, Simon Goodall
  * Removed last update due to problems
 
 29th October 2002, Simon Goodall

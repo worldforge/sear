@@ -23,6 +23,9 @@
 #else
   static const bool debug = false;
 #endif
+
+static const std::string TERRAIN = "terrain";
+  
 namespace Sear {
 
 	
@@ -45,6 +48,7 @@ bool ROAM::init() {
   if (debug) Log::writeLog("Initialising ROAM", Log::LOG_DEFAULT);
   if (_initialised) shutdown();
   readConfig();
+  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &ROAM::varconf_callback));
   loadHeightMap();
   gLand = new Landscape(_renderer, this);
   if (hMap) {
@@ -142,35 +146,27 @@ float ROAM::getHeight(float x, float y) {
 
 void ROAM::readConfig() {
   varconf::Variable temp;
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
-    return;
-  }
+  varconf::Config &general = _system->getGeneral();
   
-  hmap = _system->getGeneral()->getItem("terrain", KEY_height_map);
+  hmap = general.getItem(TERRAIN, KEY_height_map);
     
-  temp = general->getItem("terrain", KEY_height);
+  temp = general.getItem(TERRAIN, KEY_height);
   _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
 
-  temp = general->getItem("terrain", KEY_water_level);
+  temp = general.getItem(TERRAIN, KEY_water_level);
   _water_level = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
 
-  temp = general->getItem("terrain", KEY_terrain_scale);
+  temp = general.getItem(TERRAIN, KEY_terrain_scale);
   _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
 }
 
 void ROAM::writeConfig() {
   if (debug) Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
-    return;
-  }
-  general->setItem("terrain", KEY_height, _height);
-  general->setItem("terrain", KEY_water_level, _water_level);
-  general->setItem("terrain", KEY_terrain_scale, _terrain_scale);
-  general->setItem("terrain", KEY_height_map, hmap);
+  varconf::Config &general = _system->getGeneral();
+  general.setItem(TERRAIN, KEY_height, _height);
+  general.setItem(TERRAIN, KEY_water_level, _water_level);
+  general.setItem(TERRAIN, KEY_terrain_scale, _terrain_scale);
+  general.setItem(TERRAIN, KEY_height_map, hmap);
   
 }
 
@@ -181,4 +177,28 @@ void ROAM::lowerDetail() {
 void ROAM::raiseDetail() {
   gLand->raiseDetail();
 }
+
+void ROAM::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  varconf::Variable temp;
+
+  if (section == TERRAIN) {
+    if (key == KEY_height_map) {	  
+      hmap = config.getItem(TERRAIN, KEY_height_map);
+    }
+    else if (key == KEY_height) {    
+      temp = config.getItem(TERRAIN, KEY_height);
+      _height = (!temp.is_int()) ? (DEFAULT_height) : ((int)(temp));
+    }
+    else if (key == KEY_water_level) {
+      temp = config.getItem(TERRAIN, KEY_water_level);
+      _water_level = (!temp.is_double()) ? (DEFAULT_water_level) : ((double)(temp));
+    }
+    else if (key == KEY_terrain_scale) {
+      temp = config.getItem(TERRAIN, KEY_terrain_scale);
+      _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
+    }
+  }
+}
+
+
 } /* namespace Sear */

@@ -33,7 +33,7 @@
 #include "src/Model.h"
 #include "src/ModelLoader.h"
 #include "src/ModelHandler.h"
-#include "src/ObjectLoader.h"
+#include "src/ObjectHandler.h"
 #include "src/WorldEntity.h"
 
 #include "src/Camera.h"
@@ -44,7 +44,6 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
-Sear::Model *model = NULL;
 Sear::Render *render = NULL;
 Sear::System *sys = NULL;
 Sear::Camera *_camera = NULL;
@@ -54,7 +53,9 @@ bool _system_running = true;
 float x_angle = 0.0f;
 float y_angle = 0.0f;
 
-Sear::ObjectProperties *op = NULL;
+Sear::ObjectRecord *object_record = NULL;
+std::string the_state = "";
+std::string type = "";
 
 float model_x = 0.0f;
 float model_y = 0.0f;
@@ -88,7 +89,13 @@ void updateMove(float time) {
 void idle() {
   static unsigned int last_time = 0;
   float time = (((float)(sys->getTime() - last_time)) / 1000.0f);
-  model->update(time);
+  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+    Sear::ModelRecord *model_record = sys->getModelHandler()->getModel(render, object_record, *I);
+    if (model_record) {
+      Sear::Model *model = model_record->model;   
+      if (model) model->update(time);
+    }
+  }
   _camera->updateCameraPos(time);
   updateMove(time);
   last_time = sys->getTime();
@@ -97,7 +104,6 @@ void idle() {
 void move(int i) {
   move_dir += i;
 }
-
 
 void handleEvents(const SDL_Event &event) {
   static bool mouse_down = false;
@@ -112,6 +118,7 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_PAGEDOWN) _camera->elevate(-1);
       else if (event.key.keysym.sym == SDLK_UP) _camera->zoom(-1);
       else if (event.key.keysym.sym == SDLK_DOWN) _camera->zoom(1);
+      /*
       else if (event.key.keysym.sym == SDLK_1) model->action("standing");
       else if (event.key.keysym.sym == SDLK_2) model->action("walking");
       else if (event.key.keysym.sym == SDLK_3) model->action("running");
@@ -133,6 +140,7 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_p) model->action("take");
       else if (event.key.keysym.sym == SDLK_a) model->action("stow");
       else if (event.key.keysym.sym == SDLK_s) model->action("clear_cycles");
+      */
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       else if (event.key.keysym.sym == SDLK_c) black = !black;
       break;
@@ -197,9 +205,9 @@ void display() {
     glEnd();
   }
   
-  render->stateChange(op->state);
+  object_record = sys->getObjectHandler()->getObjectRecord(type);
+  the_state = sys->getModelRecords().getItem(type, "state"); 
   // Don't want any fog or lighitng effects
-  glDisable(GL_FOG);
   glColor3f(1.0f, 1.0f, 1.0f);
 
   glRotatef(y_angle, 1.0f, 0.0f, 0.0f);
@@ -209,9 +217,26 @@ void display() {
 //     glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
   glTranslatef(model_x, model_y, model_z);
   glPushMatrix();
-  
-  if(op && op->scale) glScalef(op->scale, op->scale, op->scale); 
-    model->render(false);
+
+//  cout << object_record->low_quality.size() << endl;
+//  cout << object_record->name << endl;
+  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+    Sear::ModelRecord *model_record = sys->getModelHandler()->getModel(render, object_record, *I);
+    if (model_record) {
+      _system_running = false;
+      return;
+    }
+    Sear::Model *model = model_record->model;   
+    if (model) {
+      glPushMatrix();
+      render->stateChange(the_state);
+      glDisable(GL_FOG);
+      float scale = model_record->scale;
+      glScalef(scale, scale,scale);
+      model->render(false);
+      glPopMatrix();
+    }
+  }
   glPopMatrix();
   glFlush();
   render->endFrame(false);
@@ -231,7 +256,6 @@ void loop () {
 }
 
 int main(int argc, char** argv) {
-    std::string type = "";
   if (argc >1) {
     type = argv[1];
     
@@ -245,24 +269,11 @@ int main(int argc, char** argv) {
   sys->createWindow(false);
   render = sys->getGraphics()->getRender();
   _camera = sys->getGraphics()->getCamera();
-  Sear::ModelHandler *mh = sys->getModelHandler();
-  op = (Sear::ObjectProperties*)malloc(sizeof(Sear::ObjectProperties));
-  model = mh->getModel(render, type, op);
+  object_record = sys->getObjectHandler()->getObjectRecord(type);
 //            SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
-  if (model) loop();
+  if (object_record) loop();
 
-  if (model) {
-    model->shutdown();
-    delete model;
-    model = NULL;
-  }
-  if (op) free (op);
-  if (mh) {
-    mh->shutdown();	  
-    delete mh;
-    mh = NULL;
-  }
   if (sys) {
     sys->shutdown();
     delete sys;

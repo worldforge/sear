@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.11 2002-10-21 20:12:04 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.12 2002-11-12 23:59:22 simon Exp $
 
 #include <string>
 
@@ -36,14 +36,8 @@ WireFrame_Loader::~WireFrame_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *WireFrame_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+ModelRecord *WireFrame_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-//  ModelRecord *model_record = new ModelRecord();
-//  model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);
-//  model_record->state = model_config->getItem(model_id, ModelRecord::STATE);
-//  model_record->select_state = model_config->getItem(model_id, ModelRecord::SELECT_STATE);
-//  model_record->model_by_type = model_config->getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-//  model_record->outline =  model_config->getItem(model_id, ModelRecord::OUTLINE);
   WireFrame *model = new WireFrame(render);
 
   WFMath::AxisBox<3> bbox = record->bbox;

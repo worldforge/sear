@@ -8,11 +8,10 @@ model_viewer_LDADD = \
 	../sky/libSkyBox.a \
 	../renderers/libRendererGL.a \
 	../common/libCommon.a \
+	../gui/libGui.a \
 	../loaders/libLoader3ds.a \
 	../loaders/libLoaderCal3d.a \
-	../loaders/libLoaderBillBoard.a \
 	../loaders/libLoaderBoundBox.a \
-	../loaders/libLoaderImpostor.a \
 	../loaders/libLoaderNPlane.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderSlice.a 

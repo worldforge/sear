@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.43 2002-10-30 10:03:06 simon Exp $
+// $Id: GL.cpp,v 1.44 2002-11-12 23:59:22 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -224,6 +224,7 @@ void GL::initWindow(int width, int height) {
 void GL::init() {
   if (_initialised) shutdown();
   // Most of this should be elsewhere
+  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
   readConfig();
   createDefaults();
   splash_id = requestTexture(UI, splash_texture);
@@ -340,16 +341,16 @@ inline void GL::newLine() {
 }
 
 int GL::requestTexture(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config *texture_config = _system->getTexture();
+  static varconf::Config &texture_config = _system->getTexture();
   std::string texture_name = std::string(texture);
-  texture_config->clean(texture_name);
+  texture_config.clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[section + texture_name];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
-  std::string file_name = texture_config->getItem(section, texture_name);
+  std::string file_name = texture_config.getItem(section, texture_name);
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
@@ -364,16 +365,16 @@ int GL::requestTexture(const std::string &section, const std::string &texture, b
 }
 
 int GL::requestMipMap(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config *texture_config = _system->getTexture();
+  static varconf::Config &texture_config = _system->getTexture();
   std::string texture_name = std::string(texture);
-  texture_config->clean(texture_name);
+  texture_config.clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[section + texture_name];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
-  std::string file_name = texture_config->getItem(section, texture_name);
+  std::string file_name = texture_config.getItem(section, texture_name);
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) return -1;
@@ -385,16 +386,16 @@ int GL::requestMipMap(const std::string &section, const std::string &texture, bo
 }
 
 int GL::requestTextureMask(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config *texture_config = _system->getTexture();
+  static varconf::Config &texture_config = _system->getTexture();
   std::string texture_name = std::string(texture);
-  texture_config->clean(texture_name);
+  texture_config.clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[section + texture_name + MASK];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
-  std::string file_name = texture_config->getItem(section, texture_name);
+  std::string file_name = texture_config.getItem(section, texture_name);
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
@@ -409,16 +410,16 @@ int GL::requestTextureMask(const std::string &section, const std::string &textur
 }
 
 int GL::requestMipMapMask(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config *texture_config = _system->getTexture();
+  static varconf::Config &texture_config = _system->getTexture();
   std::string texture_name = std::string(texture);
-  texture_config->clean(texture_name);
+  texture_config.clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[section + texture_name + MASK];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
-  std::string file_name = texture_config->getItem(section, texture_name);
+  std::string file_name = texture_config.getItem(section, texture_name);
   if (file_name.empty()) return -1;
   tmp = System::loadImage(file_name);
   if (!tmp) {
@@ -679,129 +680,124 @@ void GL::CheckError() {
 //TODO should be in general render class
 void GL::readConfig() {
   varconf::Variable temp;
-  varconf::Config *general = _system->getGeneral();
+  varconf::Config &general = _system->getGeneral();
   if (debug) Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
-  if (!general) {
-    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
-    return;
-  }
 
   // Setup character light source
-  temp = general->getItem(RENDER, KEY_character_light_kc);
+  temp = general.getItem(RENDER, KEY_character_light_kc);
   lights[LIGHT_CHARACTER].kc = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_kl);
+  temp = general.getItem(RENDER, KEY_character_light_kl);
   lights[LIGHT_CHARACTER].kl = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_kq);
+  temp = general.getItem(RENDER, KEY_character_light_kq);
   lights[LIGHT_CHARACTER].kq = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
   
-  temp = general->getItem(RENDER, KEY_character_light_ambient_red);
+  temp = general.getItem(RENDER, KEY_character_light_ambient_red);
   lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_ambient_green);
+  temp = general.getItem(RENDER, KEY_character_light_ambient_green);
   lights[LIGHT_CHARACTER].ambient[1] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_ambient_blue);
+  temp = general.getItem(RENDER, KEY_character_light_ambient_blue);
   lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_ambient_alpha);
+  temp = general.getItem(RENDER, KEY_character_light_ambient_alpha);
   lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
 
-  temp = general->getItem(RENDER, KEY_character_light_diffuse_red);
+  temp = general.getItem(RENDER, KEY_character_light_diffuse_red);
   lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_diffuse_green);
+  temp = general.getItem(RENDER, KEY_character_light_diffuse_green);
   lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_diffuse_blue);
+  temp = general.getItem(RENDER, KEY_character_light_diffuse_blue);
   lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_diffuse_alpha);
+  temp = general.getItem(RENDER, KEY_character_light_diffuse_alpha);
   lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
 
-  temp = general->getItem(RENDER, KEY_character_light_specular_red);
+  temp = general.getItem(RENDER, KEY_character_light_specular_red);
   lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_specular_green);
+  temp = general.getItem(RENDER, KEY_character_light_specular_green);
   lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_specular_blue);
+  temp = general.getItem(RENDER, KEY_character_light_specular_blue);
   lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_character_light_specular_alpha);
+  temp = general.getItem(RENDER, KEY_character_light_specular_alpha);
   lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
   //Setup Sun light source
-  temp = general->getItem(RENDER, KEY_sun_light_kc);
+  temp = general.getItem(RENDER, KEY_sun_light_kc);
   lights[LIGHT_SUN].kc = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_sun_light_kl);
+  temp = general.getItem(RENDER, KEY_sun_light_kl);
   lights[LIGHT_SUN].kl = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_sun_light_kq);
+  temp = general.getItem(RENDER, KEY_sun_light_kq);
   lights[LIGHT_SUN].kq = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
 
   // Setup render states
-  temp = general->getItem(RENDER, KEY_use_textures);
+  temp = general.getItem(RENDER, KEY_use_textures);
   setState(RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
-  temp = general->getItem(RENDER, KEY_use_lighting);
+  temp = general.getItem(RENDER, KEY_use_lighting);
   setState(RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
-  temp = general->getItem(RENDER, KEY_show_fps);
+  temp = general.getItem(RENDER, KEY_show_fps);
   setState(RENDER_FPS, ((!temp.is_bool()) ? (DEFAULT_show_fps) : ((bool)(temp))));
-  temp = general->getItem(RENDER, KEY_use_stencil);
+  temp = general.getItem(RENDER, KEY_use_stencil);
   setState(RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
   
   // Setup the speech offsets
-  temp = general->getItem(RENDER, KEY_speech_offset_x);
+  temp = general.getItem(RENDER, KEY_speech_offset_x);
   _speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_speech_offset_y);
+  temp = general.getItem(RENDER, KEY_speech_offset_y);
   _speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_speech_offset_z);
+  temp = general.getItem(RENDER, KEY_speech_offset_z);
   _speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
 
-  temp = general->getItem(RENDER, KEY_fog_start);
+  temp = general.getItem(RENDER, KEY_fog_start);
   _fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
-  temp = general->getItem(RENDER, KEY_fog_end);
+  temp = general.getItem(RENDER, KEY_fog_end);
   _fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
 
-  temp = general->getItem(RENDER, KEY_far_clip_dist);
+  temp = general.getItem(RENDER, KEY_far_clip_dist);
   _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
-
-}  
+}
 
 void GL::writeConfig() {
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
-    return;
-  }
+  varconf::Config &general = _system->getGeneral();
+//  if (!general) {
+//    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
+//    return;
+//  }
   
   // Save character light source
-  general->setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].kc);
-  general->setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].kl);
-  general->setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].kq);
+  general.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].kc);
+  general.setItem(RENDER, KEY_character_light_kl, lights[LIGHT_CHARACTER].kl);
+  general.setItem(RENDER, KEY_character_light_kq, lights[LIGHT_CHARACTER].kq);
 
-  general->setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
-  general->setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
-  general->setItem(RENDER, KEY_character_light_ambient_blue, lights[LIGHT_CHARACTER].ambient[2]);
-  general->setItem(RENDER, KEY_character_light_ambient_alpha, lights[LIGHT_CHARACTER].ambient[3]);
+  general.setItem(RENDER, KEY_character_light_ambient_red, lights[LIGHT_CHARACTER].ambient[0]);
+  general.setItem(RENDER, KEY_character_light_ambient_green, lights[LIGHT_CHARACTER].ambient[1]);
+  general.setItem(RENDER, KEY_character_light_ambient_blue, lights[LIGHT_CHARACTER].ambient[2]);
+  general.setItem(RENDER, KEY_character_light_ambient_alpha, lights[LIGHT_CHARACTER].ambient[3]);
 
-  general->setItem(RENDER, KEY_character_light_diffuse_red, lights[LIGHT_CHARACTER].diffuse[0]);
-  general->setItem(RENDER, KEY_character_light_diffuse_green, lights[LIGHT_CHARACTER].diffuse[1]);
-  general->setItem(RENDER, KEY_character_light_diffuse_blue, lights[LIGHT_CHARACTER].diffuse[2]);
-  general->setItem(RENDER, KEY_character_light_diffuse_alpha, lights[LIGHT_CHARACTER].diffuse[3]);
+  general.setItem(RENDER, KEY_character_light_diffuse_red, lights[LIGHT_CHARACTER].diffuse[0]);
+  general.setItem(RENDER, KEY_character_light_diffuse_green, lights[LIGHT_CHARACTER].diffuse[1]);
+  general.setItem(RENDER, KEY_character_light_diffuse_blue, lights[LIGHT_CHARACTER].diffuse[2]);
+  general.setItem(RENDER, KEY_character_light_diffuse_alpha, lights[LIGHT_CHARACTER].diffuse[3]);
 
-  general->setItem(RENDER, KEY_character_light_specular_red, lights[LIGHT_CHARACTER].specular[0]);
-  general->setItem(RENDER, KEY_character_light_specular_green, lights[LIGHT_CHARACTER].specular[1]);
-  general->setItem(RENDER, KEY_character_light_specular_blue, lights[LIGHT_CHARACTER].specular[2]);
-  general->setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
+  general.setItem(RENDER, KEY_character_light_specular_red, lights[LIGHT_CHARACTER].specular[0]);
+  general.setItem(RENDER, KEY_character_light_specular_green, lights[LIGHT_CHARACTER].specular[1]);
+  general.setItem(RENDER, KEY_character_light_specular_blue, lights[LIGHT_CHARACTER].specular[2]);
+  general.setItem(RENDER, KEY_character_light_specular_alpha, lights[LIGHT_CHARACTER].specular[3]);
   
   // Save Sun light source
-  general->setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].kc);
-  general->setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].kl);
-  general->setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].kq);
+  general.setItem(RENDER, KEY_sun_light_kc, lights[LIGHT_SUN].kc);
+  general.setItem(RENDER, KEY_sun_light_kl, lights[LIGHT_SUN].kl);
+  general.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].kq);
 
   // Save render states
-  general->setItem(RENDER, KEY_use_textures, checkState(RENDER_TEXTURES));
-  general->setItem(RENDER, KEY_use_lighting, checkState(RENDER_LIGHTING));
-  general->setItem(RENDER, KEY_show_fps, checkState(RENDER_FPS));
-  general->setItem(RENDER, KEY_use_stencil, checkState(RENDER_STENCIL));
+  general.setItem(RENDER, KEY_use_textures, checkState(RENDER_TEXTURES));
+  general.setItem(RENDER, KEY_use_lighting, checkState(RENDER_LIGHTING));
+  general.setItem(RENDER, KEY_show_fps, checkState(RENDER_FPS));
+  general.setItem(RENDER, KEY_use_stencil, checkState(RENDER_STENCIL));
   
   // Save the speech offsets
-  general->setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
-  general->setItem(RENDER, KEY_speech_offset_y, _speech_offset_y);
-  general->setItem(RENDER, KEY_speech_offset_z, _speech_offset_z);
+  general.setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
+  general.setItem(RENDER, KEY_speech_offset_y, _speech_offset_y);
+  general.setItem(RENDER, KEY_speech_offset_z, _speech_offset_z);
 
-  general->setItem(RENDER, KEY_fog_start, _fog_start);
-  general->setItem(RENDER, KEY_fog_end, _fog_end);
-  general->setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
+  general.setItem(RENDER, KEY_fog_start, _fog_start);
+  general.setItem(RENDER, KEY_fog_end, _fog_end);
+  general.setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
 }  
 
 
@@ -1082,8 +1078,8 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       
 
       // Scale Object
-//      float scale = op->scale;
-//      if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+      float scale = model_record->scale;
+      if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
       model->update(time_elapsed);
@@ -1401,10 +1397,125 @@ void GL::setupExtensions() {
 
 }
 
-} /* namespace Sear */
+void GL::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  varconf::Variable temp;
+  if (section == RENDER) {
+    if (key == KEY_character_light_kc) {
+      temp = config.getItem(RENDER, KEY_character_light_kc);
+      lights[LIGHT_CHARACTER].kc = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+    }
+    else if (key ==  KEY_character_light_kl) {
+      temp = config.getItem(RENDER, KEY_character_light_kl);
+      lights[LIGHT_CHARACTER].kl = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_kq) {
+      temp = config.getItem(RENDER, KEY_character_light_kq);
+      lights[LIGHT_CHARACTER].kq = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_ambient_red) {
+      temp = config.getItem(RENDER, KEY_character_light_ambient_red);
+      lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_ambient_green) {
+      temp = config.getItem(RENDER, KEY_character_light_ambient_green);
+      lights[LIGHT_CHARACTER].ambient[1] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_ambient_blue) {
+      temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
+      lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_ambient_alpha) {
+      temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
+      lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_diffuse_red) {
+      temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
+      lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_diffuse_green) {
+      temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
+      lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_diffuse_blue) {
+      temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
+      lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_diffuse_alpha) {
+      temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
+      lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_specular_red) {
+      temp = config.getItem(RENDER, KEY_character_light_specular_red);
+      lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_specular_green) {
+      temp = config.getItem(RENDER, KEY_character_light_specular_green);
+      lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_specular_blue) {
+      temp = config.getItem(RENDER, KEY_character_light_specular_blue);
+      lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
+    }
+    else if (key == KEY_character_light_specular_alpha) {
+      temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
+      lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
+    }
+    //Setup Sun light source
+    else if (key == KEY_sun_light_kc) {
+      temp = config.getItem(RENDER, KEY_sun_light_kc);
+      lights[LIGHT_SUN].kc = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+    }
+    else if (key == KEY_sun_light_kl) {
+      temp = config.getItem(RENDER, KEY_sun_light_kl);
+      lights[LIGHT_SUN].kl = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+    }
+    else if (key == KEY_sun_light_kq) {
+      temp = config.getItem(RENDER, KEY_sun_light_kq);
+      lights[LIGHT_SUN].kq = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+    }
+    // Setup render states
+    else if (key == KEY_use_textures) {
+      temp = config.getItem(RENDER, KEY_use_textures);
+      setState(RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
+    }
+    else if (key == KEY_use_lighting) {
+      temp = config.getItem(RENDER, KEY_use_lighting);
+      setState(RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
+    }
+    else if (key == KEY_show_fps) {
+      temp = config.getItem(RENDER, KEY_show_fps);
+      setState(RENDER_FPS, ((!temp.is_bool()) ? (DEFAULT_show_fps) : ((bool)(temp))));
+    }
+    else if (key == KEY_use_stencil) {
+      temp = config.getItem(RENDER, KEY_use_stencil);
+      setState(RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));  
+    }
+    // Setup the speech offsets
+    else if (key == KEY_speech_offset_x) {
+      temp = config.getItem(RENDER, KEY_speech_offset_x);
+      _speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
+    }
+    else if (key == KEY_speech_offset_y) {
+      temp = config.getItem(RENDER, KEY_speech_offset_y);
+      _speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+    }
+    else if (key == KEY_speech_offset_z) {
+      temp = config.getItem(RENDER, KEY_speech_offset_z);
+      _speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+    }
+    else if (key == KEY_fog_start) {
+      temp = config.getItem(RENDER, KEY_fog_start);
+      _fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
+    }
+    else if (key == KEY_fog_end) {
+      temp = config.getItem(RENDER, KEY_fog_end);
+      _fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
+    }
+    else if (key == KEY_far_clip_dist) {
+      temp = config.getItem(RENDER, KEY_far_clip_dist);
+      _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
+    }
+  }
+}
 
-//clear up defines
-#undef GL_GENERATE_MIPMAP_SGIS
-#undef GL_GENERATE_MIPMAP_HINT_SGIS
-#undef TEXTURE_MAX_ANISOTROPY_EXT
-#undef MAX_TEXTURE_MAX_ANISOTROPY_EXT
+} /* namespace Sear */

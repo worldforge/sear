@@ -1,30 +1,29 @@
-* Allow console to be opened even if not key bindings have been loaded
-
  * Setup system to update values as varconf values update
   - Every object that uses a varconf object could connect a callback to the object.
+  - Existing system works ok, but not great as it must be manually run after new values have been read in.
 
  * Allow general varconf object to parse command line.
 
- * Convert State Loader to use varconf. See ObjectHandler code as a base.
-
- * Add support for OpenGL extensions
+ * Add support for OpenGL extensions. This is to provide higher quality effects.
  
  * Fix lighting
   - 3ds normals are wonky.
   - Check  whole system lighting model.
   
- * Add ability to tokenise on quotes, not just spaces
+ * Add ability to tokenise on quotes, not just spaces. This is a must. can only have one arg with spaces at the mo.
 
- * Allow line editing in console
+ * Allow line editing in console.
 
- * In game menu for configuration
+ * In game menu for configuration -> work on GLGooey interface
 
  * Improve memory usage
-   - Unload unused textures, models, and other data.
+   - Unload unused textures and other such data during runtime.
+   - SDL_mixer (or maybe SDL sound subsystem) doesn't clean up properly
+   - Eris doesn't clean up properly
 
- * Add a BSP tree or equivalent
+ * Add a BSP tree or other space partitioning system. This is to a) reduce number of objects rendered and b) provide distance information for choosing an appropriate quality of model to render
 
- * Move OpenGL code into one object
+ * Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
 
  * Add a better GUI
    - First step is to add a gui_queue for rendering. This starts with the splash screen, then with anything else such as entity text

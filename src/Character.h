@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.8 2002-09-08 00:24:53 simon Exp $
+// $Id: Character.h,v 1.9 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -14,6 +14,10 @@
 #include <Eris/Entity.h>
 #include "ConsoleObject.h"
 #include <sigc++/object_slot.h>
+
+namespace varconf {
+class Config;
+}
 
 namespace Sear {
 
@@ -87,6 +91,8 @@ protected:
 
   void Recontainered(Eris::Entity *, Eris::Entity *);
   bool _initialised;
+ 
+  void varconf_callback(const std::string &key, const std::string &section, varconf::Config &config);
   
 private:
   static const char * const MOVE_FORWARD = "+character_move_forward";

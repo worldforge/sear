@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.20 2002-10-21 22:24:29 simon Exp $
+// $Id: GL.h,v 1.21 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -14,6 +14,8 @@
 #include <list>
 #include <map>
 #include <set>
+
+#include <sigc++/object_slot.h>
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
@@ -33,7 +35,7 @@ class Graphics;
 class ObjectRecord;
 class ModelRecord;
 
-class GL : public Render {
+class GL : public Render, public SigC::Object {
 
 public:
   GL();
@@ -204,6 +206,7 @@ protected:
   bool use_ext_texture_filter_anisotropic;
   bool use_sgis_generate_mipmap;
   bool _initialised;
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
   // Consts
   static const int sleep_time = 5000;

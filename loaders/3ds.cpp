@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.16 2002-10-21 20:12:04 simon Exp $
+// $Id: 3ds.cpp,v 1.17 2002-11-12 23:59:22 simon Exp $
 
 
 #include <iostream>
@@ -83,7 +83,7 @@ void ThreeDS::shutdown() {
   }
   while (!material_map.empty()) {
     Material *m = material_map.begin()->second;
-    if (m) free (m);
+    if (m) delete (m);
     material_map.erase(material_map.begin());
   }
   _initialised = false;
@@ -143,7 +143,6 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
       unsigned int n_counter = 0;
       unsigned int t_counter = 0;
       RenderObject *ro = new RenderObject;
-      memset(ro, 0, sizeof(RenderObject));
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
       ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
@@ -160,7 +159,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
         if (mat) {
 	  ro->material_name = std::string(f->material);
           if (!material_map[std::string(f->material)]) {
-	    Material *m = (Material*)malloc(sizeof(Material));
+	    Material *m = new Material;//*)malloc(sizeof(Material));
 	    m->ambient[0] = 0.0f;
 	    m->ambient[1] = 0.0f;
 	    m->ambient[2] = 0.0f;
@@ -213,7 +212,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
               v_counter = n_counter = t_counter = 0;
 	      
               ro = new RenderObject;
-              memset(ro, 0, sizeof(RenderObject));
+//              memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
               ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
@@ -269,8 +268,8 @@ void ThreeDS::render_file(Lib3dsFile *file) {
       unsigned int v_counter = 0;
       unsigned int n_counter = 0;
       unsigned int t_counter = 0;
-      RenderObject *ro = (RenderObject*)malloc(sizeof(RenderObject));
-      memset(ro, 0, sizeof(RenderObject));
+      RenderObject *ro = new RenderObject;
+//      memset(ro, 0, sizeof(RenderObject));
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
       ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
@@ -287,7 +286,7 @@ void ThreeDS::render_file(Lib3dsFile *file) {
         if (mat) {
 	  ro->material_name = std::string(f->material);
           if (!material_map[std::string(f->material)]) {
-	    Material *m = (Material*)malloc(sizeof(Material));
+	    Material *m = new Material;//(Material*)malloc(sizeof(Material));
 	    m->ambient[0] = 0.0f;
 	    m->ambient[1] = 0.0f;
 	    m->ambient[2] = 0.0f;
@@ -339,8 +338,8 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 	      
               v_counter = n_counter = t_counter = 0;
 	      
-              ro = (RenderObject*)malloc(sizeof(RenderObject));
-              memset(ro, 0, sizeof(RenderObject));
+              ro = new RenderObject;//*)malloc(sizeof(RenderObject));
+//              memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
               ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));

@@ -2,16 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.27 2002-10-21 22:24:29 simon Exp $
+// $Id: ModelHandler.cpp,v 1.28 2002-11-12 23:59:22 simon Exp $
+
+//#include "config.h"
 
 #include "System.h"
 #include <set>
 #include <string.h>
 
 #include <varconf/Config.h>
-//#include <Eris/TypeInfo.h>
 
-#include "config.h"
 
 #include "common/Log.h"
 #include "loaders/3ds_Loader.h"
@@ -25,15 +25,11 @@
 #include "src/Event.h"
 #include "src/EventHandler.h"
 #include "Exception.h"
-//#include "Model.h"
 #include "ModelHandler.h"
 #include "ModelLoader.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
-//#include "ObjectLoader.h"
 #include "Render.h"
-//#include "StateLoader.h"
-//#include "WorldEntity.h"
 
 #ifdef DEBUG
   #include "common/mmgr.h"
@@ -49,6 +45,7 @@ ModelHandler::ModelHandler() :
 	
 {
   // TODO: this is not the place
+  // create all the model loaders
   new Cal3d_Loader(this);
   new BoundBox_Loader(this);
   new WireFrame_Loader(this);
@@ -63,10 +60,7 @@ ModelHandler::~ModelHandler() {
 
 void ModelHandler::init() {
   if (_initialised) shutdown();
-  // TODO: Do  clean up if required
-//  _model_loaders = ModelLoaderMap();
-  _model_records = ModelRecordMap();
-  // TODO stop this
+  // TODO another method would be better - or a clean up of the event system
   System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
   _initialised = true;
 }
@@ -78,10 +72,11 @@ void ModelHandler::shutdown() {
     if (ml) delete (ml);
     _model_loaders.erase(_model_loaders.begin());
   }
+  // Delete all unique records
   while (!_object_map.empty()) {
     ModelRecord *mr = _object_map.begin()->second;
     if (mr) {
-      if (!mr->model_by_type) {
+      if (!mr->model_by_type) { // If model_by_type then record is not unique
         if (mr->model) {
           mr->model->shutdown();
           delete mr->model;
@@ -92,7 +87,7 @@ void ModelHandler::shutdown() {
     }
     _object_map.erase(_object_map.begin());
   }
-// Clean Up Models
+  // Delete all remaining records
   while (!_model_records.empty()) {
     ModelRecord *mr = _model_records.begin()->second;
     if (mr) {
@@ -113,10 +108,10 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   if (_object_map[record->id + model_id]) return _object_map[record->id + model_id];
   
   if (_model_records[model_id]) {
-    // if (_model_records[model_id]); // Huh? what was this here for?
     _object_map[record->id + model_id] = _model_records[model_id];
     return _model_records[model_id];
   }
+  // No existing model found, load up a new one
   if (!render) {
     std::cerr << "renderer is null" << std::endl;	  
     return NULL;
@@ -126,15 +121,15 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     return NULL;
   }
   ModelRecord *model = NULL;
-  varconf::Config *model_config = System::instance()->getModelRecords();
-  std::string model_loader = (std::string)model_config->getItem(model_id, ModelRecord::MODEL_LOADER);
+  varconf::Config &model_config = System::instance()->getModelRecords();
+  std::string model_loader = (std::string)model_config.getItem(model_id, ModelRecord::MODEL_LOADER);
   
   if (_model_loaders[model_loader]) model = _model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
   else {
     std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
   }
-
+  // If model is a generic one, add it to the generic list
   if (model->model_by_type)  _model_records[model_id] = model;
   _object_map[record->id + model_id] = model;
   return model; 
@@ -146,7 +141,8 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
   if (!model_loader) throw Exception("No model loader given");
   // Throw error if we already have a loader for this type
   // TODO: decide whether we should override existing loaders with new one.
-  if (_model_loaders[model_type]) throw Exception("Model loader already exists for this type!");
+  // TODO throw execption is not a good idea as this method gets called via a constructor
+  //if (_model_loaders[model_type]) throw Exception("Model loader already exists for this type!");
   // If all is well, assign loader
   _model_loaders[model_type] = model_loader;
 }
@@ -158,7 +154,7 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
 
 void ModelHandler::checkModelTimeouts() {
   // TODO what about records with no model?
-  std::cout << "Checking Timeouts" << std::endl;
+  if (debug) std::cout << "Checking Timeouts" << std::endl;
   std::set<ModelRecord*> expired_set;
   for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
     ModelRecord *record = I->second;
@@ -187,7 +183,7 @@ void ModelHandler::checkModelTimeouts() {
   while (!expired_set.empty()) {
     ModelRecord *record = *expired_set.begin();
     if (record) {
-      std::cout << "Unloading: " << record->id << std::endl;
+      if (debug) std::cout << "Unloading: " << record->id << std::endl;
       Model *model = record->model;
       if (model) delete model;
       delete record;
@@ -195,18 +191,6 @@ void ModelHandler::checkModelTimeouts() {
     expired_set.erase(expired_set.begin());
   }
   System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
-}
-
-void ModelHandler::checkModelTimeout(const std::string &id) {
-//  Model *model = _models[id];
-//  if (!model) return;
-//  if (!model->getInUse()) {
-//    if (model->getFlag("ModelByType")) return;
-//    Log::writeLog(std::string("Unloading model for ") + id, Log::LOG_INFO);
-//    model->shutdown();
-//    delete model;
-//    _models[id] = NULL;
-//  }
 }
 
 } /* namespace Sear */

@@ -5,12 +5,11 @@ SUBDIRS = common loaders renderers terrain sky gui src tools
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \
-	autogen.sh
+	sear.spec
 
 ## ensure, that all  grafx get into the dist
 dist-hook:
 	mkdir -p $(distdir)/data
-	mkdir -p $(distdir)/textures
 	mkdir -p $(distdir)/scripts
 	cp -f data/*.bmp $(distdir)/data
 	cp -f data/*.cal $(distdir)/data

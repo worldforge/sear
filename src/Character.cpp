@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.17 2002-10-21 20:09:59 simon Exp $
+// $Id: Character.cpp,v 1.18 2002-11-12 23:59:22 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -36,6 +36,9 @@
 #else
   static const bool debug = false;
 #endif
+
+static const std::string CHARACTER = "character";
+  
 namespace Sear {
 
 Character::Character(WorldEntity *self, System *system) :
@@ -68,6 +71,7 @@ bool Character::init() {
     return false;
   }
   readConfig();
+  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
   _orient = _self->getOrientation();
   divisor = sqrt(square(_orient.vector().x()) + square(_orient.vector().y()) + square(_orient.vector().z()));
   zaxis = (divisor != 0.0f) ? (_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
@@ -277,28 +281,20 @@ void Character::toggleRunModifier() {
 
 void Character::readConfig() {
   varconf::Variable temp;
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-    return;
-  }
-  temp = general->getItem("character", KEY_character_walk_speed);
+  varconf::Config &general = _system->getGeneral();
+  temp = general.getItem("character", KEY_character_walk_speed);
   _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
-  temp = general->getItem("character", KEY_character_run_speed);
+  temp = general.getItem("character", KEY_character_run_speed);
   _run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
-  temp = general->getItem("character", KEY_character_rotate_speed);
+  temp = general.getItem("character", KEY_character_rotate_speed);
   _rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
 }
 
 void Character::writeConfig() {
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-    return;
-  }
-  general->setItem("character", KEY_character_walk_speed, _walk_speed);
-  general->setItem("character", KEY_character_run_speed, _run_speed);
-  general->setItem("character", KEY_character_rotate_speed, _rotate_speed);
+  varconf::Config &general = _system->getGeneral();
+  general.setItem("character", KEY_character_walk_speed, _walk_speed);
+  general.setItem("character", KEY_character_run_speed, _run_speed);
+  general.setItem("character", KEY_character_rotate_speed, _rotate_speed);
 }
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {
@@ -407,6 +403,24 @@ void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
 //  if (entity2) cout << "Entity2: " << entity2->getType()->getName() << endl;
   if (entity2) {
     System::instance()->getActionHandler()->handleAction(std::string("entering_") + entity2->getType()->getName(), NULL);
+  }
+}
+
+void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
+  varconf::Variable temp;
+  if (section == CHARACTER) {
+    if (key == KEY_character_walk_speed) {
+      temp = config.getItem(CHARACTER, KEY_character_walk_speed);
+      _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
+    }
+    else if (key == KEY_character_run_speed) {
+      temp = config.getItem(CHARACTER, KEY_character_run_speed);
+      _run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
+    }
+    else if (key == KEY_character_rotate_speed) {
+      temp = config.getItem(CHARACTER, KEY_character_rotate_speed);
+      _rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
+    }
   }
 }
 

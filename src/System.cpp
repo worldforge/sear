@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.44 2002-10-29 18:00:07 simon Exp $
+// $Id: System.cpp,v 1.45 2002-11-12 23:59:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include "sear_icon.xpm"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,6 +54,9 @@
 #else
   static const bool debug = false;
 #endif
+
+static const std::string SYSTEM = "system";
+  
 namespace Sear {
 
 System *System::_instance = NULL;
@@ -88,11 +92,6 @@ System::System() :
   _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
-  _general(NULL),
-  _textures(NULL),
-  _models(NULL),
-  _model_records(NULL),
-  _object_records(NULL),
   _console(NULL),
   _character(NULL),
   _seconds_per_day(60.0f * 60.0f * 24.0f),
@@ -183,21 +182,16 @@ bool System::init() {
   _object_handler = new ObjectHandler();
   _object_handler->init();
   
-  _general = new varconf::Config();
-  _textures = new varconf::Config();
-  _models = new varconf::Config();
-  _model_records = new varconf::Config();
-
-  _general->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _textures->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _models->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _model_records->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _textures.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
   
-  _general->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _textures->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _models->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _model_records->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _textures.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
   
@@ -226,6 +220,7 @@ bool System::init() {
     _script_engine->runScript(*I);
   }
   readConfig();
+  _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   _system_running = true;
 
   
@@ -273,22 +268,6 @@ void System::shutdown() {
   }
   Bindings::shutdown();
 
-  if (_general) {
-    delete _general;
-    _general = NULL;
-  }          
-  if (_textures) {
-    delete _textures;
-    _textures = NULL;
-  }          
-  if (_models) {
-    delete _models;
-    _models = NULL;
-  }
-  if (_model_records) {
-    delete _model_records;
-    _model_records = NULL;
-  }
   if (_model_handler) {
     _model_handler->shutdown();
     delete _model_handler;
@@ -403,13 +382,13 @@ void System::createWindow(bool fullscreen) {
   }
 
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
-  if (value < 1) _general->setItem("render_options", "use_stencil_buffer", false);
+  if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
   
  
-  if (!_icon) _icon = loadImage(_icon_file);
+  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);//loadImage(_icon_file);
   // Should set the icon transparency but it does not work.
   if (_icon) {
-    if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGB(_icon->format, 0x0, 0x0, 0x0)) == -1) {
+    if (SDL_SetColorKey(_icon, SDL_SRCCOLORKEY, SDL_MapRGBA(_icon->format, 0x0, 0x0, 0x0, 0xFF)) == -1) {
       Log::writeLog("ERROR icon setting transparency", Log::LOG_ERROR);
     }
     SDL_WM_SetIcon(_icon, NULL);
@@ -727,57 +706,49 @@ void System::setCharacter(Character *character) {
 
 void System::readConfig() {
   varconf::Variable temp;
-  if (!_general) {
-    Log::writeLog("System: Error - General config object not created", Log::LOG_ERROR);
-    return;
-  }
-  temp = _general->getItem("general", KEY_dawn_time);
+  temp = _general.getItem(SYSTEM, KEY_dawn_time);
   _dawn_time = (!temp.is_double()) ? (DEFAULT_dawn_time) : ((double)temp);
-  temp = _general->getItem("general", KEY_day_time);
+  temp = _general.getItem(SYSTEM, KEY_day_time);
   _day_time = (!temp.is_double()) ? (DEFAULT_day_time) : ((double)temp);
-  temp = _general->getItem("general", KEY_dusk_time);
+  temp = _general.getItem(SYSTEM, KEY_dusk_time);
   _dusk_time = (!temp.is_double()) ? (DEFAULT_dusk_time) : ((double)temp);
-  temp = _general->getItem("general", KEY_night_time);
+  temp = _general.getItem(SYSTEM, KEY_night_time);
   _night_time = (!temp.is_double()) ? (DEFAULT_night_time) : ((double)temp);
 
-  temp = _general->getItem("general", KEY_seconds_per_minute);
+  temp = _general.getItem(SYSTEM, KEY_seconds_per_minute);
   _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
-  temp = _general->getItem("general", KEY_minutes_per_hour);
+  temp = _general.getItem(SYSTEM, KEY_minutes_per_hour);
   _minutes_per_hour = (!temp.is_double()) ? (DEFAULT_minutes_per_hour) : ((double)temp);
-  temp = _general->getItem("general", KEY_hours_per_day);
+  temp = _general.getItem(SYSTEM, KEY_hours_per_day);
   _hours_per_day = (!temp.is_double()) ? (DEFAULT_hours_per_day) : ((double)temp);
 
   _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
   
-  _icon_file = _general->getItem("general", KEY_icon_file);
+  _icon_file = _general.getItem(SYSTEM, KEY_icon_file);
   
-  temp = _general->getItem("general", KEY_mouse_move_select);
+  temp = _general.getItem(SYSTEM, KEY_mouse_move_select);
   _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
 
-  temp = _general->getItem("general", KEY_window_width);
+  temp = _general.getItem(SYSTEM, KEY_window_width);
   _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
-  temp = _general->getItem("general", KEY_window_height);
+  temp = _general.getItem(SYSTEM, KEY_window_height);
   _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
 }
 
 void System::writeConfig() {
-  if (!_general) {
-    Log::writeLog("System: Error- General config object not created", Log::LOG_ERROR);
-    return;
-  }
-  _general->setItem("general", KEY_dawn_time, _dawn_time);
-  _general->setItem("general", KEY_day_time, _day_time);
-  _general->setItem("general", KEY_dusk_time, _dusk_time);
-  _general->setItem("general", KEY_night_time, _night_time);
+  _general.setItem(SYSTEM, KEY_dawn_time, _dawn_time);
+  _general.setItem(SYSTEM, KEY_day_time, _day_time);
+  _general.setItem(SYSTEM, KEY_dusk_time, _dusk_time);
+  _general.setItem(SYSTEM, KEY_night_time, _night_time);
   
-  _general->setItem("general", KEY_seconds_per_minute, _seconds_per_minute);
-  _general->setItem("general", KEY_minutes_per_hour, _minutes_per_hour);
-  _general->setItem("general", KEY_hours_per_day, _hours_per_day);
+  _general.setItem(SYSTEM, KEY_seconds_per_minute, _seconds_per_minute);
+  _general.setItem(SYSTEM, KEY_minutes_per_hour, _minutes_per_hour);
+  _general.setItem(SYSTEM, KEY_hours_per_day, _hours_per_day);
   
-  _general->setItem("general", KEY_mouse_move_select,  _mouse_move_select);
+  _general.setItem(SYSTEM, KEY_mouse_move_select,  _mouse_move_select);
 
-  _general->setItem("general", KEY_window_width, _width);
-  _general->setItem("general", KEY_window_height, _height);
+  _general.setItem(SYSTEM, KEY_window_width, _width);
+  _general.setItem(SYSTEM, KEY_window_height, _height);
   
 }
 
@@ -874,66 +845,54 @@ void System::runCommand(const std::string &command, const std::string &args) {
   else if (command == GET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.remainingTokens();
-    if (_general) pushMessage(_general->getItem(section, key), CONSOLE_MESSAGE);
+     pushMessage(_general.getItem(section, key), CONSOLE_MESSAGE);
   }
   else if (command == SET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
-    if (_general) _general->setItem(section, key, value);
+    _general.setItem(section, key, value);
   }
   else if (command == LOAD_STATE_FILE) {
     if (_state_loader) _state_loader->readFiles(processHome(args));
   }
   else if (command == LOAD_GENERAL_CONFIG) {
-    if (_general) {
-      _process_records = _script_engine->prefixEnabled();
-      _general->readFromFile(processHome(args));
-      if (_process_records) {
-        _process_records = false;
-        processRecords();
-      }
+    _process_records = _script_engine->prefixEnabled();
+    _general.readFromFile(processHome(args));
+    if (_process_records) {
+      _process_records = false;
+      processRecords();
     }
   }
   else if (command == LOAD_MODEL_RECORDS) {
-    if (_model_records) {
-      _process_records = _script_engine->prefixEnabled();
-      _model_records->readFromFile(processHome(args));
-      if (_process_records) {
-        _process_records = false;
-        processRecords();
-      }
-    } else {
-      std::cerr << "no model records" << std::endl;
+    _process_records = _script_engine->prefixEnabled();
+    _model_records.readFromFile(processHome(args));
+    if (_process_records) {
+      _process_records = false;
+      processRecords();
     }
   }
   else if (command == LOAD_TEXTURE_CONFIG) {
-    if (_textures) {
-      _process_records = _script_engine->prefixEnabled();
-      _textures->readFromFile(processHome(args));
-      if (_process_records) {
-        _process_records = false;
-        processRecords();
-      }
+    _process_records = _script_engine->prefixEnabled();
+    _textures.readFromFile(processHome(args));
+    if (_process_records) {
+      _process_records = false;
+      processRecords();
     }
   }
   else if (command == LOAD_MODEL_CONFIG) {
-    if (_models) {
-      _process_records = _script_engine->prefixEnabled();
-      _models->readFromFile(processHome(args));
-      if (_process_records) {
-        _process_records = false;
-        processRecords();
-      }
+    _process_records = _script_engine->prefixEnabled();
+    _models.readFromFile(processHome(args));
+    if (_process_records) {
+      _process_records = false;
+      processRecords();
     }
   }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(processHome(args));
   }
   else if (command == SAVE_GENERAL_CONFIG) {
-    if (_general) {
-      _general->writeToFile(processHome(args));
-    }
+    _general.writeToFile(processHome(args));
   }
   else if (command == SAVE_KEY_BINDINGS) {
     Bindings::saveBindings(processHome(args));
@@ -1029,5 +988,57 @@ void System::addSearchPaths(std::list<std::string> l) {
     additional_paths.push_back(*I);
   }
 }
-        
+
+
+void System::varconf_general_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  varconf::Variable temp;
+  if (section == SYSTEM) {
+    if (key == KEY_dawn_time) {
+      temp = config.getItem(SYSTEM, KEY_dawn_time);
+      _dawn_time = (!temp.is_double()) ? (DEFAULT_dawn_time) : ((double)temp);
+    }
+    else if (key == KEY_day_time) {
+      temp = config.getItem(SYSTEM, KEY_day_time);
+      _day_time = (!temp.is_double()) ? (DEFAULT_day_time) : ((double)temp);
+    }
+    else if (key == KEY_dusk_time) {
+      temp = config.getItem(SYSTEM, KEY_dusk_time);
+      _dusk_time = (!temp.is_double()) ? (DEFAULT_dusk_time) : ((double)temp);
+    }
+    else if (key == KEY_night_time) {
+      temp = config.getItem(SYSTEM, KEY_night_time);
+      _night_time = (!temp.is_double()) ? (DEFAULT_night_time) : ((double)temp);
+    }
+    else if (key == KEY_seconds_per_minute) {
+      temp = config.getItem(SYSTEM, KEY_seconds_per_minute);
+      _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
+      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
+    }
+    else if (key == KEY_minutes_per_hour) {
+      temp = config.getItem(SYSTEM, KEY_minutes_per_hour);
+      _minutes_per_hour = (!temp.is_double()) ? (DEFAULT_minutes_per_hour) : ((double)temp);
+      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
+    }
+    else if (key == KEY_hours_per_day) {
+      temp = config.getItem(SYSTEM, KEY_hours_per_day);
+      _hours_per_day = (!temp.is_double()) ? (DEFAULT_hours_per_day) : ((double)temp);
+      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
+    }
+    else if (key == KEY_icon_file) {
+      _icon_file = config.getItem(SYSTEM, KEY_icon_file);
+    }
+    else if (key ==  KEY_mouse_move_select) {
+      temp = config.getItem(SYSTEM, KEY_mouse_move_select);
+      _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
+    }
+    else if (key == KEY_window_width) {
+      temp = config.getItem(SYSTEM, KEY_window_width);
+      _width = (!temp.is_int()) ? (DEFAULT_window_width) : ((int)temp);
+    }
+    else if (key == KEY_window_height) {
+      temp = config.getItem(SYSTEM, KEY_window_height);
+      _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
+    }
+  }
+}       
 } /* namespace Sear */

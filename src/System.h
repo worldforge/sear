@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.22 2002-10-20 13:22:26 simon Exp $
+// $Id: System.h,v 1.23 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -14,10 +14,12 @@
 #include <sigc++/object_slot.h>
 
 #include "ConsoleObject.h"
+#include <varconf/Config.h>
 
-namespace varconf {
-  class Config;
-}
+
+//namespace varconf {
+//  class Config;
+//}
 
 namespace Sear {
 class ActionHandler;
@@ -86,12 +88,11 @@ public:
 //  Render *getRenderer() const { return renderer; }
   Graphics *getGraphics() const { return _graphics; }
   
-  varconf::Config *getGeneral() { return _general; }
-  varconf::Config *getTexture() { return _textures; }
-  varconf::Config *getModel() { return _models; } 
-  
-  varconf::Config *getModelRecords() { return _model_records; }
-  varconf::Config *getObjectRecords() { return _object_records; }
+  varconf::Config &getGeneral() { return _general; }
+  varconf::Config &getTexture() { return _textures; }
+  varconf::Config &getModel() { return _models; } 
+  varconf::Config &getModelRecords() { return _model_records; }
+  varconf::Config &getObjectRecords() { return _object_records; }
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
   StateLoader *getStateLoader() const { return _state_loader; }
@@ -173,12 +174,12 @@ protected:
   static const std::string STARTUP_SCRIPT;
   static const std::string SHUTDOWN_SCRIPT;
  
-  varconf::Config *_general;
-  varconf::Config *_textures;
-  varconf::Config *_models;
+  varconf::Config _general;
+  varconf::Config _textures;
+  varconf::Config _models;
 
-  varconf::Config *_model_records;
-  varconf::Config *_object_records;
+  varconf::Config _model_records;
+  varconf::Config _object_records;
   
   Console *_console;
   Character *_character;
@@ -253,6 +254,7 @@ protected:
   Sound *sound;
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
+  void varconf_general_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);
   
 private:

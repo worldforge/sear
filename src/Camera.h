@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.7 2002-10-20 15:50:27 simon Exp $
+// $Id: Camera.h,v 1.8 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -17,14 +17,18 @@
  */ 
 
 #include <string>
-
+#include <sigc++/object_slot.h>
 #include "ConsoleObject.h"
+
+namespace varconf {
+  class Config;
+}
 
 namespace Sear {
 
 class Console;
 	
-class Camera : public ConsoleObject{
+class Camera : public ConsoleObject, public SigC::Object {
 public:
   Camera();
   ~Camera();
@@ -44,9 +48,13 @@ public:
   void elevate(int dir) { _elevation_dir += dir; }
 
   // Accessor functions
-  const float getRotation()  { return _rotation;  }
-  const float getElevation() { return _elevation; }
-  const float getDistance() { return _distance; }
+  const float getRotation() const { return _rotation;  }
+  const float getElevation() const { return _elevation; }
+  const float getDistance() const { return _distance; }
+
+  float getXPos() const { return _x_pos; }
+  float getYPos() const { return _y_pos; }
+  float getZPos() const { return _z_pos; }
 
   void readConfig();
   void writeConfig();
@@ -55,6 +63,7 @@ public:
   void runCommand(const std::string &command, const std::string &args);
   
 protected:
+   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
   // General key values
   const static char * const KEY_camera_distance = "camera_distance";
   const static char * const KEY_camera_rotation = "camera_rotation";
@@ -106,6 +115,10 @@ protected:
 
   float _min_distance; // Minimum camera distance allowed
   float _max_distance; // Maximum camera distance allowed
+
+  float _x_pos;
+  float _y_pos;
+  float _z_pos;
 
   bool _initialised;
 };

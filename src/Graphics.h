@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.7 2002-10-20 13:22:26 simon Exp $
+// $Id: Graphics.h,v 1.8 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -11,6 +11,8 @@
 #include <list>
 #include <map>
 
+#include <sigc++/object_slot.h>
+
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 
@@ -18,6 +20,10 @@
 #include "src/ConsoleObject.h"
 
 //#include "gui/ServerGui.h"
+namespace varconf {
+class Config;
+
+}
 
 namespace Sear {
 
@@ -36,7 +42,7 @@ class Console;
 
 class ServerGui;
 
-class Graphics :public ConsoleObject{
+class Graphics : public ConsoleObject, public SigC::Object{
 
 public:
 
@@ -135,6 +141,8 @@ protected:
 
   float frustum[6][4];
   bool _initialised;
+  
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   
 private:
   // Consts

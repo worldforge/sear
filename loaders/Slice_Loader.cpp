@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Slice_Loader.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
+// $Id: Slice_Loader.cpp,v 1.9 2002-11-12 23:59:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -35,15 +35,8 @@ Slice_Loader::~Slice_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *Slice_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+ModelRecord *Slice_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
- // ModelRecord *model_record = new ModelRecord();
- 
-//  model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);
-//  model_record->state = model_config->getItem(model_id, ModelRecord::STATE);
-//  model_record->select_state = model_config->getItem(model_id, ModelRecord::SELECT_STATE);
-//  model_record->model_by_type = model_config->getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-  //model_record->outline =  model_config->getItem(model_id, ModelRecord::OUTLINE);
   Slice *model = new Slice(render);
 
 //  std::string type = ms.type;
@@ -57,10 +50,10 @@ ModelRecord *Slice_Loader::loadModel(Render *render, ObjectRecord *record, const
 //
 //  }
   std::string type = record->type;
-  float width =  (double)model_config->getItem(model_id, "width");
-  float height =  (double)model_config->getItem(model_id, "height");
-  int num_slices = (int)model_config->getItem(model_id, "num_slices");
-  int slices_per_slicing = (int)model_config->getItem(model_id, "sliced_per_slicing");
+  float width =  (double)model_config.getItem(model_id, "width");
+  float height =  (double)model_config.getItem(model_id, "height");
+  int num_slices = (int)model_config.getItem(model_id, "num_slices");
+  int slices_per_slicing = (int)model_config.getItem(model_id, "sliced_per_slicing");
   if (!model->init(type, width, height, num_slices, slices_per_slicing)) {
     model->shutdown();
     delete model;

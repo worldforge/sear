@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.7 2002-09-08 00:24:54 simon Exp $
+// $Id: ROAM.h,v 1.8 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -12,13 +12,19 @@
 //#include <stdlib.h>
 //#include "Landscape.h"
 
+#include <sigc++/object_slot.h>
+
+namespace varconf {
+class Config;
+}
+
 namespace Sear {
 
 class Landscape;
 class System;
 class Render;
 
-class ROAM : public Terrain {
+class ROAM : public Terrain, public SigC::Object {
 
 public:
   ROAM(System *system, Render *renderer);
@@ -75,6 +81,7 @@ protected:
   System *_system;
   Render *_renderer;
   bool _initialised;
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 };
 
 } /* namespace Sear */

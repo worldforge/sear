@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.20 2002-10-24 09:24:49 simon Exp $
+// $Id: Graphics.cpp,v 1.21 2002-11-12 23:59:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -70,6 +70,8 @@
 
 namespace Sear {
 
+static const std::string GRAPHICS = "graphics";
+	
 static std::string DEFAULT = "default";
 static std::string FONT = "font";
 static std::string STATE = "state";
@@ -96,6 +98,7 @@ Graphics::~Graphics() {
 void Graphics::init() {
   if (_initialised) shutdown();
   readConfig();
+  _system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
   _renderer = new GL(_system, this);
   _renderer->init();
   _terrain = new ROAM(_system, _renderer);
@@ -373,10 +376,10 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
           if (!select_mode) {
-	    render_queue[_system->getModelRecords()->getItem(*I, STATE)].push_back(Render::QueueItem(object_record, *I));
+	    render_queue[_system->getModelRecords().getItem(*I, STATE)].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }
-          else render_queue[_system->getModelRecords()->getItem(*I, SELECT)].push_back(Render::QueueItem(object_record, *I));
+          else render_queue[_system->getModelRecords().getItem(*I, SELECT)].push_back(Render::QueueItem(object_record, *I));
 	}
       }
       if (object_record->draw_members) {
@@ -390,31 +393,22 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 
 void Graphics::readConfig() {
   varconf::Variable temp;
-  varconf::Config *general = _system->getGeneral();
-  if (debug) Log::writeLog("Loading Graphics Config", Log::LOG_DEFAULT);
-  if (!general) {
-    Log::writeLog("Graphics: Error - General config object does not exist!", Log::LOG_ERROR);
-    return;
-  }
+  varconf::Config &general = _system->getGeneral();
 
   // Setup frame rate detail boundaries
-  temp = general->getItem("graphics", KEY_lower_frame_rate_bound);
+  temp = general.getItem("graphics", KEY_lower_frame_rate_bound);
   _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
-  temp = general->getItem("graphics", KEY_upper_frame_rate_bound);
+  temp = general.getItem("graphics", KEY_upper_frame_rate_bound);
   _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
   
 }  
 
 void Graphics::writeConfig() {
-  varconf::Config *general = _system->getGeneral();
-  if (!general) {
-    Log::writeLog("Graphics: Error - General config object does not exist!", Log::LOG_ERROR);
-    return;
-  }
+  varconf::Config &general = _system->getGeneral();
   
   // Save frame rate detail boundaries
-  general->setItem("graphics", KEY_lower_frame_rate_bound, _lower_frame_rate_bound);
-  general->setItem("graphics", KEY_upper_frame_rate_bound, _upper_frame_rate_bound);
+  general.setItem("graphics", KEY_lower_frame_rate_bound, _lower_frame_rate_bound);
+  general.setItem("graphics", KEY_upper_frame_rate_bound, _upper_frame_rate_bound);
 }  
 
 void Graphics::readComponentConfig() {
@@ -457,6 +451,20 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
     else if (args == "character") render_mode = CHARACTER;
     else if (args == "inventory") render_mode = INVENTORY;
     else if (args == "world") render_mode = WORLD;
+  }
+}
+
+void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  varconf::Variable temp;
+  if (section == GRAPHICS) {
+    if (key == KEY_lower_frame_rate_bound) {
+      temp = config.getItem(GRAPHICS, KEY_lower_frame_rate_bound);
+      _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
+    }
+    else if (key == KEY_upper_frame_rate_bound) {
+      temp = config.getItem(GRAPHICS, KEY_upper_frame_rate_bound);
+      _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
+    }
   }
 }
 

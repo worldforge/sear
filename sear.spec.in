@@ -27,7 +27,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %setup -q 
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix}  --localstatedir=%{_localstatedir}
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{prefix}  --localstatedir=%{_localstatedir}
 make
 
 %install
@@ -40,8 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{prefix}/share/%{name}/*
-%{prefix}/bin/sear
-%{prefix}/bin/model_viewer
+%{prefix}/bin/*
 %doc README COPYING AUTHORS
 
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.13 2002-10-21 20:12:04 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.14 2002-11-12 23:59:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -35,14 +35,8 @@ NPlane_Loader::~NPlane_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *NPlane_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+ModelRecord *NPlane_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-//  ModelRecord *model_record = new ModelRecord();
-//  model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);
-//  model_record->state = model_config->getItem(model_id, ModelRecord::STATE);
-//  model_record->select_state = model_config->getItem(model_id, ModelRecord::SELECT_STATE);
-//  model_record->model_by_type = model_config->getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-//  model_record->outline =  model_config->getItem(model_id, ModelRecord::OUTLINE);
   NPlane *model = new NPlane(render);
 
 //  std::string type = ms.type;
@@ -56,9 +50,9 @@ ModelRecord *NPlane_Loader::loadModel(Render *render, ObjectRecord *record, cons
 
 //  }
   std::string type = record->type;
-  float width =  (double)model_config->getItem(model_id, "width");
-  float height =  (double)model_config->getItem(model_id, "height");
-  int num_planes = (int)model_config->getItem(model_id, "num_planes");
+  float width =  (double)model_config.getItem(model_id, "width");
+  float height =  (double)model_config.getItem(model_id, "height");
+  int num_planes = (int)model_config.getItem(model_id, "num_planes");
   if (!model->init(type, num_planes, width, height)) {
     model->shutdown();
     delete model;

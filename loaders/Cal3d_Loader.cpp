@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.12 2002-10-21 20:12:04 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.13 2002-11-12 23:59:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -30,20 +30,14 @@ Cal3d_Loader::Cal3d_Loader(ModelHandler *mh) {
 Cal3d_Loader::~Cal3d_Loader() {
   // TODO: Add ability to unregister loader.
 }
-ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-//  ModelRecord *model_record = new ModelRecord();
-//  model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);
-//  model_record->state = model_config->getItem(model_id, ModelRecord::STATE);
-//  model_record->select_state = model_config->getItem(model_id, ModelRecord::SELECT_STATE);
-//  model_record->model_by_type = model_config->getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-//  model_record->outline =  model_config->getItem(model_id, ModelRecord::OUTLINE);
   Cal3d *model = new Cal3d(render);
   float height = 1.0f;
 //  if (ms.hasBBox) {
     height = abs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
 //  }
-  std::string file_name = System::instance()->getModel()->getItem(CAL3D, model_record->data_file_id);
+  std::string file_name = System::instance()->getModel().getItem(CAL3D, model_record->data_file_id);
   if (!model->init(file_name, height)) {
     model->shutdown();
     delete (model);

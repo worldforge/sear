@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.12 2002-10-21 20:09:59 simon Exp $
+// $Id: Event.cpp,v 1.13 2002-11-12 23:59:22 simon Exp $
 
 #include "System.h"
 #include <string>
@@ -74,11 +74,6 @@ void Event::doEvent() {
     case (EF_UPDATE_CHAR_ROTATE): {
       System::instance()->getCharacter()->rotate(Character::CMD_modifier);
       break;      
-    }
-    case (EF_FREE_MODEL): {
-      System::instance()->getModelHandler()->checkModelTimeout(std::string((char *)_target));
-      free(_target);
-      break;
     }
     case (EF_FREE_MODELS): {
       System::instance()->getModelHandler()->checkModelTimeouts();

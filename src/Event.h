@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.h,v 1.5 2002-10-20 13:22:26 simon Exp $
+// $Id: Event.h,v 1.6 2002-11-12 23:59:22 simon Exp $
 
 #ifndef SEAR_EVENT_H
 #define SEAR_EVENT_H 1
@@ -17,7 +17,6 @@ typedef enum {
   EF_RUN_COMMAND,
   EF_HANDLE_MOVE,
   EF_UPDATE_CHAR_ROTATE,
-  EF_FREE_MODEL,
   EF_FREE_MODELS
 } EventFunction;
 
