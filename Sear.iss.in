@@ -31,27 +31,34 @@ Source: "AUTHORS"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "jpeg.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "libpng1.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "models.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "states.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "object_file.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "buildings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "media.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "Readme.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "SDL.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "SDL_image.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "SDL_mixer.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
 Source: "data\*.png"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "data\*.cal"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
 Source: "data\*.bmp"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
-Source: "cal3d_data\cally\*.*"; DestDir: "{app}\cal3d_data\cally"; CopyMode: alwaysoverwrite
-Source: "cal3d_data\paladin\*.*"; DestDir: "{app}\cal3d_data\paladin"; CopyMode: alwaysoverwrite
-Source: "cal3d_data\skeleton\*.*"; DestDir: "{app}\cal3d_data\skeleton"; CopyMode: alwaysoverwrite
-Source: "sear_media\*.*"; DestDir: "{app}\sear_media"; CopyMode: alwaysoverwriteSource: "sear_media\billboards\*.*"; DestDir: "{app}\sear_media\billboards"; CopyMode: alwaysoverwrite
-Source: "sear_media\boundbox\*.*"; DestDir: "{app}\sear_media\boundbox"; CopyMode: alwaysoverwrite
-Source: "sear_media\impostors\*.*"; DestDir: "{app}\sear_media\impostors"; CopyMode: alwaysoverwrite
-Source: "sear_media\skybox\*.*"; DestDir: "{app}\sear_media\skybox"; CopyMode: alwaysoverwrite
-Source: "sear_media\terrain\*.*"; DestDir: "{app}\sear_media\terrain"; CopyMode: alwaysoverwrite
-Source: "sear_media\ui\*.*"; DestDir: "{app}\sear_media\ui"; CopyMode: alwaysoverwrite
-Source: "sear_media\water\*.*"; DestDir: "{app}\sear_media\water"; CopyMode: alwaysoverwrite
-
+Source: "sear-media-@SEAR_VERSION@\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\billboards\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\billboards"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\boundbox\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\boundbox"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\impostors\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\impostors"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\skybox\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\skybox"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\terrain\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\terrain"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\ui\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\ui"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\water\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\water"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\cally\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\cally"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\lumber\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\lumber"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\paladin\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\paladin"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\pig\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\pig"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\malebuilder\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\malebuilder"; CopyMode: alwaysoverwrite
+Source: "sear-media-@SEAR_VERSION@\objects\skeleton\*.*"; DestDir: "{app}\sear-media-@SEAR_VERSION@\objects\skeleton"; CopyMode: alwaysoverwrite
 
 [INI]
+
 Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.worldforge.org/dev/eng/clients/sear"
 
 [Icons]
