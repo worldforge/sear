@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.52 2002-12-24 18:08:17 simon Exp $
+// $Id: System.cpp,v 1.53 2002-12-24 18:17:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,7 +38,6 @@
 #include "Graphics.h"
 #include "ModelHandler.h"
 #include "ObjectHandler.h"
-//#include "ObjectLoader.h"
 #include "Render.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
@@ -56,6 +55,7 @@
   static const bool debug = false;
 #endif
 
+// Config section keyword
 static const std::string SYSTEM = "system";
   
 namespace Sear {
@@ -87,15 +87,10 @@ System::System() :
   _calendar(NULL),
   _console(NULL),
   _character(NULL),
-  _seconds_per_day(60.0f * 60.0f * 24.0f),
-  _seconds_per_minute(60.0f),
-  _minutes_per_hour(60.0f),
-  _hours_per_day(24.0f),
   _cursor_default(NULL),
   _cursor_pickup(NULL),
   _cursor_touch(NULL),
   _mouse_move_select(false),
-  _current_time(0.0f),
   _seconds(0.0f),
   _process_records(false),
   sound(NULL),
@@ -172,13 +167,14 @@ bool System::init() {
  
   _calendar = new Calendar();
   _calendar->init();
-  
+ 
+  // Connect signals for record processing 
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _textures.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
-  
+  // Connect signals for error messages
   _general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _textures.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
@@ -211,13 +207,10 @@ bool System::init() {
     _script_engine->runScript(*I);
   }
   readConfig();
-
-  
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
-  _system_running = true;
-
   
   _command_history_iterator = _command_history.begin();
+  _system_running = true;
   _initialised = true;
   return true;
 }
@@ -414,23 +407,21 @@ void System::mainLoop() {
   _action_handler->handleAction("system_start", NULL);
   while (_system_running) {
     try {
-      float time_elapsed;
-      // This means Sear needs to be restarted for any time changes to take place
-      static float divisor = _seconds_per_minute * _minutes_per_hour;
       _seconds = (float)SDL_GetTicks() / 1000.0f;
-      time_elapsed = _seconds - last_time;
-      _current_time += time_elapsed / divisor;
+      float time_elapsed = _seconds - last_time;
       last_time = _seconds;
-      while (_current_time > _hours_per_day) _current_time -= _hours_per_day;
-      //_current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
+      // Update Calendar
       _calendar->update(time_elapsed);
+      // Poll event handler
       _event_handler->poll();
+      // poll network
       _client->poll();
+      // draw scene
       _graphics->drawScene(command, false, time_elapsed);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
@@ -572,6 +563,7 @@ void System::handleEvents(const SDL_Event &event) {
 }
 
 void System::setCaption(const std::string &title, const std::string &icon) {
+  // Set window and icon title
   SDL_WM_SetCaption(title.c_str(), icon.c_str());
 }
 
@@ -675,7 +667,7 @@ void System::setCharacter(Character *character) {
     _character = NULL;
   }
   _character = character;
-  // Assuming init has no bee performed
+  // Assuming init has not been performed
   _character->init();
   _character->registerCommands(_console);
 }
@@ -683,17 +675,6 @@ void System::setCharacter(Character *character) {
 void System::readConfig() {
   varconf::Variable temp;
 
-  temp = _general.getItem(SYSTEM, KEY_seconds_per_minute);
-  _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
-  temp = _general.getItem(SYSTEM, KEY_minutes_per_hour);
-  _minutes_per_hour = (!temp.is_double()) ? (DEFAULT_minutes_per_hour) : ((double)temp);
-  temp = _general.getItem(SYSTEM, KEY_hours_per_day);
-  _hours_per_day = (!temp.is_double()) ? (DEFAULT_hours_per_day) : ((double)temp);
-
-  _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
-  
-  _icon_file = _general.getItem(SYSTEM, KEY_icon_file);
-  
   temp = _general.getItem(SYSTEM, KEY_mouse_move_select);
   _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
 
@@ -704,10 +685,6 @@ void System::readConfig() {
 }
 
 void System::writeConfig() {
-  _general.setItem(SYSTEM, KEY_seconds_per_minute, _seconds_per_minute);
-  _general.setItem(SYSTEM, KEY_minutes_per_hour, _minutes_per_hour);
-  _general.setItem(SYSTEM, KEY_hours_per_day, _hours_per_day);
-  
   _general.setItem(SYSTEM, KEY_mouse_move_select,  _mouse_move_select);
 
   _general.setItem(SYSTEM, KEY_window_width, _width);
@@ -939,25 +916,7 @@ void System::addSearchPaths(std::list<std::string> l) {
 void System::varconf_general_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   varconf::Variable temp;
   if (section == SYSTEM) {
-    if (key == KEY_seconds_per_minute) {
-      temp = config.getItem(SYSTEM, KEY_seconds_per_minute);
-      _seconds_per_minute = (!temp.is_double()) ? (DEFAULT_seconds_per_minute) : ((double)temp);
-      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
-    }
-    else if (key == KEY_minutes_per_hour) {
-      temp = config.getItem(SYSTEM, KEY_minutes_per_hour);
-      _minutes_per_hour = (!temp.is_double()) ? (DEFAULT_minutes_per_hour) : ((double)temp);
-      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
-    }
-    else if (key == KEY_hours_per_day) {
-      temp = config.getItem(SYSTEM, KEY_hours_per_day);
-      _hours_per_day = (!temp.is_double()) ? (DEFAULT_hours_per_day) : ((double)temp);
-      _seconds_per_day = _seconds_per_minute * _minutes_per_hour * _hours_per_day;
-    }
-    else if (key == KEY_icon_file) {
-      _icon_file = config.getItem(SYSTEM, KEY_icon_file);
-    }
-    else if (key ==  KEY_mouse_move_select) {
+    if (key ==  KEY_mouse_move_select) {
       temp = config.getItem(SYSTEM, KEY_mouse_move_select);
       _mouse_move_select =  (!temp.is_bool()) ? (DEFAULT_mouse_move_select) : ((bool)temp);
     }

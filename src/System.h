@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.26 2002-12-24 18:08:17 simon Exp $
+// $Id: System.h,v 1.27 2002-12-24 18:17:33 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -115,9 +115,6 @@ public:
   void switchCursor(int);
   void setAction(int);
  
- void setTimeOfDay(float time) { _current_time = time; }
- float getTimeOfDay() { return _current_time; }
-
   static const int MESSAGE_LIFE = 5000;
 
   void registerCommands(Console *);
@@ -172,14 +169,6 @@ protected:
  
   static SDL_Cursor *buildCursor(const char *image[]);
 	  
-  static const float DEFAULT_seconds_per_minute = 1.0f;
-  static const float DEFAULT_minutes_per_hour = 2.0f;
-  static const float DEFAULT_hours_per_day = 24.0f;
-  
-  static const char * const KEY_seconds_per_minute = "seconds_per_minute";
-  static const char * const KEY_minutes_per_hour = "minutes_per_hour";
-  static const char * const KEY_hours_per_day = "hours_per_day";
-  
   static const char * const KEY_icon_file = "iconfile";
   static const char * const KEY_mouse_move_select = "mouse_move_select";
   
@@ -193,11 +182,6 @@ protected:
   
   static const bool DEFAULT_mouse_move_select = true;
 
-  float _seconds_per_day;
-  float _seconds_per_minute;
-  float _minutes_per_hour;
-  float _hours_per_day;
- 
   void readConfig();
   void writeConfig();
   std::string install_path;  
@@ -209,7 +193,6 @@ protected:
 
   std::string _current_dir;
 
-  float _current_time;
   float _seconds;
 
   typedef struct {
@@ -257,8 +240,6 @@ private:
   static const char * const TOGGLE_FULLSCREEN = "toggle_fullscreen";
   static const char * const ADD_EVENT = "event";
   static const char * const IDENTIFY_ENTITY = "identify";
-  static const char * const GET_TIME = "get_time";
-  static const char * const SET_TIME = "set_time";
 };
 
 } /* namespace Sear */

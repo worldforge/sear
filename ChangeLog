@@ -1,4 +1,7 @@
 24th December 2002, Simon Goodall
+ * Removed remainder of time code from System object
+
+24th December 2002, Simon Goodall
  * Converted render to use new light object
  * Moved time area functionality to Calendar
 
