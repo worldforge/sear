@@ -1,3 +1,7 @@
+2004-09-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/WorldEntity.cpp: Fix direction of orientation calculation.
+
 2004-09-24  James Turner  <james@worldforge.org>
 
 	* src/WorldEntity.cpp, src/WorldEntity.h: change how absolute entity
@@ -7,9 +11,9 @@
 
 2004-07-29  Simon Goodall  <simon@simongoodall.co.uk>
 
-        * common/Utility.cpp, common.Utility.h, renderer/GL.cpp, src/.cvsignore,
-          src/Console.cpp, src/Console.h, src/Graphics.cpp, src/Graphics.h,
-          src/System.cpp, src/System.h: Console autocomplete, improved line 
+	* common/Utility.cpp, common.Utility.h, renderer/GL.cpp, src/.cvsignore,
+	  src/Console.cpp, src/Console.h, src/Graphics.cpp, src/Graphics.h,
+	  src/System.cpp, src/System.h: Console autocomplete, improved line 
           editing and support for quotes by HagenM. Also key repeat delays are
           user configurable and command history is saved.
 

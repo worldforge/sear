@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.41 2004-09-24 21:25:02 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.42 2004-09-24 22:11:51 alriddoch Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -163,7 +163,7 @@ const WFMath::Point<3> WorldEntity::getAbsPos()
     if (!loc) return getPosition(); // nothing below makes sense for the world.
     
     WFMath::Point<3> absPos = loc->getAbsPos() + 
-        getInterpolatedPos().rotate(loc->getAbsOrient());
+        getInterpolatedPos().rotate(loc->getAbsOrient().inverse());
     
   // Set Z coord to terrain height if required
 
