@@ -1,4 +1,7 @@
 26th April 2003, Simon Goodall
+ * Now send out refnos with Atlas ops
+
+26th April 2003, Simon Goodall
  * Texture Manager class now uses default values for filters if they are not specified
 
 23rd April 2003, Simon Goodall
