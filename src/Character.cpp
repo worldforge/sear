@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.46 2004-06-28 20:14:20 alriddoch Exp $
+// $Id: Character.cpp,v 1.47 2004-06-30 18:50:16 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -327,7 +327,7 @@ void Character::wieldEntity(const std::string &name) {
     if (we->getName() == name) {
       Atlas::Objects::Operation::Wield w;
       w.setFrom(_self->getID());
-      Atlas::Message::MapType arg;
+      Atlas::Message::Element::MapType arg;
       arg["id"] = we->getID();
       Atlas::Message::Element::ListType & args = w.getArgs();
       args.push_back(arg);
@@ -343,7 +343,7 @@ void Character::useToolOnEntity(const std::string & id) {
   if (!e) return;
   Atlas::Objects::Operation::Use u;
   u.setFrom(_self->getID());
-  Atlas::Message::MapType arg;
+  Atlas::Message::Element::MapType arg;
   arg["id"] = e->getID();
   Atlas::Message::Element::ListType & args = u.getArgs();
   args.push_back(arg);

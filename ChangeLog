@@ -1,3 +1,8 @@
+2004-06-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Use old style Atlas Message typedefs to keep
+	  compatable with 0.4.93.
+
 2004-06-30  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp: Move sea level calculation out of loop (thanks to JohnFlux)
