@@ -36,6 +36,8 @@ if test $cross_compiling == no; then
   LIBS="$LIBS -L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib"
 fi
 
+CXXFLAGS="$CXXFLAGS -pedantic -ansi"
+
 dnl Test for C++ compiler
 
 AC_PROG_CXX
@@ -147,113 +149,14 @@ int main(int argc, char**argv) {
   AC_MSG_WARN(Not using sstream workaround.)
 ])
 
-dnl Check Atlas
-
-ATLAS_VERSION=0.4.5
-PKG_CHECK_MODULES(ATLAS, atlascpp-0.4 >= $ATLAS_VERSION,
-    [
-        CPPFLAGS="$CPPFLAGS $ATLAS_CFLAGS"
-        LDFLAGS="$LDFLAGS $ATLAS_LIBS"
-    ],
-    [
-        AM_PATH_ATLAS($ATLAS_VERSION, [
-                CPPFLAGS="$CPPFLAGS $ATLAS_CFLAGS"
-                LIBS="$LIBS $ATLAS_LIBS"
-	],
-                AC_MSG_ERROR(Couldn't find Atlas-C++ or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/Atlas-C++ and get at least version $ATLAS_VERSION)
-        )
-    ])
-AC_SUBST(ATLAS_VERSION)
-
-dnl Check skstream2
-SKSTREAM_VERSION=0.2.4
-PKG_CHECK_MODULES(SKSTREAM, skstream-0.2 >= $SKSTREAM_VERSION ,
-    [
-        CPPFLAGS="$CPPFLAGS $SKSTREAM_CFLAGS"
-        LDFLAGS="$LDFLAGS $SKSTREAM_LIBS"
-    ],
-    [
-        AM_PATH_SKSTREAM($SKSTREAM_VERSION, [
-                CPPFLAGS="$CPPFLAGS $SKSTREAM_CFLAGS"
-                LIBS="$LIBS $SKSTREAM_LIBS"],
-                AC_MSG_ERROR(Couldn't find Skstream2 or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/skstream and get at least version $SKSTREAM_VERSION)
-        )
-    ])
-if test $cross_compiling == yes; then
-  LIBS="$LIBS -lwsock32"
-fi
-AC_SUBST(SKSTREAM_VERSION)
-
-
-dnl Check WFMath
-WFMATH_VERSION=0.2.10
-PKG_CHECK_MODULES(WFMATH, wfmath-0.2 >= $WFMATH_VERSION,
-    [
-        CPPFLAGS="$CPPFLAGS $WFMATH_CFLAGS"
-        LDFLAGS="$LDFLAGS $WFMATH_LIBS"
-    ],
-    [
-        AM_PATH_WFMATH($WFMATH_VERSION,[
-                CPPFLAGS="$CPPFLAGS $WFMATH_CFLAGS"
-                LDFLAGS="$LDFLAGS $WFMATH_LIBS"
-                ],
-                AC_MSG_ERROR(Couldn't find WFMath or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/wfmath and get at least version $WFMATH_VERSION)
-        )
-    ])
-AC_SUBST(WFMATH_VERSION)
-
-SAGE_VERSION=0.1.0
-PKG_CHECK_MODULES(SAGE, sage >= $SAGE_VERSION,
-[
-  CPPFLAGS="$CPPFLAGS $SAGE_CFLAGS"
-  LIBS="$LIBS $SAGE_LIBS"
-],[
-  AC_MSG_ERROR(Couldn't find SAGE. Plese get at least version $SAGE_VERSION)
-])
-
-VARCONF_VERSION=0.5.5
-PKG_CHECK_MODULES(VARCONF, varconf-0.5 >= $VARCONF_VERSION,
+PKG_CHECK_MODULES(PKGCHECKS, varconf-1.0 >= 0.6.0 eris-1.0 >= 0.9.8 sage >= 0.1.0,
 	[
-		CPPFLAGS="$CPPFLAGS $VARCONF_CFLAGS"
-		LIBS="$LIBS $VARCONF_LIBS"
+		CPPFLAGS="$CPPFLAGS $PKGCHECKS_CFLAGS"
+		LIBS="$LIBS $PKGCHECKS_LIBS"
 	],
-	AC_MSG_ERROR(Couldn't find VarConf or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/varconf and get at least version $VARCONF_VERSION)
+	AC_MSG_ERROR(Couldn't find some WorldForge libs. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/)
 )
-AC_SUBST($VARCONF_VERSION)
 
-SIGC_VERSION=1.0.3
-PKG_CHECK_MODULES(SIGC, sigc++-1.2 >= 1.2,
-    [
-        CPPFLAGS="$CPPFLAGS $SIGC_CFLAGS"
-        LDFLAGS="$LDFLAGS $SIGC_LIBS"
-    ],
-    [
-        AM_PATH_SIGC($SIGC_VERSION,[
-                CPPFLAGS="$CPPFLAGS $SIGC_CFLAGS"
-                LDFLAGS="$LDFLAGS $SIGC_LIBS"
-		],
-                AC_MSG_ERROR(Couldn't find sigc++ or insufficient version found. Please goto http://sourceforge.net/projects/libsigc/ and get at least version $SIGC_VERSION)
-        )
-    ])
-AC_SUBST($SIGC_VERSION)
-   
-
-dnl Check Eris
-ERIS_VERSION=0.9.7
-PKG_CHECK_MODULES(ERIS, eris-1.0 >= $ERIS_VERSION ,
-    [
-        CPPFLAGS="$CPPFLAGS $ERIS_CFLAGS"
-        LDFLAGS="$LDFLAGS $ERIS_LIBS"
-    ],
-    [
-        AM_PATH_ERIS($ERIS_VERSION,[
-                CPPFLAGS="$CPPFLAGS $ERIS_CFLAGS"
-                LDFLAGS="$LDFLAGS $ERIS_LIBS"
-                ],
-                AC_MSG_ERROR(Couldn't find Eris or insufficent version found. Please get version $ERIS_VERSION from WorldForge ftp site.)
-        )
-    ])
-AC_SUBST(ERIS_VERSION)
 
 dnl Check Lib 3ds
 
