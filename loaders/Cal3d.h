@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.h,v 1.15 2002-09-21 14:20:30 simon Exp $
+// $Id: Cal3d.h,v 1.16 2002-12-10 13:47:15 simon Exp $
 
 #ifndef SEAR_CAL3D_H
 #define SEAR_CAL3D_H 1
@@ -58,6 +58,7 @@ public:
     std::map<std::string ,int> mesh_map;
     std::map<std::string ,int> material_map;
     std::map<std::string ,int> part_map;
+    float scale;
   };
   static const int STATE_IDLE;
   static const int STATE_FANCY;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.26 2002-12-07 17:34:53 simon Exp $
+// $Id: Cal3d.cpp,v 1.27 2002-12-10 13:47:15 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -287,6 +287,7 @@ bool Cal3d::init(const std::string& strFilename, float height) {
      {
         // set rendering scale factor
         m_renderScale = atof(strData.c_str());
+	map->scale = m_renderScale;
       }
       else if(strKey == "path")
       {
@@ -425,6 +426,7 @@ bool Cal3d::init(const std::string& strFilename, float height) {
   m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 1.0f, 0.0f);
 
   instance_count++;
+  m_renderScale = map->scale;
   _initialised = true;
   return true;
 }
@@ -527,7 +529,7 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 
 void Cal3d::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
-    static float scale = _height * getScale();
+    float scale = _height * getScale();
     _render->scaleObject(scale);
     _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
