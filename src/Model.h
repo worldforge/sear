@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.5 2002-09-26 21:16:38 simon Exp $
+//$Id: Model.h,v 1.6 2004-04-26 15:45:44 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -24,6 +24,9 @@ public:
   virtual ~Model() {}
   virtual bool init() { return false; }
   virtual void shutdown() {}
+
+  virtual void invalidate() = 0;
+
   virtual void update (float time_elapsed) {}
   virtual void render(bool select_mode) {}
   virtual void setDetailLevel(float f) {}
