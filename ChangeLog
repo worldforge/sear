@@ -1,3 +1,8 @@
+5th August 2002, Simon Goodall
+ * scale property added to objectloader. Currently only used by 3ds loader
+ * offset property added to objectloader. Currently only used by 3ds loader
+ * Enabled 3ds material properties
+
 4th August 2002, Simon Goodall
  * Further improvements on 3ds support. Now uses vertex arrays to improve performance and fixed a bug where the texture was loaded many times per object per frame which had a huge performance hit.
 

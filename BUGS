@@ -7,3 +7,4 @@ BUGS
  
  * 3Ds loader does not work on all models. e.g. jarnosun's bugbear/lizardman and drow models seem to be defined differently to other 3ds models and so currently will not work 
 
+ * Segfaults when running cyclient the same time as logged into the world. Probably an Eris bug as it segs when calling Eris::TypeInfo::getParentsAsSet

@@ -108,6 +108,7 @@ typedef std::list<WorldEntity*> Queue;
   
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotateObject(WorldEntity *we, int type) =0;
+  virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) =0;

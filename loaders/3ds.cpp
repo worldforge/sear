@@ -3,6 +3,7 @@
 // Copyright (C) 2001-2002 Simon Goodall
 
 #include <list>
+#include <map>
 #include <GL/gl.h>
 
 #include <lib3ds/mesh.h>
@@ -22,22 +23,13 @@
 
 #include "3ds.h"
 
-#include <iostream>
-
-
-typedef struct {
-  float *vertex_data;
-  float *normal_data;
-  float *texture_data;
-  unsigned int num_points;
-  int texture_id;
-} RenderObject;
 
 
 namespace Sear {
-void render_node(Lib3dsNode * node, Lib3dsFile * file);
 
-ThreeDS::ThreeDS() : model (NULL)
+ThreeDS::ThreeDS() : 
+  _model (NULL),
+  _scale(1.0f)
 {
 
 }
@@ -46,46 +38,70 @@ ThreeDS::~ThreeDS() {
 
 }
 
-bool ThreeDS::init(const std::string &file_name) {
+bool ThreeDS::init(const std::string &file_name, float scale, float offset[3]) {
+  if (scale) _scale = scale;
+  _offset[0] = offset[0];
+  _offset[1] = offset[1];
+  _offset[2] = offset[2];
   // Load 3ds file
   Log::writeLog(std::string("Loading: ") + file_name, Log::LOG_DEFAULT);
-  model = lib3ds_file_load(file_name.c_str());
-  if (!model) {
+  _model = lib3ds_file_load(file_name.c_str());
+  if (!_model) {
     Log::writeLog(std::string("Unable to load ") + file_name, Log::LOG_ERROR);
     return false;
   }
   // Calculate initial positions
-  lib3ds_file_eval(model,1);
+  lib3ds_file_eval(_model,1);
+  Lib3dsNode *p = NULL;
+  for (p=_model->nodes; p!=0; p=p->next) {
+    render_node(p, _model);
+  }
+  lib3ds_file_free(_model);
+  _model = NULL;
   return true;
 }
 
 void ThreeDS::shutdown() {
-  if (model) {
-    lib3ds_file_free(model);
-    model = NULL;
-  }
 }
 
-void ThreeDS::render(bool) {
-  if (model) {
-    Lib3dsNode *p;
-    if (model->nodes == 0) {
-      cerr << "BUFFER" << endl;
-      cout << model->meshes << endl;
-    }
-    for (p=model->nodes; p!=0; p=p->next) {
-      render_node(p, model);
+void ThreeDS::render(bool select_mode) {
+  static Render *rend = System::instance()->getGraphics()->getRender();
+  int current_texture = 0;
+  std::string current_material = "";
+  rend->translateObject(_offset[0], _offset[1], _offset[2]);
+  if (select_mode) {
+    for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
+      RenderObject *ro = *I;
+      if (ro) {
+        rend->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
+      }
     }
   } else {
-    Log::writeLog(std::string("Unable to render model"), Log::LOG_ERROR);
+    for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
+      RenderObject *ro = *I;
+      if (std::string(ro->material_name) != current_material) {
+        Material *m = material_map[ro->material_name];
+        if (m) {
+          rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+          current_material = ro->material_name;
+        }	    
+      }
+      if (ro) {
+        if (current_texture != ro->texture_id) {
+          if (ro->texture_data) rend->switchTexture(ro->texture_id);
+          current_texture = ro->texture_id;
+        }
+        rend->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
+      }
+    }
   }
 }
 
-
-void render_node(Lib3dsNode *node, Lib3dsFile *file) {
+void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
   static Render *rend = System::instance()->getGraphics()->getRender();
-  std::list<RenderObject*> render_objects;
   Lib3dsNode *p;
+  Lib3dsObjectData *d;
+  d=&node->data.object;
   for (p=node->childs; p!=0; p=p->next) {
     render_node(p, file);
   }
@@ -117,8 +133,28 @@ void render_node(Lib3dsNode *node, Lib3dsFile *file) {
         Lib3dsMaterial *mat=0;
         if (f->material[0]) {
           mat=lib3ds_file_material_by_name(file, f->material);
+	  ro->material_name = std::string(f->material).c_str();
         }
         if (mat) {
+          if (!material_map[std::string(f->material)]) {
+	    Material *m = (Material*)malloc(sizeof(Material));
+	    m->ambient[0] = 0.0f;
+	    m->ambient[1] = 0.0f;
+	    m->ambient[2] = 0.0f;
+	    m->ambient[3] = 1.0f;
+	    
+	    m->diffuse[0] = mat->diffuse[0];
+	    m->diffuse[1] = mat->diffuse[1];
+	    m->diffuse[2] = mat->diffuse[2];
+	    m->diffuse[3] = mat->diffuse[3];
+	    m->specular[0] = mat->specular[0];
+	    m->specular[1] = mat->specular[1];
+	    m->specular[2] = mat->specular[2];
+	    m->specular[3] = mat->specular[3];
+            m->shininess = pow(2, 10.0*mat->shininess);
+	    if (m->shininess>128.0f) m->shininess = 128.0f;
+	    material_map[std::string(f->material)] = m;
+	  }
           if (mat->texture1_map.name[0]) {
 	    int texture_id = rend->requestTexture(mat->texture1_map.name);
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
@@ -141,30 +177,23 @@ void render_node(Lib3dsNode *node, Lib3dsFile *file) {
         }     
         int i;
         for (i=0; i<3; ++i) {
-/*		
-          float x = mesh->pointL[f->points[i]].pos[0];
-          float y = mesh->pointL[f->points[i]].pos[1];
-          float z = mesh->pointL[f->points[i]].pos[2];
-          ro->vertex_data[v_counter++] = M[0][0] * x + M[0][1] * y + M[0][2] * z;
-          ro->vertex_data[v_counter++] = M[1][0] * x + M[1][1] * y + M[1][2] * z;
-          ro->vertex_data[v_counter++] = M[2][0] * x + M[2][1] * y + M[2][2] * z;
-          x = normalL[3 * p * i][0];
-          y = normalL[3 * p * i][1];
-          z = normalL[3 * p * i][2];
-          ro->normal_data[n_counter++] = M[0][0] * x + M[0][1] * y + M[0][2] * z;
-          ro->normal_data[n_counter++] = M[1][0] * x + M[1][1] * y + M[1][2] * z;
-          ro->normal_data[n_counter++] = M[2][0] * x + M[2][1] * y + M[2][2] * z;
-          ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][0];
-          ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][1];
-*/
+	  float out[3];
+	  lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
+          out[0] -= d->pivot[0];
+          out[1] -= d->pivot[1];
+          out[2] -= d->pivot[2];
+	  lib3ds_vector_transform(&ro->vertex_data[v_counter], node->matrix, out);
+	  v_counter += 3;
 
-          ro->vertex_data[v_counter++] = mesh->pointL[f->points[i]].pos[0];
-          ro->vertex_data[v_counter++] = mesh->pointL[f->points[i]].pos[1];
-          ro->vertex_data[v_counter++] = mesh->pointL[f->points[i]].pos[2];
+          /* It is very likely the normals have been completely messed up by these transformations */
 	  
-          ro->normal_data[n_counter++] = normalL[3 * p * i][0];
-          ro->normal_data[n_counter++] = normalL[3 * p * i][1];
-          ro->normal_data[n_counter++] = normalL[3 * p * i][2];
+	  lib3ds_vector_transform(out, M,  normalL[3 * p * i]);
+          out[0] -= d->pivot[0];
+          out[1] -= d->pivot[1];
+          out[2] -= d->pivot[2];
+	  lib3ds_vector_transform(&ro->normal_data[n_counter], node->matrix, out);
+	  n_counter += 3;
+
 	  if (mesh->texels) {
             ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][0];
             ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][1];
@@ -174,14 +203,21 @@ void render_node(Lib3dsNode *node, Lib3dsFile *file) {
       }
       ro->num_points = v_counter / 3;
       free(normalL);
+      return;
       node->user.d = glGenLists(1);
       glNewList(node->user.d, GL_COMPILE);
       current_texture = 0;
-      glColor3f(1.0f, 1.0f, 1.0f);
+      std::string current_material = "";
       glPushMatrix();
-      glMultMatrixf(&M[0][0]);
       for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
         RenderObject *ro = *I;
+	if (std::string(ro->material_name) != current_material) {
+	  Material *m = material_map[ro->material_name];
+	  if (m) {
+              rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+            current_material = ro->material_name;
+	  }	    
+	}
 	if (ro) {
           if (current_texture != ro->texture_id) {
             if (ro->texture_data) rend->switchTexture(ro->texture_id);
@@ -195,16 +231,13 @@ void render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	}
       }
       glPopMatrix();
-      glEndList();  
+      glEndList();
     }
     if (node->user.d) {
-      Lib3dsObjectData *d;
 
       glPushMatrix();
-//      glScalef(0.05f, 0.05f, 0.05f);
-      d=&node->data.object;
-      glMultMatrixf(&node->matrix[0][0]);
-      glTranslatef(-d->pivot[0], -d->pivot[1], -d->pivot[2]);
+      glTranslatef(_offset[0], _offset[1], _offset[2]);
+      if (_scale != 1.0f) glScalef(_scale, _scale, _scale);
       glCallList(node->user.d);
       glPopMatrix();
     }

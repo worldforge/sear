@@ -31,6 +31,7 @@ void ObjectLoader::init() {
   op->height = 1.0f;
   op->num_planes = 1;
   op->texture_scale = 1.0f;
+  op->scale = 1.0f;
   op->material_properties = mp;
   op->lighting_properties = NULL;
   mp->ambient[0] = 1.0f; 
@@ -173,6 +174,12 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     }
     else if (tag == "texture_scale") {
       sscanf(str, "%*s = %f", &op->texture_scale);
+    }
+    else if (tag == "scale") {
+      sscanf(str, "%*s = %f", &op->scale);
+    }
+    else if (tag == "offset_x") {
+      sscanf(str, "%*s = %f %f %f", &op->offset[0], &op->offset[1], &op->offset[2]);
     }
     else if (tag == "mat_ambient") {
       sscanf(str, "%*s = %f %f %f %f", &mp->ambient[0], &mp->ambient[1], &mp->ambient[2], &mp->ambient[3]);

@@ -754,6 +754,9 @@ void GL::rotateObject(WorldEntity *we, int type) {
   }
 }
 
+void GL::scaleObject(float scale) {
+  glScalef(scale, scale, scale);
+}
 
 void GL::setViewMode(int type) {
 //  Perspective

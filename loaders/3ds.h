@@ -5,19 +5,13 @@
 #ifndef _3DS_H_
 #define _3DS_H_ 1
 
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <string>
+#include <list>
+#include <map>
 
 #include <lib3ds/file.h>
 #include "src/Model.h"
-/*
- * This class represents a 3D Studio model. It makes use of the lib3ds library
- * to retrieve the model data. It uses the Model and MultiModel interfaces to
- * provide a generic interface for use with the rest of Sear.
- */ 
-
-
-
 
 namespace Sear {
 
@@ -38,7 +32,7 @@ public:
   /*
    * Initialise 3ds model. Should probably be combined with loadModel
    */ 
-  bool init(const std::string &file_name);
+  bool init(const std::string &file_name, float scale, float offset[3]);
 
   /*
    * Called when model is to be removed from memory. It cleans up its children.
@@ -46,10 +40,33 @@ public:
   void shutdown();
   void render(bool);
 
+  float getScale() { return _scale; }
+
 protected:
-//  unsigned int _num_models; // Number of models currently held
-//  ThreeDSMesh **_models;  // The models
-  Lib3dsFile* model;
+  typedef struct {
+    float *vertex_data;
+    float *normal_data;
+    float *texture_data;
+    unsigned int num_points;
+    int texture_id;
+    const char *material_name;
+  } RenderObject;
+
+  typedef struct {
+    float ambient[4];
+    float diffuse[4];
+    float specular[4];
+    float shininess;
+  } Material;
+  
+  void render_node(Lib3dsNode * node, Lib3dsFile * file);
+  
+  Lib3dsFile* _model;
+  float _scale;
+  float _offset[3];
+
+  std::list<RenderObject*> render_objects;
+  std::map<std::string, Material*> material_map;
 };
 
 } /* namespace Sear */

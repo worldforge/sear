@@ -85,6 +85,7 @@ public:
 
   void translateObject(float x, float y, float z);
   void rotateObject(WorldEntity *we, int type);
+  void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);

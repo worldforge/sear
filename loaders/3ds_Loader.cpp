@@ -23,8 +23,9 @@ ThreeDS_Loader::~ThreeDS_Loader() {
 
 Model *ThreeDS_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const std::string &file_name) {
   ThreeDS *model = new ThreeDS();
-  model->init(file_name);
+  model->init(file_name, op->scale, op->offset);
   model->setInUse(true);
+  model->setFlag("outline", op->outline);
   return model;
 }
 

@@ -81,7 +81,6 @@ void SkyBox::renderTextureSet(int base) {
   //Bottom
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_BOTTOM]);
   _renderer->renderArrays(Graphics::RES_QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
-  
 }
 
 } /* namespace Sear */

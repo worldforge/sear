@@ -1,5 +1,6 @@
- * Allow custom offset and scaling of 3ds models.
  * Allow 3ds models to be selected 
+
+ * Add support for OpenGL extensions
  
  * Fix lighting
   
