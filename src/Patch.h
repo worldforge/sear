@@ -11,6 +11,8 @@
 
 //#include <queue>
 
+namespace Sear {
+
 // Predefines...
 class Terrain;
 class Landscape;
@@ -97,5 +99,5 @@ Landscape *_landscape;
 
 };
 
-
+} /* namespace Sear */
 #endif /* _PATCH_H_ */

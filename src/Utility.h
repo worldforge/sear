@@ -23,6 +23,8 @@ typedef std::strstream SSTREAM;
 #error "sstream or strstream not found!"
 #endif
 
+namespace Sear {
+
 template <class out_value, class in_value>
 void cast_stream(const in_value &in, out_value &out) {
   SSTREAM ss;
@@ -61,5 +63,6 @@ WFMath::Quaternion QuatMul(const WFMath::Quaternion &q1, const WFMath::Quaternio
 
 WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, float t);
 
+} /* namespace Sear */
 #endif /* _UTILITY_H_ */
 

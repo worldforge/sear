@@ -91,6 +91,7 @@
    1.0f,  0.0f,  0.0f, \
    0.0f,  0.0f,  1.0f }
 
+namespace Sear {
 // Forward Decls
 class Render;
   
@@ -121,4 +122,5 @@ protected:
   Render *_renderer;
 };
 
+} /* namespace Sear */
 #endif /* _SKYBOX_H_ */

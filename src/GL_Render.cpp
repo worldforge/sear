@@ -33,7 +33,9 @@
 #include <unistd.h>
 
 #include "conf.h"
-  
+
+namespace Sear {
+
 float GL_Render::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
 float GL_Render::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
 
@@ -2112,3 +2114,5 @@ void GL_Render::readComponentConfig() {
   if (camera) camera->readConfig();
   if (terrain)terrain->readConfig();
 }
+
+} /* namespace Sear */

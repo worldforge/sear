@@ -5,6 +5,9 @@
 #include "conf.h"
 #include "Error.h"
 #include "System.h"
+
+namespace Sear {
+
 void traceError(int err) {
   std::string str;
   switch (err) {
@@ -32,4 +35,6 @@ void traceError(int err) {
     default:  str = "Unknown Error"; break;
   }
   System::instance()->pushMessage("Error: "  + str, 3);
+}
+
 }

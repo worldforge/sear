@@ -8,6 +8,8 @@
 #include "Models.h"
 #include <wfmath/axisbox.h>
 
+namespace Sear {
+
 class WireFrame : public Models{
 public:
   WireFrame(WFMath::AxisBox<3>);
@@ -33,4 +35,5 @@ private:
   float _vertex_data[_num_points][3];
 };
 
+} /* namespace Sear */
 #endif /* _WIREFRAME_H_ */

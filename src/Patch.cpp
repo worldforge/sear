@@ -17,6 +17,9 @@
 #include "Camera.h"
 #include "Render.h"
 #include "Utility.h"
+
+namespace Sear {
+
 // -------------------------------------------------------------------------------------------------
 //	PATCH CLASS
 // -------------------------------------------------------------------------------------------------
@@ -476,3 +479,5 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
     }
   }
 }
+
+} /* namespace Sear */

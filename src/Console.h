@@ -25,8 +25,16 @@
 #define CONSOLE_MESSAGE 0x1
 #define SCREEN_MESSAGE  0x2
 
-//#define MESSAGE_LIFE 5000
 
+/*
+ * AIMS
+ * Eventually have a register cmd function
+ * This will allow removal of command.cpp
+ * AND allow commands to by dynamically added in the future plugin system
+ */ 
+
+
+namespace Sear {
 
 class System;
 class Render;
@@ -68,4 +76,5 @@ protected:
   Render *_renderer;
 };
 
+} /* namespace Sear */
 #endif /* _CONSOLE_H_ */

@@ -7,6 +7,9 @@
 
 #include <list>
 #include "Event.h"
+
+namespace Sear {
+
 class System;
 
 class EventHandler {
@@ -25,5 +28,5 @@ protected:
 
 };
 
-
+} /* namespace Sear */
 #endif /* _EVENTHANDLER_H_ */

@@ -12,6 +12,7 @@ namespace Sear {
 
 class Exception {
 public:
+  Exception() {}
   Exception(const std::string &msg) : _msg(msg) {}
   virtual ~Exception() {}
 
@@ -19,6 +20,49 @@ public:
 
 protected:
   std::string _msg;
+
+};
+
+
+class ClientException : public Sear::Exception {
+public:
+typedef enum {
+  DEFAULT = 0,
+  NO_CONNECTION_OBJECT,
+  NOT_CONNECTED,
+  ALREADY_CONNECTED,
+  NO_HOSTNAME,
+  ERROR_CONNECTING,
+  ERROR_DISCONNECTING,
+  BAD_STATE,
+  ACTION_IN_PROGRESS,
+  
+  BAD_CONNECTION,
+  BAD_PASSWORD,
+  BAD_USERNAME,
+  BAD_FULLANME,
+  BAD_ACCOUNT_CREATION,
+  BAD_CHARACTER_CREATION,
+  BAD_LOGIN,
+  BAD_CHARACTER
+} Type;
+
+
+/*
+ * TODO
+ * Make msg optional -> base it upon type, but allow overriding
+ */
+
+//  ClientException() {}
+//  ClientException(const std::string &msg) : _msg(msg) {}
+  ClientException(const std::string &msg, const Type type) : _type(type) {
+    _msg = msg;
+  }
+  virtual ~ClientException() {}
+
+  virtual const Type getType() const { return _type; }
+protected:
+  Type _type;
 
 };
 

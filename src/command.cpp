@@ -23,6 +23,7 @@
 #include "WorldEntity.h"
 #include <unistd.h>
 
+namespace Sear {
 
 std::string::size_type pos, last_pos;
 std::string token_string;
@@ -298,7 +299,7 @@ void System::runCommand(const std::string &command) {
       renderer->setupStates();
     }
     else if (strcasecmp(tok, "cd") == 0) {
-      std::string dir = nextToken();
+      std::string dir = remainingTokens();
       if (dir.empty()) return;
       chdir(dir.c_str());
     }
@@ -308,10 +309,11 @@ void System::runCommand(const std::string &command) {
     else if (strcasecmp(tok, "disable_dir_prefix") == 0) {
       prefix_cwd = false;
     }
-		  
     else DEBUG_PRINT(std::string("Unknown Command:") + tok);
   } catch (...) {
     DEBUG_PRINT("Caught Unknown Exception");
   }
-  if (err != 0) traceError(err);
+//  if (err != 0) traceError(err);
+}
+
 }

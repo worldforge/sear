@@ -7,6 +7,9 @@
 #define _LANDSCAPE_H_ 1
 
 #include "Patch.h"
+
+namespace Sear {
+
 class Terrain;
 class Render;
 
@@ -101,5 +104,5 @@ public:
   }
 };
 
-
+} /* namespace Sear */
 #endif /* _LANDSCAPE_H_ */

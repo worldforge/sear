@@ -7,6 +7,8 @@
 
 #include <string>
 
+namespace Sear {
+
 typedef enum {
   EF_UNKNOWN = 0,
   EF_PRINT,
@@ -40,5 +42,5 @@ protected:
   unsigned int _time;
 };
 
-
+} /* namespace Sear */
 #endif /* _EVENT_H_ */

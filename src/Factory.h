@@ -9,11 +9,13 @@
 
 #include "WorldEntity.h"
 
+namespace Sear {
+
 class Factory : public Eris::Factory {
 public:
   virtual bool accept(const Atlas::Objects::Entity::GameEntity &) { return true; }
   virtual Eris::EntityPtr instantiate(const Atlas::Objects::Entity::GameEntity & ge) { return new WorldEntity(ge); }
 
 };
-
+} /* namespace Sear */
 #endif /* _FACTORY_H_ */

@@ -7,6 +7,8 @@
 
 #include <GL/gl.h>
 
+namespace Sear {
+
 // Setup static data items
 float SkyBox::vertex_coords[] = VERTEX_COORDS;
 int   SkyBox::texture_coords[] = TEXTURE_COORDS;
@@ -91,3 +93,5 @@ void SkyBox::renderTextureSet(int base) {
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
 }
+
+} /* namespace Sear */

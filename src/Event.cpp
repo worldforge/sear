@@ -12,6 +12,8 @@
 #include "Render.h"
 #include "Character.h"
 
+namespace Sear {
+
 Event::Event() :
   _ef(EF_UNKNOWN),
   _target(0),
@@ -101,4 +103,6 @@ char *Event::stringToObject(const std::string &msg) {
   for (i = 0; i < msg.size(); i++) string[i] = msg[i];
   string[msg.size()] = '\0';
   return string;
+}
+
 }

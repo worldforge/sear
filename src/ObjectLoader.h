@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <map>
 
+namespace Sear {
+
 typedef struct {
   float ambient[4];
   float diffuse[4];
@@ -59,4 +61,5 @@ protected:
   std::map<std::string, ObjectProperties*> _object_properties;
 };
 
+} /* namespace Sear */
 #endif /* _OBJECTLOADER_H_ */

@@ -8,6 +8,8 @@
 #include <map>
 #include <string>
 
+namespace Sear {
+
 class Config {
 public:
   Config() : 
@@ -41,5 +43,6 @@ protected:
   std::map<std::string, std::string> _attributes;
 };
 
+} /* namespace Sear */
 #endif /* _CONFIGURE_H_ */
 

@@ -16,6 +16,7 @@
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 
+namespace Sear {
 
 class System;
 class Terrain;
@@ -336,4 +337,5 @@ private:
   static const float DEFAULT_far_clip_dist = 100.0f;
 };
 
+} /* namespace Sear */
 #endif /* _GL_RENDER_H_ */

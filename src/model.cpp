@@ -19,9 +19,14 @@
 
 #include "model.h"
 #include <GL/gl.h>
+#include "System.h"
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
 //----------------------------------------------------------------------------//
+
+namespace Sear {
 
 const int Model::STATE_IDLE = 0;
 const int Model::STATE_FANCY = 1;
@@ -112,6 +117,13 @@ int Model::getState()
 
 GLuint Model::loadTexture(const std::string& strFilename)
 {
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  GLuint textureId;
+  int width;
+  int height;
+  int depth;
+
+  if (strFilename.substr(strFilename.length() - 4) == ".raw") {
   // open the texture file
   std::ifstream file;
   file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
@@ -122,11 +134,8 @@ GLuint Model::loadTexture(const std::string& strFilename)
   }
 
   // load the dimension of the texture
-  int width;
   file.read((char *)&width, 4);
-  int height;
   file.read((char *)&height, 4);
-  int depth;
   file.read((char *)&depth, 4);
 
   // allocate a temporary buffer to load the texture to
@@ -152,10 +161,11 @@ GLuint Model::loadTexture(const std::string& strFilename)
   }
 
   // generate texture
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-  GLuint textureId;
   glGenTextures(1, &textureId);
   glBindTexture(GL_TEXTURE_2D, textureId);
+
+
+  
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -164,6 +174,24 @@ GLuint Model::loadTexture(const std::string& strFilename)
 
   // free the allocated memory
   delete [] pBuffer;
+  } else {
+    //SDL IMAGE LOAD - NEEDS TESTING
+    SDL_Surface * image = System::loadImage(strFilename);
+    width = image->w;
+    height = image->h;
+    depth = image->format->BytesPerPixel;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
+    free(image);
+
+    
+
+  }
 
   return textureId;
 }
@@ -716,3 +744,5 @@ void Model::setState(int state, float delay)
 //----------------------------------------------------------------------------//
 //
 
+
+} /* namespace Sear */

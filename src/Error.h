@@ -24,5 +24,6 @@
 #define CLIENT_ERROR_CONNECTING 0x10
 #define CLIENT_ERROR_DISCONNECTING 0x11
 
-
+namespace Sear {
 void traceError(int);
+} /* namespace Sear */

@@ -11,6 +11,7 @@
 #define DELTA 0.0
 #include <math.h>
 
+namespace Sear {
 
 void ReduceToUnit(float vector[3]) {
   float length;
@@ -221,3 +222,5 @@ WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, flo
 
   return WFMath::Quaternion(w, x, y, z);
 }
+
+} /* namespace Sear */

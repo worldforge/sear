@@ -13,7 +13,7 @@
 
 int main(int argc, char** argv) {
   bool exit_program = false;
-  System *sys = NULL;
+  Sear::System *sys = NULL;
   std::string install_dir = "";
   sys = NULL;
   
@@ -60,7 +60,7 @@ This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 */
   
-  sys = new System();
+  sys = new Sear::System();
 //  sys->setInstallDir(std::string(INSTALLDIR) + std::string("/share/sear"));
   if (!sys->init()) {
     std::cerr << "Error initialising Sear!" << std::endl;

@@ -7,6 +7,8 @@
 
 #include "Models.h"
 
+namespace Sear {
+
 class BillBoard : public Models {
 public:
   BillBoard(float, float);
@@ -35,4 +37,5 @@ private:
   float _normal_data[_num_points][3];
 };
 
+} /* namespace Sear */
 #endif /* _BILLBOARD_H_ */

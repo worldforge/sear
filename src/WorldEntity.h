@@ -14,6 +14,8 @@
 #define WORLD_ENTITY_MESSAGE_LIFE (5000)
 #define WORLD_ENTITY_STRING_SIZE  (40)
 
+namespace Sear {
+
 typedef std::pair<std::string, unsigned int> message;
 
 class WorldEntity : public Eris::Entity {
@@ -50,4 +52,5 @@ protected:
   static int string_size;
 };
 
+} /* namespace Sear */
 #endif /* _WORLDENTITY_H_ */

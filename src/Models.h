@@ -7,6 +7,8 @@
 
 #include <stdlib.h>
 
+namespace Sear {
+
 class Models {
 public:
   Models() {}
@@ -40,4 +42,5 @@ public:
 private:
 };
 
+} /* namespace Sear */
 #endif /* _MODELS_H_ */

@@ -9,6 +9,8 @@
 #include <string.h>
 #include <iostream>
 
+namespace Sear {
+
 void ObjectLoader::init() {
   std::cout << "Object Loader: Initialising." << std::endl;
   _object_properties = std::map<std::string, ObjectProperties*>();
@@ -204,3 +206,5 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
   free(mp);
   return 0;
 }
+
+} /* namespace Sear */

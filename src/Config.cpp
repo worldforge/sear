@@ -11,6 +11,8 @@
 
 #include <unistd.h>
 
+namespace Sear {
+
 void Config::shutdown() {
   // Clear map data
 }
@@ -71,4 +73,6 @@ std::string Config::getAttribute(const std::string &attrib) {
 
 void Config::setAttribute(const std::string &attribname, const std::string &attribvalue) {
   _attributes[attribname] = attribvalue;
+}
+
 }

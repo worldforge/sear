@@ -8,6 +8,8 @@
 #include "Models.h"
 #include <wfmath/axisbox.h>
 
+namespace Sear {
+
 class BoundBox : public Models {
 public:
   BoundBox(WFMath::AxisBox<3>, bool);
@@ -36,4 +38,5 @@ private:
   float _normal_data[_num_points][3];
 };
 
+} /* namespace Sear */
 #endif /* _BOUNDBOX_H_ */

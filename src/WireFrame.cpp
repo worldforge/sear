@@ -4,6 +4,8 @@
 
 #include "WireFrame.h"
 
+namespace Sear {
+
 WireFrame::WireFrame(WFMath::AxisBox<3> bbox) :
   _bbox(bbox)
 {}
@@ -76,3 +78,5 @@ bool WireFrame::init() {
 void WireFrame::shutdown() {
 
 }
+
+} /* namespace Sear */

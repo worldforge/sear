@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "Config.h"
 
+namespace Sear {
+
 // -------------------------------------------------------------------------------------------------
 //	LANDSCAPE CLASS
 // -------------------------------------------------------------------------------------------------
@@ -176,4 +178,6 @@ float Landscape::getHeight(float x, float y) {
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
   height = h1 + (h / 2.0f);
   return height * _terrain->_terrain_scale;
-}			      
+}
+
+} /* namespace Sear */

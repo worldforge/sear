@@ -4,6 +4,8 @@
 
 #include "BoundBox.h"
 
+namespace Sear {
+
 BoundBox::BoundBox(WFMath::AxisBox<3> bbox, bool wrap) :
   _bbox(bbox),
   _wrap(wrap)
@@ -130,5 +132,7 @@ bool BoundBox::init() {
 }
 
 void BoundBox::shutdown() {
+
+}
 
 }

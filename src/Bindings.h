@@ -8,6 +8,8 @@
 #include <string>
 #include <map>
 
+namespace Sear {
+
 // Forward Declarations
 class Config;
 
@@ -28,4 +30,6 @@ protected:
   static Config* _bindings;
 };
 
+
+} /* namespace Sear */
 #endif /* _BINDINGS_H_ */

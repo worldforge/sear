@@ -14,6 +14,7 @@
 
 #include <Eris/TypeInfo.h>
 
+namespace Sear {
 
 int WorldEntity::string_size = WORLD_ENTITY_STRING_SIZE;
 int WorldEntity::message_life = WORLD_ENTITY_MESSAGE_LIFE;
@@ -155,3 +156,5 @@ void WorldEntity::displayInfo() {
   std::cout << "Visibility: " << ((isVisible()) ? ("true") : ("false")) << std::endl;
   std::cout << "Stamp: " << getStamp() << std::endl;
 }
+
+} /* namespace Sear */

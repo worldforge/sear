@@ -15,4 +15,4 @@
 #define DEG_TO_RAD (SEAR_PI / 180.0f)
 #define RAD_TO_DEG (180.0f / SEAR_PI)
 
-#include "Error.h"
+//#include "Error.h"

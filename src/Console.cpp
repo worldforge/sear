@@ -7,6 +7,8 @@
 #include "System.h"
 #include "Render.h"
 
+namespace Sear {
+
 bool Console::init() {
   _renderer = _system->getRenderer();
   panel_id = _renderer->requestTexture("ui_panel");
@@ -102,4 +104,6 @@ void Console::renderScreenMessages() {
 void Console::toggleConsole() {
   animateConsole = 1;
   showConsole = !showConsole;
+}
+
 }

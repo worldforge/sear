@@ -4,6 +4,8 @@
 
 #include "BillBoard.h"
 
+namespace Sear {
+
 BillBoard::BillBoard(float width, float height) :
   _width(width),
   _height(height)
@@ -31,5 +33,7 @@ bool BillBoard::init() {
 }
 
 void BillBoard::shutdown() {
+
+}
 
 }

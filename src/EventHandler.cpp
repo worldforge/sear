@@ -6,6 +6,7 @@
 #include "Event.h"
 #include "System.h"
 
+namespace Sear {
 
 void EventHandler::addEvent(Event event) {
   _events.push_back(event);
@@ -23,3 +24,5 @@ void EventHandler::poll() {
     }
   }
 }
+
+} /* namespace Sear */

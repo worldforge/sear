@@ -47,6 +47,8 @@
 #define CLIENT_STATUS_LOGGED_IN    (2)
 #define CLIENT_STATUS_IN_WORLD     (3)
 
+namespace Sear {
+
 class WorldEntity;
 class Console;
 class System;
@@ -121,5 +123,5 @@ protected:
   std::string _client_name;
 };
 
-
+} /* namespace Sear */
 #endif /* _CLIENT_H_ */

@@ -9,6 +9,8 @@
 #include <SDL/SDL.h>
 #include <iostream.h>
 
+namespace Sear {
+
 std::map<int, std::string> Bindings::keymap = std::map<int, std::string>();
 Config *Bindings::_bindings = NULL;
 
@@ -206,3 +208,4 @@ std::string Bindings::getBinding(std::string key) {
 }
 
 
+}

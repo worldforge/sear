@@ -27,6 +27,11 @@
 #include <unistd.h>
 #include "cursors.h"
 
+#include "Exception.h"
+#include "Log.h"
+
+namespace Sear {
+
 System *System::_instance = NULL;
 const std::string System::SCRIPTS_DIR = "scripts";
 const std::string System::STARTUP_SCRIPT = "startup.script";
@@ -49,6 +54,7 @@ System::System() :
 {
   int i;
   _instance = this;
+  // Initialise system states
   for (i = 1; i < SYS_LAST_STATE; i++) _systemState[i] = false;
 }
 
@@ -60,8 +66,10 @@ bool System::init() {
   _event_handler = new EventHandler(this);
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
-    std::cerr << "Error initializing Eris!" << std::endl;
-    return false;
+    Log::writeLog("Error initializing Eris", Log::ERROR);
+//    std::cerr << "Error initializing Eris!" << std::endl;
+    throw Exception("");
+//    return false;
   }
   
   SDL_EnableUNICODE(1);
@@ -98,7 +106,7 @@ bool System::init() {
   
   _console = new Console(this);
   
-  DEBUG_PRINT("Running startup scripts");
+  Log::writeLog("Running startup scripts", Log::INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + STARTUP_SCRIPT;
   std::string home_location = home_path + "/" + STARTUP_SCRIPT;
   std::string current_location = "./" + STARTUP_SCRIPT;
@@ -106,17 +114,17 @@ bool System::init() {
   if (fileExists(install_location)) {
     runScript(install_location);
   } else {
-//    DEBUG_PRINT("No install");
+//    No install
   }
   if (fileExists(home_location)) {
     runScript(home_location);
   } else {
-//    DEBUG_PRINT("No home");
+//   No home
   }
   if (fileExists(current_location)) {
     runScript(current_location);
   } else {
-//    DEBUG_PRINT("No current");
+// No current
   }
   readConfig();
   _system_running = true;
@@ -124,7 +132,7 @@ bool System::init() {
 }
 
 void System::shutdown() {
-  DEBUG_PRINT("Shutting Down Renderer");
+  Log::writeLog("Shutting Down Renderer", Log::INFO);
   
   if (_character) {
     _character->shutdown();
@@ -153,7 +161,7 @@ void System::shutdown() {
   }
 
   writeConfig();
-  DEBUG_PRINT("Running shutdown scripts");
+  Log::writeLog("Running shutdown scripts", Log::INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + SHUTDOWN_SCRIPT;
   std::string home_location = home_path + "/" + SHUTDOWN_SCRIPT;
   std::string current_location = "./" + SHUTDOWN_SCRIPT;
@@ -188,7 +196,7 @@ void System::shutdown() {
 }
 
 bool System::initVideo() {
-  DEBUG_PRINT("Initialising Video");
+  Log::writeLog("Initialising Video", Log::INFO);
   if ( SDL_Init(SDL_INIT_VIDEO) < 0 ) {
     std::cerr <<  "Unable to init SDL: " <<  SDL_GetError() << std::endl;
     return false;
@@ -197,7 +205,7 @@ bool System::initVideo() {
 }
 
 void System::createWindow(bool fullscreen) {
-  DEBUG_PRINT("Creating Window");
+  Log::writeLog("Creating Window", Log::INFO);
   //Request Open GL window attributes
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
@@ -263,7 +271,7 @@ void System::createWindow(bool fullscreen) {
   if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
   if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
   if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
-  DEBUG_PRINT("Creating Renderer");
+  Log::writeLog("Creating Renderer", Log::INFO);
   if (renderer) {
 //    renderer->initWindow(_width, _height);
     renderer->shutdown();
@@ -397,9 +405,6 @@ void System::toggleFullscreen() {
 }
 
 
-/*
- * Method taken from SDL site
- */
 Uint32 System::getPixel(SDL_Surface *surface, int x, int y) {
   int bpp = surface->format->BytesPerPixel;
   /* Here p is the address to the pixel we want to retrieve */
@@ -626,3 +631,4 @@ void System::switchCursor(int cursor) {
   }
 }
 
+} /* namespace Sear */

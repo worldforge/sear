@@ -11,6 +11,7 @@
 #include <map>
 #include <iostream>
 
+#include "ObjectLoader.h"
 #include <wfmath/axisbox.h>
 
 #define RENDER_FOV (45.0f)
@@ -18,6 +19,7 @@
 #define RENDER_FAR_CLIP (1000.0f)
 #define RENDER_NEAR_CLIP (0.1f)
 
+namespace Sear {
 
 typedef enum {
   RENDER_UNKNOWN = 0,
@@ -36,7 +38,6 @@ class BoundBox;
 class BillBoard;
 class Impostor;
 
-#include "ObjectLoader.h"
 
 #define FONT_TO_SKYBOX          (0)
 #define SKYBOX_TO_TERRAIN       (1)
@@ -129,4 +130,5 @@ private:
   	
 };
 
+} /* namespace Sear */
 #endif /* _RENDER_H_ */

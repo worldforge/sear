@@ -7,6 +7,8 @@
 
 #include "Models.h"
 
+namespace Sear {
+
 class Impostor : public Models {
 public:
   Impostor(float, float);
@@ -35,4 +37,5 @@ private:
   float _normal_data[_num_points][3];
 };
 
+} /* namespace Sear */ 
 #endif /* _IMPOSTOR_H_ */

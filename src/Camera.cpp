@@ -11,6 +11,8 @@
 #include <string>
 #include <iostream>
 
+namespace Sear {
+
 Camera::Camera() :
   _distance(0.0f),
   _rotation(0.0f),
@@ -98,4 +100,6 @@ void Camera::writeConfig() {
   
   general->setAttribute(KEY_camera_min_distance, string_fmt(_min_distance));
   general->setAttribute(KEY_camera_max_distance, string_fmt(_max_distance));
+}
+
 }

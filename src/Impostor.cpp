@@ -4,6 +4,8 @@
 
 #include "Impostor.h"
 
+namespace Sear {
+
 Impostor::Impostor(float width, float height) :
   _width(width),
   _height(height)
@@ -45,3 +47,5 @@ bool Impostor::init() {
 void Impostor::shutdown() {
 
 }
+
+} /* namespace Sear */

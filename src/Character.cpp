@@ -28,6 +28,8 @@
 
 #define SQR(x) ((x) * (x))
 
+namespace Sear {
+
 Character::Character(WorldEntity *self, System *system) :
   _self(self),
   _system(system),
@@ -291,3 +293,4 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   }
 }
 
+}

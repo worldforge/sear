@@ -28,6 +28,7 @@ sear_SOURCES = \
 	Event.h \
 	EventHandler.cpp \
 	EventHandler.h \
+	Exception.h \
 	Factory.h \
 	GL_Render.cpp \
 	GL_Render.h \
@@ -35,6 +36,8 @@ sear_SOURCES = \
 	Impostor.h \
 	Landscape.cpp \
 	Landscape.h \
+	Log.cpp \
+	Log.h \
 	main.cpp \
 	model.cpp \
 	model.h \

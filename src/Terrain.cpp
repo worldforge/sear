@@ -10,6 +10,8 @@
 #include <iostream.h>
 #include "Utility.h"
 
+namespace Sear {
+
 float Terrain::_water_level = 0.0f;
 
 bool Terrain::init() {
@@ -136,3 +138,5 @@ void Terrain::writeConfig() {
   general->setAttribute(KEY_water_level, string_fmt(_water_level));
   general->setAttribute(KEY_terrain_scale, string_fmt(_terrain_scale));
 }
+
+} /* namespace Sear */

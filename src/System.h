@@ -9,6 +9,8 @@
 #include <SDL/SDL_image.h>
 #include <string>
 
+namespace Sear {
+
 class GL_Render;
 class Render;
 class Client;
@@ -196,5 +198,6 @@ private:
   bool _system_running;
 };
 
+} /* namespace Sear */
 #endif /* _SYSTEM_H_ */
 

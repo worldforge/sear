@@ -1,3 +1,11 @@
+30th June 2002, Simon Goodall
+ * Implemented basic Exceptions to eventually replace all error checking
+ * Added Sear Namespace
+ * Added support for Cal3D models to use different texture file types using SDL_image - THIS NEEDS TESTING
+
+28th June 2002, Simon Goodall
+ * Implemented basic Log object to eventually replace all cout / cerr / DEBUG msgs
+
 18th June 2002, Simon Goodall
  * Replaced unique colour counter code with a much faster implementation. The new implementation obtains the first 500 unique colours which should be greater than the possible amount of objects to be rendered.
  * Fixed water feature

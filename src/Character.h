@@ -12,6 +12,8 @@
 
 #include <wfmath/quaternion.h>
 
+namespace Sear {
+
 class Client;
 class WorldEntity;
 
@@ -78,5 +80,5 @@ protected:
   bool _run_modifier;
 };
 
-
+} /* namespace Sear */
 #endif /* _CHARACTER_H_ */

@@ -9,6 +9,8 @@
 #include <GL/gl.h>
 #include "Landscape.h"
 
+namespace Sear {
+
 class System;
 class Render;
 
@@ -80,5 +82,6 @@ protected:
   Render *_renderer;
 };
 
+} /* namespace Sear */
 #endif /* _TERRAIN_H_ */
 
