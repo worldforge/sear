@@ -130,3 +130,15 @@ cull_face_cw = false
 stencil = false
 fog = true
 end_of_state
+state = 3ds
+alpha_test = false
+blend = false
+lighting = false
+textures = false
+colour_material = false
+depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = true
+end_of_state

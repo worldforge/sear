@@ -2,10 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-float[6][4] Frustum::getFrustum(float projp[16], float modl[16]) {
+#include "Frustum.h"
+
+#include "Terrain.h"
+#include "WorldEntity.h"
+#include "Utility.h"
+
+namespace Sear {
+
+void Frustum::getFrustum(float frustum[6][4], float proj[16], float modl[16]) {
   float   clip[16];
   float   t;
-  float frustum[6][4]
   
   /* Combine the two matrices (multiply projection by modelview) */
   clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
@@ -104,14 +111,14 @@ float[6][4] Frustum::getFrustum(float projp[16], float modl[16]) {
    frustum[5][3] /= t;
 }
 
-bool Frustum::PointInFrustum(float frustum[6][4], float x, float y, float z ) {
+bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
   int p;
   for( p = 0; p < 6; p++ )
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ) return false;
   return true;
 } 
 
-int Frustum::CubeInFrustum(float frustum[6][4], WorldEntity *we ) {  
+int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {  
   int p;
   int c;
   int c2 = 0;
@@ -167,7 +174,7 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::SphereInFrustum(float frustum[6][4], WorldEntity *we) {
+bool Frustum::sphereInFrustum(float frustum[6][4], WorldEntity *we, Terrain *terrain) {
 //  return true;	
   int p;
   float x, y, z, radius;

@@ -20,7 +20,6 @@
 #include "System.h"
 #include "EventHandler.h"
 #include "Event.h"
-
 #include "cmd.h"
 #include "Config.h"
 #include "Utility.h"
@@ -246,8 +245,10 @@ void Character::toggleRunModifier() {
   }
   _run_modifier = !_run_modifier;
   updateLocals(true);
-  if (_run_modifier) _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_run_args));
-  else _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_walk_args));
+//  if (_run_modifier) _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_run_args));
+//  else _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_walk_args));
+//  if (_run_modifier) _system->getModelHandler()->getModel(_self)->action("run");
+//  else _system->getModelHandler()->getModel(_self)->action("walk");
 }
 
 void Character::readConfig() {

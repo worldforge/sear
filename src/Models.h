@@ -5,6 +5,8 @@
 #ifndef _MODELS_H_
 #define _MODELS_H_ 1
 
+#include <string>
+
 namespace Sear {
 
 class Models {
@@ -18,6 +20,11 @@ public:
   virtual void render(bool select_mode) {}
 
   virtual bool useTextures() { return false; }
+  virtual void action(const std::string &action) {}
+
+  virtual void setFlag(const std::string &flag, bool state) {}
+  
+  virtual bool getFlag(const std::string &flag) { return false; }
   
   typedef enum {
     NONE = 0,

@@ -10,10 +10,12 @@
 #include "Bindings.h"
 #include "Console.h"
 #include "EventHandler.h"
+#include "ModelHandler.h"
 #include "Config.h"
 #include "Character.h"
 #include "conf.h"
 #include "ObjectLoader.h"
+#include "StateLoader.h"
 #include "cmd.h"
 #include "Utility.h"
 
@@ -62,6 +64,7 @@ System::~System() {
 bool System::init() {
   if (!initVideo()) return false;
   _event_handler = new EventHandler(this);
+  _model_handler = new ModelHandler();
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
     Log::writeLog("Error initializing Eris", Log::ERROR);
@@ -94,6 +97,9 @@ bool System::init() {
   _ol = new ObjectLoader();
   _ol->init();
 
+  _sl = new StateLoader();
+  _sl->init();
+  
   _general = new Config();
   _textures = new Config();
   _models = new Config();
@@ -283,7 +289,7 @@ void System::createWindow(bool fullscreen) {
     _console->init();
     renderer->init();
     renderer->initWindow(_width, _height);
-    renderer->buildDisplayLists();
+//    renderer->buildDisplayLists();
     pushMessage("Loading, Please wait...", 2, 100);
     renderer->drawScene("", false); // Render scene one before producing colour set
     renderer->buildColourSet();

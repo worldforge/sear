@@ -5,22 +5,22 @@
 #ifndef _FRUSTUM_H_
 #define _FRUSTUM_H_ 1
 
-#include <wfmathaxisbox.h>
+#include <wfmath/axisbox.h>
 
 namespace Sear {
 
 // Forward Declarations
+class Terrain;
 class WorldEntity;
 	
 class Frustum {
 public:
-
-  static float[6][4] Frustum::getFrustum(float projp[16], float modl[16]);
-  static bool Frustum::PointInFrustum(float frustum[6][4], float x, float y, float z );
-  static int Frustum::CubeInFrustum(float frustum[6][4], WorldEntity *we );
-  static int Frustum::patchInFrustum(float frustum[6][4], WFMath::AxisBox<3> bbox); 
-  static float Frustum::distFromNear(float frustum[6][4], float x, float y, float z);
-  static bool Frustum::SphereInFrustum(float frustum[6][4], WorldEntity *we);
+  static void getFrustum(float frustum[6][4], float projp[16], float modl[16]);
+  static bool pointInFrustum(float frustum[6][4], float x, float y, float z );
+  static int cubeInFrustum(float frustum[6][4], WorldEntity *we );
+  static int patchInFrustum(float frustum[6][4], WFMath::AxisBox<3> bbox); 
+  static float distFromNear(float frustum[6][4], float x, float y, float z);
+  static bool sphereInFrustum(float frustum[6][4], WorldEntity *we, Terrain *);
 };
   
 } /* namespace Sear */

@@ -54,6 +54,7 @@ void cast_stream(const in_value &in, out_value &out) {
 #endif
 }
 
+#define SQR(X) ((X) * (X))
 
 template <class T>
 std::string string_fmt(const T & t) {

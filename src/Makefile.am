@@ -6,7 +6,8 @@ sear_LDADD = \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderBillBoard.a \
 	../loaders/libLoaderImpostor.a \
-	../loaders/libLoaderCal3d.a 
+	../loaders/libLoaderCal3d.a \
+	../loaders/libLoader3ds.a 
 
 sear_SOURCES = \
 	Bindings.cpp \
@@ -57,4 +58,6 @@ sear_SOURCES = \
 	ModelHandler.h \
 	ModelLoader.h \
 	StateLoader.cpp \
-	StateLoader.h
+	StateLoader.h \
+	Frustum.cpp \
+	Frustum.h

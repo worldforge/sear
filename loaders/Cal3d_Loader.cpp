@@ -20,9 +20,10 @@ Cal3d_Loader::~Cal3d_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Models *Cal3d_Loader::loadModel(WorldEntity*, ObjectProperties*, const std::string &file_name) {
+Models *Cal3d_Loader::loadModel(WorldEntity*, ObjectProperties* op, const std::string &file_name) {
   Cal3d *model = new Cal3d();
   model->init(file_name);
+  model->setFlag("outline", op->outline);
   return model;
 }
 

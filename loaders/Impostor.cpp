@@ -17,7 +17,7 @@ Impostor::~Impostor() {}
 bool Impostor::init(const std::string &type, float _width, float _height) {
   _type = type;
   if (!_width) _width = 2.0f;
-  if (_height) _height = 2.0f;
+  if (!_height) _height = 2.0f;
   float width_by_2 = _width / 2.0f;
   _vertex_data[0][0] = -width_by_2; _vertex_data[0][1] = 0.0f; _vertex_data[0][2] = 0.0f;
   _vertex_data[1][0] = -width_by_2; _vertex_data[1][1] = 0.0f; _vertex_data[1][2] = _height;
@@ -52,8 +52,12 @@ void Impostor::shutdown() {
 
 }
 
-void Impostor::render(bool) {
-  GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+void Impostor::render(bool select_mode) {
+  if (select_mode) {
+    GL::instance()->switchTexture(GL::instance()->requestTextureMask(_type));
+  } else {
+    GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+  }
   GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
 }

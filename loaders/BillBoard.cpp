@@ -40,10 +40,13 @@ bool BillBoard::init(const std::string &type, float _width, float _height) {
 void BillBoard::shutdown() {
 }
 
-void BillBoard::render(bool) {
-  GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
-  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
-
+void BillBoard::render(bool select_mode) {
+  if (select_mode) {	
+    GL::instance()->switchTexture(GL::instance()->requestTextureMask(_type));
+  } else {
+    GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+  }
+  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
 }
 
 } /* namespace Sear */

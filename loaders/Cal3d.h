@@ -36,6 +36,9 @@ protected:
   float m_lodLevel;
 
   bool _use_textures;
+ 
+  static float _walk_blend[];
+  static float _run_blend[];
   
 // constructors/destructor
 public:
@@ -59,11 +62,16 @@ public:
   void setState(int state, float delay);
 
   bool useTextures() { return _use_textures; }
+  void action(const std::string &action);
   RotationStyle rotationStyle() { return NORMAL; }
-
+  void setFlag(const std::string &flag, bool state);
+  bool getFlag(const std::string &flag);
+ 
+  
 protected:
   unsigned int loadTexture(const std::string& strFilename);
   void renderMesh(bool bWireframe, bool bLight, bool);
+  bool _outline;
 };
 
 } /* namespace Sear */

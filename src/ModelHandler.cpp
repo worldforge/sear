@@ -18,6 +18,7 @@
 #include "../loaders/BillBoard_Loader.h"
 #include "../loaders/WireFrame_Loader.h"
 #include "../loaders/Impostor_Loader.h"
+#include "../loaders/3ds_Loader.h"
 
 namespace Sear {
 
@@ -29,6 +30,7 @@ ModelHandler::ModelHandler()
   new BillBoard_Loader(this);
   new WireFrame_Loader(this);
   new Impostor_Loader(this);
+  new ThreeDS_Loader(this);
 
 }
 

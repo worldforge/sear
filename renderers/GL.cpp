@@ -30,6 +30,8 @@
 #include "../src/Character.h"
 #include "../src/ObjectLoader.h"
 
+#include "../src/Frustum.h"
+
 #include "../src/Models.h"
 #include <unistd.h>
 
@@ -214,11 +216,11 @@ void GL::initWindow(int width, int height) {
   Log::writeLog(std::string("GL_VERSION: ") + string_fmt(glGetString(GL_VERSION)), Log::DEFAULT);
   Log::writeLog(std::string("GL_EXTENSIONS: ") + string_fmt(glGetString(GL_EXTENSIONS)), Log::DEFAULT);
   
-  glLineWidth(4);
+  glLineWidth(4.0f);
   //TODO: this needs to go into the set viewport method
   //Check for divide by 0
   if (height == 0) height = 1;
-  glLineWidth(2.0f); 
+//  glLineWidth(2.0f); 
   glViewport(0, 0, width, height);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
@@ -240,7 +242,6 @@ void GL::initWindow(int width, int height) {
   
 void GL::init() {
   readConfig();
-  //setupStates();
   splash_id = requestTexture(splash_texture);
   initFont();
   // TODO: initialisation need to go into system
@@ -257,11 +258,10 @@ void GL::init() {
   camera->init();
 //  CheckError();
   initLighting();
-  mh = new ModelHandler();
+  mh = _system->getModelHandler();
 
-  _state_loader = new StateLoader();
-  _state_loader->init();
-  _state_loader->readFiles("/opt/worldforge/cvs/forge/clients/sear/data/states.cfg");
+  _state_loader = _system->getStateLoader();
+  setupStates();
 
 }
 
@@ -486,8 +486,9 @@ inline GLuint GL::getTextureID(int texture_id) {
 }
 
 void GL::drawScene(const std::string& command, bool select_mode) {
+	
   // TODO: Move to generic render class
-//	select_mode = true;
+//select_mode = true;
   if (select_mode) resetColors();
   active_name = "";
   // This clears the currently loaded texture
@@ -557,8 +558,15 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       glLightfv(GL_LIGHT0,GL_POSITION,ps);
 
 //      if (_entity_models[id]) player_model = _entity_models[id]->model;
-        // TODO: make use of Frustum class here
-//      extractFrustum();
+      float  proj[16];
+      float  modl[16];
+      /* Get the current PROJECTION matrix from OpenGL */
+      glGetFloatv( GL_PROJECTION_MATRIX, proj );
+                              
+      /* Get the current MODELVIEW matrix from OpenGL */
+      glGetFloatv( GL_MODELVIEW_MATRIX, modl );
+      
+      Frustum::getFrustum(frustum, proj, modl); 
     }
     // Setup Sun
     if (checkState(RENDER_LIGHTING)) {
@@ -714,7 +722,7 @@ void GL::buildQueues(WorldEntity *we, int depth) {
       
       std::string model_type = std::string(op->model_type);
 
-      if (op->draw_self) render_queue[op->state].push_back(we);
+      if (op->draw_self && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->state].push_back(we);
       if (op->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); i++) {
           buildQueues((WorldEntity*)we->getMember(i), depth + 1);
@@ -827,16 +835,6 @@ void GL::procEvent(int x, int y) {
   stateChange("font"); // FONT
 }
 
-//TODO should be in Frustum class
-int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {  
-  return true;
-}
-
-float GL::distFromNear(float x, float y, float z) {
-  return 1.0f;//(frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
-}
-
-
 void GL::CheckError() {
   GLenum err = glGetError();
   std::string msg;
@@ -852,40 +850,6 @@ void GL::CheckError() {
   }
   Log::writeLog(msg, Log::ERROR);
 }
-
-void GL::buildDisplayLists() {
-  if (glIsList(states)) glDeleteLists(states, LAST_STATE);
-  setupStates();
-  states = glGenLists(LAST_STATE);
-  for (State state = (State)0; state != LAST_STATE; ((int)state)++) {
-    Log::writeLog("Building list for state: " + string_fmt(state), Log::DEFAULT);
-    // THIS BUILDS A DISP LIST TO CHANGE TO A STATE FROM ANYWHERE
-/*    glNewList(states + state, GL_COMPILE);
-      if (stateProperties[state].alpha_test) glEnable(GL_ALPHA_TEST);
-      else glDisable(GL_ALPHA_TEST);
-      if (stateProperties[state].blend) glEnable(GL_BLEND);
-      else glDisable(GL_BLEND);
-      if (stateProperties[state].lighting) glEnable(GL_LIGHTING);
-      else glDisable(GL_LIGHTING);
-      if (stateProperties[state].textures) glEnable(GL_TEXTURE_2D);
-      else glDisable(GL_TEXTURE_2D);
-      if (stateProperties[state].colour_material) glEnable(GL_COLOR_MATERIAL);
-      else glDisable(GL_COLOR_MATERIAL);
-      if (stateProperties[state].depth_test) glEnable(GL_DEPTH_TEST);
-      else glDisable(GL_DEPTH_TEST);
-      if (stateProperties[state].cull_face) glEnable(GL_CULL_FACE);
-      else glDisable(GL_CULL_FACE);
-      if (stateProperties[state].cull_face_cw) glFrontFace(GL_CW);
-      else glFrontFace(GL_CCW);
-      if (stateProperties[state].stencil) glEnable(GL_STENCIL_TEST);
-      else glDisable(GL_STENCIL_TEST);
-      if (stateProperties[state].fog) glEnable(GL_FOG);
-      else glDisable(GL_FOG);
-      */
-    glEndList();
-  }
-}
-
 
 //TODO should be in general render class
 void GL::readConfig() {
@@ -1081,52 +1045,9 @@ void GL::setupStates() {
   glFogfv(GL_FOG_COLOR, fog_colour);
   glFogf(GL_FOG_START, _fog_start);
   glFogf(GL_FOG_END, _fog_end);
-/*
-  _states = glGenLists(LAST_CHANGE);
-  stateDisplayList(_states + SKYBOX_TO_TERRAIN, SKYBOX, TERRAIN);         // 0
-  stateDisplayList(_states + TERRAIN_TO_WIREFRAME, TERRAIN, WIREFRAME); // 1
-  
-  _states = glGenLists(LAST_CHANGE);
-  stateDisplayList(_states + SKYBOX_TO_TERRAIN, SKYBOX, TERRAIN);         // 0
-  stateDisplayList(_states + TERRAIN_TO_WIREFRAME, TERRAIN, WIREFRAME); // 1
-  stateDisplayList(_states + WIREFRAME_TO_CHARACTERS, WIREFRAME, CHARACTERS); // 1
-  stateDisplayList(_states + CHARACTERS_TO_MODELS, CHARACTERS, MODELS);   // 2
-  stateDisplayList(_states + MODELS_TO_BILLBOARD, MODELS, BILLBOARD);     // 3
-  stateDisplayList(_states + BILLBOARD_TO_FONT, BILLBOARD, FONT);         // 4
-  stateDisplayList(_states + FONT_TO_PANEL, FONT, PANEL);                 // 5
-  stateDisplayList(_states + PANEL_TO_FONT, PANEL, FONT);                 // 6
-  stateDisplayList(_states + FONT_TO_SKYBOX, FONT, SKYBOX);               // 7
-*/
-  _current_state = FONT_TO_PANEL;
-  stateChange("font"); //font
-}
 
-void GL::nextState(int desired_state) {
-//  if (desired_state == _current_state) return;
-//  if ((_current_state == BILLBOARD_TO_FONT) && (desired_state == FONT_TO_SKYBOX)) _current_state = PANEL_TO_FONT; // Skip states if required!
-//  if ((_current_state == PANEL_TO_FONT) && (desired_state == FONT_TO_PANEL)) _current_state = BILLBOARD_TO_FONT; // Skip states if required!
-//  _current_state++;
-//  if (_current_state >= LAST_CHANGE) _current_state = 0;
-//  if (_current_state != desired_state) {
-    // Do not want to be here if at all possible
-    // Force change to required state
-/*	  // 
-    switch(desired_state) {
-      case FONT_TO_SKYBOX: stateChange(SKYBOX); break;
-      case SKYBOX_TO_TERRAIN: stateChange(TERRAIN); break;
-      case TERRAIN_TO_WIREFRAME: stateChange(WIREFRAME); break;
-      case WIREFRAME_TO_CHARACTERS: stateChange(CHARACTERS); break;
-      case CHARACTERS_TO_MODELS: stateChange(MODELS); break;
-      case MODELS_TO_BILLBOARD: stateChange(BILLBOARD); break;
-      case BILLBOARD_TO_FONT: stateChange(FONT); break;
-      case FONT_TO_PANEL: stateChange(PANEL); break;
-      case PANEL_TO_FONT: stateChange(FONT); break;
-    }
-  */
-//    _current_state = desired_state;  
-//  } else glCallList(_states + _current_state);
+//  stateChange("font"); //font
 }
-
 
 void GL::readComponentConfig() {
   if (camera) camera->readConfig();
@@ -1175,7 +1096,6 @@ void GL::setViewMode(int type) {
 }
 
 void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
-  return;
   // TODO: set up missing values
   if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   ambient);
   if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   diffuse);
@@ -1275,9 +1195,10 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
 }
 
 void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
+  if (select_mode) stateChange("select");
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change staet for this queue
-    stateChange(_state_loader->getStateProperties((std::string)I->first));
+    if (!select_mode) stateChange(_state_loader->getStateProperties((std::string)I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 
       WorldEntity *we = (WorldEntity *)*J;
@@ -1307,11 +1228,52 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
       model->update(time_elapsed);
       
       // Draw Model
-      model->render(select_mode);
+      if (select_mode) {
+        nextColour(we->getID());
+	model->render(true);
+      } else {
+        if (we->getID() == activeID) drawOutline(we, model, checkState(RENDER_STENCIL) && model->getFlag("outline"));
+	else model->render(false);
+      }
       
       glPopMatrix();
     }
   }
 }
 
+ 
+float GL::distFromNear(float x, float y, float z) {
+  return Frustum::distFromNear(frustum, x, y, z);
+}
+	
+int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
+  return Frustum::patchInFrustum(frustum, bbox);
+}
+
+void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
+  active_name = we->getName();
+  StateProperties *sp = _cur_state;
+  if (use_stencil) {
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, -1, 1);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    glPushMatrix();
+    model->render(false);
+    glPopMatrix();
+    stateChange("halo");
+    glStencilFunc(GL_NOTEQUAL, -1, 1);
+    glColor4fv(_halo_blend_colour);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    model->render(true);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDisable(GL_STENCIL_TEST);
+    glColor4fv(white);
+  } else {
+    glColor4fv(_halo_blend_colour);  
+    model->render(true);
+    glColor4fv(white);
+  }
+  stateChange(sp);
+}
+  
 } /* namespace Sear */

@@ -90,11 +90,9 @@ public:
   SkyBox* getSkyBox() { return skybox; }
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
-  void buildDisplayLists();
 
   void readConfig();
   void writeConfig();
-  void nextState(int);
   void setupStates();
   void readComponentConfig();
 
@@ -111,7 +109,7 @@ public:
   void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
-
+  void drawOutline(WorldEntity *, Models *, bool);
   
 protected:
   System *_system;

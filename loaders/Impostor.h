@@ -21,6 +21,8 @@ public:
   
   void render(bool); 
   bool useTextures() { return  _use_textures; }
+
+  RotationStyle rotationStyle() { return Models::POSITION; }
   
 private:
   bool _use_textures;

@@ -12,6 +12,9 @@
 #include "EventHandler.h"
 #include "Event.h"
 
+#include "ModelHandler.h"
+#include "Models.h"
+
 #include <Eris/TypeInfo.h>
 #include "Log.h"
 #include "Utility.h"
@@ -30,6 +33,11 @@ void WorldEntity::handleMove() {
   } else {
     translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
+  }
+  if (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()) >= 7.0f) {
+    System::instance()->getModelHandler()->getModel(this)->action("run");
+  } else {
+    System::instance()->getModelHandler()->getModel(this)->action("walk");
   }
 }
 

@@ -78,6 +78,7 @@
 #define CMD_EVENT "event"
 #define CMD_RUN_SCRIPT "run_script"
 #define CMD_LOAD_OBJECT_FILE "load_object_file"
+#define CMD_LOAD_STATE_FILE "load_state_file"
 #define CMD_LOAD_GENERAL "load_general"
 #define CMD_SAVE_GENERAL "save_general"
 #define CMD_LOAD_BINDING "load_bindings"

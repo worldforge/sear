@@ -25,6 +25,8 @@
 #include "WorldEntity.h"
 #include <unistd.h>
 
+#include "StateLoader.h"
+
 #include "Log.h"
 
 namespace Sear {
@@ -250,6 +252,11 @@ void System::runCommand(const std::string &command) {
       if (_ol) _ol->readFiles(arg1);
       else Log::writeLog("Object loader not created", Log::ERROR);
     }
+    else if (strcasecmp(tok, CMD_LOAD_STATE_FILE) == 0) {
+      std::string arg1 = processHome(nextToken());
+      if (_sl) _sl->readFiles(arg1);
+      else Log::writeLog("State loader not created", Log::ERROR);
+    }
     else if (strcasecmp(tok, CMD_LOAD_GENERAL) == 0) {
       std::string arg1 = processHome(nextToken());
       if (_general) _general->loadConfig(arg1);
@@ -305,10 +312,6 @@ void System::runCommand(const std::string &command) {
       if (!world) return;
       WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
       if (we) we->displayInfo();
-    }
-    else if (strcasecmp(tok, "lists") == 0) {
-      renderer->buildDisplayLists();
-      renderer->setupStates();
     }
     else if (strcasecmp(tok, "cd") == 0) {
       std::string dir = remainingTokens();

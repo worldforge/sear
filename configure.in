@@ -196,6 +196,7 @@ AC_OUTPUT([
 	data/general.cfg
 	data/models.cfg
 	data/object_file.cfg
+	data/states.cfg
 	scripts/login.script
 	scripts/startup.script
 	scripts/shutdown.script

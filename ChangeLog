@@ -1,3 +1,10 @@
+10th July 2002, Simon Goodall
+ * Re-implemented Frustum culling
+ * Stateloader file now loaded via console command instead of hardcoded location
+ * Fixed console text bugs caused by wrong state in use
+ * Re-implemented model running / walking and added it to other models too. anything with a vel above root 7 will be running
+ * Re-implemented object outlining
+
 10th July, Simon Goodall
  * Moved state code to separate class and read settings from a file instead of hardcoding them.
 

@@ -1,3 +1,5 @@
-Cally = @prefix@/share/sear/data/cally.cal
-Paladin = @prefix@/share/sear/data/paladin.cal
-Skeleton = @prefix@/share/sear/data/skeleton.cal
+character = /opt/worldforge/share/sear/data/cally.cal
+settler = /opt/worldforge/share/sear/data/paladin.cal
+farmer = /opt/worldforge/share/sear/data/paladin.cal
+skeleton = /opt/worldforge/share/sear/data/skeleton.cal
+pig = /opt/worldforge/cvs/media-3d/collection-wildoz/tools/anvil/anvil.3ds

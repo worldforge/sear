@@ -14,7 +14,9 @@ namespace Sear {
 class Render;
 class Client;
 class EventHandler;
+class ModelHandler;
 class ObjectLoader;
+class StateLoader;
 class Config;
 class Console;
 class Character;
@@ -69,7 +71,10 @@ public:
   Config *getTexture() { return _textures; }
   Config *getModel() { return _models; } 
   ObjectLoader *getObjectLoader() { return _ol; }
+  StateLoader *getStateLoader() { return _sl; }
   EventHandler *getEventHandler() { return _event_handler; }
+  ModelHandler *getModelHandler() { return _model_handler; }
+  
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
   void setCharacter(Character *);
@@ -122,7 +127,9 @@ protected:
   int area;
 
   EventHandler *_event_handler;
+  ModelHandler *_model_handler;
   ObjectLoader *_ol;
+  StateLoader *_sl;
 
   std::string home_path;
 

@@ -90,6 +90,7 @@ typedef enum {
   virtual unsigned int getTextureID(int texture_id) { return 0;}
   virtual void drawScene(const std::string &,bool) {}
   virtual void drawTextRect(int, int, int, int, int) {}
+  virtual void stateChange(const std::string &state) {}
   virtual void stateChange(State) {}
   virtual void setColour(float red, float blue , float green, float alpha) {}
 	  
@@ -117,8 +118,6 @@ typedef enum {
   virtual void processObjectProperties(ObjectProperties *){}
   virtual void checkModelStatus(const std::string &) {}
   virtual void setModelInUse(const std::string &, bool) {} 
-  virtual void buildDisplayLists() {}
-  virtual void nextState(int) {}
   virtual void setupStates() {}
   virtual void readConfig() {}
   virtual void writeConfig() {}

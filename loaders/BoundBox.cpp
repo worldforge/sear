@@ -137,10 +137,13 @@ void BoundBox::shutdown() {
 
 }
 
-void BoundBox::render(bool) {
-  GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
-  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
-
+void BoundBox::render(bool select_mode) {
+  if (select_mode) {
+    GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], NULL, NULL);
+  } else {
+    GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+    GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+  }
 }
 
 } /* namespace Sear */

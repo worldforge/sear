@@ -23,6 +23,9 @@ const int Cal3d::STATE_IDLE = 0;
 const int Cal3d::STATE_FANCY = 1;
 const int Cal3d::STATE_MOTION = 2;
 
+float Cal3d::_walk_blend[] = {1.0, 0.0, 0.0};
+float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
+
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
@@ -432,23 +435,26 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
+	
         unsigned char meshColor[4];
         float ambient[4];
         float diffuse[4];
         float specular[4];
-        pCalRenderer->getAmbientColor(&meshColor[0]);
-        ambient[0] = meshColor[0] / 255.0f;  ambient[1] = meshColor[1] / 255.0f; ambient[2] = meshColor[2] / 255.0f; ambient[3] = meshColor[3] / 255.0f;
+	if (!select_mode) {
+          pCalRenderer->getAmbientColor(&meshColor[0]);
+          ambient[0] = meshColor[0] / 255.0f;  ambient[1] = meshColor[1] / 255.0f; ambient[2] = meshColor[2] / 255.0f; ambient[3] = meshColor[3] / 255.0f;
 
-        // set the material diffuse color
-        pCalRenderer->getDiffuseColor(&meshColor[0]);
-        diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = meshColor[3] / 255.0f;
+          // set the material diffuse color
+          pCalRenderer->getDiffuseColor(&meshColor[0]);
+          diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = meshColor[3] / 255.0f;
 
-        // set the material specular color
-        pCalRenderer->getSpecularColor(&meshColor[0]);
-        specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
+          // set the material specular color
+          pCalRenderer->getSpecularColor(&meshColor[0]);
+          specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
 
 
-        renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+          renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+	}
 	
         // get the transformed vertices of the submesh
         static float meshVertices[30000][3];
@@ -470,7 +476,7 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
         faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
 
         // set the vertex and normal buffers
-        if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
+        if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           renderer->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
           renderer->renderElements(Models::TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
 	} else {
@@ -588,8 +594,23 @@ void Cal3d::setState(int state, float delay)
   }
 }
 
-//----------------------------------------------------------------------------//
-//
+void Cal3d::action(const std::string &action) {
+  if (action == "walk") {
+    setMotionBlend((float *)&_walk_blend[0], 0);
+  } else if (action == "run") {
+    setMotionBlend((float *)&_run_blend[0], 0);
+  } else if (action == "wave") {
+    executeAction(1);
+  }
+}
 
+void Cal3d::setFlag(const std::string &flag, bool state) {
+  if (flag == "outline") _outline = state;
+}
+
+bool Cal3d::getFlag(const std::string &flag) {
+  if (flag == "outline") return _outline;
+  return false;
+}
 
 } /* namespace Sear */

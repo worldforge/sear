@@ -63,11 +63,13 @@ void Console::renderConsoleMessages(const std::string &command) {
   int i;
   int consoleOffset = CONSOLE_HEIGHT - consoleHeight;
 //  _renderer->stateChange(Render::PANEL);
-  _renderer->nextState(FONT_TO_PANEL);
+//  _renderer->nextState(FONT_TO_PANEL);
+  _renderer->stateChange("panel");
   _renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
   _renderer->drawTextRect(0, 0, _renderer->getWindowWidth(), consoleHeight, panel_id);
 //  _renderer->stateChange(Render::CONSOLE);
-  _renderer->nextState(PANEL_TO_FONT);
+//  _renderer->nextState(PANEL_TO_FONT);
+  _renderer->stateChange("font");
   _renderer->setColour(1.0f, 1.0f, 0.0f, 0.85f);
   for (I = console_messages.begin(), i = 0; I != console_messages.end(); I++, i++) {
     int j = console_messages.size() - i;
@@ -81,7 +83,7 @@ void Console::renderScreenMessages() {
   if (screen_messages.empty()) return;	
   std::list<screenMessage>::iterator I;
   int i;
-//  _renderer->stateChange(Render::CONSOLE);
+  _renderer->stateChange("font");
   _renderer->setColour(1.0f, 1.0f, 0.0f, 0.85f);
   int height = _renderer->getWindowHeight();
   unsigned int current_time = _system->getTime();
