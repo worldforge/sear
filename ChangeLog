@@ -1,4 +1,8 @@
 11th December 2002, Simon Goodall
+ * Scripting engine now works with dos file formats
+ * '#' is now the comment character until end of line 
+
+11th December 2002, Simon Goodall
  * Converted scripting engine to use ifstream instead of FILE.
 
 10th December 2002, Simon Goodall
