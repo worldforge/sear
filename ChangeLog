@@ -1,4 +1,7 @@
 10th December 2002, Simon Goodall
+ * Bumped version number due to release
+
+10th December 2002, Simon Goodall
  * Fixed bug in cally loader where every model was scaled by teh same height regardless of individual settings
 
 10th December 2002, Simon Goodall
