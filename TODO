@@ -1,4 +1,6 @@
- * Allow console to be opened even if not key bindings have been loaded
+ * Update cally code to reuse core models 
+
+* Allow console to be opened even if not key bindings have been loaded
 
  * Setup system to update values as varconf values update
   - Every object that uses a varconf object could connect a callback to the object.

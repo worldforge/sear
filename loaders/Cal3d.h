@@ -5,10 +5,13 @@
 #ifndef _CAL3D_H_
 #define _CAL3D_H_ 1
 
+#include <map>
+
 #include <cal3d/cal3d.h>
 
 #include "src/Model.h"
 #include "src/Graphics.h"
+
 
 namespace Sear {
 
@@ -25,7 +28,7 @@ public:
 // member variables
 protected:
   int m_state;
-  CalCoreModel m_calCoreModel;
+  CalCoreModel *m_calCoreModel;
   CalModel m_calModel;
   int m_animationId[16];
   int m_animationCount;
@@ -73,6 +76,9 @@ public:
 protected:
   unsigned int loadTexture(const std::string& strFilename);
   void renderMesh(bool bWireframe, bool bLight, bool);
+
+  static int instance_count;
+  static std::map<std::string, CalCoreModel*> core_models;
 };
 
 } /* namespace Sear */
