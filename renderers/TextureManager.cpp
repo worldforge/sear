@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.2 2003-03-11 22:44:34 simon Exp $
+// $Id: TextureManager.cpp,v 1.3 2003-03-11 23:33:46 simon Exp $
 
 #include "TextureManager.h"
 
@@ -22,6 +22,10 @@
 #ifdef __WIN32
 PFNGLACTIVETEXTUREARBPROC glActiveTextureARB  = NULL;
 #endif 
+
+// Default texture maps
+#include "default_image.xpm"
+#include "default_font.xpm"
 
 #ifdef HAVE_CONFIG
 #include "config.h"
@@ -69,10 +73,6 @@ static const std::string FILTER_NEAREST_MIPMAP_LINEAR = "nearest_mipmap_linear";
 static const std::string FILTER_LINEAR_MIPMAP_NEAREST = "linear_mipmap_nearest";
 static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
  
-static const unsigned int MAX_TEXTURES = 8;
-// Need to have MAX_TEXTURES of -1
-#define TEXTURE_INIT { -1, -1, -1, -1, -1, -1, -1, -1 }
-
 bool use_arb_multitexture = false;
 bool use_sgis_generate_mipmap = false;
 bool use_arb_texture_border_clamp = false;
@@ -80,7 +80,9 @@ bool use_ext_texture_filter_anisotropic = false;
 
 TextureManager::TextureManager() :
   _initialised(false),
-  _texture_counter(1)
+  _texture_counter(1),
+  _last_textures(NULL),
+  _texture_units(1)
 {  
   _texture_config.sigsv.connect(SigC::slot(*this, &TextureManager::varconf_callback));
   _texture_config.sige.connect(SigC::slot(*this, &TextureManager::varconf_error_callback));
@@ -88,7 +90,18 @@ TextureManager::TextureManager() :
 
 void TextureManager::init() {
   if (_initialised) shutdown();
+  readConfig(System::instance()->getGeneral());
   setupGLExtensions();
+  // Create _last_textures  
+    _last_textures = new TextureID[_texture_units];
+  // Setup default texture properties
+
+  // setup default font properties
+
+  // create default texture
+
+  // create default font
+
   _initialised = true;
 }
 
@@ -102,6 +115,11 @@ void TextureManager::shutdown() {
   _texture_map.clear();
   // Reset counter
   _texture_counter = 1;
+
+  if (_last_textures) {
+    delete _last_textures;
+    _last_textures = NULL;
+  }
 
   _initialised = false;
 }
@@ -122,16 +140,16 @@ void TextureManager::readTextureConfig(const std::string &filename) {
   config.readFromFile(filename);
 }
 
-int TextureManager::loadTexture(const std::string &texture_name) {
+TextureID TextureManager::loadTexture(const std::string &texture_name) {
   assert((_initialised == true) && "TextureManager not initialised");
   if (!_texture_config.find(texture_name)) {
     std::cerr << "Texture " << texture_name << " not defined." << std::endl;
-    return 0;
+    return -1;
   }
-  // Read texture properties
+  // Check if the texture has a filename specified
   if (!_texture_config.findItem(texture_name, KEY_filename)) {
     std::cerr << "Error " << texture_name << " has no filename" << std::endl;
-    return 0;
+    return -1;
   }
   std::string filename = (std::string)_texture_config.getItem(texture_name, KEY_filename);
   
@@ -139,12 +157,24 @@ int TextureManager::loadTexture(const std::string &texture_name) {
   SDL_Surface *surface = System::loadImage(filename);
   if (!surface) {
     std::cerr << "Error loading texture: " << filename << std::endl;
-    return 0;
+    return -1;
   }
+  TextureObject texture_id = loadTexture(texture_name, surface);
+  // Free image
+  SDL_FreeSurface(surface);
+  // store into texture array
+  _textures[_texture_counter] = texture_id;
+  // assign name to texture array loc
+  _texture_map[texture_name] = _texture_counter;
+
+  return _texture_counter++;
+}
+
+TextureObject TextureManager::loadTexture(const std::string &texture_name, SDL_Surface *surface) {
   // If we have requested a mask, filter pixels
   bool mask = (bool)_texture_config.getItem(texture_name, KEY_mask);
   if (mask) {
-    // Set all picles to white. We let the alpha channel do the clipping
+    // Set all pixels to white. We let the alpha channel do the clipping
     // TODO perhaps define a transparent pixel or threshold to do this
     if (surface->format->BytesPerPixel == 4) {
       for (int i = 0; i < surface->w * surface->h * 4; i += 4) {
@@ -212,22 +242,15 @@ int TextureManager::loadTexture(const std::string &texture_name) {
     glTexImage2D(GL_TEXTURE_2D, 0, depth, surface->w, surface->h, 0, depth, GL_UNSIGNED_BYTE, surface->pixels);
   }
 
-  // Free image
-  SDL_FreeSurface(surface);
 
   // Set texture priority if requested
   if (_texture_config.findItem(texture_name, KEY_priority)) {
     float priority = (double)_texture_config.getItem(texture_name, KEY_priority);
     glPrioritizeTextures(1, &texture_id, &priority);
   }
-
-  // store into texture array
-  _textures[_texture_counter] = texture_id;
-  // assign name to texture array loc
-  _texture_map[texture_name] = _texture_counter;
-
-  return _texture_counter++;
+  return texture_id;
 }
+
 
 void TextureManager::unloadTexture(const std::string &texture_name) {
   assert((_initialised == true) && "TextureManager not initialised");
@@ -244,40 +267,20 @@ void TextureManager::unloadTexture(unsigned int texture_id) {
 
 void TextureManager::switchTexture(TextureID texture_id) {
   assert((_initialised == true) && "TextureManager not initialised");
-  static TextureID last_texture_id = -1;
-  if (texture_id == last_texture_id) return;
+  if (texture_id == _last_textures[0]) return;
   
   glBindTexture(GL_TEXTURE_2D, _textures[texture_id]);
-  last_texture_id = texture_id;  
+  _last_textures[0] = texture_id;  
 }
 
 void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
   assert((_initialised == true) && "TextureManager not initialised");
-  // TODO make this more generic!
-  static TextureID last_texture_ids[MAX_TEXTURES] = TEXTURE_INIT;
   if (!use_arb_multitexture) return switchTexture(texture_id);
+  if (texture_unit >= _texture_units) return; // Check we have enough texture units
+  if (_last_textures[texture_unit] == texture_id) return;
   glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
   glBindTexture(GL_TEXTURE_2D, _textures[texture_id]);
-  last_texture_ids[texture_unit] = texture_id;
-  // Make sure we are at texture unit 0
-  glActiveTextureARB(GL_TEXTURE0_ARB);
-}
-
-
-void TextureManager::switchMultiTexture(TextureID *texture_ids, unsigned int num_textures) {
-  assert((_initialised == true) && "TextureManager not initialised");
-  assert((texture_ids != NULL) && "NULL textures");
-  // TODO make this more generic!
-  static TextureID last_texture_ids[MAX_TEXTURES] = TEXTURE_INIT;
-  if (!use_arb_multitexture) return switchTexture(texture_ids[0]);
-
-  for (unsigned int i = num_textures - 1; i >=0; --i) {
-    // Check to see if texture is already loaded
-    if (last_texture_ids[i] == texture_ids[i]) continue;
-    glActiveTextureARB(GL_TEXTURE0_ARB + i);
-    glBindTexture(GL_TEXTURE_2D, _textures[texture_ids[i]]);
-    last_texture_ids[i] = texture_ids[i];
-  }
+  _last_textures[texture_unit] = texture_id;
   // Make sure we are at texture unit 0
   glActiveTextureARB(GL_TEXTURE0_ARB);
 }
@@ -285,7 +288,6 @@ void TextureManager::switchMultiTexture(TextureID *texture_ids, unsigned int num
 void TextureManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
 
 }
-
 
 void TextureManager::varconf_error_callback(const char *message) {
   std::cerr << "Error reading texture config: " << message << std::endl;
@@ -308,6 +310,7 @@ void TextureManager::setupGLExtensions() {
   if (extensions.find("GL_ARB_multitexture") != std::string::npos) {
     use_arb_multitexture = true;
     if (debug) std::cout << "Using GL_ARB_multitexture Extension" << std::endl;
+    glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &_texture_units);
   } else {
     use_arb_multitexture = false;
   }
@@ -372,9 +375,6 @@ void TextureManager::setScale(unsigned int texture_unit, float scale_x, float sc
   glMatrixMode(GL_MODELVIEW);
   glActiveTextureARB(GL_TEXTURE0_ARB);
 }
-
-
-} /* namespace Sear */
 
 #if(0)
 
@@ -460,7 +460,6 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
     }
     colour_map[code] = colour;
   }
-//  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
   unsigned char *data = new unsigned char [width * height * 4];
   i = 0;
   for ( row=0; row < height; ++row ) {
@@ -474,4 +473,50 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
   } 
   return data;  
 }
+
 #endif
+
+TextureID TextureManager::createDefaultTexture() {
+  assert((_initialised == true) && "TextureManager not initialised");
+  
+  std::string texture_name = "default_texture";
+
+  // Load texture into memory
+  SDL_Surface *surface = IMG_ReadXPMFromArray(default_image_xpm);
+  if (!surface) {
+    std::cerr << "Error loading default texture" << std::endl;
+    return -1;
+  }
+  TextureObject texture_id = loadTexture(texture_name, surface);
+  // Free image
+  SDL_FreeSurface(surface);
+  // store into texture array
+  _textures[_texture_counter] = texture_id;
+  // assign name to texture array loc
+  _texture_map[texture_name] = _texture_counter;
+  return _texture_counter++;
+}
+
+TextureID TextureManager::createDefaultFont() {
+  assert((_initialised == true) && "TextureManager not initialised");
+  
+  std::string texture_name = "default_font";
+
+  // Load texture into memory
+  SDL_Surface *surface = IMG_ReadXPMFromArray(default_font_xpm);
+  if (!surface) {
+    std::cerr << "Error loading default font" << std::endl;
+    return -1;
+  }
+  TextureObject texture_id = loadTexture(texture_name, surface);
+  // Free image
+  SDL_FreeSurface(surface);
+  // store into texture array
+  _textures[_texture_counter] = texture_id;
+  // assign name to texture array loc
+  _texture_map[texture_name] = _texture_counter;
+  return _texture_counter++;
+}
+
+
+} /* namespace Sear */

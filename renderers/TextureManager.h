@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.2 2003-03-11 22:44:34 simon Exp $
+// $Id: TextureManager.h,v 1.3 2003-03-11 23:33:46 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -10,6 +10,8 @@
 #include <string>
 #include <map>
 #include <vector>
+
+#include "SDL.h"
 
 #include <sigc++/object_slot.h>
 
@@ -148,6 +150,8 @@ public:
   void setScale(float scale_x, float scale_y);
   void setScale(unsigned int texture_unit, float scale);
   void setScale(unsigned int texture_unit, float scale_x, float scale_y);
+
+  unsigned int getNumTextureUnits() const { return _texture_units; }
   
 private:
   bool _initialised; ///< Flag indicating whether object has had init called
@@ -155,13 +159,20 @@ private:
   TextureMap _texture_map; ///< Mapping between texture name and its TextureID
   TextureVector _textures; ///< Used to translate a TextureID to a TextureObject
   unsigned int _texture_counter; ///< Keeps track of last allocated TextureID
+  TextureID *_last_textures;
+  int _texture_units;
 
   /**
    * This function is used to setup the required OpenGL texture extensions
    */ 
   void setupGLExtensions();
+  TextureObject loadTexture(const std::string &texture_name, SDL_Surface *surface);
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);	  
   void varconf_error_callback(const char *message);
+
+  TextureID createDefaultTexture();
+  TextureID createDefaultFont();
+
   
   /**
    * Returns the OpenGL filter from the name
