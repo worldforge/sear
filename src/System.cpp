@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sigc++/slot.h>
-
+#include <GL/gl.h>
 #include <varconf/varconf.h>
 #include <Eris/Types.h>
 
@@ -784,6 +784,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(IDENTIFY_ENTITY, this);
   console->registerCommand(SET_TIME, this);
   console->registerCommand(GET_TIME, this);
+  console->registerCommand("normalise_on", this);
+  console->registerCommand("normalise_off", this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -909,6 +911,10 @@ void System::runCommand(const std::string &command, const std::string &args) {
     std::string time = string_fmt(_current_time);
     pushMessage(std::string("Time: ") + time, CONSOLE_MESSAGE);
   }
+
+  else if (command == "normalise_on") glEnable(GL_NORMALIZE);
+  else if (command == "normalise_off") glDisable(GL_NORMALIZE);
+  
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }
 

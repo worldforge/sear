@@ -28,7 +28,10 @@ ROAM::ROAM(System *system, Render *renderer) :
 {}
 
 ROAM::~ROAM() {
-  free(hMap);
+  if (hMap) {
+    free(hMap);
+    hMap = NULL;
+  }
 }
 
 bool ROAM::init() {
@@ -53,9 +56,13 @@ void ROAM::shutdown() {
   Log::writeLog("Deleting ROAM", Log::LOG_DEFAULT);
   if (gLand) {
     delete gLand;
+    gLand = NULL;
   }
   Log::writeLog("Freeing HeightMap", Log::LOG_DEFAULT);
-  if (hMap) free(hMap);
+  if (hMap) {
+    free(hMap);
+    hMap = NULL;
+  }
 }
 
 void ROAM::draw() {
@@ -74,7 +81,10 @@ void ROAM::render() {
 
 void ROAM::loadHeightMap() {
   int i, x, y;
-  hMap = NULL;
+  if (hMap) {
+    free(hMap);
+    hMap = NULL;
+  }
   SDL_Surface *terrain = NULL;
   
   terrain = IMG_Load(hmap.c_str());

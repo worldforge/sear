@@ -180,9 +180,9 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 
           /* It is very likely the normals have been completely messed up by these transformations */
 	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
-//          out[0] -= d->pivot[0];
-//          out[1] -= d->pivot[1];
-//          out[2] -= d->pivot[2];
+          out[0] -= d->pivot[0];
+          out[1] -= d->pivot[1];
+          out[2] -= d->pivot[2];
 	  lib3ds_vector_transform(&ro->normal_data[n_counter], node->matrix, out);
           n_counter += 3;
 

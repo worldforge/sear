@@ -25,6 +25,7 @@ typedef struct {
   bool cull_face_cw;
   bool stencil;
   bool fog;
+  bool rescale_normals;
 } StateProperties;
 
 class StateLoader {

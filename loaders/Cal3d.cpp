@@ -26,9 +26,9 @@ const int Cal3d::STATE_IDLE = 0;
 const int Cal3d::STATE_FANCY = 1;
 const int Cal3d::STATE_MOTION = 2;
 
-float Cal3d::_walk_blend[] = {1.0, 0.0, 0.0};
+float Cal3d::_strut_blend[] = {1.0, 0.0, 0.0};
+float Cal3d::_walk_blend[] = {0.0, 1.0, 0.0};
 float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
-float Cal3d::_swagger_blend[] = {0.0, 1.0, 0.0};
 
 std::map<std::string, CalCoreModel*> Cal3d::core_models = std::map<std::string, CalCoreModel*>();
 int Cal3d::instance_count = 0;
@@ -66,10 +66,10 @@ void Cal3d::executeAction(int action)
   switch(action)
   {
     case 0:
-      m_calModel.getMixer()->executeAction(m_animationId[5], 0.3f, 0.3f);
+      m_calModel.getMixer()->executeAction(m_animationId[WAVE], 0.3f, 0.3f);
       break;
     case 1:
-      m_calModel.getMixer()->executeAction(m_animationId[6], 0.3f, 0.3f);
+      m_calModel.getMixer()->executeAction(m_animationId[SHOOT_ARROW], 0.3f, 0.3f);
       break;
   }
 }
@@ -202,7 +202,6 @@ bool Cal3d::init(const std::string& strFilename)
   if (core_models[strFilename]) {
     m_calCoreModel = core_models[strFilename];
   } else {
-
     // open the model configuration file
     std::ifstream file;
     file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
@@ -301,23 +300,65 @@ bool Cal3d::init(const std::string& strFilename)
           return false;
         }
       }
-      else if(strKey == "animation")
-      {
-        // load core animation
-  //      std::cout << "Loading animation '" << strData << "'..." << std::endl;
-        m_animationId[animationCount] = m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(m_animationId[animationCount] == -1)
-        {
+      else if(strKey == "animation_idle") {
+        m_animationId[IDLE] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[IDLE] == -1) {
           CalError::printLastError();
           return false;
         }
-
+        animationCount++;
+      }
+      else if(strKey == "animation_walk") {
+        m_animationId[WALK] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[WALK] == -1) {
+          CalError::printLastError();
+          return false;
+        }
+        animationCount++;
+      }
+      else if(strKey == "animation_run") {
+        m_animationId[RUN] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[RUN] == -1) {
+          CalError::printLastError();
+          return false;
+        }
+        animationCount++;
+      }
+      else if(strKey == "animation_strut") {
+        m_animationId[STRUT] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[STRUT] == -1) {
+          CalError::printLastError();
+          return false;
+        }
+        animationCount++;
+      }
+      else if(strKey == "animation_wave") {
+        m_animationId[WAVE] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[WAVE] == -1) {
+          CalError::printLastError();
+          return false;
+        }
+        animationCount++;
+      }
+      else if(strKey == "animation_shoot_arrow") {
+        m_animationId[SHOOT_ARROW] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[SHOOT_ARROW] == -1) {
+          CalError::printLastError();
+          return false;
+        }
+        animationCount++;
+      }
+      else if(strKey == "animation_funky") {
+        m_animationId[FUNKY] = m_calCoreModel->loadCoreAnimation(strPath + strData);
+        if(m_animationId[FUNKY] == -1) {
+          CalError::printLastError();
+          return false;
+        }
         animationCount++;
       }
       else if(strKey == "mesh")
       {
         // load core mesh
-  //      std::cout << "Loading mesh '" << strData << "'..." << std::endl;
         if(m_calCoreModel->loadCoreMesh(strPath + strData) == -1)
         {
           CalError::printLastError();
@@ -327,7 +368,6 @@ bool Cal3d::init(const std::string& strFilename)
       else if(strKey == "material")
       {
         // load core material
-  //      std::cout << "Loading material '" << strData << "'..." << std::endl;
         if(m_calCoreModel->loadCoreMaterial(strPath + strData) == -1)
         {
           CalError::printLastError();
@@ -401,10 +441,8 @@ bool Cal3d::init(const std::string& strFilename)
   m_calModel.setMaterialSet(0);
 
   // set initial animation state
-  m_state = STATE_MOTION;
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION], m_motionBlend[0], 0.0f);
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 1], m_motionBlend[1], 0.0f);
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 2], m_motionBlend[2], 0.0f);
+  m_state = STATE_IDLE;
+  m_calModel.getMixer()->blendCycle(m_animationId[IDLE], 1.0f, 0.0f);
 
   instance_count++;
   return true;
@@ -527,7 +565,6 @@ void Cal3d::shutdown()
   instance_count--;
   // destroy the model instance
   m_calModel.destroy();
-
   // Hopefully removes all core models once last cal3d has been removed
   // This should really be handled elsewhere
   if (instance_count == 0) {
@@ -563,11 +600,11 @@ void Cal3d::setMotionBlend(float *pMotionBlend, float delay)
   m_motionBlend[1] = pMotionBlend[1];
   m_motionBlend[2] = pMotionBlend[2];
 
-  m_calModel.getMixer()->clearCycle(m_animationId[STATE_IDLE], delay);
-  m_calModel.getMixer()->clearCycle(m_animationId[STATE_FANCY], delay);
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION], m_motionBlend[0], delay);
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 1], m_motionBlend[1], delay);
-  m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 2], m_motionBlend[2], delay);
+  m_calModel.getMixer()->clearCycle(m_animationId[IDLE], delay);
+  m_calModel.getMixer()->clearCycle(m_animationId[FUNKY], delay);
+  m_calModel.getMixer()->blendCycle(m_animationId[STRUT], m_motionBlend[0], delay);
+  m_calModel.getMixer()->blendCycle(m_animationId[WALK], m_motionBlend[1], delay);
+  m_calModel.getMixer()->blendCycle(m_animationId[RUN], m_motionBlend[2], delay);
 
   m_state = STATE_MOTION;
 }
@@ -583,29 +620,29 @@ void Cal3d::setState(int state, float delay)
   {
     if(state == STATE_IDLE)
     {
-      m_calModel.getMixer()->blendCycle(m_animationId[STATE_IDLE], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_FANCY], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION + 1], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION + 2], delay);
+      m_calModel.getMixer()->blendCycle(m_animationId[IDLE], 1.0f, delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[FUNKY], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[STRUT], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[WALK], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[RUN], delay);
       m_state = STATE_IDLE;
     }
     else if(state == STATE_FANCY)
     {
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_IDLE], delay);
-      m_calModel.getMixer()->blendCycle(m_animationId[STATE_FANCY], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION + 1], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_MOTION + 2], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[IDLE], delay);
+      m_calModel.getMixer()->blendCycle(m_animationId[FUNKY], 1.0f, delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[STRUT], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[WALK], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[RUN], delay);
       m_state = STATE_FANCY;
     }
     else if(state == STATE_MOTION)
     {
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_IDLE], delay);
-      m_calModel.getMixer()->clearCycle(m_animationId[STATE_FANCY], delay);
-      m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION], m_motionBlend[0], delay);
-      m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 1], m_motionBlend[1], delay);
-      m_calModel.getMixer()->blendCycle(m_animationId[STATE_MOTION + 2], m_motionBlend[2], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[IDLE], delay);
+      m_calModel.getMixer()->clearCycle(m_animationId[FUNKY], delay);
+      m_calModel.getMixer()->blendCycle(m_animationId[STRUT], m_motionBlend[0], delay);
+      m_calModel.getMixer()->blendCycle(m_animationId[WALK], m_motionBlend[1], delay);
+      m_calModel.getMixer()->blendCycle(m_animationId[RUN], m_motionBlend[2], delay);
       m_state = STATE_MOTION;
     }
   }
@@ -614,15 +651,18 @@ void Cal3d::setState(int state, float delay)
 void Cal3d::action(const std::string &action) {
   if (action == "idle") {
     setState(STATE_IDLE, 0);
-//    setMotionBlend((float *)&_idle_blend[0], 0);
+  }  else if (action == "funky") {
+    setState(STATE_FANCY, 0);
+  }  else if (action == "strut") {
+    setMotionBlend((float *)&_strut_blend[0], 0);
   } else if (action == "walk") {
     setMotionBlend((float *)&_walk_blend[0], 0);
   } else if (action == "run") {
     setMotionBlend((float *)&_run_blend[0], 0);
   } else if (action == "wave") {
-    executeAction(1);
-  } else if (action == "funky") {
     executeAction(0);
+  } else if (action == "shoot_arrow") {
+    executeAction(1);
   }
 }
 

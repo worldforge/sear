@@ -109,10 +109,13 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_PAGEDOWN) _camera->elevate(-1);
       else if (event.key.keysym.sym == SDLK_UP) _camera->zoom(-1);
       else if (event.key.keysym.sym == SDLK_DOWN) _camera->zoom(1);
-      else if (event.key.keysym.sym == SDLK_1) model->action("walk");
-      else if (event.key.keysym.sym == SDLK_2) model->action("run");
-      else if (event.key.keysym.sym == SDLK_3) model->action("wave");
-      else if (event.key.keysym.sym == SDLK_4) model->action("funky");
+      else if (event.key.keysym.sym == SDLK_1) model->action("idle");
+      else if (event.key.keysym.sym == SDLK_2) model->action("walk");
+      else if (event.key.keysym.sym == SDLK_3) model->action("run");
+      else if (event.key.keysym.sym == SDLK_4) model->action("strut");
+      else if (event.key.keysym.sym == SDLK_5) model->action("wave");
+      else if (event.key.keysym.sym == SDLK_6) model->action("shoot_arrow");
+      else if (event.key.keysym.sym == SDLK_7) model->action("funky");
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       break;
     }

@@ -1,3 +1,8 @@
+31th August 2002, Simon Goodall
+ * Fixed bug with cally models where models appeared white instead of their material colours. Caused by scaling the cally model which upsets the normals. Added option to state manager to enable GL_RESCALE_NORMAL to fix this
+ * Fixed bug in ROAM code where the height map was free'd twice
+ * Cally config files now need to specify what type of animation the animation file is. e.g. animation_walk=walk_animation.caf
+
 30th August 2002, Simon Goodall
  * Code changes for new Metaserver design
 

@@ -129,6 +129,10 @@ StateProperties *StateLoader::readRecord(FILE *state_file) {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       sp->fog = (std::string(string_data) == "true") ? (true) : (false);
     }
+    else if (tag == "rescale_normals") {
+      sscanf(str, "%*s = %s\n", &string_data[0]);  
+      sp->rescale_normals = (std::string(string_data) == "true") ? (true) : (false);
+    }
     else {
       Log::writeLog(std::string("State Loader: Unknown Tag - ") + tag, Log::LOG_ERROR);
     }

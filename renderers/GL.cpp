@@ -487,6 +487,8 @@ void GL::stateChange(StateProperties *sp) {
     else glDisable(GL_STENCIL_TEST);
     if (sp->fog) glEnable(GL_FOG);
     else glDisable(GL_FOG);
+    if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
+    else glDisable(GL_RESCALE_NORMAL);
   }
   _cur_state = sp;
 }
@@ -729,6 +731,10 @@ void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StatePr
   if (previous_state->fog != next_state->fog) {
     if (next_state->fog) glEnable(GL_FOG);
     else glDisable(GL_FOG);
+  }
+  if (previous_state->rescale_normals != next_state->rescale_normals) {
+    if (next_state->rescale_normals) glEnable(GL_RESCALE_NORMAL);
+    else glDisable(GL_RESCALE_NORMAL);
   }
   glEndList();
 }

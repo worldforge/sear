@@ -17,10 +17,21 @@ namespace Sear {
 
 class Render;
 	
-class Cal3d : public Model
-{
+class Cal3d : public Model {
 // misc
 public:
+
+  typedef enum {
+    IDLE = 0,
+    WALK,
+    RUN,
+    STRUT,
+    WAVE,
+    SHOOT_ARROW,
+    FUNKY,
+    NUM_ANIMATIONS
+  } Animation;
+	
   static const int STATE_IDLE;
   static const int STATE_FANCY;
   static const int STATE_MOTION;
@@ -30,7 +41,7 @@ protected:
   int m_state;
   CalCoreModel *m_calCoreModel;
   CalModel m_calModel;
-  int m_animationId[16];
+  int m_animationId[NUM_ANIMATIONS];
   int m_animationCount;
   int m_meshId[32];
   int m_meshCount;
@@ -45,7 +56,7 @@ protected:
  
   static float _walk_blend[];
   static float _run_blend[];
-  static float _swagger_blend[];
+  static float _strut_blend[];
   
 // constructors/destructor
 public:
