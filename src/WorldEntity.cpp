@@ -172,7 +172,9 @@ std::string WorldEntity::type() {
 
 std::string WorldEntity::parent() {
   Eris::TypeInfo *ti = getType();
-  if (ti) return *ti->getParentsAsSet().begin();
+  if (ti) {
+	  return *ti->getParentsAsSet().begin();
+  }
   return "";
 }
 
