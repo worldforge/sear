@@ -1,4 +1,7 @@
 8th September 2002, Simon Goodall
+ * Removed optionability of lib3ds and cal3d due to  incompatibility problems of the method used
+
+8th September 2002, Simon Goodall
  * Updated depend on varconf 0.5.4 release instead of CVS
 
 8th September 2002, Simon Goodall
