@@ -1,4 +1,3 @@
-/load_general ${SEAR_INSTALL}/data/general_files.cfg
 /load_general ${SEAR_INSTALL}/data/general.cfg
 /load_bindings ${SEAR_INSTALL}/data/bindings.cfg
 /load_state_file ${SEAR_INSTALL}/data/states.cfg
