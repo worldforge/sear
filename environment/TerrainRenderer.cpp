@@ -316,12 +316,13 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
     glColor4f(0.8f, 0.8f, 1.f, 0.6f);
     glNormal3f(0.0f,0.0f,1.0f);
     glEnable(GL_COLOR_MATERIAL);
+    float seaLevel = 0.1f * sin(System::instance()->getTime() / 10000.0f);
     for (; I != segs.end(); ++I) {
         const Terrain::Segmentcolumn & col = I->second;
         Terrain::Segmentcolumn::const_iterator J = col.begin();
         for (; J != col.end(); ++J) {
             glPushMatrix();
-            glTranslatef(I->first * segSize, J->first * segSize, 0.1f * sin(System::instance()->getTime() / 10000.0f));
+            glTranslatef(I->first * segSize, J->first * segSize, seaLevel);
             GLfloat vertices[] = { 0.f, 0.f, 0.f,
                                    segSize, 0, 0.f,
                                    segSize, segSize, 0.f,

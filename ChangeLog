@@ -1,3 +1,11 @@
+2004-06-30  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* environment/TerrainRenderer.cpp: Move sea level calculation out of loop (thanks to JohnFlux)
+	* loaders/cal3d/Cal3D.cpp: Use a longer blend time between animations
+	* src/FileHandler.cpp: Include errno.h for gcc 3.4
+	* src/Graphics.cpp, src/Light.h: Use enum for colour channels
+	* src/LightManger.cpp: Code tidying
+
 2004-06-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* common/Use.h, common/Wield.h, common/operations.cpp: Add

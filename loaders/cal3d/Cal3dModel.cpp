@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.13 2004-06-15 20:37:05 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.14 2004-06-30 12:44:21 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -200,17 +200,17 @@ void Cal3dModel::setLodLevel(float lodLevel) {
 void Cal3dModel::action(const std::string &action) {
   Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
   if (action == "standing") {
-    m_calModel.getMixer()->blendCycle(animations[STANDING], 1.0f, 0.1f);
-    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.1f);
-    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.1f);
+    m_calModel.getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
+    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.2f);
   } else if (action == "walking") {
-    m_calModel.getMixer()->blendCycle(animations[WALKING], 1.0f, 0.1f);
-    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.1f);
-    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.1f);
+    m_calModel.getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
+    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.2f);
+    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.2f);
   } else if (action == "running") {
-    m_calModel.getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.1f);
-    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.1f);
-    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.1f);
+    m_calModel.getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
+    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.2f);
   } else {
 //    std::string act = *animations.find(action);
 //    if (*animations.find(action) != ) {

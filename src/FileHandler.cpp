@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.11 2004-06-26 15:48:02 simon Exp $
+// $Id: FileHandler.cpp,v 1.12 2004-06-30 12:44:21 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <iostream>
+#include <errno.h>
 
 #include "FileHandler.h"
 #include "Console.h"

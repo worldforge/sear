@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Light.h,v 1.3 2004-06-26 07:02:36 simon Exp $
+// $Id: Light.h,v 1.4 2004-06-30 12:44:21 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1
@@ -19,6 +19,13 @@ public:
     SPOT,
     LAST_LIGHT_TYPE
   } LightType;
+
+  typedef enum {
+    RED = 0,
+    BLUE,
+    GREEN,
+    ALPHA
+  } Channels;
   
   Light() :
     light_type(POINT),

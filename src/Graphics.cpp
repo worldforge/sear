@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.55 2004-06-26 07:02:15 simon Exp $
+// $Id: Graphics.cpp,v 1.56 2004-06-30 12:44:21 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -539,20 +539,20 @@ void Graphics::writeConfig() {
   general.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
   general.setItem(GRAPHICS, KEY_fire_aq, m_fire.attenuation_quadratic);
   
-  general.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[0]);
-  general.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[1]);
-  general.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[2]);
-  general.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[3]);
+  general.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[Light::RED]);
+  general.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[Light::GREEN]);
+  general.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[Light::BLUE]);
+  general.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[Light::ALPHA]);
 
-  general.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[0]);
-  general.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[1]);
-  general.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[2]);
-  general.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[3]);
+  general.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[Light::RED]);
+  general.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[Light::GREEN]);
+  general.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[Light::BLUE]);
+  general.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[Light::ALPHA]);
 
-  general.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[0]);
-  general.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[1]);
-  general.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[2]);
-  general.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[3]);
+  general.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[Light::RED]);
+  general.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[Light::GREEN]);
+  general.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[Light::BLUE]);
+  general.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[Light::ALPHA]);
 
 }  
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.5 2004-06-26 15:48:02 simon Exp $
+// $Id: LightManager.cpp,v 1.6 2004-06-30 12:44:21 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -62,17 +62,18 @@ void LightManager::applyLight(const Light &light) {
   // Select light number
   GLenum lightNum = GL_LIGHT2;
   switch (m_lightCounter) {
-    case (0) : lightNum  = GL_LIGHT2;break;
-    case (1) : lightNum  = GL_LIGHT3;break;
-    case (2) : lightNum  = GL_LIGHT4;break;
-    case (3) : lightNum  = GL_LIGHT5;break;
-    case (4) : lightNum  = GL_LIGHT6;break;
-    case (5) : lightNum  = GL_LIGHT7;break;
+    case (0) : lightNum = GL_LIGHT2; break;
+    case (1) : lightNum = GL_LIGHT3; break;
+    case (2) : lightNum = GL_LIGHT4; break;
+    case (3) : lightNum = GL_LIGHT5; break;
+    case (4) : lightNum = GL_LIGHT6; break;
+    case (5) : lightNum = GL_LIGHT7; break;
     default: return; // Number out of allowed range
   }
 
   // Turn on light
   glEnable(lightNum);
+
   // Set position
   float pos[] = {light.position.x(), light.position.y(), light.position.z(), 1.0f}; // 1.0f for positional light
   glLightfv(lightNum, GL_POSITION, pos);
