@@ -34,17 +34,9 @@ class Render;
 
 class Console : public ConsoleObject {
 public:
-  Console(System *system) :
-    animateConsole(0),
-    showConsole(0),
-    consoleHeight(0),
-    console_messages(std::list<std::string>()),
-    screen_messages(std::list<screenMessage>()),
-    _system(system),
-    _renderer(NULL)
-  {
-  }
-  ~Console() {}
+  Console(System *system);
+  ~Console();
+  
   bool init();
   void shutdown();
  

@@ -43,6 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{prefix}/share/%{name}/*
 %{prefix}/bin/%{name}
+%doc README COPYING AUTHORS
 
 
 # end of file

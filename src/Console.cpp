@@ -13,6 +13,18 @@
 
 namespace Sear {
 
+Console::Console(System *system) :
+  animateConsole(0),
+  showConsole(0),
+  consoleHeight(0),
+  console_messages(std::list<std::string>()),
+  screen_messages(std::list<screenMessage>()),
+  _system(system),
+  _renderer(NULL)
+{ }
+
+Console::~Console() {}
+
 bool Console::init() {
   _renderer = _system->getGraphics()->getRender();
   panel_id = _renderer->requestTexture("ui", "panel");

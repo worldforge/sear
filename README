@@ -1,12 +1,53 @@
 Sear
 
+Dependancies
+------------
+
+Atlas 0.4.5
+ftp://ftp.worldforge.org/pub/worldforge/libs/Atlas-C++
+
+Eris 0.9.5
+Get latest CVS versopn
+
+Varconf
+Get latest CVS version
+
+WFmath
+Get latest CVS version
+
+Skstream2
+Get latest CVS version
+
+SDL 1.2.4 (1.2.2 will also probably work)
+http://www.libsdl.org/
+
+SDL_image 1.2.2
+http://www.libsdl.org/projects/SDL_image
+
+SigC 1.0.3
+http://sourceforge.net/projects/libsigc/
+
+Lib3ds 1.0.2
+http://sourceforge.net/projects/lib3ds/
+
+OpenGL 1.3
+
+cal3d 0.7
+http://sourceforge.net/projects/cal3d/
+
 MEDIA is not in CVS. Please see ftp for media packs, details on website.
+ftp://ftp.worldforge.org/pub/worldforge/clients/sear
+
 
 Please visit website for full instructions. 
 
+
 Terrain Engine code based up ROAM demo by Bryan Turner. (www.fractalscape.org)
 
+
 Website: http://www.worldforge.org/dev/eng/clients/sear
+
+Simon Goodall
 
 Email: sear@simongoodall.co.uk
 IRC irc.worldforge.org NICK simon

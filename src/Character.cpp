@@ -23,7 +23,6 @@
 #include "Event.h"
 #include "System.h"
 #include "Character.h"
-#include "client.h"
 #include "Console.h"
 #include "Render.h"
 #include "Graphics.h"
