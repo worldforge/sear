@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.h,v 1.3 2003-03-23 19:51:49 simon Exp $
+// $Id: Calendar.h,v 1.4 2004-05-14 12:17:21 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -56,19 +56,16 @@ public:
    */  
   void shutdown();
 
-  /** 
-   * Update calendar by time_elapsed
-   * @param time_elapsed Time elapsed in milliseconds 
-   */
-  void update(unsigned int time_elapsed) {
-    update ((float)time_elapsed / 1000.0f);
-  }
-
   /**
    * Update calendar by time_elapsed seconds.
    * @param time_elapsed Time elapsed in seconds
    */
-  void update(float time_elapsed);
+  void update(double time_elapsed);
+
+  /**
+   * Re-sync with server time
+   */
+  void serverUpdate(double time);
 
   /**
    * Read Calendar config data
@@ -141,7 +138,7 @@ public:
    * Return current seconds
    * @return Current seconds
    */
-  float getSeconds() const { return _seconds; }
+  double getSeconds() const { return _seconds; }
   
   /**
    * Return minutes
@@ -213,7 +210,7 @@ public:
    * Return number of seconds in current time area
    * @return Seconds in time area
    */ 
-  float getTimeInArea() const { return _time_in_area; }
+  double getTimeInArea() const { return _time_in_area; }
   
   /**
    * Return name of day
@@ -239,8 +236,9 @@ private:
   unsigned int _months_per_year;    //</ Number of months in a year
 
   // Current time and date values
-  float _seconds; ///< Current seconds
-  float _seconds_counter; ///< Number of seconds passed in current day
+  double _seconds; ///< Current seconds
+  double m_server_seconds; ///< Predicted server seconds
+  double _seconds_counter; ///< Number of seconds passed in current day
   unsigned int _minutes; ///< Current minutes
   unsigned int _hours; ///< Current hour
   unsigned int _days; ///< Current day
@@ -254,7 +252,7 @@ private:
   unsigned int _dusk_start; ///< Hour in which dusk starts
   unsigned int _night_start; ///< Hour in which night starts
 
-  float _time_in_area; ///< Time duration in current time area
+  double _time_in_area; ///< Time duration in current time area
   
   /**
    * Mapping between number and name

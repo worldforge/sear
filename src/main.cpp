@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.19 2004-04-29 10:33:26 simon Exp $
+// $Id: main.cpp,v 1.20 2004-05-14 12:17:21 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
   Sear::System *sys = NULL;
   std::list<std::string> path_list;
   sys = NULL;
-  
+  char **p_argv  = argv;
+  int p_argc = argc;
   if (argc > 1) {
     std::string invoked = std::string((char *)argv[0]);
     (argv)++;
@@ -70,7 +71,7 @@ int main(int argc, char** argv) {
 	exit_program = true;
       }
       else {
-        std::cout << "Unknown arument: " << arg << std::endl;
+//        std::cout << "Unknown arument: " << arg << std::endl;
       }
     }
   }
@@ -84,7 +85,7 @@ under certain conditions; type `show c' for details.
   
   sys = new Sear::System();
   sys->addSearchPaths(path_list);
-  if (!sys->init()) {
+  if (!sys->init(p_argc, p_argv)) {
     std::cerr << "Error initialising Sear!" << std::endl;
     exit (1);
   }

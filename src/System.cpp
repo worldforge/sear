@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.84 2004-05-06 18:32:50 simon Exp $
+// $Id: System.cpp,v 1.85 2004-05-14 12:17:21 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -100,7 +100,7 @@ namespace Sear {
   static const int DEFAULT_window_width = 640;
   static const int DEFAULT_window_height = 480;  
   static const bool DEFAULT_mouse_move_select = true;
-  static const float DEFAULT_max_click_time = 0.3;
+  static const double DEFAULT_max_click_time = 0.3;
   static const int DEFAULT_joystick_touch_button = 1;
   static const int DEFAULT_joystick_pickup_button = 2;
 
@@ -133,7 +133,7 @@ System::System() :
   _cursor_pickup(NULL),
   _cursor_touch(NULL),
   _mouse_move_select(false),
-  _seconds(0.0f),
+  _seconds(0.0),
   _process_records(false),
   sound(NULL),
   _system_running(false),
@@ -152,7 +152,7 @@ System::~System() {
 }
 
 
-bool System::init() {
+bool System::init(int argc, char *argv[]) {
   if (_initialised) shutdown();
   if (!initVideo()) return false;
 
@@ -239,6 +239,10 @@ bool System::init() {
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     _script_engine->runScript(*I);
   }
+ for (int i = 0; i < argc; ++i) {
+std::cout << argv[i] << std::endl;
+}
+  _general.getCmdline(argc, argv);
   readConfig();
   RenderSystem::getInstance().readConfig();
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
@@ -364,12 +368,12 @@ bool System::initVideo() {
 
 void System::mainLoop() {
   SDL_Event event;
-  static float last_time = 0.0f;
+  static double last_time = 0.0;
   _action_handler->handleAction("system_start", NULL);
   while (_system_running) {
     try {
-      _seconds = (float)SDL_GetTicks() / 1000.0f;
-      float time_elapsed = _seconds - last_time;
+      _seconds = (double)SDL_GetTicks() / 1000.0f;
+      double time_elapsed = _seconds - last_time;
       last_time = _seconds;
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
@@ -433,7 +437,7 @@ void System::handleEvents(const SDL_Event &event) {
         case (SDL_BUTTON_LEFT):   {
           switch (action) {
             case (ACTION_DEFAULT): {
-              float period = _seconds - _click_seconds;
+              double period = _seconds - _click_seconds;
               if ((period > DEFAULT_max_click_time) &&
                   ((event.button.x != _click_x) ||
                    (event.button.y != _click_y))) {
@@ -976,5 +980,11 @@ void System::varconf_general_callback(const std::string &section, const std::str
       _height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
     }
   }
-}       
+}
+
+
+void System::updateTime(double time) {
+  _calendar->serverUpdate(time);
+}
+       
 } /* namespace Sear */

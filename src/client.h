@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.15 2004-04-26 20:26:51 simon Exp $
+// $Id: client.h,v 1.16 2004-05-14 12:17:21 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -103,6 +103,7 @@ protected:
   void Timeout(Eris::Connection::Status);
   void StatusChanged(Eris::Connection::Status);
   void Log(Eris::LogLevel, const std::string &);
+  void GotTime(double time);
 
   //Lobby
   void LoggedIn(const Atlas::Objects::Entity::Player &p);

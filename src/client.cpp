@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.57 2004-04-27 15:07:02 simon Exp $
+// $Id: client.cpp,v 1.58 2004-05-14 12:17:21 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -413,6 +413,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
     throw Exception("Bad creation");
   }
   Log::writeLog("Client::createCharacter: Setting up callbacks", Log::LOG_INFO);
+  world->GotTime.connect(SigC::slot(*this, &Client::GotTime));
   world->Entered.connect(SigC::slot(*this, &Client::Entered));
   world->EntityCreate.connect(SigC::slot(*this, &Client::EntityCreate));
   world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
@@ -454,6 +455,7 @@ int Client::takeCharacter(const std::string &id) {
     throw Exception ("Bad take");
   }
   Log::writeLog("Client::takeCharacter: Setting up callbacks", Log::LOG_INFO);
+  world->GotTime.connect(SigC::slot(*this, &Client::GotTime));
   world->Entered.connect(SigC::slot(*this, &Client::Entered));  
   world->EntityCreate.connect(SigC::slot(*this, &Client::EntityCreate));
   world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
@@ -817,6 +819,10 @@ void Client::completedServerList() {
     //HINT: Always use .c_str() for compatibility to MSVC
   }
   return;
+}
+
+void Client::GotTime(double time) {
+  System::instance()->updateTime(time);
 }
 
 } /* namespace Sear */

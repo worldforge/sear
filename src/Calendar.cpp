@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.7 2004-04-27 15:07:02 simon Exp $
+// $Id: Calendar.cpp,v 1.8 2004-05-14 12:17:21 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -50,8 +50,8 @@ static const std::string KEY_DAY_NAME = "day_name_";
 static const std::string KEY_MONTH_NAME = "month_name_";
 
 // Default config values
-static const unsigned int DEFAULT_SECONDS_PER_MINUTE = 60;
-static const unsigned int DEFAULT_MINUTES_PER_HOUR = 20;
+static const unsigned int DEFAULT_SECONDS_PER_MINUTE = 20;
+static const unsigned int DEFAULT_MINUTES_PER_HOUR = 60;
 static const unsigned int DEFAULT_HOURS_PER_DAY = 24;
 static const unsigned int DEFAULT_DAYS_PER_WEEK = 7;
 static const unsigned int DEFAULT_WEEKS_PER_MONTH = 4;
@@ -126,19 +126,68 @@ void Calendar::shutdown() {
   _initialised = false;
 }
 
-void Calendar::update(float time_elapsed) {
+void Calendar::serverUpdate(double time) {
+//  if (debug)
+  std::cout << "Current: " << _seconds << " - Server: " << time << std::endl;
+  double diff = time - m_server_seconds;
+  /*
+  if (abs(diff) < 60.0) {
+    _seconds = time;
+  } else {
+    _seconds += (diff > 0.0) ? (60.0) : (-60.0);
+  }
+  */
+//  _seconds = time;
+  // Sync calendar values
+  update(diff);
+}
+
+void Calendar::update(double time_elapsed) {
   assert ((_initialised == true) && "Calender not initialised");
+
+  m_server_seconds += time_elapsed;
+
   _seconds += time_elapsed;
   _seconds_counter += time_elapsed;
   // Check for seconds overflow  
-  if (_seconds >= _seconds_per_minute) {
+  while (_seconds >= _seconds_per_minute) {
     ++_minutes;
     _seconds -= _seconds_per_minute;
   } 
   // Check for minutes overflow
-  if (_minutes >= _minutes_per_hour) {
+  while (_minutes >= _minutes_per_hour) {
     ++_hours;
     _minutes -= _minutes_per_hour;
+  }
+  
+  // Check for hours overflow
+  while (_hours >= _hours_per_day) {
+    ++_days;
+    // Update day name
+    _current_day_name = _day_names[_days];
+    _hours -= _hours_per_day;
+  }
+  // Check for days overflow
+  while (_days >= _days_per_week) {
+    ++_weeks;
+    _days -= _days_per_week;
+    _seconds_counter -= _seconds_per_minute * _minutes_per_hour * _hours_per_day;
+    // Update day name
+    _current_day_name = _day_names[_days];
+  }
+  // Check for weeks overflow
+  while (_weeks >= _weeks_per_month) {
+    ++_months;
+    // Update month name
+    _current_month_name = _month_names[_months];
+    _weeks -= _weeks_per_month;
+  }
+  // Check for months overflow
+  while (_months >= _months_per_year) {
+    ++_years;
+    _months -= _months_per_year;
+    // Update month name
+    _current_month_name = _month_names[_months];
   }
   // Update Time Area
   TimeArea ta = _time_area; // Store current time area
@@ -172,36 +221,8 @@ void Calendar::update(float time_elapsed) {
     // Update _time_in_area
     _time_in_area += time_elapsed;
   }
-  
-  // Check for hours overflow
-  if (_hours >= _hours_per_day) {
-    ++_days;
-    // Update day name
-    _current_day_name = _day_names[_days];
-    _hours -= _hours_per_day;
-  }
-  // Check for days overflow
-  if (_days >= _days_per_week) {
-    ++_weeks;
-    _days -= _days_per_week;
-    _seconds_counter -= _seconds_per_minute * _minutes_per_hour * _hours_per_day;
-    // Update day name
-    _current_day_name = _day_names[_days];
-  }
-  // Check for weeks overflow
-  if (_weeks >= _weeks_per_month) {
-    ++_months;
-    // Update month name
-    _current_month_name = _month_names[_months];
-    _weeks -= _weeks_per_month;
-  }
-  // Check for months overflow
-  if (_months >= _months_per_year) {
-    ++_years;
-    _months -= _months_per_year;
-    // Update month name
-    _current_month_name = _month_names[_months];
-  }
+
+
 }
 
 void Calendar::readConfig() {

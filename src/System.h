@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.41 2004-05-02 14:17:20 jmt Exp $
+// $Id: System.h,v 1.42 2004-05-14 12:17:21 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -77,7 +77,7 @@ public:
    * Initialise the system object
    * @return True on success
    */ 
-  bool init();
+  bool init(int argc, char *argv[]);
 
   /**
    * Shutdown the system object. This will destroy any objects created by the system
@@ -137,6 +137,9 @@ public:
    * @return Time in seconds
    */ 
   float getTimef() const { return (float)SDL_GetTicks() / 1000.0f; }
+  double getTimeD() const { return (double)SDL_GetTicks() / 1000.0; }
+
+  void updateTime(double time);
 
   /**
    * Set a system state
@@ -222,7 +225,7 @@ protected:
   int _click_x;
   int _click_y;
   std::string _click_id;
-  float _click_seconds;
+  double _click_seconds;
 
   ScriptEngine *_script_engine; ///< Pointer to scripting engine object
   EventHandler *_event_handler; ///< Pointer to event handler object
@@ -253,7 +256,7 @@ protected:
 
   bool _mouse_move_select;
 
-  float _seconds;
+  double _seconds;
 
   typedef struct {
     std::string section;
