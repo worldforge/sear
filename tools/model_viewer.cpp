@@ -118,6 +118,8 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_7) model->action("funky");
       else if (event.key.keysym.sym == SDLK_8) model->action("change_set_0");
       else if (event.key.keysym.sym == SDLK_9) model->action("change_set_1");
+      else if (event.key.keysym.sym == SDLK_i) model->action("add_0");
+      else if (event.key.keysym.sym == SDLK_o) model->action("remove_0");
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       break;
     }

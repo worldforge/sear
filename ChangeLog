@@ -1,4 +1,7 @@
 31th August 2002, Simon Goodall
+ * Cal3d loader now supports adding and removing meshes. Model viewer option added to test this
+
+31th August 2002, Simon Goodall
  * Added support for multiple texture sets in cal3d loader.
  * Added extra options to model viewer.
  * Added a light source to modelviewer.

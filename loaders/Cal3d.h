@@ -31,6 +31,14 @@ public:
     FUNKY,
     NUM_ANIMATIONS
   } Animation;
+
+  typedef enum {
+    AXE = 0,
+    SWORD,
+    STAFF,
+    BOW,
+    NUM_WEAPONS
+  } Weapons;
 	
   static const int STATE_IDLE;
   static const int STATE_FANCY;
@@ -42,6 +50,7 @@ protected:
   CalCoreModel *m_calCoreModel;
   CalModel m_calModel;
   int m_animationId[NUM_ANIMATIONS];
+  int m_weaponId[NUM_WEAPONS];
   int m_animationCount;
   int m_meshId[32];
   int m_meshCount;

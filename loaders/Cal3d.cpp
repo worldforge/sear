@@ -366,6 +366,20 @@ bool Cal3d::init(const std::string& strFilename) {
           return false;
         }
       }
+      else if(strKey.substr(0,5)   == "mesh_") {
+        // load core mesh
+	int code = m_calCoreModel->loadCoreMesh(strPath + strData);
+        if(code == -1)
+        {
+          CalError::printLastError();
+          return false;
+        }
+	std::string weapon = strKey.substr(5);
+	if (weapon == "axe") m_weaponId[AXE] = code;
+	else if (weapon == "sword") m_weaponId[SWORD] = code;
+	else if (weapon == "staff") m_weaponId[STAFF] = code;
+	else if (weapon == "bow") m_weaponId[BOW] = code;
+      }
       else if(strKey.substr(0,8) == "material") {
 	int length =  strKey.substr(9).find_first_of("_");
 	std::string set = strKey.substr(9, length);
@@ -678,6 +692,16 @@ void Cal3d::action(const std::string &action) {
     int i = 0;
     cast_stream(action.substr(11), i);
     m_calModel.setMaterialSet(i);
+  }
+  else if (action.substr(0, 4) == "add_") {
+    int i = 0;
+    cast_stream(action.substr(4), i);
+    m_calModel.attachMesh(m_weaponId[i]);
+  }
+  else if (action.substr(0, 7) == "remove_") {
+    int i = 0;
+    cast_stream(action.substr(7), i);
+    m_calModel.detachMesh(m_weaponId[i]);
   }
 }
 
