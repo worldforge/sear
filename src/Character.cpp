@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.45 2004-06-25 14:09:56 simon Exp $
+// $Id: Character.cpp,v 1.46 2004-06-28 20:14:20 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -33,6 +33,9 @@
 #include "Graphics.h"
 #include "ObjectHandler.h"
 #include "ObjectRecord.h"
+
+#include "common/Use.h"
+#include "common/Wield.h"
 
 #include <wfmath/atlasconv.h>
 
@@ -80,6 +83,8 @@ namespace Sear {
   static const std::string GIVE = "give";
   static const std::string DISPLAY_INVENTORY = "inventory";
   static const std::string MAKE = "make";
+  static const std::string USE = "use";
+  static const std::string WIELD = "wield";
 
   static const std::string SET_MATERIAL ="set_material";
   static const std::string SET_MESH ="set_mesh";
@@ -316,6 +321,35 @@ void Character::touchEntity(const std::string &id) {
   _avatar->touch(e);
 }
 
+void Character::wieldEntity(const std::string &name) {
+  for (unsigned int i = 0; i < _self->getNumMembers(); ++i) {
+    WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
+    if (we->getName() == name) {
+      Atlas::Objects::Operation::Wield w;
+      w.setFrom(_self->getID());
+      Atlas::Message::MapType arg;
+      arg["id"] = we->getID();
+      Atlas::Message::Element::ListType & args = w.getArgs();
+      args.push_back(arg);
+      _avatar->getWorld()->getConnection()->send(w);
+      return;
+    }
+  }
+}
+
+void Character::useToolOnEntity(const std::string & id) {
+  assert ((_initialised == true) && "Character not initialised");
+  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  if (!e) return;
+  Atlas::Objects::Operation::Use u;
+  u.setFrom(_self->getID());
+  Atlas::Message::MapType arg;
+  arg["id"] = e->getID();
+  Atlas::Message::Element::ListType & args = u.getArgs();
+  args.push_back(arg);
+  _avatar->getWorld()->getConnection()->send(u);
+}
+
 void Character::displayInventory() {
   assert ((_initialised == true) && "Character not initialised");	
 //  if (!_self) return;
@@ -431,6 +465,8 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(MAKE, this);
   console->registerCommand(TOUCH, this);
   console->registerCommand(SAY, this);
+  console->registerCommand(USE, this);
+  console->registerCommand(WIELD, this);
   console->registerCommand("set_app", this);
   console->registerCommand("clear_app", this);
   console->registerCommand("read_app", this);
@@ -480,6 +516,13 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      std::string type = tokeniser.nextToken();
      std::string name = tokeniser.remainingTokens();
      make(type, name);
+   }
+   else if (command == USE) {
+     useToolOnEntity(System::instance()->getGraphics()->getRender()->getActiveID());
+   }
+   else if (command == WIELD) {
+     std::string name = tokeniser.nextToken();
+     wieldEntity(name);
    }
    else if (command == "clear_app") clearApp();
     else if (command == "set_height") {

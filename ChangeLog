@@ -1,3 +1,11 @@
+2004-06-28  Al Riddoch  <alriddoch@zepler.org>
+
+	* common/Use.h, common/Wield.h, common/operations.cpp: Add
+	  new Use and Wield op classes.
+
+	* src/Character.cpp, src/Character.h: Add new use and wield
+	  commands to character using new ops.
+
 2004-06-26  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* src/system.cpp, src/Filehandler.h, src/FileHandler.cpp: Change storage type from list to set to avoid duplicates. Make code use typedef for FileList
