@@ -53,8 +53,6 @@ void Sprite::draw(Render* r)
         cerr << "called draw on NULL sprite reference" << endl;
 }
 
-#pragma mark -
-
 SpriteData::SpriteData(const std::string& spriteName) :
     m_refCount(0),
     m_valid(false),
