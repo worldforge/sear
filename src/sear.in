@@ -46,5 +46,5 @@ fi
 
 # Execute real sear binary
 echo "Starting Sear...."
-$PREFIX/bin/sear.bin
+$PREFIX/bin/sear-bin
 

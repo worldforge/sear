@@ -1,3 +1,8 @@
+2004-07-26  Simon Goodall  <simon@simongoodall.co.uk>
+
+	* sear.spec.in, src/Makefile.am, src/sear.in: Rename sear.bin to 
+	  sear-bin for debian compatibility. 
+
 2004-07-19  Simon Goodall  <simon@simongoodall.co.uk>
 
 	* Makefile.am, data/Makefile.am, scripts/Makefile.am: Move data and

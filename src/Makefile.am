@@ -1,4 +1,4 @@
-bin_PROGRAMS = sear.bin
+bin_PROGRAMS = sear-bin
 bin_SCRIPTS = sear
 noinst_LIBRARIES = libSear.a
 

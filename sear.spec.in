@@ -40,12 +40,15 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{_datadir}/%{name}/*
-%{_bindir}/sear.bin
+%{_bindir}/sear-bin
 %{_bindir}/sear
 
 %doc README COPYING AUTHORS
 
 %ChangeLog
+* Tue Jul 26 2004 Simon Goodall <simon@simongoodall.co.uk>
+- Update binary name
+
 * Tue Jul 13 2004 Simon Goodall <simon@simongoodall.co.uk>
 - Updates to work with Sear 0.5.0 release
 
