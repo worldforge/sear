@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: BillBoard.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
@@ -12,12 +14,16 @@ namespace Sear {
 
 BillBoard::BillBoard(Render *render) : Model(render),
 	// TODO: Should be set to false UNLESS a texture can be loaded
-  _use_textures(true)
+  _use_textures(true),
+  _initialised(false)
 {}
 
-BillBoard::~BillBoard() {}
+BillBoard::~BillBoard() {
+  if (_initialised) shutdown();
+}
   
 bool BillBoard::init(const std::string &type, float _width, float _height) {
+  if (_initialised) shutdown();
   _type = type;
   if (!_height) _height = 2.0f;
   if (!_width) _width = 2.0f;
@@ -37,10 +43,12 @@ bool BillBoard::init(const std::string &type, float _width, float _height) {
   _normal_data[1][1] = 0.0f; _normal_data[1][2] = -1.0f; _normal_data[1][2] = 0.0f;
   _normal_data[2][1] = 0.0f; _normal_data[2][2] = -1.0f; _normal_data[2][2] = 0.0f;
   _normal_data[3][1] = 0.0f; _normal_data[3][2] = -1.0f; _normal_data[3][2] = 0.0f;
+  _initialised = true;
   return true;
 }
 
 void BillBoard::shutdown() {
+  _initialised = false;
 }
 
 void BillBoard::render(bool select_mode) {

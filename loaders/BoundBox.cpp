@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: BoundBox.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
@@ -12,10 +14,13 @@ namespace Sear {
 
 BoundBox::BoundBox(Render *render) : Model(render), 
   _type("default"),
-  _use_textures(true)
+  _use_textures(true),
+  _initialised(false)
 {}
 
-BoundBox::~BoundBox() {}
+BoundBox::~BoundBox() {
+  if (_initialised) shutdown();
+}
   
 bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wrap) {
   _type = type;
@@ -197,11 +202,12 @@ bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wra
   _normal_data[21][0] =  0.0f; _normal_data[21][1] = -1.0f; _normal_data[21][2] =  0.0f;
   _normal_data[22][0] =  0.0f; _normal_data[22][1] = -1.0f; _normal_data[22][2] =  0.0f;
   _normal_data[23][0] =  0.0f; _normal_data[23][1] = -1.0f; _normal_data[23][2] =  0.0f;
+  _initialised = true;
   return true;
 }
 
 void BoundBox::shutdown() {
-
+  _initialised = false;
 }
 
 void BoundBox::render(bool select_mode) {

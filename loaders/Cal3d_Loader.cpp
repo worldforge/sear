@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: Cal3d_Loader.cpp,v 1.9 2002-09-07 23:27:06 simon Exp $
+
 #include "src/ModelHandler.h"
 
 #include "Cal3d_Loader.h"

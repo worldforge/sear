@@ -2,10 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-$Id: Cal3d.h,v 1.13 2002-09-07 22:42:45 simon Exp $
+// $Id: Cal3d.h,v 1.14 2002-09-07 23:27:06 simon Exp $
 
-#ifndef _CAL3D_H_
-#define _CAL3D_H_ 1
+#ifndef SEAR_CAL3D_H
+#define SEAR_CAL3D_H 1
 
 #include <map>
 
@@ -106,10 +106,10 @@ protected:
 //  static std::map<std::string, CalCoreModel*> core_models;
   static std::map<std::string, ModelAnimPair*> core_models;
 
-  bool _intialised;
+  bool _initialised;
 };
 
 } /* namespace Sear */
 
-#endif /* _CAL3D_H_ */
+#endif /* SEAR_CAL3D_H */
 

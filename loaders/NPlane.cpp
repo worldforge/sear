@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: NPlane.cpp,v 1.8 2002-09-07 23:27:06 simon Exp $
+
 #include "common/Utility.h"
 
 #include "src/System.h"
@@ -16,13 +18,16 @@ NPlane::NPlane(Render *render) : Model(render),
   _num_planes(0),
   _vertex_data(NULL),
   _normal_data(NULL),
-  _texture_data(NULL)
-
+  _texture_data(NULL),
+  _initialised(false)
 {}
 
-NPlane::~NPlane() {}
+NPlane::~NPlane() {
+  if (_initialised) shutdown();
+}
   
 bool NPlane::init(const std::string &type, unsigned int num_planes, float width, float height) {
+  if (_initialised) shutdown();
   _type = type;
   _num_planes = num_planes;
   float rads_per_segment = WFMath::Pi / (float)num_planes;
@@ -59,6 +64,7 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
     _texture_data[8 * i + 6] = 0.0f; _texture_data[8 * i + 7] = 1.0f;
     
   }
+  _initialised = true;
   return true;
 }
 
@@ -66,6 +72,7 @@ void NPlane::shutdown() {
   if (_vertex_data) free(_vertex_data);
   if (_normal_data) free(_normal_data);
   if (_texture_data) free(_texture_data);
+  _initialised = false;
 }
 
 void NPlane::render(bool select_mode) {

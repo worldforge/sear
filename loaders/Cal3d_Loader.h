@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _CAL3D_LOADER_H_
-#define _CAL3D_LOADER_H_ 1
+// $Id: Cal3d_Loader.h,v 1.6 2002-09-07 23:27:06 simon Exp $
+
+#ifndef SEAR_CAL3D_LOADER_H
+#define SEAR_CAL3D_LOADER_H 1
 
 #include "src/ModelLoader.h"
 #include "src/ModelStruct.h"
@@ -25,4 +27,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _CAL3D_LOADER_H_ */
+#endif /* SEAR_CAL3D_LOADER_H */

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _IMPOSTOR_LOADER_H_
-#define _IMPOSTOR_LOADER_H_ 1
+// $Id: Impostor_Loader.h,v 1.5 2002-09-07 23:27:06 simon Exp $
+
+#ifndef SEAR_IMPOSTOR_LOADER_H
+#define SEAR_IMPOSTOR_LOADER_H 1
 
 #include "src/ModelLoader.h"
 #include "src/ModelStruct.h"
@@ -26,4 +28,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _IMPOSTOR_LOADER_H_ */
+#endif /* SEAR_IMPOSTOR_LOADER_H */

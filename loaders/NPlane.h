@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _NPLANE_H_
-#define _NPLANE_H_ 1
+// $Id: NPlane.h,v 1.3 2002-09-07 23:27:06 simon Exp $
+
+#ifndef SEAR_NPLANE_H
+#define SAER_NPLANE_H 1
 
 #include <string>
 
@@ -32,7 +34,8 @@ private:
   float *_vertex_data;
   float *_normal_data;
   float *_texture_data;
+  bool _initialised;
 };
 
 } /* namespace Sear */ 
-#endif /* _NPLANE_H_ */
+#endif /* SEAR_NPLANE_H */

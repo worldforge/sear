@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Slice.cpp,v 1.5 2002-09-07 23:27:06 simon Exp $
+
 #include "common/Utility.h"
 
 #include "src/System.h"
@@ -32,14 +34,16 @@ namespace Sear {
 Slice::Slice(Render *render) : Model(render),
   _use_textures(true),
   slicings(NULL),
-  _trunk_model(NULL)
+  _trunk_model(NULL),
+  _initialised(false)
 {}
 
 Slice::~Slice() {
-
+  if (_initialised) shutdown();
 }
   
 bool Slice::init(const std::string &type, float width, float height, Model *trunk_model, unsigned int num_slicings, unsigned int slices_per_slicing) {
+  if (_initialised) shutdown();
   _type = type;
   _trunk_model = trunk_model;
   _num_slicings = num_slicings;
@@ -88,17 +92,25 @@ bool Slice::init(const std::string &type, float width, float height, Model *trun
     } 
   }
 
-  
+  _initialised = true;  
   return true;
 }
 
 void Slice::shutdown() {
   if (slicings) {
-//    for (unsigned int i = 0; i < _num_slicings; i++) {
-//    }	    
+    for (unsigned int i = 0; i < _num_slicings; i++) {
+      while (!slicings[i]->empty()) {
+        ASlice *slice = *slicings[i]->begin();
+	if (slice) delete slice;
+	slicings[i]->erase(slicings[i]->begin());
+      }
+      free (slicings[i]);
+      slicings[i] = NULL;
+    }	    
     free(slicings);
     slicings = NULL;
   }
+  _initialised = false;
 }
 
 void Slice::render(bool select_mode) {

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: WireFrame_Loader.cpp,v 1.8 2002-09-07 23:27:06 simon Exp $
+
 #include <string>
 
 #include "common/Utility.h"

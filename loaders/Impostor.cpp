@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Impostor.cpp,v 1.12 2002-09-07 23:27:06 simon Exp $
+
 #include "src/System.h"
 #include "src/Render.h"
 
@@ -11,13 +13,17 @@ namespace Sear {
 
 Impostor::Impostor(Render *render) : Model(render),
   _use_textures(true),
-  _multi_textures(false)
+  _multi_textures(false),
+  _initialised(false)
 
 {}
 
-Impostor::~Impostor() {}
+Impostor::~Impostor() {
+  if (_initialised) shutdown();
+}
   
 bool Impostor::init(const std::string &type, float _width, float _height, bool multi_textures) {
+  if (_initialised) shutdown();
   _type = type;
   _multi_textures = multi_textures;
   if (!_width) _width = 2.0f;
@@ -49,11 +55,13 @@ bool Impostor::init(const std::string &type, float _width, float _height, bool m
   _normal_data[5][1] = 1.0f; _normal_data[5][2] = 0.0f; _normal_data[5][2] = 0.0f;
   _normal_data[6][1] = 1.0f; _normal_data[6][2] = 0.0f; _normal_data[6][2] = 0.0f;
   _normal_data[7][1] = 1.0f; _normal_data[7][2] = 0.0f; _normal_data[7][2] = 0.0f;
+  _initialised = true;
   return true;
 }
 
 void Impostor::shutdown() {
-
+  _type = "";
+  _initialised = false;
 }
 
 void Impostor::render(bool select_mode) {

@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _BOUNDBOX_H
-#define _BOUNDBOX_H_ 1
+// $Id: BoundBox.h,v 1.5 2002-09-07 23:27:06 simon Exp $
+
+#ifndef SEAR_BOUNDBOX_H
+#define SEAR_BOUNDBOX_H 1
 
 /*
  * This reprents a model based upon its bounding box.
@@ -49,7 +51,8 @@ private:
   float _vertex_data[_num_points][3]; // Vertex data
   float _texture_data[_num_points][2]; // Texture Co-oridinates data
   float _normal_data[_num_points][3]; // Normal data
+  bool _initialised;
 };
 
 } /* namespace Sear */
-#endif /* _BOUNDBOX_H_ */
+#endif /* SEAR_BOUNDBOX_H */

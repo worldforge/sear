@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: WireFrame.cpp,v 1.8 2002-09-07 23:27:06 simon Exp $
+
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
@@ -10,12 +12,17 @@
 
 namespace Sear {
 
-WireFrame::WireFrame(Render *render) : Model(render)
+WireFrame::WireFrame(Render *render) :
+  Model(render),
+  _initialised(false)
 {}
  
-WireFrame::~WireFrame() {}
+WireFrame::~WireFrame() {
+  if (_initialised) shutdown();
+}
   
 bool WireFrame::init(WFMath::AxisBox<3> _bbox) {
+  if (_initialised) shutdown();
   _vertex_data[0][0] = _bbox.lowCorner().x(); _vertex_data[0][1] = _bbox.highCorner().y(); _vertex_data[0][2] = _bbox.lowCorner().z();
   _vertex_data[1][0] = _bbox.lowCorner().x();_vertex_data[1][1] = _bbox.lowCorner().y(); _vertex_data[1][2] = _bbox.lowCorner().z();
 
@@ -74,11 +81,12 @@ bool WireFrame::init(WFMath::AxisBox<3> _bbox) {
   _vertex_data[30][0] = _bbox.highCorner().x(); _vertex_data[30][1] = _bbox.lowCorner().y(); _vertex_data[30][2] = _bbox.highCorner().z();
   _vertex_data[31][0] = _bbox.highCorner().x(); _vertex_data[31][1] = _bbox.lowCorner().y(); _vertex_data[31][2] = _bbox.lowCorner().z();
 
-      
+  _initialised = true;    
   return true;
 }
 
 void WireFrame::shutdown() {
+  _initialised = false;
 }
 
 void WireFrame::render(bool) {

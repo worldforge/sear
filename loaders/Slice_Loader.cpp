@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: Slice_Loader.cpp,v 1.4 2002-09-07 23:27:06 simon Exp $
+
 #include "src/System.h"
 #include <string>
 

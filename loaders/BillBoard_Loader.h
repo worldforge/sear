@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _BILLBOARD_LOADER_H_
-#define _BILLBOARD_LOADER_H_ 1
+// $Id: BillBoard_Loader.h,v 1.5 2002-09-07 23:27:05 simon Exp $
+
+#ifndef SEAR_BILLBOARD_LOADER_H
+#define SEAR_BILLBOARD_LOADER_H 1
 
 #include "src/ModelLoader.h"
 #include "src/ModelStruct.h"
@@ -27,4 +29,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _BILLBOARD_LOADER_H_ */
+#endif /* SEAR_BILLBOARD_LOADER_H */

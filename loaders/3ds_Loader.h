@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _3DS_LOADER_H_
-#define _3DS_LOADER_H_ 1
+// $Id: 3ds_Loader.h,v 1.4 2002-09-07 23:27:05 simon Exp $
+
+#ifndef SEAR_3DS_LOADER_H
+#define SEAR_3DS_LOADER_H 1
 
 
 #include "src/ModelLoader.h"
@@ -27,4 +29,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _3DS_LOADER_H_ */
+#endif /* SEAR_3DS_LOADER_H */

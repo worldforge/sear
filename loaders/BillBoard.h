@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _BILLBOARD_H_
-#define _BILLBOARD_H_ 1
+// $Id: BillBoard.h,v 1.4 2002-09-07 23:27:05 simon Exp $
+
+#ifndef SEAR_BILLBOARD_H
+#define SEAR_BILLBOARD_H 1
 
 /*
  * This class represents the data for a billboard model
@@ -46,14 +48,15 @@ public:
 
   bool useTextures() { return _use_textures; }
   
-private:
+protected:
   bool _use_textures;
   static const int _num_points = 4; // Number of points in billboard
   std::string _type;
   float _vertex_data[_num_points][3]; // Vertex array data
   float _texture_data[_num_points][2]; // Texture co-ordintate array data
   float _normal_data[_num_points][3]; // Normals array data
+  bool _initialised;
 };
 
 } /* namespace Sear */
-#endif /* _BILLBOARD_H_ */
+#endif /* SEAR_BILLBOARD_H */

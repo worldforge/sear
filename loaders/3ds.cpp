@@ -2,6 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
+// $Id: 3ds.cpp,v 1.13 2002-09-07 23:27:04 simon Exp $
+
+
 #include <iostream>
 #include <list>
 #include <map>
@@ -29,13 +32,14 @@
 namespace Sear {
 
 ThreeDS::ThreeDS(Render *render) : Model(render),
-  _model (NULL)
+  _model (NULL),
+  _initialised(false)
 {
 
 }
 
 ThreeDS::~ThreeDS() {
-
+  if (_initialised) shutdown();
 }
 
 bool ThreeDS::init(const std::string &file_name) {
@@ -56,10 +60,13 @@ bool ThreeDS::init(const std::string &file_name) {
   }
   lib3ds_file_free(_model);
   _model = NULL;
+  _initialised = true;
   return true;
 }
 
 void ThreeDS::shutdown() {
+  //TODO Clean up 
+  _initialised = false;
 }
 
 void ThreeDS::render(bool select_mode) {

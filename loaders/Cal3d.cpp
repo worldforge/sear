@@ -2,8 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-
-$Id: Cal3d.cpp,v 1.18 2002-09-07 22:42:45 simon Exp $
+// $Id: Cal3d.cpp,v 1.19 2002-09-07 23:27:06 simon Exp $
 
 #include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -41,7 +40,7 @@ int Cal3d::instance_count = 0;
 
 Cal3d::Cal3d(Render *render) :
   Model(render),
-  _intialised(false)
+  _initialised(false)
 {
   m_state = STATE_IDLE;
   m_motionBlend[0] = 0.6f;
@@ -60,7 +59,7 @@ Cal3d::Cal3d(Render *render) :
 
 Cal3d::~Cal3d()
 {
-  if (_initalised) shutdown();
+  if (_initialised) shutdown();
 }
 
 //----------------------------------------------------------------------------//
@@ -204,6 +203,7 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
 //----------------------------------------------------------------------------//
 
 bool Cal3d::init(const std::string& strFilename) {
+  if (_initialised) shutdown();	
   if (core_models[strFilename]) {
     map = core_models[strFilename];
   } else {
@@ -485,7 +485,7 @@ bool Cal3d::init(const std::string& strFilename) {
   m_calModel.getMixer()->blendCycle(map->m_animationId[IDLE], 1.0f, 0.0f);
 
   instance_count++;
-  _initalised = true;
+  _initialised = true;
   return true;
 }
 

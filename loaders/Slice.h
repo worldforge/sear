@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Slice.h,v 1.4 2002-09-07 23:27:06 simon Exp $
+
 #ifndef SEAR_SLICE_H
 #define SEAR_SLICE_H 1
 
@@ -36,13 +38,14 @@ public:
 
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
   
-private:
+protected:
   bool _use_textures;
   std::string _type;
   Slicing **slicings;
   Model *_trunk_model;
   unsigned int _num_slicings;
   unsigned int _slices_per_slicing;
+  bool _initialised;
 };
 
 } /* namespace Sear */ 

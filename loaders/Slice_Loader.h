@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: Slice_Loader.h,v 1.2 2002-09-07 23:27:06 simon Exp $
+
 #ifndef SEAR_SLICE_LOADER_H
 #define SEAR_SLICE_LOADER_H 1
 

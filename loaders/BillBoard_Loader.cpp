@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: BillBoard_Loader.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+
 #include "src/System.h"
 #include <string>
 
