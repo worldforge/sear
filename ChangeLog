@@ -1,3 +1,6 @@
+16th July 2003, Simon Goodall
+ * Some cleanups
+
 15th July 2003, Simon Goodall
  * Fixed bug where incorrect parent type was returned in WorldEntity::parent()
  * Fixed typos in Call3D loader when material properties had a cut and paste error

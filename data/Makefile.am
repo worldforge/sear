@@ -1,9 +1,8 @@
 EXTRA_DIST = \
-	bindings.cfg.in \
-	general.cfg.in \
-	general_files.cfg.in \
-	object_file.cfg.in \
-	states.cfg.in \
+	bindings.cfg \
+	general.cfg \
+	general_files.cfg \
+	states.cfg \
 	moraf_ne_hm.png \
 	moraf_nw_hm.png \
 	moraf_se_hm.png \

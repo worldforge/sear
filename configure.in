@@ -15,7 +15,7 @@ AC_CANONICAL_TARGET
 dnl Initialise automake
 SEAR_MAJOR_VERSION=0
 SEAR_MINOR_VERSION=4
-SEAR_MICRO_VERSION=5
+SEAR_MICRO_VERSION=6
 SEAR_VERSION=$SEAR_MAJOR_VERSION.$SEAR_MINOR_VERSION.$SEAR_MICRO_VERSION
 
 AC_SUBST(SEAR_VERSION)
@@ -248,17 +248,11 @@ AC_OUTPUT([
 	renderers/Makefile
 	terrain/Makefile
 	sky/Makefile
-	gui/Makefile
 	data/Makefile
 	scripts/Makefile
 	sear.spec
 	sear-media.spec
-	data/bindings.cfg
-	data/general.cfg
-	data/general_files.cfg
-	data/states.cfg
 	scripts/startup.script
 	scripts/shutdown.script
 	Sear.iss
-	tools/Makefile
 ])

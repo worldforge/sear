@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.45 2003-07-15 11:11:22 simon Exp $
+// $Id: client.cpp,v 1.46 2003-07-16 22:53:55 simon Exp $
 
 #include "System.h"
 
@@ -38,8 +38,6 @@
 #include "Model.h"
 #include "Exception.h"
 #include "WorldEntity.h"
-
-#include "gui/ServerGui.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
