@@ -46,7 +46,7 @@ cull_face_cw = false
 stencil = false
 fog = true
 end_of_state
-state = characters
+state = character
 alpha_test = false
 blend = false
 lighting = true
