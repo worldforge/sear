@@ -9,8 +9,9 @@
 #include <string>
 
 #include <wfmath/quaternion.h>
-
+#include <Eris/Entity.h>
 #include "ConsoleObject.h"
+#include <sigc++/object_slot.h>
 
 namespace Sear {
 
@@ -18,7 +19,7 @@ class Client;
 class System;
 class WorldEntity;
 
-class Character : public ConsoleObject{
+class Character : public ConsoleObject, public SigC::Object {
 public:
   Character(WorldEntity*, System*);
   ~Character();
@@ -81,6 +82,8 @@ protected:
 
   bool _run_modifier;
 
+  void Recontainered(Eris::Entity *, Eris::Entity *);
+  
 private:
   static const char * const MOVE_FORWARD = "+character_move_forward";
   static const char * const MOVE_BACKWARD = "+character_move_backward";

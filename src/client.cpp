@@ -19,6 +19,7 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "ActionHandler.h"
 #include "client.h"
 #include "Console.h"
 #include "Factory.h"
@@ -438,6 +439,7 @@ void Client::Entered(Eris::Entity* e){
   _status = CLIENT_STATUS_IN_WORLD;
   _system->setState(SYS_IN_WORLD, true);
   _system->getEventHandler()->addEvent(Event(EF_HANDLE_MOVE, e, EC_IN_WORLD, 0));
+  _system->getActionHandler()->handleAction("enter_world", NULL);
   
 }
 

@@ -14,10 +14,12 @@
 #include <varconf/Config.h>
 #include <wfmath/atlasconv.h>
 #include <Eris/Connection.h>
+#include <Eris/TypeInfo.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "ActionHandler.h"
 #include "WorldEntity.h"
 #include "EventHandler.h"
 #include "Event.h"
@@ -42,8 +44,8 @@ Character::Character(WorldEntity *self, System *system) :
   _orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
   _time(0),
   _run_modifier(false)
-	
 {
+  _self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
 }
 
 Character::~Character() {
@@ -377,6 +379,15 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == PICKUP) _system->setAction(ACTION_PICKUP);
    else if (command == TOUCH) _system->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
+}
+
+void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
+//  cout << "Recontainered" << endl;
+//  if (entity1) cout << "Entity1: " << entity1->getType()->getName() << endl;
+//  if (entity2) cout << "Entity2: " << entity2->getType()->getName() << endl;
+  if (entity2) {
+    System::instance()->getActionHandler()->handleAction(std::string("entering_") + entity2->getType()->getName(), NULL);
+  }
 }
 
 } /* namespace Sear */

@@ -87,6 +87,7 @@ public:
   StateLoader *getStateLoader() { return _sl; }
   EventHandler *getEventHandler() { return _event_handler; }
   ModelHandler *getModelHandler() { return _model_handler; }
+  ActionHandler *getActionHandler() { return _action_handler; }
   
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
