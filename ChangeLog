@@ -1,4 +1,7 @@
 31th August 2002, Simon Goodall
+ * Fixed bug where "Cannot SAY..." was displayed even if connected to game world
+
+31th August 2002, Simon Goodall
  * Cal3d and Lib3ds are now optional, but recommended
 
 31th August 2002, Simon Goodall
