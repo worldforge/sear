@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.13 2003-03-06 23:50:38 simon Exp $
+// $Id: Bindings.cpp,v 1.14 2003-03-23 19:51:49 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -37,6 +37,7 @@ void Bindings::init() {
 }
 
 void Bindings::initKeyMap() {
+  assert((_bindings != NULL) && "Bindings config is NULL");
   keymap = std::map<int, std::string>(); // Create an empty mapping
   // Assign keys to textual representation
   keymap[SDLK_BACKSPACE] = "backspace";
@@ -187,37 +188,33 @@ void Bindings::shutdown() {
 }
 
 void Bindings::loadBindings(const std::string &file_name) {
+  assert((_bindings != NULL) && "Bindings config is NULL");
   // Merges key bindings file, file_name with existing contents
-  if (_bindings){ 
-    if (!_bindings->readFromFile(file_name)) 
-      Log::writeLog(std::string("Error processing ") + file_name, Log::LOG_ERROR);
-  }
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
+  if (!_bindings->readFromFile(file_name)) 
+    Log::writeLog(std::string("Error processing ") + file_name, Log::LOG_ERROR);
 }
 
 void Bindings::saveBindings(const std::string &file_name) {
+  assert((_bindings != NULL) && "Bindings config is NULL");
   // Save current key bindings to file_name
-  if (_bindings) _bindings->writeToFile(file_name);
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
+  _bindings->writeToFile(file_name);
 }
 
 void Bindings::bind(std::string key, std::string command) {
+  assert((_bindings != NULL) && "Bindings config is NULL");
   if (key.empty()) return; // Check we were sent a key
-  if (_bindings) _bindings->setItem("key_bindings", key, command); // Store new binding
-  else Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
+  _bindings->setItem("key_bindings", key, command); // Store new binding
 }
 
 std::string Bindings::idToString(int key) {
+  assert((_bindings != NULL) && "Bindings config is NULL");
   // Return the key mapping.
   return keymap[key];
 }
 
 std::string Bindings::getBinding(const std::string &key) {
   // Check if bindings object has been created
-  if (!_bindings) {
-    Log::writeLog("Bindings: Error - bindings config object not created", Log::LOG_ERROR);
-    return "";
-  }
+  assert((_bindings != NULL) && "Bindings config is NULL");
   if (key.empty()) return "";
   // Retrive current binding
   std::string the_key = std::string(key);

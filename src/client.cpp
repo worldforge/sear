@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.41 2003-03-06 23:50:38 simon Exp $
+// $Id: client.cpp,v 1.42 2003-03-23 19:51:49 simon Exp $
 
 #include "System.h"
 
@@ -97,7 +97,9 @@ Client::Client(System *system, const std::string &client_name) :
   _status(CLIENT_STATUS_DISCONNECTED),
   _client_name(client_name),
   _initialised(false)
-{}
+{
+  assert((system != NULL) && "System is NULL");
+}
 
 Client::~Client() {
   if (_initialised) shutdown();
@@ -105,23 +107,27 @@ Client::~Client() {
 
 bool Client::init() {
   if (_initialised) shutdown();
+
+  // Setup logging
+  Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
+  Eris::Logged.connect(SigC::slot(*this, &Client::Log));
+
+  // Create new eris connection object
   _connection = new Eris::Connection(_client_name, DEBUG_ERIS);
-  if (!_connection) {
-    Log::writeLog("Client - Connection is NULL", Log::LOG_ERROR);
-    throw ClientException("Connection is NULL", ClientException::BAD_CONNECTION);
-  }
+//  if (!_connection) {
+//    Log::writeLog("Client - Connection is NULL", Log::LOG_ERROR);
+//    throw ClientException("Connection is NULL", ClientException::BAD_CONNECTION);
+//  }
+  // Set up connection callbacks
   _connection->Failure.connect(SigC::slot(*this, &Client::NetFailure));
   _connection->Connected.connect(SigC::slot(*this, &Client::NetConnected));
   _connection->Disconnected.connect(SigC::slot(*this, &Client::NetDisconnected));
   _connection->Disconnecting.connect(SigC::slot(*this, &Client::NetDisconnecting));
   _connection->Timeout.connect(SigC::slot(*this, &Client::Timeout));
   _connection->StatusChanged.connect(SigC::slot(*this, &Client::StatusChanged));
-
-  Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
-  Eris::Logged.connect(SigC::slot(*this, &Client::Log));
+  
   _initialised = true;
   return true;
-  
 }
 
 void Client::shutdown() {
@@ -145,7 +151,6 @@ void Client::shutdown() {
     delete _meta;
     _meta = NULL;
   }
-//  if (&Eris::PollDefault::instance()) delete &Eris::PollDefault::instance();
   _initialised = false;
 }
 
@@ -154,8 +159,9 @@ void Client::Log(Eris::LogLevel lvl, const std::string &msg) {
 }
 
 int Client::connect(const std::string &host, int port) {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog(std::string("Connecting to ") + host + std::string(" on port ") + string_fmt(port) , Log::LOG_DEFAULT);
-  if (!_connection) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
+//  if (!_connection) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (_connection->isConnected()) throw ClientException("Already Connected", ClientException::ALREADY_CONNECTED);
   if (host.empty()) throw ClientException("No hostname given", ClientException::NO_HOSTNAME);
   Log::writeLog("Calling Connect", Log::LOG_INFO);
@@ -178,9 +184,10 @@ int Client::connect(const std::string &host, int port) {
 }
 
 int Client::reconnect() {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::reconnect", Log::LOG_INFO);
   _system->pushMessage(CLIENT_RECONNECTING, CONSOLE_MESSAGE);
-  if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
+//  if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
   try {
     _connection->reconnect();
@@ -200,9 +207,10 @@ int Client::reconnect() {
 }
 
 int Client::disconnect() {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::disconnect", Log::LOG_INFO);
   _system->pushMessage(CLIENT_DISCONNECTING, CONSOLE_MESSAGE);
-  if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
+//  if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
   //Are we logged in?
   if (_player != NULL) {
@@ -227,8 +235,9 @@ int Client::disconnect() {
 }
 
 int Client::createAccount(const std::string &username, const std::string &fullname, const std::string &password) {
+  assert ((_initialised == true) && "Client not initialised");
   if (_status != CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::BAD_CONNECTION);
-  if (_connection == NULL) throw ClientException("No connection object!", ClientException::BAD_CONNECTION);
+//  if (_connection == NULL) throw ClientException("No connection object!", ClientException::BAD_CONNECTION);
   if (!_connection->isConnected()) throw ClientException("Not Connected!", ClientException::BAD_CONNECTION);
   if (username.empty()) throw ClientException("No Username!", ClientException::BAD_USERNAME);
   if (fullname.empty()) throw ClientException("No Fullname!", ClientException::BAD_FULLANME);
@@ -238,12 +247,12 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   Log::writeLog("Client::createAccount: Creating player", Log::LOG_INFO);
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
+    // Setup player callbacks
     _player->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
     _player->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
     _player->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
     _player->GotAllCharacters.connect(SigC::slot(*this, &Client::GotAllCharacters));
     _player->GotCharacterInfo.connect(SigC::slot(*this, &Client::GotCharacterInfo));
-
   }
   try {
     _player->createAccount(username, fullname, password);
@@ -264,10 +273,11 @@ int Client::createAccount(const std::string &username, const std::string &fullna
 }
 
 int Client::login(const std::string &username, const std::string &password) {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::login", Log::LOG_INFO);
   if (_status < CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
   if (_status == CLIENT_STATUS_LOGGED_IN) throw Exception("Already Logged In");
-  if (_connection == NULL) throw ClientException("No Connection Object", ClientException::NO_CONNECTION_OBJECT);
+//  if (_connection == NULL) throw ClientException("No Connection Object", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw Exception("Not Connected");
   if (username.empty()) throw Exception("No Username");
   if (password.empty()) throw Exception("No Password");
@@ -277,6 +287,7 @@ int Client::login(const std::string &username, const std::string &password) {
   
   if (_player == NULL) {
     _player = new Eris::Player(_connection);
+    // setup player callbacks
     _player->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
     _player->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
     _player->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
@@ -298,6 +309,7 @@ int Client::login(const std::string &username, const std::string &password) {
 }
 
 void Client::poll() {
+  assert ((_initialised == true) && "Client not initialised");
   try {
 //    if (_connection != NULL) _connection->poll();
     Eris::PollDefault::poll();   
@@ -369,9 +381,10 @@ void Client::LoginSuccess() {
 }
 
 int Client::createCharacter(const std::string &name, const std::string &type, const std::string &sex, const std::string &description) {
+  assert ((_initialised == true) && "Client not initialised");
   // Check conditions
   if (_status != CLIENT_STATUS_LOGGED_IN) throw Exception("Not logged in");
-  if (_connection == NULL) throw Exception("Connection is NULL");
+//  if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("Not connected");
   if (name.empty()) throw Exception("No name given");
   if (description.empty()) throw Exception ("no description given");
@@ -410,9 +423,10 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
 }
 
 int Client::takeCharacter(const std::string &id) {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::takeCharacter", Log::LOG_INFO);
   if (_status != CLIENT_STATUS_LOGGED_IN) throw Exception("not logged in");
-  if (_connection == NULL) throw Exception("Connection is NULL");
+//  if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("not connected");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_lobby == NULL) throw Exception("lobby is NULL");
@@ -456,8 +470,9 @@ void Client::SightPerson(Eris::Person *person) {
 }
 
 int Client::logout() {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::logout", Log::LOG_INFO);
-  if (_connection == NULL) throw Exception("Connection is NULL");
+//  if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("Not Connected");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_status == CLIENT_STATUS_LOGGED_IN) {
@@ -469,13 +484,15 @@ int Client::logout() {
 }
 
 int Client::getCharacters() {
+  assert ((_initialised == true) && "Client not initialised");
   if (_player) _player->refreshCharacterInfo();
   return 0;
 }
 
 std::string Client::getStatus() {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::getStatus", Log::LOG_INFO);
-  if (_connection == NULL) return "NO OBJECT";
+//  if (_connection == NULL) return "NO OBJECT";
   switch(_connection->getStatus()) {
     case 0: return "INVALID_STATUS";
     case 1: return "NEGOTIATE";
@@ -488,8 +505,9 @@ std::string Client::getStatus() {
 }
 
 int Client::listRooms() {
+  assert ((_initialised == true) && "Client not initialised");
   Log::writeLog("Client::listRooms", Log::LOG_INFO);
-  if (_connection == NULL) throw Exception("Connection is NULL");
+//  if (_connection == NULL) throw Exception("Connection is NULL");
   if (!_connection->isConnected()) throw Exception("Not Conncted");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_lobby == NULL) throw Exception("Lobby is NULL");
@@ -602,6 +620,7 @@ void Client::GotAllCharacters() {
 }
 
 void Client::registerCommands(Console *console) {
+  assert ((_initialised == true) && "Client not initialised");
   //TODO: we could register the commands as they become available?
   console->registerCommand(SERVER_CONNECT, this);
   console->registerCommand(SERVER_RECONNECT, this);
@@ -617,6 +636,7 @@ void Client::registerCommands(Console *console) {
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
+  assert ((_initialised == true) && "Client not initialised");
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(args);
   if (command == SERVER_CONNECT) {
@@ -740,6 +760,7 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 }
 
 void Client::getServers() {
+  assert ((_initialised == true) && "Client not initialised");
   if (!_meta) {
     // TODO put this into a config file
     std::string metaserver = "metaserver.worldforge.org";
@@ -753,6 +774,7 @@ void Client::getServers() {
 }
 
 void Client::stopServers() {
+  assert ((_initialised == true) && "Client not initialised");
   if (_meta) _meta->cancel();
 }
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.13 2003-03-06 23:50:38 simon Exp $
+// $Id: Camera.cpp,v 1.14 2003-03-23 19:51:49 simon Exp $
 
 #include <string>
 
@@ -33,7 +33,7 @@
 namespace Sear {
 	
 static const std::string CAMERA = "camera";
-	  // General key values
+  // General key values
   const static std::string KEY_camera_distance = "camera_distance";
   const static std::string KEY_camera_rotation = "camera_rotation";
   const static std::string KEY_camera_elevation = "camera_elevation";
@@ -94,11 +94,14 @@ Camera::~Camera() {
 
 bool Camera::init() {
   if (_initialised) shutdown();
+  // Read camera config from file
   readConfig();
+  // Store initial euclidean camera values
   float dist_sqr = _distance * _distance;
   _x_pos = dist_sqr * cos(_elevation) * cos(_rotation);
   _y_pos = dist_sqr * cos(_elevation) * sin(_rotation);
   _z_pos = _distance * sin(_elevation);
+  // Connect callback to check for updates
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Camera::varconf_callback));
   _initialised = true;
   return true;
@@ -111,6 +114,7 @@ void Camera::shutdown() {
 }
 
 void Camera::updateCameraPos(float time_elapsed) {
+  assert ((_initialised == true) && "Camera not initialised");	
   bool changed = false;
   //Only perform calculations if required
   if (_zoom_speed != 0.0f) {
@@ -164,6 +168,7 @@ void Camera::readConfig() {
 }
 
 void Camera::writeConfig() {
+  assert ((_initialised == true) && "Camera not initialised");	
   varconf::Config &general = System::instance()->getGeneral();
   
   if (_save_camera_position) {
@@ -183,6 +188,8 @@ void Camera::writeConfig() {
 }
 
 void Camera::registerCommands(Console *console) {
+  assert ((_initialised == true) && "Camera not initialised");
+  assert ((console != NULL) && "console is NULL");
   console->registerCommand(ZOOM_IN, this);
   console->registerCommand(ZOOM_OUT, this);
   console->registerCommand(ZOOM_STOP_IN, this);
@@ -200,6 +207,7 @@ void Camera::registerCommands(Console *console) {
 }
 
 void Camera::runCommand(const std::string &command, const std::string &args) {
+  assert ((_initialised == true) && "Camera not initialised");	
   if (command == ZOOM_IN) zoom(-1);
   else if (command == ZOOM_OUT) zoom(1);
   else if (command == ZOOM_STOP_IN) zoom(1);
@@ -217,6 +225,7 @@ void Camera::runCommand(const std::string &command, const std::string &args) {
 }
 
 void Camera::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  assert ((_initialised == true) && "Camera not initialised");	
   varconf::Variable temp;
   if (section == CAMERA) {
     if (key == KEY_camera_distance) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Calendar.h,v 1.2 2003-03-06 23:50:38 simon Exp $
+// $Id: Calendar.h,v 1.3 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -11,7 +11,7 @@
 
 #include <sigc++/object_slot.h>
 #include <varconf/Config.h>
-#include "src/ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 /**
  * Sear namespace

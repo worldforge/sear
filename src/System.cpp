@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.54 2003-03-06 23:50:38 simon Exp $
+// $Id: System.cpp,v 1.55 2003-03-23 19:51:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,7 +82,6 @@ namespace Sear {
   static const std::string LOAD_STATE_FILE = "load_state_file";
   static const std::string LOAD_GENERAL_CONFIG = "load_general";
   static const std::string LOAD_KEY_BINDINGS = "load_bindings";
-  static const std::string LOAD_TEXTURE_CONFIG = "load_textures";
   static const std::string LOAD_MODEL_CONFIG = "load_models";
   static const std::string SAVE_GENERAL_CONFIG = "save_general";
   static const std::string SAVE_KEY_BINDINGS = "save_bindings";
@@ -224,7 +223,6 @@ bool System::init() {
   
   _console = new Console(this);
   _console->init();
-
   registerCommands(_console);
   _client->registerCommands(_console);
   _script_engine->registerCommands(_console);
@@ -232,7 +230,7 @@ bool System::init() {
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
-
+/*
   try { 
     sound = new Sound();
     sound->init();
@@ -240,7 +238,9 @@ bool System::init() {
   } catch (Exception &e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
-  
+  */
+  _width = 640; _height = 480;
+  createWindow(false);
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
@@ -432,6 +432,7 @@ void System::createWindow(bool fullscreen) {
 
   _graphics->registerCommands(_console);
   _graphics->getRender()->initWindow(_width, _height);
+  _graphics->initST();
 
   renderer = _graphics->getRender();
   pushMessage("Loading, Please wait...", 2, 100);
@@ -790,7 +791,6 @@ void System::registerCommands(Console *console) {
   console->registerCommand(LOAD_MODEL_RECORDS, this);
   console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
-  console->registerCommand(LOAD_TEXTURE_CONFIG, this);
   console->registerCommand(LOAD_KEY_BINDINGS, this);
   console->registerCommand(LOAD_MODEL_CONFIG, this);
   console->registerCommand(SAVE_GENERAL_CONFIG, this);
@@ -850,15 +850,7 @@ void System::runCommand(const std::string &command, const std::string &args) {
       processRecords();
     }
   }
-  else if (command == LOAD_TEXTURE_CONFIG) {
-    _process_records = _script_engine->prefixEnabled();
-    _textures.readFromFile(processHome(args));
-    if (_process_records) {
-      _process_records = false;
-      processRecords();
-    }
-  }
-  else if (command == LOAD_MODEL_CONFIG) {
+ else if (command == LOAD_MODEL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
     _models.readFromFile(processHome(args));
     if (_process_records) {

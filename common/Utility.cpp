@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.5 2003-03-06 23:50:37 simon Exp $
+// $Id: Utility.cpp,v 1.6 2003-03-23 19:51:49 simon Exp $
 
 #include "Utility.h"
 
@@ -162,7 +162,8 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
     }
     colour_map[code] = colour;
   }
-  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
+//  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
+  unsigned char *data = new unsigned char [width * height * 4];
   i = 0;
   for ( row=0; row < height; ++row ) {
     for ( col=0; col < width; ++col ) {

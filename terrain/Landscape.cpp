@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.21 2003-03-07 12:50:51 simon Exp $
+// $Id: Landscape.cpp,v 1.22 2003-03-23 19:51:49 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -80,7 +80,7 @@ void Landscape::Init(float *hMap, int size, int offsetx, int offsety) {
   int X, Y;
   texture_name_id = "landscape_" + string_fmt(offsetx) + "_" + string_fmt(offsety);
 //  std::cout << "Texture Name - " << texture_name_id << std::endl;
-//  texture_id = _renderer->requestMipMap(texture_name_id);
+//  texture_id = _renderer->requestTexture(texture_name_id);
   // Store the Height Field array
   m_HeightMap = hMap;
   map_size = size;
@@ -187,7 +187,8 @@ void Landscape::render() {
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange(TERRAIN);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id, true), _renderer->requestMipMap(TERRAIN, DETAIL, false));
+    _renderer->switchTexture(0, _renderer->requestTexture(texture_name_id));
+    _renderer->switchTexture(1, _renderer->requestTexture(DETAIL));
   } else {
     // Do Nothing
   }
@@ -199,7 +200,8 @@ void Landscape::render() {
   _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
   _renderer->stateChange(WATER);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchMultiTexture(_renderer->requestMipMap(WATER, WATER), _renderer->requestMipMap(TERRAIN, DETAIL, false));
+    _renderer->switchTexture(0, _renderer->requestTexture(WATER));
+    _renderer->switchTexture(1, _renderer->requestTexture(DETAIL));
   } else {
 //    //Do Nothing
   }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.12 2003-03-06 23:50:38 simon Exp $
+// $Id: main.cpp,v 1.13 2003-03-23 19:51:49 simon Exp $
 
 #include <unistd.h>
 #include <iostream>
@@ -83,7 +83,7 @@ under certain conditions; type `show c' for details.
     exit (1);
   }
   try {
-    sys->createWindow(false);
+  //  sys->createWindow(false);
     sys->setCaption(CLIENT_NAME, CLIENT_NAME);
     sys->mainLoop();
   } catch (Sear::Exception e) {

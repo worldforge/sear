@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.27 2003-03-07 12:50:51 simon Exp $
+// $Id: Render.h,v 1.28 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -85,10 +85,9 @@ typedef std::list<WorldEntity*> MessageList;
   
   virtual float getLightLevel() =0;
   
-  virtual int requestTexture(const std::string &section, const std::string &texture, bool clamp = false) =0;
-  virtual int requestMipMap(const std::string &section, const std::string &texture, bool clamp = false) =0;
+  virtual int requestTexture(const std::string &texture_name) =0;
   virtual void buildColourSet() =0;
-  virtual unsigned int getTextureID(unsigned int texture_id)=0;
+//  virtual unsigned int getTextureID(unsigned int texture_id)=0;
 //  virtual void drawScene(const std::string &,bool, float) =0;
   virtual void drawTextRect(int, int, int, int, int) =0;
   virtual void stateChange(const std::string &state) =0;
@@ -99,9 +98,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual int getWindowHeight() =0;
 
   virtual void switchTexture(int texture) =0;
-  virtual void switchTextureID(unsigned int texture) =0;
-  virtual void switchMultiTexture(int texture, int) =0;
-  virtual void switchMultiTextureID(unsigned int texture, unsigned int) =0;
+  virtual void switchTexture(unsigned int, int) =0;
   virtual void setTextureScale(unsigned int unit, float scale) = 0;
   virtual std::string getActiveID() =0;
 
@@ -119,9 +116,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void readConfig() =0;
   virtual void writeConfig() =0;
 
-  virtual int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
-  virtual int requestMipMapMask(const std::string &section, const std::string &texture, bool clamp = false) =0;
-  
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotate(float angle, float x, float y, float z) =0;
 //  virtual void rotateObject(WorldEntity *we, int type) =0;
@@ -131,7 +125,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
-  virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
+//  virtual int createTexture(const std::string &texture_name, char **xpm) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
 //  virtual void drawMessageQueue(QueueMap queue) =0;
   virtual void drawMessageQueue(MessageList &list) =0;

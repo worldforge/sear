@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.8 2003-03-11 18:40:54 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.9 2003-03-23 19:51:49 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -271,53 +271,7 @@ void Cal3dCoreModel::varconf_error_callback(const char *message) {
 
 unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   unsigned int textureId;
-  int width;
-  int height;
-  int depth;
-  
-  if (strFilename.substr(strFilename.length() - 4) == ".raw") {
-    // open the texture file
-    std::ifstream file;
-    file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
-    if(!file) {
-      std::cerr << "Texture file '" << strFilename << "' not found." << std::endl;
-      return 0;
-    }
-  
-    // load the dimension of the texture
-    file.read((char *)&width, 4);
-    file.read((char *)&height, 4);
-    file.read((char *)&depth, 4);
-  
-    // allocate a temporary buffer to load the texture to
-    unsigned char *pBuffer;
-    pBuffer = new unsigned char[2 * width * height * depth];
-    if(pBuffer == 0) {
-      std::cerr << "Memory allocation for texture '" <<  strFilename << "' failed." << std::endl;
-      return 0;
-    }
-  
-    // load the texture
-    file.read((char *)pBuffer, width * height * depth);
-  
-    // explicitely close the file
-    file.close();
-  
-    // flip texture around y-axis (-> opengl-style)
-    int y;
-    for(y = 0; y < height; y++)
-    {
-      memcpy(&pBuffer[(height + y) * width * depth], &pBuffer[(height - y - 1) * width * depth], width * depth);
-    }
-    textureId = System::instance()->getGraphics()->getRender()->createTexture(width, height, depth, &pBuffer[width * height * depth], false);
-    // free the allocated memory
-    delete [] pBuffer;
-  } else {
-    SDL_Surface * image = System::loadImage(strFilename);
-    if (image == NULL) return 0;
-    textureId = System::instance()->getGraphics()->getRender()->createTexture((unsigned int)image->w, (unsigned int)image->h,(unsigned int)image->format->BytesPerPixel,(unsigned char *)image->pixels, false);
-    SDL_FreeSurface(image);
-  }
+  textureId = System::instance()->getGraphics()->getRender()->requestTexture(strFilename);
   return textureId;
 }
 

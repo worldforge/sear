@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.10 2003-03-06 23:50:38 simon Exp $
+// $Id: Slice.cpp,v 1.11 2003-03-23 19:51:49 simon Exp $
 
 #include "common/Utility.h"
 
@@ -168,9 +168,9 @@ void Slice::render(bool select_mode) {
       for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
         ASlice *slice = *I;
         if (select_mode) {
-          _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+          _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
         } else {
-          _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+          _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
         }
         _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
       }
@@ -188,9 +188,9 @@ void Slice::render(bool select_mode) {
   for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
     ASlice *slice = *I;
     if (select_mode) {
-      _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+      _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
     } else {
-      _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
+      _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
     }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
   }

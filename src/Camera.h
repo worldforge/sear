@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.11 2003-03-06 23:50:38 simon Exp $
+// $Id: Camera.h,v 1.12 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -18,7 +18,7 @@
 
 #include <string>
 #include <sigc++/object_slot.h>
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 namespace varconf {
   class Config;

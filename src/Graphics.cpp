@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.25 2003-03-06 23:50:38 simon Exp $
+// $Id: Graphics.cpp,v 1.26 2003-03-23 19:51:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -123,15 +123,8 @@ void Graphics::init() {
   _system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
   _renderer = new GL(_system, this);
   _renderer->init();
-  _terrain = new ROAM(_system, _renderer);
-  if (!_terrain->init()) {
-    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
-  }
-  _sky = new SkyBox(_system, _renderer);
-  if (!_sky->init()) {
-    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::LOG_ERROR);
-  }
-  _camera = new Camera();
+  ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
+ _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
   sg = new ServerGui();
@@ -168,7 +161,16 @@ void Graphics::shutdown() {
   }
   _initialised = false;
 }
-
+void Graphics::initST() {
+_terrain = new ROAM(_system, _renderer);
+  if (!_terrain->init()) {
+    Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
+  }
+  _sky = new SkyBox(_system, _renderer);
+  if (!_sky->init()) {
+    Log::writeLog("Render: Error - Could not initialise Sky Box", Log::LOG_ERROR);
+  }
+}
 void Graphics::drawScene(const std::string& command, bool select_mode, float time_elapsed) {
   if (!_renderer) throw Exception("No Render object to render with!");
   if (select_mode) _renderer->resetSelection();

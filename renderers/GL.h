@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.29 2003-03-07 12:50:51 simon Exp $
+// $Id: GL.h,v 1.30 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -23,6 +23,8 @@
 #include "src/Light.h"
 #include "src/StateLoader.h"
 #include "src/Render.h"
+
+#include "TextureManager.h"
 
 namespace Sear {
 
@@ -54,16 +56,11 @@ public:
   void print3D(const char* string, int set);
   inline void newLine();
 
-  int requestTexture(const std::string &section, const std::string &texture, bool clamp = false);
-  int requestMipMap(const std::string &section, const std::string &texture, bool clamp = false);
-  int requestTextureMask(const std::string &section, const std::string &texture, bool clamp = false);
-  int requestMipMapMask(const std::string &section, const std::string &texture, bool clamp = false);
-  void createTexture(SDL_Surface*, unsigned int, bool);
-  void createMipMap(SDL_Surface*, unsigned int, bool);
-  void createTextureMask(SDL_Surface*, unsigned int, bool);
-  void createMipMapMask(SDL_Surface*, unsigned int, bool);
+  TextureID requestTexture(const std::string &texture_name) {
+    assert(_texture_manager != NULL);
+    return _texture_manager->requestTextureID(texture_name);
+  }
   
-  GLuint getTextureID(unsigned int texture_id);
   static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
@@ -78,11 +75,14 @@ public:
   int getWindowWidth() { return window_width; }
   int getWindowHeight() { return window_height; }
 
-  inline void switchTexture(int texture);// { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
-  inline void switchTextureID(unsigned int texture) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
-  inline void switchMultiTexture(int texture, int);// { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
-  inline void switchMultiTextureID(unsigned int texture, unsigned int) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
-  void createDefaults();
+  void switchTexture(TextureID texture) {
+    assert(_texture_manager != NULL);
+    _texture_manager->switchTexture(texture);
+  }
+  void switchTexture(unsigned int unit, TextureID texture) {
+    assert(_texture_manager != NULL);
+    _texture_manager->switchTexture(unit, texture);
+  }
   
   std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}
@@ -103,7 +103,6 @@ public:
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
-  unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
   void drawMessageQueue(MessageList &list);
   void drawOutline(ModelRecord *);
@@ -127,6 +126,7 @@ public:
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void setTextureScale(unsigned int unit, float scale);
+  TextureManager *getTextureManager() const { return _texture_manager; }
 protected:
   System *_system;
   Graphics *_graphics;
@@ -188,8 +188,6 @@ protected:
   GLubyte colourArray[NUM_COLOURS][3];
   WorldEntity *entityArray[NUM_COLOURS];
   unsigned int colour_index;
-//  std::set<int> colourSet;
-//  std::set<int>::const_iterator colourSetIterator;
   std::map<unsigned int, std::string> colour_mapped;
   
   GLint redBits, greenBits, blueBits;
@@ -198,9 +196,7 @@ protected:
   
   inline static  GLuint makeMask(GLuint bits);
   inline void resetColours();
-//  inline std::string getSelectedID(unsigned int i);
   inline WorldEntity *getSelectedID(unsigned int i);
-//  void nextColour(const std::string &id);
   void nextColour(WorldEntity*);
 
   void setupExtensions();
@@ -210,6 +206,9 @@ protected:
   bool _multi_texture_mode;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+
+
+  TextureManager *_texture_manager;
 };
 
 } /* namespace Sear */

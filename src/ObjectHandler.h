@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.2 2002-10-20 15:50:27 simon Exp $
+// $Id: ObjectHandler.h,v 1.3 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_OBJECTHANDLER_H
 #define SEAR_OBJECTHANDLER_H 1
@@ -12,7 +12,7 @@
 
 #include <sigc++/object_slot.h>
 
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 
 namespace varconf {

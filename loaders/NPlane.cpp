@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.15 2003-03-06 23:50:38 simon Exp $
+// $Id: NPlane.cpp,v 1.16 2003-03-23 19:51:49 simon Exp $
 
 #include "common/Utility.h"
 
@@ -122,9 +122,9 @@ void NPlane::render(bool select_mode) {
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   //TODO, should we use one texture for the whole model, or one per plane?
   if (select_mode) {
-    _render->switchTexture(_render->requestMipMapMask("nplane", _type, true));
+    _render->switchTexture(_render->requestTexture( _type));
   } else {
-    _render->switchTexture(_render->requestMipMap("nplane", _type, true));
+    _render->switchTexture(_render->requestTexture(_type));
   }
   _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 8, _vertex_data, _texture_data, _normal_data,false);
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.12 2002-12-10 19:36:51 simon Exp $
+// $Id: client.h,v 1.13 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -15,7 +15,7 @@
 #include <Atlas/Message/DecoderBase.h>
 
 #include "conf.h"
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 //Client Messages
 #define CLIENT_CONNECTING       "Connecting"

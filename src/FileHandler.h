@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.4 2003-03-06 23:50:38 simon Exp $
+// $Id: FileHandler.h,v 1.5 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -10,7 +10,7 @@
 #include <string>
 #include <list>
 
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 
 /*

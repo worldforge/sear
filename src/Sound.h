@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Sound.h,v 1.6 2003-03-06 23:50:38 simon Exp $
+// $Id: Sound.h,v 1.7 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_SOUND_H
 #define SEAR_SOUND_H 1
@@ -13,7 +13,7 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_mixer.h>
 
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
     
 namespace Sear {
 

@@ -2,14 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.24 2003-03-06 23:50:38 simon Exp $
+// $Id: Console.cpp,v 1.25 2003-03-23 19:51:49 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
 
 #include "Bindings.h"
 #include "Console.h"
-#include "ConsoleObject.h"
 #include "System.h"
 #include "Graphics.h"
 #include "Render.h"
@@ -36,7 +35,10 @@ static const std::string LIST_CONSOLE_COMMANDS = "list_commands";
 static const std::string UI = "ui";
 static const std::string PANEL = "panel";
 static const std::string FONT = "font";
-	
+
+static const std::string SAY = "say";
+static const std::string CMD_SAY = "/say ";
+
 Console::Console(System *system) :
   animateConsole(0),
   showConsole(0),
@@ -45,7 +47,9 @@ Console::Console(System *system) :
   screen_messages(std::list<screenMessage>()),
   _system(system),
   _initialised(false)
-{ }
+{
+  assert((system != NULL) && "System is NULL");
+}
 
 Console::~Console() {
   if (_initialised) shutdown();
@@ -71,6 +75,7 @@ void Console::shutdown() {
 }
 
 void Console::pushMessage(const std::string &message, int type, int duration) {
+  assert ((_initialised == true) && "Console not initialised");
   // Is this a screen message
   if (type & SCREEN_MESSAGE) {	
     //If we have reached our message limit, remove the oldest message regardless of duration
@@ -86,6 +91,7 @@ void Console::pushMessage(const std::string &message, int type, int duration) {
 }
 
 void Console::draw(const std::string &command) {
+  assert ((_initialised == true) && "Console not initialised");
   // If we are animating and putting console into visible state,
   //  the raise height a tad
   if (animateConsole && showConsole) {
@@ -117,6 +123,7 @@ void Console::draw(const std::string &command) {
 }
 
 void Console::renderConsoleMessages(const std::string &command) {
+  assert ((_initialised == true) && "Console not initialised");
   Render *renderer = _system->getGraphics()->getRender();
   if (!renderer) {
     Log::writeLog("Console: Error - Renderer object not created", Log::LOG_ERROR);
@@ -129,7 +136,8 @@ void Console::renderConsoleMessages(const std::string &command) {
   renderer->stateChange(PANEL);
   //Make panel slightly transparent
   renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  renderer->drawTextRect(0, 0, renderer->getWindowWidth(), consoleHeight, renderer->requestTexture(UI, PANEL));
+  if (panel_id == 0) panel_id = renderer->requestTexture(PANEL);
+  renderer->drawTextRect(0, 0, renderer->getWindowWidth(), consoleHeight, panel_id);
   renderer->stateChange(FONT);
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
@@ -143,6 +151,7 @@ void Console::renderConsoleMessages(const std::string &command) {
 }
 
 void Console::renderScreenMessages() {
+  assert ((_initialised == true) && "Console not initialised");
   Render *renderer = _system->getGraphics()->getRender();
   if (screen_messages.empty()) return;	
   std::list<screenMessage>::const_iterator I;
@@ -177,6 +186,7 @@ void Console::renderScreenMessages() {
 }
 
 void Console::toggleConsole() {
+  assert ((_initialised == true) && "Console not initialised");
   // Start the animation	
   animateConsole = 1;
   // Toggle state
@@ -190,6 +200,7 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
 }
 
 void Console::runCommand(const std::string &command) {
+  assert ((_initialised == true) && "Console not initialised");
   if (command.empty()) return; // Ignore empty string
   // Grab first character of command string
   char c = command.c_str()[0];
@@ -197,8 +208,8 @@ void Console::runCommand(const std::string &command) {
   if ((c != '/' && c != '+' && c != '-')) {
     // Its a speech string, so SAY it
     // FIXME /say is not always available!
-    if (_registered_commands["say"]) {
-      runCommand(std::string("/say ") + command);
+    if (_registered_commands[SAY]) {
+      runCommand(std::string(CMD_SAY) + command);
     } else {
       if (debug) Log::writeLog(std::string("Cannot SAY, not in game yet: ") + command, Log::LOG_ERROR);
       pushMessage("Cannot SAY, not it game yet" , CONSOLE_MESSAGE, 0);
@@ -225,6 +236,7 @@ void Console::runCommand(const std::string &command) {
 }
 
 void Console::runCommand(const std::string &command, const std::string &args) {
+  assert ((_initialised == true) && "Console not initialised");
   // This command toggles the console
   if (command == TOGGLE_CONSOLE) {
     toggleConsole();

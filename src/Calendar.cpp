@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.2 2003-03-06 23:50:38 simon Exp $
+// $Id: Calendar.cpp,v 1.3 2003-03-23 19:51:49 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -125,6 +125,7 @@ void Calendar::shutdown() {
 }
 
 void Calendar::update(float time_elapsed) {
+  assert ((_initialised == true) && "Calender not initialised");
   _seconds += time_elapsed;
   _seconds_counter += time_elapsed;
   // Check for seconds overflow  
@@ -243,6 +244,7 @@ void Calendar::readConfig() {
 }
 
 void Calendar::writeConfig() {
+  assert ((_initialised == true) && "Calender not initialised");
   varconf::Config &config = System::instance()->getGeneral();
   config.setItem(CALENDER, KEY_SECONDS_PER_MINUTE, (int)_seconds_per_minute);
   config.setItem(CALENDER, KEY_MINUTES_PER_HOUR, (int)_minutes_per_hour);
@@ -269,6 +271,7 @@ void Calendar::writeConfig() {
 }
 
 void Calendar::config_update(const std::string &section, const std::string &key, varconf::Config &config) {
+  assert ((_initialised == true) && "Calender not initialised");
   if (section == CALENDER) {
     varconf::Variable temp;
     if (key == KEY_SECONDS_PER_MINUTE) {
@@ -330,6 +333,8 @@ void Calendar::config_update(const std::string &section, const std::string &key,
 }
  
 void Calendar::registerCommands(Console *console) {
+  assert ((_initialised == true) && "Calender not initialised");
+  assert ((console != NULL) && "Console is NULL");
   console->registerCommand(GET_TIME, this);
   console->registerCommand(SET_SECONDS, this);
   console->registerCommand(SET_MINUTES, this);
@@ -341,6 +346,7 @@ void Calendar::registerCommands(Console *console) {
 }
 
 void Calendar::runCommand(const std::string &command, const std::string &args) {
+  assert ((_initialised == true) && "Calender not initialised");
   if (command == GET_TIME) {
     std::string message = string_fmt(_hours) + ":" + string_fmt(_minutes) + ":" + string_fmt((int)_seconds) + " " + getDayName() + " " + string_fmt(_days + _weeks * _days_per_week + 1) + " of " + getMonthName() + " " + string_fmt(_years);
     System::instance()->pushMessage(message, 0x1);

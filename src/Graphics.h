@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.10 2003-03-06 23:50:38 simon Exp $
+// $Id: Graphics.h,v 1.11 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -17,7 +17,7 @@
 #include <wfmath/quaternion.h>
 
 #include "Render.h"
-#include "src/ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 
 //#include "gui/ServerGui.h"
 namespace varconf {
@@ -89,7 +89,7 @@ typedef enum {
   Camera* getCamera() { return _camera; }
   Terrain* getTerrain() { return _terrain; }
   Sky* getSky() { return _sky; }
- 
+void initST(); 
   void setupStates();
   void readConfig();
   void writeConfig();

@@ -1,3 +1,7 @@
+23rd March 2002, Simon Goodall
+ * Intergrated texturemanager into GL class.
+ * Added docs for new texture config format
+
 11th March 2002, Simon Goodall
  * Added base code for texture manager class
 

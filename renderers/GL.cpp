@@ -2,13 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.60 2003-03-15 17:18:49 simon Exp $
-
-/*TODO
- * Allow texture unloading
- * Allow priority textures
- */ 
-
+// $Id: GL.cpp,v 1.61 2003-03-23 19:51:49 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -18,16 +12,6 @@
 
 #include <GL/gl.h>
 #include <GL/glu.h>
-//#ifndef __WIN32
-//typedef void (*PFNGLACTIVETEXTUREARBPROC) (GLenum texture);
-//typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
-//#endif
-//#ifdef __WIN32
-//PFNGLACTIVETEXTUREARBPROC glActiveTextureARB  = NULL;
-//PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
-//PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
-//PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
-//#endif
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
@@ -47,7 +31,6 @@
 #include "src/ModelHandler.h"
 #include "src/ModelRecord.h"
 #include "src/ObjectRecord.h"
-//#include "src/ObjectLoader.h"
 #include "src/Sky.h"
 #include "src/System.h"
 #include "src/Terrain.h"
@@ -58,17 +41,9 @@
 
 #include "src/default_image.xpm"
 #include "src/default_font.xpm"
+#include "TextureManager.h"
 
 #include "GL.h"
-//#define GL_GLEXT_PROTOTYPES 1
-//#include <GL/glext.h>
-
-// GL EXTENSIONS DEF
-//#define GENERATE_MIPMAP_SGIS            0x8191
-//#define GENERATE_MIPMAP_HINT_SGIS       0x8192
-
-//#define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
-//#define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -88,7 +63,7 @@ namespace Sear {
   static const int sleep_time = 5000;
 
   static const std::string font_texture = "ui_font";
-  static const std::string splash_texture = "ui_splash";
+  static const std::string TEXTURE_splash_texture = "ui_splash";
   
   // Config key strings
   
@@ -184,12 +159,8 @@ namespace Sear {
   static const float DEFAULT_far_clip_dist = 100.0f;
   static const float DEFAULT_texture_scale = 10.0f;
 
-//#ifndef GL_EXT_compiled_vertex_array
-//static const bool use_ext_compiled_vertex_array = false;
-//#else
 static bool use_ext_compiled_vertex_array = false;
 static bool use_multitexturing = false;
-//#endif	
 static std::string FONT = "font";
 static std::string UI = "ui";
 static std::string SPLASH = "splash";
@@ -271,7 +242,9 @@ GL::GL() :
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false),
-  _multi_texture_mode(false)
+  _multi_texture_mode(false),
+  _texture_manager(NULL),
+  splash_id(-1)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -290,8 +263,9 @@ GL::GL(System *system, Graphics *graphics) :
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
-  _initialised(false)
+  _initialised(false),
 	
+  _texture_manager(NULL)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -347,6 +321,10 @@ void GL::initWindow(int width, int height) {
 
   setViewMode(PERSPECTIVE);
   setupExtensions();
+  _texture_manager->init();
+  splash_id = requestTexture(TEXTURE_splash_texture);
+      initFont();
+
 }
   
 void GL::init() {
@@ -354,10 +332,10 @@ void GL::init() {
   
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
+  _texture_manager = new TextureManager();
   readConfig();
-  createDefaults();
-  splash_id = requestTexture(UI, splash_texture);
-  initFont();
+//  splash_id = requestTexture(TEXTURE_splash_texture);
+//  initFont();
   initLighting();
   // TODO: initialisation need to go into system?
   setupStates();
@@ -396,13 +374,8 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
-  font_id = requestTexture(UI, FONT);
-  GLuint texture = getTextureID(font_id);
-  if (!glIsTexture(texture) || font_id == -1) {
-    font_id = requestTexture(DEFAULT, DEFAULT_FONT);
-    texture = getTextureID(font_id);
-  }
-  glBindTexture(GL_TEXTURE_2D, texture);
+  font_id = requestTexture(DEFAULT_FONT);
+  switchTexture(font_id);
   for (loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
@@ -429,18 +402,13 @@ void GL::shutdownFont() {
 
 void GL::print(GLint x, GLint y, const char * string, int set) {
   if (set > 1) set = 1;
-  GLuint texture = getTextureID(font_id);
-//  if (!glIsTexture(texture)) {
-//    static GLuint default_id = getTextureID(requestTexture("default_font"));
-//    texture = default_id;
-//  }
-  glBindTexture(GL_TEXTURE_2D, texture);
+  switchTexture(font_id);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
-  store();
+  glPushMatrix();
   glLoadIdentity(); // Reset The Projection Matrix
   glOrtho(0, window_width, 0 , window_height, -1, 1); // Set Up An Ortho Screen
   glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
-  store();
+  glPushMatrix();
   glLoadIdentity(); // Reset The Modelview Matrix
   glTranslated(x,y,0); // Position The Text (0,0 - Bottom Left)
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
@@ -453,13 +421,14 @@ void GL::print(GLint x, GLint y, const char * string, int set) {
 
 void GL::print3D(const char *string, int set) {
   if (set > 1) set = 1;
-  GLuint texture = getTextureID(font_id);
-  if (!glIsTexture(texture)) {
-    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT_FONT));
-    texture = default_id;
-  }
-  glBindTexture(GL_TEXTURE_2D, texture);
-  store();
+//  int texture = requestTexture(font_id);
+//  if (!glIsTexture(texture)) {
+//    static int default_id = requestTexture( DEFAULT_FONT);
+//    texture = default_id;
+//  }
+//  glBindTexture(GL_TEXTURE_2D, texture);
+  switchTexture(font_id);
+  glPushMatrix();
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
   glPopMatrix(); // Restore The Old Projection Matrix
@@ -469,231 +438,6 @@ inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 //  float m[16];
 //  glLoadTransposeMatrixfARB(&m);
-}
-
-// TODO COMBINE THESE METHODS INTO A GENERIC ONE
-
-int GL::requestTexture(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config &texture_config = _system->getTexture();
-  std::string texture_name = std::string(texture);
-  texture_config.clean(texture_name);
-  SDL_Surface *tmp = NULL;
-  unsigned int texture_id = 0;
-  int id = texture_map[section + texture_name];
-  if (id != 0) return id;
-  glGenTextures(1, &texture_id);
-  if (texture_id == 0) return -1;
-  std::string file_name = texture_config.getItem(section, texture_name);
-  if (file_name.empty()) return -1;
-  tmp = System::loadImage(file_name);
-  if (!tmp) {
-    Log::writeLog("Error loading texture", Log::LOG_ERROR);
-    return -1;
-  }
-  createTexture(tmp, texture_id, clamp);
-  SDL_FreeSurface (tmp);
-  textureList.push_back(texture_id);
-  texture_map[section + texture_name] = next_id;
-  return next_id++;
-}
-
-int GL::requestMipMap(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config &texture_config = _system->getTexture();
-  std::string texture_name = std::string(texture);
-  texture_config.clean(texture_name);
-  SDL_Surface *tmp = NULL;
-  unsigned int texture_id = 0;
-  int id = texture_map[section + texture_name];
-  if (id != 0) return id;
-  glGenTextures(1, &texture_id);
-  if (texture_id == 0) return -1;
-  std::string file_name = texture_config.getItem(section, texture_name);
-  if (file_name.empty()) return -1;
-  tmp = System::loadImage(file_name);
-  if (!tmp) return -1;
-  createMipMap(tmp, texture_id, clamp);
-  SDL_FreeSurface (tmp);
-  textureList.push_back(texture_id);
-  texture_map[section + texture_name] = next_id;
-  return next_id++;
-}
-
-int GL::requestTextureMask(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config &texture_config = _system->getTexture();
-  std::string texture_name = std::string(texture);
-  texture_config.clean(texture_name);
-  SDL_Surface *tmp = NULL;
-  unsigned int texture_id = 0;
-  int id = texture_map[section + texture_name + MASK];
-  if (id != 0) return id;
-  glGenTextures(1, &texture_id);
-  if (texture_id == 0) return -1;
-  std::string file_name = texture_config.getItem(section, texture_name);
-  if (file_name.empty()) return -1;
-  tmp = System::loadImage(file_name);
-  if (!tmp) {
-    Log::writeLog("Error loading texture", Log::LOG_ERROR);
-    return -1;
-  }
-  createTextureMask(tmp, texture_id, clamp);
-  SDL_FreeSurface(tmp);
-  textureList.push_back(texture_id);
-  texture_map[section + texture_name + MASK] = next_id;
-  return next_id++;
-}
-
-int GL::requestMipMapMask(const std::string &section, const std::string &texture, bool clamp) {
-  static varconf::Config &texture_config = _system->getTexture();
-  std::string texture_name = std::string(texture);
-  texture_config.clean(texture_name);
-  SDL_Surface *tmp = NULL;
-  unsigned int texture_id = 0;
-  int id = texture_map[section + texture_name + MASK];
-  if (id != 0) return id;
-  glGenTextures(1, &texture_id);
-  if (texture_id == 0) return -1;
-  std::string file_name = texture_config.getItem(section, texture_name);
-  if (file_name.empty()) return -1;
-  tmp = System::loadImage(file_name);
-  if (!tmp) {
-    Log::writeLog("Error loading texture", Log::LOG_ERROR);
-    return -1;
-  }
-  createMipMapMask(tmp, texture_id, clamp);
-  SDL_FreeSurface (tmp);
-  textureList.push_back(texture_id);
-  texture_map[section + texture_name + MASK] = next_id;
-  return next_id++;
-}
-
-void GL::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  if (clamp) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  }
-  if (use_ext_texture_filter_anisotropic) {
-    GLfloat largest_supported_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-  }
-  glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-}
- 
-void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-  if (clamp) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
-  }
-  if (use_ext_texture_filter_anisotropic) {
-    GLfloat largest_supported_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-  }
-  if (use_sgis_generate_mipmap) {
-    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-    glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-  } else {
-    gluBuild2DMipmaps(GL_TEXTURE_2D, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-  }
-}
-
-void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clamp) {
-  int i;
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  if (clamp) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  }
-  if (use_ext_texture_filter_anisotropic) {
-    GLfloat largest_supported_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-  }
-  if (surface->format->BytesPerPixel == 4) {
-    for (i = 0; i < surface->w * surface->h * 4; i += 4) {
-      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-  } else {
-    for (i = 0; i < surface->w * surface->h * 3; i += 3) {
-      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-  }
-}
-
-void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp)  {
-  int i;
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-  if (clamp) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);		  
-  }
-  if (use_ext_texture_filter_anisotropic) {
-    GLfloat largest_supported_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-  }
-  if (surface->format->BytesPerPixel == 4) {
-    for (i = 0; i < surface->w * surface->h * 4; i += 4) {
-      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
-    }
-    if (use_sgis_generate_mipmap) {
-      glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-    } else {
-      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, surface->w, surface->h, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-    }
-  } else {
-    for (i = 0; i < surface->w * surface->h * 3; i += 3) {
-      ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
-      ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
-    }
-    if (use_sgis_generate_mipmap) {
-      glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-    } else {
-      gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
-    }
-  }
-}
-
-inline GLuint GL::getTextureID(unsigned int texture_id) {
-  if (texture_id > textureList.size()) return 0;
-  return textureList[texture_id - 1]; // texture id's start at 1
-//	int i;
-//  std::list<GLuint>::const_iterator I = textureList.begin();
-//  for (i = 1; i < texture_id; ++i, ++I);
-//  return *I;
 }
 
 void GL::stateChange(const std::string &state) {
@@ -749,8 +493,9 @@ void GL::stateChange(StateProperties *sp) {
 
 
 void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
+  switchTexture(texture);
   // TODO should use switchTexture
-  glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
+//  glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
   setViewMode(ORTHOGRAPHIC);
   // TODO: make into arrays?
   glBegin(GL_QUADS);
@@ -892,10 +637,6 @@ void GL::readConfig() {
 
 void GL::writeConfig() {
   varconf::Config &general = _system->getGeneral();
-//  if (!general) {
-//    Log::writeLog("GL: Error - General config object does not exist!", Log::LOG_ERROR);
-//    return;
-//  }
   
   // Save character light source
   general.setItem(RENDER, KEY_character_light_kc, lights[LIGHT_CHARACTER].attenuation_constant);
@@ -1190,36 +931,6 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     }
 }
 
-unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
-  unsigned int texture = 0;
-  glGenTextures(1, &texture);
-  // TODO: Check for valid texture generation and return error
-  glBindTexture(GL_TEXTURE_2D, texture);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  if (clamp) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  } 
-  if (use_ext_texture_filter_anisotropic) {
-    GLfloat largest_supported_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
-  }
-//  if (use_sgis_generate_mipmap) {
-//    glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
-//    glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
-//  } else {
-//    gluBuild2DMipmaps(GL_TEXTURE_2D, (depth == 3) ? GL_RGB : GL_RGBA, width, height, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
-//  }
-    
-  glTexImage2D(GL_TEXTURE_2D, 0, (depth == 3) ? GL_RGB : GL_RGBA, width, height, 0, (depth == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, data);
-  return texture;
-}
-
 void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
   static StateLoader *state_loader = System::instance()->getStateLoader();
 //  static ModelHandler *model_handler = _system->getModelHandler();
@@ -1234,14 +945,11 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
         continue;
       }
       Model *model = model_record->model;
-//      WorldEntity *we = (WorldEntity *)*J;
       // Get model
-  //    Model *model = model_handler->getModel(this, we->getType());
       if (!model) {  // ERROR GETTING MODEL
 	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
       }
-//      ObjectProperties *op = we->getObjectProperties(); 
       glPushMatrix();
 
       // Translate Model
@@ -1251,7 +959,6 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
      
       // Rotate Model
       rotateObject(object_record, model_record);
-      
 
       // Scale Object
       float scale = model_record->scale;
@@ -1273,7 +980,6 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 	}
 	else model->render(false);
       }
-      
       glPopMatrix();
     }
   }
@@ -1338,90 +1044,6 @@ void GL::drawOutline(ModelRecord *model_record) {
   stateChange(sp); // Restore state
 }
 
-void GL::createDefaults() {
-  //Create Default Texture
-  if (debug) Log::writeLog("Building Default Texture", Log::LOG_INFO);
-  unsigned int texture_id = 0;
-  unsigned int width, height;
-  glGenTextures(1, &texture_id);
-
-  if (texture_id == 0) {
-    Log::writeLog("Error creating default texture", Log::LOG_ERROR);
-    return;
-  }
-
-  unsigned char *data = xpm_to_image((const char**)default_image_xpm, width, height);
-//  SDL_Surface *surface = IMG_ReadXPMFromArray(default_image_xpm);
-
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-//  glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-
-  //SDL_FreeSurface(surface);
-  //surface = NULL;
-
-  free(data);
-  data = NULL;
-  textureList.push_back(texture_id);
-  texture_map["defaultdefault"] = next_id++;
-  
-  //Create Default Font
-  if (debug) Log::writeLog("Building Default Font Texture", Log::LOG_INFO);
-  texture_id = 0;
-  glGenTextures(1, &texture_id);
-
-  if (texture_id == 0) {
-    Log::writeLog("Error creating default font", Log::LOG_ERROR);
-    return;
-  }
-
-  //data = xpm_to_image(default_font, default_font_width, default_font_height);
-  data = xpm_to_image((const char**)default_font_xpm, width, height);
-  
-  //surface = IMG_ReadXPMFromArray(default_font_xpm);
-
-  glBindTexture(GL_TEXTURE_2D, texture_id);
-  
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
- // glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-
-  //SDL_FreeSurface(surface);
-  //surface = NULL;
-  free (data);
-  textureList.push_back(texture_id);
-  texture_map["defaultdefault_font"] = next_id++;
-}
- 
-inline void GL::switchTexture(int texture) {
-  switchTextureID(getTextureID(texture));
-}
-
-inline void GL::switchTextureID(unsigned int texture) {
-  if (_multi_texture_mode) {
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glDisable(GL_TEXTURE_2D);
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-    _multi_texture_mode = false;
-    
-  }
-  if (!glIsTexture(texture)) {
-    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
-    texture = default_id;
-  }
-  glBindTexture(GL_TEXTURE_2D, texture);
-}
 
 inline void GL::store() { glPushMatrix(); }
 inline void GL::restore() { glPopMatrix(); }
@@ -1463,7 +1085,8 @@ void GL::drawSplashScreen() {
   setViewMode(ORTHOGRAPHIC);
   
   glColor4fv(white);
-  switchTexture(requestTexture(UI, SPLASH));
+  if (splash_id == -1) splash_id = requestTexture(TEXTURE_splash_texture);
+  switchTexture(splash_id);
   // TODO into vertex array?
   glBegin(GL_QUADS); 
     glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
@@ -1561,55 +1184,12 @@ inline void GL::getFrustum(float frust[6][4]) {
 
 void GL::setupExtensions() {
   sage_init();
-//  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
-//  if (extensions.find("GL_SGIS_generate_mipmap") != std::string::npos) {
-//    use_sgis_generate_mipmap = true;
-//    Log::writeLog("Using GL_SGIS_generate_mipmap Extension", Log::LOG_INFO);
-//  } else {
-    use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
-///  }
-//  if (extensions.find("GL_EXT_texture_filter_anisotropic") != std::string::npos) {
-////    use_ext_texture_filter_anisotropic = true;
-//  /  Log::writeLog("Using GL_EXT_texture_filter_anisotropic Extension", Log::LOG_INFO);
-//  } else {
-//    use_ext_texture_filter_anisotropic = false;
-//  }
+  use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
-//#ifdef __WIN32
-//  glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTextureARB");
-//  glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
-//  use_multitexturing = true;
-//  if (!glActiveTextureARB){ use_multitexturing = false;  std::cerr << "no glActiveTextureARB" << std::endl << std::flush;}
-//  if (!glClientActiveTextureARB) {use_multitexturing = false; std::cerr << "no glClientActiveTextureARB" << std::endl << std::flush;}
-//   glLockArraysEXT = (PFNGLLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glLockArraysEXT");
-//   glUnlockArraysEXT = (PFNGLUNLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glUnlockArraysEXT");
-////  use_ext_compiled_vertex_array = true;
-//   if (!glLockArraysEXT) {
-//     std::cerr << "No glLockArraysEXT" << std::endl;
-    use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
-    if (use_ext_compiled_vertex_array) {
-      std::cout << "Using use_ext_compiled_vertex_array" << std::endl;
-      
-    }
-///   }
-//   if (!glUnlockArraysEXT) {
-//     use_ext_compiled_vertex_array = false;
-//     std::cerr << "No glUnlockArraysEXT" << std::endl;
-//   }
-//#endif
-  /* Example use og getting a function
-  
-  typedef void (*GL_ActiveTextureARB_func)(unsigned int);
-  GL_ActiveTextureARB_Func glActiveTexture_ARB_ptr = 0;
-  bool has_multitexture = true;
-  glActiveTextureARB_ptr = (GL_ActiveTRextureARB_Func)SDL_GL_GetProcAddress("glActiveTextureARB");
-  if (!glActiveTextureARB_ptr) {
-    // Print Error message?
-    has_multitexture = false;
+  use_ext_compiled_vertex_array = sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY];
+  if (use_ext_compiled_vertex_array) {
+    std::cout << "Using use_ext_compiled_vertex_array" << std::endl; 
   }
-  
-  */  
-
 }
 
 void GL::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
@@ -1740,36 +1320,6 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
 std::string GL::getActiveID() {
   return (activeEntity) ? (activeEntity->getID()) : ("");
 } 
- void GL::switchMultiTexture(int texture_1, int texture_2) {
-  switchMultiTextureID(getTextureID(texture_1), getTextureID(texture_2));
-}
-
-void GL::switchMultiTextureID(unsigned int texture_1, unsigned int texture_2) {
-  if (!use_multitexturing) switchTexture(texture_1);
-  if (!glIsTexture(texture_1)) {
-    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
-    texture_1 = default_id;
-  }
-  if (!glIsTexture(texture_2)) {
-    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
-    texture_2 = default_id;
-  }
-  // Assume Active texture is unit 0
-//  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture_1);
-//  glEnable(GL_TEXTURE_2D);
-  glActiveTextureARB(GL_TEXTURE1_ARB);
-  glBindTexture(GL_TEXTURE_2D, texture_2);
-//  glMatrixMode(GL_TEXTURE);
-//  glLoadIdentity();
-//  glScalef(_texture_scale, _texture_scale, 1.0f);
-//  glMatrixMode(GL_MODELVIEW);
-  
-  if (!_multi_texture_mode) glEnable(GL_TEXTURE_2D);
-  glActiveTextureARB(GL_TEXTURE0_ARB);
-  _multi_texture_mode = true;
-}
-
 void GL::setTextureScale(unsigned int unit, float scale) {
   switch(unit) {
     case (0): glActiveTextureARB(GL_TEXTURE0_ARB); break;

@@ -51,7 +51,6 @@ libSear_a_SOURCES = \
 	conf.h \
 	Console.cpp \
 	Console.h \
-	ConsoleObject.h \
 	cursors.h \
 	Event.cpp \
 	Event.h \
@@ -70,6 +69,8 @@ libSear_a_SOURCES = \
 	Sound.cpp \
 	Sound.h \
 	Sky.h \
+	StateLoader.cpp \
+	StateLoader.h \
 	System.cpp \
 	System.h \
 	Terrain.h \
@@ -78,8 +79,6 @@ libSear_a_SOURCES = \
 	ModelHandler.cpp \
 	ModelHandler.h \
 	ModelLoader.h \
-	StateLoader.cpp \
-	StateLoader.h \
 	Frustum.cpp \
 	Frustum.h \
 	FileHandler.cpp \

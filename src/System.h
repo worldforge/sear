@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.28 2003-03-06 23:50:38 simon Exp $
+// $Id: System.h,v 1.29 2003-03-23 19:51:49 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -13,7 +13,7 @@
 #include <SDL/SDL_image.h>
 #include <sigc++/object_slot.h>
 
-#include "ConsoleObject.h"
+#include "interfaces/ConsoleObject.h"
 #include <varconf/Config.h>
 
 namespace Sear {

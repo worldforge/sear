@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.11 2003-03-06 23:50:38 simon Exp $
+// $Id: SkyBox.cpp,v 1.12 2003-03-23 19:51:49 simon Exp $
 
 #include "common/Log.h"
 
@@ -46,18 +46,18 @@ SkyBox::~SkyBox() {
 bool SkyBox::init() {
   if (_initialised) shutdown();
   if (debug) Log::writeLog("SkyBox: Initialising.", Log::LOG_DEFAULT);
-  texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_NORTH, true);
-  texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_SOUTH, true);
-  texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_WEST, true);
-  texture_id[TEXTURE_SKY_DAY_EAST]     = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_EAST, true);
-  texture_id[TEXTURE_SKY_DAY_TOP]      = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_TOP, true);
-  texture_id[TEXTURE_SKY_DAY_BOTTOM]   = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_BOTTOM, true);
-  texture_id[TEXTURE_SKY_NIGHT_NORTH]  = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_NORTH, true);
-  texture_id[TEXTURE_SKY_NIGHT_SOUTH]  = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_SOUTH, true);
-  texture_id[TEXTURE_SKY_NIGHT_WEST]   = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_WEST, true);
-  texture_id[TEXTURE_SKY_NIGHT_EAST]   = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_EAST, true);
-  texture_id[TEXTURE_SKY_NIGHT_TOP]    = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_TOP, true);
-  texture_id[TEXTURE_SKY_NIGHT_BOTTOM] = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_BOTTOM, true);
+  texture_id[TEXTURE_SKY_DAY_NORTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_NORTH);
+  texture_id[TEXTURE_SKY_DAY_SOUTH]    = _renderer->requestTexture(CONFIG_SKY_DAY_SOUTH);
+  texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture(CONFIG_SKY_DAY_WEST);
+  texture_id[TEXTURE_SKY_DAY_EAST]     = _renderer->requestTexture(CONFIG_SKY_DAY_EAST);
+  texture_id[TEXTURE_SKY_DAY_TOP]      = _renderer->requestTexture(CONFIG_SKY_DAY_TOP);
+  texture_id[TEXTURE_SKY_DAY_BOTTOM]   = _renderer->requestTexture(CONFIG_SKY_DAY_BOTTOM);
+  texture_id[TEXTURE_SKY_NIGHT_NORTH]  = _renderer->requestTexture(CONFIG_SKY_NIGHT_NORTH);
+  texture_id[TEXTURE_SKY_NIGHT_SOUTH]  = _renderer->requestTexture(CONFIG_SKY_NIGHT_SOUTH);
+  texture_id[TEXTURE_SKY_NIGHT_WEST]   = _renderer->requestTexture(CONFIG_SKY_NIGHT_WEST);
+  texture_id[TEXTURE_SKY_NIGHT_EAST]   = _renderer->requestTexture(CONFIG_SKY_NIGHT_EAST);
+  texture_id[TEXTURE_SKY_NIGHT_TOP]    = _renderer->requestTexture(CONFIG_SKY_NIGHT_TOP);
+  texture_id[TEXTURE_SKY_NIGHT_BOTTOM] = _renderer->requestTexture(CONFIG_SKY_NIGHT_BOTTOM);
   _initialised = true;
   return true;
 }
