@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall
 
 #include "Log.h"
-#include <iostream.h>
+#include <iostream>
 
 /* LOG AIMS
  * Will provide  ability to log each type to a different file

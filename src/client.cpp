@@ -690,7 +690,7 @@ void Client::gotServerCount(int count) {
   Log::writeLog(std::string("Server count: ") + string_fmt(count), Log::LOG_INFO);
 }
 
-void Client::gotFailure(const string& msg) {
+void Client::gotFailure(const std::string &msg) {
   Log::writeLog(msg, Log::LOG_ERROR);
 }
 
