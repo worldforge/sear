@@ -2,13 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: CoreModelHandler.h,v 1.1 2003-03-04 23:28:46 simon Exp $
+// $Id: CoreModelHandler.h,v 1.2 2003-03-05 23:39:04 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_COREMODELHANDLER_H
 #define SEAR_LOADERS_CAL3D_COREMODELHANDLER_H 1
 
+#include <sigc++/object_slot.h>
+#include <string>
+#include <map>
+
 namespace Sear {
 
+// Forward declarations
+class Cal3dModel;
+class Cal3dCoreModel;
+	
 class CoreModelHandler :public SigC::Object {
 public:
   CoreModelHandler();
@@ -22,7 +30,7 @@ public:
     
 private:
   bool _initialised;
-  typedef std::map <std::string, CalCoreModel> CoreModelMap;
+  typedef std::map <std::string, Cal3dCoreModel*> CoreModelMap;
   CoreModelMap _core_models;
   
 };

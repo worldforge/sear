@@ -3,8 +3,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.1 2003-03-04 23:28:46 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.2 2003-03-05 23:39:04 simon Exp $
 
+#include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
 #include <string>
 
@@ -31,7 +32,6 @@
 #endif
 
 namespace Sear {
-
 static const std::string SECTION_model = "model";
 static const std::string SECTION_material = "material";
 
@@ -95,7 +95,15 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   unsigned int set_counter = 1;
   
   // Get path of files
-  std::string path = (std::string)config.getItem(SECTION_model, KEY_path);
+  // Will be overwritten by any entry in the config file
+  std::string path;
+  std::string::size_type pos = filename.find_last_of("/");
+  if (pos == std::string::npos) pos = filename.find_last_of("\\");
+  if (pos != std::string::npos) path = filename.substr(0, pos) + "/";
+  
+  if (config.findItem(SECTION_model, KEY_path)) {
+    path = (std::string)config.getItem(SECTION_model, KEY_path);
+  }
   // Load skeleton
   if (!_core_model->loadCoreSkeleton(path + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
     CalError::printLastError();
@@ -106,35 +114,47 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   // Load all meshes 
   for (MeshMap::const_iterator I = _meshes.begin(); I != _meshes.end(); ++I) {
     std::string mesh_name = I->first;
-    int mesh = _core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_material + "-" + mesh_name));
-    if (!mesh) CalError::printLastError();
+    int mesh = _core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
+    if (!mesh) {
+      std::cerr << "Error loading mesh - " << path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name) << std::endl;
+      CalError::printLastError();
+    }
     _meshes[mesh_name] = mesh;
   }
   // Load all animations
   for (AnimationMap::const_iterator I = _animations.begin(); I != _animations.end(); ++I) {
     std::string animation_name = I->first;
     int animation = _core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
-    if (!animation) CalError::printLastError();
+    if (!animation) {
+      std::cerr << "Error loading animation - " << path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name) << std::endl;
+      CalError::printLastError();
+    }
     _animations[animation_name] = animation;
   }
   // Load all materials
   for (MaterialList::const_iterator I = _material_list.begin(); I != _material_list.end(); ++I) {
     std::string material_name = *I;
-    int length =  material_name.substr(9).find_first_of("_");
-    std::string set = material_name.substr(9, length);
-    std::string part = material_name.substr(9 + length + 1);
+    int length =  material_name.find_first_of("_");
+    std::string set = material_name.substr(0,length);
+    std::string part = material_name.substr(length + 1);
     
-    int material = _core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + material_name));
-    if (!material) CalError::printLastError();
+    int material = _core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
+    if (!material) {
+      std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
+      CalError::printLastError();
+    }
     _materials[set][part] = material;
     // Create material thread and assign material to a set;
     if (_parts[part] == 0) {
       _parts[part] = part_counter++;
+      std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
     }
     if (_sets[set] == 0) {
       _sets[set] = set_counter++;
+      std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
     }
-     _core_model->createCoreMaterialThread(_parts[part]);
+     //_core_model->createCoreMaterialThread(_parts[part]);
+     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
     _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);    
   }
@@ -213,7 +233,7 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
       _animations[key.substr(KEY_animation.size() + 1)] = 0;
     }
     if (key.substr(0, KEY_material.size()) == KEY_material) {
-      _material_list.push_back(key.substr(KEY_mesh.size() + 1));;
+      _material_list.push_back(key.substr(KEY_material.size() + 1));;
     }
   }
 }
@@ -274,5 +294,10 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   return textureId;
 }
 
+Cal3dModel *Cal3dCoreModel::instantiate() {
+  Cal3dModel *model = new Cal3dModel(System::instance()->getGraphics()->getRender());
+  model->init(this);
+  return model;
+}
 
 } /* namespace Sear */

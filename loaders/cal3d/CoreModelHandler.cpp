@@ -2,11 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.1 2003-03-04 23:28:46 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.2 2003-03-05 23:39:04 simon Exp $
 
+#include "CoreModelHandler.h"
+#include "Cal3dCoreModel.h"
+#include "Cal3dModel.h"
 
 namespace Sear {
-
+	
 CoreModelHandler::CoreModelHandler() :
   _initialised(false)
 {}
@@ -22,8 +25,8 @@ void CoreModelHandler::init() {
 }
 
 void CoreModelHandler::shutdown() {
-  while (!core_models.empty()) {
-    Cal3dCoreModel *core_model = *_core_models.begin();
+  while (!_core_models.empty()) {
+    Cal3dCoreModel *core_model = _core_models.begin()->second;
     assert(core_model && "Core model is NULL");
     core_model->shutdown();
     delete core_model;
@@ -33,6 +36,7 @@ void CoreModelHandler::shutdown() {
 }
 
 Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
+  assert(_initialised %% "CoreModelHandler not initialised");
   // Check to see if we have this core model loaded?
   if (_core_models[filename] == NULL) {
     // load core model
@@ -42,10 +46,12 @@ Cal3dModel *CoreModelHandler::instantiateModel(const std::string &filename) {
   }
   // Get core model
   Cal3dCoreModel *core_model = _core_models[filename];
-  // Instantiate a model
-  Cal3dModel *model = core_model->instantiate();
-  // return model
-  return model;
+  if (core_model == NULL) {
+    std::cerr << "Error core model not created for " << filename << std::endl;
+    return NULL;
+  }
+  // Instantiate and return a model
+  return core_model->instantiate();
 }
 
 } /* namespace Sear */
