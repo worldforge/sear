@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.16 2004-04-19 09:25:48 alriddoch Exp $
+// $Id: Character.h,v 1.17 2004-05-23 16:39:01 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -83,6 +83,7 @@ public:
   void touchEntity(const std::string&);
   void displayInventory();
   void say(const std::string&);
+  void make(const std::string&);
 
   float getAngle() { return _angle; }
   WFMath::Quaternion getOrientation() { return _orient; }

@@ -1,3 +1,10 @@
+2004-05-23  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.h, src/Character.cpp: Add a make command that
+	  allows the character to attempt to create arbitrary in game
+	  objects. Also, sneak in a GNU compliant changelog entry, in
+	  the hope that Simon might pick up the habbit :)
+
 2004-05-23 James Turner <james@worldforge.org>
 
 	* Twiddle SDL_mixer includes to work with the Mac package, and not pull in SDL/SDL.h

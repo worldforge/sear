@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
+// $Id: Character.cpp,v 1.36 2004-05-23 16:39:01 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -29,6 +29,10 @@
 #include "Console.h"
 #include "Render.h"
 #include "Graphics.h"
+
+#include <wfmath/atlasconv.h>
+
+#include <Atlas/Objects/Operation/Create.h>
 
 
 #ifdef USE_MMGR
@@ -69,6 +73,7 @@ namespace Sear {
   static const std::string DROP = "drop";
   static const std::string GIVE = "give";
   static const std::string DISPLAY_INVENTORY = "inventory";
+  static const std::string MAKE = "make";
 
   static const std::string SET_MATERIAL ="set_material";
   static const std::string SET_MESH ="set_mesh";
@@ -304,6 +309,19 @@ void Character::say(const std::string &msg) {
   _avatar->say(msg);
 }
 
+void Character::make(const std::string &arg) {
+  assert ((_initialised == true) && "Character not initialised");
+  Atlas::Objects::Operation::Create c;
+  c.setFrom(_self->getID());
+  Atlas::Message::Element::MapType msg;
+  msg["loc"] = _self->getContainer()->getID();
+  WFMath::Point<3> pos = _self->getPosition() + WFMath::Vector<3>(2,0,0);
+  msg["pos"] = pos.toAtlas();
+  msg["parents"] = Atlas::Message::Element::ListType(1, arg);
+  c.setArgs(Atlas::Message::Element::ListType(1, msg));
+  _avatar->getWorld()->getConnection()->send(c);
+}
+
 void Character::toggleRunModifier() {
   assert ((_initialised == true) && "Character not initialised");	
 //  if (!_self) {
@@ -382,6 +400,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(DROP, this);
   console->registerCommand(GIVE, this);
   console->registerCommand(DISPLAY_INVENTORY, this);
+  console->registerCommand(MAKE, this);
   console->registerCommand(TOUCH, this);
   console->registerCommand(SAY, this);
 }
@@ -425,6 +444,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == PICKUP) System::instance()->setAction(ACTION_PICKUP);
    else if (command == TOUCH) System::instance()->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
+   else if (command == MAKE) make(args);
 //   else if (command == SET_MESH) {
  //   ObjectHandler *object_handler = _system->getObjectHandler();
   //  ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
