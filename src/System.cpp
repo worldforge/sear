@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.82 2004-04-29 10:33:26 simon Exp $
+// $Id: System.cpp,v 1.83 2004-05-02 14:17:20 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -687,10 +687,6 @@ void System::pushMessage(const std::string &msg, int type, int duration) {
   if(_console) _console->pushMessage(msg, type, duration);
 }
 
-std::string System::processHome(const std::string &input) {
-    return input;
-}
-
 void System::setCharacter(Character *character) {
   if (_character) { // get rid of old instance if it exists
     _character->shutdown();
@@ -828,7 +824,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == LOAD_GENERAL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
-    _general.readFromFile(processHome(args));
+    _general.readFromFile(args);
     if (_process_records) {
       _process_records = false;
       processRecords();
@@ -837,7 +833,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == LOAD_MODEL_RECORDS) {
     _process_records = _script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
-    _model_records.readFromFile(processHome(args));
+    _model_records.readFromFile(args);
     if (_process_records) {
       _process_records = false;
       processRecords();
@@ -846,7 +842,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
  else if (command == LOAD_MODEL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
-    _models.readFromFile(processHome(args));
+    _models.readFromFile(args);
     if (_process_records) {
       _process_records = false;
       processRecords();
@@ -854,15 +850,15 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   System::instance()->getFileHandler()->expandString(args);
   }
   else if (command == LOAD_KEY_BINDINGS) {
-    Bindings::loadBindings(processHome(args));
+    Bindings::loadBindings(args);
   }
   else if (command == SAVE_GENERAL_CONFIG) {
   System::instance()->getFileHandler()->expandString(args);
-    _general.writeToFile(processHome(args));
+    _general.writeToFile(args);
   }
   else if (command == SAVE_KEY_BINDINGS) {
   System::instance()->getFileHandler()->expandString(args);
-    Bindings::saveBindings(processHome(args));
+    Bindings::saveBindings(args);
   }
   else if (command == READ_CONFIG) {
     readConfig();

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.40 2004-04-28 22:02:44 jmt Exp $
+// $Id: System.h,v 1.41 2004-05-02 14:17:20 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -119,14 +119,6 @@ public:
    * @param duration Length of time to display message
    */ 
   void pushMessage(const std::string &msg, int type, int duration = MESSAGE_LIFE);
-  
-  /**
-   * Processes a string converting any '~' characters found to the 
-   * users home directory.
-   * @param path String to convert
-   * @return Converted string
-   */ 
-  std::string processHome(const std::string &path);
 
   /**
    * Adds a list of paths to use for searching to the existing list
