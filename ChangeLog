@@ -1,4 +1,7 @@
 12th December 2002, Simon Goodall
+ * Fixed Icon transparency under Win32
+
+12th December 2002, Simon Goodall
  * Added icon file and resource script for win32 executable
  * Updated make_win32 script to build in app icon
 
