@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.9 2003-01-11 17:18:39 simon Exp $
+// $Id: 3ds.h,v 1.10 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -13,6 +13,9 @@
 #include <map>
 
 #include <lib3ds/file.h>
+
+#include "common/types.h"
+
 #include "src/Model.h"
 
 namespace Sear {
@@ -44,9 +47,9 @@ public:
 
 protected:
   typedef struct {
-    float *vertex_data;
-    float *normal_data;
-    float *texture_data;
+    Vertex_3 *vertex_data;
+    Normal *normal_data;
+    Texel *texture_data;
     unsigned int num_points;
     int texture_id;
     std::string material_name;

@@ -5,7 +5,7 @@ SUBDIRS = data scripts common loaders renderers terrain sky gui src tools
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \
-	autogen.sh sear.spec
+	autogen.sh sear.spec sear.rc make_win.sh
 
 ##manual copy game data to target dir
 ##and spit out some infos
@@ -28,7 +28,3 @@ install-data-local:
 
 # Rule to build tar-gzipped distribution package
 $(PACKAGE)-$(VERSION).tar.gz: dist
-
-# Rule to build RPM distribution package
-rpm: $(PACKAGE)-$(VERSION).tar.gz
-	rpm -ta $(PACKAGE)-$(VERSION).tar.gz

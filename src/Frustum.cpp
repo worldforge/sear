@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.8 2002-10-21 20:09:59 simon Exp $
+// $Id: Frustum.cpp,v 1.9 2003-03-06 23:50:38 simon Exp $
 
 #include "common/Utility.h"
 
@@ -11,8 +11,15 @@
 #include "WorldEntity.h"
 #include "Frustum.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.53 2002-12-24 18:17:33 simon Exp $
+// $Id: System.cpp,v 1.54 2003-03-06 23:50:38 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,8 +48,13 @@
 #include "glgooey/WindowManager.h"
 #endif
 
-#ifdef DEBUG
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -60,11 +65,46 @@ static const std::string SYSTEM = "system";
   
 namespace Sear {
 
-System *System::_instance = NULL;
 
- const std::string System::SCRIPTS_DIR = "scripts";
- const std::string System::STARTUP_SCRIPT = "startup.script";
- const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
+  static const std::string SCRIPTS_DIR = "scripts";
+  static const std::string STARTUP_SCRIPT = "startup.script";
+  static const std::string SHUTDOWN_SCRIPT = "shutdown.script";
+
+  // Console commands
+  static const std::string EXIT = "exit";
+  static const std::string QUIT = "quit";
+
+  static const std::string GET_ATTRIBUTE = "getat";
+  static const std::string SET_ATTRIBUTE = "setat";
+
+  static const std::string LOAD_MODEL_RECORDS = "load_model_records";
+  static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
+  static const std::string LOAD_STATE_FILE = "load_state_file";
+  static const std::string LOAD_GENERAL_CONFIG = "load_general";
+  static const std::string LOAD_KEY_BINDINGS = "load_bindings";
+  static const std::string LOAD_TEXTURE_CONFIG = "load_textures";
+  static const std::string LOAD_MODEL_CONFIG = "load_models";
+  static const std::string SAVE_GENERAL_CONFIG = "save_general";
+  static const std::string SAVE_KEY_BINDINGS = "save_bindings";
+  static const std::string READ_CONFIG = "read_config";
+  static const std::string BIND_KEY = "bind";
+  static const std::string KEY_PRESS = "keypress";
+  static const std::string TOGGLE_FULLSCREEN = "toggle_fullscreen";
+  static const std::string ADD_EVENT = "event";
+  static const std::string IDENTIFY_ENTITY = "identify";
+
+  // Config key values  
+  static const std::string KEY_icon_file = "iconfile";
+  static const std::string KEY_mouse_move_select = "mouse_move_select";
+  static const std::string KEY_render_use_stencil = "render_use_stencil";
+  static const std::string KEY_window_width = "width";
+  static const std::string KEY_window_height = "height";
+  //Config default values
+  static const int DEFAULT_window_width = 640;
+  static const int DEFAULT_window_height = 480;  
+  static const bool DEFAULT_mouse_move_select = true;
+
+System *System::_instance = NULL;
 
 System::System() :
   repeat(false),

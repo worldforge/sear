@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.9 2003-02-22 19:11:48 simon Exp $
+// $Id: Slice.cpp,v 1.10 2003-03-06 23:50:38 simon Exp $
 
 #include "common/Utility.h"
 
@@ -26,8 +26,15 @@
  * Material settings
  */ 
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -70,27 +77,27 @@ bool Slice::init(const std::string &type, float width, float height, unsigned in
       float y_2 = -y + (float) mod * mod_y;
       ASlice *s = new ASlice();
       // Calc Vertices
-      s->vertex_data[0][0] = x_1; s->vertex_data[0][1] = y_1; s->vertex_data[0][2] = 0.0f;
-      s->vertex_data[1][0] = x_2; s->vertex_data[1][1] = y_2; s->vertex_data[1][2] = 0.0f;
-      s->vertex_data[2][0] = x_2; s->vertex_data[2][1] = y_2; s->vertex_data[2][2] = height;
-      s->vertex_data[3][0] = x_1; s->vertex_data[3][1] = y_1; s->vertex_data[3][2] = height;
+      s->vertex_data[0].x = x_1; s->vertex_data[0].y = y_1; s->vertex_data[0].z = 0.0f;
+      s->vertex_data[1].x = x_2; s->vertex_data[1].y = y_2; s->vertex_data[1].z = 0.0f;
+      s->vertex_data[2].x = x_2; s->vertex_data[2].y = y_2; s->vertex_data[2].z = height;
+      s->vertex_data[3].x = x_1; s->vertex_data[3].y = y_1; s->vertex_data[3].z = height;
 
       // Calc normals
       float v[3][3];
-      v[0][0] = s->vertex_data[0][0]; v[0][1] = s->vertex_data[0][1]; v[0][2] = s->vertex_data[0][2];
-      v[1][0] = s->vertex_data[1][0]; v[1][1] = s->vertex_data[1][1]; v[1][2] = s->vertex_data[1][2];
-      v[2][0] = s->vertex_data[2][0]; v[2][1] = s->vertex_data[2][1]; v[2][2] = s->vertex_data[2][2];
+      v[0][0] = s->vertex_data[0].x; v[0][1] = s->vertex_data[0].y; v[0][2] = s->vertex_data[0].z;
+      v[1][0] = s->vertex_data[1].x; v[1][1] = s->vertex_data[1].y; v[1][2] = s->vertex_data[1].z;
+      v[2][0] = s->vertex_data[2].x; v[2][1] = s->vertex_data[2].y; v[2][2] = s->vertex_data[2].z;
       float out [3];
       calcNormal(v, out);
-      s->normal_data[0][0] = out[0]; s->normal_data[0][1] = out[1]; s->normal_data[0][2] = out[2];
-      s->normal_data[1][0] = out[0]; s->normal_data[1][1] = out[1]; s->normal_data[1][2] = out[2];
-      s->normal_data[2][0] = out[0]; s->normal_data[2][1] = out[1]; s->normal_data[2][2] = out[2];
+      s->normal_data[0].x = out[0]; s->normal_data[0].y = out[1]; s->normal_data[0].z = out[2];
+      s->normal_data[1].x = out[0]; s->normal_data[1].y = out[1]; s->normal_data[1].z = out[2];
+      s->normal_data[2].x = out[0]; s->normal_data[2].y = out[1]; s->normal_data[2].z = out[2];
 
       // Calc Texture Coords 
-      s->texture_data[0][0] = 0.0f; s->texture_data[0][1] = 0.0f;
-      s->texture_data[1][0] = 1.0f; s->texture_data[1][1] = 0.0f;
-      s->texture_data[2][0] = 1.0f; s->texture_data[2][1] = 1.0f;
-      s->texture_data[3][0] = 0.0f; s->texture_data[3][1] = 1.0f;
+      s->texture_data[0].s = 0.0f; s->texture_data[0].t = 0.0f;
+      s->texture_data[1].s = 1.0f; s->texture_data[1].t = 0.0f;
+      s->texture_data[2].s = 1.0f; s->texture_data[2].t = 1.0f;
+      s->texture_data[3].s = 0.0f; s->texture_data[3].t = 1.0f;
       
       slicing->push_back(s);
     } 
@@ -165,7 +172,7 @@ void Slice::render(bool select_mode) {
         } else {
           _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
         }
-        _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0], false);
+        _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
       }
   }
   // Render primary Slice
@@ -185,7 +192,7 @@ void Slice::render(bool select_mode) {
     } else {
       _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
     }
-    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0], false);
+    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
   }
 }
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.19 2003-02-22 19:11:48 simon Exp $
+// $Id: Character.cpp,v 1.20 2003-03-06 23:50:38 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -30,20 +30,65 @@
 #include "Render.h"
 #include "Graphics.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
 
-static const std::string CHARACTER = "character";
-  
 namespace Sear {
+  // Console commands	
+  static const std::string CHARACTER = "character";
+  static const std::string MOVE_FORWARD = "+character_move_forward";
+  static const std::string MOVE_BACKWARD = "+character_move_backward";
+  static const std::string MOVE_STOP_FORWARD = "-character_move_forward";
+  static const std::string MOVE_STOP_BACKWARD = "-character_move_backward";
+ 
+  static const std::string ROTATE_LEFT = "+character_rotate_left";
+  static const std::string ROTATE_RIGHT = "+character_rotate_right";
+  static const std::string ROTATE_STOP_LEFT = "-character_rotate_left";
+  static const std::string ROTATE_STOP_RIGHT = "-character_rotate_right";
+ 
+  static const std::string STRAFE_LEFT = "+character_strafe_left";
+  static const std::string STRAFE_RIGHT = "+character_strafe_right";
+  static const std::string STRAFE_STOP_LEFT = "-character_strafe_left";
+  static const std::string STRAFE_STOP_RIGHT = "-character_strafe_right";
 
-Character::Character(WorldEntity *self, System *system) :
+  static const std::string RUN = "+run";
+  static const std::string STOP_RUN = "-run";
+  static const std::string TOGGLE_RUN = "toggle_run";
+  
+  static const std::string SAY = "say";
+  static const std::string PICKUP = "pickup";
+  static const std::string TOUCH = "touch";
+  static const std::string DROP = "drop";
+  static const std::string GIVE = "give";
+  static const std::string DISPLAY_INVENTORY = "inventory"; 
+
+  static const int server_update_interval = 500;
+
+  // Config key names
+  static const std::string KEY_character_walk_speed = "character_walk_speed";
+  static const std::string KEY_character_run_speed = "character_run_speed";
+  static const std::string KEY_character_rotate_speed = "character_rotate_speed";
+
+  // Config default values
+  static const float DEFAULT_character_walk_speed = 2.0f;
+  static const float DEFAULT_character_run_speed = 3.0f;
+  static const float DEFAULT_character_rotate_speed = 20.0f;
+
+const float Character::CMD_modifier = 9999.9f;
+
+Character::Character(WorldEntity *self) :
   _self(self),
-  _system(system),
   _walk_speed(0.0f),
   _run_speed(0.0f),
   _rotate_speed(0.0f),
@@ -110,7 +155,7 @@ void Character::rotate(float rate) {
   }
   if (rate != CMD_modifier) _rate += rate * _rotate_speed;
   updateLocals(true);
-  if (_rate != 0.0f) _system->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+  if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
 void Character::updateLocals(bool send_to_server) {
@@ -252,7 +297,7 @@ void Character::displayInventory() {
 //    std::cout << I->second << " - " << I->first << std::endl;
   std::string quantity = string_fmt(I->second);
   std::string name = I->first;
-    _system->pushMessage(std::string(name + std::string(" - ") + std::string(quantity)), 3);
+    System::instance()->pushMessage(std::string(name + std::string(" - ") + std::string(quantity)), 3);
   }
  
 }
@@ -282,7 +327,7 @@ void Character::toggleRunModifier() {
 
 void Character::readConfig() {
   varconf::Variable temp;
-  varconf::Config &general = _system->getGeneral();
+  varconf::Config &general = System::instance()->getGeneral();
   temp = general.getItem("character", KEY_character_walk_speed);
   _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
   temp = general.getItem("character", KEY_character_run_speed);
@@ -292,7 +337,7 @@ void Character::readConfig() {
 }
 
 void Character::writeConfig() {
-  varconf::Config &general = _system->getGeneral();
+  varconf::Config &general = System::instance()->getGeneral();
   general.setItem("character", KEY_character_walk_speed, _walk_speed);
   general.setItem("character", KEY_character_run_speed, _run_speed);
   general.setItem("character", KEY_character_rotate_speed, _rotate_speed);
@@ -384,7 +429,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      std::string item = tokeniser.remainingTokens();
      int quantity = 0;
      cast_stream(quantity_str, quantity); 
-     giveEntity(item, quantity, _system->getGraphics()->getRender()->getActiveID());
+     giveEntity(item, quantity, System::instance()->getGraphics()->getRender()->getActiveID());
    }
    else if (command == DROP) {
      std::string quantity_str = tokeniser.nextToken();
@@ -393,15 +438,15 @@ void Character::runCommand(const std::string &command, const std::string &args) 
      cast_stream(quantity_str, quantity); 
      dropEntity(item, quantity);
    }
-   else if (command == PICKUP) _system->setAction(ACTION_PICKUP);
-   else if (command == TOUCH) _system->setAction(ACTION_TOUCH);
+   else if (command == PICKUP) System::instance()->setAction(ACTION_PICKUP);
+   else if (command == TOUCH) System::instance()->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
 }
 
 void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
-//  cout << "Recontainered" << endl;
-//  if (entity1) cout << "Entity1: " << entity1->getType()->getName() << endl;
-//  if (entity2) cout << "Entity2: " << entity2->getType()->getName() << endl;
+  std::cout << "Recontainered" << std::endl;
+  if (entity1) std::cout << "Entity1: " << entity1->getType()->getName() << std::endl;
+  if (entity2) std::cout << "Entity2: " << entity2->getType()->getName() << std::endl;
   if (entity2) {
     System::instance()->getActionHandler()->handleAction(std::string("entering_") + entity2->getType()->getName(), NULL);
   }

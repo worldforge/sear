@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.26 2003-01-15 22:21:45 simon Exp $
+// $Id: WorldEntity.cpp,v 1.27 2003-03-06 23:50:38 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -23,8 +23,16 @@
 
 #include <set>
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -164,6 +172,8 @@ void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
   WFMath::Point<3> pos = GetPos();
   Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
+  pos = getAbsPos();
+  Log::writeLog(std::string("ABS - X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   Eris::Entity *e = getContainer();
   Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getID())), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Num Children: ") + string_fmt(getNumMembers()), Log::LOG_DEFAULT);

@@ -2,13 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.h,v 1.5 2002-09-26 17:17:46 simon Exp $
+// $Id: Slice.h,v 1.6 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_SLICE_H
 #define SEAR_SLICE_H 1
 
 #include <string>
 #include <list>
+
+#include "common/types.h"
 
 #include "src/Model.h"
 #include "src/Graphics.h"
@@ -20,9 +22,9 @@ class Render;
 class Slice : public Model {
 public:
   typedef struct {
-    float vertex_data[4][3];
-    float normal_data[4][3];
-    float texture_data[4][2];
+    Vertex_3 vertex_data[4];
+    Normal normal_data[4];
+    Texel texture_data[4];
   } ASlice;
 
   typedef std::list<ASlice*> Slicing;

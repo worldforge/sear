@@ -1,4 +1,7 @@
 6th March 2002, Simon Goodall
+ * added file defining basic geometric types (vertex, normal, texel etc)
+
+6th March 2002, Simon Goodall
  * Fixed terrain bug caused by array out of bounds. (might have broken something else though who thought comments were a bad idea?)
  * Fixed bug on cally re-write where first material was not loaded properly
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.14 2002-11-12 23:59:22 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.15 2003-03-06 23:50:38 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -17,8 +17,15 @@
 #include "NPlane_Loader.h"
 #include "NPlane.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;

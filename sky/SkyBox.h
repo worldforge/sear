@@ -2,10 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.h,v 1.4 2002-09-08 00:24:53 simon Exp $
+// $Id: SkyBox.h,v 1.5 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_SKYBOX_H
 #define SEAR_SKYBOX_H 1
+
+#include "common/types.h"
 
 #include "src/System.h"
 
@@ -46,51 +48,51 @@
 
 
 #define VERTEX_COORDS { \
-  -1.0f,  1.0f,  1.0f,  \
-  -1.0f, -1.0f,  1.0f,  \
-   1.0f, -1.0f,  1.0f,  \
-   1.0f,  1.0f,  1.0f,  \
+  {-1.0f,  1.0f,  1.0f},  \
+  { -1.0f, -1.0f,  1.0f},  \
+  {  1.0f, -1.0f,  1.0f},  \
+  { 1.0f,  1.0f,  1.0f},  \
                         \
-  -1.0f,  1.0f, -1.0f,  \
-  -1.0f,  1.0f,  1.0f,  \
-   1.0f,  1.0f,  1.0f,  \
-   1.0f,  1.0f, -1.0f,  \
+  {-1.0f,  1.0f, -1.0f},  \
+  {-1.0f,  1.0f,  1.0f},  \
+  { 1.0f,  1.0f,  1.0f},  \
+  { 1.0f,  1.0f, -1.0f},  \
                         \
-   1.0f, -1.0f, -1.0f,  \
-   1.0f, -1.0f,  1.0f,  \
-  -1.0f, -1.0f,  1.0f,  \
-  -1.0f, -1.0f, -1.0f,  \
+  { 1.0f, -1.0f, -1.0f},  \
+  { 1.0f, -1.0f,  1.0f},  \
+  {-1.0f, -1.0f,  1.0f},  \
+  {-1.0f, -1.0f, -1.0f},  \
                         \
-   1.0f,  1.0f, -1.0f,  \
-   1.0f,  1.0f,  1.0f,  \
-   1.0f, -1.0f,  1.0f,  \
-   1.0f, -1.0f, -1.0f,  \
+  { 1.0f,  1.0f, -1.0f},  \
+  { 1.0f,  1.0f,  1.0f},  \
+  { 1.0f, -1.0f,  1.0f},  \
+  { 1.0f, -1.0f, -1.0f},  \
                         \
-  -1.0f ,-1.0f, -1.0f,  \
-  -1.0f, -1.0f,  1.0f,  \
-  -1.0f,  1.0f,  1.0f,  \
-  -1.0f,  1.0f, -1.0f,  \
+  {-1.0f ,-1.0f, -1.0f},  \
+  {-1.0f, -1.0f,  1.0f},  \
+  {-1.0f,  1.0f,  1.0f},  \
+  {-1.0f,  1.0f, -1.0f},  \
                         \
-  -1.0f, -1.0f, -1.0f,  \
-  -1.0f,  1.0f, -1.0f,  \
-   1.0f,  1.0f, -1.0f,  \
-   1.0f, -1.0f, -1.0f }
+  {-1.0f, -1.0f, -1.0f},  \
+  {-1.0f,  1.0f, -1.0f},  \
+  { 1.0f,  1.0f, -1.0f},  \
+  { 1.0f, -1.0f, -1.0f} }
 
 #define TEXTURE_COORDS {  \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, \
-  0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f }
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, \
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, \
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, \
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, \
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f }, \
+  { 0.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f }, { 1.0f, 0.0f } }
 
 #define NORMAL_COORDS { \
-   0.0f,  0.0f, -1.0f, \
-   0.0f, -1.0f,  0.0f, \
-   0.0f,  1.0f,  0.0f, \
-  -1.0f,  0.0f,  0.0f, \
-   1.0f,  0.0f,  0.0f, \
-   0.0f,  0.0f,  1.0f }
+  { 0.0f,  0.0f, -1.0f}, \
+  { 0.0f, -1.0f,  0.0f}, \
+  { 0.0f,  1.0f,  0.0f}, \
+  {-1.0f,  0.0f,  0.0f}, \
+  { 1.0f,  0.0f,  0.0f}, \
+  { 0.0f,  0.0f,  1.0f} }
 
 #include "src/Sky.h"
    
@@ -115,9 +117,9 @@ protected:
   void render();
   void renderTextureSet(int);
 
-  static float vertex_coords[];
-  static float texture_coords[];
-  static float normal_coords[];
+  static Vertex_3 vertex_coords[];
+  static Texel texture_coords[];
+  static Normal normal_coords[];
  
   int texture_id[NUM_SKY_TEXTURES];
  

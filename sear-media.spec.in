@@ -2,8 +2,6 @@
 %define version @VERSION@
 %define release 1
 
-#define a default prefix??
-
 Summary: Sear Media Pack
 Name: %{name}
 Version: %{version}

@@ -2,18 +2,19 @@
 %define version @VERSION@
 %define release 1
 
-#define a default prefix??
-
 Summary: Sear - an 3D client for Worldforge
 Name: %{name}
 Version: %{version}
 Release: %{release}
+Source: http://ftp.worldforge.org/pub/worldforge/clients/sear/sear-%{version}.tar.gz
 Source0: %{name}-%{version}.tar.gz
 URL: http://www.worldforge.org/dev/eng/clients/sear/
 Copyright: GPL
-Group: Games
+Group: Amusements/Games
 BuildRoot: /var/tmp/%{name}-buildroot
 Prefix: %{_prefix}
+Requires: Atlas-C++ >= @ATLAS_VERSION@ libsigc++ >= 1.0 SDL >= @SDL_VERSION@ SDL_image >= 1.2.2 SDL_mixer >= 1.2.2 varconf >= @VARCONF_VERSION@ skstream >= @SKSTREAM_VERSION@ eris >= @ERIS_VERSION@ 
+BuildRequires: Atlas-C++-devel >= @ATLAS_VERSION@ libsigc++-devel >= 1.0 SDL-devel >= @SDL_VERSION@ SDL_image-devel >= 1.2.2 SDL_mixer-devel >= 1.2.2 varconf-devel >= @VARCONF_VERSION@ skstream-devel >= @SKSTREAM_VERSION@ eris-devel >= @ERIS_VERSION@ 
 
 %description
 Sear is a 3D client for MMORPGs using the Worldforge system. 
@@ -40,8 +41,12 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{prefix}/share/%{name}/*
-%{prefix}/bin/*
+%{prefix}/bin/sear
+%{prefix}/bin/model_viewer
 %doc README COPYING AUTHORS
 
-
+%ChangeLog
+* Sun Jan 12 2003 Simon Goodall <simon@simongoodall.co.uk>
+- Added Dependancies
+- Changed group to Amusements/Games instead of just Games
 # end of file

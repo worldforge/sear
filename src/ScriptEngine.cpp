@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.3 2002-12-11 21:21:21 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -16,13 +16,28 @@
 
 #include <fstream>
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
 namespace Sear {
+ static const std::string CHANGE_DIRECTORY = "cd";
+  static const std::string CHANGE_TO_FILE_DIRECTORY = "cd_this_dir";
+  static const std::string ENABLE_DIR_PREFIX = "enable_dir_prefix";
+  static const std::string DISABLE_DIR_PREFIX = "disable_dir_prefix";
+  static const std::string RUN_SCRIPT = "run_script";
+  static const std::string SEARCH_RUN_SCRIPT = "search_run_script";
+ 
 
 ScriptEngine::ScriptEngine() :
   _initialised(false),

@@ -2,10 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Label.cpp,v 1.1 2002-09-27 15:46:42 simon Exp $
+// $Id: Label.cpp,v 1.2 2003-03-06 23:50:37 simon Exp $
 
 
 #include "Label.h"
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 
 namespace Sear {
 

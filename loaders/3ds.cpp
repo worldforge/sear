@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.19 2003-02-22 19:11:48 simon Exp $
+// $Id: 3ds.cpp,v 1.20 2003-03-06 23:50:38 simon Exp $
 
 
 #include <iostream>
@@ -29,8 +29,15 @@
 
 #include <iostream>
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -76,9 +83,9 @@ void ThreeDS::shutdown() {
   while (!render_objects.empty()) {
     RenderObject *ro = *render_objects.begin();
     if (ro) {
-      if (ro->vertex_data) free (ro->vertex_data);
-      if (ro->texture_data) free (ro->texture_data);
-      if (ro->normal_data) free (ro->normal_data);
+      if (ro->vertex_data) delete (ro->vertex_data);
+      if (ro->texture_data) delete (ro->texture_data);
+      if (ro->normal_data) delete (ro->normal_data);
       delete ro;
     }
     render_objects.erase(render_objects.begin());
@@ -165,9 +172,9 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
       RenderObject *ro = new RenderObject;
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
-      ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-      ro->normal_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-      ro->texture_data = (mesh->texels) ? (float*)malloc(2 * ro->num_points * sizeof(float)) : (NULL);
+      ro->vertex_data = new Vertex_3[ro->num_points];
+      ro->normal_data = new Normal[ro->num_points];
+      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
       int current_texture = 0;
       for (p=0; p<mesh->faces; ++p) {
         Lib3dsFace *f=&mesh->faceL[p];
@@ -235,9 +242,9 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 //              memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
-              ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-              ro->normal_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-              ro->texture_data = (mesh->texels) ? (float*)malloc(2 * ro->num_points * sizeof(float)) : (NULL);
+              ro->vertex_data = new Vertex_3[ro->num_points];
+              ro->normal_data = new Normal[ro->num_points];
+              ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
 	      render_objects.push_back(ro);
 	    }
           }
@@ -249,25 +256,25 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
           out[0] -= d->pivot[0];
           out[1] -= d->pivot[1];
           out[2] -= d->pivot[2];
-          lib3ds_vector_transform(&ro->vertex_data[v_counter], node->matrix, out);
-          v_counter += 3;
+//	  float *v_data = (float*)ro->vertex_data;
+          lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], node->matrix, out);
 
           /* It is very likely the normals have been completely messed up by these transformations */
 	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
           out[0] -= d->pivot[0];
           out[1] -= d->pivot[1];
           out[2] -= d->pivot[2];
-	  lib3ds_vector_transform(&ro->normal_data[n_counter], node->matrix, out);
+	  lib3ds_vector_transform((float*)&ro->normal_data[n_counter], node->matrix, out);
           n_counter += 3;
 
 	  if (mesh->texels) {
-            ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][0];
-            ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][1];
+            ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
+            ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
 	  }
 
         }
       }
-      ro->num_points = v_counter / 3;
+      ro->num_points = v_counter;
       free(normalL);
     }
   }
@@ -292,9 +299,9 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 //      memset(ro, 0, sizeof(RenderObject));
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
-      ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-      ro->normal_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-      ro->texture_data = (mesh->texels) ? (float*)malloc(2 * ro->num_points * sizeof(float)) : (NULL);
+      ro->vertex_data = new Vertex_3[ro->num_points];
+      ro->normal_data = new Normal[ro->num_points];
+      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
       int current_texture = 0;
       for (p=0; p<mesh->faces; ++p) {
         Lib3dsFace *f=&mesh->faceL[p];
@@ -354,7 +361,7 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
-	      ro->num_points = v_counter / 3;
+	      ro->num_points = v_counter;
 	      
               v_counter = n_counter = t_counter = 0;
 	      
@@ -362,9 +369,9 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 //              memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
-              ro->vertex_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-              ro->normal_data = (float*)malloc(3 * ro->num_points * sizeof(float));
-              ro->texture_data = (mesh->texels) ? (float*)malloc(2 * ro->num_points * sizeof(float)) : (NULL);
+              ro->vertex_data = new Vertex_3[ro->num_points];
+              ro->normal_data = new Normal[ro->num_points];
+              ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
 	      render_objects.push_back(ro);
 	    }
           }
@@ -376,25 +383,24 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 //          out[0] -= d->pivot[0];
 //          out[1] -= d->pivot[1];
 //          out[2] -= d->pivot[2];
-          lib3ds_vector_transform(&ro->vertex_data[v_counter], mesh->matrix, out);
-          v_counter += 3;
+          lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], mesh->matrix, out);
 
           /* It is very likely the normals have been completely messed up by these transformations */
 	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
 //          out[0] -= d->pivot[0];
 //          out[1] -= d->pivot[1];
 //          out[2] -= d->pivot[2];
-	  lib3ds_vector_transform(&ro->normal_data[n_counter], mesh->matrix, out);
-          n_counter += 3;
+	  lib3ds_vector_transform((float*)&ro->normal_data[n_counter], mesh->matrix, out);
+          n_counter++;
 
 	  if (mesh->texels) {
-            ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][0];
-            ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][1];
+            ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
+            ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
 	  }
 
         }
       }
-      ro->num_points = v_counter / 3;
+      ro->num_points = v_counter;
       free(normalL);
     }
   }

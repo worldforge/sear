@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.9 2002-12-24 15:11:33 simon Exp $
+// $Id: Graphics.h,v 1.10 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -128,27 +128,7 @@ protected:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   
 private:
-  // Consts
-  static const int sleep_time = 5000;
-  
-  // Config key strings
-  static const char * const KEY_use_textures = "render_use_textures";
-  static const char * const KEY_use_lighting = "render_use_lighting";
-  static const char * const KEY_show_fps = "render_show_fps";
-  static const char * const KEY_use_stencil = "render_use_stencil";
 
-  static const char * const KEY_lower_frame_rate_bound = "lower_frame_rate_bound";
-  static const char * const KEY_upper_frame_rate_bound = "upper_frame_rate_bound";
-  
-  // Default config values
-  static const float DEFAULT_use_textures = true;
-  static const float DEFAULT_use_lighting = true;
-  static const float DEFAULT_show_fps = true;
-  static const float DEFAULT_use_stencil = true;
-
-  static const float DEFAULT_lower_frame_rate_bound = 25.0f;
-  static const float DEFAULT_upper_frame_rate_bound = 30.0f;
- 
   
 };
 

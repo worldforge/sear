@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Lobby.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+// $Id: Lobby.h,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_LOBBY_H
 #define SEAR_LOBBY_H 1
@@ -31,7 +31,7 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-protected:
+private:
   // Eris callbacks
   void privateChat(const std::string &src, const std::string &msg);
   void Entered(Eris::Room *room);
@@ -43,14 +43,7 @@ protected:
 
   Eris::Lobby *_lobby;
   bool _initialised;
-  
-private:
-  static const char * const JOIN_ROOM = "join_room";
-  static const char * const LEAVE_ROOM = "leave_room";
-  static const char * const LIST_ROOMS = "list_rooms";
-  static const char * const TALK = "talk";
-  static const char * const EMOTE = "emote";
-};
+};  
 
 } /* namespace Sear */
 #endif /* CONSOLEOBJECT_H */

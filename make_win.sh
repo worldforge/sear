@@ -1,5 +1,5 @@
 #!/bin/sh -v
-CROSSTOOLS=/home/sg02r/cross-tools
+CROSSTOOLS=/usr/local/cross-tools
 GCC=$CROSSTOOLS/i386-mingw32msvc/bin/gcc
 WINDRES=$CROSSTOOLS/bin/i386-mingw32msvc-windres
 STRIP=$CROSSTOOLS/i386-mingw32msvc/bin/strip

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.27 2002-12-24 18:17:33 simon Exp $
+// $Id: System.h,v 1.28 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -16,12 +16,9 @@
 #include "ConsoleObject.h"
 #include <varconf/Config.h>
 
-
-//namespace varconf {
-//  class Config;
-//}
-
 namespace Sear {
+	
+// Forward declarations
 class ActionHandler;
 class Render;
 class Calendar;
@@ -45,40 +42,127 @@ typedef enum {
   SYS_LAST_STATE
 } SystemState;
 
+/// \todo replace defines for cursor mode
 #define ACTION_DEFAULT (0)
 #define ACTION_PICKUP (1)
 #define ACTION_TOUCH (2)
 
-
-
+/**
+ * This class is the root object for Sear. All the higher level classes will be created by
+ * a single system object.
+ * \todo Make System class completly singular (make constructor private)
+ */ 
 class System : public ConsoleObject, public SigC::Object{
 public:
+  /**
+   * Default constructor
+   */ 
   System();
+
+  /**
+   * Destructor. Will call shutdown if still initialised when called.
+   * @see shutdown()
+   */ 
   ~System();
 
+  /** 
+   * Initialise the system object
+   * @return True on success
+   */ 
   bool init();
+
+  /**
+   * Shutdown the system object. This will destroy any objects created by the system
+   * object, save any settings, and run any shutdown scripts found.
+   */ 
   void shutdown();
 
+  /**
+   * Creates a window at pre-determined size
+   * @param fullscreen Flag indicating whether to create window in fullscreen mode
+   */ 
   void createWindow(bool fullscreen);
+
+  /**
+   * This is the main program loop. Will loop until an exit condition has been met.
+   */ 
   void mainLoop();
 
-  /*
+  /**
    * Sets the Window and icon title
+   * @param title Window title
+   * @param icon Icon title
    */
   void setCaption(const std::string &title, const std::string &icon); 
+
+  /**
+   * This toggles the fullscreen flag of the window
+   */ 
   void toggleFullscreen();
 
-  void runCommand(const std::string &);
-  void pushMessage(const std::string &msg, int type, int = MESSAGE_LIFE);
-  bool fileExists(const std::string &);
-  std::string processHome(const std::string &);
+  /**
+   * This passes a command string to the console to run. The first word encountered
+   * will be sent as the command, the remainder will be sent as args.
+   * @see Console::runCommand()
+   * @param command Command string
+   */ 
+  void runCommand(const std::string &command);
 
+  /**
+   * This function will display a message on the console, the top of the screen, or both.
+   * An optional message duration can be set, or the default value will be used.
+   * \todo DOC message type
+   * @param msg Message to be displayed
+   * @param type where message is to be displayed
+   * @param duration Length of time to display message
+   */ 
+  void pushMessage(const std::string &msg, int type, int duration = MESSAGE_LIFE);
+
+  /**
+   * Function checks for the existance of the given file
+   * @param filename File to look for
+   * @return True if file exists
+   */ 
+  bool fileExists(const std::string &filename);
+  
+  /**
+   * Processes a string converting any '~' characters found to the 
+   * users home directory.
+   * @param path String to convert
+   * @return Converted string
+   */ 
+  std::string processHome(const std::string &path);
+
+  /**
+   * Adds a list of paths to use for searching to the existing list
+   * @param l Additional list of paths
+   */ 
   void addSearchPaths(std::list<std::string> l);
   
+  /**
+   * Gets the time in milliseconds since SDL was initialised
+   * @return Time in milliseconds
+   */ 
   unsigned int getTime() const { return SDL_GetTicks(); }
+
+  /**
+   * Gets the time in seconds since SDL was initialised
+   * @return Time in seconds
+   */ 
   float getTimef() const { return (float)SDL_GetTicks() / 1000.0f; }
 
+  /**
+   * Set a system state
+   * @param ss Sytem state to set
+   * @param state Value of state
+   */ 
   void setState(SystemState ss, bool state) { _systemState[ss] = state; }
+  
+  /**
+   * Get value of a system state
+   * @param ss System state to query
+   * @return Value of query state
+   */ 
   bool checkState(SystemState ss) { return _systemState[ss]; }
 
   const std::string getHomePath() { return home_path; }
@@ -86,13 +170,32 @@ public:
   void setInstallDir(const std::string &install_dir) { install_path = install_dir; }
   
 
-//  Render *getRenderer() const { return renderer; }
   Graphics *getGraphics() const { return _graphics; }
   
+  /**
+   * Get the General Config object
+   * @return Reference to general config object
+   */ 
   varconf::Config &getGeneral() { return _general; }
+  /**
+   * Get the Texure Config object
+   * @return Reference to texture config object
+   */ 
   varconf::Config &getTexture() { return _textures; }
+  /**
+   * Get the Model Config object
+   * @return Reference to model config object
+   */ 
   varconf::Config &getModel() { return _models; } 
+  /**
+   * Get the ModelRecords Config object
+   * @return Reference to ModelRecords config object
+   */ 
   varconf::Config &getModelRecords() { return _model_records; }
+  /**
+   * Get the ObjectRecords Config object
+   * @return Reference to ObjectRecords config object
+   */ 
   varconf::Config &getObjectRecords() { return _object_records; }
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
@@ -109,7 +212,7 @@ public:
   void setCharacter(Character *);
   
   static System *instance() { return _instance; }
-  static Uint32 System::getPixel(SDL_Surface *surface, int x, int y);
+  static Uint32 getPixel(SDL_Surface *surface, int x, int y);
   static SDL_Surface *loadImage(const std::string &);
 
   void switchCursor(int);
@@ -140,22 +243,22 @@ protected:
   int _width;
   int _height;
 
-  ScriptEngine *_script_engine;
-  EventHandler *_event_handler;
-  FileHandler *_file_handler;
-  ModelHandler *_model_handler;
-  StateLoader *_state_loader;
-  ActionHandler *_action_handler;
-  ObjectHandler *_object_handler;
-  Calendar *_calendar;
+  ScriptEngine *_script_engine; ///< Pointer to scripting engine object
+  EventHandler *_event_handler; ///< Pointer to event handler object
+  FileHandler *_file_handler; ///< Pointer to file handler object
+  ModelHandler *_model_handler; ///< Pointer to model handler object
+  StateLoader *_state_loader; ///< Pointer to state loader object
+  ActionHandler *_action_handler; ///< Pointer to action handler object
+  ObjectHandler *_object_handler; ///< Pointer to object handler object
+  Calendar *_calendar; ///< Pointer to calender object
 
   std::list<std::string> additional_paths;
   
   std::string home_path;
 
-  static const std::string SCRIPTS_DIR;
-  static const std::string STARTUP_SCRIPT;
-  static const std::string SHUTDOWN_SCRIPT;
+//  static const std::string SCRIPTS_DIR;
+//  static const std::string STARTUP_SCRIPT;
+//  static const std::string SHUTDOWN_SCRIPT;
  
   varconf::Config _general;
   varconf::Config _textures;
@@ -168,19 +271,6 @@ protected:
   Character *_character;
  
   static SDL_Cursor *buildCursor(const char *image[]);
-	  
-  static const char * const KEY_icon_file = "iconfile";
-  static const char * const KEY_mouse_move_select = "mouse_move_select";
-  
-  static const char * const KEY_render_use_stencil = "render_use_stencil";
-
-  static const char * const KEY_window_width = "width";
-  static const char * const KEY_window_height = "height";
-  
-  static const int DEFAULT_window_width = 640;
-  static const int DEFAULT_window_height = 480;
-  
-  static const bool DEFAULT_mouse_move_select = true;
 
   void readConfig();
   void writeConfig();
@@ -205,41 +295,20 @@ protected:
   bool _process_records;
   void processRecords();
   Sound *sound;
+  
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_general_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);
   
 private:
-  bool _systemState[SYS_LAST_STATE];
-  bool _system_running;
+  bool _systemState[SYS_LAST_STATE]; ///< Array storing various system states
+  bool _system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
 
   std::list<std::string> _command_history;
   std::list<std::string>::iterator _command_history_iterator;
 
-  bool _initialised;
-
-  static const char * const EXIT = "exit";
-  static const char * const QUIT = "quit";
-
-  static const char * const GET_ATTRIBUTE = "getat";
-  static const char * const SET_ATTRIBUTE = "setat";
-
-  static const char * const LOAD_MODEL_RECORDS = "load_model_records";
-  static const char * const LOAD_OBJECT_RECORDS = "load_object_records";
-  static const char * const LOAD_STATE_FILE = "load_state_file";
-  static const char * const LOAD_GENERAL_CONFIG = "load_general";
-  static const char * const LOAD_KEY_BINDINGS = "load_bindings";
-  static const char * const LOAD_TEXTURE_CONFIG = "load_textures";
-  static const char * const LOAD_MODEL_CONFIG = "load_models";
-  static const char * const SAVE_GENERAL_CONFIG = "save_general";
-  static const char * const SAVE_KEY_BINDINGS = "save_bindings";
-  static const char * const READ_CONFIG = "read_config";
-  static const char * const BIND_KEY = "bind";
-  static const char * const KEY_PRESS = "keypress";
-  static const char * const TOGGLE_FULLSCREEN = "toggle_fullscreen";
-  static const char * const ADD_EVENT = "event";
-  static const char * const IDENTIFY_ENTITY = "identify";
+  bool _initialised; ///< Initialisation state of System
 };
 
 } /* namespace Sear */

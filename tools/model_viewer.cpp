@@ -44,8 +44,12 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
-#ifdef DEBUG
-#include "common/mmgr.h"
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
 #endif
 
 Sear::Render *render = NULL;
@@ -185,7 +189,7 @@ void display() {
 
   render->beginFrame();
   if (black) glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Colour used to clear window
-  else glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  else glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
   orient /= WFMath::Quaternion(WFMath::Vector<3>(1.0f, 0.0f, 0.0f), _camera->getElevation());
@@ -193,7 +197,6 @@ void display() {
   glTranslatef(0.0f, _camera->getDistance(), 0.0f);
   render->applyQuaternion(orient);
 //  glTranslatef(camera_x, camera_y, camera_z);
-
   render->stateChange("default");
   if (show_axis) {
     glBegin(GL_LINES);
@@ -222,8 +225,8 @@ void display() {
   glTranslatef(model_x, model_y, model_z);
   glPushMatrix();
 
-//  cout << object_record->low_quality.size() << endl;
-//  cout << object_record->name << endl;
+  std::cout << object_record->low_quality.size() << std::endl;
+  std::cout << object_record->name << std::endl;
   for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
     Sear::ModelRecord *model_record = sys->getModelHandler()->getModel(render, object_record, *I);
     if (model_record) {
@@ -236,9 +239,11 @@ void display() {
       render->stateChange(the_state);
       glDisable(GL_FOG);
       float scale = model_record->scale;
-      glScalef(scale, scale,scale);
+  //    glScalef(scale, scale,scale);
       model->render(false);
       glPopMatrix();
+    } else {
+      std::cerr << "Error no model" << std::endl;
     }
   }
   glPopMatrix();

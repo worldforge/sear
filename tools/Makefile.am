@@ -10,7 +10,7 @@ model_viewer_LDADD = \
 	../common/libCommon.a \
 	../gui/libGui.a \
 	../loaders/libLoader3ds.a \
-	../loaders/libLoaderCal3d.a \
+	../loaders/cal3d/libLoaderCal3d.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderNPlane.a \
 	../loaders/libLoaderWireFrame.a \

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.3 2002-10-20 13:22:26 simon Exp $
+// $Id: ActionHandler.h,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -16,12 +16,14 @@
 
 #include "ConsoleObject.h"
 
+// Forward declaration
 namespace varconf {
   class Config;
 }
 
 namespace Sear {
 
+//Forward declaration
 class Console;
 class WorldEntity;
 
@@ -57,8 +59,6 @@ private:
 
   bool _initialised;
   
-  static const char * const LOAD_CONFIG = "load_action_config";
-  static const char * const DO_ACTION = "do_action";
 };
   
 } /* namespace Sear */

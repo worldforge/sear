@@ -2,21 +2,34 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Lobby.cpp,v 1.8 2002-12-23 17:29:35 simon Exp $
+// $Id: Lobby.cpp,v 1.9 2003-03-06 23:50:38 simon Exp $
 
 #include "Lobby.h"
 #include <iostream>
 #include "Console.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
 namespace Sear {
 
-Lobby::Lobby() :
+  static const std::string JOIN_ROOM = "join_room";
+  static const std::string LEAVE_ROOM = "leave_room";
+  static const std::string LIST_ROOMS = "list_rooms";
+  static const std::string TALK = "talk";
+  static const std::string EMOTE = "emote";
+
+  Lobby::Lobby() :
   _lobby(NULL),
   _initialised(false)
 {}

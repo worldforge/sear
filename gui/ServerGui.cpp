@@ -1,6 +1,17 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif 
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2003 Simon Goodall
+
+// $Id: ServerGui.cpp,v 1.2 2003-03-06 23:50:37 simon Exp $
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 
 #ifdef HAVE_GLGOOEY
 #include "glgooey/WindowManager.h"

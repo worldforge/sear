@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.40 2003-01-31 12:18:48 alriddoch Exp $
+// $Id: client.cpp,v 1.41 2003-03-06 23:50:38 simon Exp $
 
 #include "System.h"
 
@@ -41,8 +41,15 @@
 
 #include "gui/ServerGui.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -508,7 +515,7 @@ void Client::EntityDelete(Eris::Entity* e){
 
 void Client::Entered(Eris::Entity* e){
   Log::writeLog("Entered World", Log::LOG_INFO);
-  _system->setCharacter(new Character((WorldEntity*)Eris::World::Instance()->getFocusedEntity(), _system));
+  _system->setCharacter(new Character((WorldEntity*)Eris::World::Instance()->getFocusedEntity()));
   _status = CLIENT_STATUS_IN_WORLD;
   _system->setState(SYS_IN_WORLD, true);
   _system->getEventHandler()->addEvent(Event(EF_HANDLE_MOVE, e, EC_IN_WORLD, 0));

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.3 2002-12-11 22:19:26 simon Exp $
+// $Id: ModelRecord.h,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -38,15 +38,15 @@ public:
   Model *model;	
   Graphics::RotationStyle rotation_style;
 
-  static const char * const SCALE = "scale";
-  static const char * const STATE = "state";
-  static const char * const SELECT_STATE = "select_state";
-  static const char * const MODEL_BY_TYPE = "model_by_type";
-  static const char * const MODEL_LOADER = "model_loader";
-  static const char * const OUTLINE = "outline";
-  static const char * const ROTATION_STYLE = "rotation_style";
-  static const char * const DATA_FILE_ID = "data_file_id";
-  static const char * const DEFAULT_SKIN = "default_skin";
+  static const std::string SCALE;
+  static const std::string STATE;
+  static const std::string SELECT_STATE;
+  static const std::string MODEL_BY_TYPE;
+  static const std::string MODEL_LOADER;
+  static const std::string OUTLINE;
+  static const std::string ROTATION_STYLE;
+  static const std::string DATA_FILE_ID;
+  static const std::string DEFAULT_SKIN;
 };
 
 } /* namespace Sear */

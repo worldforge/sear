@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.12 2002-11-13 19:39:27 simon Exp $
+// $Id: Camera.cpp,v 1.13 2003-03-06 23:50:38 simon Exp $
 
 #include <string>
 
@@ -16,8 +16,15 @@
 #include "conf.h"
 #include "Console.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -25,8 +32,48 @@
 
 namespace Sear {
 	
-static std::string CAMERA = "camera";
-	
+static const std::string CAMERA = "camera";
+	  // General key values
+  const static std::string KEY_camera_distance = "camera_distance";
+  const static std::string KEY_camera_rotation = "camera_rotation";
+  const static std::string KEY_camera_elevation = "camera_elevation";
+
+  const static std::string KEY_camera_zoom_speed = "camera_zoom_speed";
+  const static std::string KEY_camera_rotation_speed = "camera_rotation_speed";
+  const static std::string KEY_camera_elevation_speed = "camera_elevation_speed";
+  
+  const static std::string KEY_camera_min_distance = "camera_min_distance";
+  const static std::string KEY_camera_max_distance = "camera_max_distance";
+
+  const static std::string KEY_save_camera_position = "save_camera_position";
+  
+  // Default config values
+  const static float DEFAULT_camera_distance = 5.0f;
+  const static float DEFAULT_camera_rotation = 0.0f;
+  const static float DEFAULT_camera_elevation = -0.1f;
+  
+  const static float DEFAULT_camera_zoom_speed = 20.0f;
+  const static float DEFAULT_camera_rotation_speed = 40.0f;
+  const static float DEFAULT_camera_elevation_speed = 40.0f;
+  
+  const static float DEFAULT_camera_min_distance = 5.0f;
+  const static float DEFAULT_camera_max_distance = 25.0f;
+
+  const static bool DEFAULT_save_camera_position = false;
+  
+  static const std::string ZOOM_IN = "+camera_zoom_in";
+  static const std::string ZOOM_OUT = "+camera_zoom_out";
+  static const std::string ZOOM_STOP_IN = "-camera_zoom_in";
+  static const std::string ZOOM_STOP_OUT = "-camera_zoom_out";
+  static const std::string ROTATE_LEFT = "+camera_rotate_left";
+  static const std::string ROTATE_RIGHT = "+camera_rotate_right";
+  static const std::string ROTATE_STOP_LEFT = "-camera_rotate_left";
+  static const std::string ROTATE_STOP_RIGHT = "-camera_rotate_right";
+  static const std::string ELEVATE_UP = "+camera_elevate_up";
+  static const std::string ELEVATE_DOWN = "+camera_elevate_down";
+  static const std::string ELEVATE_STOP_UP = "-camera_elevate_up";
+  static const std::string ELEVATE_STOP_DOWN = "-camera_elevate_down";
+ 
 Camera::Camera() :
   _distance(0.0f),
   _rotation(0.0f),

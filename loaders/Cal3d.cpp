@@ -2,28 +2,28 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.30 2003-02-25 21:57:25 simon Exp $
+// $Id: Cal3d.cpp,v 1.31 2003-03-06 23:50:38 simon Exp $
 
-//#include <GL/gl.h>
+#include "Cal3d.h"
+#include <string>
+
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
-
 #include "src/System.h"
 #include "src/Render.h"
 
-#include "Cal3d.h"
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
 
-#include <string>
-
-//----------------------------------------------------------------------------//
-// Static member variables initialization                                     //
-//----------------------------------------------------------------------------//
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 #ifdef DEBUG
-  #include "common/mmgr.h"
   static const bool debug = true;
 #else
   static const bool debug = false;

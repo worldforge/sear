@@ -2,21 +2,30 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.4 2002-10-21 20:09:59 simon Exp $
+// $Id: FileHandler.cpp,v 1.5 2003-03-06 23:50:38 simon Exp $
 
 #include <stdio.h>
 
 #include "FileHandler.h"
 #include "Console.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
 namespace Sear {
 
+  static const std::string ADD_SEARCH_PATH = "add_search_path";
+  static const std::string REMOVE_SEARCH_PATH = "remove_search_path";
 	
 FileHandler::FileHandler() {}
 FileHandler::~FileHandler() {}

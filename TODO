@@ -48,10 +48,6 @@
 
  * Include sound/music media in media pack
 
- * Create a calender object.
-  - Records passage of time
-  - Used by other system components to render specific "time/date" based objects (sun/moon/stars etc.)
-
  * Add weather effects
   - Query weather entity
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.2 2003-03-06 21:04:14 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.3 2003-03-06 23:50:38 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -147,17 +147,17 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 	}
 	
         // get the transformed vertices of the submesh
-        static float meshVertices[30000][3];
+        static Vertex_3 meshVertices[30000];
         int vertexCount;
-        vertexCount = pCalRenderer->getVertices(&meshVertices[0][0]);
+        vertexCount = pCalRenderer->getVertices((float*)&meshVertices[0]);
 
         // get the transformed normals of the submesh
-        static float meshNormals[30000][3];
-        pCalRenderer->getNormals(&meshNormals[0][0]);
+        static Normal meshNormals[30000];
+        pCalRenderer->getNormals((float*)&meshNormals[0]);
 
         // get the texture coordinates of the submesh
-        static float meshTextureCoordinates[30000][2];
-        int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, &meshTextureCoordinates[0][0]);
+        static Texel meshTextureCoordinates[30000];
+        int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, (float*)&meshTextureCoordinates[0]);
 
         // get the faces of the submesh
         static int meshFaces[50000][3];
@@ -171,9 +171,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 	    multitexture = true;
             _render->switchMultiTextureID((unsigned int)pCalRenderer->getMapUserData(0), (unsigned int)pCalRenderer->getMapUserData(1));
 	  }
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0], multitexture);
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
 	} else {
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0], false);
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
 	}
       }
     }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.h,v 1.9 2002-12-14 14:46:36 simon Exp $
+// $Id: Patch.h,v 1.10 2003-03-06 23:50:38 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_PATCH_H
@@ -11,6 +11,7 @@
 // Depth of variance tree: should be near SQRT(PATCH_SIZE) + 1
 //#define VARIANCE_DEPTH (6)
 #define VARIANCE_DEPTH (9)
+#include "common/types.h"
 #include "common/Utility.h"
 //#include <queue>
 
@@ -96,9 +97,9 @@ public:
 //  static const int rdepth = 2*n -1;
   static const int array_size = 3 * 2 * (int)((200.0f / 8.0f) * (200.0f / 8.0f));
   int v_counter, n_counter, t_counter;
-  float vertex_data[array_size][3];
-  float normal_data[array_size][3];
-  float texture_data[array_size][2];
+  Vertex_3 vertex_data[array_size];
+  Normal normal_data[array_size];
+  Texel texture_data[array_size];
 
 
   float min_height, max_height;

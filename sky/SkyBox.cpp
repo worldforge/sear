@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.10 2003-02-22 19:11:48 simon Exp $
+// $Id: SkyBox.cpp,v 1.11 2003-03-06 23:50:38 simon Exp $
 
 #include "common/Log.h"
 
@@ -10,8 +10,16 @@
 #include "src/Model.h"
 
 #include "SkyBox.h"
-#ifdef DEBUG
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -21,9 +29,9 @@ namespace Sear {
 
 	
 // Setup static data items
-float SkyBox::vertex_coords[] = VERTEX_COORDS;
-float SkyBox::texture_coords[] = TEXTURE_COORDS;
-float SkyBox::normal_coords[] = NORMAL_COORDS;
+Vertex_3 SkyBox::vertex_coords[] = VERTEX_COORDS;
+Texel SkyBox::texture_coords[] = TEXTURE_COORDS;
+Normal SkyBox::normal_coords[] = NORMAL_COORDS;
 
 SkyBox::SkyBox(System *system, Render *renderer) :
   _system(system),

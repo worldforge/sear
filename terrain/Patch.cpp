@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.15 2003-03-06 21:31:02 simon Exp $
+// $Id: Patch.cpp,v 1.16 2003-03-06 23:50:38 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -227,17 +227,17 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 //      out[0] /= MULT_SCALE_LAND;
 //      out[1] /= MULT_SCALE_LAND;
 //      out[2] /= MULT_SCALE_HEIGHT;
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
      
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
       
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
     }
     
 //    if (_renderer->checkState(RENDER_TEXTURES)) {
@@ -277,26 +277,26 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 //      ax /= (float)_landscape->patch_size;
 //      ay /= (float)_landscape->patch_size;
 
-      texture_data[t_counter][0] = lx;
-      texture_data[t_counter++][1] = ly;
+      texture_data[t_counter].s = lx;
+      texture_data[t_counter++].t = ly;
     
-      texture_data[t_counter][0] = rx;
-      texture_data[t_counter++][1] = ry;
+      texture_data[t_counter].s = rx;
+      texture_data[t_counter++].t = ry;
       
-      texture_data[t_counter][0] = ax;
-      texture_data[t_counter++][1] = ay;
+      texture_data[t_counter].s = ax;
+      texture_data[t_counter++].t = ay;
 
-      vertex_data[v_counter][0] = leftX;
-      vertex_data[v_counter][1] = leftY;
-      vertex_data[v_counter++][2] = leftZ;
+      vertex_data[v_counter].x = leftX;
+      vertex_data[v_counter].y = leftY;
+      vertex_data[v_counter++].z = leftZ;
 
-      vertex_data[v_counter][0] = rightX;
-      vertex_data[v_counter][1] = rightY;
-      vertex_data[v_counter++][2] = rightZ;
+      vertex_data[v_counter].x = rightX;
+      vertex_data[v_counter].y = rightY;
+      vertex_data[v_counter++].z = rightZ;
 
-      vertex_data[v_counter][0] = apexX;
-      vertex_data[v_counter][1] = apexY;
-      vertex_data[v_counter++][2] = apexZ;
+      vertex_data[v_counter].x = apexX;
+      vertex_data[v_counter].y = apexY;
+      vertex_data[v_counter++].z = apexZ;
 
 //cout << leftX << " " << leftY << " " << leftZ << endl;
       
@@ -491,7 +491,7 @@ void Patch::render() {
 
   _renderer->store();
   _renderer->translateObject(m_WorldX, m_WorldY, 0 );
-  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0], true);
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0], &texture_data[0], &normal_data[0], true);
   _renderer->restore();
 }
 
@@ -502,7 +502,7 @@ void Patch::renderWater() {
 
   _renderer->store();
   _renderer->translateObject(m_WorldX, m_WorldY, 0 );
-  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0], true);
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0], &texture_data[0], &normal_data[0], true);
   _renderer->restore();
 }
 
@@ -550,17 +550,17 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
 //      out[0] /= MULT_SCALE_LAND;
 //      out[1] /= MULT_SCALE_LAND;
 //      out[2] /= MULT_SCALE_HEIGHT;
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
      
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
       
-      normal_data[n_counter][0] = out[0];
-      normal_data[n_counter][1] = out[1];
-      normal_data[n_counter++][2] = out[2];
+      normal_data[n_counter].x = out[0];
+      normal_data[n_counter].y = out[1];
+      normal_data[n_counter++].z = out[2];
 //    }
     
 //    if (_renderer->checkState(RENDER_TEXTURES)) {
@@ -590,27 +590,27 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
 //      ax /= (float)val;
 //      ay /= (float)val;
       
-      texture_data[t_counter][0] = lx;
-      texture_data[t_counter++][1] = ly;
+      texture_data[t_counter].s = lx;
+      texture_data[t_counter++].t = ly;
     
-      texture_data[t_counter][0] = rx;
-      texture_data[t_counter++][1] = ry;
+      texture_data[t_counter].s = rx;
+      texture_data[t_counter++].t = ry;
       
-      texture_data[t_counter][0] = ax;
-      texture_data[t_counter++][1] = ay;
+      texture_data[t_counter].s = ax;
+      texture_data[t_counter++].t = ay;
 
       float z = (float)Landscape::waterlevel;
-      vertex_data[v_counter][0] = leftX;
-      vertex_data[v_counter][1] = leftY;
-      vertex_data[v_counter++][2] = z;
+      vertex_data[v_counter].x = leftX;
+      vertex_data[v_counter].y = leftY;
+      vertex_data[v_counter++].z = z;
 
-      vertex_data[v_counter][0] = rightX;
-      vertex_data[v_counter][1] = rightY;
-      vertex_data[v_counter++][2] = z;
+      vertex_data[v_counter].x = rightX;
+      vertex_data[v_counter].y = rightY;
+      vertex_data[v_counter++].z = z;
 
-      vertex_data[v_counter][0] = apexX;
-      vertex_data[v_counter][1] = apexY;
-      vertex_data[v_counter++][2] = z;
+      vertex_data[v_counter].x = apexX;
+      vertex_data[v_counter].y = apexY;
+      vertex_data[v_counter++].z = z;
   }
   }
 }

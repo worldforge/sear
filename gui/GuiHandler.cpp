@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: GuiHandler.cpp,v 1.2 2002-10-20 13:22:26 simon Exp $
+// $Id: GuiHandler.cpp,v 1.3 2003-03-06 23:50:37 simon Exp $
 
 
 
@@ -11,6 +11,15 @@
 
 #include "GuiHandler.h"
 #include "Component.h"
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 
 namespace Sear {
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.6 2002-10-21 20:09:59 simon Exp $
+// $Id: ActionHandler.cpp,v 1.7 2003-03-06 23:50:38 simon Exp $
 
 #include "ActionHandler.h"
 
@@ -14,8 +14,16 @@
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -24,6 +32,8 @@
 namespace Sear {
 
 	
+static const std::string LOAD_CONFIG = "load_action_config";
+static const std::string DO_ACTION = "do_action";
 static const std::string SCRIPT = "script";
 static const std::string ENTITY = "entity_based";
 

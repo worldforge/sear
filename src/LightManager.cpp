@@ -1,13 +1,21 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.1 2002-12-24 16:17:15 simon Exp $
+// $Id: LightManager.cpp,v 1.2 2003-03-06 23:50:38 simon Exp $
 
 #include "LightManager.h"
 #include "Light.h"
 
 #include "src/System.h"
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 namespace Sear {
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.11 2002-11-12 23:59:22 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.12 2003-03-06 23:50:38 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -15,8 +15,15 @@
 #include "3ds_Loader.h"
 #include "3ds.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;

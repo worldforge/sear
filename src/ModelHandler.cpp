@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.30 2003-01-14 16:48:28 simon Exp $
+// $Id: ModelHandler.cpp,v 1.31 2003-03-06 23:50:38 simon Exp $
 
 //#include "config.h"
 
@@ -31,8 +31,15 @@
 #include "ObjectRecord.h"
 #include "Render.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;

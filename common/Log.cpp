@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Log.cpp,v 1.5 2002-10-21 20:12:04 simon Exp $
+// $Id: Log.cpp,v 1.6 2003-03-06 23:50:37 simon Exp $
 
 #include "Log.h"
 #include <iostream>
@@ -13,12 +13,20 @@
  * only included in debug mode
  */ 
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
+  
 namespace Sear {
   
 void Log::writeLog(const std::string &msg, LogLevel level) {

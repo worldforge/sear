@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Slice_Loader.cpp,v 1.9 2002-11-12 23:59:22 simon Exp $
+// $Id: Slice_Loader.cpp,v 1.10 2003-03-06 23:50:38 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -16,8 +16,16 @@
 
 #include "Slice_Loader.h"
 #include "Slice.h"
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 #ifdef DEBUG
-#include "common/mmgr.h"
 static const bool debug = true;
 #else
 static const bool debug = false;

@@ -2,19 +2,24 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: StateLoader.cpp,v 1.10 2002-10-21 20:09:59 simon Exp $
+// $Id: StateLoader.cpp,v 1.11 2003-03-06 23:50:38 simon Exp $
 
 #include "StateLoader.h"
-
-//#include <string.h>
 
 #include <varconf/varconf.h>
 
 #include "common/Log.h"
 
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
+
 
 #ifdef DEBUG
-  #include "common/mmgr.h"
   static const bool debug = true;
 #else
   static const bool debug = false;

@@ -4,7 +4,7 @@ noinst_LIBRARIES = libSear.a
 
 INCLUDES = -I..
 
-CAL3D_LIBS = ../loaders/libLoaderCal3d.a
+CAL3D_LIBS = ../loaders/cal3d/libLoaderCal3d.a
 LIB3DS_LIBS = ../loaders/libLoader3ds.a
 
 sear_LDADD = \
@@ -76,6 +76,7 @@ libSear_a_SOURCES = \
 	default_font.xpm \
 	sear_icon.xpm \
 	ObjectRecord.h \
+	ModelRecord.cpp \
 	ModelRecord.h \
 	ObjectHandler.h \
 	ObjectHandler.cpp \

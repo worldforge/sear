@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.23 2002-10-21 20:09:59 simon Exp $
+// $Id: Console.cpp,v 1.24 2003-03-06 23:50:38 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -14,8 +14,15 @@
 #include "Graphics.h"
 #include "Render.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -226,7 +233,8 @@ void Console::runCommand(const std::string &command, const std::string &args) {
   else if (command == LIST_CONSOLE_COMMANDS) {
     for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); ++I) {
       // TODO - should we check to see if I->second is valid?
-      if (debug) Log::writeLog(I->first, Log::LOG_INFO);
+//      if (debug)
+	      Log::writeLog(I->first, Log::LOG_INFO);
     }
   }
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+// $Id: FileHandler.h,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -46,8 +46,6 @@ protected:
   FileList  _searchpaths;
 
 private:
-  static const char * const ADD_SEARCH_PATH = "add_search_path";
-  static const char * const REMOVE_SEARCH_PATH = "remove_search_path";
   
 };
 

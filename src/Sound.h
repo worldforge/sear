@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Sound.h,v 1.5 2002-09-08 00:24:53 simon Exp $
+// $Id: Sound.h,v 1.6 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_SOUND_H
 #define SEAR_SOUND_H 1
@@ -38,12 +38,7 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 private:
-  static const char * const PLAY_SOUND = "play_sound";
-  static const char * const PLAY_SOUND_LOOP = "play_sound_loop";
-  static const char * const STOP_SOUND_LOOP = "stop_sound_loop";
-  static const char * const PLAY_MUSIC = "play_music";
-  static const char * const STOP_MUSIC = "stop_music";
-  std::map<std::string, Mix_Chunk*> sound_map;
+ std::map<std::string, Mix_Chunk*> sound_map;
   std::map<std::string, Mix_Music*> music_map;
   bool _initialised;
 };

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.1 2002-12-24 18:08:17 simon Exp $
+// $Id: Calendar.cpp,v 1.2 2003-03-06 23:50:38 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -13,6 +13,14 @@
 #include "src/ActionHandler.h"
 #include "src/Console.h"
 #include "src/System.h"
+
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 #ifdef DEBUG
   static const bool debug = true;

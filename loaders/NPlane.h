@@ -2,12 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.3 2002-09-07 23:27:06 simon Exp $
+// $Id: NPlane.h,v 1.4 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_NPLANE_H
-#define SAER_NPLANE_H 1
+#define SEAR_NPLANE_H 1
 
 #include <string>
+
+#include "common/types.h"
 
 #include "src/Model.h"
 #include "src/Graphics.h"
@@ -31,9 +33,9 @@ private:
   bool _use_textures;
   unsigned int _num_planes;
   std::string _type;
-  float *_vertex_data;
-  float *_normal_data;
-  float *_texture_data;
+  Vertex_3 *_vertex_data;
+  Normal *_normal_data;
+  Texel *_texture_data;
   bool _initialised;
 };
 

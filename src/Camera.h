@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.10 2003-01-13 17:09:07 simon Exp $
+// $Id: Camera.h,v 1.11 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -28,105 +28,143 @@ namespace Sear {
 
 class Console;
 	
+/**
+ * This class represents the camera in the game world.
+ */ 
 class Camera : public ConsoleObject, public SigC::Object {
 public:
+  /**
+   * Default constructor
+   */ 
   Camera();
+
+  /**
+   * Destructor
+   */ 
   ~Camera();
 
-  // initialise camera
+  /**
+   * Initialise camera
+   * @return True on success, false on failure
+   */ 
   bool init();
 
-  // Shutdown camera
+  /**
+   * Shutdown camera
+   */ 
   void shutdown();
 
-  // updates camera values according to current rates
-  void updateCameraPos(float);
+  /**
+   * updates camera values according to current rates
+   * @param time_elapsed Time elapsed in seconds since last update
+   */ 
+  void updateCameraPos(float time_elapsed);
 
-  // Change direction / rate of camera value
+  /**
+   * Change zoom state
+   * @param dir Direction of zoom. -1 is move closer, 0 is stationary, 1 is move away
+   */ 
   void zoom(int dir) { _zoom_dir += dir; }
+
+  /**
+   * Change rotate state
+   * @param dir Direction of rotation. -1 is rotate --, 0 is stationary, 1 is rotate --
+   */ 
   void rotate(int dir) { _rotation_dir += dir; }
+
+  /**
+   * Change elevation state
+   * @param dir Direction of elevation. -1 is elevate --, 0 is stationary, 1 is elevate --
+   */ 
   void elevate(int dir) { _elevation_dir += dir; }
 
-  // Accessor functions
+  /**
+   * Get current rotation angle
+   * @return Current rotation angle (radians)
+   */ 
   const float getRotation() const { return _rotation;  }
+  /**
+   * Get current elevation angle
+   * @return Current elevation angle (radians)
+   */ 
   const float getElevation() const { return _elevation; }
+  /**
+   * Get current zoom distance
+   * @return Current zoom distance (meters)
+   */ 
   const float getDistance() const { return _distance; }
 
+  /**
+   * Get camera X position
+   * @return X position
+   */ 
   float getXPos() const { return _x_pos; }
+
+  /**
+   * Get camera Y position
+   * @return Y position
+   */ 
   float getYPos() const { return _y_pos; }
+
+  /**
+   * Get camera Z position
+   * @return Z position
+   */ 
   float getZPos() const { return _z_pos; }
 
+  /**
+   * Read camera config data
+   */ 
   void readConfig();
+
+  /**
+   * Write camera config data
+   */ 
   void writeConfig();
  
+  /**
+   * Register console commands
+   * @param console Console object to register with
+   */ 
   void registerCommands(Console *console);
+
+  /**
+   * Runs a console command
+   * @param command Console command
+   * @param args Console command arguments
+   */ 
   void runCommand(const std::string &command, const std::string &args);
   
 protected:
-   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
-  // General key values
-  const static char * const KEY_camera_distance = "camera_distance";
-  const static char * const KEY_camera_rotation = "camera_rotation";
-  const static char * const KEY_camera_elevation = "camera_elevation";
+  /**
+   * Callback used when config data changes
+   * @param section Name of section containing changed data
+   * @param key Name of key with changed data
+   * @param config Config object that has been changed
+   */ 
+   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 
-  const static char * const KEY_camera_zoom_speed = "camera_zoom_speed";
-  const static char * const KEY_camera_rotation_speed = "camera_rotation_speed";
-  const static char * const KEY_camera_elevation_speed = "camera_elevation_speed";
+  float _distance;  ///< distance from focus (meters)
+  float _rotation;  ///< horizontal rotation (radians)
+  float _elevation; ///< vertical rotation (radians)
   
-  const static char * const KEY_camera_min_distance = "camera_min_distance";
-  const static char * const KEY_camera_max_distance = "camera_max_distance";
+  int _zoom_dir;      ///< Direction / rate of zoom
+  int _rotation_dir;  ///< Direction / rate of rotation
+  int _elevation_dir; ///< Direction / rate of elevation - negative values point downwards
 
-  const static char * const KEY_save_camera_position = "save_camera_position";
-  
-  // Default config values
-  const static float DEFAULT_camera_distance = 5.0f;
-  const static float DEFAULT_camera_rotation = 0.0f;
-  const static float DEFAULT_camera_elevation = -0.1f;
-  
-  const static float DEFAULT_camera_zoom_speed = 20.0f;
-  const static float DEFAULT_camera_rotation_speed = 40.0f;
-  const static float DEFAULT_camera_elevation_speed = 40.0f;
-  
-  const static float DEFAULT_camera_min_distance = 5.0f;
-  const static float DEFAULT_camera_max_distance = 25.0f;
+  float _zoom_speed;      ///< Speed of zoom changes
+  float _rotation_speed;  ///< Speed of rotation changes
+  float _elevation_speed; ///< Speed of elevation changes
 
-  const static bool DEFAULT_save_camera_position = false;
-  
-  static const char * const ZOOM_IN = "+camera_zoom_in";
-  static const char * const ZOOM_OUT = "+camera_zoom_out";
-  static const char * const ZOOM_STOP_IN = "-camera_zoom_in";
-  static const char * const ZOOM_STOP_OUT = "-camera_zoom_out";
-  static const char * const ROTATE_LEFT = "+camera_rotate_left";
-  static const char * const ROTATE_RIGHT = "+camera_rotate_right";
-  static const char * const ROTATE_STOP_LEFT = "-camera_rotate_left";
-  static const char * const ROTATE_STOP_RIGHT = "-camera_rotate_right";
-  static const char * const ELEVATE_UP = "+camera_elevate_up";
-  static const char * const ELEVATE_DOWN = "+camera_elevate_down";
-  static const char * const ELEVATE_STOP_UP = "-camera_elevate_up";
-  static const char * const ELEVATE_STOP_DOWN = "-camera_elevate_down";
- 
-  float _distance;  // distance from focus
-  // Angles are stored in radians 
-  float _rotation;  // horizontal rotation
-  float _elevation; // vertical rotation
-  
-  int _zoom_dir;      // Direction / rate of zoom
-  int _rotation_dir;  // Direction / rate of rotation
-  int _elevation_dir; // Direction / rate of elevation - negative values point downwards
+  float _min_distance; ///< Minimum camera distance allowed
+  float _max_distance; ///< Maximum camera distance allowed
 
-  float _zoom_speed;
-  float _rotation_speed;
-  float _elevation_speed;
+  float _x_pos; ///< X position of camera
+  float _y_pos; ///< Y position of camera
+  float _z_pos; ///< Z position of camera
 
-  float _min_distance; // Minimum camera distance allowed
-  float _max_distance; // Maximum camera distance allowed
-
-  float _x_pos;
-  float _y_pos;
-  float _z_pos;
-
-  bool _initialised;
-  bool _save_camera_position;
+  bool _initialised; ///< Camera initialisation state 
+  bool _save_camera_position; ///< Flag for whether camera state should be saved
 };
 
 } /* namespace Sear */

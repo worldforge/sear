@@ -2,12 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.4 2002-09-07 23:27:06 simon Exp $
+// $Id: WireFrame.h,v 1.5 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
 
 #include <wfmath/axisbox.h>
+
+#include "common/types.h"
 
 #include "src/Model.h"
 
@@ -26,7 +28,7 @@ public:
   
 private:
   static const int _num_points = 32;
-  float _vertex_data[_num_points][3];
+  Vertex_3 _vertex_data[_num_points];
   bool _initialised;
 };
 

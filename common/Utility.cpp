@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.4 2002-10-21 20:12:04 simon Exp $
+// $Id: Utility.cpp,v 1.5 2003-03-06 23:50:37 simon Exp $
 
 #include "Utility.h"
 
@@ -12,8 +12,15 @@
 #include <map>
 #include <math.h>
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;

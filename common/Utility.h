@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.9 2003-02-22 19:11:48 simon Exp $
+// $Id: Utility.h,v 1.10 2003-03-06 23:50:37 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -154,8 +154,8 @@ public:
   ~Tokeniser() {}
 
   void initTokens(const std::string &tokens);
-  std::string Tokeniser::nextToken();
-  std::string Tokeniser::remainingTokens();
+  std::string nextToken();
+  std::string remainingTokens();
   
 protected:
   std::string::size_type pos, last_pos;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.6 2003-01-11 17:18:39 simon Exp $
+// $Id: BoundBox.h,v 1.7 2003-03-06 23:50:38 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -15,6 +15,8 @@
 #include <wfmath/axisbox.h>
 
 #include "src/Model.h"
+
+#include "common/types.h"
 
 namespace Sear {
 
@@ -48,9 +50,9 @@ private:
   std::string _type;
   bool _use_textures;
   static const int _num_points = 24; // NUmber of points in model
-  float _vertex_data[_num_points][3]; // Vertex data
-  float _texture_data[_num_points][2]; // Texture Co-oridinates data
-  float _normal_data[_num_points][3]; // Normal data
+  Vertex_3 _vertex_data[_num_points]; // Vertex data
+  Texel _texture_data[_num_points]; // Texture Co-oridinates data
+  Normal _normal_data[_num_points]; // Normal data
   bool _initialised;
   unsigned int _list;
   unsigned int _list_select;
