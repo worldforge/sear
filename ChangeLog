@@ -1,4 +1,7 @@
 2004-06-22  Simon Goodall  <simon@simongoodall.co.uk>
+	* renderers/GL.cpp: Fix clamping
+
+2004-06-22  Simon Goodall  <simon@simongoodall.co.uk>
 	* renderers/GL.cpp: clamp min light level to 0.15f so we can still see at night
 
 2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>
