@@ -5,6 +5,8 @@
 #ifndef SEAR_GUI_WINDOW_H
 #define SEAR_GUI_WINDOW_H
 
+#include "gui/event.h"
+
 #include <set>
 
 namespace Sear {
@@ -32,6 +34,7 @@ public:
   void addChild(Window *);
   void setPos(int, int);
   void setSize(int, int);
+  void mouseMotion(short, short);
 
   virtual void render(Render *) = 0;
 };

@@ -1,5 +1,16 @@
 2004-06-09  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Workspace.cpp: Start writing event processing code.
+
+	* gui/Window.h, gui/Window.cpp: Add interface to pass mouse motion
+	  events to windows.
+
+	* gui/Widget.cpp: Clean up formatting.
+
+	* gui/event.h: Add enum for event types.
+
+2004-06-09  Al Riddoch  <alriddoch@zepler.org>
+
 	* renderers/GL.cpp: Tweak light parameteres to give a smaller but
 	  brighter pool of light.
 

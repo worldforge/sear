@@ -38,18 +38,6 @@ void Workspace::draw()
   glEnableClientState(GL_VERTEX_ARRAY);
   glLineWidth(1.0f);
 
-#if 0
-  static const GLshort coords[] = {300, 300, 300, 400, 400, 400, 400, 300};
-  static const GLushort line_i[] = {0, 1, 2, 3, 0};
-  glVertexPointer(2, GL_SHORT, 0, coords);
-
-  renderer->setColour(1.0f, 1.0f, 1.0f, 0.5f);
-  glDrawArrays(GL_QUADS, 0, 4);
-
-  renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
-  glDrawElements(GL_LINE_STRIP, 5, GL_UNSIGNED_SHORT, line_i);
-#endif
-
   // Render the gui recursively
   m_rootWindow->render(renderer);
 
@@ -62,8 +50,27 @@ void Workspace::show()
 {
 }
 
-void Workspace::handleEvent(const SDL_Event &)
+void Workspace::handleEvent(const SDL_Event & event)
 {
+  Render *renderer = m_system->getGraphics()->getRender();
+
+  switch (event.type) {
+    case SDL_MOUSEMOTION: {
+        short x = event.motion.x;
+        short y = renderer->getWindowHeight() - event.motion.y;
+        std::cout << "Mouse motion " << x << " " << y
+                  << std::endl << std::flush;
+        m_rootWindow->mouseMotion(x, y);
+      }
+      break;
+    case SDL_MOUSEBUTTONDOWN:
+    case SDL_MOUSEBUTTONUP:
+    case SDL_KEYDOWN:
+    case SDL_KEYUP:
+      // This is the type of event we are interested in
+    default:
+      break;
+  }
 }
 
 void Workspace::addToplevel(Toplevel * t)

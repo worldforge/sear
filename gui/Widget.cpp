@@ -16,10 +16,10 @@ Widget::~Widget() {
 
 void Widget::setParent(Widget * w)
 {
-    assert(w != 0);
-    assert(m_parent == 0);
+  assert(w != 0);
+  assert(m_parent == 0);
 
-    m_parent = w;
+  m_parent = w;
 }
 
 } // namespace Sear

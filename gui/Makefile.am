@@ -12,4 +12,5 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    Button.cpp Button.h \
                    Box.cpp Box.h \
                    Graphic.cpp Graphic.h \
-                   Compass.cpp Compass.h
+                   Compass.cpp Compass.h \
+                   event.h
