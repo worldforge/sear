@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.13 2002-09-27 15:46:43 simon Exp $
+// $Id: WorldEntity.h,v 1.14 2004-06-10 21:04:14 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -29,8 +29,8 @@ public:
   void handleMove();
   void handleTalk(const std::string &);
 
-  void translateAbsPos(WFMath::Point<3>);
-  void rotateAbsOrient(WFMath::Quaternion);
+  void translateAbsPos(const WFMath::Point<3> &);
+  void rotateAbsOrient(const WFMath::Quaternion &);
   WFMath::Quaternion getAbsOrient();
   WFMath::Point<3> getAbsPos();
   bool hasMessages();

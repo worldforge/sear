@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
+// $Id: WorldEntity.cpp,v 1.36 2004-06-10 21:04:14 alriddoch Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -140,7 +140,7 @@ WFMath::Point<3> WorldEntity::GetPos() {
   return WFMath::Point<3>(newx, newy, newz); 
 }
 
-void WorldEntity::translateAbsPos(WFMath::Point<3> p) {
+void WorldEntity::translateAbsPos(const WFMath::Point<3> & p) {
   abs_pos = p;
   WFMath::Point<3> pos = _position;
   WFMath::Point<3> child_pos = WFMath::Point<3>(p.x() + pos.x(), p.y() + pos.y(), p.z() + pos.z());
@@ -148,7 +148,7 @@ void WorldEntity::translateAbsPos(WFMath::Point<3> p) {
     ((WorldEntity*)getMember(i))->translateAbsPos(child_pos);
 }
 
-void WorldEntity::rotateAbsOrient(WFMath::Quaternion q) {
+void WorldEntity::rotateAbsOrient(const WFMath::Quaternion & q) {
   abs_orient = q;
   WFMath::Quaternion child_orient = q / getOrientation();
   for (unsigned int i = 0; i < getNumMembers(); ++i)

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.14 2004-04-27 15:07:02 simon Exp $
+// $Id: Frustum.cpp,v 1.15 2004-06-10 21:04:14 alriddoch Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -164,7 +164,7 @@ int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {
 }
 
 
-int Frustum::patchInFrustum(float frustum[6][4], WFMath::AxisBox<3> bbox) {  
+int Frustum::patchInFrustum(float frustum[6][4], const WFMath::AxisBox<3> & bbox) {  
   int c;
   int c2 = 0;
 
@@ -188,7 +188,7 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::sphereInFrustum(float frustum[6][4], WFMath::AxisBox<3> &bbox, WFMath::Point<3> &pos) {
+bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos) {
   float x, y, z, radius;
   WFMath::Ball<3> b = bbox.boundingSphere();
   x = b.getCenter().x() + pos.x();

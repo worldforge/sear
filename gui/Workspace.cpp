@@ -58,8 +58,6 @@ void Workspace::handleEvent(const SDL_Event & event)
     case SDL_MOUSEMOTION: {
         short x = event.motion.x;
         short y = renderer->getWindowHeight() - event.motion.y;
-        std::cout << "Mouse motion " << x << " " << y
-                  << std::endl << std::flush;
         m_rootWindow->mouseMotion(x, y);
       }
       break;

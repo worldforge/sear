@@ -1,3 +1,13 @@
+2004-06-10  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/WorldEntity.h, src/WorldEntity.cpp,
+	  src/Frustum.h, src/Frustum.cpp,
+	  src/Character.h, src/Character.cpp:
+	  Change some pass by value arguments to pass by reference
+	  for efficiency.
+
+	* gui/Workspace.cpp: Get rid of some annoying debug ouput.
+
 2004-06-09  James Turner  <james@worldforge.org>
 
 	* Updated method for computing the fog color, based on the current

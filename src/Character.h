@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.17 2004-05-23 16:39:01 alriddoch Exp $
+// $Id: Character.h,v 1.18 2004-06-10 21:04:14 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -75,7 +75,7 @@ public:
   void setRotationRate(float);
 
   void updateLocals(bool);
-  void updateMove(float, float, float, WFMath::Quaternion);
+  void updateMove(const WFMath::Vector<3> &, const WFMath::Quaternion &);
 
   void getEntity(const std::string&);
   void dropEntity(const std::string&, int);

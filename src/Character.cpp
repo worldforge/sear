@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.36 2004-05-23 16:39:01 alriddoch Exp $
+// $Id: Character.cpp,v 1.37 2004-06-10 21:04:14 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -250,12 +250,13 @@ void Character::updateLocals(bool send_to_server) {
   x += mod_speed * cos(_angle + PI_BY_2);
   _time = ticks;
   _orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -_angle);
-  if (send_to_server) updateMove(x, y, z, _orient);
+  if (send_to_server) updateMove(WFMath::Vector<3>(x, y, z), _orient);
 }
 
-void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient) {
+void Character::updateMove(const WFMath::Vector<3> & direction,
+                           const WFMath::Quaternion & orient) {
   assert ((_initialised == true) && "Character not initialised");
-  _avatar->moveInDirection(WFMath::Vector<3>(x, y, z), orient);
+  _avatar->moveInDirection(direction, orient);
 }
 
 void Character::getEntity(const std::string &id) {
