@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.96 2004-06-24 14:58:35 jmt Exp $
+// $Id: System.cpp,v 1.97 2004-06-24 15:20:13 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -530,6 +530,7 @@ void System::handleEvents(const SDL_Event &event) {
      // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
         if (!repeat) {
+          // TODO place these values in a config file
           SDL_EnableKeyRepeat(1000,500);
           //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
           m_command = "";

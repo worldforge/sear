@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.9 2004-06-21 12:20:31 simon Exp $
+// $Id: ModelRecord.h,v 1.10 2004-06-24 15:20:13 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -28,7 +28,7 @@ public:
   ~ModelRecord() {}
  
   float scale;
-  float offset[3];
+//  float offset[3];
   std::string id;
   int state;
   std::string state_name;
@@ -42,12 +42,16 @@ public:
   Model *model;	
   Graphics::RotationStyle rotation_style;
   float offset_x, offset_y, offset_z;
+  float rotate_x, rotate_y, rotate_z;
   bool scaleByHeight;
 
   static const std::string SCALE;
   static const std::string OFFSET_X;
   static const std::string OFFSET_Y;
   static const std::string OFFSET_Z;
+  static const std::string ROTATE_X;
+  static const std::string ROTATE_Y;
+  static const std::string ROTATE_Z;
   static const std::string STATE;
   static const std::string SELECT_STATE;
   static const std::string MODEL_BY_TYPE;

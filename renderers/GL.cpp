@@ -1056,8 +1056,15 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       translateObject(pos.x(), pos.y(), pos.z() );
       // Move object to correct position
       translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
+//      WFMath::Quaternion r = WFMath::Quaternion(0, model_record->rotate_x);
+//      r.rotation(1, model_record->rotate_y);
+//      r.rotation(2, model_record->rotate_z);
+        glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
+
+// model_record->rotate_x, model_record->rotate_y, model_record->rotate_z, 1.0f);
       // Rotate Model
       rotateObject(object_record, model_record);
+//      applyQuaternion(r);
 
       // Scale Object
       float scale = model_record->scale;

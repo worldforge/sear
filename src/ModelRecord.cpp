@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.4 2004-04-27 15:07:02 simon Exp $
+// $Id: ModelRecord.cpp,v 1.5 2004-06-24 15:20:13 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -19,6 +19,9 @@ namespace Sear {
   const std::string ModelRecord::OFFSET_X = "offset_x";
   const std::string ModelRecord::OFFSET_Y = "offset_y";
   const std::string ModelRecord::OFFSET_Z = "offset_z";
+  const std::string ModelRecord::ROTATE_X = "rotate_x";
+  const std::string ModelRecord::ROTATE_Y = "rotate_y";
+  const std::string ModelRecord::ROTATE_Z = "rotate_z";
   const std::string ModelRecord::STATE = "state";
   const std::string ModelRecord::SELECT_STATE = "select_state";
   const std::string ModelRecord::MODEL_BY_TYPE = "model_by_type";

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.53 2004-06-20 18:43:35 simon Exp $
+// $Id: Graphics.cpp,v 1.54 2004-06-24 15:20:13 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -338,9 +338,9 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
           //if (Frustum::orientBBoxInFrustum(frustum, we->getOrientBBox(), object_record->position)) {
             if (!select_mode) {
                // Add to queue by state, then model record
-               assert(_system->getModelRecords().findItem(*I, "state_num"));
+//               assert(_system->getModelRecords().findItem(*I, "state_num"));
                int number = _system->getModelRecords().getItem(*I, "state_num");
-               assert(number > 0);
+//               assert(number > 0);
                render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
               if (we->hasMessages()) message_list.push_back(we);
             }

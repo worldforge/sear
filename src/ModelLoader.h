@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.25 2004-06-21 12:20:31 simon Exp $
+// $Id: ModelLoader.h,v 1.26 2004-06-24 15:20:13 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -38,13 +38,7 @@ public:
     } else {
       model_record->scale = 1.0;
     }
-    // Get model offset (x)
-    if (model_config.findItem(model_id, ModelRecord::OFFSET_X)) {
-      model_record->offset_x = (double)model_config.getItem(model_id, ModelRecord::OFFSET_X);
-    } else {
-      model_record->offset_x = 0.0;
-    }
-    // Get model offset (y)
+   // Get model offset (y)
     if (model_config.findItem(model_id, ModelRecord::OFFSET_Y)) {
       model_record->offset_y = (double)model_config.getItem(model_id, ModelRecord::OFFSET_Y);
     } else {
@@ -56,6 +50,28 @@ public:
     } else {
       model_record->offset_z = 0.0;
     }
+
+    // Get model rotation (x)
+    if (model_config.findItem(model_id, ModelRecord::ROTATE_X)) {
+      model_record->rotate_x = (double)model_config.getItem(model_id, ModelRecord::ROTATE_X);
+    } else {
+      model_record->rotate_x = 0.0;
+    }
+    // Get model rotation (y)
+    if (model_config.findItem(model_id, ModelRecord::ROTATE_Y)) {
+      model_record->rotate_y = (double)model_config.getItem(model_id, ModelRecord::ROTATE_Y);
+    } else {
+      model_record->rotate_y = 0.0;
+    }
+    // Get model rotation (z)
+    if (model_config.findItem(model_id, ModelRecord::ROTATE_Z)) {
+      model_record->rotate_z = (double)model_config.getItem(model_id, ModelRecord::ROTATE_Z);
+    } else {
+      model_record->rotate_z = 0.0;
+    }
+ 
+
+
     // Get render state number
     if (model_config.findItem(model_id, "state_num")) {
       model_record->state = model_config.getItem(model_id, "state_num");

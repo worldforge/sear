@@ -148,3 +148,4 @@ Eris::Avatar* Editor::getAvatar() const
 }
 
 } // of namespace Sear
+
