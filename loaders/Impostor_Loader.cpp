@@ -6,7 +6,8 @@
 #include "Impostor.h"
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 #include "../src/ObjectLoader.h"
 
 #include <string>
@@ -25,10 +26,10 @@ Models *Impostor_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
   Impostor *model = new Impostor();
 
   std::string type = we->type();
-  int id = GL::instance()->requestTexture(std::string("impostor_") + type);
+  int id = System::instance()->getRenderer()->requestTexture(std::string("impostor_") + type);
   if (id == -1) {
     type = we->parent();
-    id = GL::instance()->requestTexture(std::string("impostor_") + type);
+    id = System::instance()->getRenderer()->requestTexture(std::string("impostor_") + type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

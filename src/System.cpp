@@ -680,7 +680,13 @@ void System::registerCommands(Console *console) {
 }
 
 void System::runCommand(const std::string &command) {
-  _console->runCommand(command);
+  try {
+    _console->runCommand(command);
+  } catch (Exception e) {
+    Log::writeLog(e.getMessage(), Log::ERROR);
+  } catch (...) {
+    Log::writeLog("Caught Console Command Exception", Log::ERROR);
+  }
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {

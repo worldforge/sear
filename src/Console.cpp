@@ -121,7 +121,7 @@ void Console::runCommand(const std::string &command_string) {
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(command_string);
   std::string command = tokeniser.nextToken();
-  std::string args = tokeniser.nextToken();
+  std::string args = tokeniser.remainingTokens();
   ConsoleObject* con_obj = _registered_commands[command];
   if (command != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
   if (con_obj) con_obj->runCommand(command, args);

@@ -256,6 +256,7 @@ void GL::init() {
   }
   camera = new Camera();
   camera->init();
+  camera->registerCommands(_system->getConsole());
 //  CheckError();
   initLighting();
   mh = _system->getModelHandler();

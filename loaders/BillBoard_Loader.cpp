@@ -6,7 +6,8 @@
 #include "BillBoard.h"
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 #include "../src/ObjectLoader.h"
 
 #include <string>
@@ -25,10 +26,10 @@ Models *BillBoard_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const
   BillBoard *model = new BillBoard();
 
   std::string type = we->type();
-  int id = GL::instance()->requestTexture(std::string("billboard_") + type);
+  int id = System::instance()->getRenderer()->requestTexture(std::string("billboard_") + type);
   if (id == -1) {
     type = we->parent();
-    id = GL::instance()->requestTexture(std::string("billboard_") + type);
+    id = System::instance()->getRenderer()->requestTexture(std::string("billboard_") + type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

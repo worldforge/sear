@@ -6,7 +6,8 @@
 #include "BoundBox.h"
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 #include "../src/Utility.h"
 
 #include "../src/ObjectLoader.h"
@@ -33,10 +34,10 @@ Models *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
   std::string type = we->type();
-  int id = GL::instance()->requestTexture(std::string("boundbox_") + type);
+  int id = System::instance()->getRenderer()->requestTexture(std::string("boundbox_") + type);
   if (id == -1) {
     type = we->parent();
-    id = GL::instance()->requestTexture(std::string("boundbox_") + type);
+    id = System::instance()->getRenderer()->requestTexture(std::string("boundbox_") + type);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

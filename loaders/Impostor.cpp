@@ -3,7 +3,8 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "Impostor.h"
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 
 namespace Sear {
 
@@ -53,12 +54,13 @@ void Impostor::shutdown() {
 }
 
 void Impostor::render(bool select_mode) {
+  static Render *render = System::instance()->getRenderer();
   if (select_mode) {
-    GL::instance()->switchTexture(GL::instance()->requestTextureMask(_type));
+    render->switchTexture(render->requestTextureMask(_type));
   } else {
-    GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+    render->switchTexture(render->requestTexture(_type));
   }
-  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+  render->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
 }
 

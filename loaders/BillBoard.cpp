@@ -3,7 +3,8 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "BillBoard.h"
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 
 namespace Sear {
 
@@ -41,12 +42,13 @@ void BillBoard::shutdown() {
 }
 
 void BillBoard::render(bool select_mode) {
+  static Render *_render = System::instance()->getRenderer();
   if (select_mode) {	
-    GL::instance()->switchTexture(GL::instance()->requestTextureMask(_type));
+    _render->switchTexture(_render->requestTextureMask(_type));
   } else {
-    GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+    _render->switchTexture(_render->requestTexture(_type));
   }
-  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
+  _render->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], NULL);
 }
 
 } /* namespace Sear */

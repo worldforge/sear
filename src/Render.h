@@ -99,6 +99,7 @@ typedef enum {
   virtual int getWindowHeight() { return 0; }
 
   virtual void switchTexture(int texture) {}
+  virtual void switchTextureID(unsigned int texture) {}
   virtual std::string getActiveID() { return "";}
 
   virtual int patchInFrustum(WFMath::AxisBox<3>) { return 0;}
@@ -129,17 +130,17 @@ private:
   
 public:
 
-  int requestTextureMask(const std::string&, bool clamp = false) {}
-  void createTextureMask(SDL_Surface*, unsigned int, bool) {}
+  virtual int requestTextureMask(const std::string&, bool clamp = false) { return 0;}
+  virtual void createTextureMask(SDL_Surface*, unsigned int, bool) {}
   
-  void translateObject(float x, float y, float z) {}
-  void rotateObject(WorldEntity *we, int type) {}
-  void setViewMode(int type) {}
-  void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {}
-  void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {}
-  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {}
-  unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) { return 0;}
-  void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {}
+  virtual void translateObject(float x, float y, float z) {}
+  virtual void rotateObject(WorldEntity *we, int type) {}
+  virtual void setViewMode(int type) {}
+  virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {}
+  virtual void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {}
+  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {}
+  virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) { return 0;}
+  virtual void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {}
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
 

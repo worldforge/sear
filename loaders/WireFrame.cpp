@@ -4,7 +4,8 @@
 
 #include "WireFrame.h"
 
-#include "../renderers/GL.h"
+#include "../src/System.h"
+#include "../src/Render.h"
 
 namespace Sear {
 
@@ -79,7 +80,8 @@ void WireFrame::shutdown() {
 }
 
 void WireFrame::render(bool) {
-  GL::instance()->renderArrays(Models::LINES, _num_points, &_vertex_data[0][0], NULL, NULL);
+  static Render *render = System::instance()->getRenderer();
+  render->renderArrays(Models::LINES, _num_points, &_vertex_data[0][0], NULL, NULL);
 }
 
 } /* namespace Sear */
