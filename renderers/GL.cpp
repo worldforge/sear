@@ -105,7 +105,7 @@ std::string getSelectedID(unsigned int i) {
   return colour_mapped[i];
 }
 
-int nextColour(std::string id) {
+int nextColour(const std::string &id) {
   unsigned int ic;
   
   if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
@@ -289,20 +289,17 @@ void GL::initLighting() {
 
 void GL::initFont() {
   int loop;
-  float cx;  // Holds Our X Character Coord
+  float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
   Log::writeLog("Render: Initilising Fonts", Log::DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
-//  font_id = requestTexture(font_texture);
-//  if (font_id == -1) return; //ERROR
-//  GLuint font = getTextureID(font_id); // Select Our Font Texture
-//  if (!glIsTexture(font)) {
-//    static int default_font = requestTexture("default_font");
-//    font = getTextureID(default_font);
-//    font_id = default_font;
-//  }
-//  glBindTexture(GL_TEXTURE_2D, font); // Select Our Font Texture
-
+  font_id = requestTexture(font_texture);
+  GLuint texture = getTextureID(font_id);
+  if (!glIsTexture(texture)) {
+    static GLuint default_id = getTextureID(requestTexture("default_font"));
+    texture = default_id;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture);
   for (loop=0; loop<256; loop++) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
@@ -506,7 +503,6 @@ void GL::drawScene(const std::string& command, bool select_mode) {
   num_frames++;
   frame_time += time_elapsed;
 
-
   if (checkState(RENDER_STENCIL)) {
     glClearStencil(1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
@@ -549,8 +545,6 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       if (!select_mode) {
         glPushMatrix();
           glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-//          nextState(FONT_TO_SKYBOX);
-//	  stateChange("skybox");
           skybox->draw(); //Draw the sky box
         glPopMatrix();
       }
@@ -565,7 +559,6 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       float ps[] = {-x, -y, -z + 2.0f, 1.0f};
       glLightfv(GL_LIGHT0,GL_POSITION,ps);
 
-//      if (_entity_models[id]) player_model = _entity_models[id]->model;
       float  proj[16];
       float  modl[16];
       /* Get the current PROJECTION matrix from OpenGL */
@@ -621,8 +614,6 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     }
     if (!select_mode) {
       glPushMatrix();
-//        nextState(SKYBOX_TO_TERRAIN);
-//	  stateChange("terrain");
         terrain->draw();
       glPopMatrix();
     }
@@ -647,6 +638,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
       }
     }
   } else {
+    stateChange("splash");
     #ifndef _WIN32
       // TODO Need to find a win32 version
       usleep(sleep_time);
@@ -659,8 +651,6 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     glPushMatrix(); // Store The Modelview Matrix
     glLoadIdentity(); // Reset The Modelview Matrix
   
-    glEnable(GL_TEXTURE_2D);
-    glDisable(GL_DEPTH_TEST); 
     glColor3f(1.0f, 1.0f, 1.0f);
     glBindTexture(GL_TEXTURE_2D, getTextureID(splash_id));
     glBegin(GL_QUADS); 
@@ -676,6 +666,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
 
   }
   if (!select_mode) {
+    stateChange("font");
    _system->getConsole()->draw(command);
 //  Calc FPS
     stateChange("font");
@@ -1220,9 +1211,8 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
 }
 
 void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
-  if (select_mode) stateChange("select");
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
-    // Change staet for this queue
+    // Change state for this queue
     if (!select_mode) stateChange(_state_loader->getStateProperties((std::string)I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 
@@ -1242,7 +1232,6 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
       translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
      
       // Rotate Model
-      // TODO: Is this broken or is it to do with the server?
       if (model->rotationStyle()) rotateObject(we, model->rotationStyle());
 
       // Scale Object
@@ -1277,8 +1266,8 @@ int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 
 void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
   active_name = we->getName();
-  StateProperties *sp = _cur_state;
-  if (use_stencil) {
+  if (use_stencil) { // Using Stencil Buffer
+    StateProperties *sp = _cur_state; // Store current state
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, -1, 1);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -1293,12 +1282,12 @@ void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_STENCIL_TEST);
     glColor4fv(white);
-  } else {
+    stateChange(sp); // Restore state
+  } else { // Just use solid colour on object 
     glColor4fv(_halo_blend_colour);  
     model->render(true);
     glColor4fv(white);
   }
-  stateChange(sp);
 }
 
 void GL::createDefaults() {
