@@ -28,6 +28,7 @@
 #include "ModelHandler.h"
 #include "ObjectLoader.h"
 #include "Render.h"
+#include "Sound.h"
 #include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
@@ -147,6 +148,10 @@ bool System::init() {
   readConfig();
   _system_running = true;
 
+  sound = new Sound();
+  sound->init();
+  sound->registerCommands(_console);
+  
   _command_history_iterator = _command_history.begin();
   return true;
 }
@@ -214,12 +219,17 @@ void System::shutdown() {
   if (_cursor_default) SDL_FreeCursor(_cursor_default);
   if (_cursor_pickup) SDL_FreeCursor(_cursor_pickup);
   if (_cursor_touch) SDL_FreeCursor(_cursor_touch);
+  if (sound) {
+    sound->shutdown();
+    delete sound;
+  }
   SDL_Quit();
 }
 
 bool System::initVideo() {
   Log::writeLog("Initialising Video", Log::LOG_INFO);
 #ifdef DEBUG
+#warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
   if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else

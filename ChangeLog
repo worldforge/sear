@@ -1,4 +1,7 @@
 20th August 2002, Simon Goodall
+ * Added sound support to Sear through SDL_sound library. use the console command "/play_sound sound_file" to play a sound. currently will only play one sound file at a time.
+
+20th August 2002, Simon Goodall
  * Updated comments for console code
 
 20th August 2002, Simon Goodall

@@ -19,9 +19,6 @@ void Log::writeLog(const std::string &msg, LogLevel level) {
     case LOG_DEFAULT: type = "Default"; break;
     case LOG_ERROR: type = "Error"; break;
     case LOG_WARNING: type = "Warning"; break;
-    case LOG_METHOD_ENTRY: type = "Method Entry"; break;
-    case LOG_METHOD_EXIT: type = "Method Exit"; break;
-    case LOG_POSITION: type = "Position"; break;
     case LOG_ERIS: type = "Eris"; break;		
     case LOG_INFO: type = "Info"; break;
   }

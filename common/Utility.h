@@ -2,6 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+//TODO
+// Add conditional compiling for stringstream bug
+
 #ifndef _UTILITY_H_
 #define _UTILITY_H_ 1
 

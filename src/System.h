@@ -28,6 +28,7 @@ class StateLoader;
 class Console;
 class Character;
 class Graphics;
+class Sound;
 
 typedef enum {
   SYS_UNKNOWN = 0,
@@ -226,6 +227,7 @@ protected:
   std::list<VarconfRecord*> record_list;
   bool _process_records;
   void processRecords();
+  Sound *sound;
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);

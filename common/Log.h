@@ -25,9 +25,6 @@ public:
     LOG_DEFAULT = 0,
     LOG_ERROR,
     LOG_WARNING,
-    LOG_METHOD_ENTRY,
-    LOG_METHOD_EXIT,
-    LOG_POSITION,
     LOG_ERIS,
     LOG_INFO
   } LogLevel;

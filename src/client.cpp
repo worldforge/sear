@@ -142,7 +142,7 @@ int Client::disconnect() {
   //Are we logged in?
   if (_player != NULL) {
     Log::writeLog("Client::disconnect: Logging out first...", Log::LOG_INFO);
-    logout();
+//    logout();
   }
   try {
     _connection->disconnect();

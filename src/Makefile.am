@@ -48,6 +48,8 @@ libSear_a_SOURCES = \
 	ObjectLoader.h \
 	ObjectLoader.cpp \
 	Render.h \
+	Sound.cpp \
+	Sound.h \
 	Sky.h \
 	System.cpp \
 	System.h \

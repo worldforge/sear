@@ -173,7 +173,7 @@ if test $cross_compiling == no; then
   AC_CHECK_LIB(SDL_image,IMG_Load, [], [
     AC_MSG_ERROR(Couldn't find SDL_image. Please goto http://www.libsdl.org/projects/SDL_image)
 ])
-dnl  AC_CHECK_LIB(SDL_sound,Sound_Init)
+  AC_CHECK_LIB(SDL_sound,Sound_Init)
   AC_CHECK_LIB(GL,glViewport)
   AC_CHECK_LIB(GLU,gluPerspective)
   AC_CHECK_LIB(cal3d,main, [], [
@@ -204,15 +204,15 @@ else
 	AC_MSG_ERROR(Error could not find SDL_image)
   fi
 
-dnl  AC_CHECK_HEADER(SDL/SDL_sound.h,
-dnl	[found_sdl_image=yes break],
-dnl	[found_sdl_image=no])
+  AC_CHECK_HEADER(SDL/SDL_sound.h,
+	[found_sdl_image=yes break],
+	[found_sdl_image=no])
 
-dnl  if test $found_sdl_image == yes; then
-dnl	LIBS="$LIBS -lSDL_sound"
-dnl  else
-dnl	AC_MSG_ERROR(Error could not find SDL_sound)
-dnl  fi
+  if test $found_sdl_image == yes; then
+	LIBS="$LIBS -lSDL_sound"
+  else
+	AC_MSG_ERROR(Error could not find SDL_sound)
+  fi
 
   AC_CHECK_HEADER(GL/gl.h,
 	[found_gl=yes break],
