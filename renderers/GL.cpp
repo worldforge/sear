@@ -1516,17 +1516,23 @@ void GL::resize(int width, int height) {
   if (m_fullscreen) flags |= SDL_FULLSCREEN;
   if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
 
-  //Is this the correct way to free a window?
+  // This is probly being leaked.
   m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
   if (m_screen == NULL ) {
     std::cerr << "Unable to set " << m_width << " x " << m_height << " video: " << SDL_GetError() << std::endl;
+    // Need a better error condition
+    return;
+  }
+  // Have the textures been destroyed?
+  if (!glIsTexture(1)) {
     Environment::getInstance().invalidate();
     createWindow(m_width, m_height, m_fullscreen);
     RenderSystem::getInstance().invalidate();
     Environment::getInstance().invalidate(); 
     return;
   }
- setViewMode(PERSPECTIVE);
+  // Update view port
+  setViewMode(PERSPECTIVE);
 }
 
 } // namespace Sear
