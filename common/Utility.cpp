@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $Id: Utility.cpp,v 1.2 2002-09-08 00:26:37 simon Exp $
+
 #include "Utility.h"
 
 #include <wfmath/quaternion.h>

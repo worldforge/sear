@@ -2,11 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//TODO
-// Add conditional compiling for stringstream bug
+// $Id: Utility.h,v 1.4 2002-09-08 00:26:37 simon Exp $
 
-#ifndef _UTILITY_H_
-#define _UTILITY_H_ 1
+#ifndef SEAR_UTILITY_H
+#define SEAR_UTILITY_H 1
 
 #include <wfmath/const.h>
 #include <wfmath/quaternion.h>
@@ -115,5 +114,5 @@ protected:
 
   
 } /* namespace Sear */
-#endif /* _UTILITY_H_ */
+#endif /* SEAR_UTILITY_H */
 

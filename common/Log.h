@@ -2,8 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-#ifndef _LOG_H_
-#define _LOG_H_ 1
+// $Id: Log.h,v 1.3 2002-09-08 00:26:37 simon Exp $
+
+#ifndef SEAR_LOG_H
+#define SEAR_LOG_H 1
 
 /*
  * This class handles all text i/o
@@ -40,4 +42,4 @@ public:
 
 } /* namespace Sear */
 
-#endif /* _LOG_H_ */
+#endif /* SEAR_LOG_H */

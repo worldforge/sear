@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+// $id: $
 
 /*
  * This is the model viewer for Sear

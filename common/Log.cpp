@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
+// $Id: Log.cpp,v 1.4 2002-09-08 00:26:37 simon Exp $
+
 #include "Log.h"
 #include <iostream>
 
