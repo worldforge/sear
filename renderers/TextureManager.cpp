@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.22 2004-04-27 15:07:02 simon Exp $
+// $Id: TextureManager.cpp,v 1.23 2004-05-13 16:10:28 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -10,6 +10,7 @@
 
 #include "TextureManager.h"
 
+#include <sage/GL.h>
 #include <sage/GLU.h>
 
 #ifdef __APPLE__
@@ -61,6 +62,7 @@ static const std::string KEY_priority = "priority";
 static const std::string KEY_mask = "mask";
 static const std::string KEY_min_filter = "min_filter";
 static const std::string KEY_mag_filter = "mag_filter";
+static const std::string KEY_internal_format = "internal_format";
 
 // config defaults
 static const bool DEFAULT_clamp = false;
@@ -81,6 +83,48 @@ static const std::string FILTER_LINEAR_MIPMAP_NEAREST = "linear_mipmap_nearest";
 static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
 
 static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";	
+static const std::string ALPHA = "alpha";
+static const std::string ALPHA4 = "alpha4";
+static const std::string ALPHA8 = "alpha8";
+static const std::string ALPHA12 = "alpha12";
+static const std::string ALPHA16 = "alpha16";
+
+static const std::string LUMINANCE = "luminance";
+static const std::string LUMINANCE4 = "luminance4";
+static const std::string LUMINANCE8 = "luminance8";
+static const std::string LUMINANCE12 = "luminance12";
+static const std::string LUMINANCE16 = "luminance16";
+
+static const std::string LUMINANCE_ALPHA = "luminance_alpha";
+static const std::string LUMINANCE4_ALPHA4 = "luminance4_alpha4";
+static const std::string LUMINANCE6_ALPHA2 = "luminance6_alpha2";
+static const std::string LUMINANCE8_ALPHA8 = "luminance8_alpha8";
+static const std::string LUMINANCE12_ALPHA4 = "luminance12_alpha4";
+static const std::string LUMINANCE12_ALPHA12 = "luminance12_alpha12";
+static const std::string LUMINANCE16_ALPHA16 = "luminance16_alpha16";
+  
+static const std::string INTENSITY = "intensity";
+static const std::string INTENSITY4 = "intensity4";
+static const std::string INTENSITY8 = "intensity8";
+static const std::string INTENSITY12 = "intensity12";
+static const std::string INTENSITY16 = "intensity16";
+
+static const std::string RGB = "rgb";
+static const std::string R3_G3_B2 = "r3_g3_b2";
+static const std::string RGB4 = "rgb4";
+static const std::string RGB5 = "rgb5";
+static const std::string RGB8 = "rgb8";
+static const std::string RGB10 = "rgb10";
+static const std::string RGB12 = "rgb12";
+static const std::string RGB16 = "rgb16";
+static const std::string RGBA = "rgba";
+static const std::string RGBA2 = "rgba2";
+static const std::string RGBA4 = "rgba4";
+static const std::string RGB5_A1 = "rgb5_a1";
+static const std::string RGBA8 = "rgba8";
+static const std::string RGB10_A2 = "rgb10_a2";
+static const std::string RGBA12 = "rgba12";
+static const std::string RGBA16 = "rgba16";
 
 bool use_arb_multitexture = false;
 bool use_sgis_generate_mipmap = false;
@@ -301,7 +345,11 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }
 //    fmt = (bpp == 24) ? 3 : 4;
-    fmt = (bpp == 24) ? GL_RGB5 : GL_RGB5_A1;
+    if (m_texture_config.findItem(texture_name, KEY_internal_format)) {
+      fmt = getFormat((std::string)m_texture_config.getItem(texture_name, KEY_internal_format));
+    } else {
+      fmt = (bpp == 24) ? GL_RGB5 : GL_RGB5_A1;
+    }
 /*
   // TODO make this support more texture formats
 //  int type = (int)m_texture_config.getItem(texture_name, KEY_type);
@@ -625,5 +673,52 @@ SDL_Surface *TextureManager::loadImage(const  std::string &filename) {
   return(image);
 }
 
+
+GLint TextureManager::getFormat(const std::string &fmt) {
+  if (fmt == ALPHA) return GL_ALPHA;
+  if (fmt == ALPHA4) return GL_ALPHA4;
+  if (fmt == ALPHA8) return GL_ALPHA8;
+  if (fmt == ALPHA12) return GL_ALPHA12;
+  if (fmt == ALPHA16) return GL_ALPHA16;
+
+  if (fmt == LUMINANCE) return GL_LUMINANCE;
+  if (fmt == LUMINANCE4) return GL_LUMINANCE4;
+  if (fmt == LUMINANCE8) return GL_LUMINANCE8;
+  if (fmt == LUMINANCE12) return GL_LUMINANCE12;
+  if (fmt == LUMINANCE16) return GL_LUMINANCE16;
+
+  if (fmt == LUMINANCE_ALPHA) return GL_LUMINANCE_ALPHA;
+  if (fmt == LUMINANCE4_ALPHA4) return GL_LUMINANCE4_ALPHA4;
+  if (fmt == LUMINANCE6_ALPHA2) return GL_LUMINANCE6_ALPHA2;
+  if (fmt == LUMINANCE8_ALPHA8) return GL_LUMINANCE8_ALPHA8;
+  if (fmt == LUMINANCE12_ALPHA4) return GL_LUMINANCE12_ALPHA4;
+  if (fmt == LUMINANCE12_ALPHA12) return GL_LUMINANCE12_ALPHA12;
+  if (fmt == LUMINANCE16_ALPHA16) return GL_LUMINANCE16_ALPHA16;
+  
+  if (fmt == INTENSITY) return GL_INTENSITY;
+  if (fmt == INTENSITY4) return GL_INTENSITY4;
+  if (fmt == INTENSITY8) return GL_INTENSITY8;
+  if (fmt == INTENSITY12) return GL_INTENSITY12;
+  if (fmt == INTENSITY16) return GL_INTENSITY16;
+
+  if (fmt == RGB) return GL_RGB;
+  if (fmt == R3_G3_B2) return GL_R3_G3_B2;
+  if (fmt == RGB4) return GL_RGB4;
+  if (fmt == RGB5) return GL_RGB5;
+  if (fmt == RGB8) return GL_RGB8;
+  if (fmt == RGB10) return GL_RGB10;
+  if (fmt == RGB12) return GL_RGB12;
+  if (fmt == RGB16) return GL_RGB16;
+  if (fmt == RGBA) return GL_RGBA;
+  if (fmt == RGBA2) return GL_RGBA2;
+  if (fmt == RGBA4) return GL_RGBA4;
+  if (fmt == RGB5_A1) return GL_RGB5_A1;
+  if (fmt == RGBA8) return GL_RGBA8;
+  if (fmt == RGB10_A2) return GL_RGB10_A2;
+  if (fmt == RGBA12) return GL_RGBA12;
+  if (fmt == RGBA16) return GL_RGBA16;
+  assert(0);
+  return 0;
+}
 
 } /* namespace Sear */

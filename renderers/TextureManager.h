@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.11 2004-04-27 12:57:35 simon Exp $
+// $Id: TextureManager.h,v 1.12 2004-05-13 16:10:28 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -161,6 +161,8 @@ public:
   void setupGLExtensions();
  
   void invalidate();
+
+  static GLint getFormat(const std::string &fmt);
  
 private:
   bool m_initialised; ///< Flag indicating whether object has had init called
