@@ -263,6 +263,8 @@ private:
   static const char * const TOGGLE_FULLSCREEN = "toggle_fullscreen";
   static const char * const ADD_EVENT = "event";
   static const char * const IDENTIFY_ENTITY = "identify";
+  static const char * const GET_TIME = "get_time";
+  static const char * const SET_TIME = "set_time";
 };
 
 } /* namespace Sear */

@@ -336,16 +336,18 @@ void System::createWindow(bool fullscreen) {
 
 void System::mainLoop() {
   SDL_Event event;
-  float last_time = 0.0f;
+  static float last_time = 0.0f;
   while (_system_running) {
     try {
       float time_elapsed;
+      // This means Sear needs to be restarted for any time changes to take place
+      static float divisor = _seconds_per_minute * _minutes_per_hour;
       _seconds = (float)SDL_GetTicks() / 1000.0f;
-      _current_time = _seconds / _seconds_per_minute / _minutes_per_hour;
       time_elapsed = _seconds - last_time;
+      _current_time += time_elapsed / divisor;
       last_time = _seconds;
-      while (_current_time > _seconds_per_day) _current_time -= _seconds_per_day;
-      _current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
+      while (_current_time > _hours_per_day) _current_time -= _hours_per_day;
+      //_current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
       if (_current_time < _dawn_time) _time_area = NIGHT;
       else if (_current_time < _day_time) _time_area = DAWN;
       else if (_current_time < _dusk_time) _time_area = DAY;
@@ -357,10 +359,6 @@ void System::mainLoop() {
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
-#ifdef COLOUR_CURSOR_TEST      
-      SDL_GetMouseState(&_x_pos, &_y_pos);
-//      SDL_GetRelativeMouseState(&_x_pos, &_y_pos);
-#endif      
       _event_handler->poll();
       _client->poll();
       _graphics->drawScene(command, false, time_elapsed);
@@ -752,6 +750,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(TOGGLE_FULLSCREEN, this);
   console->registerCommand(ADD_EVENT, this);
   console->registerCommand(IDENTIFY_ENTITY, this);
+  console->registerCommand(SET_TIME, this);
+  console->registerCommand(GET_TIME, this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -866,6 +866,16 @@ void System::runCommand(const std::string &command, const std::string &args) {
     if (!world) return;
     WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
     if (we) we->displayInfo();  
+  }
+  else if (command == SET_TIME) {
+    float new_time;
+    std::string nt = tokeniser.nextToken();
+    cast_stream(nt, new_time);
+    _current_time = new_time;
+  }
+  else if (command == GET_TIME) {
+    std::string time = string_fmt(_current_time);
+    pushMessage(std::string("Time: ") + time, CONSOLE_MESSAGE);
   }
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }

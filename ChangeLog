@@ -1,3 +1,6 @@
+20th August 2002, Simon Goodall
+ * Added two new console commands: get_time and set_time. get_time prints the current time on the console. set_time allows you to set the current time.
+
 19th August 2002, Simon Goodall
  * Modified console so all commands now start with a '/' excluding those already beginning with a '+' or '-'. All other entries will be classified as speech.
 
