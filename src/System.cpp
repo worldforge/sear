@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.105 2004-10-20 21:06:29 alriddoch Exp $
+// $Id: System.cpp,v 1.106 2004-10-28 10:37:04 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -229,9 +229,9 @@ bool System::init(int argc, char *argv[]) {
     edit->registerCommands(_console);
 
   _workspace = new Workspace(this);
-  Toplevel * t = new Toplevel("Panel");
-  t->setPos(50, 50);
-  _workspace->addToplevel(t);
+  // Toplevel * t = new Toplevel("Panel");
+  // t->setPos(50, 50);
+  // _workspace->addToplevel(t);
   _workspace->show();
   // _workspace->registerCommands(_console);
 
