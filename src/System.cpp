@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.104 2004-10-20 14:16:25 simon Exp $
+// $Id: System.cpp,v 1.105 2004-10-20 21:06:29 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -232,7 +232,7 @@ bool System::init(int argc, char *argv[]) {
   Toplevel * t = new Toplevel("Panel");
   t->setPos(50, 50);
   _workspace->addToplevel(t);
-  _workspace->showAll();
+  _workspace->show();
   // _workspace->registerCommands(_console);
 
   int sticks = SDL_NumJoysticks();
