@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.55 2003-02-25 22:34:24 simon Exp $
+// $Id: GL.cpp,v 1.56 2003-02-26 14:47:37 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -23,8 +23,8 @@
 //typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
 //#endif
 #ifdef __WIN32
-PFNGLACTIVETEXTUREARBPROC glActiveTexture  = NULL;
-PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture = NULL;
+PFNGLACTIVETEXTUREARBPROC glActiveTextureARB  = NULL;
+PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 #endif
@@ -313,6 +313,7 @@ void GL::initWindow(int width, int height) {
   
     std::string vendor = string_fmt(glGetString(GL_VENDOR));
     std::string renderer = string_fmt(glGetString(GL_RENDERER));
+    // TODO - CHECK OPENGL VERSION
     std::string version = string_fmt(glGetString(GL_VERSION));
     std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
   
@@ -469,6 +470,8 @@ inline void GL::newLine() {
 //  float m[16];
 //  glLoadTransposeMatrixfARB(&m);
 }
+
+// TODO COMBINE THESE METHODS INTO A GENERIC ONE
 
 int GL::requestTexture(const std::string &section, const std::string &texture, bool clamp) {
   static varconf::Config &texture_config = _system->getTexture();
@@ -774,6 +777,8 @@ void GL::procEvent(int x, int y) {
   y_pos = y;
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
+// TODO pre-cache 8 - bits?
+  
   GLubyte red = i[0] >> (8 - redBits);// & redMask;
   GLubyte green = i[1] >> (8 - greenBits);// & greenMask;
   GLubyte blue = i[2] >> (8 - blueBits);// & blueMask;
@@ -1067,7 +1072,7 @@ void GL::setViewMode(int type) {
     }			    
   }	
 }
-
+// TODO put into material manager and use display lists to retrieve them
 void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
   // TODO: set up missing values
   if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   ambient);
@@ -1422,6 +1427,7 @@ inline void GL::store() { glPushMatrix(); }
 inline void GL::restore() { glPopMatrix(); }
 
 inline void GL::beginFrame() {
+  // TODO into display list
   terrain = _graphics->getTerrain();
   active_name = "";
   if (checkState(RENDER_STENCIL)) {
@@ -1458,6 +1464,7 @@ void GL::drawSplashScreen() {
   
   glColor4fv(white);
   switchTexture(requestTexture(UI, SPLASH));
+  // TODO into vertex array?
   glBegin(GL_QUADS); 
     glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
     glTexCoord2i(0, 1); glVertex2f(0.0f, window_height);
@@ -1568,14 +1575,14 @@ void GL::setupExtensions() {
   }
   use_multitexturing = true;
 #ifdef __WIN32
-  glActiveTexture = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTexture");
-  glClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTexture");
+  glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTextureARB");
+  glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTextureARB");
   use_multitexturing = true;
-  if (!glActiveTexture){ use_multitexturing = false;  std::cerr << "no glActiveTexture" << std::endl << std::flush;}
-  if (!glClientActiveTexture) {use_multitexturing = false; std::cerr << "no glClientActiveTexture" << std::endl << std::flush;}
+  if (!glActiveTextureARB){ use_multitexturing = false;  std::cerr << "no glActiveTextureARB" << std::endl << std::flush;}
+  if (!glClientActiveTextureARB) {use_multitexturing = false; std::cerr << "no glClientActiveTextureARB" << std::endl << std::flush;}
    glLockArraysEXT = (PFNGLLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glLockArraysEXT");
    glUnlockArraysEXT = (PFNGLUNLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glUnlockArraysEXT");
-  use_ext_compiled_vertex_array = true;
+//  use_ext_compiled_vertex_array = true;
    if (!glLockArraysEXT) {
      std::cerr << "No glLockArraysEXT" << std::endl;
      use_ext_compiled_vertex_array = false;
