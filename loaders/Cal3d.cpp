@@ -198,11 +198,15 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
 //----------------------------------------------------------------------------//
 
 bool Cal3d::init(const std::string& strFilename) {
-  static unsigned int set_counter = 1;
-  static unsigned int part_counter = 1;
   if (core_models[strFilename]) {
     m_calCoreModel = core_models[strFilename];
   } else {
+    unsigned int set_counter = 1;
+    unsigned int part_counter = 1;
+    std::map<int, int> material_map;
+    std::map<int, int> part_map;
+    std::map<std::string, int> material_set_map;
+    std::map<std::string, int> material_part_map;
     // open the model configuration file
     std::ifstream file;
     file.open(strFilename.c_str(), std::ios::in | std::ios::binary);
@@ -445,7 +449,7 @@ bool Cal3d::init(const std::string& strFilename) {
       // initialize the material thread
       m_calCoreModel->setCoreMaterialId(part_map[materialId] - 1, material_map[materialId] - 1, materialId);
     }
-    core_models[strFilename] = m_calCoreModel;
+    core_models[strFilename] = m_calCoreModel;;
   }
 
   // create the model instance from the loaded core model

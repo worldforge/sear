@@ -9,10 +9,15 @@
 #include <varconf/Config.h>
 #include <Eris/TypeInfo.h>
 
-#include "common/Log.h"
+#include "config.h"
 
+#include "common/Log.h"
+#ifdef HAVE_LIB3DS
 #include "loaders/3ds_Loader.h"
+#endif
+#ifdef HAVE_LIBCAL3D
 #include "loaders/Cal3d_Loader.h"
+#endif
 #include "loaders/BoundBox_Loader.h"
 #include "loaders/BillBoard_Loader.h"
 #include "loaders/Impostor_Loader.h"
@@ -36,13 +41,17 @@ ModelHandler::ModelHandler() :
 	
 {
   // TODO: this is not the place
+#ifdef HAVE_LIBCAL3D
   new Cal3d_Loader(this);
+#endif
   new BoundBox_Loader(this);
   new BillBoard_Loader(this);
   new WireFrame_Loader(this);
   new Impostor_Loader(this);
   new NPlane_Loader(this);
+#ifdef HAVE_LIB3DS
   new ThreeDS_Loader(this);
+#endif
 }
 
 ModelHandler::~ModelHandler() {

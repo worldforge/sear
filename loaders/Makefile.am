@@ -1,4 +1,16 @@
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderCal3d.a libLoader3ds.a libLoaderNPlane.a
+if ENABLE_CAL3D
+CAL3D_LIBS = libLoaderCal3d.a
+else
+CAL3D_LIBS = 
+endif
+
+if ENABLE_3DS
+LIB3DS_LIBS = libLoader3ds.a
+else
+LIB3DS_LIBS = 
+endif
+
+noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderNPlane.a $(CAL3D_LIBS) $(LIB3DS_LIBS)
 
 INCLUDES = -I..
 
