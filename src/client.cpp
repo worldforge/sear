@@ -73,7 +73,7 @@ bool Client::init() {
   _connection->Timeout.connect(SigC::slot(this, &Client::Timeout));
   _connection->StatusChanged.connect(SigC::slot(this, &Client::StatusChanged));
 
-  Eris::setLogLevel((Eris::LogLevel) 4);//ERIS_LOG_LEVEL);
+  Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
   Eris::Logged.connect(SigC::slot(this, &Client::Log));
   return true;
   
@@ -83,6 +83,7 @@ void Client::shutdown() {
   Log::writeLog("Client::shutdown", Log::METHOD_ENTRY);
   if (_player) delete _player;
   if (_connection) delete _connection;
+  // TODO clean up factory
 }
 
 void Client::Log(Eris::LogLevel lvl, const std::string &msg) {
@@ -371,7 +372,7 @@ void Client::SightPerson(Eris::Person *person) {
   _system->pushMessage(std::string(CLIENT_SIGHTED_PERSON) + " " + person->getName(), CONSOLE_MESSAGE);
 //  Log::writeLog(person->getName());
 //  Log::writeLog(person->getAccount());
-  // This is here dur to bugs in ERIS ??,
+  // This is here due to bugs in ERIS ??,
   _system->setState(SYS_LOGGED_IN, true);
 }
 
@@ -507,10 +508,10 @@ void Client::GotCharacterInfo(const Atlas::Objects::Entity::GameEntity& ge) {
 
 void Client::GotAllCharacters() {
   Log::writeLog("Client::getCharacters", Log::INFO);
-  if (_connection == NULL) throw Exception("Connection is NULL");
-  if (!_connection->isConnected()) throw Exception("Not Connected");
+//  if (_connection == NULL) throw Exception("Connection is NULL");
+//  if (!_connection->isConnected()) throw Exception("Not Connected");
   if (_player == NULL) throw Exception ("Player is NULL");
-  if (_lobby == NULL) throw Exception("Lobby is NULL");
+//  if (_lobby == NULL) throw Exception("Lobby is NULL");
   Eris::CharacterList l = _player->getCharacters();
   for (Eris::CharacterList::iterator I=l.begin(); I != l.end(); I++) {
     Atlas::Objects::Entity::GameEntity ge = *I;

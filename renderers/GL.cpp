@@ -42,6 +42,9 @@
 #include "../terrain/ROAM.h"
 #include "../sky/SkyBox.h"
 
+#include "../src/default_image.xpm"
+#include "../src/default_font.xpm"
+
 namespace Sear {
 
 float GL::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
@@ -226,6 +229,7 @@ void GL::initWindow(int width, int height) {
 void GL::init() {
   // Most of this should be elsewhere
   readConfig();
+  createDefaults();
   splash_id = requestTexture(splash_texture);
   initFont();
   // TODO: initialisation need to go into system
@@ -287,9 +291,16 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   Log::writeLog("Render: Initilising Fonts", Log::DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
-  font_id = requestTexture(font_texture);
-  if (font_id == -1) return; //ERROR
-  glBindTexture(GL_TEXTURE_2D, getTextureID(font_id)); // Select Our Font Texture
+//  font_id = requestTexture(font_texture);
+//  if (font_id == -1) return; //ERROR
+//  GLuint font = getTextureID(font_id); // Select Our Font Texture
+//  if (!glIsTexture(font)) {
+//    static int default_font = requestTexture("default_font");
+//    font = getTextureID(default_font);
+//    font_id = default_font;
+//  }
+//  glBindTexture(GL_TEXTURE_2D, font); // Select Our Font Texture
+
   for (loop=0; loop<256; loop++) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
@@ -316,7 +327,12 @@ void GL::shutdownFont() {
 
 void GL::print(GLint x, GLint y, const char * string, int set) {
   if (set > 1) set = 1;
-  glBindTexture(GL_TEXTURE_2D, getTextureID(font_id)); // Select Our Font Texture
+  GLuint texture = getTextureID(font_id);
+  if (!glIsTexture(texture)) {
+    static GLuint default_id = getTextureID(requestTexture("default_font"));
+    texture = default_id;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
   glPushMatrix(); // Store The Projection Matrix
   glLoadIdentity(); // Reset The Projection Matrix
@@ -1270,6 +1286,64 @@ void GL::drawOutline(WorldEntity *we, Models *model, bool use_stencil) {
     glColor4fv(white);
   }
   stateChange(sp);
+}
+
+void GL::createDefaults() {
+  //Create Default Texture
+  Log::writeLog("Building Default Texture", Log::INFO);
+  unsigned int texture_id = 0;
+  glGenTextures(1, &texture_id);
+
+  if (texture_id == 0) return;
+
+  unsigned char *data = xpm_to_image(default_image, default_image_width, default_image_height);
+  
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, default_image_width, default_image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  free (data);
+  textureList.push_back(texture_id);
+  texture_map["default"] = next_id++;
+  
+  //Create Default Font
+  Log::writeLog("Building Default Font Texture", Log::INFO);
+  texture_id = 0;
+  glGenTextures(1, &texture_id);
+
+  if (texture_id == 0) return;
+
+  data = xpm_to_image(default_font, default_font_width, default_font_height);
+  
+  glBindTexture(GL_TEXTURE_2D, texture_id);
+  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, default_font_width, default_font_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  free (data);
+  textureList.push_back(texture_id);
+  texture_map["default_font"] = next_id++;
+}
+ 
+void GL::switchTexture(int texture) {
+  switchTextureID(getTextureID(texture));
+}
+
+void GL::switchTextureID(unsigned int texture) {
+  if (!glIsTexture(texture)) {
+    static GLuint default_id = getTextureID(requestTexture("default"));
+    texture = default_id;
+  }
+  glBindTexture(GL_TEXTURE_2D, texture);
 }
   
 } /* namespace Sear */

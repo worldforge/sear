@@ -74,9 +74,9 @@ public:
   int getWindowWidth() { return window_width; }
   int getWindowHeight() { return window_height; }
 
-  void switchTexture(int texture) { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
-  void switchTextureID(unsigned int texture) { glBindTexture(GL_TEXTURE_2D, texture);}
-
+  void switchTexture(int texture);// { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
+  void switchTextureID(unsigned int texture) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
+void createDefaults();
   
   std::string getActiveID() { return activeID; }
   Camera* getCamera() { return camera; }

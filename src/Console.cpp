@@ -118,6 +118,7 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
 }
 
 void Console::runCommand(const std::string &command_string) {
+  if (command_string.empty()) return; // Ignore no commanc
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(command_string);
   std::string command = tokeniser.nextToken();

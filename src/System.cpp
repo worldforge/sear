@@ -327,14 +327,19 @@ void System::mainLoop() {
       renderer->drawScene(command, false);
     } catch (ClientException ce) {
       Log::writeLog(ce.getMessage(), Log::ERROR);
+      pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
     } catch (Exception e) {
       Log::writeLog(e.getMessage(), Log::ERROR);
+      pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     } catch (Eris::InvalidOperation io) {
       Log::writeLog(io._msg, Log::ERROR);
+      pushMessage(io._msg, CONSOLE_MESSAGE);
     } catch (Eris::BaseException be) {
       Log::writeLog(be._msg, Log::ERROR);
+      pushMessage(be._msg, CONSOLE_MESSAGE);
     } catch (...) {
-      Log::writeLog("Caught Something", Log::ERROR);
+      Log::writeLog("Caught Unknown Exception", Log::ERROR);
+      pushMessage("Caught Unknown Exception", CONSOLE_MESSAGE);
     }
   }
 }

@@ -1,4 +1,8 @@
 22nd July 2002, Simon Goodall
+ * Added a built-in texture that will be used should the requested one be invalid
+ * Added a built-in font texture that will be used should the requested one be invalid
+
+22nd July 2002, Simon Goodall
  * Placed exception handling in client console commands.
  * Console command errors will print error messages to console instead of just to log
  * Fixed Config bug where random data was written to files. Caused by using unitialised arrays

@@ -13,9 +13,7 @@
 
 namespace Sear {
 
-const std::string Tokeniser::delimeters = "\" ";
-const std::string Tokeniser::quotes = "\"";
-//const std::string Tokeniser::delimeters = "\" ";
+const std::string Tokeniser::delimeters = " ";
 
 
 void ReduceToUnit(float vector[3]) {
@@ -276,6 +274,59 @@ std::string Tokeniser::remainingTokens() {
 //    return "";
 //  }
 }                                
-
   
+unsigned char *xpm_to_image(const char *image[], unsigned int width, unsigned int height) {
+  unsigned int i, row, col;
+  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
+  i = 0;
+  for ( row=0; row < height; ++row ) {
+    for ( col=0; col < width; ++col ) {
+      switch (image[height - row - 1][col]) {
+        case '.':
+          data[i++] = 0xFF;
+          data[i++] = 0xFF;
+          data[i++] = 0xFF;
+          data[i++] = 0xFF;
+          break;
+        case 'X':
+	  data[i++] = 0x0;
+	  data[i++] = 0x0;
+	  data[i++] = 0x0;
+	  data[i++] = 0x0;
+          break;
+        case ' ':
+          break;
+      }
+    }	
+  } 
+  return data;  
+}
+
+unsigned char *xpm_to_font(const char *image[], unsigned int width, unsigned int height) {
+  unsigned int i, row, col;
+  unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));
+  i = 0;
+  for ( row=0; row < height; ++row ) {
+    for ( col=0; col < width; ++col ) {
+      switch (image[height - row - 1][col]) {
+        case '.':
+          data[i++] = 0xFF;
+          data[i++] = 0xFF;
+          data[i++] = 0xFF;
+          data[i++] = 0x00;
+          break;
+        case 'X':
+	  data[i++] = 0x0;
+	  data[i++] = 0x0;
+	  data[i++] = 0x0;
+	  data[i++] = 0xFF;
+          break;
+        case ' ':
+          break;
+      }
+    }	
+  } 
+  return data;  
+}
+
 } /* namespace Sear */
