@@ -7,15 +7,15 @@ Atlas 0.4.5
 ftp://ftp.worldforge.org/pub/worldforge/libs/Atlas-C++
 
 Eris 0.9.5
-Get latest CVS versopn
-
-Varconf
 Get latest CVS version
 
-WFmath
+Varconf 0.5.3
 Get latest CVS version
 
-Skstream2
+WFmath 0.2.8
+Get latest CVS version
+
+Skstream2 0.2.4
 Get latest CVS version
 
 SDL 1.2.4 (1.2.2 will also probably work)
@@ -32,11 +32,13 @@ http://sourceforge.net/projects/lib3ds/
 
 OpenGL 1.3
 
-cal3d 0.7
+Cal3D 0.7
 http://sourceforge.net/projects/cal3d/
 
 MEDIA is not in CVS. Please see ftp for media packs, details on website.
 ftp://ftp.worldforge.org/pub/worldforge/clients/sear
+
+For Sear 0.4.x, use media-0.4.0.script and textures.cfg with the existing media pack. Place both these files in top level dir of the media pack.
 
 
 Please visit website for full instructions. 
