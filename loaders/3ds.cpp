@@ -79,14 +79,14 @@ void ThreeDS::render(bool select_mode) {
   } else {
     for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
       RenderObject *ro = *I;
-      if (std::string(ro->material_name) != current_material) {
-        Material *m = material_map[ro->material_name];
-        if (m) {
-          rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-          current_material = ro->material_name;
-        }	    
-      }
       if (ro) {
+        if (ro->material_name && std::string(ro->material_name) != current_material) {
+          Material *m = material_map[ro->material_name];
+          if (m) {
+            rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+            current_material = ro->material_name;
+          }	    
+        }
         if (current_texture != ro->texture_id) {
           if (ro->texture_data) rend->switchTexture(ro->texture_id);
           current_texture = ro->texture_id;
@@ -133,9 +133,10 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
         Lib3dsMaterial *mat=0;
         if (f->material[0]) {
           mat=lib3ds_file_material_by_name(file, f->material);
-	  ro->material_name = std::string(f->material).c_str();
+	  ro->material_name = NULL;
         }
         if (mat) {
+	  ro->material_name = std::string(f->material).c_str();
           if (!material_map[std::string(f->material)]) {
 	    Material *m = (Material*)malloc(sizeof(Material));
 	    m->ambient[0] = 0.0f;
@@ -178,21 +179,20 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
         int i;
         for (i=0; i<3; ++i) {
 	  float out[3];
-	  lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
+          lib3ds_vector_transform(out, M, mesh->pointL[f->points[i]].pos);
           out[0] -= d->pivot[0];
           out[1] -= d->pivot[1];
           out[2] -= d->pivot[2];
-	  lib3ds_vector_transform(&ro->vertex_data[v_counter], node->matrix, out);
-	  v_counter += 3;
+          lib3ds_vector_transform(&ro->vertex_data[v_counter], node->matrix, out);
+          v_counter += 3;
 
           /* It is very likely the normals have been completely messed up by these transformations */
-	  
-	  lib3ds_vector_transform(out, M,  normalL[3 * p * i]);
+	  lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
 //          out[0] -= d->pivot[0];
 //          out[1] -= d->pivot[1];
 //          out[2] -= d->pivot[2];
 	  lib3ds_vector_transform(&ro->normal_data[n_counter], node->matrix, out);
-	  n_counter += 3;
+          n_counter += 3;
 
 	  if (mesh->texels) {
             ro->texture_data[t_counter++] = mesh->texelL[f->points[i]][0];
@@ -211,14 +211,14 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
       glPushMatrix();
       for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
         RenderObject *ro = *I;
-	if (std::string(ro->material_name) != current_material) {
-	  Material *m = material_map[ro->material_name];
-	  if (m) {
-              rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-            current_material = ro->material_name;
-	  }	    
-	}
 	if (ro) {
+          if (ro->material_name && std::string(ro->material_name) != current_material) {
+            Material *m = material_map[ro->material_name];
+            if (m) {
+              rend->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+              current_material = ro->material_name;
+            }	    
+          }
           if (current_texture != ro->texture_id) {
             if (ro->texture_data) rend->switchTexture(ro->texture_id);
             current_texture = ro->texture_id;

@@ -1,3 +1,10 @@
+13th August 2002, Simon Goodall
+ * Fixed potential seg faults on 3ds loader
+  - Fault 1 caused by no material name
+  - fault 2 caused by multipling a value instead of adding to it
+
+### SEAR 0.4.0 RELEASED ### 
+
 12th August 2002, Simon Goodall
  * Fixed bug where  height map location was blanked unless explicitly added to home dir general.
  * Fixed bug where camera position was stored in config files
