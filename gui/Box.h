@@ -27,6 +27,10 @@ protected:
 public:
   virtual ~Box();
 
+  size_t size() const {
+    return m_boxContents.size();
+  }
+
   Widget * push_back(Widget *);
   void render();
 };

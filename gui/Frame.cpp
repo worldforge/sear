@@ -23,8 +23,8 @@ Frame::~Frame()
 
 void Frame::render(Render * renderer)
 {
-  static const GLushort line_up[] = {0, 1, 2};
-  static const GLushort line_down[] = {0, 3, 2};
+  static const GLushort line_up[] = {1, 0, 3};
+  static const GLushort line_down[] = {1, 2, 3};
 
   const GLshort coords[] = { m_x, m_y,
                              m_x, m_y + m_h,

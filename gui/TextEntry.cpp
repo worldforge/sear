@@ -18,7 +18,7 @@ namespace Sear {
 
 TextEntry::TextEntry(int size, const std::string & text) :
            m_frame(new Frame()), m_text(new Text("")),
-           m_caret(new Caret(16)), m_input(text),
+           m_caret(new Caret(16 * m_text->scale())), m_input(text),
            m_textOffset(0), m_size(size), m_border(4)
 {
   m_frame->down();
@@ -39,13 +39,13 @@ void TextEntry::setText()
     m_textOffset = m_caretPos ;
   }
   m_text->content() = m_input.substr(m_textOffset, std::min(m_size, m_input.size() - m_textOffset));
-  m_caret->setPos((m_caretPos - m_textOffset) * 10 + m_border + 4, m_border);
+  m_caret->setPos((m_caretPos - m_textOffset) * 10 * m_text->scale() + m_border + 4, m_border);
 }
 
 void TextEntry::map(Window * win, int x, int y, int & w, int & h)
 {
   m_text->setPos(m_border, m_border);
-  int cw = m_size * 10, ch = 16;
+  int cw = m_size * 10 * m_text->scale(), ch = 16 * m_text->scale();
   m_frame->addChild(m_text);
   m_frame->setPos(x, y);
   m_frame->setSize(m_border * 2 + cw, m_border * 2 + ch);
@@ -53,7 +53,7 @@ void TextEntry::map(Window * win, int x, int y, int & w, int & h)
   m_frame->KeyPress.connect(SigC::slot(*this, &TextEntry::onKeyPress));
   focusSignal().connect(SigC::slot(*this, &TextEntry::onFocus));
   m_frame->setEvents(MOUSE_BUTTON_DOWN | KEY_PRESS);
-  m_caret->setPos(m_caretPos * 10 + m_border + 4, m_border);
+  m_caret->setPos(m_caretPos * 10 * m_text->scale() + m_border + 4, m_border);
   win->addChild(m_frame);
   w = m_frame->w();
   h = m_frame->h();

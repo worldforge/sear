@@ -38,6 +38,10 @@ void Workspace::draw()
   Render *renderer = m_system->getGraphics()->getRender();
   renderer->setViewMode(ORTHOGRAPHIC);
 
+  glPushMatrix();
+  glTranslatef(0.f, renderer->getWindowHeight(), 0.f);
+  glScalef(1.f, -1.f, 1.f);
+
   glEnableClientState(GL_VERTEX_ARRAY);
   glLineWidth(1.0f);
 
@@ -45,6 +49,8 @@ void Workspace::draw()
   m_rootWindow->render(renderer);
 
   glDisableClientState(GL_VERTEX_ARRAY);
+
+  glPopMatrix();
 
   renderer->setViewMode(PERSPECTIVE);
 }
@@ -125,12 +131,11 @@ void Workspace::keyPress(Window & w, short x, short y, SDLKey ks, Uint16 ch)
 void Workspace::handleEvent(const SDL_Event & event)
 {
   assert(m_rootWindow != 0);
-  Render *renderer = m_system->getGraphics()->getRender();
 
   switch (event.type) {
     case SDL_MOUSEMOTION: {
         short x = event.motion.x;
-        short y = renderer->getWindowHeight() - event.motion.y;
+        short y = event.motion.y;
 
         mouseMotion(*m_rootWindow, x, y, m_oldx, m_oldy);
         m_oldx = x;
@@ -139,14 +144,14 @@ void Workspace::handleEvent(const SDL_Event & event)
       break;
     case SDL_MOUSEBUTTONDOWN: {
         short x = event.button.x;
-        short y = renderer->getWindowHeight() - event.button.y;
+        short y = event.button.y;
 
         mouseDown(*m_rootWindow, x, y);
       }
       break;
     case SDL_MOUSEBUTTONUP: {
         short x = event.button.x;
-        short y = renderer->getWindowHeight() - event.button.y;
+        short y = event.button.y;
 
         mouseUp(*m_rootWindow, x, y);
       }

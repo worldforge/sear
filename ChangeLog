@@ -1,3 +1,17 @@
+2004-12-31  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Workspace.cpp: Turn coord system upside down to match what people
+	  expect in guis.
+
+	* gui/TextEntry.cpp, gui/Text.h, gui/Text.cpp: Add a scale factor to
+	  text so its not so massive.
+
+	* gui/Box.h: Add accessor for number of contained entities, in STL
+	  container style.
+
+	* gui/Dialogue.cpp, gui/Dialogue.h: New class for top level decorated
+	  widgets.
+
 2004-12-31  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Character.cpp, src/Character.h: Change member variables to begin

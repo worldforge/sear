@@ -19,8 +19,9 @@ private:
   const Text & operator=(const Text &);
 protected:
   std::string m_content;
+  float m_scale;
 public:
-  explicit Text(const std::string &);
+  explicit Text(const std::string &, float scale = 0.7f);
   virtual ~Text();
 
   const std::string & content() const {
@@ -29,6 +30,10 @@ public:
 
   std::string & content() {
     return m_content;
+  }
+
+  float scale() const {
+    return m_scale;
   }
 
   void setContent(const std::string &);
