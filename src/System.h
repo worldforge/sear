@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.43 2004-05-17 10:39:28 simon Exp $
+// $Id: System.h,v 1.44 2004-05-23 13:32:29 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -12,9 +12,7 @@
 #include <SDL/SDL.h>
 
 #ifdef __APPLE__
-    extern "C" {
-        extern SDL_Surface* IMG_Load(const char*);
-    }
+    #include <SDL_image/SDL_image.h>
 #else
     #include <SDL/SDL_image.h>
 #endif

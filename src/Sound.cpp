@@ -10,10 +10,10 @@
 #include "Exception.h"
 #include "Console.h"
 #include "common/Log.h"
-
+#include <SDL/SDL.h>
 #include <unistd.h>
 
-// $Id: Sound.cpp,v 1.14 2004-04-27 15:07:02 simon Exp $
+// $Id: Sound.cpp,v 1.15 2004-05-23 13:32:29 jmt Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 
@@ -29,12 +29,14 @@
   static const bool debug = false;
 #endif
 namespace Sear {
+
   static const std::string PLAY_SOUND = "play_sound";
   static const std::string PLAY_SOUND_LOOP = "play_sound_loop";
   static const std::string STOP_SOUND_LOOP = "stop_sound_loop";
   static const std::string PLAY_MUSIC = "play_music";
   static const std::string STOP_MUSIC = "stop_music";
- 
+  static const std::string ENABLE_SOUND = "enable_sound";
+  
 Sound::Sound() :
   _initialised(false)
 {}
@@ -131,6 +133,7 @@ void Sound::registerCommands(Console *console) {
   console->registerCommand(STOP_SOUND_LOOP, this);
   console->registerCommand(PLAY_MUSIC, this);
   console->registerCommand(STOP_MUSIC, this);
+  console->registerCommand(ENABLE_SOUND, this);
 }
 
 void Sound::runCommand(const std::string &command, const std::string &args) {
@@ -139,6 +142,10 @@ void Sound::runCommand(const std::string &command, const std::string &args) {
   else if (command == STOP_SOUND_LOOP) stopSoundLoop();
   else if (command == PLAY_MUSIC) playMusic(args);
   else if (command == STOP_MUSIC) stopMusic();
+  else if (command == ENABLE_SOUND)
+  {
+    //setEnabled(args == "1");
+  }
 }
 
 } /* namespace Sear */

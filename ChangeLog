@@ -1,3 +1,11 @@
+2004-05-23 James Turner <james@worldforge.org>
+
+	* Twiddle SDL_mixer includes to work with the Mac package, and not pull in SDL/SDL.h
+	  in the header file (only needed in Sound.cpp)
+	* Stub in a sound enable / disable command, not hooked up right now
+	* Remove the OS-X image load code, and use the SDL_image framework instead
+	* Remove #include of config.h in Utility.h, very naughty.
+
 20th May 2004, Simon Goodall
  * More resize work
 

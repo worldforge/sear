@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.11 2004-04-26 16:01:35 simon Exp $
+// $Id: Utility.h,v 1.12 2004-05-23 13:32:29 jmt Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -11,11 +11,6 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/axisbox.h>
 #include <string>
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
-
 #include <deque>
 
 #ifdef HAVE_SSTREAM
