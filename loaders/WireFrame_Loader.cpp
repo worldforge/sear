@@ -7,9 +7,9 @@
 #include "../src/Models.h"
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
-#include "../renderers/GL.h"
 #include "../src/ObjectLoader.h"
 
+#include "../src/Utility.h"
 #include <string>
 
 namespace Sear {
@@ -31,7 +31,7 @@ Models *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const
     WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
-  model->init(GL::bboxCheck(bbox));
+  model->init(bboxCheck(bbox));
   return model;
 }
 

@@ -5,8 +5,6 @@
 #include "BoundBox.h"
 #include "../renderers/GL.h"
 
-#include <iostream>
-
 namespace Sear {
 
 BoundBox::BoundBox() :

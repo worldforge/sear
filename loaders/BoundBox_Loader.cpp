@@ -7,6 +7,7 @@
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
 #include "../renderers/GL.h"
+#include "../src/Utility.h"
 
 #include "../src/ObjectLoader.h"
 
@@ -41,7 +42,7 @@ Models *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const 
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(GL::bboxCheck(bbox), std::string("boundbox_") + type, op->wrap_texture);
+  model->init(bboxCheck(bbox), std::string("boundbox_") + type, op->wrap_texture);
   return model;
 }
 
