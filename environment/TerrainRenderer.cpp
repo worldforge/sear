@@ -282,7 +282,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         }
 
         dcol[J->first] = seg;
-        s->invalidate (false);
+//        s->invalidate (false);
       }
       // If we don't have VBO's fall back on display lists
       bool end = false;

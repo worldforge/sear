@@ -1,3 +1,9 @@
+2005-03-22  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/TerrainRenderer.cpp: Remove call to segment->invalidate
+	  which removed the normal buffer causing some wierd lighting with 
+	  vertex arrays.
+
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/3ds_Loader.cpp, loaders/LibModelFile_Loader.cpp,
