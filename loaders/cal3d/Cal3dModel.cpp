@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.5 2003-03-23 19:51:49 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.6 2003-07-15 11:11:22 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -137,7 +137,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
           // set the material diffuse color
           pCalRenderer->getDiffuseColor(&meshColor[0]);
-          diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = meshColor[3] / 255.0f;
+          diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = 255.0f;//meshColor[3] / 255.0f;
 
           // set the material specular color
           pCalRenderer->getSpecularColor(&meshColor[0]);
@@ -274,7 +274,12 @@ void Cal3dModel::action(const std::string &action) {
     m_calModel.getMixer()->clearCycle(animations[WALKING],  0.1f);
     m_calModel.getMixer()->clearCycle(animations[STANDING],  0.1f);
   } else {
-    m_calModel.getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
+//    std::string act = *animations.find(action);
+//    if (*animations.find(action) != ) {
+//      m_calModel.getMixer()->executeAction(animations[action], 0.0f, 0.0f);
+//    } else {
+      m_calModel.getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
+ //   }
   }
 }
 
@@ -301,4 +306,21 @@ std::list<std::string> Cal3dModel::getMeshNames() {
   }
   return l;
 }
+/*
+void Cal3dModel::showMesh(const std::string &mesh) {
+  int meshId = _core_model->meshes[mesh];  
+  m_calModel.attachMesh(meshId);
+}
+void Cal3dModel::showMesh(int meshId) {
+  m_calModel.attachMesh(meshId);
+}
+
+void Cal3dModel::hideMesh(const std::string &mesh) {
+  int meshId = _core_model->meshes[mesh];  
+  m_calModel.detachMesh(meshId);
+}
+void Cal3dModel::hideMesh(int meshId) {
+  m_calModel.detachMesh(meshId);
+}
+*/
 } /* namespace Sear */

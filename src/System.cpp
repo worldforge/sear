@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.61 2003-07-03 10:25:36 simon Exp $
+// $Id: System.cpp,v 1.62 2003-07-15 11:11:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -242,6 +242,7 @@ bool System::init() {
   }
   */
   _width = 640; _height = 480;
+  //_width = 800; _height = 600;
   createWindow(false);
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
@@ -518,7 +519,8 @@ void System::handleEvents(const SDL_Event &event) {
      // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
         if (!repeat) {
-          SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+          SDL_EnableKeyRepeat(1000,500);
+          //SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
           command = "";
           repeat = true;
         }

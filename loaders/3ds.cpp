@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.21 2003-03-23 19:51:49 simon Exp $
+// $Id: 3ds.cpp,v 1.22 2003-07-15 11:11:20 simon Exp $
 
 
 #include <iostream>
@@ -83,9 +83,9 @@ void ThreeDS::shutdown() {
   while (!render_objects.empty()) {
     RenderObject *ro = *render_objects.begin();
     if (ro) {
-      if (ro->vertex_data) delete (ro->vertex_data);
-      if (ro->texture_data) delete (ro->texture_data);
-      if (ro->normal_data) delete (ro->normal_data);
+      if (ro->vertex_data) delete [] (ro->vertex_data);
+      if (ro->texture_data) delete [] (ro->texture_data);
+      if (ro->normal_data) delete [] (ro->normal_data);
       delete ro;
     }
     render_objects.erase(render_objects.begin());
@@ -234,7 +234,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
-	      ro->num_points = v_counter / 3;
+	      ro->num_points = v_counter;// / 3;
 	      
               v_counter = n_counter = t_counter = 0;
 	      
@@ -265,7 +265,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
           out[1] -= d->pivot[1];
           out[2] -= d->pivot[2];
 	  lib3ds_vector_transform((float*)&ro->normal_data[n_counter], node->matrix, out);
-          n_counter += 3;
+          n_counter++;
 
 	  if (mesh->texels) {
             ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];

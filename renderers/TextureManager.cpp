@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.9 2003-06-12 20:34:53 simon Exp $
+// $Id: TextureManager.cpp,v 1.10 2003-07-15 11:11:22 simon Exp $
 
 #include "TextureManager.h"
 
@@ -61,7 +61,8 @@ static const bool DEFAULT_clamp = false;
 static const bool DEFAULT_mipmap = true;
 static const bool DEFAULT_mask = false;
 static const unsigned int DEFAULT_min_filter = GL_LINEAR;
-static const unsigned int DEFAULT_mag_filter = GL_NEAREST;
+static const unsigned int DEFAULT_mag_filter = GL_LINEAR;
+//static const unsigned int DEFAULT_mag_filter = GL_NEAREST;
 
 // Filter strings
 static const std::string FILTER_NEAREST = "nearest";

@@ -1,3 +1,8 @@
+15th July 2003, Simon Goodall
+ * Fixed bug where incorrect parent type was returned in WorldEntity::parent()
+ * Fixed typos in Call3D loader when material properties had a cut and paste error
+ * Removed some unrequired debug info
+
 3rd July 2003, Simon Goodall
  * Changed default state to allow textures so default texture is visible regardless of datafiles
  * Made default key binding of "escape" to "/quit"

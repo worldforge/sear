@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.23 2003-04-23 20:28:27 simon Exp $
+// $Id: Landscape.cpp,v 1.24 2003-07-15 11:11:22 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -183,6 +183,7 @@ void Landscape::render() {
   _renderer->translateObject(offset_x, offset_y, 0.0f);
 
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f) * _terrain->_terrain_scale;
+  //_renderer->setTextureScale(1, 2.0);
   _renderer->setTextureScale(1, _terrain->_detail_scale);
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   if (_terrain_state == -1) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.27 2003-03-06 23:50:38 simon Exp $
+// $Id: WorldEntity.cpp,v 1.28 2003-07-15 11:11:22 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -167,6 +167,7 @@ WFMath::Point<3> WorldEntity::getAbsPos() {
 
 void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Entity ID: ") + getID(), Log::LOG_DEFAULT);
+  System::instance()->pushMessage(std::string(getName()) + std::string(" - id: ") + std::string(getID()), CONSOLE_MESSAGE | SCREEN_MESSAGE);
   Log::writeLog(std::string("Entity Name: ") + getName(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Type: ") + type(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
@@ -192,12 +193,14 @@ std::string WorldEntity::type() {
 }
 
 std::string WorldEntity::parent() {
-//  Eris::TypeInfo *ti = getType();
-//  if (ti) {
-//    return *ti->getParentsAsSet().begin();
-//  }
-  if (_parents.size() > 0) return *_parents.begin();
-  else return "";
+  Eris::TypeInfo *ti = getType();
+  if (ti) {
+    if (ti->getParentsAsSet().size() > 0)
+      return *ti->getParentsAsSet().begin();
+  }
+  return "";
+//  if (_parents.size() > 0) return *_parents.begin();
+//  else return "";
 }
 
 void WorldEntity::checkActions() {

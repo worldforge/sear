@@ -179,7 +179,7 @@ void display() {
   // Set up view port
 //  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //  glLoadIdentity();
-//  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);a
+//  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
   static float ambient[] = {1.0f, 1.0f, 1.0f, 1.0f};
   static float diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
   glEnable(GL_LIGHT0);

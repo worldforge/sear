@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.6 2003-06-12 20:34:53 simon Exp $
+// $Id: TextureManager.h,v 1.7 2003-07-15 11:11:22 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -177,6 +177,7 @@ public:
  
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &arguments);
+  void setupGLExtensions();
   
 private:
   bool _initialised; ///< Flag indicating whether object has had init called
@@ -191,7 +192,6 @@ private:
   /**
    * This function is used to setup the required OpenGL texture extensions
    */ 
-  void setupGLExtensions();
   TextureObject loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);  
   void varconf_error_callback(const char *message);

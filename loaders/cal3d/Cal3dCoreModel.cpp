@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.12 2003-06-11 23:07:57 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.13 2003-07-15 11:11:22 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -48,14 +48,14 @@ static const std::string KEY_ambient_red = "ambient_red";
 static const std::string KEY_ambient_green = "ambient_blue";
 static const std::string KEY_ambient_blue = "ambient_green";
 static const std::string KEY_ambient_alpha = "ambient_alpha";
-static const std::string KEY_diffuse_red = "ambient_red";
-static const std::string KEY_diffuse_green = "ambient_blue";
-static const std::string KEY_diffuse_blue = "ambient_green";
-static const std::string KEY_diffuse_alpha = "ambient_alpha";
-static const std::string KEY_specular_red = "ambient_red";
-static const std::string KEY_specular_green = "ambient_blue";
-static const std::string KEY_specular_blue = "ambient_green";
-static const std::string KEY_specular_alpha = "ambient_alpha";
+static const std::string KEY_diffuse_red = "diffuse_red";
+static const std::string KEY_diffuse_green = "diffuse_blue";
+static const std::string KEY_diffuse_blue = "diffuse_green";
+static const std::string KEY_diffuse_alpha = "diffuse_alpha";
+static const std::string KEY_specular_red = "specular_red";
+static const std::string KEY_specular_green = "specular_blue";
+static const std::string KEY_specular_blue = "specular_green";
+static const std::string KEY_specular_alpha = "specular_alpha";
 static const std::string KEY_shininess = "shininess";
 static const std::string KEY_texture_map = "texture_map";
 	
@@ -154,11 +154,11 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
     // Create material thread and assign material to a set;
     if (_sets[set] == 0) {
       _sets[set] = set_counter++;
-      std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
+//      if (debug) std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
     }
     if (_parts[part] == 0) {
       _parts[part] = part_counter++;
-      std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
+//      if (debug) std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
     }
     _core_model->createCoreMaterialThread(_parts[part] - 1);
 //     _core_model->createCoreMaterialThread(material);
@@ -235,7 +235,6 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 	  }
         } else { // Use default texture
           std::string texture = material->getMapFilename(i);
-	  std::cout << texture << std::endl;
 	  if (texture.empty()) continue;
           unsigned int textureId = loadTexture(texture);
           if (!material->setMapUserData(i, (Cal::UserData)textureId)) {
@@ -248,7 +247,6 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 }
 
 void Cal3dCoreModel::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  std::cout << section << " - " << key << std::endl << std::flush;
   if (section == SECTION_model) {
     if (key == KEY_mesh) {}
     else if (key.substr(0, KEY_mesh.size()) == KEY_mesh) {
@@ -266,7 +264,7 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
 }
 
 void Cal3dCoreModel::varconf_error_callback(const char *message) {
-  std::cerr << message << std::endl;
+  std::cerr << message << std::endl << std::flush;
 }
 
 unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {

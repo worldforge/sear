@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.24 2003-06-11 23:07:57 simon Exp $
+// $Id: Character.cpp,v 1.25 2003-07-15 11:11:22 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -72,6 +72,9 @@ namespace Sear {
   static const std::string DROP = "drop";
   static const std::string GIVE = "give";
   static const std::string DISPLAY_INVENTORY = "inventory"; 
+
+  static const std::string SET_MATERIAL ="set_material";
+  static const std::string SET_MESH ="set_mesh";
 
   static const int server_update_interval = 500;
 
@@ -297,7 +300,8 @@ void Character::dropEntity(const std::string &name, int quantity) {
 }
 
 void Character::touchEntity(const std::string &id) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((_initialised == true) && "Character not initialised");
+  if (id.empty()) return;	
   Atlas::Objects::Operation::Touch touch;
   Atlas::Message::Object::MapType args;
 //  if (!_self) {
@@ -475,8 +479,12 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == PICKUP) System::instance()->setAction(ACTION_PICKUP);
    else if (command == TOUCH) System::instance()->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
+//   else if (command == SET_MESH) {
+ //   ObjectHandler *object_handler = _system->getObjectHandler();
+  //  ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
+   // object_record->action(command + " " + args);
+ // }
 }
-
 void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
   assert ((_initialised == true) && "Character not initialised");	
   std::cout << "Recontainered" << std::endl;

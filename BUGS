@@ -1,4 +1,11 @@
+
+
 BUGS
+ * Text box sometimes  repeatslast 3/4 chars across lines
+ * out by one on terrain
+
+
+
  * some problems with multi texturing on cal3d when model doesn't have any second texture (or even first!) breaks alpha-mapping
  * segfaults with fullscreen - win32 on call, linux when quitting
 
