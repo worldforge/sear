@@ -3,7 +3,6 @@
   - Allow paging of terrain segments
   - Allow terrain to "wrap"
   - Implement ROAM optimisations as on Flipcode and FractalScape
-  - Allow different terrain textures
   - Build terrain texture from several base textures and map data.
   - Include Random Midpoint Generation (optional/separate engine?)
 

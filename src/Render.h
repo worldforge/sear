@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.23 2003-01-11 17:18:39 simon Exp $
+// $Id: Render.h,v 1.24 2003-02-22 19:11:48 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -97,6 +97,8 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void switchTexture(int texture) =0;
   virtual void switchTextureID(unsigned int texture) =0;
+  virtual void switchMultiTexture(int texture, int) =0;
+  virtual void switchMultiTextureID(unsigned int texture, unsigned int) =0;
   virtual std::string getActiveID() =0;
 
   virtual int patchInFrustum(WFMath::AxisBox<3>) =0;
@@ -123,8 +125,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
-  virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) =0;
-  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) =0;
+  virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data,bool) =0;
+  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data,bool) =0;
   virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
 //  virtual void drawMessageQueue(QueueMap queue) =0;

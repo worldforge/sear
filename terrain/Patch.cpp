@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.12 2002-12-14 14:46:36 simon Exp $
+// $Id: Patch.cpp,v 1.13 2003-02-22 19:11:48 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -250,18 +250,39 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 //    if (_renderer->checkState(RENDER_TEXTURES)) {
       _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
 
-      float lx = leftX;
-      float ly = leftY;
-      float rx = rightX; 
-      float ry = rightY;      
-      float ax = apexX;
-      float ay = apexY;
-      lx /= (float)_landscape->patch_size;
-      ly /= (float)_landscape->patch_size;
-      rx /= (float)_landscape->patch_size;
-      ry /= (float)_landscape->patch_size;
-      ax /= (float)_landscape->patch_size;
-      ay /= (float)_landscape->patch_size;
+//      float lx = leftX ; 
+//      float ly = leftY;
+//      float rx = rightX;
+//      float ry = rightY;
+//      float ax = apexX;
+//      float ay = apexY;
+      float lx = leftX + m_WorldX;
+      float ly = leftY + m_WorldY;
+      float rx = rightX + m_WorldX;
+      float ry = rightY + m_WorldY;      
+      float ax = apexX + m_WorldX;
+      float ay = apexY + m_WorldY;
+
+      lx = lx / _landscape->map_size;
+      ly = ly / _landscape->map_size;
+      rx = rx / _landscape->map_size; 
+      ry = ry / _landscape->map_size;      
+      ax = ax / _landscape->map_size;
+      ay = ay / _landscape->map_size;
+//      float lx = leftX / _landscape->map_size;
+//      float ly = leftY / _landscape->map_size;
+//      float rx = rightX / _landscape->map_size; 
+//      float ry = rightY / _landscape->map_size;      
+//      float ax = apexX / _landscape->map_size;
+//      float ay = apexY / _landscape->map_size;
+
+      
+//      lx /= (float)_landscape->patch_size;
+//      ly /= (float)_landscape->patch_size;
+//      rx /= (float)_landscape->patch_size;
+//      ry /= (float)_landscape->patch_size;
+//      ax /= (float)_landscape->patch_size;
+//      ay /= (float)_landscape->patch_size;
 
       texture_data[t_counter][0] = lx;
       texture_data[t_counter++][1] = ly;
@@ -475,7 +496,7 @@ void Patch::render() {
 
   _renderer->store();
   _renderer->translateObject(m_WorldX, m_WorldY, 0 );
-  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0]);
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0], true);
   _renderer->restore();
 }
 
@@ -486,7 +507,7 @@ void Patch::renderWater() {
 
   _renderer->store();
   _renderer->translateObject(m_WorldX, m_WorldY, 0 );
-  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0]);
+  _renderer->renderArrays(Graphics::RES_TRIANGLES, 0, v_counter, &vertex_data[0][0], &texture_data[0][0], &normal_data[0][0], true);
   _renderer->restore();
 }
 
@@ -550,23 +571,29 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
 //    if (_renderer->checkState(RENDER_TEXTURES)) {
       _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
 
-      float lx = leftX;
-      float ly = leftY;
-      float rx = rightX; 
-      float ry = rightY;      
-      float ax = apexX;
-      float ay = apexY;
+      float lx = leftX + m_WorldX;
+      float ly = leftY + m_WorldY;
+      float rx = rightX + m_WorldX;
+      float ry = rightY + m_WorldY;      
+      float ax = apexX + m_WorldX;
+      float ay = apexY + m_WorldY;
+      lx = lx / _landscape->map_size;
+      ly = ly / _landscape->map_size;
+      rx = rx / _landscape->map_size; 
+      ry = ry / _landscape->map_size;      
+      ax = ax / _landscape->map_size;
+      ay = ay / _landscape->map_size;
 
 
-      float diff = (sin(System::instance()->getTime() / 1000.0f) - 1.0f);
-      float val = _landscape->patch_size - diff;
-
-      lx /= (float)val;
-      ly /= (float)val;
-      rx /= (float)val;
-      ry /= (float)val;
-      ax /= (float)val;
-      ay /= (float)val;
+//      float diff = (sin(System::instance()->getTime() / 1000.0f) - 1.0f);
+//      float val = _landscape->patch_size - diff;
+//
+//      lx /= (float)val;
+//      ly /= (float)val;
+//      rx /= (float)val;
+//      ry /= (float)val;
+//      ax /= (float)val;
+//      ay /= (float)val;
       
       texture_data[t_counter][0] = lx;
       texture_data[t_counter++][1] = ly;

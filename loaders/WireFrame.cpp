@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.10 2002-10-21 20:12:04 simon Exp $
+// $Id: WireFrame.cpp,v 1.11 2003-02-22 19:11:48 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -100,7 +100,7 @@ void WireFrame::render(bool) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-  _render->renderArrays(Graphics::RES_LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+  _render->renderArrays(Graphics::RES_LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL, false);
 }
 
 } /* namespace Sear */

@@ -1,3 +1,8 @@
+15th January 2002, Simon Goodall
+ * Terrain now uses a different texture map per heightmap
+ * Terrain now uses multitexturing
+ * glLockArarys used if available
+
 31st January 2003, Al Riddoch
  * Add mechanism to detect correct version of varconf on systems with varconf
    for sigc++ 1.0 and 1.2 installed.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.53 2002-12-27 00:44:57 simon Exp $
+// $Id: GL.cpp,v 1.54 2003-02-22 19:11:48 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -13,7 +13,17 @@
 #include <SDL/SDL_image.h>
 
 #include <unistd.h>
+//#define GL_GLEXT_PROTOTYPES 1
+#include <GL/gl.h>
 #include <GL/glu.h>
+
+//typedef void (*PFNGLACTIVETEXTUREARBPROC) (GLenum texture);
+//typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
+
+PFNGLACTIVETEXTUREARBPROC glActiveTexture  = NULL;
+PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture = NULL;
+PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
+PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
@@ -62,7 +72,13 @@
 #endif
 namespace Sear {
 
-	
+
+//#ifndef GL_EXT_compiled_vertex_array
+//static const bool use_ext_compiled_vertex_array = false;
+//#else
+static bool use_ext_compiled_vertex_array = false;
+static bool use_multitexturing = false;
+//#endif	
 static std::string FONT = "font";
 static std::string UI = "ui";
 static std::string SPLASH = "splash";
@@ -143,7 +159,8 @@ GL::GL() :
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
-  _initialised(false)
+  _initialised(false),
+  _multi_texture_mode(false)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -188,12 +205,12 @@ void GL::initWindow(int width, int height) {
     std::string version = string_fmt(glGetString(GL_VERSION));
     std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
   
-  if (debug) {
+//  if (debug) {
     Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
     Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
     Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
     Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
-  }
+//  }
 
   // These will be empty if there was a problem initialising the driver 
   if (vendor.empty() || renderer.empty()) {
@@ -222,6 +239,7 @@ void GL::initWindow(int width, int height) {
   
 void GL::init() {
   if (_initialised) shutdown();
+  
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
   readConfig();
@@ -468,7 +486,7 @@ void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
     glTexParameterfv(GL_TEXTURE_2D, TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
   if (use_sgis_generate_mipmap) {
-    glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+    glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
     glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
   } else {
     gluBuild2DMipmaps(GL_TEXTURE_2D, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
@@ -533,7 +551,7 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
     if (use_sgis_generate_mipmap) {
-      glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+      glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
       glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
     } else {
       gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, surface->w, surface->h, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
@@ -545,7 +563,7 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
       ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
     }
     if (use_sgis_generate_mipmap) {
-      glTexParameteri(GL_TEXTURE_2D, GENERATE_MIPMAP_SGIS, GL_TRUE);
+      glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
       glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, surface->w, surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
     } else {
       gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
@@ -750,6 +768,8 @@ void GL::readConfig() {
 
   temp = general.getItem(RENDER, KEY_far_clip_dist);
   _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
+  temp = general.getItem(RENDER, KEY_texture_scale);
+  _texture_scale = (!temp.is_double()) ? (DEFAULT_texture_scale) : ((double)(temp));
 }
 
 void GL::writeConfig() {
@@ -945,7 +965,8 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
   else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
 }
 
-void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
+void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data, bool multitexture) {
+  if (!use_multitexturing) multitexture = false;;
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -957,8 +978,17 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   glVertexPointer(3, GL_FLOAT, 0, vertex_data);
   glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && texture_data) {
-    glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    if (multitexture) {
+      glClientActiveTexture(GL_TEXTURE1);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glClientActiveTexture(GL_TEXTURE0);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    } else {	    
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
   }
   if (lighting && normal_data) {
     glNormalPointer(GL_FLOAT, 0, normal_data);
@@ -979,10 +1009,20 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
  
   glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  if (textures && texture_data) {
+    if (multitexture)  {
+      glClientActiveTexture(GL_TEXTURE1);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glClientActiveTexture(GL_TEXTURE0);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    } else {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+  }
 }
 
-void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {
+void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data, bool multitexture) {
+  if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -991,14 +1031,23 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   glVertexPointer(3, GL_FLOAT, 0, vertex_data);
   glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && texture_data) {
-    glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+     if (multitexture) {
+      glClientActiveTexture(GL_TEXTURE1);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glClientActiveTexture(GL_TEXTURE0);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    } else {	    
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
   }
   if (lighting && normal_data) {
     glNormalPointer(GL_FLOAT, 0, normal_data);
     glEnableClientState(GL_NORMAL_ARRAY);
   }
-
+  if (use_ext_compiled_vertex_array) glLockArraysEXT(0, number_of_points);
   switch (type) {
     case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
     case (Graphics::RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
@@ -1010,10 +1059,17 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     case (Graphics::RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
- 
+  if (use_ext_compiled_vertex_array) glUnlockArraysEXT();
   glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  if (textures && texture_data) {
+      glClientActiveTexture(GL_TEXTURE1);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glClientActiveTexture(GL_TEXTURE0);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    } else {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
 }
 
 unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
@@ -1235,6 +1291,13 @@ inline void GL::switchTexture(int texture) {
 }
 
 inline void GL::switchTextureID(unsigned int texture) {
+  if (_multi_texture_mode) {
+    glActiveTexture(GL_TEXTURE1);
+    glDisable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE0);
+    _multi_texture_mode = false;
+    
+  }
   if (!glIsTexture(texture)) {
     static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
     texture = default_id;
@@ -1390,6 +1453,23 @@ void GL::setupExtensions() {
   } else {
     use_ext_texture_filter_anisotropic = false;
   }
+  glActiveTexture = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTexture");
+  glClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTexture");
+  use_multitexturing = true;
+  if (!glActiveTexture){ use_multitexturing = false;  std::cerr << "no glActiveTexture" << std::endl << std::flush;}
+  if (!glClientActiveTexture) {use_multitexturing = false; std::cerr << "no glClientActiveTexture" << std::endl << std::flush;}
+   glLockArraysEXT = (PFNGLLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glLockArraysEXT");
+   glUnlockArraysEXT = (PFNGLUNLOCKARRAYSEXTPROC)SDL_GL_GetProcAddress("glUnlockArraysEXT");
+  use_ext_compiled_vertex_array = true;
+   if (!glLockArraysEXT) {
+     std::cerr << "No glLockArraysEXT" << std::endl;
+     use_ext_compiled_vertex_array = false;
+   }
+   if (!glUnlockArraysEXT) {
+     use_ext_compiled_vertex_array = false;
+     std::cerr << "No glUnlockArraysEXT" << std::endl;
+   }
+  
   /* Example use og getting a function
   
   typedef void (*GL_ActiveTextureARB_func)(unsigned int);
@@ -1523,11 +1603,45 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
       temp = config.getItem(RENDER, KEY_far_clip_dist);
       _far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
     }
+    else if (key == KEY_texture_scale) {
+      temp = config.getItem(RENDER, KEY_texture_scale);
+      _texture_scale = (!temp.is_double()) ? (DEFAULT_texture_scale) : ((double)(temp));
+    }
   }
 }
 
 std::string GL::getActiveID() {
   return (activeEntity) ? (activeEntity->getID()) : ("");
+} 
+ void GL::switchMultiTexture(int texture_1, int texture_2) {
+  switchMultiTextureID(getTextureID(texture_1), getTextureID(texture_2));
 }
-	;// { return activeID; }
+
+void GL::switchMultiTextureID(unsigned int texture_1, unsigned int texture_2) {
+  if (!use_multitexturing) switchTexture(texture_1);
+  if (!glIsTexture(texture_1)) {
+    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
+    texture_1 = default_id;
+  }
+  if (!glIsTexture(texture_2)) {
+    static GLuint default_id = getTextureID(requestTexture(DEFAULT, DEFAULT));
+    texture_2 = default_id;
+  }
+  // Assume Active texture is unit 0
+//  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture_1);
+//  glEnable(GL_TEXTURE_2D);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, texture_2);
+  glMatrixMode(GL_TEXTURE);
+  glLoadIdentity();
+  glScalef(_texture_scale, _texture_scale, 1.0f);
+  glMatrixMode(GL_MODELVIEW);
+  
+  if (!_multi_texture_mode) glEnable(GL_TEXTURE_2D);
+  glActiveTexture(GL_TEXTURE0);
+  _multi_texture_mode = true;
+}
+
+
 } /* namespace Sear */

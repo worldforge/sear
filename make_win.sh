@@ -9,10 +9,10 @@ DIR2=$CROSSTOOLS/i386-mingw32msvc/lib
 
 LIBS="-L $DIR -lSDL -lSDL_mixer -lSDL_image -lopengl32"
 
-STAT=" -lcal3d -lvarconf -leris -lsigc -l3ds -lAtlasNet -lAtlasFunky -lAtlasObjectsEntity -lAtlasObjectsOperation -lAtlasObjects -lAtlasMessage -lAtlasCodecs -lAtlas -lskstream -lwsock32 -lwfmath -leris -lglu32 -lopengl32  -lm -leris "
+STAT="-lsage -lcal3d -lvarconf -leris -lsigc -l3ds -lAtlasNet -lAtlasFunky -lAtlasObjectsEntity -lAtlasObjectsOperation -lAtlasObjects -lAtlasMessage -lAtlasCodecs -lAtlas -lskstream -lwsock32 -lwfmath -leris -lglu32 -lopengl32  -lm -leris -lsage"
 
 $WINDRES -i sear.rc -o sear_rc.o
 
-$GCC -o sear.exe src/*.o common/*.o loaders/*.o terrain/*.o sky/*.o renderers/*.o gui/*.o sear_rc.o $LIBS $STAT -lstdc++ $@
+$GCC -o sear.exe src/*.o loaders/*.o terrain/*.o sky/*.o renderers/*.o gui/*.o common/*.o sear_rc.o $LIBS $STAT -lstdc++ $@
 
 $STRIP sear.exe

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.18 2002-11-12 23:59:22 simon Exp $
+// $Id: Character.cpp,v 1.19 2003-02-22 19:11:48 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -147,6 +147,7 @@ void Character::updateLocals(bool send_to_server) {
   x = mod_speed * cos(_angle);  
   mod_speed = (_run_modifier) ? (_strafe_speed * _run_speed) : (_strafe_speed * _walk_speed);
   z += 0.0f;
+  
   y += mod_speed * -sin(_angle + (WFMath::Pi / 2.0f));
   x += mod_speed * cos(_angle + (WFMath::Pi / 2.0f));
   _time = ticks;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.14 2003-01-11 17:18:39 simon Exp $
+// $Id: BoundBox.cpp,v 1.15 2003-02-22 19:11:48 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -235,7 +235,7 @@ void BoundBox::render(bool select_mode) {
       _list_select = _render->getNewList();
       _render->beginRecordList(_list_select);
 //      _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
+      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL, false);
       _render->endRecordList();
     } 
   } else {
@@ -246,7 +246,7 @@ void BoundBox::render(bool select_mode) {
       _render->beginRecordList(_list);
       _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
       _render->switchTexture(_render->requestTexture("boundbox", _type));
-      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+      _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0], false);
       _render->endRecordList();
     } 
   }

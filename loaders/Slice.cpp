@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
+// $Id: Slice.cpp,v 1.9 2003-02-22 19:11:48 simon Exp $
 
 #include "common/Utility.h"
 
@@ -165,7 +165,7 @@ void Slice::render(bool select_mode) {
         } else {
           _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
         }
-        _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
+        _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0], false);
       }
   }
   // Render primary Slice
@@ -185,7 +185,7 @@ void Slice::render(bool select_mode) {
     } else {
       _render->switchTexture(_render->requestMipMap("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
     }
-    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0]);
+    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0][0], &slice->texture_data[0][0], &slice->normal_data[0][0], false);
   }
 }
 

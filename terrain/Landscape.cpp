@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.16 2003-02-17 16:14:06 simon Exp $
+// $Id: Landscape.cpp,v 1.17 2003-02-22 19:11:48 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -180,7 +180,9 @@ void Landscape::render() {
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange(TERRAIN);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchTexture(_renderer->requestMipMap(TERRAIN, texture_name_id));
+//    _renderer->switchTexture(_renderer->requestMipMap(TERRAIN, texture_name_id));
+//    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id),0);
+    _renderer->switchMultiTexture(_renderer->requestMipMap(TERRAIN, texture_name_id), _renderer->requestMipMap(TERRAIN, GRASS, false));
   } else {
     // Do Nothing
   }
@@ -192,7 +194,7 @@ void Landscape::render() {
 //  _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
   _renderer->stateChange(WATER);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
-    _renderer->switchTexture(_renderer->requestMipMap(WATER, WATER));
+    _renderer->switchMultiTexture(_renderer->requestMipMap(WATER, WATER), _renderer->requestMipMap(TERRAIN, GRASS, false));
   } else {
 //    //Do Nothing
   }

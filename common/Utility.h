@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.8 2002-10-30 10:03:06 simon Exp $
+// $Id: Utility.h,v 1.9 2003-02-22 19:11:48 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -76,6 +76,65 @@ std::string string_fmt(const T & t) {
   return ss.str();
 }
 #endif
+/*
+double SineSeries (double fRad, int i, int iMaxTerms) {
+  if (i > iMaxTerms) return 1.0;
+
+  return 1.0 - (fRad * fRad / (2.0 * i + 2.0) / (2.0 * i + 3.0) * SineSeries (fRad, i + 1, iMaxTerms));
+}
+
+double Sine(double fRad) {
+  const int iMaxTerms = 10;
+  return fRad * SineSeries(fRad, 0, iMaxTerms);
+}
+
+*/
+
+/*
+template <R, i> struct Sine {
+  enum { Val = 1.0 - (R * R / (2.0 * i + 2.0) / (2.0 * i + 3.0) * Sine<R, i + i >) };
+};
+
+template <> struct Sine<R, iMaxTerms > {
+  enum { Val = 1.0; };
+};
+#define SineT(n) Sine<n>::Val
+
+*/
+
+template<int N, int I>
+class Sine {
+public:
+    static inline float sin()
+    {
+        return (I*2*M_PI/N) * SineSeries<N,I,10,0>::accumulate();
+    }
+};
+
+
+// Compute J terms in the series expansion.  K is the loop variable.
+template<int N, int I, int J, int K>
+class SineSeries {
+public:
+    enum { go = (K+1 != J) };
+
+    static inline float accumulate()
+    {
+        return 1-(I*2*M_PI/N)*(I*2*M_PI/N)/(2*K+2)/(2*K+3) *
+            SineSeries<N*go,I*go,J*go,(K+1)*go>::accumulate();
+    }
+};
+
+
+// Specialization to terminate loop
+class SineSeries<0,0,0,0> {
+public:
+    static inline float accumulate()
+    { return 1; }
+};
+
+#define SineT(n) Sine<n, 10>::sin()
+
 
 template <class T>
 const T SQR(const T &t) { return t * t; }

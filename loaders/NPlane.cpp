@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.13 2002-10-21 22:24:28 simon Exp $
+// $Id: NPlane.cpp,v 1.14 2003-02-22 19:11:48 simon Exp $
 
 #include "common/Utility.h"
 
@@ -116,7 +116,7 @@ void NPlane::render(bool select_mode) {
   } else {
     _render->switchTexture(_render->requestMipMap("nplane", _type, true));
   }
-  _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 8, _vertex_data, _texture_data, _normal_data);
+  _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 8, _vertex_data, _texture_data, _normal_data,false);
 }
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.25 2003-01-11 17:18:39 simon Exp $
+// $Id: GL.h,v 1.26 2003-02-22 19:11:48 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -80,6 +80,8 @@ public:
 
   inline void switchTexture(int texture);// { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
   inline void switchTextureID(unsigned int texture) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
+  inline void switchMultiTexture(int texture, int);// { glBindTexture(GL_TEXTURE_2D, getTextureID(texture));}
+  inline void switchMultiTextureID(unsigned int texture, unsigned int) ;//{ glBindTexture(GL_TEXTURE_2D, texture);}
   void createDefaults();
   
   std::string getActiveID();// { return activeID; }
@@ -99,8 +101,8 @@ public:
   void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
-  void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
-  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
+  void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data, bool multitexture);
+  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data, bool multitexture);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
   void drawMessageQueue(MessageList &list);
@@ -134,6 +136,7 @@ protected:
   const float fov;
   const float near_clip;
   float _far_clip_dist;
+  float _texture_scale;
 
   std::map<std::string, int> texture_map;
   
@@ -181,7 +184,7 @@ protected:
 
   std::map<std::string, GLuint> _state_map;
 
-  static const unsigned int NUM_COLOURS = 500;
+  static const unsigned int NUM_COLOURS = 512;
   GLubyte colourArray[NUM_COLOURS][3];
   WorldEntity *entityArray[NUM_COLOURS];
   unsigned int colour_index;
@@ -204,6 +207,8 @@ protected:
   bool use_ext_texture_filter_anisotropic;
   bool use_sgis_generate_mipmap;
   bool _initialised;
+  bool _multi_texture_mode;
+  
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
   // Consts
@@ -258,6 +263,7 @@ private:
   static const char * const KEY_fog_end = "fog_end";
 
   static const char * const KEY_far_clip_dist = "far_clip_dist";
+  static const char * const KEY_texture_scale = "texture_scale";
   
   // Default config values
   static const float DEFAULT_character_light_kc = 1.0f;
@@ -303,6 +309,10 @@ private:
   static const float DEFAULT_fog_start = 20.0f;
   static const float DEFAULT_fog_end = 35.0f;
   static const float DEFAULT_far_clip_dist = 100.0f;
+  static const float DEFAULT_texture_scale = 100.0f;
+
+
+  
 };
 
 } /* namespace Sear */

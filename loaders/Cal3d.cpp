@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.28 2002-12-11 22:19:26 simon Exp $
+// $Id: Cal3d.cpp,v 1.29 2003-02-22 19:11:48 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -513,9 +513,9 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
         // set the vertex and normal buffers
         if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           _render->switchTextureID((unsigned int)pCalRenderer->getMapUserData(0));
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0]);
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], &meshTextureCoordinates[0][0], &meshNormals[0][0], false);
 	} else {
-          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0]);
+          _render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0][0], NULL, &meshNormals[0][0], false);
 	}
 
 

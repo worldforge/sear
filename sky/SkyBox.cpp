@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.9 2002-11-27 00:38:47 simon Exp $
+// $Id: SkyBox.cpp,v 1.10 2003-02-22 19:11:48 simon Exp $
 
 #include "common/Log.h"
 
@@ -79,22 +79,22 @@ void SkyBox::renderTextureSet(int base) {
   base *= 6; //NUM OF CUBE SIDES
   //Top
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_TOP]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 0, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 0, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
   //North
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_NORTH]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 4, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 4, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
   //South
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_SOUTH]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 8, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 8, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
   //East
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_EAST]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 12, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 12, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
   //West
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_WEST]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 16, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 16, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
   //Bottom
   _renderer->switchTexture(texture_id[base + TEXTURE_SKY_DAY_BOTTOM]);
-  _renderer->renderArrays(Graphics::RES_QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0]);
+  _renderer->renderArrays(Graphics::RES_QUADS, 20, 4, &vertex_coords[0], &texture_coords[0], &normal_coords[0],false);
 }
 
 } /* namespace Sear */

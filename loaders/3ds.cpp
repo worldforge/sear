@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.18 2003-01-11 17:18:39 simon Exp $
+// $Id: 3ds.cpp,v 1.19 2003-02-22 19:11:48 simon Exp $
 
 
 #include <iostream>
@@ -107,7 +107,7 @@ void ThreeDS::render(bool select_mode) {
       for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
         RenderObject *ro = *I;
         if (ro) {
-          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data);
+          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data, false);
         }
       }
       _render->endRecordList();
@@ -132,7 +132,7 @@ void ThreeDS::render(bool select_mode) {
             if (ro->texture_data) _render->switchTexture(ro->texture_id);
             current_texture = ro->texture_id;
           }
-          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data);
+          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
         }
       }
       _render->endRecordList();
