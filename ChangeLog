@@ -1,5 +1,11 @@
 2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Makefile.am, src/Factory.cpp, src/TerrainEntity.cpp,
+	  src/TerrainEntity.h: Create new entity subclass to handle terrain 
+	  updates.
+
+2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.in common/Makefile.am common/operations.cpp, 
 	  gui/Compass.cpp loaders/ModelHandler.cpp renderers/Frustum.cpp,
 	  renderers/GL.cpp renderers/Graphics.cpp src/Character.cpp, 

@@ -113,7 +113,8 @@ libSear_a_SOURCES = \
 	Calendar.cpp \
 	Calendar.h \
 	Editor.cpp \
-	Editor.h
+	Editor.h \
+	TerrainEntity.cpp TerrainEntity.h
 
 #	Lobby.cpp \
 #	Lobby.h \
