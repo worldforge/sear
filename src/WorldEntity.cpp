@@ -58,6 +58,17 @@ void WorldEntity::renderMessages() {
   std::list<std::string> mesgs = std::list<std::string>();
   std::list<screenMessage>::reverse_iterator I;
   for (I = messages.rbegin(); I != messages.rend(); I++) {
+	  const std::string str = (const std::string)((*I).first);
+	  std::list<std::string> message_list = std::list<std::string>();
+	  unsigned int pos = 0;
+	  while (pos < str.length()) {
+		    message_list.push_back( std::string(str, pos, pos + string_size));
+		      pos+=string_size;
+	  }
+
+
+
+/*
     const std::string str = (const std::string)((*I).first);
     std::list<std::string> message_list = std::list<std::string>();
     int pos = 0;
@@ -77,6 +88,7 @@ void WorldEntity::renderMessages() {
       message_list.push_back(str1);
       pos += string_size;
     }
+    */
     std::list<std::string>::reverse_iterator K;
     for (K = message_list.rbegin(); K != message_list.rend(); K++) {
       mesgs.push_back(*K);

@@ -1,3 +1,6 @@
+21st August 2002, Simon Goodall
+ * Fixed bug found and solved by damien when displaying speech caused a segfault on some systems.
+
 20th August 2002, Simon Goodall
  * ActionHandler will now emit an even when the character enters another container of the name: "entering_" + entity_type
 
