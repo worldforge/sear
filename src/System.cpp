@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.102 2004-10-18 21:19:58 alriddoch Exp $
+// $Id: System.cpp,v 1.103 2004-10-18 21:23:37 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,9 +49,6 @@
 
 #include "gui/Workspace.h"
 #include "gui/Toplevel.h"
-#include "gui/Box.h"
-#include "gui/Button.h"
-#include "gui/TextEntry.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -233,28 +230,9 @@ bool System::init(int argc, char *argv[]) {
 
   _workspace = new Workspace(this);
   Toplevel * t = new Toplevel("Panel");
-  t->setPos(150, 150);
-
-  HBox * hb = new HBox();
-  t->setContents(hb);
-  VBox * vb = new VBox();
-  hb->push_back(vb);
-
-  vb->push_back(new Button("Hello"));
-  vb->push_back(new Button("Goodbye"));
-  vb->push_back(new Button("Question?"));
-  vb->push_back(new Button("Hello"));
-
-  vb = new VBox();
-  hb->push_back(vb);
-
-  vb->push_back(new TextEntry(10, "Hello"));
-  vb->push_back(new TextEntry(10, "Goodbye"));
-  vb->push_back(new TextEntry(10, "Answer"));
-  vb->push_back(new TextEntry(10, "Hello"));
-
+  t->setPos(50, 50);
   _workspace->addToplevel(t);
-  _workspace->show();
+  _workspace->showAll();
   // _workspace->registerCommands(_console);
 
   int sticks = SDL_NumJoysticks();
@@ -440,7 +418,7 @@ bool System::initVideo() {
 #ifdef DEBUG
 //#warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
-  if (SDL_Init(SDL_INIT_JOYSTICK) < 0 ) {
+  if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else
   // We want release versions to die quietly
   if (SDL_Init(SDL_INIT_JOYSTICK) < 0 ) {

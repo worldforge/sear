@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.59 2004-10-18 21:19:58 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.60 2004-10-18 21:23:37 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -178,13 +178,12 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   drawWorld(select_mode, time_elapsed);
 
   if (!select_mode) {
+/* Removed for release
  
-// Removed for release
     Workspace *ws = _system->getWorkspace();
     if (ws) ws->draw();
     else throw Exception("Error no Workspace object");
-// end of removed for release
-
+*/
     Console *con = _system->getConsole();
     if (con) con->draw();
     else throw Exception("Error no Console object");
