@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.31 2004-07-29 18:27:02 simon Exp $
+// $Id: Console.cpp,v 1.32 2004-10-11 10:46:39 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -88,8 +88,8 @@ std::istream &operator>>(std::istream &IStream, std::list< std::string > &List) 
 }
 
 Console::Console(System *system) :
-  animateConsole(0),
-  showConsole(0),
+  animateConsole(true),
+  showConsole(true),
   consoleHeight(0),
   console_messages(std::list<std::string>()),
   screen_messages(std::list<screenMessage>()),

@@ -1,3 +1,7 @@
+2004-10-11  Simon Goodall  <sear@simongoodall.co.uk>
+	* src/Console.cpp: Show console by default on startup so newbie's have
+	  some idea of what to do.
+
 2004-09-29  James Turner  <james@worldforge.org>
 
 	* src/WorldEntity.cpp, src/WorldEntity.h: further code cleans-ups,
