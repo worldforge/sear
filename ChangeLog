@@ -1,4 +1,8 @@
 21st August 2002, Simon Goodall
+ * Fixed bug where two_sided_lighting was never enabled even if requested
+ * Defined default material properties for most objects instead of using whatever the last set properties were
+
+21st August 2002, Simon Goodall
  * Added support to loop sound files
  * Added ActionHandler events for walking running, and stopped
  * Stationary cally models now in idle pose

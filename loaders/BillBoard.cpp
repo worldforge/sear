@@ -44,6 +44,10 @@ void BillBoard::shutdown() {
 }
 
 void BillBoard::render(bool select_mode) {
+  static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   if (select_mode) {	
     _render->switchTexture(_render->requestTextureMask("billboard", _type));
   } else {

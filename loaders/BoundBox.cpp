@@ -142,6 +142,10 @@ void BoundBox::shutdown() {
 
 void BoundBox::render(bool select_mode) {
   if (!_render) return;
+  static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   if (select_mode) {
     _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
   } else {

@@ -70,6 +70,10 @@ void NPlane::shutdown() {
 
 void NPlane::render(bool select_mode) {
   if (!_render) return;
+  static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   //TODO, should we use one texture for the whole model, or one per plane?
   if (select_mode) {
     _render->switchTexture(_render->requestTextureMask("nplane", _type));

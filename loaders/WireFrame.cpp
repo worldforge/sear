@@ -83,6 +83,10 @@ void WireFrame::shutdown() {
 
 void WireFrame::render(bool) {
   static Render *render = System::instance()->getGraphics()->getRender();
+  static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   render->renderArrays(Graphics::RES_LINES, 0, _num_points, &_vertex_data[0][0], NULL, NULL);
 }
 

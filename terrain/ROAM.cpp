@@ -59,6 +59,10 @@ void ROAM::shutdown() {
 }
 
 void ROAM::draw() {
+  static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  _renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   render();
 }
 

@@ -700,7 +700,7 @@ void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StatePr
     if (next_state->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
     else glDisable(GL_LIGHTING);
   }
-  if (previous_state->lighting != next_state->lighting) {
+  if (previous_state->two_sided_lighting != next_state->two_sided_lighting) {
     if (next_state->lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
   }
