@@ -1,0 +1,13 @@
+ Idea:
+
+   Keep track in System of the last time mouse or joystick modified view.
+   If neither have for a short time, then run procEvent to find out
+   what we are pointing at.
+
+   Test joystick button code, and pick some suitable buttons.
+
+   Add chat entry using enter.
+
+   Do shit loads of work on the server map layout.
+
+   Chickens!
