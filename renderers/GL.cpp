@@ -175,7 +175,7 @@ static const bool debug = false;
 
 namespace Sear {
 
-void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
+bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
   _graphics = System::instance()->getGraphics();
   // Destroy the existing window
   if (m_screen != NULL) destroyWindow();
@@ -198,7 +198,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
   // Only request stencil if specified
-  if (checkState(RENDER_STENCIL)) {
+  if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
   }
 
@@ -206,6 +206,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   const SDL_VideoInfo *info = SDL_GetVideoInfo();
   if (!info) {
     Log::writeLog("Error quering video", Log::LOG_DEFAULT);
+    return false;
   }                                                                                
   /* Check is there are any modes available */
   if (debug) {
@@ -229,16 +230,15 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   if (m_fullscreen) flags |= SDL_FULLSCREEN;
   if (!(m_width && m_height)) {
     std::cerr << "Invalid resolution: " << m_width << " x " << m_height << std::endl;
-    throw;
+    return false;
   }
   if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
-                                                                                
-                                                                                
+
   //Is this the correct way to free a window?
   m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
   if (m_screen == NULL ) {
     std::cerr << "Unable to set " << m_width << " x " << m_height << " video: " << SDL_GetError() << std::endl;
-    throw ;
+    return false;
   }
   // Check OpenGL flags
   int value;
@@ -276,7 +276,8 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
                                                                                 
   // These will be empty if there was a problem initialising the driver
   if (vendor.empty() || renderer.empty()) {
-    throw Exception("Error with OpenGL system");
+    std::cerr << "Error with OpenGL system" << std::endl;
+    return false;
   }
                                                                                 
   //RenderSystem::getInstance().getStateManager()->initGL();
@@ -304,6 +305,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
+  return true;
 }
 void GL::destroyWindow() {
   RenderSystem::getInstance().invalidate();
@@ -729,21 +731,21 @@ void GL::readConfig() {
   // Setup render states
   if (general.findItem(RENDER, KEY_use_textures)) {
     temp = general.getItem(RENDER, KEY_use_textures);
-    setState(RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
   } else {
-    setState(RENDER_TEXTURES, DEFAULT_use_textures);
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, DEFAULT_use_textures);
   }
   if (general.findItem(RENDER, KEY_use_lighting)) {
     temp = general.getItem(RENDER, KEY_use_lighting);
-    setState(RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
   } else {
-    setState(RENDER_LIGHTING, DEFAULT_use_lighting);
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, DEFAULT_use_lighting);
   }
   if (general.findItem(RENDER, KEY_use_stencil)) {
     temp = general.getItem(RENDER, KEY_use_stencil);
-    setState(RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
   } else {
-    setState(RENDER_STENCIL, DEFAULT_use_stencil);
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, DEFAULT_use_stencil);
   }
 
   // Setup the speech offsets
@@ -816,9 +818,9 @@ void GL::writeConfig() {
   general.setItem(RENDER, KEY_sun_light_kq, lights[LIGHT_SUN].attenuation_quadratic);
 
   // Save render states
-  general.setItem(RENDER, KEY_use_textures, checkState(RENDER_TEXTURES));
-  general.setItem(RENDER, KEY_use_lighting, checkState(RENDER_LIGHTING));
-  general.setItem(RENDER, KEY_use_stencil, checkState(RENDER_STENCIL));
+  general.setItem(RENDER, KEY_use_textures, RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES));
+  general.setItem(RENDER, KEY_use_lighting, RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING));
+  general.setItem(RENDER, KEY_use_stencil, RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL));
   
   // Save the speech offsets
   general.setItem(RENDER, KEY_speech_offset_x, _speech_offset_x);
@@ -922,8 +924,8 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
 void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
   if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
+  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
+  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!vertex_data) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);
@@ -978,8 +980,8 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
 void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
   if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
+  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
+  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!vertex_data) return; //throw Exception(""); 
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
@@ -1113,7 +1115,7 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 void GL::drawOutline(ModelRecord *model_record) {
   StateID cur_state = RenderSystem::getInstance().getCurrentState();
   Model *model = model_record->model;
-  bool use_stencil = checkState(RENDER_STENCIL) && model_record->outline;
+  bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
   if (use_stencil) { // Using Stencil Buffer
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, -1, 1);
@@ -1146,7 +1148,7 @@ inline void GL::restore() { glPopMatrix(); }
 inline void GL::beginFrame() {
   // TODO into display list
   active_name = "";
-  if (checkState(RENDER_STENCIL)) {
+  if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     glClearStencil(1);
     glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // Clear The Screen And The Depth Buffer
   } else {
@@ -1352,15 +1354,15 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
     // Setup render states
     else if (key == KEY_use_textures) {
       temp = config.getItem(RENDER, KEY_use_textures);
-      setState(RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
     }
     else if (key == KEY_use_lighting) {
       temp = config.getItem(RENDER, KEY_use_lighting);
-      setState(RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
     }
     else if (key == KEY_use_stencil) {
       temp = config.getItem(RENDER, KEY_use_stencil);
-      setState(RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));  
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));  
     }
     // Setup the speech offsets
     else if (key == KEY_speech_offset_x) {
@@ -1396,8 +1398,8 @@ std::string GL::getActiveID() {
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
-  bool textures = checkState(RENDER_TEXTURES);
-  bool lighting = checkState(RENDER_LIGHTING);
+  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
+  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!mesh.vertex_array) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.37 2004-04-29 10:33:26 simon Exp $
+// $Id: Render.h,v 1.38 2004-05-17 14:00:25 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -34,14 +34,6 @@ class ObjectRecord;
 class Render {
 
 public:
-typedef enum {
-  RENDER_UNKNOWN = 0,
-  RENDER_LIGHTING,
-  RENDER_TEXTURES,
-  RENDER_SHADOWS,
-  RENDER_STENCIL,
-  RENDER_LAST_STATE
-} RenderState;
 
 typedef std::pair<ObjectRecord*, std::string> QueueItem;
 typedef std::list<QueueItem> Queue;
@@ -105,9 +97,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
   virtual void drawMessageQueue(MessageList &list) =0;
 
-  void setState(RenderState rs, bool state) { _renderState[rs] = state; }
-  bool checkState(RenderState rs) { return _renderState[rs]; }
-
   virtual void applyCharacterLighting(float x, float y, float z) =0;
   virtual void getFrustum(float [6][4]) =0;
 
@@ -118,8 +107,6 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void freeList(unsigned int list) = 0;
   
 protected:
-  bool  _renderState[RENDER_LAST_STATE];
-
 };
   
 } /* namespace Sear */

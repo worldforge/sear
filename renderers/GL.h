@@ -22,6 +22,7 @@
 
 #include "src/Light.h"
 #include "src/Render.h"
+#include "RenderSystem.h"
 
 namespace Sear {
 
@@ -41,7 +42,7 @@ public:GL();
   void initContext();
   void shutdown();
   void invalidate();
-  void createWindow(unsigned int width, unsigned int height, bool fullscreen);
+  bool createWindow(unsigned int width, unsigned int height, bool fullscreen);
   void destroyWindow();
   void toggleFullscreen();
 
@@ -122,6 +123,7 @@ public:
   void playList(unsigned int list) { glCallList(list); }
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
+
 protected:
   System *_system;
   Graphics *_graphics;
@@ -184,6 +186,8 @@ protected:
   bool m_initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+
+
 };
 
 

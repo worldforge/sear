@@ -116,9 +116,9 @@ StateID RenderSystem::getCurrentState() {
 }
 
 
-void RenderSystem::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
+bool RenderSystem::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
   assert (m_initialised);
-  dynamic_cast<GL*>(m_renderer)->createWindow(width, height, fullscreen);
+  return dynamic_cast<GL*>(m_renderer)->createWindow(width, height, fullscreen);
 }
 void RenderSystem::destroyWindow() {
   assert (m_initialised);

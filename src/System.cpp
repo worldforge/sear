@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.86 2004-05-17 10:39:28 simon Exp $
+// $Id: System.cpp,v 1.87 2004-05-17 14:00:25 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -248,8 +248,12 @@ std::cout << argv[i] << std::endl;
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();
-
-  RenderSystem::getInstance().createWindow(m_width, m_height, false);
+  bool success;
+  if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, false))) {
+    RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, false);
+    success = RenderSystem::getInstance().createWindow(m_width, m_height, false);
+  }
+  if (!success) return false;
 
   if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
   SDL_WM_SetIcon(_icon, NULL);

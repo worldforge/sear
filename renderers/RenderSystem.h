@@ -19,6 +19,17 @@ class Render;
 
 class RenderSystem {
 public:
+  typedef enum {
+    RENDER_UNKNOWN = 0,
+    RENDER_LIGHTING,
+    RENDER_TEXTURES,
+    RENDER_SHADOWS,
+    RENDER_STENCIL,
+    RENDER_LAST_STATE
+  } RenderState;
+
+
+
   static RenderSystem &getInstance() { return m_instance; }
 
   RenderSystem() :
@@ -51,7 +62,7 @@ public:
   Render *getRenderer() const { return m_renderer; }
  
   // Renderer Functions
-  void createWindow(unsigned int width, unsigned int height, bool fullscreen);
+  bool createWindow(unsigned int width, unsigned int height, bool fullscreen);
   void destroyWindow();
   void toggleFullscreen();
 
@@ -60,6 +71,13 @@ public:
 
   void readConfig();
   void writeConfig();
+
+  void setState(RenderState state, bool value) {
+    m_renderState[state] = value;
+  }
+  bool getState(RenderState state) const {
+    return m_renderState[state];
+  }
 
 
 private:
@@ -70,6 +88,7 @@ private:
   StateManager *m_stateManager;
   TextureManager *m_textureManager;
   Render *m_renderer;
+  bool  m_renderState[RENDER_LAST_STATE];
 };
 
 } // namespace Sear

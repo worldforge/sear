@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.45 2004-04-28 14:06:03 simon Exp $
+// $Id: Graphics.cpp,v 1.46 2004-05-17 14:00:25 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -197,7 +197,6 @@ Compare D^2 to choose what detail level to use
         Environment::getInstance().renderSky();
 	_renderer->restore();
       }
-
       // Translate camera getDist() units away from the character. Allows closups or large views
       _renderer->translateObject(0.0f, _camera->getDistance(), -1.0f);
       _renderer->applyQuaternion(orient);

@@ -1,4 +1,7 @@
 17th May 2004, Simon Goodall
+ * Futher missing stencil buffer fixes. Now try and create window. if that fails set use stencil to false and try again (if its already false, then we try twice anyway)
+
+17th May 2004, Simon Goodall
  * Fix default calendar start time
 
 17th May 2004, Simon Goodall
