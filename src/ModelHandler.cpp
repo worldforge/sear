@@ -23,6 +23,7 @@
 #include "loaders/Impostor_Loader.h"
 #include "loaders/NPlane_Loader.h"
 #include "loaders/WireFrame_Loader.h"
+#include "loaders/Slice_Loader.h"
 
 #include "Exception.h"
 #include "Model.h"
@@ -49,6 +50,7 @@ ModelHandler::ModelHandler() :
   new WireFrame_Loader(this);
   new Impostor_Loader(this);
   new NPlane_Loader(this);
+  new Slice_Loader(this);
 #ifdef HAVE_LIB3DS
   new ThreeDS_Loader(this);
 #endif

@@ -8,33 +8,33 @@
 #include "src/Render.h"
 #include "src/ModelHandler.h"
 
-#include "NPlane_Loader.h"
-#include "NPlane.h"
+#include "Slice_Loader.h"
+#include "Slice.h"
 
 namespace Sear {
 
-NPlane_Loader::NPlane_Loader(ModelHandler *mh) {
-  mh->registerModelLoader("nplane", this);
+Slice_Loader::Slice_Loader(ModelHandler *mh) {
+  mh->registerModelLoader("slice", this);
 }
 
-NPlane_Loader::~NPlane_Loader() {
+Slice_Loader::~Slice_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-Model *NPlane_Loader::loadModel(Render *render, ModelStruct &ms) {
-  NPlane *model = new NPlane(render);
+Model *Slice_Loader::loadModel(Render *render, ModelStruct &ms) {
+  Slice *model = new Slice(render);
 
   std::string type = ms.type;
-  int id = render->requestMipMap("nplane", type, true);
+  int id = render->requestMipMap("slice", type + "_0_0", true);
   if (id == -1 && ms.parent) {
     type = ms.parent;
-    id = render->requestMipMap("nplane", type, true);
+    id = render->requestMipMap("slice", type + "_0_0", true);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?
 
   }
-  model->init(type, ms.num_planes, ms.width, ms.height);
+  model->init(type, ms.width, ms.height);
   return model;
 }
 

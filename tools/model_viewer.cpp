@@ -60,6 +60,8 @@ float model_y = 0.0f;
 float model_z = 0.0f;
 int move_dir = 0;
 
+bool black = true;
+
 void reshape(int width, int height) {
   //Check for divide by 0
   if (height == 0) height = 1;
@@ -121,6 +123,7 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_i) model->action("add_0");
       else if (event.key.keysym.sym == SDLK_o) model->action("remove_0");
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
+      else if (event.key.keysym.sym == SDLK_c) black = !black;
       break;
     }
     case SDL_KEYUP: {
@@ -158,7 +161,8 @@ void display() {
 //  glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
 
   render->beginFrame();
-//  glClearColor(0.0f, 0.0f, 1.0f, 1.0f); // Colour used to clear window
+  if (black) glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Colour used to clear window
+  else glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
   WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
   orient /= WFMath::Quaternion(WFMath::Vector<3>(1.0f, 0.0f, 0.0f), _camera->getElevation());

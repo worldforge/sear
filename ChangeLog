@@ -1,4 +1,7 @@
 3rd September 2002, Simon Goodall
+ * Added first version of a slice loader. This will hopefully allow for trees as in A Tale in the Desert. Currently will load and blend in the foilage area. Trunk model not yet implemented.
+
+3rd September 2002, Simon Goodall
  * Added new class called FileHandler. Currently this allows you to add or remove search paths. It also allows searching for the first or every occurance of teh file name in the search paths. The main aim is to search for the startup and shutdown scripts. An extra command line argument has been providied to allow extra search paths for the startup scripts.
 
 2nd September 2002, Simon Goodall

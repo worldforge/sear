@@ -14,7 +14,8 @@ model_viewer_LDADD = \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderImpostor.a \
 	../loaders/libLoaderNPlane.a \
-	../loaders/libLoaderWireFrame.a 
+	../loaders/libLoaderWireFrame.a \
+	../loaders/libLoaderSlice.a 
 
 model_viewer_SOURCES = \
 	model_viewer.cpp

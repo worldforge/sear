@@ -10,7 +10,7 @@ else
 LIB3DS_LIBS = 
 endif
 
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderNPlane.a $(CAL3D_LIBS) $(LIB3DS_LIBS)
+noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderNPlane.a libLoaderSlice.a $(CAL3D_LIBS) $(LIB3DS_LIBS)
 
 INCLUDES = -I..
 
@@ -41,3 +41,8 @@ libLoader3ds_a_SOURCES = \
 libLoaderNPlane_a_SOURCES = \
 	NPlane.cpp NPlane.h \
 	NPlane_Loader.cpp NPlane_Loader.h
+
+
+libLoaderSlice_a_SOURCES = \
+	Slice.cpp Slice.h \
+	Slice_Loader.cpp Slice_Loader.h

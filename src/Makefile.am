@@ -4,6 +4,18 @@ noinst_LIBRARIES = libSear.a
 
 INCLUDES = -I..
 
+if ENABLE_CAL3D
+CAL3D_LIBS = ../loaders/libLoaderCal3d.a
+else
+CAL3D_LIBS = 
+endif
+
+if ENABLE_3DS
+LIB3DS_LIBS = ../loaders/libLoader3ds.a
+else
+LIB3DS_LIBS = 
+endif
+
 sear_LDADD = \
 	libSear.a \
 	../common/libCommon.a \
@@ -14,9 +26,10 @@ sear_LDADD = \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderBillBoard.a \
 	../loaders/libLoaderImpostor.a \
-	../loaders/libLoaderCal3d.a \
-	../loaders/libLoader3ds.a \
-	../loaders/libLoaderNPlane.a 
+	../loaders/libLoaderNPlane.a \
+	../loaders/libLoaderSlice.a \
+	$(CAL3D_LIBS) \
+	$(LIB3DS_LIBS) 
 
 sear_SOURCES = \
 	main.cpp

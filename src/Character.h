@@ -43,6 +43,7 @@ public:
   
   float getAngle() { return _angle; }
   WFMath::Quaternion getOrientation() { return _orient; }
+  WorldEntity *getSelf() { return _self; }
   void toggleRunModifier();
 
   void readConfig();
