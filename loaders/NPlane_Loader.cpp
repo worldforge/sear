@@ -25,10 +25,10 @@ Model *NPlane_Loader::loadModel(Render *render, ModelStruct &ms) {
   NPlane *model = new NPlane(render);
 
   std::string type = ms.type;
-  int id = render->requestTexture("nplane", type);
+  int id = render->requestTexture("nplane", type, true);
   if (id == -1 && ms.parent) {
     type = ms.parent;
-    id = render->requestTexture("nplane", type);
+    id = render->requestTexture("nplane", type, true);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

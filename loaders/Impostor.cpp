@@ -70,16 +70,16 @@ void Impostor::render(bool select_mode) {
     _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   } else {
     if (select_mode) {
-      _render->switchTexture(_render->requestTextureMask("impostor_front", _type));
+      _render->switchTexture(_render->requestTextureMask("impostor_front", _type, true));
     } else {
-      _render->switchTexture(_render->requestTexture("impostor_front", _type));
+      _render->switchTexture(_render->requestTexture("impostor_front", _type, true));
     }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
     if (select_mode) {
-      _render->switchTexture(_render->requestTextureMask("impostor_side", _type));
+      _render->switchTexture(_render->requestTextureMask("impostor_side", _type, true));
     } else {
-      _render->switchTexture(_render->requestTexture("impostor_side", _type));
+      _render->switchTexture(_render->requestTexture("impostor_side", _type, true));
     }
     _render->renderArrays(Graphics::RES_QUADS, 4, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   }

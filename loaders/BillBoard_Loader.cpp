@@ -26,10 +26,10 @@ Model *BillBoard_Loader::loadModel(Render *render, ModelStruct &ms) {
   BillBoard *model = new BillBoard(render);
 
   std::string type = ms.type;
-  int id = render->requestTexture("billboard", type);
+  int id = render->requestTexture("billboard", type, true);
   if (id == -1 && ms.parent) {
     type = ms.parent;
-    id = render->requestTexture("billboard", type);
+    id = render->requestTexture("billboard", type, true);
   }
   if (id == -1) {
     // TODO: what happens if we still cannot find a texture?

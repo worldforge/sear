@@ -76,9 +76,9 @@ void NPlane::render(bool select_mode) {
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   //TODO, should we use one texture for the whole model, or one per plane?
   if (select_mode) {
-    _render->switchTexture(_render->requestTextureMask("nplane", _type));
+    _render->switchTexture(_render->requestTextureMask("nplane", _type, true));
   } else {
-    _render->switchTexture(_render->requestTexture("nplane", _type));
+    _render->switchTexture(_render->requestTexture("nplane", _type, true));
   }
   _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
 }

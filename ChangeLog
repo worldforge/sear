@@ -1,4 +1,7 @@
 23rd August 2002, Simon Goodall
+ * Billboards, Impostors and NPlanes now "clamp" textures to avoid visual defects
+
+23rd August 2002, Simon Goodall
  * Added metaserver support. Currently displays active servers in stdout. use the command "/get_servers"
  * Modified Impostor code so to optionally use two textures instead of one.
 
