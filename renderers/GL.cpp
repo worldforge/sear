@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.44 2002-11-12 23:59:22 simon Exp $
+// $Id: GL.cpp,v 1.45 2002-12-09 13:28:01 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -1054,7 +1054,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       ObjectRecord *object_record = J->first;
       ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second);
       if (!model_record) {
-        std::cerr << "No model record!" << std::endl;	      
+//        std::cerr << "No model record!" << std::endl;	      
         continue;
       }
       Model *model = model_record->model;
