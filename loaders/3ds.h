@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.12 2004-06-21 12:20:31 simon Exp $
+// $Id: 3ds.h,v 1.13 2004-06-23 17:24:49 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -49,14 +49,24 @@ public:
   void setHeight(float height) { m_height = height; }
 
 protected:
-  typedef struct {
+  class RenderObject {
+public:
+   RenderObject() : 
+     vertex_data(NULL),
+     normal_data(NULL),
+     texture_data(NULL),
+     num_points(0),
+     texture_id(0),
+     texture_mask_id(0)
+ {}
     Vertex_3 *vertex_data;
     Normal *normal_data;
     Texel *texture_data;
     unsigned int num_points;
     int texture_id;
+    int texture_mask_id;
     std::string material_name;
-  } RenderObject;
+  } ;
 
   typedef struct {
     float ambient[4];

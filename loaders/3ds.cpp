@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.31 2004-06-21 12:20:31 simon Exp $
+// $Id: 3ds.cpp,v 1.32 2004-06-23 17:24:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -75,7 +75,7 @@ bool ThreeDS::init(const std::string &file_name) {
     render_file(_model);
   } else {
     for (p=_model->nodes; p!=0; p=p->next) {
-      if (debug) std::cout << "Rendering Node" << std::endl;
+//      if (debug) std::cout << "Rendering Node" << std::endl;
       render_node(p, _model);
     }
   }
@@ -122,53 +122,29 @@ void ThreeDS::invalidate() {
 }
 
 void ThreeDS::render(bool select_mode) {
-  int current_texture = -2;
   std::string current_material = "";
   _render->scaleObject(m_height);
-  if (select_mode) {
-//    if (_list_select) {
-//      _render->playList(_list_select);
-//    } else {
-//      _list_select = _render->getNewList();
-//      _render->beginRecordList(_list_select);
-      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); I++) {
-        RenderObject *ro = *I;
-        if (ro) {
-          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, NULL, ro->normal_data, false);
-        }
-//      }
-//      _render->endRecordList();
-    }
-  } else {
-//    if (_list) {
-//      _render->playList(_list);
-//    } else {
-//      _list = _render->getNewList();
-//      _render->beginRecordList(_list);
-      for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
-        RenderObject *ro = *I;
-        if (ro) {
-          if (!ro->material_name.empty() && ro->material_name != current_material) {
-            Material *m = material_map[ro->material_name];
-            if (m) {
-              _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-              current_material = ro->material_name;
-            }	    
-          }
-          if (current_texture != ro->texture_id) {
-            if (ro->texture_data) {
-              RenderSystem::getInstance().switchTexture(ro->texture_id);
-              current_texture = ro->texture_id;
-            } else {
-              RenderSystem::getInstance().switchTexture(0);
-              current_texture = 0;
-            }
-          }
-          _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
-        }
+  for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
+    RenderObject *ro = *I;
+    if (ro) {
+      if (!ro->material_name.empty() && ro->material_name != current_material) {
+        Material *m = material_map[ro->material_name];
+        if (m) {
+          _render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+          current_material = ro->material_name;
+        }	    
       }
-//      _render->endRecordList();
-//    }
+      if (ro->texture_data) {
+        if (select_mode) {
+          RenderSystem::getInstance().switchTexture(ro->texture_mask_id);
+        } else {
+          RenderSystem::getInstance().switchTexture(ro->texture_id);
+        }
+      } else {
+        RenderSystem::getInstance().switchTexture(0);
+      }
+      _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
+    }
   }
 }
 
@@ -230,43 +206,25 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	    material_map[std::string(f->material)] = m;
 	  }
 	  int texture_id = -1;
-		 /* 
-	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
-	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    std::cout << "3DS Opacity Name: " << mat->opacity_map.name << std::endl;
-	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    std::cout << "3DS Specular Name: " << mat->specular_map.name << std::endl;
-	    std::cout << "3DS Shininess Name: " << mat->shininess_map.name << std::endl;
-	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    */
+	  int texture_mask_id = -1;
           if (mat->texture1_map.name[0]) {
-//	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
 	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
-	  }  
-	  else if (mat->texture2_map.name[0]) {
-//	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture2_map.name);
-	  }  
-	  else if (mat->reflection_map.name[0]) {
-//	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->reflection_map.name);
-	  }  
-	  else if (mat->bump_map.name[0]) {
-//	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->bump_map.name);
+	    texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
 	  }  
 	  if (texture_id != -1) {
-	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
+	    if (current_texture == 0) {
+              ro->texture_id = current_texture = texture_id;
+	      ro->texture_mask_id = texture_mask_id;
+            }
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
 	      ro->num_points = v_counter;// / 3;
 	      
               v_counter = n_counter = t_counter = 0;
 	      
-              ro = new RenderObject;
-	      ro->texture_id = 0;
-//              memset(ro, 0, sizeof(RenderObject));
+              ro = new RenderObject();
 	      ro->texture_id = texture_id;
+	      ro->texture_mask_id = texture_mask_id;
               ro->num_points = 3 * mesh->faces;
               ro->vertex_data = new Vertex_3[ro->num_points];
               ro->normal_data = new Normal[ro->num_points];
@@ -326,9 +284,7 @@ void ThreeDS::render_file(Lib3dsFile *file) {
       unsigned int v_counter = 0;
       unsigned int n_counter = 0;
       unsigned int t_counter = 0;
-      RenderObject *ro = new RenderObject;
-	      ro->texture_id = 0;
-//      memset(ro, 0, sizeof(RenderObject));
+      RenderObject *ro = new RenderObject();
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;
       ro->vertex_data = new Vertex_3[ro->num_points];
@@ -345,7 +301,7 @@ void ThreeDS::render_file(Lib3dsFile *file) {
         if (mat) {
 	  ro->material_name = std::string(f->material);
           if (!material_map[std::string(f->material)]) {
-	    Material *m = new Material;//(Material*)malloc(sizeof(Material));
+	    Material *m = new Material;
 	    m->ambient[0] = 0.0f;
 	    m->ambient[1] = 0.0f;
 	    m->ambient[2] = 0.0f;
@@ -364,42 +320,25 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 	    material_map[std::string(f->material)] = m;
 	  }
 	  int texture_id = -1;
-		  /*
-	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
-	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    std::cout << "3DS Opacity Name: " << mat->opacity_map.name << std::endl;
-	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    std::cout << "3DS Specular Name: " << mat->specular_map.name << std::endl;
-	    std::cout << "3DS Shininess Name: " << mat->shininess_map.name << std::endl;
-	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    */
+	  int texture_mask_id = -1;
           if (mat->texture1_map.name[0]) {
-//	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
 	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
-	  }  
-	  else if (mat->texture2_map.name[0]) {
-//	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture2_map.name);
-	  }  
-	  else if (mat->reflection_map.name[0]) {
-//	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->reflection_map.name);
-	  }  
-	  else if (mat->bump_map.name[0]) {
-//	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    texture_id = RenderSystem::getInstance().requestTexture(mat->bump_map.name);
+	    texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
 	  }  
 	  if (texture_id != -1) {
-	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
+	    if (current_texture == 0) {
+              ro->texture_id = current_texture = texture_id;
+	      ro->texture_mask_id = texture_mask_id;
+            }
             if (texture_id != current_texture) {
 	      current_texture = texture_id;
 	      ro->num_points = v_counter;
 	      
               v_counter = n_counter = t_counter = 0;
 	      
-              ro = new RenderObject;//*)malloc(sizeof(RenderObject));
-//              memset(ro, 0, sizeof(RenderObject));
+              ro = new RenderObject();
 	      ro->texture_id = texture_id;
+	      ro->texture_mask_id = texture_mask_id;
               ro->num_points = 3 * mesh->faces;
               ro->vertex_data = new Vertex_3[ro->num_points];
               ro->normal_data = new Normal[ro->num_points];

@@ -1,3 +1,6 @@
+2004-06-23  Simon Goodall  <simon@simongoodall.co.uk>
+	* loaders/3ds.cpp,loaders/3ds.h: Make use of "masking" function to allow alpha mapped textures during selection. Remove uneeded code.
+
 2004-06-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp: Fix the position of entities passed to other
