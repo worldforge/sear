@@ -1,3 +1,5 @@
 .deps
+.libs
+model_viewer
 Makefile
 Makefile.in

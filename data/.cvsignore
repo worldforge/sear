@@ -4,4 +4,6 @@ bindings.cfg
 buildings.cfg
 general.cfg
 general_files.cfg
+models.cfg
+object_file.cfg
 states.cfg
