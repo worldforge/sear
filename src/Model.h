@@ -1,14 +1,16 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.6 2004-04-26 15:45:44 simon Exp $
+//$Id: Model.h,v 1.7 2004-06-13 18:21:01 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
 
 #include <map>
 #include <string>
+
+#include <Atlas/Message/Element.h>
 
 #include "Render.h"
 #include "Graphics.h"
@@ -33,6 +35,9 @@ public:
 
   virtual bool useTextures() { return false; }
   virtual void action(const std::string &action) {}
+  virtual void setAppearance(Atlas::Message::Element::MapType &mt) {
+  std::cout << "No app" << std::endl;
+  }
 
   virtual void setFlag(const std::string &flag, bool state) { _flag_map[flag] = state; }
   virtual bool getFlag(const std::string &flag) { return _flag_map[flag]; }

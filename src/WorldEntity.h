@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.14 2004-06-10 21:04:14 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.15 2004-06-13 18:21:01 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -12,6 +12,7 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
+#include <Eris/Types.h>
 #include <Eris/World.h>
 
 //#include "ObjectLoader.h"
@@ -56,6 +57,9 @@ protected:
   static const int string_size = 40;
   std::string last_action;
   std::string last_mode;
+  
+  void sigChanged(const Eris::StringSet &ss);
+friend class Character;
 };
 
 } /* namespace Sear */

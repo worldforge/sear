@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.11 2004-04-27 15:07:02 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.12 2004-06-13 18:21:01 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -221,16 +221,80 @@ void Cal3dModel::action(const std::string &action) {
   }
 }
 
+void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
+  std::cout << "------" << std::endl;
+
+  // Get mesh atrributes
+  Atlas::Message::Element::MapType::const_iterator I = map.find("mesh");
+  if (I == map.end()) {
+    std::cout << "No 'mesh' found -- using defaults" << std::endl;
+    // instantiate defaults
+    Atlas::Message::Element::MapType meshes;
+    for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
+    std::string name = J->first;
+//    if (name.find("_") != std::string::npos)
+      meshes[name.substr(0, name.find("_") - 1)] = "1";
+    }
+    map["mesh"] = meshes;
+    I = map.find("mesh");   
+  }
+  const Atlas::Message::Element::MapType meshes = I->second.asMap();
+  I = map.find("material");
+  if (I == map.end()) {
+    // instantiate defaults
+    map["material"] = Atlas::Message::Element::MapType();
+    I = map.find("material");
+  }
+  const Atlas::Message::Element::MapType materials = I->second.asMap();
+
+
+  // Make sure only single val meshes are attached
+  for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
+    std::string name = J->first;
+    if (name.find("_") != std::string::npos)
+      m_calModel.detachMesh(_core_model->_meshes[name]);
+  }
+
+  // Attach meshes and set materials 
+  for (I = meshes.begin(); I != meshes.end(); ++I) {
+    std::string name = I->first;
+    std::string value = I->second.asString();
+    // Attach mesh
+    if (_core_model->_meshes.find(name + "_" + value) 
+      != _core_model->_meshes.end()) {
+      m_calModel.attachMesh(_core_model->_meshes[name + "_" + value]);
+    // Set material set
+    
+    Atlas::Message::Element::MapType::const_iterator K = materials.find(name);
+    if (K != materials.end()) {
+      setMaterialPartSet(name + "_" + value, K->second.asString());
+    } else {
+      // set default material
+      setMaterialPartSet(name + "_" + value, "default");
+//      materials[name] = "default";
+    }
+    }
+  }
+  for (I = materials.begin(); I != materials.end(); ++I) {
+    std::string name = I->first;
+    std::string value = I->second.asString();
+    setMaterialPartSet(name, value);
+  }
+}
+
 void Cal3dModel::setMaterialSet(unsigned int set) {
   m_calModel.setMaterialSet(set);
 }
 
-void Cal3dModel::setMaterialPartSet(unsigned int set, unsigned int msh) {
+void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
+ std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
   //TODO make this do the correct thing!
 //  m_calModel.setMaterialSet(set);
   // Get mesh name
   CalMesh *mesh = m_calModel.getMesh(msh);
-  mesh->setMaterialSet(set);
+  if (mesh) {
+    mesh->setMaterialSet(set - 1);
+  }
 }
 
 std::list<std::string> Cal3dModel::getMaterialNames() {

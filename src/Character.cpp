@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.37 2004-06-10 21:04:14 alriddoch Exp $
+// $Id: Character.cpp,v 1.38 2004-06-13 18:21:01 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -16,6 +16,7 @@
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 #include <Eris/Avatar.h>
+#include <Eris/Player.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -24,15 +25,20 @@
 #include "WorldEntity.h"
 #include "EventHandler.h"
 #include "Event.h"
+#include "client.h"
 #include "System.h"
 #include "Character.h"
 #include "Console.h"
 #include "Render.h"
 #include "Graphics.h"
+#include "ObjectHandler.h"
+#include "ObjectRecord.h"
 
 #include <wfmath/atlasconv.h>
 
 #include <Atlas/Objects/Operation/Create.h>
+#include <Atlas/Objects/Operation/Set.h>
+#include <Atlas/Message/Element.h>
 
 
 #ifdef USE_MMGR
@@ -98,6 +104,8 @@ const float Character::CMD_modifier = 9999.9f;
 static const std::string STOPPED = "stopped_";
 static const std::string WALKING = "walking_";
 static const std::string RUNNING = "running_";
+
+static const std::string GUISE = "guise";
 
 Character::Character(Eris::Avatar *avatar) :
   _avatar(avatar),
@@ -404,6 +412,9 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(MAKE, this);
   console->registerCommand(TOUCH, this);
   console->registerCommand(SAY, this);
+  console->registerCommand("set_app", this);
+  console->registerCommand("clear_app", this);
+  console->registerCommand("read_app", this);
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
@@ -446,6 +457,29 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    else if (command == TOUCH) System::instance()->setAction(ACTION_TOUCH);
    else if (command == DISPLAY_INVENTORY) displayInventory();
    else if (command == MAKE) make(args);
+   else if (command == "clear_app") clearApp();
+   else if (command == "set_app") {
+     std::string map = tokeniser.nextToken();
+     std::string name = tokeniser.nextToken();
+     std::string value = tokeniser.remainingTokens();
+     setAppearance(map, name, value);
+    }
+  else if (command == "read_app") {
+    ObjectHandler *object_handler = System::instance()->getObjectHandler();
+    Atlas::Message::Element::MapType mt;
+    ObjectRecord *record = NULL;
+    if (object_handler) record = object_handler->getObjectRecord(_self->getID());
+    if (_self->hasProperty(GUISE)) { // Read existing values
+      mt = _self->getProperty(GUISE).asMap();
+      if (record) record->setAppearance(mt);
+    } else { // Set defaults and send to server
+      if (record) {
+        record->setAppearance(mt);
+        _self->setProperty(GUISE, mt);
+        setApp();
+      }
+    }
+  }
 //   else if (command == SET_MESH) {
  //   ObjectHandler *object_handler = _system->getObjectHandler();
   //  ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
@@ -482,5 +516,64 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
     }
   }
 }
+
+void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
+  if (!name.empty()) {
+    Atlas::Message::Element::MapType mt;
+    if (_self->hasProperty(GUISE)) {
+      mt = _self->getProperty(GUISE).asMap();
+    }
+    Atlas::Message::Element::MapType::iterator I = mt.find(map);
+    if (I != mt.end()) {
+      I->second.asMap()[name] = value;
+    } else {
+      Atlas::Message::Element::MapType m;
+      m[name] = value;
+      mt[map] = m;
+    }
+    _self->setProperty(GUISE, mt);
+  }
+  setApp();
+}
+
+void Character::clearApp() {
+  assert ((_initialised == true) && "Character not initialised");
+  Atlas::Objects::Operation::Set set;
+  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
+
+  Atlas::Message::Element::MapType msg;
+  const Atlas::Message::Element::MapType mt;
+  msg["id"] = _self->getID();
+  msg[GUISE] = mt;
+
+  set.setArgs(Atlas::Message::Element::ListType(1, msg));
+  _avatar->getWorld()->getConnection()->send(set);
+}
+
+
+
+void Character::setApp() {
+  assert ((_initialised == true) && "Character not initialised");
+  Atlas::Objects::Operation::Set set;
+  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
+//  set.setFrom(_self->getID());
+//  set.setFrom(_self->getID());
+
+  Atlas::Message::Element::MapType msg;
+  const Atlas::Message::Element::MapType mt = _self->getProperty(GUISE).asMap();
+
+//  msg["loc"] = _self->getContainer()->getID();
+//  WFMath::Point<3> pos = _self->getPosition() + WFMath::Vector<3>(2,0,0);
+//  msg["pos"] = pos.toAtlas();
+//  msg["parents"] = Atlas::Message::Element::ListType(1, arg);
+
+//  set.sendFrom(_self->getID());
+  msg["id"] = _self->getID();
+  msg[GUISE] = mt;
+
+  set.setArgs(Atlas::Message::Element::ListType(1, msg));
+  _avatar->getWorld()->getConnection()->send(set);
+}
+
 
 } /* namespace Sear */

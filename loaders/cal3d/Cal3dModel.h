@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.6 2004-04-26 15:45:20 simon Exp $
+// $Id: Cal3dModel.h,v 1.7 2004-06-13 18:21:01 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -40,6 +40,7 @@ public:
   void setLodLevel(float lodLevel);
 
   void action(const std::string &action);
+  void setAppearance(Atlas::Message::Element::MapType &map);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
  
   void setHeight(float height) { _height = height; }
@@ -78,7 +79,7 @@ private:
 //  static float _run_blend[];
 //  static float _strut_blend[];
   float m_rotate;
-
+  std::string current_head;
 };
 
 

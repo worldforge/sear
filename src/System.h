@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.46 2004-05-30 18:52:05 jmt Exp $
+// $Id: System.h,v 1.47 2004-06-13 18:21:01 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -193,7 +193,7 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-
+  Client *getClient() { return _client; }
 protected:
   bool repeat; 
   int action;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.21 2004-05-19 17:52:19 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.22 2004-06-13 18:21:01 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -158,7 +158,7 @@ printf("Rotate %f\n", m_rotate);
     int length =  material_name.find_first_of("_");
     std::string set = material_name.substr(0,length);
     std::string part = material_name.substr(length + 1);
-    
+   std::cout << "Set: " << set << " - Part: " << part << std::endl;
     int material = _core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
     if (material == -1) {
       std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
@@ -169,16 +169,18 @@ printf("Rotate %f\n", m_rotate);
     // Create material thread and assign material to a set;
     if (_sets[set] == 0) {
       _sets[set] = set_counter++;
-//      if (debug) std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
+//      if (debug)
+ std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
     }
     if (_parts[part] == 0) {
       _parts[part] = part_counter++;
-//      if (debug) std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
+//      if (debug)
+ std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
     }
     _core_model->createCoreMaterialThread(_parts[part] - 1);
 //     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
-    _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);    
+    _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);
   }
   // Check for custom material settings
   for (MaterialsMap::const_iterator I = _materials.begin(); I != _materials.end(); ++I) {

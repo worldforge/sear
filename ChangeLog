@@ -1,4 +1,7 @@
 2004-06-13  Simon Goodall  <simon@simongoodall.co.uk>
+	* Initial workings to allow appearance attributes of character to be changed. /read_app reads the properties from the server. /set_app is used to set mesh and material properties. E.g. "/set_app mesh head 1" changes head mesh. "/set_app material head alternative" changes head material. /clear_app clears current settings
+
+2004-06-13  Simon Goodall  <simon@simongoodall.co.uk>
 	* Fix bug where the render active name function did select the correct state to render with.
 
 2004-06-13  Al Riddoch  <alriddoch@zepler.org>

@@ -2,18 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.36 2004-06-10 21:04:14 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.37 2004-06-13 18:21:01 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 
-#include "System.h"
+#include <Atlas/Message/Element.h>
+
 #include <wfmath/axisbox.h>
+#include <Eris/Types.h>
 #include <Eris/TypeInfo.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "System.h"
 #include "Console.h"
 #include "Event.h"
 #include "EventHandler.h"
@@ -42,6 +45,7 @@ namespace Sear {
 
 static const std::string ACTION = "action";
 static const std::string MODE = "mode";
+static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
    Eris::Entity(ge, world),
@@ -50,7 +54,7 @@ WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::Wor
    abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
    messages(std::list<message>())
 {
-
+  Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
 }
 
 WorldEntity::~WorldEntity() {
@@ -237,6 +241,7 @@ std::string WorldEntity::parent() {
 }
 
 void WorldEntity::checkActions() {
+  return;
   ObjectHandler *object_handler = System::instance()->getObjectHandler();
 
   // TODO possibility to link into action handler
@@ -264,6 +269,37 @@ void WorldEntity::checkActions() {
   } else {
     last_mode == "";
   }
+}
+
+void WorldEntity::sigChanged(const Eris::StringSet &ss) {
+  ObjectHandler *object_handler = System::instance()->getObjectHandler();
+  for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
+    std::string str = *I;
+    if (str == MODE) {
+      const std::string mode = getProperty(MODE).asString();
+      if (mode != last_mode) {
+        ObjectRecord *record = NULL;
+        if (object_handler) record = object_handler->getObjectRecord(getID());
+        if (record) record->action(mode);
+        last_mode = mode;
+      }
+    } else if (str == ACTION) {
+      const std::string action = getProperty(ACTION).asString();
+      if (action != last_action) {
+        ObjectRecord *record = NULL;
+        if (object_handler) record = object_handler->getObjectRecord(getID());
+        if (record) record->action(action);
+        last_action = action;
+      }
+    } else if (str == GUISE) {
+      Atlas::Message::Element::MapType mt = getProperty(GUISE).asMap();
+      ObjectRecord *record = NULL;
+      if (object_handler) record = object_handler->getObjectRecord(getID());
+      if (record) record->setAppearance(mt);
+    }
+
+  }
+
 }
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.58 2004-05-14 12:17:21 simon Exp $
+// $Id: client.cpp,v 1.59 2004-06-13 18:21:01 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -42,6 +42,8 @@
 #include "Render.h"
 #include "ModelHandler.h"
 #include "Model.h"
+#include "ObjectHandler.h"
+#include "ObjectRecord.h"
 #include "Exception.h"
 #include "WorldEntity.h"
 
@@ -551,6 +553,13 @@ void Client::Entered(Eris::Entity* e){
 
 void Client::Appearance(Eris::Entity *e){
 if (debug)  Log::writeLog(std::string("Appearance: ") + e->getName(), Log::LOG_INFO);
+  if (!e->hasProperty("guise")) return;
+
+  Atlas::Message::Element::MapType mt = e->getProperty("guise").asMap();    ObjectRecord *record = NULL;
+  ObjectHandler *object_handler = System::instance()->getObjectHandler();
+  if (object_handler) record = object_handler->getObjectRecord(e->getID());
+  if (record) record->setAppearance(mt);
+
 //  ((WorldEntity *)e)->handleMove();
 //  static ModelHandler *mh =  _system->getModelHandler();
 //  Model *m = mh->getModel(NULL, (WorldEntity*)e);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.16 2004-05-14 12:17:21 simon Exp $
+// $Id: client.h,v 1.17 2004-06-13 18:21:01 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -91,7 +91,9 @@ public:
   void runCommand(const std::string &command, const std::string &args);
   void getServers();
   void stopServers();
-  
+ 
+  Eris::Player *getPlayer() { return _player; }
+ 
 protected:
   //Callbacks
 
