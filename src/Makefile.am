@@ -40,11 +40,11 @@ SEAR_EXT_LIBS = \
 	/usr/lib/libAtlas-0.5.a \
 	/usr/lib/libwfmath-0.3.a \
 	/usr/local/lib/libsage.a \
-	/usr/lib/lib3ds.a \
+	/usr/local/lib/lib3ds.a \
 	/usr/local/lib/libcal3d.a \
 	/usr/X11R6/lib/libGLU.a \
-	/usr/lib/gcc/i386-redhat-linux/3.4.2/libstdc++.a \
-	/usr/lib/gcc/i386-redhat-linux/3.4.2/libgcc.a \
+	$(STATIC_LIBSTDCPP) \
+	$(STATIC_LIBGCC) \
 	/usr/lib/libGL.so \
 	-lc -lm -lpthread -lgcc_s
 else

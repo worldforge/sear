@@ -77,11 +77,16 @@ AC_ARG_ENABLE(mmgr,
 )
 AM_CONDITIONAL(MMGR, test x"$use_mmgr" = xtrue)
 
+STATIC_LIBSTDCPP=
+STATIC_LIBGCC=
+
 AC_ARG_ENABLE(static_build,
   [  --enable-static-build	enable static link of some libs [default=no]],
   [
     if test "$enableval" = "yes"; then
       link_static="true"
+      STATIC_LIBSTDCPP=`$CXX -print-file-name=libstdc++.a`
+      STATIC_LIBGCC=`$CXX -print-file-name=libgcc.a`
     else
       link_static="false"
     fi
@@ -267,6 +272,8 @@ dnl SDL adds itself to LIBS
 LIBS=
 
 AC_SUBST(SEAR_LIBS)
+AC_SUBST(STATIC_LIBSTDCPP)
+AC_SUBST(STATIC_LIBGCC)
 
 dnl Generate files
 AC_OUTPUT([
