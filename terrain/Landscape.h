@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.6 2002-12-06 21:14:03 simon Exp $
+// $Id: Landscape.h,v 1.7 2002-12-07 17:34:53 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -76,7 +76,9 @@ public:
     _renderer(renderer),
     _terrain(terrain),
     _right(right),
-    _bottom(bottom)
+    _bottom(bottom),
+    min_height(9999.0f),
+    max_height(9999.0f)
   {}
   virtual ~Landscape() {}
 //  static
@@ -121,6 +123,10 @@ public:
     if (x < NUM_PATCHES_PER_SIDE && y < NUM_PATCHES_PER_SIDE) return &m_Patches[x][y];
     else return NULL;
   }
+
+  void SetVisibility();
+  bool m_isVisible;
+  float min_height, max_height;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.28 2002-11-12 23:59:22 simon Exp $
+// $Id: ModelHandler.cpp,v 1.29 2002-12-07 17:34:53 simon Exp $
 
 //#include "config.h"
 
@@ -123,7 +123,8 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   ModelRecord *model = NULL;
   varconf::Config &model_config = System::instance()->getModelRecords();
   std::string model_loader = (std::string)model_config.getItem(model_id, ModelRecord::MODEL_LOADER);
-  
+
+  if (model_loader.empty()) return NULL; 
   if (_model_loaders[model_loader]) model = _model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
   else {
     std::cerr << "No loader found: " << model_loader << std::endl;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.25 2002-10-21 22:24:28 simon Exp $
+// $Id: Cal3d.cpp,v 1.26 2002-12-07 17:34:53 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -176,6 +176,7 @@ unsigned int Cal3d::loadTexture(const std::string& strFilename)
     delete [] pBuffer;
   } else {
     SDL_Surface * image = System::loadImage(strFilename);
+    if (image == NULL) return 0;
     textureId = _render->createTexture((unsigned int)image->w, (unsigned int)image->h,(unsigned int)image->format->BytesPerPixel,(unsigned char *)image->pixels, false);
     SDL_FreeSurface(image);
   }
@@ -478,6 +479,11 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
           specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
 
 
+//          _render->setMaterial(&ambient[0], NULL, &specular[0], 50.0f, NULL);
+//	  cout << ambient[0] << "," << ambient[1] << "," << ambient[2]<< "," << ambient[3] << endl;
+//	  cout << diffuse[0] << "," << diffuse[1] << "," << diffuse[2]<< "," << diffuse[3] << endl;
+	 // THIS IS A QUICK HACK SO WE CAN ENABLE ALPHA AND LIGHTING AT THE SAME TIME
+	 diffuse[3] = 1.0f;
           _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
 	}
 	

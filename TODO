@@ -1,36 +1,39 @@
- * Setup system to update values as varconf values update
-  - Every object that uses a varconf object could connect a callback to the object.
-  - Existing system works ok, but not great as it must be manually run after new values have been read in.
-
- * Allow general varconf object to parse command line.
-
- * Add support for OpenGL extensions. This is to provide higher quality effects.
  
+ * Terrain engine improvements
+  - Allow paging of terrain segments
+  - Allow terrain to "wrap"
+  - Implement ROAM optimisations as on Flipcode and FractalScape
+  - Allow different terrain textures
+  - Build terrain texture from several base textures and map data.
+  - Include Random Midpoint Generation (optional/separate engine?)
+
+ * Implement a GUI system such as GLGooey
+  - Allow console line editing
+
  * Add ability to tokenise on quotes, not just spaces. This is a must. can only have one arg with spaces at the mo.
 
- * Allow line editing in console.
+ * Allow varconf object to parse command line for general configuration.
 
- * In game menu for configuration -> work on GLGooey interface
-
+ * Rendering Improvements
+  - Support more OpenGL extensions.
+  - Implement shadows (Volumes/Maps)
+  - Implements Per-Pixel lighting and associated techniques
+  - Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
+  - Allow access to cube mapping for sky boxa
+  - Add sun/lens glare effects
+  - Add wavy grass like in ATITD
+  - Add foot prints
+ 
  * Improve memory usage
    - Unload unused textures and other such data during runtime.
    - SDL_mixer (or maybe SDL sound subsystem) doesn't clean up properly
    - Eris doesn't clean up properly
 
- * Add a BSP tree or other space partitioning system. This is to a) reduce number of objects rendered and b) provide distance information for choosing an appropriate quality of model to render
-
- * Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
-
- * Add a better GUI
-   - First step is to add a gui_queue for rendering. This starts with the splash screen, then with anything else such as entity text
-   - Finally render console.
-
- * Add collision detection
-   - This can be as an addition to the BSP tree or equivalent code
-
- * Improve terrain engine
-   - Include demetar?
-   - Look in gamedev/flipcode for the possible additions to current terrain engine
+ * Add an oct tree or other space partitioning system.
+  - Provide basis for collision detection code
+  - Reduce number of entities to render
+  - Can link nodes to an "indoor" engine
+  - Use to provide distance info for rendering options
 
  * Add support to create custom font textures from say freetype
 
@@ -43,3 +46,44 @@
 
  * Improve Sound/Music System
  Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org
+
+ * Include sound/music media in media pack
+
+ * Create a calender object.
+  - Records passage of time
+  - Used by other system components to render specific "time/date" based objects (sun/moon/stars etc.)
+
+ * Add weather effects
+  - Query weather entity
+
+ * Create a texture handling class.
+  - Loads and unloads textures as required
+  - Can perform transformations on textures
+  - Provides aliases for textures (ie, 3ds models have texture names built in)
+
+ * Create a file handling class
+  - Allows memory mapping if appropriate
+  - Allow file access from archives
+  - transparent access bewtween file system and archives
+
+ * Create a light management class
+  - Store type/position/emissive info about each light source
+  - Determines light priority order (render N most appropriate light sources)
+ 
+ * Create a particle engine for special effects
+  - Smoke
+  - Flames
+  - Fog
+
+ * Improve scripting engine
+  - Character manipulation
+  - Animation control
+  - Init special effects
+
+ * Allow character portraits
+
+ * Cally improvements
+  - Make model heads turn to face the way the camera is looking
+  - Allow skinning
+  - Improve animation/mesh changing 
+

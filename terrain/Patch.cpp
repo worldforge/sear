@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.10 2002-12-06 21:14:03 simon Exp $
+// $Id: Patch.cpp,v 1.11 2002-12-07 17:34:53 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -32,19 +32,24 @@
   static const bool debug = false;
 #endif
 
+#define DEF_VAL 9999.0f
+  
 namespace Sear {
 
 Patch::Patch() :
   _renderer(NULL),
   _terrain(NULL),
-  _landscape(NULL)
-
+  _landscape(NULL),
+  min_height(DEF_VAL),
+  max_height(-DEF_VAL)
 {}
 
 Patch::Patch(Render* render, ROAM *roam, Landscape *landscape) :
   _renderer(render),
   _terrain(roam),
-  _landscape(landscape)
+  _landscape(landscape),
+  min_height(DEF_VAL),
+  max_height(-DEF_VAL)
 {}
 
 Patch::~Patch() {}
@@ -121,9 +126,9 @@ void Patch::RecursTessellate( TriTreeNode *tri,
   
   if ( node < var_depth) {
     // Extremely slow distance metric (sqrt is used).
-    // Replace this with a faster one!
-	   
-    WFMath::Point<3> v = ((WorldEntity*)Eris::World::Instance()->getFocusedEntity())->getAbsPos();
+    // Replace this with a faster one! 
+    WorldEntity *focus = ((WorldEntity*)Eris::World::Instance()->getFocusedEntity());
+    WFMath::Point<3> v = focus->getAbsPos();
 //    cout << _landscape->offset_x << endl;
 //    cout << _landscape->offset_y << endl;
     float x = v.x() - (centerX + _landscape->offset_x);
@@ -135,6 +140,9 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     y += System::instance()->getGraphics()->getCamera()->getYPos();
     z += System::instance()->getGraphics()->getCamera()->getZPos();
     
+    float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+    z += height;
+      
     float distance = sqrt(x * x + y * y + z * z);
 	      
 //    float distance = fabs(_renderer->distFromNear(centerX + _landscape->offset_x, centerY + _landscape->offset_y, _landscape->getHeight(centerX, centerY)));
@@ -408,10 +416,33 @@ void Patch::ComputeVariance() {
 void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
   int m_WorldX = this->m_WorldX + _landscape->offset_x;
   int m_WorldY = this->m_WorldY + _landscape->offset_y;
+  if (min_height == DEF_VAL) {
+    for (int x = this->m_WorldX; x < this->m_WorldX + _landscape->patch_size; x++) {
+      for (int y = this->m_WorldY; y < this->m_WorldY + _landscape->patch_size; y++) {
+        float h = _landscape->getHeight(x,y);
+	if (h < min_height) min_height = h;
+      }
+    }
+    min_height *= _terrain->_terrain_scale;
+  }
+  if (max_height == -DEF_VAL) {
+    for (int x = this->m_WorldX; x < this->m_WorldX + _landscape->patch_size; x++) {
+      for (int y = this->m_WorldY; y < this->m_WorldY + _landscape->patch_size; y++) {
+        float h = _landscape->getHeight(x,y);
+	if (h > max_height) max_height = h;
+      }
+    }
+    max_height *= _terrain->_terrain_scale;
+  }
 //  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _terrain->getHeight(m_WorldX, m_WorldY));
 //  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _terrain->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size));
-  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _landscape->getHeight(m_WorldX, m_WorldY) * _terrain->_terrain_scale);
-  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _landscape->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size) * _terrain->_terrain_scale);
+  //
+  //Need to determine min/max pathc height:
+
+//  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _landscape->getHeight(m_WorldX, m_WorldY) * _terrain->_terrain_scale);
+//  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _landscape->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size) * _terrain->_terrain_scale);
+  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, min_height);
+  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, max_height);
   int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
 
   if (i != 0) m_isVisible = 1;

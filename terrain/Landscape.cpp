@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.13 2002-12-06 21:14:03 simon Exp $
+// $Id: Landscape.cpp,v 1.14 2002-12-07 17:34:53 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -29,6 +29,8 @@ namespace Sear {
 static const std::string TERRAIN = "terrain";
 static const std::string GRASS = "grass";
 static const std::string WATER = "water";
+
+#define DEF_VAL 9999.0f
 
 // -------------------------------------------------------------------------------------------------
 //	LANDSCAPE CLASS
@@ -143,6 +145,7 @@ void Landscape::Reset() {
 	}
       }
     }
+  SetVisibility();
 }
 
 // ---------------------------------------------------------------------
@@ -160,7 +163,7 @@ void Landscape::Tessellate() {
 // Render each patch of the landscape & adjust the frame variance.
 //
 void Landscape::render() {
-
+  if (!m_isVisible) return;
     //cout << gFrameVariance << endl;
    //TODO: split into render land, render water
   int nCount;
@@ -201,6 +204,29 @@ void Landscape::render() {
   //if ( GetNextTriNode() != gDesiredTris ) gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
   // Bounds checking.
   if (gFrameVariance < 0 ) gFrameVariance = 0;
+}
+//
+
+void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
+  if (min_height == DEF_VAL) {
+    for (int x = 0; x < map_size; x++) {
+      for (int y = 0; y < map_size; y++) {
+        float h = getHeight(x,y);
+	if (h < min_height) min_height = h;
+	if (h > max_height) max_height = h;
+      }
+    }
+    min_height *= _terrain->_terrain_scale;
+    max_height *= _terrain->_terrain_scale;
+  }
+  WFMath::Point<3> corner1 = WFMath::Point<3>(offset_x, offset_y, min_height);
+  WFMath::Point<3> corner2 = WFMath::Point<3>(offset_x + map_size, offset_y + map_size, max_height);
+  int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
+
+  if (i != 0) m_isVisible = 1;
+  else m_isVisible = 0;
+//  m_isVisible = 1;
+
 }
 /*
 float Landscape::getHeight(float x, float y) {

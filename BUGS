@@ -1,4 +1,7 @@
 BUGS
+ * Terrain segments don't join up correctly
+ * Terrain detail ossilate rapidly
+
  * Fix font length problems
    - The font in many cases will not clip to the screen and go onto the next line. This is a problem on the console fonts, but no so much for the floating character speech
  

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.h,v 1.7 2002-12-03 22:10:55 simon Exp $
+// $Id: Patch.h,v 1.8 2002-12-07 17:34:53 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_PATCH_H
@@ -100,6 +100,9 @@ public:
   float normal_data[array_size][3];
   float texture_data[array_size][2];
 
+
+  float min_height, max_height;
+  
 };
 
 } /* namespace Sear */
