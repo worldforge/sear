@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.5 2003-05-29 18:37:17 simon Exp $
+// $Id: StateManager.cpp,v 1.6 2003-06-11 23:07:57 simon Exp $
 
 /*
  * TODO
@@ -272,10 +272,11 @@ void StateManager::stateChange(StateID state) {
   StateProperties *sp = _states[state];
   // If state doesn't exist, take first one
   if (!sp) {
-	  std::cout << "bad state found - " << state <<  std::endl;
+    std::cout << "bad state found - " << state <<  std::endl;
     sp = _states[1];
     state = 1;
   }
+  assert(sp != NULL);
   // First time round, we have no states
   if (_current_state != -1) {
     GLuint list = _state_change_vector[_current_state][state];

@@ -1,3 +1,7 @@
+12th June 2003, Simon Goodall
+ * Fixed some dealloc errs, mainly delete / delete []
+ * Fixed problem caused by mutli texture units causing a problem. header defined 6 units, but this causes probs on cards with less than 6 units.
+
 29th May 2003, Simon Goodall
  * Fixed Multitexturing.
  * Multitexturing is now determined via the statemanager code

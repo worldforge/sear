@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.26 2003-04-23 20:28:27 simon Exp $
+// $Id: Console.cpp,v 1.27 2003-06-11 23:07:57 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -45,6 +45,7 @@ Console::Console(System *system) :
   consoleHeight(0),
   console_messages(std::list<std::string>()),
   screen_messages(std::list<screenMessage>()),
+  panel_id(0),
   _system(system),
   _initialised(false)
 {

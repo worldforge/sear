@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.65 2003-05-29 18:37:17 simon Exp $
+// $Id: GL.cpp,v 1.66 2003-06-11 23:07:57 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -271,6 +271,12 @@ GL::~GL() {
 void GL::shutdown() {
   writeConfig();
   shutdownFont();
+  _texture_manager->shutdown();
+  delete _texture_manager;
+  _texture_manager = NULL;
+  _state_manager->shutdown();
+  delete _state_manager;
+  _state_manager = NULL;
   _initialised = false;
 }
 
@@ -621,7 +627,7 @@ void GL::writeConfig() {
 
 void GL::setupStates() {
   // TODO: should this be in the init?
-//  glAlphaFunc(GL_GREATER, 0.1f);
+  //glAlphaFunc(GL_GREATER, 0.1f);
 //  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
   GLfloat fog_colour[] = {0.50f, 0.50f, 0.50f, 0.50f};

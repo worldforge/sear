@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.23 2003-04-26 17:02:26 simon Exp $
+// $Id: Character.cpp,v 1.24 2003-06-11 23:07:57 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -258,7 +258,7 @@ void Character::getEntity(const std::string &id) {
   args[LOC] = _self->getID();
   args[ID] = id;
   move.SetFrom(_self->getID());
-  move.SetSerialno(Eris::getNewSerialno());
+//  move.SetSerialno(Eris::getNewSerialno());
   move.SetArgs(Atlas::Message::Object::ListType(1, args));
   Eris::Connection::Instance()->send(move);
 }
@@ -288,7 +288,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
       args[LOC] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
       args[ID] = we->getID();
       move.SetFrom(_self->getID());
-      move.SetSerialno(Eris::getNewSerialno());
+//      move.SetSerialno(Eris::getNewSerialno());
       move.SetArgs(Atlas::Message::Object::ListType(1, args));
       Eris::Connection::Instance()->send(move);
       quantity--;
@@ -309,7 +309,7 @@ void Character::touchEntity(const std::string &id) {
   touch.SetFrom(_self->getID());
   touch.SetTo(id);
   touch.SetArgs(Atlas::Message::Object::ListType(1, args));
-  touch.SetSerialno(Eris::getNewSerialno());
+//  touch.SetSerialno(Eris::getNewSerialno());
   Eris::Connection::Instance()->send(touch);
 }
 
@@ -339,7 +339,7 @@ void Character::say(const std::string &msg) {
   talk =  Atlas::Objects::Operation::Talk::Instantiate();
   args[SAY] = msg;
   talk.SetArgs(Atlas::Message::Object::ListType(1, args));
-  talk.SetSerialno(Eris::getNewSerialno());
+//  talk.SetSerialno(Eris::getNewSerialno());
   talk.SetFrom(_self->getID());
   Eris::Connection::Instance()->send(talk);
 }
@@ -400,7 +400,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
       args[ID] = we->getID();
       move.SetFrom(_self->getID());
       move.SetArgs(Atlas::Message::Object::ListType(1, args));
-      move.SetSerialno(Eris::getNewSerialno());
+//      move.SetSerialno(Eris::getNewSerialno());
       Eris::Connection::Instance()->send(move);
       quantity--;
     }

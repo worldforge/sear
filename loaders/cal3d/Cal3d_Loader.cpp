@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.5 2003-04-23 19:41:57 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.6 2003-06-11 23:07:57 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -40,6 +40,8 @@ Cal3d_Loader::Cal3d_Loader(ModelHandler *mh) {
 }
 
 Cal3d_Loader::~Cal3d_Loader() {
+  _core_model_handler->shutdown();
+  delete _core_model_handler;
 }
 
 ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {

@@ -36,7 +36,7 @@ if test $cross_compiling == no; then
   LIBS="$LIBS -L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib"
 fi
 
-CXXFLAGS="$CXXFLAGS -pedantic -ansi"
+#CXXFLAGS="$CXXFLAGS -pedantic -ansi"
 
 dnl Test for C++ compiler
 

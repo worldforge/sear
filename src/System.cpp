@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.58 2003-04-30 19:22:45 simon Exp $
+// $Id: System.cpp,v 1.59 2003-06-11 23:07:57 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -278,6 +278,12 @@ void System::shutdown() {
     delete _object_handler;
     _object_handler = NULL;
   }
+ 
+  if (_model_handler) {
+    _model_handler->shutdown();
+    delete _model_handler;
+    _model_handler = NULL;
+  }  
   
   if (_graphics) {
     _graphics->writeConfig();
@@ -299,13 +305,7 @@ void System::shutdown() {
     _script_engine->runScript(*I);
   }
   Bindings::shutdown();
-
-  if (_model_handler) {
-    _model_handler->shutdown();
-    delete _model_handler;
-    _model_handler = NULL;
-  }  
-  if (_event_handler) {
+ if (_event_handler) {
     _event_handler->shutdown();
     delete _event_handler;
     _event_handler = NULL;

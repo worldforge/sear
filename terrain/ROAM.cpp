@@ -136,7 +136,7 @@ void ROAM::shutdown() {
     _landscapes = NULL;
   }
   if (_height_maps) {
-    for (unsigned int i = 0; i < num_landscapes; ++i) if (_height_maps[i]) delete _height_maps[i];
+    for (unsigned int i = 0; i < num_landscapes; ++i) if (_height_maps[i]) delete [] _height_maps[i];
     free(_height_maps);
     _height_maps = NULL;
   }

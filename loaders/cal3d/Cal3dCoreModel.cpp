@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.11 2003-04-30 19:22:44 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.12 2003-06-11 23:07:57 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -222,7 +222,6 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
           std::string texture = (std::string)config.getItem(section, key);
-	  std::cout << texture << std::endl;
           unsigned int textureId = loadTexture(texture);
 	  if (material->getMapCount() <= i) {
             // Increase the space available to store data

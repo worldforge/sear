@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.7 2003-04-30 19:22:45 simon Exp $
+// $Id: TextureManager.cpp,v 1.8 2003-06-11 23:07:57 simon Exp $
 
 #include "TextureManager.h"
 
@@ -125,7 +125,7 @@ void TextureManager::shutdown() {
   _texture_counter = 1;
 
   if (_last_textures) {
-    delete _last_textures;
+    delete [] _last_textures;
     _last_textures = NULL;
   }
 
@@ -185,7 +185,9 @@ return texture_id;
 //  return _texture_counter++;
 }
 
-TextureObject TextureManager::loadTexture(const std::string &texture_name, SDL_Surface *surface) {
+TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *surface) {
+  std::string texture_name(name);
+  _texture_config.clean(texture_name);
   // If we have requested a mask, filter pixels
 /*  bool mask = (bool)_texture_config.getItem(texture_name, KEY_mask);
   mask = false;
@@ -295,6 +297,7 @@ void TextureManager::switchTexture(TextureID texture_id) {
   if (texture_id == _last_textures[0]) return;
   TextureObject to = _textures[texture_id];
   if (to == 0) {
+    _texture_config.clean(_names[texture_id]);
     to = loadTexture(_names[texture_id]);
     if (to == 0) {
       std::cerr << "Cannot find " << _names[texture_id] << std::endl;
@@ -515,7 +518,7 @@ TextureObject texture;
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-  free(data);
+  delete []data;
 
 
   // store into texture array
@@ -565,7 +568,7 @@ TextureID TextureManager::createDefaultFont() {
   GLfloat priority = 1.0f;
   glPrioritizeTextures(1, &texture, &priority);
   
-  free (data);
+  delete [] data;
 
 
   // store into texture array

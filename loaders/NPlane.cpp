@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.16 2003-03-23 19:51:49 simon Exp $
+// $Id: NPlane.cpp,v 1.17 2003-06-11 23:07:57 simon Exp $
 
 #include "common/Utility.h"
 
@@ -108,9 +108,9 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
 }
 
 void NPlane::shutdown() {
-  if (_vertex_data) delete(_vertex_data);
-  if (_normal_data) delete(_normal_data);
-  if (_texture_data) delete(_texture_data);
+  if (_vertex_data) delete [] _vertex_data;
+  if (_normal_data) delete [] _normal_data;
+  if (_texture_data) delete []_texture_data;
   _initialised = false;
 }
 

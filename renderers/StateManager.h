@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: StateManager.h,v 1.3 2003-05-29 18:37:17 simon Exp $
+// $Id: StateManager.h,v 1.4 2003-06-11 23:07:57 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -14,8 +14,6 @@
 #include <sigc++/object_slot.h>
 #include "interfaces/ConsoleObject.h"
 
-
-
 namespace varconf {
   class Config;
 }
@@ -26,7 +24,7 @@ class Console;
 	
 // This would be better obtained elsewhere ie from a query to
 // OpenGL, but simpler this way
-#define MAX_UNITS 6
+#define MAX_UNITS 2
 
 typedef struct {
   std::string state;
