@@ -23,16 +23,17 @@
 #include "common/Utility.h"
 
 #include "src/Camera.h"
-#include "src/System.h"
-#include "src/Terrain.h"
-#include "src/Sky.h"
-#include "src/WorldEntity.h"
 #include "src/Console.h"
-#include "src/ObjectLoader.h"
+#include "src/Exception.h"
 #include "src/Frustum.h"
 #include "src/Graphics.h"
 #include "src/Model.h"
 #include "src/ModelHandler.h"
+#include "src/ObjectLoader.h"
+#include "src/Sky.h"
+#include "src/System.h"
+#include "src/Terrain.h"
+#include "src/WorldEntity.h"
 
 #include "terrain/ROAM.h"
 #include "sky/SkyBox.h"
@@ -920,7 +921,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
 	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
       }
-      
+      ObjectProperties *op = we->getObjectProperties(); 
       glPushMatrix();
 
       // Translate Model
@@ -931,8 +932,8 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
       if (model->rotationStyle()) rotateObject(we, model->rotationStyle());
 
       // Scale Object
-      float scale = model->getScale();
-      glScalef(scale, scale, scale);
+      float scale = op->scale;
+      if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
       model->update(time_elapsed);
@@ -944,7 +945,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
       } else {
         if (we->getID() == activeID) {
           active_name = we->getName();
-	  drawOutline(model, checkState(RENDER_STENCIL) && model->getFlag("outline"));
+	  drawOutline(model, checkState(RENDER_STENCIL) && op->outline);
 	}
 	else model->render(false);
       }

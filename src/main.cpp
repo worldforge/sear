@@ -72,7 +72,7 @@ under certain conditions; type `show c' for details.
     sys->setCaption(CLIENT_NAME, CLIENT_NAME);
   //  sys->setInstallDir(install_dir);
     sys->mainLoop();
-  } catch (Exception e) {
+  } catch (Sear::Exception e) {
     std::cerr << "Exception: " << e.getMessage() << std::endl;
   } catch (...) {
     std::cerr << "Unknown Exception" << std::endl;

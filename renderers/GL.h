@@ -10,6 +10,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <set>
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
