@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.39 2004-06-15 01:09:35 alriddoch Exp $
+// $Id: Character.cpp,v 1.40 2004-06-15 13:25:36 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -191,12 +191,10 @@ void Character::rotateImmediate(float rot)
 {
   assert ((_initialised == true) && "Character not initialised");
 
-  std::cout << "Character::rotateImmediate" << std::endl << std::flush;
   float angle = deg_to_rad(rot);
   _angle += angle;
-  // FIXME This is performance suicide
+  // Only send to server if we haven't recently.
   bool send = ((SDL_GetTicks() - _lastUpdate) > 1000);
-  std::cout << _lastUpdate << ":" << SDL_GetTicks() << std::endl << std::flush;
   updateLocals(send);
   // If we don't send, we need to schedule an update.
   if (!send && !_updateScheduled) {
@@ -207,7 +205,7 @@ void Character::rotateImmediate(float rot)
 
 void Character::sendUpdate()
 {
-  std::cout << "Sending update event" << std::endl << std::flush;
+  // Send update of our rotation etc to server.
   updateLocals(true);
   _updateScheduled = false;
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.93 2004-06-07 11:22:56 alriddoch Exp $
+// $Id: System.cpp,v 1.94 2004-06-15 13:25:36 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -659,7 +659,6 @@ void System::handleAnalogueControllers() {
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
-      std::cout << "E: " << elevation << std::endl << std::flush;
       Graphics * g = getGraphics();
       Camera * c = NULL;
       if (g != NULL) {

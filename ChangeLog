@@ -1,5 +1,10 @@
 2004-06-15  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/System.cpp, src/Character.cpp: Remove debugging output
+	  that was slowing down rotation.
+
+2004-06-15  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/Event.h, src/Event.cpp: Add a new event to explicitly send an
 	  update to the server.
 
