@@ -121,11 +121,7 @@ fi
 
 AC_LANG_RESTORE
 
-AC_CHECK_HEADERS(sstream strstream, [ found_string_stream=yes break ],
-                                    [ found_string_stream=no ])
-if test $found_string_stream == no ; then 
-    AC_MSG_ERROR(Couldn't find C++ string <-> stream conversion method.)
-fi
+AC_CHECK_HEADER(sstream, , AC_MSG_ERROR(Couldn't find sstream header))
 
 AC_TRY_RUN([
 #include <string>

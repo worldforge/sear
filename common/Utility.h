@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.12 2004-05-23 13:32:29 jmt Exp $
+// $Id: Utility.h,v 1.13 2004-05-26 21:57:57 jmt Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -10,16 +10,10 @@
 #include <wfmath/const.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/axisbox.h>
+
 #include <string>
 #include <deque>
-
-#ifdef HAVE_SSTREAM
 #include <sstream>
-#elif defined(HAVE_STRSTREAM)
-#include <strstream>
-#else
-#error "sstream or strstream not found!"
-#endif
 
 namespace Sear {
 
@@ -38,7 +32,6 @@ T square(T t) {
   return (t * t);
 }
 
-#ifdef HAVE_SSTREAM
 template <class out_value, class in_value>
 void cast_stream(const in_value &in, out_value &out) {
   std::stringstream ss;
@@ -57,23 +50,7 @@ std::string string_fmt(const T & t) {
   ss << t;
   return ss.str();
 }
-#endif
 
-#ifdef HAVE_STRSTREAM
-template <class out_value, class in_value>
-void cast_stream(const in_value &in, out_value &out) {
-  std::strstream ss;
-  ss << in << std::ends;
-  ss >> out;
-}
-
-template <class T>
-std::string string_fmt(const T & t) {
-  std::strstream ss;
-  ss << t << std::ends;
-  return ss.str();
-}
-#endif
 /*
 double SineSeries (double fRad, int i, int iMaxTerms) {
   if (i > iMaxTerms) return 1.0;

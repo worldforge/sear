@@ -1,3 +1,9 @@
+2004-05-26  James Turner  <james@worldforge.org>
+
+        * Remove <strstream> check from configure, and usage from
+          Utility.h
+        * Updated version of XCode project
+
 2004-05-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Frame.h: Fix include typo.
@@ -16,6 +22,13 @@
 
 	* gui/*: Updated ground work for gui widgets.
 
+2004-05-24  James Turner  <james@worldforge.org>
+
+	* Fix the compass to actually point north. Ooops.
+	* Add a fail() handler to sprite, falling back to the default
+	  texture and a fixed size, currently 64x64
+	* Add XCode project file
+	
 2004-05-23  James Turner  <james@worldforge.org>
 
 	* Add in a Sprite class, including a new config file, and changes
