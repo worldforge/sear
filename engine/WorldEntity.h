@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.1.2.1 2003-01-05 14:22:01 simon Exp $
+// $Id: WorldEntity.h,v 1.1.2.2 2003-01-05 18:18:27 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -31,7 +31,9 @@ public:
   WFMath::Point<3> GetPos(); 
   void handleMove();
   void handleTalk(const std::string &);
+  void setProperty(const std::string &s, const Atlas::Message::Object &val);
 
+  
   void translateAbsPos(WFMath::Point<3>);
   void rotateAbsOrient(WFMath::Quaternion);
   WFMath::Quaternion getAbsOrient();
@@ -48,12 +50,17 @@ protected:
   WFMath::Quaternion abs_orient;
   WFMath::Point<3> abs_pos;
 
+  std::string last_mode;
+  std::string last_action;
+  
   static int l_get_entity(lua_State *L);
   static int l_get_name(lua_State *L);
   static int l_get_id(lua_State *L);
   static int l_get_type(lua_State *L);
   static int l_get_parent(lua_State *L);
   static int l_get_property(lua_State *L);
+
+
   
 };
 

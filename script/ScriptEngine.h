@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.h,v 1.1.2.1 2003-01-05 14:19:45 simon Exp $
+// $Id: ScriptEngine.h,v 1.1.2.2 2003-01-05 18:18:28 simon Exp $
 
 #ifndef SEAR_SCRIPTENGINE_H
 #define SEAR_SCRIPTENGINE_H 1
@@ -29,6 +29,10 @@ public:
   void printError(int error);
 
   void event(const std::string &event);
+  void event_v(const std::string &event, void *arg1);
+  void event_vs(const std::string &event, void *arg1, const std::string &arg2);
+ 
+  void entityEvent(const std::string &id, const std::string &func, const std::string &arglist);
   
   lua_State *getState() const { return _openState; }
   static ScriptEngine *instance() { return _instance; }

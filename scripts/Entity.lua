@@ -12,6 +12,13 @@ function Entity.new()
   new.getType = %Public.getType;
   new.getParent = %Public.getParent;
   new.getProperty = %Public.getProperty;
+  new.onMove = %Public.onMove;
+  new.onProperty = %Public.onProperty;
+  new.onTalk = %Public.onTalk;
+  new.onAppearance = %Public.onAppearance;
+  new.onDisappearance = %Public.onDisappearance;
+  new.onCreate = %Public.onCreate;
+  new.onDelete = %Public.onDelete;
   new.printInfo = %Public.printInfo;
   return new;
 end
@@ -40,6 +47,36 @@ end
 
 function Entity.getProperty(entity, property)
   return entity_get_property(entity, property);
+end
+
+function Entity.onMove(entity, pos)
+  print(Entity.getName(entity).." - Moved - "..pos);
+end
+
+function Entity.onProperty(entity, property)
+  print (Entity.getName(entity).." - Property Changed - "..property);
+  print (Entity.getProperty(entity, property));
+end
+
+function Entity.onTalk(entity, talk)
+  print (Entity.getName(entity).." - Talk - "..talk);
+end
+
+function Entity.onAppearance(entity, args)
+  print (Entity.getName(entity).." - Appearance");
+end
+
+function Entity.onDisappearance(entity, args)
+  print (Entity.getName(entity).." - Disappearance");
+end
+
+
+function Entity.onCreate(entity, args)
+  print (Entity.getName(entity).." - Created");
+end
+
+function Entity.onDelete(entity, args)
+  print (Entity.getName(entity).." - Deleted");
 end
 
 function Entity.printInfo(entity)

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.1.2.1 2003-01-05 14:19:45 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.1.2.2 2003-01-05 18:18:28 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -101,4 +101,40 @@ void ScriptEngine::event(const std::string &event) {
   lua_settop(_openState, n);
 }
 
+void ScriptEngine::event_v(const std::string &event, void *arg1) {
+  int n = lua_gettop(_openState);
+  lua_getglobal(_openState, event.c_str());
+  // Check that this is a defined function before attempting to exec
+  if (lua_isfunction(_openState, n+1) == 1) {
+    lua_pushusertag(_openState, arg1, LUA_ANYTAG);
+    lua_call(_openState, 1, 0);
+  } else {
+    std::cerr << "Function not found - " << 
+	    lua_typename(_openState, 1) << 
+	    std::endl;
+    lua_remove(_openState, 1);
+  }
+  lua_settop(_openState, n);
+}
+
+
+void ScriptEngine::event_vs(const std::string &event, void *arg1, const std::string &arg2) {
+  int n = lua_gettop(_openState);
+  lua_getglobal(_openState, event.c_str());
+  // Check that this is a defined function before attempting to exec
+  if (lua_isfunction(_openState, n+1) == 1) {
+    lua_pushusertag(_openState, arg1, LUA_ANYTAG);
+    lua_pushstring(_openState, arg2.c_str());
+    lua_call(_openState, 2, 0);
+  } else {
+    lua_remove(_openState, 1);
+  }
+  lua_settop(_openState, n);
+}
+
+void ScriptEngine::entityEvent(const std::string &id, const std::string &func, const std::string &arglist) {
+  std::string cmd = "entityEvent(\"" + id + "\",\"" + func + "\",\"" + arglist + "\");";
+  runCommand(cmd);
+}
+	
 } /* namespace Sear */

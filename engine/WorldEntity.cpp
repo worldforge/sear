@@ -2,11 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.1.2.1 2003-01-05 14:22:01 simon Exp $
+// $Id: WorldEntity.cpp,v 1.1.2.2 2003-01-05 18:18:27 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
 #include <Eris/TypeInfo.h>
+
+#include "script/ScriptEngine.h"
 
 #include "WorldEntity.h"
 
@@ -41,12 +43,19 @@ void WorldEntity::handleMove() {
     translateAbsPos(WFMath::Point<3>(0.0f, 0.0f, 0.0f));
     rotateAbsOrient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f));
   }
+  ScriptEngine::instance()->entityEvent(getID(),"onMove", "position");
 }
 
 void WorldEntity::handleTalk(const std::string &msg) {
   if (debug) std::cout << _id << ": " << msg << std::endl;	
+  ScriptEngine::instance()->entityEvent(getID(),"onTalk", msg);
 }
 
+void WorldEntity::setProperty(const std::string &s, const Atlas::Message::Object &val) {
+  Eris::Entity::setProperty(s, val);
+  ScriptEngine::instance()->entityEvent(getID(),"onProperty", s);
+
+}
 void WorldEntity::SetVelocity() {
   time = System::instance()->getTime();
 }
@@ -123,7 +132,6 @@ void WorldEntity::registerCommands(lua_State *L) {
 int WorldEntity::l_get_entity(lua_State *L) {
   if (debug) std::cout << "l_get_entity" << std::endl;
   int top = lua_gettop(L);
-  std::cout << "TOP - " << top << std::endl << std::flush;;
   if (top != 1) {
     std::cerr << "Not enough args for l_get_entity" << std::endl;
     lua_pushusertag(L, (int)0, LUA_ANYTAG);
