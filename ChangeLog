@@ -1,3 +1,6 @@
+2004-06-13  Simon Goodall  <simon@simongoodall.co.uk>
+	* Fix bug where the render active name function did select the correct state to render with.
+
 2004-06-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* Fix up all the Makefile.am files so that distcheck works.

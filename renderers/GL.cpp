@@ -1256,6 +1256,7 @@ inline void GL::resetSelection() {
 inline void GL::renderActiveName() {
   if (active_name.empty()) return;
   glColor4fv(activeNameColour);
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   print(x_pos, y_pos, active_name.c_str(), 1);
 }
 
