@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.29 2002-12-07 17:34:53 simon Exp $
+// $Id: ModelHandler.cpp,v 1.30 2003-01-14 16:48:28 simon Exp $
 
 //#include "config.h"
 
@@ -130,6 +130,12 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
   }
+  // Check model was loaded
+  if (!model) {
+    std::cerr << "Error loading model" << std::endl;	 
+    return NULL;
+  }
+	  
   // If model is a generic one, add it to the generic list
   if (model->model_by_type)  _model_records[model_id] = model;
   _object_map[record->id + model_id] = model;
