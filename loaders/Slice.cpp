@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.7 2002-09-26 17:17:46 simon Exp $
+// $Id: Slice.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
 
 #include "common/Utility.h"
 
@@ -26,6 +26,12 @@
  * Material settings
  */ 
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 

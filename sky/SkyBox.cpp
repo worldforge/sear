@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.7 2002-10-20 15:50:27 simon Exp $
+// $Id: SkyBox.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
 
 #include "common/Log.h"
 
@@ -10,13 +10,14 @@
 #include "src/Model.h"
 
 #include "SkyBox.h"
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
-#ifdef DEBUG
-static const bool debug = true;
-#else
-static const bool debug = false;
-#endif
 
 	
 // Setup static data items

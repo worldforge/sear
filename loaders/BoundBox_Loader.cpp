@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.17 2002-10-09 17:13:39 alriddoch Exp $
+// $Id: BoundBox_Loader.cpp,v 1.18 2002-10-21 20:12:04 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -21,6 +21,12 @@
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const std::string BoundBox_Loader::BOUNDBOX = "boundbox";

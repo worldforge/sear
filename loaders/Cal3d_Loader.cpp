@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.11 2002-09-26 17:17:46 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.12 2002-10-21 20:12:04 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -13,6 +13,12 @@
 #include "Cal3d_Loader.h"
 #include "Cal3d.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const std::string Cal3d_Loader::CAL3D = "cal3d";

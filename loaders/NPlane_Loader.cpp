@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.12 2002-09-26 20:23:03 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.13 2002-10-21 20:12:04 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -17,6 +17,12 @@
 #include "NPlane_Loader.h"
 #include "NPlane.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const std::string NPlane_Loader::NPLANE = "nplane";

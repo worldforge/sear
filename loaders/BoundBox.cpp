@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+// $Id: BoundBox.cpp,v 1.13 2002-10-21 20:12:04 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -10,6 +10,12 @@
 
 #include "BoundBox.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 BoundBox::BoundBox(Render *render) : Model(render), 

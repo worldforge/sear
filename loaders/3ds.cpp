@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.15 2002-10-20 15:50:26 simon Exp $
+// $Id: 3ds.cpp,v 1.16 2002-10-21 20:12:04 simon Exp $
 
 
 #include <iostream>
@@ -29,12 +29,13 @@
 
 #include <iostream>
 
-namespace Sear {
 #ifdef DEBUG
-static const bool debug = true;
+  #include "common/mmgr.h"
+  static const bool debug = true;
 #else
-static const bool debug = false;
+  static const bool debug = false;
 #endif
+namespace Sear {
 	
 ThreeDS::ThreeDS(Render *render) : Model(render),
   _initialised(false)

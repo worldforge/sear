@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.39 2002-10-20 15:50:26 simon Exp $
+// $Id: GL.cpp,v 1.40 2002-10-21 20:12:04 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -51,13 +51,14 @@
 #define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
 #define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
-#ifdef DEBUG
-static const bool debug = true;
-#else
-static const bool debug = false;
-#endif
 	
 static std::string FONT = "font";
 static std::string UI = "ui";
@@ -354,7 +355,7 @@ int GL::requestTexture(const std::string &section, const std::string &texture, b
     return -1;
   }
   createTexture(tmp, texture_id, clamp);
-  free (tmp);
+  SDL_FreeSurface (tmp);
   textureList.push_back(texture_id);
   texture_map[section + texture_name] = next_id;
   return next_id++;
@@ -375,7 +376,7 @@ int GL::requestMipMap(const std::string &section, const std::string &texture, bo
   tmp = System::loadImage(file_name);
   if (!tmp) return -1;
   createMipMap(tmp, texture_id, clamp);
-  free (tmp);
+  SDL_FreeSurface (tmp);
   textureList.push_back(texture_id);
   texture_map[section + texture_name] = next_id;
   return next_id++;
@@ -399,7 +400,7 @@ int GL::requestTextureMask(const std::string &section, const std::string &textur
     return -1;
   }
   createTextureMask(tmp, texture_id, clamp);
-  free (tmp);
+  SDL_FreeSurface(tmp);
   textureList.push_back(texture_id);
   texture_map[section + texture_name + MASK] = next_id;
   return next_id++;
@@ -423,7 +424,7 @@ int GL::requestMipMapMask(const std::string &section, const std::string &texture
     return -1;
   }
   createMipMapMask(tmp, texture_id, clamp);
-  free (tmp);
+  SDL_FreeSurface (tmp);
   textureList.push_back(texture_id);
   texture_map[section + texture_name + MASK] = next_id;
   return next_id++;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.10 2002-09-26 17:17:46 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.11 2002-10-21 20:12:04 simon Exp $
 
 #include <string>
 
@@ -18,6 +18,12 @@
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const std::string WireFrame_Loader::WIREFRAME = "wireframe";

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.7 2002-09-26 17:17:46 simon Exp $
+// $Id: Landscape.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -18,6 +18,12 @@
 #include "Landscape.h"
 #include "ROAM.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 // -------------------------------------------------------------------------------------------------

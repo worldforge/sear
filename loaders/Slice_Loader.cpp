@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Slice_Loader.cpp,v 1.7 2002-09-26 20:23:03 simon Exp $
+// $Id: Slice_Loader.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -16,6 +16,12 @@
 
 #include "Slice_Loader.h"
 #include "Slice.h"
+#ifdef DEBUG
+#include "common/mmgr.h"
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
 
 namespace Sear {
 

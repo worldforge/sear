@@ -17,13 +17,14 @@
 #include "ROAM.h"
 #include "Landscape.h"
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
-#ifdef DEBUG
-static const bool debug = true;
-#else
-static const bool debug = false;
-#endif
 	
 float ROAM::_water_level = 0.0f;
 
@@ -41,6 +42,7 @@ ROAM::~ROAM() {
 }
 
 bool ROAM::init() {
+  if (debug) Log::writeLog("Initialising ROAM", Log::LOG_DEFAULT);
   if (_initialised) shutdown();
   readConfig();
   loadHeightMap();
@@ -94,7 +96,8 @@ void ROAM::loadHeightMap() {
   }
   SDL_Surface *terrain = NULL;
   
-  terrain = IMG_Load(hmap.c_str());
+  terrain = System::loadImage(hmap);
+  
   if (terrain == NULL) {
     Log::writeLog(std::string("Unable to load heightmap: ") + hmap + std::string(": ") + string_fmt (SDL_GetError()), Log::LOG_ERROR);
     Log::writeLog("Using flat terrain instead", Log::LOG_ERROR);
@@ -116,7 +119,7 @@ void ROAM::loadHeightMap() {
   if (!hMap) {
     Log::writeLog("ROAM: Error - Unable to allocate memory for height map array", Log::LOG_ERROR);
     return;
-  }
+  } 
   i = 0;
   for(y = 0; y < hMapHeight; ++y) {
     for(x = 0; x < hMapWidth; ++x) {
@@ -124,7 +127,7 @@ void ROAM::loadHeightMap() {
     }
   }
   SDL_UnlockSurface(terrain);
-  free(terrain);
+  SDL_FreeSurface(terrain);
 }
 
 void ROAM::update(float time_elapsed) {

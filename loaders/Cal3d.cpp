@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.23 2002-09-26 17:17:46 simon Exp $
+// $Id: Cal3d.cpp,v 1.24 2002-10-21 20:12:04 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -22,6 +22,12 @@
 // Static member variables initialization                                     //
 //----------------------------------------------------------------------------//
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const int Cal3d::STATE_IDLE = 0;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.3 2002-09-08 12:21:50 simon Exp $
+// $Id: Utility.cpp,v 1.4 2002-10-21 20:12:04 simon Exp $
 
 #include "Utility.h"
 
@@ -12,6 +12,12 @@
 #include <map>
 #include <math.h>
 
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 namespace Sear {
 
 const std::string Tokeniser::delimeters = " ";

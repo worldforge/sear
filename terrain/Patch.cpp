@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.5 2002-09-08 00:24:54 simon Exp $
+// $Id: Patch.cpp,v 1.6 2002-10-21 20:12:04 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -23,6 +23,12 @@
 #include "ROAM.h"
 
 #include <assert.h>
+#ifdef DEBUG
+  #include "common/mmgr.h"
+  static const bool debug = true;
+#else
+  static const bool debug = false;
+#endif
 
 namespace Sear {
 
