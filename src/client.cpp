@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.51 2004-01-26 14:08:49 alriddoch Exp $
+// $Id: client.cpp,v 1.52 2004-02-06 12:16:09 simon Exp $
 
 #include "System.h"
 
@@ -613,10 +613,10 @@ void Client::GotAllCharacters() {
 //  if (!_connection->isConnected()) throw Exception("Not Connected");
   if (_player == NULL) throw Exception ("Player is NULL");
 //  if (_lobby == NULL) throw Exception("Lobby is NULL");
-  Eris::CharacterList l = _player->getCharacters();
-  for (Eris::CharacterList::iterator I=l.begin(); I != l.end(); ++I) {
-    Atlas::Objects::Entity::GameEntity ge = *I;
-    _system->pushMessage(ge.getId().c_str(), CONSOLE_MESSAGE);
+  Eris::CharacterMap m = _player->getCharacters();
+  for (Eris::CharacterMap::iterator I=m.begin(); I != m.end(); ++I) {
+//    Atlas::Objects::Entity::GameEntity ge = *I->first;
+    _system->pushMessage(I->first.c_str(), CONSOLE_MESSAGE);
   }
 }
 
