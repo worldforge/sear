@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.17 2005-01-06 12:46:55 simon Exp $
+// $Id: Event.cpp,v 1.18 2005-02-18 16:39:06 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -10,7 +10,7 @@
 
 #include "System.h"
 #include <string>
-#include <Eris/World.h>
+//#include <Eris/World.h>
 
 #include "common/Log.h"
 #include "loaders/ModelHandler.h"
@@ -49,7 +49,7 @@ Event::Event(EventFunction ef, void* target, EventCondition ec, unsigned int tim
 Event::Event(const std::string ef, const std::string target, const std::string ec, const std::string time) {
   _ef = (EventFunction)atoi(ef.c_str());
   if (_ef == EF_PRINT || _ef == EF_RUN_COMMAND) _target = stringToObject(target);
-  else if (_ef == EF_HANDLE_MOVE) _target = Eris::World::Instance()->lookup(target);
+//  else if (_ef == EF_HANDLE_MOVE) _target = Eris::World::Instance()->lookup(target);
   _ec = (EventCondition)atoi(ec.c_str());
  _time = atoi(time.c_str());
  if (_ec == EC_TIME) _time += System::instance()->getTime(); 
@@ -75,10 +75,10 @@ void Event::doEvent() {
       System::instance()->runCommand(cmd);
       break;      
     }
-    case (EF_HANDLE_MOVE): {
-      ((WorldEntity*)_target)->handleMove();
-      break;
-    }
+//    case (EF_HANDLE_MOVE): {
+//      ((WorldEntity*)_target)->handleMove();
+//      break;
+//    }
     case (EF_UPDATE_CHAR_ROTATE): {
       System::instance()->getCharacter()->rotate(Character::CMD_modifier);
       break;      

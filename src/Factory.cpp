@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.4 2005-01-06 12:46:55 simon Exp $
+// $Id: Factory.cpp,v 1.5 2005-02-18 16:39:06 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -10,13 +10,9 @@
 
 #include "Factory.h"
 
-#include <Eris/Factory.h>
-#include <Eris/World.h>
-#include <Eris/TypeInfo.h>
+#include <Eris/View.h>
 #include <Eris/Connection.h>
 
-#include <Atlas/Objects/Entity/GameEntity.h>
-                                                                                
 #include "System.h"
 #include "renderers/Graphics.h"
 #include "environment/Environment.h"
@@ -27,21 +23,22 @@
 
 namespace Sear {
 
-   Eris::EntityPtr Factory::instantiate(const Atlas::Objects::Entity::GameEntity & ge, Eris::World *world) {
-    WorldEntity *we = new WorldEntity(ge, world);
-    Eris::TypeInfoPtr type = world->getConnection()->getTypeService()->getTypeForAtlas(ge);
-    if (type->safeIsA(terrainType)) {
+   Eris::EntityPtr Factory::instantiate(const Atlas::Objects::Entity::GameEntity & ge, Eris::TypeInfo *type, Eris::View *view) {
+    WorldEntity *we = new WorldEntity(ge->getId(), type, view);
+std::cout << "Type: " << type->getName() << std::endl;
+//    Eris::TypeInfoPtr type = world->getConnection()->getTypeService()->getTypeForAtlas(ge);
+    if (type->isA(terrainType)) {
       // Extract base points and send to terrain        
       //TerrainEntity * te = new TerrainEntity(ge,w);
 
 
-   if (!we->hasProperty("terrain")) {
+   if (!we->hasAttr("terrain")) {
         std::cerr << "World entity has no terrain" << std::endl << std::flush;
-        std::cerr << "World entity id " << we->getID() << std::endl
+        std::cerr << "World entity id " << we->getId() << std::endl
                   << std::flush;
         return we;
     }
-    const Atlas::Message::Element &terrain = we->getProperty("terrain");
+    const Atlas::Message::Element &terrain = we->valueOfAttr("terrain");
     if (!terrain.isMap()) {
         std::cerr << "Terrain is not a map" << std::endl << std::flush;
     }

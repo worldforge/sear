@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.107 2005-01-06 12:46:55 simon Exp $
+// $Id: System.cpp,v 1.108 2005-02-18 16:39:06 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -19,6 +19,7 @@
 #include <sage/GL.h>
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
+#include <Eris/View.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -461,6 +462,9 @@ void System::mainLoop() {
       _event_handler->poll();
       // poll network
       _client->poll();
+      if (_client->getAvatar() && _client->getAvatar()->getView()) {
+        _client->getAvatar()->getView()->update();
+      }
       // draw scene
       _graphics->drawScene(false, time_elapsed);
     } catch (ClientException ce) {
@@ -743,7 +747,7 @@ void System::setCharacter(Character *character) {
   }
   _character = character;
   // Assuming init has not been performed
-  _character->init();
+//  _character->init();
   _character->registerCommands(_console);
 }
 
@@ -965,9 +969,8 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     getEventHandler()->addEvent(Event(event_function, target, event_condition, extra));
   }
   else if (command == IDENTIFY_ENTITY) {
-    Eris::World *world = Eris::World::Instance();
-    if (!world) return;
-    WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
+    if (!_client->getAvatar()) return;
+    WorldEntity *we = ((WorldEntity*)(_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
     if (we) we->displayInfo();  
   }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.17 2004-06-13 18:21:01 simon Exp $
+// $Id: client.h,v 1.18 2005-02-18 16:39:06 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -11,7 +11,7 @@
 
 #include <Eris/Connection.h>
 #include <Eris/Log.h>
-#include <Eris/Player.h>
+#include <Eris/Account.h>
 #include <Atlas/Message/DecoderBase.h>
 
 #include "conf.h"
@@ -46,11 +46,10 @@
 
 namespace Eris {
   class Meta;
-  class Player;
+  class Account;
   class Connection;
   class Lobby;
   class Person;
-  class World;
   class ServerInfo;
 }
 
@@ -85,14 +84,18 @@ public:
   void poll();
   std::string getStatus();
   
-  int listRooms();
+//  int listRooms();
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-  void getServers();
-  void stopServers();
+//  void getServers();
+  //void stopServers();
  
-  Eris::Player *getPlayer() { return _player; }
+  Eris::Account    *getAccount() const { return m_account; }
+  Eris::Avatar     *getAvatar() const { return m_avatar; }
+  Eris::Connection *getConnection() const { return m_connection;  }
+
+
  
 protected:
   //Callbacks
@@ -102,43 +105,47 @@ protected:
   void NetConnected();
   void NetDisconnected();
   bool NetDisconnecting();
-  void Timeout(Eris::Connection::Status);
+//  void Timeout(Eris::Connection::Status);
   void StatusChanged(Eris::Connection::Status);
   void Log(Eris::LogLevel, const std::string &);
-  void GotTime(double time);
+//  void GotTime(double time);
 
   //Lobby
-  void LoggedIn(const Atlas::Objects::Entity::Player &p);
-  void SightPerson(Eris::Person*);
+//  void LoggedIn(const Atlas::Objects::Entity::Account &a);
+//  void SightPerson(Eris::Person*);
 
-  //Player
+  // Account
   void LoginSuccess();
-  void LoginFailure(Eris::LoginFailureType, const std::string&);
+  void LoginFailure(const std::string&);
   void LogoutComplete(bool);
   void GotCharacterInfo(const Atlas::Objects::Entity::GameEntity&);
   void GotAllCharacters();
+  void AvatarSuccess(Eris::Avatar *);
+  void AvatarFailure(const std::string &msg);
 
   //World	
-  void EntityCreate(Eris::Entity*);
-  void EntityDelete(Eris::Entity*);
-  void Entered(Eris::Entity*);
-  void Appearance(Eris::Entity*);
-  void Disappearance(Eris::Entity*);
-  void RootEntityChanged(Eris::Entity*);
+//  void EntityCreate(Eris::Entity*);
+//  void EntityDelete(Eris::Entity*);
+//  void Entered(Eris::Entity*);
+//  void Appearance(Eris::Entity*);
+//  void Disappearance(Eris::Entity*);
+//  void RootEntityChanged(Eris::Entity*);
 
   //Metaserver
-  void gotServerCount(int count);
-  void gotFailure(const std::string& msg);
-  void receivedServerInfo(const Eris::ServerInfo & sInfo);
-  void completedServerList();
+//  void gotServerCount(int count);
+//  void gotFailure(const std::string& msg);
+  //void receivedServerInfo(const Eris::ServerInfo & sInfo);
+//  void completedServerList();
 
   System *_system;
 
-  Eris::Connection* _connection;
-  Eris::Player* _player;
-  Eris::Lobby* _lobby;
-  Lobby *the_lobby;
-  Eris::Meta *_meta;
+  Eris::Connection *m_connection;
+  Eris::Account    *m_account;
+  Eris::Avatar     *m_avatar;
+
+//  Eris::Lobby* _lobby;
+//  Lobby *the_lobby;
+//  Eris::Meta *_meta;
 
   Factory *_factory;
   

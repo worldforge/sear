@@ -96,8 +96,6 @@ libSear_a_SOURCES = \
 	Exception.h \
 	Factory.cpp \
 	Factory.h \
-	Lobby.cpp \
-	Lobby.h \
 	main.cpp \
 	Sound.cpp \
 	Sound.h \
@@ -117,3 +115,6 @@ libSear_a_SOURCES = \
 	Editor.cpp \
 	Editor.h
 
+#	Lobby.cpp \
+#	Lobby.h \
+#

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.2 2005-01-09 18:28:11 simon Exp $
+// $Id: ModelHandler.cpp,v 1.3 2005-02-18 16:39:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -155,8 +155,8 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   }
 
   if (we != NULL) {
-    if (we->hasProperty("guise")) {
-      Atlas::Message::Element::MapType mt = we->getProperty("guise").asMap();
+    if (we->hasAttr("guise")) {
+      Atlas::Message::Element::MapType mt = we->valueOfAttr("guise").asMap();
       model->model->setAppearance(mt);
     }                                                                          
   }

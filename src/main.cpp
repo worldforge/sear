@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.20 2004-05-14 12:17:21 simon Exp $
+// $Id: main.cpp,v 1.21 2005-02-18 16:39:06 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -18,7 +18,7 @@
 #include "conf.h"
 #include "System.h"
 #include "Exception.h"
-
+#include "common/operations.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -85,6 +85,14 @@ under certain conditions; type `show c' for details.
   
   sys = new Sear::System();
   sys->addSearchPaths(path_list);
+
+  WIELD_NO = Atlas::Objects::objectFactory.addFactory("wield",
+                   (Atlas::Objects::FactoryMethod)&Wield::factory);
+  USE_NO = Atlas::Objects::objectFactory.addFactory("use",
+                   (Atlas::Objects::FactoryMethod)&Use::factory);
+
+
+
   if (!sys->init(p_argc, p_argv)) {
     std::cerr << "Error initialising Sear!" << std::endl;
     exit (1);

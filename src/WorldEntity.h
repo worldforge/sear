@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.18 2004-09-29 10:50:25 jmt Exp $
+// $Id: WorldEntity.h,v 1.19 2005-02-18 16:39:06 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -13,10 +13,12 @@
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
 #include <Eris/Types.h>
-#include <Eris/World.h>
 #include "common/types.h"
 
 //#include "ObjectLoader.h"
+namespace Eris {
+  class View;
+}
 
 namespace Sear {
 
@@ -24,13 +26,13 @@ typedef std::pair<std::string, unsigned int> message;
 
 class WorldEntity : public Eris::Entity {
 public:
- WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world);
+  WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view);
   ~WorldEntity();
   
-  void handleMove();
+  void onMove();
   void handleTalk(const std::string &);
 
-  const WFMath::Quaternion getAbsOrient();
+//  const WFMath::Quaternion getAbsOrient();
   const WFMath::Point<3> getAbsPos();
 
   const OrientBBox &getOrientBBox() const { return m_orientBBox; }
@@ -49,7 +51,7 @@ protected:
   /** Calculate the current position of this entity relative to it's
   container (location). This is based on the last pos set by the server,
   and a linear interpolation of the last set velocity. */
-  WFMath::Vector<3> getInterpolatedPos() const;
+//  WFMath::Vector<3> getInterpolatedPos() const;
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
@@ -65,7 +67,7 @@ protected:
 friend class Character;
 
   OrientBBox m_orientBBox;
-  unsigned int m_lastMoveTime;
+//  unsigned int m_lastMoveTime;
 };
 
 } /* namespace Sear */

@@ -1,5 +1,21 @@
 2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.in common/Makefile.am common/operations.cpp, 
+	  gui/Compass.cpp loaders/ModelHandler.cpp renderers/Frustum.cpp,
+	  renderers/GL.cpp renderers/Graphics.cpp src/Character.cpp, 
+	  src/Character.h src/Editor.cpp src/Event.cpp src/Event.h,
+	  src/Factory.cpp src/Factory.h src/Makefile.am src/System.cpp,
+	  src/WorldEntity.cpp src/WorldEntity.h src/client.cpp,
+	  src/client.h src/main.cpp,operations.h: Update for Eris 1.3 and Atlas
+	  0.5.92 API's. Some functionaliy still needs to be re-implmented
+	  (Appearance setting on entity appearance, sync world time with server,
+	  adjust height for terrain, get terrain information from world entity,
+	  correct character orientation).
+	* common/Use.h, common/Wield.h: Removed as functionality is now in
+	  operations.cpp/operations.h
+
+2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dModel.cpp, 
 	  loaders/cal3d/Cal3dModel.h, README: Update for Cal3d 0.10.0
 

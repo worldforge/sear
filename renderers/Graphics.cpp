@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: Graphics.cpp,v 1.2 2005-02-18 16:39:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -11,7 +11,7 @@
 
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
-#include <Eris/World.h>
+#include <Eris/View.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
@@ -34,6 +34,7 @@
 #include "Render.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
+#include "src/client.h"
 
 #include "renderers/RenderSystem.h"
 #include "gui/Compass.h"
@@ -237,13 +238,13 @@ Compare D^2 to choose what detail level to use
 	
   m_lm->reset();
   WFMath::Point<3> pos(0,0,0); // Initial camera position
-  #warning FIXME Should not be treating World as a singleton
-  Eris::World *world = Eris::World::getPrimary();
-  if (_system->checkState(SYS_IN_WORLD) && world) {
+  Eris::Avatar *avatar = _system->getClient()->getAvatar();
+  if (_system->checkState(SYS_IN_WORLD) && avatar) {
     if (!_character) _character = _system->getCharacter();
-    WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
+    //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
+    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
     if (focus) {
-      std::string id = focus->getID();
+      std::string id = focus->getId();
       static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
       orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
@@ -290,7 +291,8 @@ Compare D^2 to choose what detail level to use
     }
 #if(1)
     WorldEntity *root = NULL; 
-    if ((root = (WorldEntity *)world->getRootEntity())) {
+    Eris::View *view = avatar->getView();
+    if ((root = dynamic_cast<WorldEntity *>(view->getTopLevel()))) {
       if (_character) _character->updateLocals(false);
       _render_queue = Render::QueueMap();
       _message_list = Render::MessageList();
@@ -334,28 +336,28 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
     if (we->getType() != NULL) {
       // TODO there must be a better way of doing this - after the first time round for each object, it should only require one call
       ObjectHandler *object_handler = _system->getObjectHandler();
-      ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
-      if (object_record && object_record->type.empty()) object_record->type = we->getID();
+      ObjectRecord *object_record = object_handler->getObjectRecord(we->getId());
+      if (object_record && object_record->type.empty()) object_record->type = we->getId();
       if (!object_record) {
         std::string type = we->type();
         varconf::Config::inst()->clean(type);
         object_record = object_handler->getObjectRecord(type);
-	object_handler->copyObjectRecord(we->getID(), object_record);
-        object_record = object_handler->getObjectRecord(we->getID());
+	object_handler->copyObjectRecord(we->getId(), object_record);
+        object_record = object_handler->getObjectRecord(we->getId());
         if (object_record) object_record->type = we->type();
       }
       if (!object_record) {
         std::string parent = we->parent();
         varconf::Config::inst()->clean(parent);
         object_record = object_handler->getObjectRecord(parent);
-	object_handler->copyObjectRecord(we->getID(), object_record);
-        object_record = object_handler->getObjectRecord(we->getID());
+	object_handler->copyObjectRecord(we->getId(), object_record);
+        object_record = object_handler->getObjectRecord(we->getId());
         if (object_record) object_record->type = we->parent();
       }
       if (!object_record) {
         object_record = object_handler->getObjectRecord(DEFAULT);
-	object_handler->copyObjectRecord(we->getID(), object_record);
-        object_record = object_handler->getObjectRecord(we->getID());
+	object_handler->copyObjectRecord(we->getId(), object_record);
+        object_record = object_handler->getObjectRecord(we->getId());
         if (object_record) object_record->type = DEFAULT;
       }
       if (!object_record) {
@@ -363,7 +365,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         return;   
       }
       object_record->name = we->getName();
-      object_record->id = we->getID();
+      object_record->id = we->getId();
       object_record->entity = we;
 
       if (we->hasBBox()) {
@@ -377,7 +379,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       // Hmm, might be better to explicity link to object.
       // calls only required if Pos, or orientation changes - how can we tell?
       object_record->position = we->getAbsPos();
-      object_record->orient = we->getAbsOrient();
+      object_record->orient = we->getOrientation();
       // TODO determine what model queue to use.
       // TODO if queue is empty switch to another
 //      if (object_record->low_quality.begin() == object_record->low_quality.end()) std::cout << "Error, no models!" << std::endl;
@@ -416,8 +418,8 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         }
       }
       if (object_record->draw_members) {
-        for (unsigned int i = 0; i < we->getNumMembers(); ++i) {
-          buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode, render_queue, message_list);
+        for (unsigned int i = 0; i < we->numContained(); ++i) {
+          buildQueues((WorldEntity*)we->getContained(i), depth + 1, select_mode, render_queue, message_list);
         }
       }
     }

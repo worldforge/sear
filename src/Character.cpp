@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.51 2005-01-06 12:46:55 simon Exp $
+// $Id: Character.cpp,v 1.52 2005-02-18 16:39:06 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -16,7 +16,8 @@
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 #include <Eris/Avatar.h>
-#include <Eris/Player.h>
+#include <Eris/Account.h>
+#include <Eris/View.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -34,13 +35,12 @@
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
 
-#include "common/Use.h"
-#include "common/Wield.h"
+#include "common/operations.h"
 
 #include <wfmath/atlasconv.h>
 
-#include <Atlas/Objects/Operation/Create.h>
-#include <Atlas/Objects/Operation/Set.h>
+#include <Atlas/Objects/Operation.h>
+//#include <Atlas/Objects/Operation/Set.h>
 #include <Atlas/Message/Element.h>
 
 
@@ -130,8 +130,8 @@ Character::Character(Eris::Avatar *avatar) :
   m_initialised(false)
 {
   //assert ((self != NULL) && "Character self is NULL");
-  m_self = static_cast<WorldEntity*>(m_avatar->getEntity());
-  m_self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
+// TODO ERIS Replace this with new version
+//  m_self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
 }
 
 Character::~Character() {
@@ -293,7 +293,7 @@ void Character::updateMove(const WFMath::Vector<3> & direction,
 void Character::getEntity(const std::string &id) {
   assert ((m_initialised == true) && "Character not initialised");
 
-  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  Eris::EntityPtr e = System::instance()->getClient()->getAvatar()->getView()->getEntity(id);
   if (!e) return;
   m_avatar->place(e, m_avatar->getEntity());
   setAction("pickup");
@@ -306,8 +306,8 @@ void Character::dropEntity(const std::string &name, int quantity) {
   }
   Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < m_self->getNumMembers()); ++i) {
-    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getMember(i));
+  for (unsigned int i = 0; (quantity) && (i < m_self->numContained()); ++i) {
+    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getContained(i));
     if (we->getName() == name) {
       m_avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
       quantity--;
@@ -318,25 +318,28 @@ void Character::dropEntity(const std::string &name, int quantity) {
 
 void Character::touchEntity(const std::string &id) {
   assert ((m_initialised == true) && "Character not initialised");
-  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  Eris::EntityPtr e = System::instance()->getClient()->getAvatar()->getView()->getEntity(id);
   if (!e) return;
   m_avatar->touch(e);
   setAction("touch");
 }
 
 void Character::wieldEntity(const std::string &name) {
-  for (unsigned int i = 0; i < m_self->getNumMembers(); ++i) {
-    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getMember(i));
-    Eris::StringSet wep = we->getInherits();
-    if ((we->getName() == name) || (wep.find(name) != wep.end())) {
-      Atlas::Objects::Operation::Wield w;
-      w.setFrom(m_self->getID());
+  for (unsigned int i = 0; i < m_self->numContained(); ++i) {
+    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getContained(i));
+    Eris::TypeInfo *type = we->getType();
+    assert(type);
+    if ((we->getName() == name) || (type->getName() == name)) {
+      //Atlas::Objects::Operation::Wield w;
+      Wield w;
+      w->setFrom(m_self->getId());
       Atlas::Message::Element::MapType arg;
-      arg["id"] = we->getID();
+      arg["id"] = we->getId();
       arg["objtype"] = "obj";
-      Atlas::Message::Element::ListType & args = w.getArgs();
-      args.push_back(arg);
-      m_avatar->getWorld()->getConnection()->send(w);
+      w->setArgsAsList(Atlas::Message::Element::ListType(1, arg));
+//      Atlas::Message::Element::ListType & args = w->getArgs();
+//      args.push_back(arg);
+      m_avatar->getConnection()->send(w);
       setAction("wield");
       return;
     }
@@ -346,16 +349,17 @@ void Character::wieldEntity(const std::string &name) {
 void Character::useToolOnEntity(const std::string & id) {
   assert ((m_initialised == true) && "Character not initialised");
   if (id.empty()) return;
-  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  Eris::EntityPtr e = System::instance()->getClient()->getAvatar()->getView()->getEntity(id);
   if (!e) return;
-  Atlas::Objects::Operation::Use u;
-  u.setFrom(m_self->getID());
+  Use u;
+  u->setFrom(m_self->getId());
   Atlas::Message::Element::MapType arg;
-  arg["id"] = e->getID();
+  arg["id"] = e->getId();
   arg["objtype"] = "obj";
-  Atlas::Message::Element::ListType & args = u.getArgs();
-  args.push_back(arg);
-  m_avatar->getWorld()->getConnection()->send(u);
+  u->setArgsAsList(Atlas::Message::Element::ListType(1, arg));
+//  Atlas::Message::Element::ListType & args = u->getArgs();
+//  args.push_back(arg);
+  m_avatar->getConnection()->send(u);
   setAction("use");
 }
 
@@ -363,8 +367,8 @@ void Character::displayInventory() {
   assert ((m_initialised == true) && "Character not initialised");	
 //  if (!m_self) return;
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; i < m_self->getNumMembers(); ++i)
-    inventory[m_self->getMember(i)->getName()]++;
+  for (unsigned int i = 0; i < m_self->numContained(); ++i)
+    inventory[m_self->getContained(i)->getName()]++;
   for (std::map<std::string, int>::const_iterator I = inventory.begin(); I != inventory.end(); ++I) {
 //    std::cout << I->second << " - " << I->first << std::endl;
   std::string quantity = string_fmt(I->second);
@@ -382,15 +386,18 @@ void Character::say(const std::string &msg) {
 void Character::make(const std::string &type, const std::string &name) {
   assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Create c;
-  c.setFrom(m_self->getID());
+  c->setFrom(m_self->getId());
   Atlas::Message::Element::MapType msg;
-  msg["loc"] = m_self->getContainer()->getID();
+  
+  Eris::Entity *e = m_self->getLocation();
+  assert(e);
+  msg["loc"] = e->getId();
   WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
   msg["pos"] = pos.toAtlas();
   msg["name"] = name;
   msg["parents"] = Atlas::Message::Element::ListType(1, type);
-  c.setArgs(Atlas::Message::Element::ListType(1, msg));
-  m_avatar->getWorld()->getConnection()->send(c);
+  c->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getConnection()->send(c);
 }
 
 void Character::toggleRunModifier() {
@@ -429,7 +436,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     return;
   }
 
-  Eris::EntityPtr te = Eris::World::Instance()->lookup(target);
+  Eris::EntityPtr te = System::instance()->getClient()->getAvatar()->getView()->getEntity(target);
   if(!te) {
     Log::writeLog("No target " + target + " to give " + string_fmt(quantity) + " items of " + name + " to", Log::LOG_DEFAULT);
     return;
@@ -437,8 +444,8 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
 
   Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < m_self->getNumMembers()); ++i) {
-    WorldEntity *we = (WorldEntity*)m_self->getMember(i);
+  for (unsigned int i = 0; (quantity) && (i < m_self->numContained()); ++i) {
+    WorldEntity *we = (WorldEntity*)m_self->getContained(i);
     if (we->getName() == name) {
       m_avatar->place(we, te, WFMath::Point<3>(0,0,0));
       quantity--;
@@ -448,7 +455,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
 }
 
 void Character::registerCommands(Console *console) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  //assert ((m_initialised == true) && "Character not initialised");	
   console->registerCommand(MOVE_FORWARD, this);
   console->registerCommand(MOVE_BACKWARD, this);
   console->registerCommand(MOVE_STOP_FORWARD, this);
@@ -553,14 +560,14 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     ObjectHandler *object_handler = System::instance()->getObjectHandler();
     Atlas::Message::Element::MapType mt;
     ObjectRecord *record = NULL;
-    if (object_handler) record = object_handler->getObjectRecord(m_self->getID());
-    if (m_self->hasProperty(GUISE)) { // Read existing values
-      mt = m_self->getProperty(GUISE).asMap();
+    if (object_handler) record = object_handler->getObjectRecord(m_self->getId());
+    if (m_self->hasAttr(GUISE)) { // Read existing values
+      mt = m_self->valueOfAttr(GUISE).asMap();
       if (record) record->setAppearance(mt);
     } else { // Set defaults and send to server
       if (record) {
         record->setAppearance(mt);
-        m_self->setProperty(GUISE, mt);
+        m_self->setAttr(GUISE, mt);
         setApp();
       }
     }
@@ -573,7 +580,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   }
 //   else if (command == SET_MESH) {
  //   ObjectHandler *object_handler = _system->getObjectHandler();
-  //  ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
+  //  ObjectRecord *object_record = object_handler->getObjectRecord(we->getId());
    // object_record->action(command + " " + args);
  // }
 }
@@ -611,8 +618,8 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
 void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
   if (!name.empty()) {
     Atlas::Message::Element::MapType mt;
-    if (m_self->hasProperty(GUISE)) {
-      mt = m_self->getProperty(GUISE).asMap();
+    if (m_self->hasAttr(GUISE)) {
+      mt = m_self->valueOfAttr(GUISE).asMap();
     }
     Atlas::Message::Element::MapType::iterator I = mt.find(map);
     if (I != mt.end()) {
@@ -622,7 +629,7 @@ void Character::setAppearance(const std::string &map, const std::string &name, c
       m[name] = value;
       mt[map] = m;
     }
-    m_self->setProperty(GUISE, mt);
+    m_self->setAttr(GUISE, mt);
   }
   setApp();
 }
@@ -630,16 +637,16 @@ void Character::setAppearance(const std::string &map, const std::string &name, c
 void Character::clearApp() {
   assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
-  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
+  set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
   Atlas::Message::Element::MapType msg;
   const Atlas::Message::Element::MapType mt;
-  msg["id"] = m_self->getID();
+  msg["id"] = m_self->getId();
   msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
-  set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  m_avatar->getWorld()->getConnection()->send(set);
+  set->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getConnection()->send(set);
 }
 
 
@@ -647,56 +654,60 @@ void Character::clearApp() {
 void Character::setApp() {
   assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
-  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
-//  set.setFrom(m_self->getID());
-//  set.setFrom(m_self->getID());
+  set->setFrom(System::instance()->getClient()->getAccount()->getId());
+//  set.setFrom(m_self->getId());
+//  set.setFrom(m_self->getId());
 
   Atlas::Message::Element::MapType msg;
-  const Atlas::Message::Element::MapType mt = m_self->getProperty(GUISE).asMap();
+  const Atlas::Message::Element::MapType mt = m_self->valueOfAttr(GUISE).asMap();
 
-//  msg["loc"] = m_self->getContainer()->getID();
+//  msg["loc"] = m_self->getContainer()->getId();
 //  WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
 //  msg["pos"] = pos.toAtlas();
 //  msg["parents"] = Atlas::Message::Element::ListType(1, arg);
 
-//  set.sendFrom(m_self->getID());
-  msg["id"] = m_self->getID();
+//  set.sendFrom(m_self->getId());
+  msg["id"] = m_self->getId();
   msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
-  set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  m_avatar->getWorld()->getConnection()->send(set);
+  set->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getConnection()->send(set);
 }
 
 
 void Character::setHeight(float height) {
   assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
-  set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
+  set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
   Atlas::Message::Element::MapType msg;
-  msg["id"] = m_self->getID();
+  msg["id"] = m_self->getId();
   msg["objtype"] = "obj";
   msg[HEIGHT] = height;
 
-  set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  m_avatar->getWorld()->getConnection()->send(set);
+  set->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getConnection()->send(set);
 }
 
 void Character::setAction(const std::string &action) {
   assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
-  set.setFrom(m_self->getID());
+  set->setFrom(m_self->getId());
 
   Atlas::Message::Element::MapType msg;
-  msg["id"] = m_self->getID();
+  msg["id"] = m_self->getId();
   msg["objtype"] = "obj";
   msg["action"] = action;
 
-  set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  m_avatar->getWorld()->getConnection()->send(set);
+  set->setArgsAsList(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getConnection()->send(set);
 }
 
 
+void Character::GotCharacterEntity(Eris::Entity *e) {
+  m_self = dynamic_cast<WorldEntity*>(e);
+  init();
+}
 
 } /* namespace Sear */

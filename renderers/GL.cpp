@@ -17,7 +17,6 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include <Eris/Entity.h>
-#include <Eris/World.h>
 
 //#include "sear_icon.xpm"
 #include "RenderSystem.h"
@@ -606,7 +605,7 @@ void GL::procEvent(int x, int y) {
   WorldEntity *selected_entity = getSelectedID(ic);
   if (selected_entity != activeEntity) {
     activeEntity = selected_entity;
-    if (debug && activeEntity) Log::writeLog(std::string("ActiveID: ") + activeEntity->getID(), Log::LOG_DEFAULT);
+    if (debug && activeEntity) Log::writeLog(std::string("ActiveID: ") + activeEntity->getId(), Log::LOG_DEFAULT);
   }
 }
 
@@ -1399,7 +1398,7 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
 }
 
 std::string GL::getActiveID() {
-  return (activeEntity) ? (activeEntity->getID()) : ("");
+  return (activeEntity) ? (activeEntity->getId()) : ("");
 } 
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   if (!use_multitexturing) multitexture = false;

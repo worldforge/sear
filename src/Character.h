@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.24 2004-12-31 15:38:15 simon Exp $
+// $Id: Character.h,v 1.25 2005-02-18 16:39:06 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -12,7 +12,7 @@
 
 #include <wfmath/quaternion.h>
 #include <Eris/Entity.h>
-#include <Eris/Utils.h>
+//#include <Eris/Utils.h>
 #include <Eris/Types.h>
 #include <Eris/Avatar.h>
 #include "interfaces/ConsoleObject.h"
@@ -105,6 +105,8 @@ public:
   void clearApp();
   void setHeight(float);
   void setAction(const std::string &action);
+  void GotCharacterEntity(Eris::Entity *e);
+
 private:
   WorldEntity *m_self;
   Eris::Avatar *m_avatar;

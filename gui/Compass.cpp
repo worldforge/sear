@@ -5,9 +5,12 @@
 #include "Compass.h"
 #include "renderers/RenderSystem.h"
 #include "renderers/Render.h"
+#include "src/System.h"
+#include "src/client.h"
 
-#include <Eris/World.h>
+#include <Eris/Avatar.h>
 #include <Eris/Entity.h>
+#include <Eris/View.h>
 
 #include <iostream>
 
@@ -34,15 +37,17 @@ void Compass::setup()
 
 void Compass::update(double cameraRotation)
 {
-    Eris::Entity* focus = Eris::World::Instance()->getFocusedEntity();
+  Eris::Avatar *avatar = System::instance()->getClient()->getAvatar();
+  Eris::Entity *focus = avatar->getEntity();
+//    Eris::Entity* focus = Eris::World::Instance()->getFocusedEntity();
     if (!focus) return;
     
     WFMath::Quaternion q = focus->getOrientation();
     
-    Eris::Entity* ent = focus->getContainer();
-    while (ent && (ent != Eris::World::Instance()->getRootEntity())) {
+    Eris::Entity* ent = focus->getLocation();
+    while (ent && (ent != avatar->getView()->getTopLevel())) {
         q *= ent->getOrientation();
-        ent = ent->getContainer();
+        ent = ent->getLocation();
     }
     
     WFMath::Vector<3> northAxis(0.0, 1.0, 0.0),
