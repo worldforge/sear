@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.36 2004-04-26 15:32:31 simon Exp $
+// $Id: System.h,v 1.37 2004-04-26 15:38:38 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -217,7 +217,6 @@ public:
   void setCharacter(Character *);
   
   static System *instance() { return _instance; }
-  static Uint32 getPixel(SDL_Surface *surface, int x, int y);
 
   void switchCursor(int);
   void setAction(int);

@@ -1,4 +1,7 @@
 26th April 2004, Simon Goodall
+ * Removed getPixel function as it is not used
+
+26th April 2004, Simon Goodall
  * Some refactoring to allow user def screen sizes again
  * Moved image loading code from System to TextureManager.
  * Some GL Context invalidation code for Textures

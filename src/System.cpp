@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.76 2004-04-26 15:32:31 simon Exp $
+// $Id: System.cpp,v 1.77 2004-04-26 15:38:38 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -824,28 +824,6 @@ void System::toggleMouselook() {
     SDL_WarpMouse(_width / 2, _height / 2);
   } else {
     SDL_ShowCursor(SDL_ENABLE);
-  }
-}
-
-
-Uint32 System::getPixel(SDL_Surface *surface, int x, int y) {
-  int bpp = surface->format->BytesPerPixel;
-  /* Here p is the address to the pixel we want to retrieve */
-  Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-  switch(bpp) {
-    case 1:
-      return *p;
-    case 2:
-      return *(Uint16 *)p;
-    case 3:
-      if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-        return p[0] << 16 | p[1] << 8 | p[2];
-      else
-        return p[0] | p[1] << 8 | p[2] << 16;
-     case 4:
-       return *(Uint32 *)p;
-    default:
-       return 0;       /* shouldn't happen, but avoids warnings */
   }
 }
 
