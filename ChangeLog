@@ -1,3 +1,8 @@
+2004-06-05  Al Riddoch  <alriddoch@zepler.org>
+
+	* environment/TerrainRenderer.cpp: Implement culling entire terrain
+	  chunks using the Frustum test. Big speedup.
+
 2004-06-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Container.cpp: Implement addChild() and showAll().

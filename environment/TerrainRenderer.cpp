@@ -8,6 +8,10 @@
 
 #include "TerrainRenderer.h"
 
+#include "renderers/RenderSystem.h"
+
+#include "src/Render.h"
+
 #include <sage/GLU.h>
 
 #include "src/System.h"
@@ -19,8 +23,6 @@
 #include <Mercator/Surface.h>
 
 #include <iostream>
-
-#include "renderers/RenderSystem.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -209,6 +211,10 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
     enableRendererState();
 
+    Render * r = RenderSystem::getInstance().getRenderer();
+    float frustum[6][4];
+    r->getFrustum(frustum);
+
     const Terrain::Segmentstore & segs = t.getTerrain();
 
     Terrain::Segmentstore::const_iterator I = segs.lower_bound(lowXBound);
@@ -220,6 +226,30 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         Terrain::Segmentcolumn::const_iterator J = col.lower_bound(lowYBound);
         Terrain::Segmentcolumn::const_iterator L = col.upper_bound(upYBound);
         for (; J != L; ++J) {
+            Mercator::Segment * s = J->second;
+            float min, max;
+            // FIXME This test can go, once the Mercator change is in.
+            if (s->isValid()) {
+                min = s->getMin();
+                max = s->getMax();
+            } else {
+                // Hack. Get this data from control points
+                min = 0;
+                max = 1;
+            }
+
+            WFMath::AxisBox<3> box(WFMath::Point<3>(I->first * segSize,
+                                                    J->first * segSize,
+                                                    min),
+                                   WFMath::Point<3>((I->first + 1) * segSize,
+                                                    (J->first + 1) * segSize,
+                                                    max));
+
+            if (!r->patchInFrustum(box)) {
+                continue;
+            }
+            
+            // Do the Frustum test.
             DisplayListColumn & dcol = (M == m_displayLists.end()) ? 
                                            m_displayLists[I->first] :
                                            M->second;
@@ -236,7 +266,6 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 //                                << std::endl << std::flush;);
 
 
-                Mercator::Segment * s = J->second;
                 if (!s->isValid()) {
                     s->populate();
                 }
