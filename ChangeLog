@@ -1,4 +1,7 @@
 11th March 2002, Simon Goodall
+ * Added base code for texture manager class
+
+11th March 2002, Simon Goodall
  * Cally models can now specify additional textures to those that were specified on material createion
 
 8th March 2002, Simon Goodall
