@@ -57,7 +57,15 @@ public:
         }
         disp = 0;
 
+        // Clean up buffers
         if (harray) delete [] harray;
+        harray = NULL;
+        narray = NULL;
+
+        // Clean up textures
+        if (glIsTexture(m_alphaTextures[0])) {
+          glDeleteTextures(8, m_alphaTextures);
+        }
       }
     };
     typedef std::map<int, DataSeg> DisplayListColumn;

@@ -1,3 +1,8 @@
+2005-03-14  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/TerrainRenderer.h: Reset pointers and clean up textures in
+	  call to invalidate()
+
 2005-03-04  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment.Stars.cpp: Add mmgr include.
