@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.26 2004-05-24 18:47:11 alriddoch Exp $
+// $Id: TextureManager.cpp,v 1.27 2004-05-27 22:58:34 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,6 +22,15 @@
 #include "src/FileHandler.h"
 
 #include <unistd.h>
+
+#ifdef WINDOWS
+    
+int ilogb(double x)
+{
+    return static_cast<int>(_logb(x));
+}
+    
+#endif
 
 // Default texture maps
 #include "default_image.xpm"
@@ -135,7 +144,8 @@ bool use_ext_texture_filter_anisotropic = false;
 TextureManager::TextureManager() :
   m_initialised(false),
   m_texture_counter(1),
-  m_texture_units(1)
+  m_texture_units(1),
+  m_baseMipmapLevel(1)
 {  
   m_texture_config.sigsv.connect(SigC::slot(*this, &TextureManager::varconf_callback));
   m_texture_config.sige.connect(SigC::slot(*this, &TextureManager::varconf_error_callback));
@@ -286,20 +296,35 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
   GLuint texture_id;
   glGenTextures(1, &texture_id);
   glBindTexture(GL_TEXTURE_2D, texture_id);
+  
+  // build image - use mip mapping if requested
+  bool mipmap = true;
+  if (m_texture_config.findItem(texture_name, KEY_mipmap))
+  {
+    mipmap = (bool)m_texture_config.getItem(texture_name, KEY_mipmap);
+    std::cout << "custom mipmap value for texture " << texture_name << " is "
+     << (mipmap ? "true" : "false") << std::endl;
+  }
+
   // Set texture filters
-  std::string min_filter = (std::string)m_texture_config.getItem(texture_name, KEY_min_filter);
-  if (min_filter.empty()) {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, DEFAULT_min_filter);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, getFilter(min_filter));
+  int minFilter = GL_LINEAR;
+  if (m_texture_config.findItem(texture_name, KEY_min_filter)) {
+    minFilter = getFilter((std::string)m_texture_config.getItem(texture_name, KEY_min_filter));
+  } else if (mipmap) {
+    minFilter = GL_LINEAR_MIPMAP_LINEAR;
   }
-  std::string mag_filter = (std::string)m_texture_config.getItem(texture_name, KEY_mag_filter);
-  if (mag_filter.empty()) {
+  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+
+  if (m_texture_config.findItem(texture_name, KEY_mag_filter)) {
+    int filter = getFilter((std::string) m_texture_config.getItem(texture_name, KEY_mag_filter));
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+  } else {
+    std::cout << "using default mag filter" << std::endl;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, DEFAULT_mag_filter);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, getFilter(mag_filter));
   }
-  // Set clamp or repeat
+
+// Set clamp or repeat
   bool clamp = DEFAULT_clamp;
   bool clamp_s = DEFAULT_clamp_s;
   bool clamp_t = DEFAULT_clamp_t;
@@ -372,17 +397,31 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     default: depth = GL_RGBA; break;
   }
 */
-  // build image - use mip mapping if requested
-  bool mipmap = (bool)m_texture_config.getItem(texture_name, KEY_mipmap);
+  
   if (mipmap) {
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, m_baseMipmapLevel);
+    
     if (use_sgis_generate_mipmap) {
+      
       glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+      glTexImage2D(GL_TEXTURE_2D, 0,fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     } else {
-      gluBuild2DMipmaps(GL_TEXTURE_2D, fmt, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
+      int maxMipmapLevel = ilogb(std::max(surface->w, surface->h));
+      std::cout << "max mip level is " << maxMipmapLevel << std::endl;
+      
+      assert(glGetError() == 0);
+      
+      gluBuild2DMipmapLevels(GL_TEXTURE_2D, fmt, surface->w, surface->h, 
+        format, GL_UNSIGNED_BYTE, 
+        0, m_baseMipmapLevel, maxMipmapLevel,
+        surface->pixels);
+        
+      assert(glGetError() == 0);
     }
+    
   } else {
-   glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
   }
 
   // Set texture priority if requested
@@ -486,9 +525,14 @@ void TextureManager::setupGLExtensions() {
   if (debug) std::cout << m_texture_units << " texture units" << std::endl;
   
   use_arb_multitexture = sage_ext[GL_ARB_MULTITEXTURE];
+  if (debug && use_arb_multitexture) std::cout << "Using arb_multitexture" << std::endl;
+  
   use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
+  if (debug && use_sgis_generate_mipmap) std::cout << "Using GL_SGIS_GENERATE_MIPMAP" << std::endl;
+  
   use_ext_texture_filter_anisotropic = sage_ext[GL_EXT_TEXTURE_FILTER_ANISOTROPIC];
   use_arb_texture_border_clamp = true;//sage_ext[GL_ARB_TEXTURE_BORDER_CLAMP];
+
 }
 
 void TextureManager::setScale(float scale_x, float scale_y) {

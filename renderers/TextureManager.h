@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.15 2004-05-23 21:28:36 jmt Exp $
+// $Id: TextureManager.h,v 1.16 2004-05-27 22:58:34 jmt Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -195,6 +195,8 @@ private:
   TextureID m_default_texture;
   TextureID m_default_font;
 
+  int m_baseMipmapLevel;
+  
   /**
    * This function is used to setup the required OpenGL texture extensions
    */ 
