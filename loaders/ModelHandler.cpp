@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.6 2005-03-15 17:55:03 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: ModelHandler.cpp,v 1.7 2005-04-05 21:51:40 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -128,6 +124,7 @@ void ModelHandler::shutdown() {
   
 ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
   assert (m_initialised == true);
+  assert(record);
   // Model loaded for this object?
   if (m_object_map[record->id + model_id]) {
     return m_object_map[record->id + model_id];
@@ -138,15 +135,10 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     m_object_map[record->id + model_id] = m_model_records_map[model_id];
     return m_model_records_map[model_id];
   }
-  assert(render);
+//  assert(render);
   // No existing model found, load up a new one
   if (!render) {
     std::cerr << "renderer is null" << std::endl;	  
-    return NULL;
-  }
-  assert(record);
-  if (!record) {
-    std::cerr << "record is NULL" << std::endl;
     return NULL;
   }
 
@@ -296,6 +288,21 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
   if (command == CMD_LOAD_MODEL_RECORDS) {
     loadModelRecords(args);
   }
+
+}
+
+void ModelHandler::invalidate() {
+  // Do the same again for the object map
+  //for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
+  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
+    ModelRecord *record = I->second;
+    assert(record);
+    Model *model = record->model;
+    if (model) {
+      model->invalidate();
+    }
+  }
+
 
 }
 

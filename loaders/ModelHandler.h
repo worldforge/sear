@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.3 2005-03-15 17:55:03 simon Exp $
+// $Id: ModelHandler.h,v 1.4 2005-04-05 21:51:40 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -36,7 +36,7 @@ public:
   void init();
   void shutdown();
  
-  void invalidate() {};
+  void invalidate();
   
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);

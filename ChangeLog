@@ -1,5 +1,10 @@
 2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Implement invalidate
+	   method. Remove assert(render) call.
+
+2005-04-05  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Calendar.cpp: Fix time update code. This fixes the random fog 
 	  colour issue.
 
