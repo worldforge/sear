@@ -2,10 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.48 2005-03-15 17:55:05 simon Exp $
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: WorldEntity.cpp,v 1.49 2005-04-06 12:28:51 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -72,7 +69,13 @@ void WorldEntity::onMove() {
   rotateBBox(getOrientation());
 }
 
-void WorldEntity::handleTalk(const std::string &msg) {
+void WorldEntity::onTalk(const Atlas::Objects::Root &talkArgs) {
+  if (!talkArgs->hasAttr("say")) {
+    printf("Error: Talk but no 'say'\n");
+    return;
+  }
+  std::string msg = talkArgs->getAttr("say").asString();
+
   Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);	
   System::instance()->pushMessage(getName()+ ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
 
@@ -80,9 +83,6 @@ void WorldEntity::handleTalk(const std::string &msg) {
   messages.push_back(message(msg, System::instance()->getTime() + message_life));  
 }
 
-bool WorldEntity::hasMessages() {
-  return !messages.empty();
-}
 
 void WorldEntity::renderMessages() {
   if (messages.empty()) return;
@@ -232,48 +232,13 @@ std::string WorldEntity::parent() {
     }
   }
   return "";
-//  if (_parents.size() > 0) return *_parents.begin();
-//  else return "";
-}
-
-void WorldEntity::checkActions() {
-  return;
-  ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
-
-  // TODO possibility to link into action handler
-  
-  if (hasAttr(ACTION)) {
-    std::string action = valueOfAttr(ACTION).asString();
-    if (debug) std::cout << "Action: " << action << std::endl;
-    if (action != last_action) {
-      ObjectRecord *record = NULL;
-      if (object_handler) record = object_handler->getObjectRecord(getId());
-      if (record) record->action(action);
-      last_action = action;
-    }
-  } else {
-    last_action == "";
-  }
-	 
-  if (hasAttr(MODE)) {
-    std::string mode = valueOfAttr(MODE).asString();
-    if (debug) std::cout << "Mode: " << mode << std::endl;
-    if (mode != last_mode) {
-      ObjectRecord *record = NULL;
-      if (object_handler) record = object_handler->getObjectRecord(getId());
-      if (record) record->action(mode);
-      last_mode = mode;
-    }
-  } else {
-    last_mode == "";
-  }
 }
 
 void WorldEntity::sigChanged(const Eris::StringSet &ss) {
   ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
   for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
     std::string str = *I;
-    if (debug) std::cout << "Changed - " << str << std::endl;
+//    if (debug) std::cout << "Changed - " << str << std::endl;
     if (str == MODE) {
       const std::string mode = valueOfAttr(MODE).asString();
       static ActionHandler *ac = System::instance()->getActionHandler();
@@ -302,7 +267,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setAppearance(mt);
     } else if (str == "bbox") {
-std::cout << "Changing Height;" << std::endl;
+      if (debug) std::cout << "Changing Height;" << std::endl;
       float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());

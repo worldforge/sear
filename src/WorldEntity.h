@@ -2,13 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.20 2005-02-21 14:16:46 simon Exp $
+// $Id: WorldEntity.h,v 1.21 2005-04-06 12:28:51 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
 
 #include <string>
 #include <list>
+#include <Atlas/Objects/Operation.h>
+
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
@@ -30,22 +32,19 @@ public:
   ~WorldEntity();
   
   void onMove();
-  void handleTalk(const std::string &);
+  void onTalk(const Atlas::Objects::Root &talkArgs);
 
   const WFMath::Quaternion getAbsOrient();
   const WFMath::Point<3> getAbsPos();
 
   const OrientBBox &getOrientBBox() const { return m_orientBBox; }
-  bool hasMessages();
+  bool hasMessages() const { return !messages.empty(); }
   void renderMessages();
   void displayInfo();
 
   std::string type();
   std::string parent();
 
-//  ObjectProperties *getObjectProperties() { return _op; }
- // void setObjectProperties(ObjectProperties *op) { _op = op; }
-  void checkActions();
   void rotateBBox(const WFMath::Quaternion &q);  
 protected:
   /** Calculate the current position of this entity relative to it's
@@ -56,7 +55,6 @@ protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
 
   std::list<message> messages;
-  //ObjectProperties *_op;
 
   static const int message_life = 5000;
   static const int string_size = 40;
@@ -71,4 +69,5 @@ friend class Character;
 };
 
 } /* namespace Sear */
+
 #endif /* SEAR_WORLDENTITY_H */
