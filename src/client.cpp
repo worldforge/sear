@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.49 2004-01-19 11:27:05 simon Exp $
+// $Id: client.cpp,v 1.50 2004-01-19 12:15:17 simon Exp $
 
 #include "System.h"
 
@@ -533,7 +533,7 @@ void Client::EntityDelete(Eris::Entity* e){
 
 void Client::Entered(Eris::Entity* e){
   Log::writeLog("Entered World", Log::LOG_INFO);
-  _system->setCharacter(new Character((WorldEntity*)Eris::World::Instance()->getFocusedEntity()));
+  _system->setCharacter(new Character(Eris::World::Instance()->getPrimaryAvatar()));
   _status = CLIENT_STATUS_IN_WORLD;
   _system->setState(SYS_IN_WORLD, true);
   _system->getEventHandler()->addEvent(Event(EF_HANDLE_MOVE, e, EC_IN_WORLD, 0));

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.27 2003-09-27 13:53:19 simon Exp $
+// $Id: Character.cpp,v 1.28 2004-01-19 12:15:17 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -16,6 +16,7 @@
 #include <wfmath/atlasconv.h>
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
+#include <Eris/Avatar.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -103,8 +104,8 @@ static const std::string STOPPED = "stopped_";
 static const std::string WALKING = "walking_";
 static const std::string RUNNING = "running_";
 
-Character::Character(WorldEntity *self) :
-  _self(self),
+Character::Character(Eris::Avatar *avatar) :
+  _avatar(avatar),
   _walk_speed(0.0f),
   _run_speed(0.0f),
   _rotate_speed(0.0f),
@@ -117,7 +118,8 @@ Character::Character(WorldEntity *self) :
   _run_modifier(false),
   _initialised(false)
 {
-  assert ((self != NULL) && "Character self is NULL");
+  //assert ((self != NULL) && "Character self is NULL");
+  _self = (WorldEntity*)_avatar->getEntity();
   _self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
 }
 
@@ -222,55 +224,19 @@ void Character::updateLocals(bool send_to_server) {
 }
 
 void Character::updateMove(float x, float y, float z, WFMath::Quaternion orient) {
-  assert ((_initialised == true) && "Character not initialised");	
-  Atlas::Objects::Operation::Move move;
-  Atlas::Message::Element::MapType args;
-  Atlas::Message::Element::ListType vel;
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
-  move = Atlas::Objects::Operation::Move::Instantiate();
-  vel.push_back(x);
-  vel.push_back(y);
-  vel.push_back(z);
-  args[VELOCITY] = vel;
-  args[ORIENTATION] = orient.toAtlas();
-  args[LOC] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
-  args[ID] = _self->getID();
-  move.setFrom(_self->getID());
-  move.setSerialno(Eris::getNewSerialno());
-  move.setArgs(Atlas::Message::Element::ListType(1, args));
-  Eris::Connection::Instance()->send(move);
+  assert ((_initialised == true) && "Character not initialised");
+  _avatar->moveInDirection(WFMath::Vector<3>(x, y, z), orient);
 }
 
 void Character::getEntity(const std::string &id) {
-  assert ((_initialised == true) && "Character not initialised");	
-  Atlas::Objects::Operation::Move move;
-  Atlas::Message::Element::MapType args;
-  Atlas::Message::Element::ListType pos;
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
-  move = Atlas::Objects::Operation::Move::Instantiate();
-  pos.push_back(0.0);
-  pos.push_back(0.0);
-  pos.push_back(0.0);
-  args[POS] = pos;
-  args[LOC] = _self->getID();
-  args[ID] = id;
-  move.setFrom(_self->getID());
-//  move.setSerialno(Eris::getNewSerialno());
-  move.setArgs(Atlas::Message::Element::ListType(1, args));
-  Eris::Connection::Instance()->send(move);
+  assert ((_initialised == true) && "Character not initialised");
+  
+  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  if (!e) return;
+  _avatar->place(e, _avatar->getEntity());
 }
 
 void Character::dropEntity(const std::string &name, int quantity) {
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
   if (quantity == 0) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
@@ -278,22 +244,9 @@ void Character::dropEntity(const std::string &name, int quantity) {
   Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
-    WorldEntity *we = (WorldEntity*)_self->getMember(i);
+    WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
     if (we->getName() == name) {
-      Atlas::Objects::Operation::Move move;
-      Atlas::Message::Element::MapType args;
-      Atlas::Message::Element::ListType pos;
-      move = Atlas::Objects::Operation::Move::Instantiate();
-      pos.push_back(_self->GetPos().x());
-      pos.push_back(_self->GetPos().y());
-      pos.push_back(_self->GetPos().z());
-      args[POS] = pos;
-      args[LOC] = (_self->getContainer()) ? (_self->getContainer()->getID()) : ("");
-      args[ID] = we->getID();
-      move.setFrom(_self->getID());
-//      move.setSerialno(Eris::getNewSerialno());
-      move.setArgs(Atlas::Message::Element::ListType(1, args));
-      Eris::Connection::Instance()->send(move);
+      _avatar->drop(we);
       quantity--;
     }
   }
@@ -301,20 +254,9 @@ void Character::dropEntity(const std::string &name, int quantity) {
 
 void Character::touchEntity(const std::string &id) {
   assert ((_initialised == true) && "Character not initialised");
-  if (id.empty()) return;	
-  Atlas::Objects::Operation::Touch touch;
-  Atlas::Message::Element::MapType args;
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
-  touch = Atlas::Objects::Operation::Touch::Instantiate();
-  args[ID] = id;
-  touch.setFrom(_self->getID());
-  touch.setTo(id);
-  touch.setArgs(Atlas::Message::Element::ListType(1, args));
-//  touch.setSerialno(Eris::getNewSerialno());
-  Eris::Connection::Instance()->send(touch);
+  Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
+  if (!e) return;
+  _avatar->touch(e);
 }
 
 void Character::displayInventory() {
@@ -333,19 +275,8 @@ void Character::displayInventory() {
 }
 
 void Character::say(const std::string &msg) {
-  assert ((_initialised == true) && "Character not initialised");	
-  Atlas::Objects::Operation::Talk talk;
-  Atlas::Message::Element::MapType args;
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
-  talk =  Atlas::Objects::Operation::Talk::Instantiate();
-  args[SAY] = msg;
-  talk.setArgs(Atlas::Message::Element::ListType(1, args));
-//  talk.setSerialno(Eris::getNewSerialno());
-  talk.setFrom(_self->getID());
-  Eris::Connection::Instance()->send(talk);
+  assert ((_initialised == true) && "Character not initialised");
+  _avatar->say(msg);
 }
 
 void Character::toggleRunModifier() {
@@ -485,7 +416,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
    // object_record->action(command + " " + args);
  // }
 }
-void Character::Recontainered(Eris::Entity *entity1, Eris::Entity *entity2) {
+void Character::Recontainered(Eris::EntityPtr entity1, Eris::EntityPtr entity2) {
   assert ((_initialised == true) && "Character not initialised");	
   if (debug) {
     std::cout << "Recontainered" << std::endl;

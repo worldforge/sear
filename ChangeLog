@@ -1,4 +1,7 @@
 19th January 2004, Simon Goodall
+ * Replaced Atlas specific code with calls to Avatar->*
+
+19th January 2004, Simon Goodall
  * Fixes for latest Eris changes
 
 10th December 2003, Simon Goodall

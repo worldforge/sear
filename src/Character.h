@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.12 2003-04-30 19:22:45 simon Exp $
+// $Id: Character.h,v 1.13 2004-01-19 12:15:17 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -13,6 +13,8 @@
 #include <wfmath/quaternion.h>
 #include <Eris/Entity.h>
 #include <Eris/Utils.h>
+#include <Eris/Types.h>
+#include <Eris/Avatar.h>
 #include "interfaces/ConsoleObject.h"
 #include <sigc++/object_slot.h>
 
@@ -39,7 +41,7 @@ public:
    * @param we The character entity
    * @param system The system object
    */ 
-  Character(WorldEntity *we);
+  Character(Eris::Avatar *avatar);
 
   /**
    * Destructor
@@ -87,6 +89,7 @@ public:
   
 private:
   WorldEntity *_self;
+  Eris::Avatar *_avatar;
   float _walk_speed;
   float _run_speed;
   float _rotate_speed;
@@ -102,7 +105,7 @@ private:
 
   bool _run_modifier; ///< Flag storing run/walk state. True means run
 
-  void Recontainered(Eris::Entity *, Eris::Entity *);
+  void Recontainered(Eris::Entity*, Eris::Entity*);
   bool _initialised; ///< Initialisation state of character object
  
   void varconf_callback(const std::string &key, const std::string &section, varconf::Config &config);
