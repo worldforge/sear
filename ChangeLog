@@ -1,8 +1,14 @@
+15th January 2002, Simon Goodall
+ * Fixed segfault caused by an entity having no parents
+
 14th January 2002, Simon Goodall
  * Fixed NULL pointer error in model loading code
 
 11th January 2002, Simon Goodall
  * Added display lists to Render object. Paintbox and 3DS models are now rendered by display lists
+
+24th December 2002, Simon Goodall
+ * Queues are now built on actual state object, not state name.
 
 24th December 2002, Simon Goodall
  * Removed remainder of time code from System object

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.25 2002-12-24 18:08:17 simon Exp $
+// $Id: WorldEntity.cpp,v 1.26 2003-01-15 22:21:45 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -182,11 +182,12 @@ std::string WorldEntity::type() {
 }
 
 std::string WorldEntity::parent() {
-  Eris::TypeInfo *ti = getType();
-  if (ti) {
-    return *ti->getParentsAsSet().begin();
-  }
-  return "";
+//  Eris::TypeInfo *ti = getType();
+//  if (ti) {
+//    return *ti->getParentsAsSet().begin();
+//  }
+  if (_parents.size() > 0) return *_parents.begin();
+  else return "";
 }
 
 void WorldEntity::checkActions() {
