@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.38 2004-04-19 09:25:48 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.39 2004-04-19 12:51:45 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -245,6 +245,12 @@ Compare D^2 to choose what detail level to use
       if (!select_mode) _renderer->drawMessageQueue(_message_list);
     }
 #endif
+      _renderer->store();
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+  glEnableClientState(GL_VERTEX_ARRAY);
+  Environment::getInstance().renderSea();
+  glDisableClientState(GL_VERTEX_ARRAY);
+      _renderer->restore();
   } else {
 
 //    _renderer->applyLighting();
