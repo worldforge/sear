@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.63 2003-04-23 20:28:27 simon Exp $
+// $Id: GL.cpp,v 1.64 2003-04-30 19:22:45 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -221,7 +221,6 @@ void GL::buildColourSet() {
     colourArray[indx][2] = blue;
   }
 }
-
 
 GL *GL::_instance = NULL;
 
@@ -458,7 +457,8 @@ void GL::procEvent(int x, int y) {
   glClear(GL_COLOR_BUFFER_BIT);
   _graphics->drawScene("", true, 0);
   x_pos = x;
-  y_pos = window_height - y;
+  y = window_height - y;
+  y_pos = y;
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
 // TODO pre-cache 8 - bits?
@@ -806,6 +806,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && texture_data) {
+    if (multitexture) {
       glClientActiveTextureARB(GL_TEXTURE1_ARB);
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       glClientActiveTextureARB(GL_TEXTURE0_ARB);
@@ -813,6 +814,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     } else {
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
+  }
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
@@ -911,7 +913,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     model->render(false);
     glPopMatrix();
     //TODO hard code halo in static const variable
-    stateChange(getStateID(HALO));
+    stateChange(model_record->select_state);
     glStencilFunc(GL_NOTEQUAL, -1, 1);
     glColor4fv(_halo_colour);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -1205,11 +1207,7 @@ std::string GL::getActiveID() {
   return (activeEntity) ? (activeEntity->getID()) : ("");
 } 
 void GL::setTextureScale(unsigned int unit, float scale) {
-  switch(unit) {
-    case (0): glActiveTextureARB(GL_TEXTURE0_ARB); break;
-    case (1): glActiveTextureARB(GL_TEXTURE1_ARB); break;
-    default: glActiveTextureARB(GL_TEXTURE0_ARB); break;
-  }
+  glActiveTextureARB(GL_TEXTURE0_ARB + unit);
   glMatrixMode(GL_TEXTURE);
   glLoadIdentity();
   glScalef(scale, scale, 1.0f);

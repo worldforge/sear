@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.6 2003-04-26 14:20:08 simon Exp $
+// $Id: TextureManager.cpp,v 1.7 2003-04-30 19:22:45 simon Exp $
 
 #include "TextureManager.h"
 
@@ -151,17 +151,19 @@ void TextureManager::readTextureConfig(const std::string &filename) {
 
 TextureObject TextureManager::loadTexture(const std::string &texture_name) {
   assert((_initialised == true) && "TextureManager not initialised");
-  if (!_texture_config.find(texture_name)) {
+  std::string clean_name = std::string(texture_name);
+  _texture_config.clean(clean_name);
+  if (!_texture_config.find(clean_name)) {
     std::cerr << "Texture " << texture_name << " not defined." << std::endl;
     return 0;
   }
   // Check if the texture has a filename specified
-  if (!_texture_config.findItem(texture_name, KEY_filename)) {
+  if (!_texture_config.findItem(clean_name, KEY_filename)) {
     std::cerr << "Error " << texture_name << " has no filename" << std::endl;
     return 0;
   }
-  std::string filename = (std::string)_texture_config.getItem(texture_name, KEY_filename);
-  std::string path = (std::string)_texture_config.getItem(texture_name, KEY_path);
+  std::string filename = (std::string)_texture_config.getItem(clean_name, KEY_filename);
+  std::string path = (std::string)_texture_config.getItem(clean_name, KEY_path);
   if (!path.empty()) {
     filename = path + "/" + filename;
   }
@@ -172,7 +174,7 @@ TextureObject TextureManager::loadTexture(const std::string &texture_name) {
     std::cerr << "Error loading texture: " << filename << std::endl;
     return 0;
   }
-  TextureObject texture_id = loadTexture(texture_name, surface);
+  TextureObject texture_id = loadTexture(clean_name, surface);
   // Free image
   SDL_FreeSurface(surface);
   // store into texture array
@@ -294,7 +296,10 @@ void TextureManager::switchTexture(TextureID texture_id) {
   TextureObject to = _textures[texture_id];
   if (to == 0) {
     to = loadTexture(_names[texture_id]);
-    if (to ==0) to = _textures[_default_texture];
+    if (to == 0) {
+      std::cerr << "Cannot find " << _names[texture_id] << std::endl;
+      to = _textures[_default_texture];
+    }
     _textures[texture_id] = to;
   }
   glBindTexture(GL_TEXTURE_2D, to);
@@ -303,13 +308,22 @@ void TextureManager::switchTexture(TextureID texture_id) {
 
 void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
   assert((_initialised == true) && "TextureManager not initialised");
+  if (texture_id == _last_textures[texture_unit]) return;
   if (texture_id == -1) texture_id = _default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
   if (texture_unit >= _texture_units) return; // Check we have enough texture units
-  if (_last_textures[texture_unit] == texture_id) return;
+  TextureObject to = _textures[texture_id];
+  if (to == 0) {
+    to = loadTexture(_names[texture_id]);
+    if (to == 0) {
+      std::cerr << "Cannot find " << _names[texture_id] << std::endl;
+      to = _textures[_default_texture];
+    }
+    _textures[texture_id] = to;
+  }
   glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
-  glBindTexture(GL_TEXTURE_2D, _textures[texture_id]);
-  _last_textures[texture_unit] = texture_id;
+  glBindTexture(GL_TEXTURE_2D, to);
+  _last_textures[texture_unit] = to;
   // Make sure we are at texture unit 0
   glActiveTextureARB(GL_TEXTURE0_ARB);
 }
@@ -346,6 +360,7 @@ void TextureManager::setupGLExtensions() {
   int tex_units;
   glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &tex_units);
   _texture_units = tex_units;
+  std::cout << "We have " << _texture_units << " texture units" << std::endl;
   use_arb_multitexture = sage_ext[GL_ARB_MULTITEXTURE];
   use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_ext_texture_filter_anisotropic = sage_ext[GL_EXT_TEXTURE_FILTER_ANISOTROPIC];

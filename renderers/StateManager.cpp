@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.3 2003-04-23 20:28:27 simon Exp $
+// $Id: StateManager.cpp,v 1.4 2003-04-30 19:22:45 simon Exp $
 
 /*
  * TODO
@@ -83,7 +83,7 @@ static const std::string CMD_LOAD_STATE_CONFIG = "load_state_file";
 StateManager::StateManager() :
   _initialised(false),
   _current_state(-1),
-  _state_counter(0)
+  _state_counter(1)
 {}
 
 StateManager::~StateManager() {
@@ -97,9 +97,7 @@ void StateManager::init() {
   _states.resize(256);
   _name_state_vector.resize(256);
   _state_change_vector.resize(256);
-  for (unsigned int i = 0; i < 256; i++) {
-    _state_change_vector[i].resize(256);
-  }
+  for (unsigned int i = 0; i < 256; _state_change_vector[i++].resize(256));
   
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
@@ -152,7 +150,6 @@ void StateManager::init() {
 
   _initialised = true;
 }
-
 
 void StateManager::shutdown() {
   if (debug) std::cout << "State Loader: Shutting Down" << std::endl;
@@ -260,12 +257,12 @@ void StateManager::stateChange(StateID state) {
   StateProperties *sp = _states[state];
   // If state doesn't exist, take first one
   if (!sp) {
-    sp = _states[0];
-    state = 0;
+	  std::cout << "bad state found - " << state <<  std::endl;
+    sp = _states[1];
+    state = 1;
   }
   // First time round, we have no states
   if (_current_state != -1) {
-//    std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
     GLuint list = _state_change_vector[_current_state][state];
     // Check whether we need to generate a display list
     if (!glIsList(list)) {
@@ -303,8 +300,12 @@ void StateManager::stateChange(StateID state) {
     else glDisable(GL_FOG);
     if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
     else glDisable(GL_RESCALE_NORMAL);
-    glAlphaFunc(sp->alpha_function, sp->alpha_value);
-    glBlendFunc(sp->blend_src_function, sp->blend_dest_function);
+    if (sp->alpha_function != 0) {
+      glAlphaFunc(sp->alpha_function, sp->alpha_value);
+    }
+    if (sp->blend_src_function != 0) {
+      glBlendFunc(sp->blend_src_function, sp->blend_dest_function);
+    }
   }
   _current_state = state;
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.28 2003-04-23 20:28:27 simon Exp $
+// $Id: Graphics.cpp,v 1.29 2003-04-30 19:22:45 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -101,7 +101,7 @@ void Graphics::init() {
   _renderer->init();
   ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
   ((GL*)_renderer)->getStateManager()->registerCommands(_system->getConsole());
- _camera = new Camera();
+  _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
   _initialised = true;
@@ -134,7 +134,7 @@ void Graphics::shutdown() {
   _initialised = false;
 }
 void Graphics::initST() {
-_terrain = new ROAM(_system, _renderer);
+  _terrain = new ROAM(_system, _renderer);
   if (!_terrain->init()) {
     Log::writeLog("Error initialising Terrain. Suggest Restart!", Log::LOG_ERROR);
   }
@@ -309,10 +309,10 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position, _terrain)) {
           if (!select_mode) {
-	    render_queue[_system->getModelRecords().getItem(*I, STATE)].push_back(Render::QueueItem(object_record, *I));
+	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }
-          else render_queue[_system->getModelRecords().getItem(*I, SELECT)].push_back(Render::QueueItem(object_record, *I));
+          else render_queue[_system->getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
 	}
       }
       if (object_record->draw_members) {

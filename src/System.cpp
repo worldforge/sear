@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.57 2003-04-23 20:28:27 simon Exp $
+// $Id: System.cpp,v 1.58 2003-04-30 19:22:45 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -250,6 +250,7 @@ bool System::init() {
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();
+  _graphics->initST();
   _system_running = true;
   _initialised = true;
   return true;
@@ -430,7 +431,6 @@ void System::createWindow(bool fullscreen) {
 
   _graphics->registerCommands(_console);
   _graphics->getRender()->initWindow(_width, _height);
-  _graphics->initST();
 
   renderer = _graphics->getRender();
   pushMessage("Loading, Please wait...", 2, 100);

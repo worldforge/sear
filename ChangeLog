@@ -1,3 +1,10 @@
+30th April 2003, Simon Goodall
+ * Fixed states so they are now loaded and assigned to entities properly
+ * Fixed siily selection bug caused by deleting the wrong bit of code
+ * Fixed Cal3d Loader code to use new TextureManager entries
+ * SetScale function now support any number of texture units
+ * Moved SkyBox and Terrain initialisation time so they can load in the textures
+
 29th April 2003, Simon Goodall
  * Updated ModelLoader to assign state ids to models
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.11 2003-03-23 19:51:49 simon Exp $
+// $Id: Character.h,v 1.12 2003-04-30 19:22:45 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -12,6 +12,7 @@
 
 #include <wfmath/quaternion.h>
 #include <Eris/Entity.h>
+#include <Eris/Utils.h>
 #include "interfaces/ConsoleObject.h"
 #include <sigc++/object_slot.h>
 
