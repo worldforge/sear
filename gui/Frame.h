@@ -5,7 +5,7 @@
 #ifndef SEAR_GUI_FRAME_H
 #define SEAR_GUI_FRAME_H
 
-#include <set>
+#include "gui/Window.h"
 
 namespace Sear {
 

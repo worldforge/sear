@@ -1,5 +1,9 @@
 2004-05-26  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Frame.h: Fix include typo.
+
+2004-05-26  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/*: Correctly put all the gui classes into the Sear namespace.
 
 2004-05-24  Al Riddoch  <alriddoch@zepler.org>
