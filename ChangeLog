@@ -1,5 +1,10 @@
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/Environment.cpp, environment/Environment.h: Add some 
+	  asserts to replace some NULL checks
+
+2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/StaticObject.cpp, renderers/StaticObject.h: Create an object to wrap static mesh handling and rendering.
 
 2005-03-15  Simon Goodall  <sear@simongoodall.co.uk>

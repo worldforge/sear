@@ -25,6 +25,7 @@ class Environment {
 
 public:
   ~Environment() {
+    assert(m_initialised == false);
     if (m_initialised) shutdown();
   }
 

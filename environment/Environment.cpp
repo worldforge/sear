@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -30,7 +30,8 @@ void Environment::init() {
 }
 
 void Environment::shutdown() {
-  if (!m_initialised) return;
+  assert(m_initialised);
+//  if (!m_initialised) return;
 
   delete m_terrain;
   m_terrain = NULL;
@@ -73,6 +74,7 @@ void Environment::renderTerrain(const WFMath::Point<3> &pos) {
 }
 
 void Environment::renderSea() {
+return;
   m_terrain->renderSea();
 }
 
