@@ -6,7 +6,6 @@
 
 #include <wfmath/quaternion.h>
 #include <stdio.h>
-#include <iostream>
 #include <string>
 #include <map>
 #define DELTA 0.0
@@ -281,10 +280,8 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
   unsigned int num_colours = 0;
   unsigned int unknown = 0;
   unsigned int index = 0;
-  std::cout << image[0] << std::endl;
 //  sscanf(image[0], "%u", &width);//, &height, &num_colours, &unknown);
   sscanf(&image[0][0], "%u %u %u %u", &width, &height, &num_colours, &unknown);
-  std::cout << "Width: " << width << " Height: " << height << " Num Colours: " << num_colours << std::endl;
   std::map<char, unsigned int> colour_map;
   for (index = 1; index <= num_colours; index++) {
     char code = image[index][0];
@@ -296,7 +293,6 @@ unsigned char *xpm_to_image(const char *image[], unsigned int &width, unsigned i
       colour <<= 8;
       colour |= 0xFF;
     }
-    std::cout << "Colour " << code << " is " << colour_name << ", " << colour << std::endl;
     colour_map[code] = colour;
   }
   unsigned char *data = (unsigned char *)malloc(width * height * 4 * sizeof(char));

@@ -47,6 +47,7 @@ typedef struct {
   bool outline;
   bool model_by_type;
   char state[OBJECT_LOADER_MAX_SIZE];
+  char select_state[OBJECT_LOADER_MAX_SIZE];
   float width;
   float height;
   float texture_scale;

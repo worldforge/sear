@@ -1,5 +1,3 @@
- * re-implement on screen speech
- * Add weather effects
  * Move render type def from Models to renderer
  * Add ability to specify search paths for default file locations 
  * Add ability to tokenise on quotes, not just spaces

@@ -5,18 +5,16 @@
 #ifndef _CAL3D_LOADER_H_
 #define _CAL3D_LOADER_H_ 1
 
-#include "../src/ModelLoader.h"
-
-#include "../src/ObjectLoader.h"
-
 #include <string>
+
+#include "../src/ModelLoader.h"
+#include "../src/ObjectLoader.h"
 
 namespace Sear {
 
 // Forward Declarations
 class Models;
 class ModelHandler;
-//class ObjectProperties;	
 
 class Cal3d_Loader : public ModelLoader {
 public:	

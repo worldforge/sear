@@ -2,6 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
+#include <set>
+
+#include <Eris/TypeInfo.h>
 
 #include "ModelHandler.h"
 #include "ModelLoader.h"
@@ -12,6 +15,7 @@
 #include "Config.h"
 #include "ObjectLoader.h"
 #include "Log.h"
+
 
 #include "../loaders/Cal3d_Loader.h"
 #include "../loaders/BoundBox_Loader.h"
@@ -76,44 +80,43 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   if (_models[id]) return _models[id];
   
   // Get object type record
-  ObjectProperties *op = NULL;
+  ObjectProperties *op = we->getObjectProperties();
   ObjectLoader *ol = System::instance()->getObjectLoader();
-  std::string model_type = "";
   std::string object_type = "";
+  std::string data_source = "";
+  Models *model = NULL;
+  static Config *model_config = System::instance()->getModel();
+  object_type = we->type();
+  std::set<std::string> parents_list = we->getType()->getParentsAsSet();
+  std::set<std::string>::const_iterator I = parents_list.begin();
 
-
-  if (!op && !type.empty()) {
-    op = ol->getObjectProperties(type);
-    object_type = type;
-    we->setObjectProperties(op);
-  }
-  if (op == NULL && !parent.empty()) {
-    op = ol->getObjectProperties(parent);
-    object_type = parent;
-    we->setObjectProperties(op);
-  }
-  if (op == NULL) {
-     op = ol->getObjectProperties("default");
-     object_type = "default";
-     we->setObjectProperties(op);
-  }
-  
-  model_type = op->model_type;		
-  
-  if (op->model_by_type) {
-    if (_models[object_type]) {
-      _models[id] = _models[object_type];
-      return _models[id];
+  while(!model) {
+    op = ol->getObjectProperties(object_type);
+//    if (!op) continue;
+    if (op) {
+      data_source = model_config->getAttribute(object_type);
+      if (op->model_by_type) {
+        if (_models[object_type]) {
+          _models[id] = _models[object_type];
+          return _models[id];
+        }
+      }
+      if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(we, op, data_source);
+    }
+    if (!model) {
+      if (I == parents_list.end()) {
+        if (object_type == "default") break;
+	else object_type = "default";
+      } else {
+        object_type = *I;
+        I++;
+      }    
     }
   }
-  
-  std::string data_source = System::instance()->getModel()->getAttribute(type);
-  if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute(parent);
-  if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute("default");
-  Models *model = NULL;
-  if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, op, data_source);
-  // TODO: throw Exception instead
-  else Log::writeLog("No ModelLoader available", Log::LOG_ERROR); 
+  if (!op) Log::writeLog("ERROR OP IS NULL", Log::LOG_ERROR);
+  _models[id] = model;
+  we->setObjectProperties(op);
+
   _models[id] = model;
   if (op->model_by_type) {
     model->setFlag("ModelByType", true);

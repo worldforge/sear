@@ -54,19 +54,58 @@ float GL::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
 	
 std::set<int> colourSet;
 std::set<int>::const_iterator colourSetIterator;
+std::map<unsigned int, std::string> colour_mapped;
 
+GLint redBits, greenBits, blueBits;
+GLuint redMask;
+GLuint greenMask;
+GLuint blueMask;
+int redShift;
+int greenShift;
+int blueShift;
+  
 GLuint makeMask(GLint bits) {
   return (0xFF >> (8 - bits));
 }
 
-  GLint redBits, greenBits, blueBits;
-  GLuint redMask;
-  GLuint greenMask;
-  GLuint blueMask;
-  int redShift;
-  int greenShift;
-  int blueShift;
+
+std::string getSelectedID(unsigned int i) {
+  return colour_mapped[i];
+}
+
+void nextColour(const std::string &id) {
+  unsigned int ic;
   
+  if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
+  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
+
+  colour_mapped[ic] = id;
+  
+  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
+  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
+  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
+  
+  glColor3ub(red, green, blue);
+}
+
+void resetColors(){
+  colour_mapped = std::map<unsigned int, std::string>();
+  colourSetIterator = colourSet.begin();
+  *colourSetIterator++;
+}
+
+GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
+GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
+GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
+GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
+GLfloat  whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
+GLfloat  blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
+GLfloat  ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
+GLfloat  diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
+GLfloat  specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
+
 void GL::buildColourSet() {
   unsigned int numPrims = 500;
   glGetIntegerv (GL_RED_BITS, &redBits);
@@ -92,52 +131,6 @@ void GL::buildColourSet() {
   Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_DEFAULT);
 }
 
-std::map<unsigned int, std::string> colour_mapped;
-
-void resetColors(){
-  colour_mapped = std::map<unsigned int, std::string>();
-  colourSetIterator = colourSet.begin();
-  *colourSetIterator++;
-}
-
-std::string getSelectedID(unsigned int i) {
-  
-  return colour_mapped[i];
-}
-
-int nextColour(const std::string &id) {
-  unsigned int ic;
-  
-  if  (colourSetIterator != colourSet.end()) ic = *colourSetIterator++;
-  else Log::writeLog("Out of colours, please increase number available", Log::LOG_ERROR);
-  colour_mapped[ic] = id;
-  
-  GLubyte red = (ic & (redMask << redShift)) << (8 - redBits);
-  GLubyte green = (ic & (greenMask << greenShift)) << (8 - greenBits);
-  GLubyte blue = (ic & (blueMask << blueShift)) << (8 - blueBits);
-  
-  glColor3ub(red, green, blue);
-  
-  return 0;
-}
-
-
-GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
-GLfloat green[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
-
-//GLfloat  whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
-
-
-
-
-GLfloat  whiteLight[]    = { 1.0f,  1.0f, 1.0f, 1.0f };
-GLfloat  blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
-GLfloat  ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
-GLfloat  diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
-GLfloat  specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
 GL *GL::_instance = NULL;
 
@@ -622,8 +615,10 @@ void GL::drawScene(const std::string& command, bool select_mode) {
     if ((root = (WorldEntity *)world->getRootEntity())) {
       if (_character) _character->updateLocals(false);
       render_queue = std::map<std::string, Queue>();
-      buildQueues(root, 0);
+      buildQueues(root, 0, select_mode);
       drawQueue(render_queue, select_mode, time_elapsed);
+      stateChange("font");
+      drawMessageQueue(render_queue, select_mode);
       // TODO: make into rasieDetail and lowerDetail methods
       if (!select_mode) {
         if (frame_rate < _lower_frame_rate_bound) {
@@ -666,7 +661,7 @@ void GL::drawScene(const std::string& command, bool select_mode) {
 
   }
   if (!select_mode) {
-    stateChange("font");
+//    stateChange("font"); // TODO this is probably not required!
    _system->getConsole()->draw(command);
 //  Calc FPS
     stateChange("font");
@@ -693,26 +688,22 @@ void GL::drawScene(const std::string& command, bool select_mode) {
 #endif
 }
 
-void GL::buildQueues(WorldEntity *we, int depth) {
+void GL::buildQueues(WorldEntity *we, int depth, bool select_mode) {
+  // Assuming depth 0 is the world and that world is not visible	
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
       ObjectProperties *op = we->getObjectProperties();
       if (!op) {
-        std::string type = we->type();
-        std::string parent = we->parent();
-        ObjectLoader *ol = _system->getObjectLoader();
-        if (!type.empty()) op = ol->getObjectProperties(type);
-        if (op == NULL && !parent.empty()) op = ol->getObjectProperties(parent);
-        if (op == NULL) op = ol->getObjectProperties("default");
-	we->setObjectProperties(op);
+	mh->getModel(we); // Allocates a model and an ObjectProperties
+        op = we->getObjectProperties();
       }
+      if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
       
-      std::string model_type = std::string(op->model_type);
-
-      if (op->draw_self && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->state].push_back(we);
+      if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->select_state].push_back(we);
+      if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, terrain)) render_queue[op->state].push_back(we);
       if (op->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); i++) {
-          buildQueues((WorldEntity*)we->getMember(i), depth + 1);
+          buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode);
         }
       }
     }
@@ -1213,7 +1204,7 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
 void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
-    if (!select_mode) stateChange(_state_loader->getStateProperties((std::string)I->first));
+    stateChange(_state_loader->getStateProperties((std::string)I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 
       WorldEntity *we = (WorldEntity *)*J;
@@ -1254,26 +1245,24 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
     }
   }
 }
-#if(0)
-void GL_Render::drawMessageQueue(bool select_mode) {
-         if (select_mode) return;
-   std::string type, parent;
-  for (std::map<std::string, Queue>::const_iterator I = model_queue.begin(); I != model_queue.end(); I++) {
-           WorldEntity *we = (WorldEntity *)*(I->second.begin());
-     type = we->getType()->getName();
-    parent = *we->getType()->getParentsAsSet().begin();
+//#if(0)
+void GL::drawMessageQueue(std::map<std::string, Queue> queue, bool select_mode) {
+  if (select_mode) return;
+//  std::string type, parent;
+  glColor4fv(yellow);
+  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
+//    WorldEntity *we = (WorldEntity *)*(I->second.begin());
+//    type = we->getType()->getName();
+//    parent = *we->getType()->getParentsAsSet().begin();
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
-	      glColor3f(1.0f, 1.0f, 1.0f);
-	        WorldEntity *we = (WorldEntity*)*J;
-	          glPushMatrix();
-	        WFMath::Point<3> pos = we->getAbsPos();
-            glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-
+      WorldEntity *we = (WorldEntity*)*J;
+      glPushMatrix();
+      WFMath::Point<3> pos = we->getAbsPos();
+      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient2 /= orient; 
       QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
-
       glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
       glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
       glScalef(0.025f, 0.025f, 0.025f);
@@ -1283,7 +1272,7 @@ void GL_Render::drawMessageQueue(bool select_mode) {
     }
   }
 }
-#endif
+//#endif
  
 float GL::distFromNear(float x, float y, float z) {
   return Frustum::distFromNear(frustum, x, y, z);

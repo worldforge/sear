@@ -1,3 +1,7 @@
+24th July 2002, Simon Goodall
+ * Re-implemented floating character speech
+ * Fixed selection bug caused by using a texture when they should have been disabled
+
 22nd July 2002, Simon Goodall
  * Some fixes for cross-compiling
 

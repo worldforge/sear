@@ -102,6 +102,7 @@ void createDefaults();
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
+  void drawMessageQueue(std::map<std::string, Queue> queue, bool select_mode);
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
   void drawOutline(WorldEntity *, Models *, bool);
@@ -146,7 +147,7 @@ protected:
   float frame_time;
   std::map<std::string, Queue> render_queue;
 
-  void buildQueues(WorldEntity*, int);
+  void buildQueues(WorldEntity*, int, bool);
   StateLoader *_state_loader; 
   float frame_rate;
   float model_detail;
