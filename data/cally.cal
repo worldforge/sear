@@ -10,13 +10,13 @@ scale=0.0125
 
 skeleton=cally.csf
 
-animation=cally_idle.caf
-animation=cally_tornado_kick.caf
-animation=cally_walk.caf
-animation=cally_strut.caf
-animation=cally_jog.caf
-animation=cally_shoot_arrow.caf
-animation=cally_wave.caf
+animation_idle=cally_idle.caf
+animation_funky=cally_tornado_kick.caf
+animation_walk=cally_walk.caf
+animation_strut=cally_strut.caf
+animation_run=cally_jog.caf
+animation_shoot_arrow=cally_shoot_arrow.caf
+animation_wave=cally_wave.caf
 
 mesh=cally_calf_left.cmf
 mesh=cally_calf_right.cmf

@@ -10,13 +10,13 @@ scale=0.0125
 
 skeleton=skeleton.csf
 
-animation=skeleton_idle.caf
-animation=skeleton_hiphop.caf
-animation=skeleton_walk.caf
-animation=skeleton_strut.caf
-animation=skeleton_jog.caf
-animation=skeleton_shoot_arrow.caf
-animation=skeleton_wave.caf
+animation_idle=skeleton_idle.caf
+animation_funky=skeleton_hiphop.caf
+animation_walk=skeleton_walk.caf
+animation_strut=skeleton_strut.caf
+animation_run=skeleton_jog.caf
+animation_shoot_arrow=skeleton_shoot_arrow.caf
+animation_wave=skeleton_wave.caf
 
 
 mesh=skeleton_calf_left.cmf
