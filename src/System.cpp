@@ -369,12 +369,23 @@ void System::mainLoop() {
       last_time = _seconds;
       while (_current_time > _hours_per_day) _current_time -= _hours_per_day;
       //_current_time = _current_time / _minutes_per_hour / _seconds_per_minute;
-      if (_current_time < _dawn_time) _time_area = NIGHT;
-      else if (_current_time < _day_time) _time_area = DAWN;
-      else if (_current_time < _dusk_time) _time_area = DAY;
-      else if (_current_time < _night_time) _time_area = DUSK;
-      else if (_current_time < _hours_per_day) _time_area = NIGHT;
+      if (checkState(SYS_IN_WORLD)) {
+        TimeArea ta = _time_area;
+        if (_current_time < _dawn_time) _time_area = NIGHT;
+        else if (_current_time < _day_time) _time_area = DAWN;
+        else if (_current_time < _dusk_time) _time_area = DAY;
+        else if (_current_time < _night_time) _time_area = DUSK;
+        else if (_current_time < _hours_per_day) _time_area = NIGHT;
       
+        if (ta != _time_area) {
+          switch(_time_area) {
+            case NIGHT: _action_handler->handleAction("night", NULL); break;
+            case DAWN: _action_handler->handleAction("dawn", NULL); break;
+            case DAY: _action_handler->handleAction("day", NULL); break;
+            case DUSK: _action_handler->handleAction("dusk", NULL); break;
+          }
+        }
+      }
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
         // Stop processing events if we are quiting
