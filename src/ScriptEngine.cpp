@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.4 2003-03-06 23:50:38 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.5 2003-12-03 17:40:32 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -130,7 +130,10 @@ void ScriptEngine::runCommand(const std::string &command, const std::string &arg
   else if (command == ENABLE_DIR_PREFIX) _prefix_enabled = true;
   else if (command == DISABLE_DIR_PREFIX) _prefix_enabled = false;
   else if (command == RUN_SCRIPT) runScript(System::instance()->processHome(args));
-  else if (command == CHANGE_TO_FILE_DIRECTORY) chdir(_file_dir.c_str());
+  else if (command == CHANGE_TO_FILE_DIRECTORY) { 
+std::cout << "Changing dir to " << _file_dir << std::endl;
+chdir(_file_dir.c_str());
+}
   else if (command == SEARCH_RUN_SCRIPT) {
     FileHandler::FileList l = System::instance()->getFileHandler()->getAllinSearchPaths(args);
     for (FileHandler::FileList::const_iterator I = l.begin(); I != l.end(); ++I) {

@@ -1,4 +1,7 @@
 3rd December 2003, Simon Goodall
+ * Some fixes to make sounds work again
+
+3rd December 2003, Simon Goodall
  * Changed GL includes to use sage ones.
  * Fixed other build warnings
 

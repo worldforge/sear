@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.64 2003-12-03 11:08:18 simon Exp $
+// $Id: System.cpp,v 1.65 2003-12-03 17:40:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -234,7 +234,7 @@ bool System::init() {
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
-/*
+
   try { 
     sound = new Sound();
     sound->init();
@@ -242,7 +242,7 @@ bool System::init() {
   } catch (Exception &e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
-  */
+  
   _width = 640; _height = 480;
   //_width = 800; _height = 600;
   createWindow(false);
