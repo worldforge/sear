@@ -158,7 +158,7 @@ PKG_CHECK_MODULES(SIGC, sigc++-1.2 >= 1.1.11,
         LDFLAGS="$LDFLAGS $SIGC_LIBS"
     ],
     [
-        AM_PATH_SIGC(SIGC_VERSION,[
+        AM_PATH_SIGC($SIGC_VERSION,[
                 CXXFLAGS="$CXXFLAGS $SIGC_CFLAGS"
                 LDFLAGS="$LDFLAGS $SIGC_LIBS"
                 ],

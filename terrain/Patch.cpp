@@ -154,7 +154,7 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
     rightZ -= (rightZ < 127.0f) ? (10.0f) : (0.0f);
     apexZ  -= (apexZ  < 127.0f) ? (10.0f) : (0.0f);
 
-    static float scale = ((ROAM*)System::instance()->getGraphics()->getTerrain())->_terrain_scale;
+    static float scale = _terrain->_terrain_scale;
     
     leftZ *=  scale;
     rightZ *=  scale;

@@ -1,7 +1,11 @@
+18th August 2002, Simon Goodall
+ * Possible fix to Win32 Fullscreen bug
+ * Minor changes so code uses pointers passed to them in the constructor instead of getting it from elsewhere everytime it is required.
+
 18th AUGUST 2002, Al Riddoch
  * Added configure check, and fixes so that the code builds with sigc++ 1.2
 
-17th AUGUST 2002, Simon Goodall
+17th August 2002, Simon Goodall
  * Intorduced ModelStruct to encapsulate all data required to produce a model.
  * Some more internal changes made to get the model_viewer code working in tools dir
 

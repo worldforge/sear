@@ -7,7 +7,7 @@
 
 #include "../src/Terrain.h"
 
-#include <stdlib.h>
+//#include <stdlib.h>
 //#include "Landscape.h"
 
 namespace Sear {
@@ -19,17 +19,8 @@ class Render;
 class ROAM : public Terrain {
 
 public:
-  ROAM(System *system, Render *renderer) :
-    hMap(NULL),
-    last_time(0.0f),
-    gLand(NULL),
-    _system(system),
-    _renderer(renderer)
-  {
-  }
-  ~ROAM() {
-    free(hMap);
-  }
+  ROAM(System *system, Render *renderer);
+  ~ROAM();
 
   bool init();
   void shutdown();

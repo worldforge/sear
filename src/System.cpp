@@ -271,6 +271,9 @@ void System::createWindow(bool fullscreen) {
     exit(1);
   }
   Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
+
+  //Is this the correct way to free a window?
+  if (screen) free(screen);
   screen = SDL_SetVideoMode(_width, _height, 0, flags);
   if (screen == NULL ) {
     Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
@@ -308,11 +311,15 @@ void System::createWindow(bool fullscreen) {
   if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
   if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
   Log::writeLog("Creating Renderer", Log::LOG_INFO);
-  if (renderer) {
+//  if (renderer) {
 //    renderer->initWindow(_width, _height);
-    renderer->shutdown();
-    delete renderer;
-  }// else {
+//    renderer->shutdown();
+//    delete renderer;
+//  }// else {a
+  if (_graphics) {
+    _graphics->shutdown();
+    delete _graphics;
+  }
     _graphics = new Graphics(this);
     _graphics->init();
  //   renderer = new GL(this);

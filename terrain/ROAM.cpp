@@ -3,6 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include <string>
+#include <stdlib.h>
 
 #include <varconf/Config.h>
 #include "common/Utility.h"
@@ -17,6 +18,18 @@
 namespace Sear {
 
 float ROAM::_water_level = 0.0f;
+
+ROAM::ROAM(System *system, Render *renderer) :
+  hMap(NULL),
+  last_time(0.0f),
+  gLand(NULL),
+  _system(system),
+  _renderer(renderer)
+{}
+
+ROAM::~ROAM() {
+  free(hMap);
+}
 
 bool ROAM::init() {
   readConfig();
@@ -105,7 +118,7 @@ float ROAM::getHeight(float x, float y) {
 
 void ROAM::readConfig() {
   varconf::Variable temp;
-  varconf::Config *general = System::instance()->getGeneral();
+  varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;
@@ -125,7 +138,7 @@ void ROAM::readConfig() {
 
 void ROAM::writeConfig() {
   Log::writeLog("Writing ROAM Config", Log::LOG_DEFAULT);
-  varconf::Config *general = System::instance()->getGeneral();
+  varconf::Config *general = _system->getGeneral();
   if (!general) {
     Log::writeLog("ROAM: General config object not created!", Log::LOG_ERROR);
     return;

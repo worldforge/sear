@@ -10,7 +10,7 @@ BUGS
 
 [general]
 
-iconfile = "/opt/worldforge/share/sear/data/sear_icon.bmp"
+iconfile = "./data/sear_icon.bmp"
 mouse_move_select = "false"
 
 [render]
@@ -20,6 +20,6 @@ render_use_lighting = "false"
 
 [terrain]
 
-height_map = "/opt/worldforge/share/sear/data/agrilan_hm.png"
+height_map = "./data/agrilan_hm.png"
 
 
