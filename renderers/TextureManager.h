@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.4 2003-03-23 19:51:49 simon Exp $
+// $Id: TextureManager.h,v 1.5 2003-06-12 15:32:17 nowhere Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -10,6 +10,8 @@
 #include <string>
 #include <map>
 #include <vector>
+
+#include <cassert>
 
 #include "SDL.h"
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.17 2003-04-30 19:22:45 simon Exp $
+// $Id: ModelLoader.h,v 1.18 2003-06-12 15:32:17 nowhere Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -37,24 +37,24 @@ public:
     model_record->id = model_id;
     model_record->scale = (double)model_config.getItem(model_id, ModelRecord::SCALE);
     
-    model_record->state_name = model_config.getItem(model_id, ModelRecord::STATE);
+    model_record->state_name = (std::string)model_config.getItem(model_id, ModelRecord::STATE);
     model_record->state = System::instance()->getGraphics()->getRender()->getStateID(model_record->state_name);
     model_config.setItem(model_id, "state_num", model_record->state);
     
-    model_record->select_state_name = model_config.getItem(model_id, ModelRecord::SELECT_STATE);
+    model_record->select_state_name = (std::string)model_config.getItem(model_id, ModelRecord::SELECT_STATE);
     model_record->select_state = System::instance()->getGraphics()->getRender()->getStateID(model_record->select_state_name);
     model_config.setItem(model_id, "select_state_num", model_record->select_state);
     
     model_record->model_by_type = model_config.getItem(model_id, ModelRecord::MODEL_BY_TYPE);
-    model_record->outline =  model_config.getItem(model_id, ModelRecord::OUTLINE);
-    model_record->default_skin = model_config.getItem(model_id, ModelRecord::DEFAULT_SKIN);
-    std::string rotation_style = model_config.getItem(model_id, ModelRecord::ROTATION_STYLE);
+    model_record->outline = model_config.getItem(model_id, ModelRecord::OUTLINE);
+    model_record->default_skin = (std::string)model_config.getItem(model_id, ModelRecord::DEFAULT_SKIN);
+    std::string rotation_style = (std::string)model_config.getItem(model_id, ModelRecord::ROTATION_STYLE);
     if (rotation_style == "none") model_record->rotation_style = Graphics::ROS_NONE;
     else if (rotation_style == "normal") model_record->rotation_style = Graphics::ROS_NORMAL;
     else if (rotation_style == "position") model_record->rotation_style = Graphics::ROS_POSITION;
     else if (rotation_style == "billboard") model_record->rotation_style = Graphics::ROS_BILLBOARD;
     else if (rotation_style == "halo") model_record->rotation_style = Graphics::ROS_HALO;
-    model_record->data_file_id = model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
+    model_record->data_file_id = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
     return model_record;
   }
 

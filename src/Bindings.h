@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Bindings.h,v 1.7 2003-03-06 23:50:38 simon Exp $
+// $Id: Bindings.h,v 1.8 2003-06-12 15:32:17 nowhere Exp $
 
 #ifndef SEAR_BINDINGS_H
 #define SEAR_BINDINGS_H 1
@@ -15,6 +15,7 @@
 
 #include <string>
 #include <map>
+#include <cassert>
 
 // Forward Declarations
 namespace varconf {
