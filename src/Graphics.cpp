@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.46 2004-05-17 14:00:25 simon Exp $
+// $Id: Graphics.cpp,v 1.47 2004-05-19 17:52:20 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,7 +169,7 @@ Compare D^2 to choose what detail level to use
 	
   WFMath::Point<3> pos(0,0,0); // Initial camera position
 #warning FIXME Should not be treating World as a singleton
-  Eris::World *world = Eris::World::Instance();
+  Eris::World *world = Eris::World::getPrimary();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
     WorldEntity *focus = (WorldEntity *)world->getFocusedEntity(); //Get the player character entity
@@ -316,9 +316,9 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         if (Frustum::sphereInFrustum(frustum, object_record->bbox, object_record->position)) {
           if (!select_mode) {
             // Add to queue by state, then model record
-assert(_system->getModelRecords().findItem(*I, "state_num"));
-int number = _system->getModelRecords().getItem(*I, "state_num");
-assert(number > 0);
+            assert(_system->getModelRecords().findItem(*I, "state_num"));
+            int number = _system->getModelRecords().getItem(*I, "state_num");
+            assert(number > 0);
 	    render_queue[_system->getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
 	    if (we->hasMessages()) message_list.push_back(we);
 	  }
@@ -339,10 +339,14 @@ void Graphics::readConfig() {
   varconf::Config &general = _system->getGeneral();
 
   // Setup frame rate detail boundaries
-  temp = general.getItem("graphics", KEY_lower_frame_rate_bound);
-  _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
-  temp = general.getItem("graphics", KEY_upper_frame_rate_bound);
-  _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
+  if (general.getItem("graphics", KEY_lower_frame_rate_bound)) {
+    temp = general.getItem("graphics", KEY_lower_frame_rate_bound);
+    _lower_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_lower_frame_rate_bound) : ((double)(temp));
+  }
+  if (general.findItem("graphics", KEY_upper_frame_rate_bound)) {
+    temp = general.getItem("graphics", KEY_upper_frame_rate_bound);
+    _upper_frame_rate_bound = (!temp.is_double()) ? (DEFAULT_upper_frame_rate_bound) : ((double)(temp));
+  }
   
 }  
 

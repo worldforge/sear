@@ -1,3 +1,7 @@
+19th May 2004, Simon Goodall
+ * Further varconf checks
+ * Resize texture vectors if limit is reached.
+
 17th May 2004, Simon Goodall
  * Futher missing stencil buffer fixes. Now try and create window. if that fails set use stencil to false and try again (if its already false, then we try twice anyway)
 

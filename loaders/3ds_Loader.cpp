@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.13 2004-04-27 15:07:01 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.14 2004-05-19 17:52:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -43,6 +43,10 @@ ThreeDS_Loader::~ThreeDS_Loader() {
 
 ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
+  if (!System::instance()->getModel().findItem(THREEDS, model_record->data_file_id)) {
+    std::cerr << "Error: No 3DS filename" << std::endl;
+    return NULL;
+  }
   std::string file_name = System::instance()->getModel().getItem(THREEDS, model_record->data_file_id);
   ThreeDS *model = new ThreeDS(render);
   if (!model->init(file_name)) {

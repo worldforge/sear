@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.22 2004-04-27 15:07:01 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.23 2004-05-19 17:52:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -37,6 +37,9 @@
 namespace Sear {
 
 const std::string BoundBox_Loader::BOUNDBOX = "boundbox";
+
+// Config keys
+const std::string KEY_wrap_texture = "wrap_texture";
 	
 BoundBox_Loader::BoundBox_Loader(ModelHandler *mh) {
   mh->registerModelLoader(BOUNDBOX, this);
@@ -70,8 +73,13 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
 //  }
  
   std::string type = record->type;
-  if (!model->init(bbox, type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
-  //if (!model->init(bboxCheck(bbox), type, (bool)model_config.getItem(model_id, "wrap_texture"))) {
+  bool wrap = false; //default to false
+  // Check whether we specify texture wrapping
+  if (model_config.findItem(model_id, KEY_wrap_texture)) {
+    wrap = (bool)model_config.getItem(model_id, KEY_wrap_texture);
+  }
+  // Initialise model
+  if (!model->init(bbox, type, wrap)) {
     std::cerr<< "error initing model" << std::endl;
     model->shutdown();
     delete model;

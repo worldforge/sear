@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.9 2004-04-27 15:07:02 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.10 2004-05-19 17:52:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -47,7 +47,10 @@ Cal3d_Loader::~Cal3d_Loader() {
 ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
 
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-  
+  if (!System::instance()->getModel().findItem(CAL3D, model_record->data_file_id)) {
+    std::cerr << "Error: No Cal3D filename" << std::endl;
+    return NULL;
+  }
   std::string file_name = System::instance()->getModel().getItem(CAL3D, model_record->data_file_id);
   
 //  std::cerr << "Loading Cally model " << file_name << std::endl;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.23 2004-05-13 16:10:28 simon Exp $
+// $Id: TextureManager.cpp,v 1.24 2004-05-19 17:52:20 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,7 +82,9 @@ static const std::string FILTER_NEAREST_MIPMAP_LINEAR = "nearest_mipmap_linear";
 static const std::string FILTER_LINEAR_MIPMAP_NEAREST = "linear_mipmap_nearest";
 static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
 
-static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";	
+static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";
+
+// Format strings
 static const std::string ALPHA = "alpha";
 static const std::string ALPHA4 = "alpha4";
 static const std::string ALPHA8 = "alpha8";
@@ -126,6 +128,7 @@ static const std::string RGB10_A2 = "rgb10_a2";
 static const std::string RGBA12 = "rgba12";
 static const std::string RGBA16 = "rgba16";
 
+// OpenGL Extension flags
 bool use_arb_multitexture = false;
 bool use_sgis_generate_mipmap = false;
 bool use_arb_texture_border_clamp = false;
@@ -143,6 +146,7 @@ TextureManager::TextureManager() :
 void TextureManager::init() {
   if (m_initialised) shutdown();
   if (debug) std::cout << "Initialising TextureManager" << std::endl;
+  // Default size, can be bigger if required
   m_textures.resize(256);
   m_names.resize(256);
 
@@ -153,7 +157,9 @@ void TextureManager::init() {
 
 void TextureManager::initGL() {
   assert((m_initialised == true) && "TextureManager not initialised");
+  // Determine available OpenGL extensions
   setupGLExtensions();
+  // Initialise our current texture cache
   m_last_textures.resize(m_texture_units);
   for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
   // Setup default texture properties
@@ -196,11 +202,11 @@ void TextureManager::readConfig(varconf::Config &config) {
 
 void TextureManager::writeConfig(varconf::Config &config) {
   assert((m_initialised == true) && "TextureManager not initialised");
+  // Nothing to write here
 }
 
 void TextureManager::readTextureConfig(const std::string &filename) {
   assert((m_initialised == true) && "TextureManager not initialised");
-//  varconf::Config config;
   
   m_texture_config.readFromFile(filename);
 }
@@ -218,6 +224,7 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   }
  
   m_texture_config.clean(clean_name);
+  // Check texture is defined
   if (!m_texture_config.find(clean_name)) {
     std::cerr << "Texture " << texture_name << " not defined." << std::endl;
     return 0;
@@ -227,13 +234,16 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
     std::cerr << "Error " << texture_name << " has no filename" << std::endl;
     return 0;
   }
+  // Get filename of texture
   std::string filename = (std::string)m_texture_config.getItem(clean_name, KEY_filename);
-   
-  std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
-  if (!path.empty()) {
-    filename = path + "/" + filename;
+  // Get path to prefix to filename 
+  if (m_texture_config.findItem(clean_name, KEY_path)) {
+    std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
+    if (!path.empty()) {
+      filename = path + "/" + filename;
+    }
   }
- 
+  // Expand variables in filename
   System::instance()->getFileHandler()->expandString(filename);
   // Load texture into memory
   SDL_Surface *surface = loadImage(filename);
@@ -250,6 +260,7 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
 
 GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface, bool mask) {
   assert((m_initialised == true) && "TextureManager not initialised");
+  // Copy name so we can change it
   std::string texture_name(name);
   m_texture_config.clean(texture_name);
   // If we have requested a mask, filter pixels
@@ -301,6 +312,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
     clamp_s = (bool)m_texture_config.getItem(texture_name, KEY_clamp_s);
   }
   if (m_texture_config.findItem(texture_name, KEY_clamp_t)) {
+
     clamp_t = (bool)m_texture_config.getItem(texture_name, KEY_clamp_t);
   }
 

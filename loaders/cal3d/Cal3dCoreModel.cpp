@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.20 2004-04-27 15:07:02 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.21 2004-05-19 17:52:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -117,11 +117,15 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   // Load skeleton
   if (!_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
     CalError::printLastError();
-   throw Exception();
+    throw Exception();
     return;
   }
   // Get scale
-  _scale = (double)config.getItem(SECTION_model, KEY_scale);
+  if (config.findItem(SECTION_model, KEY_scale)) {
+    _scale = (double)config.getItem(SECTION_model, KEY_scale);
+  } else {
+    _scale = 1.0f;
+  }
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
 printf("Rotate %f\n", m_rotate);
