@@ -85,6 +85,7 @@ libSear_a_SOURCES = \
 	default_font.xpm \
 	sear_icon.xpm \
 	ObjectRecord.h \
+	ModelRecord.cpp \
 	ModelRecord.h \
 	ObjectHandler.h \
 	ObjectHandler.cpp \

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.3 2003-03-23 19:51:49 simon Exp $
+// $Id: Calendar.cpp,v 1.4 2003-05-02 20:24:55 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -24,7 +24,6 @@
 
 #ifdef DEBUG
   static const bool debug = true;
-  #include "common/mmgr.h"
 #else
   static const bool debug = false;
 #endif

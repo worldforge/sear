@@ -1,3 +1,7 @@
+2nd May 2003, Simon Goodall
+ * String decls of ModelRecord now in code file to avoid compiler errors on some compilers
+ * Removed mmgr.h from being included regardless of configure option in Calender.cpp
+
 30th April 2003, Simon Goodall
  * Fixed states so they are now loaded and assigned to entities properly
  * Fixed siily selection bug caused by deleting the wrong bit of code
