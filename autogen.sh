@@ -38,7 +38,7 @@ autoconf
 
 # Default install is /opt/worldforge
 
-CONFIGUREFLAGS="--prefix=/opt/worldforge --enable-debug=yes"
+CONFIGUREFLAGS="--prefix=/opt/worldforge" # --enable-debug=yes"
 echo Running: configure $CONFIGUREFLAGS
 ./configure $CONFIGUREFLAGS $@
 

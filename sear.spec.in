@@ -27,22 +27,20 @@ rm -rf ${RPM_BUILD_ROOT}
 %setup -q 
 
 %build
-CFLAGS="$RPM_OPT_FLAGS" 
-./autogen.sh --prefix=%{prefix}
+CFLAGS="$RPM_OPT_FLAGS" CXXFLAGS="$RPM_OPT_FLAGS" ./autogen.sh --prefix=%{prefix}  --localstatedir=%{_localstatedir}
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install prefix=$RPM_BUILD_ROOT/%{prefix}
+make install prefix=$RPM_BUILD_ROOT/%{prefix} localstatedir=$RPM_BUILD_ROOT/%{_localstatedir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-#update to others can read???
 %defattr(-,root,root)
 %{prefix}/share/%{name}/*
-%{prefix}/bin/%{name}
+%{prefix}/bin/sear
 %{prefix}/bin/model_viewer
 %doc README COPYING AUTHORS
 
