@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.24 2003-07-15 11:11:22 simon Exp $
+// $Id: Landscape.cpp,v 1.25 2003-12-02 15:15:15 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -229,8 +229,8 @@ void Landscape::render() {
 
 void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
   if (min_height == DEF_VAL) {
-    for (unsigned int x = 0; x < map_size; ++x) {
-      for (unsigned int y = 0; y < map_size; ++y) {
+    for (int x = 0; x < map_size; ++x) {
+      for (int y = 0; y < map_size; ++y) {
         float h = getHeight(x,y);
 	if (h < min_height) min_height = h;
 	if (h > max_height) max_height = h;
@@ -241,8 +241,7 @@ void Landscape::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, in
   WFMath::Point<3> corner2 = WFMath::Point<3>(offset_x + map_size, offset_y + map_size, max_height);
   int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
 
-  if (i != 0) m_isVisible = 1;
-  else m_isVisible = 0;
+  m_isVisible = (i == 0) ? (0) : (1);
 }
 
 } /* namespace Sear */
