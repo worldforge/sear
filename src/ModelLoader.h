@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.27 2004-06-25 09:46:16 simon Exp $
+// $Id: ModelLoader.h,v 1.28 2004-06-26 15:48:02 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -76,8 +76,6 @@ public:
       model_record->rotate_z = 0.0;
     }
  
-
-
     // Get render state number
     if (model_config.findItem(model_id, "state_num")) {
       model_record->state = model_config.getItem(model_id, "state_num");

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.8 2004-04-27 15:07:02 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.9 2004-06-26 15:48:02 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -111,12 +111,15 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
     record->draw_self = true;
     record->draw_members = true;
     _object_records[section] = record;
-//    if (debug) 
-std::cout << "Adding ObjectRecord: " << section << std::endl;
+    if (debug) {
+      std::cout << "Adding ObjectRecord: " << section << std::endl;
+    }
   }
   if (key == "draw_self") record->draw_self = (bool)config.getItem(section, key);
   else if (key == "draw_members") record->draw_members = (bool)config.getItem(section, key);
-  else if (key == "low_quality") record->low_quality.push_back((std::string)config.getItem(section, key));
+  else if (key == "low_quality") {
+    record->low_quality.push_back((std::string)config.getItem(section, key));
+  }
   else if (key == "medium_quality") record->medium_quality.push_back((std::string)config.getItem(section, key));
   else if (key == "high_quality") record->high_quality.push_back((std::string)config.getItem(section, key));
 }

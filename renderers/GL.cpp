@@ -1068,7 +1068,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
-      if (!select_mode) { // Onl needs to be done once a frame
+      if (!select_mode) { // Only needs to be done once a frame
         model->update(time_elapsed);
         model->setLastTime(System::instance()->getTimef());
       }      

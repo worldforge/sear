@@ -1,5 +1,9 @@
 2004-06-26  Simon Goodall  <simon@simongoodall.co.uk>
 
+	* src/system.cpp, src/Filehandler.h, src/FileHandler.cpp: Change storage type from list to set to avoid duplicates. Make code use typedef for FileList
+
+2004-06-26  Simon Goodall  <simon@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Fix bug where sun light source was disabled	
 
 2004-06-26  Simon Goodall  <simon@simongoodall.co.uk>

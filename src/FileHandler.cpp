@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.10 2004-04-29 07:04:15 jmt Exp $
+// $Id: FileHandler.cpp,v 1.11 2004-06-26 15:48:02 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -149,10 +149,10 @@ std::string FileHandler::getUserDataPath() const
 }
 
 void FileHandler::addSearchPath(const std::string &searchpath) {
-  _searchpaths.push_back(searchpath);
+  _searchpaths.insert(searchpath);
 }
 void FileHandler::removeSearchPath(const std::string &searchpath) {
-  for (std::list<std::string>::iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
+  for (FileList::iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string path = *I;
     if (path == searchpath) {
       _searchpaths.erase(I);
@@ -175,7 +175,7 @@ FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filena
   for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
-        l.push_back(filepath);
+        l.insert(filepath);
   }
   return l;  
 }

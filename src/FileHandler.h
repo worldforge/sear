@@ -2,13 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.7 2004-04-28 22:02:44 jmt Exp $
+// $Id: FileHandler.h,v 1.8 2004-06-26 15:48:02 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
 
 #include <string>
 #include <list>
+#include <set>
 #include <map>
 
 #include "interfaces/ConsoleObject.h"
@@ -32,7 +33,7 @@ public:
   FileHandler();
   ~FileHandler();
 
-  typedef std::list<std::string> FileList;
+  typedef std::set<std::string> FileList;
   
   void addSearchPath(const std::string &searchpath);
   void removeSearchPath(const std::string &searchpath);
