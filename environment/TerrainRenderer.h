@@ -42,16 +42,18 @@ public:
       float *narray;
 
       void invalidate() {
-        if (glIsBufferARB(vb_narray)) {
-          glDeleteBuffersARB(1, &vb_narray);
-        }
-        vb_narray = 0;
+        if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+          if (glIsBufferARB(vb_narray)) {
+            glDeleteBuffersARB(1, &vb_narray);
+          }
+          vb_narray = 0;
+  
+          if (glIsBufferARB(vb_harray)) {
+            glDeleteBuffersARB(1, &vb_harray);
+          }
 
-        if (glIsBufferARB(vb_harray)) {
-          glDeleteBuffersARB(1, &vb_harray);
+          vb_harray = 0;
         }
-        vb_harray = 0;
-
         if (glIsList(disp)) {
           glDeleteLists(1, disp);
         }

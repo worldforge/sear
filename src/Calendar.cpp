@@ -2,14 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.14 2005-03-04 17:58:24 simon Exp $
+// $Id: Calendar.cpp,v 1.15 2005-04-05 21:49:59 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 
 #include "Calendar.h"
 #include "common/Utility.h"
@@ -133,8 +130,7 @@ void Calendar::setWorldTime(const WFMath::TimeStamp &ts) {
   WFMath::TimeDiff df = ts - m_ts;
   m_ts = ts;
   double time = (double)df.milliseconds() / 1000.0;
-  double diff = time - m_server_seconds;
-  update(diff);
+  update(time);
 }
 
 void Calendar::update(double time_elapsed) {
