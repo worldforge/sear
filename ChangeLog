@@ -1,3 +1,11 @@
+2004-06-09  James Turner  <james@worldforge.org>
+
+	* Updated method for computing the fog color, based on the current
+	  horizon color. Rather than using readPixels, which is slow,
+	  sometimes drastically so, store the first (bottom) row of
+	  the atmosphere texture in client memory, and do our own
+	  interpolation.
+
 2004-06-09  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Workspace.cpp: Start writing event processing code.

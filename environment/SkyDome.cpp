@@ -208,7 +208,64 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
-//static int counter = 0;
+void SkyDome::getHorizonColors()
+{
+    m_horizonColors.clear();
+    
+    RenderSystem::getInstance().switchTexture(m_textures[0]); // atmosphere tex
+    GLint width, height;
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+    
+    GLubyte* skyTexels = new GLubyte[width * height * 4];
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, skyTexels);
+    int glerr = glGetError();
+    if (glerr != GL_NO_ERROR) {
+        std::cerr << "got error while trying to read atmosphere texels" << std::endl;
+        return;
+    }
+
+    GLubyte* texel = skyTexels;
+    for (int S=0; S < width; ++S) {
+        Color_4 c;
+        c.r = *texel++;
+        c.g = *texel++;
+        c.b = *texel++;
+        c.a = *texel++;
+        m_horizonColors.push_back(c);
+    }
+
+    delete[] skyTexels;
+}
+
+void SkyDome::updateFogColor(float t)
+{
+    if (m_horizonColors.empty()) getHorizonColors();
+    
+    if (t == 1.0f) t = 0.0f; // ensure t is in the range [0.0 .. 1.0)
+    t *= m_horizonColors.size(); // t is now in [0.0 ... num_colors)
+    
+// compute I and J indices into horizon colors, then interpolate
+// note this code uses lots of local variables, for clarity, and we only
+// run this once per frame
+    unsigned int I = static_cast<unsigned int>(t); // truncation is desired here
+    unsigned int J = (I == (m_horizonColors.size() - 1)? 0 : I + 1);
+    
+    Color_4 lower = m_horizonColors[I],
+        upper = m_horizonColors[J];
+    
+    const float interp = t - I, // get the fractional part of t
+        invInterp = 1.0f - interp;
+                
+    float color[4];
+    color[0] = ((lower.r * invInterp) + (upper.r * interp)) / 255.0f;
+    color[1] = ((lower.g * invInterp) + (upper.g * interp)) / 255.0f;
+    color[2] = ((lower.b * invInterp) + (upper.b * interp)) / 255.0f;
+    color[3] = 1.0f;
+    glFogfv(GL_FOG_COLOR, color);
+}
 
 void SkyDome::render()
 {
@@ -225,7 +282,8 @@ void SkyDome::render()
   val += (float)cal->getSeconds();
 
   val /= (float)(cal->getSecondsPerMinute() * cal->getMinutesPerHour() * cal->getHoursPerDay());
-
+  updateFogColor(val);
+  
   glEnableClientState(GL_VERTEX_ARRAY);
  
   // Select atmosphere texture
@@ -238,20 +296,6 @@ void SkyDome::render()
     glLoadIdentity();
     glTranslatef(val, 0.0f,0.0f);
   glMatrixMode(GL_MODELVIEW);
-
-  // Quick hack so we dont call readpixels every frame
-  static int delay = 20; // set so we do this in the first frame
-  if (++delay >= 20) {
-    glTexCoord2i(0, 0);
-    glVertexPointer(3, GL_FLOAT, 0, &m_box[0]);
-    glDrawArrays(GL_QUADS, 0, sizeof(m_box) / 4);
- 
-    GLfloat i[4];
-    glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT,&i);
-    glFogfv(GL_FOG_COLOR,i);
-    delay = 0;
-    glClear(GL_COLOR_BUFFER_BIT);
-  }
 
   // Set the dome vetices
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 

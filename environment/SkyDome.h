@@ -7,7 +7,8 @@
 #include <math.h>
 #include <iostream>
 #include "renderers/RenderSystem.h"
-
+#include "common/types.h"
+#include <vector>
 
 namespace Sear {
 
@@ -27,6 +28,9 @@ private:
 
   void domeInit(float radius, int levels, int segments);
   
+  void updateFogColor(float t);
+  void getHorizonColors();
+  
   float *m_verts, *m_texCoords;
   int m_size;
   
@@ -36,6 +40,8 @@ private:
   static float m_quad_t[];
 
   TextureID m_textures[5];
+  
+  std::vector<Color_4> m_horizonColors;
 };
 
 } // namespace Sear
