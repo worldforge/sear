@@ -142,11 +142,11 @@ int main(int argc, char**argv) {
 } 
 ], [
   AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 1, [We need the stringstreeam workaround])
-#  AC_MSG_WARN(Using sstream workaround.)
+  AC_MSG_WARN(Using sstream workaround.)
 ],[
-  AC_MSG_WARN(Not using sstream workaround.)
+#  AC_MSG_WARN(Not using sstream workaround.)
 ],[
-  AC_MSG_WARN(Not using sstream workaround.)
+#  AC_MSG_WARN(Not using sstream workaround.)
 ])
 
 PKG_CHECK_MODULES(PKGCHECKS, varconf-1.0 >= 0.6.0 eris-1.2 >= 0.9.8 sage >= 0.1.0,
