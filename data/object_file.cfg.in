@@ -12,6 +12,7 @@ select_state = select
 draw_self = true
 draw_members = false
 outline = true
+scale = 0.025
 end_of_record
 object_type = settler
 model_type = cal3d
@@ -20,6 +21,7 @@ select_state = select
 draw_self = true
 draw_members = false
 outline = true
+scale = 0.025
 end_of_record
 object_type = character
 model_type = cal3d
@@ -28,6 +30,7 @@ select_state = select
 draw_self = true
 draw_members = false
 outline = true
+scale = 0.0125
 end_of_record
 object_type = pig
 model_type = billboard
@@ -35,6 +38,8 @@ state = billboard
 select_state = select_billboard
 draw_self = true
 draw_members = false
+model_by_type = true
+outline = true
 end_of_record
 object_type = sty
 model_type = wireframe
@@ -91,13 +96,14 @@ height = 10.0
 model_by_type = true
 end_of_record
 object_type = birch_summer_1_us
-model_type = impostor
+model_type = nplane
 state = billboard
 select_state = select_billboard
 draw_self = true
 draw_members = true
 width = 10.0
 height = 10.0
+num_planes = 5
 model_by_type = true
 end_of_record
 object_type = poplar_summer_1_us
