@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.2 2003-03-06 12:52:08 simon Exp $
+// $Id: Cal3dModel.h,v 1.3 2003-03-14 11:02:42 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -55,10 +55,13 @@ public:
   
   void setMaterialSet(unsigned int set);
   
-  void setMaterialPartSet(const std::string &part, const std::string &set) {
-    setMaterialPartSet(_core_model->_parts[part], _core_model->_sets[set]);
+  void setMaterialPartSet(const std::string &mesh, const std::string &set) {
+    setMaterialPartSet(_core_model->_meshes[mesh], _core_model->_sets[set]);
   }
   void setMaterialPartSet(unsigned int part, unsigned int set);
+ 
+  std::list<std::string> getMeshNames();
+  std::list<std::string> getMaterialNames();
   
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);

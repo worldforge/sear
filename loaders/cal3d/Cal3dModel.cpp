@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.3 2003-03-06 23:50:38 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.4 2003-03-14 11:02:42 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -43,6 +43,8 @@ float run_blend[] = {0.0, 0.0, 0.5, 0.5};
 static const std::string STANDING = "standing";
 static const std::string WALKING = "walking";
 static const std::string RUNNING = "running";
+
+static const std::string ANIM_default = "default";
 
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
@@ -96,7 +98,7 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
 
   // set initial animation state
   m_state = STATE_IDLE;
-  m_calModel.getMixer()->blendCycle(_core_model->getAnimationMap()[STANDING], 1.0f, 0.0f);
+  m_calModel.getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
 
   m_renderScale = _core_model->getScale();
   _initialised = true;
@@ -212,7 +214,7 @@ void Cal3dModel::setMotionBlend(float *pMotionBlend, float delay) {
   m_motionBlend[1] = pMotionBlend[1];
   m_motionBlend[2] = pMotionBlend[2];
 
-  Cal3dCoreModel::AnimationMap animations = _core_model->getAnimationMap();
+  Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
   
   m_calModel.getMixer()->clearCycle(animations["idle"], delay);
   m_calModel.getMixer()->clearCycle(animations["funky"], delay);
@@ -226,7 +228,7 @@ void Cal3dModel::setMotionBlend(float *pMotionBlend, float delay) {
 void Cal3dModel::setState(int state, float delay) {
   // check if this is really a new state
   if(state != m_state) {
-    Cal3dCoreModel::AnimationMap animations = _core_model->getAnimationMap();
+    Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
     if(state == STATE_IDLE) {
       m_calModel.getMixer()->blendCycle(animations["idle"], 1.0f, delay);
       m_calModel.getMixer()->clearCycle(animations["funky"], delay);
@@ -257,7 +259,7 @@ void Cal3dModel::setState(int state, float delay) {
 }
 
 void Cal3dModel::action(const std::string &action) {
-  Cal3dCoreModel::AnimationMap animations = _core_model->getAnimationMap();
+  Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
   if (action == "standing") {
     m_calModel.getMixer()->blendCycle(animations[STANDING], 1.0f, 0.1f);
     m_calModel.getMixer()->clearCycle(animations[WALKING],  0.1f);
@@ -270,16 +272,32 @@ void Cal3dModel::action(const std::string &action) {
     m_calModel.getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.1f);
     m_calModel.getMixer()->clearCycle(animations[WALKING],  0.1f);
     m_calModel.getMixer()->clearCycle(animations[STANDING],  0.1f);
-  } 
+  } else {
+    m_calModel.getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
+  }
 }
 
 void Cal3dModel::setMaterialSet(unsigned int set) {
   m_calModel.setMaterialSet(set);
 }
 
-void Cal3dModel::setMaterialPartSet(unsigned int set, unsigned int part) {
+void Cal3dModel::setMaterialPartSet(unsigned int set, unsigned int msh) {
   //TODO make this do the correct thing!
-  m_calModel.setMaterialSet(set);
+//  m_calModel.setMaterialSet(set);
+  // Get mesh name
+  CalMesh *mesh = m_calModel.getMesh(msh);
+  mesh->setMaterialSet(set);
 }
 
+std::list<std::string> Cal3dModel::getMaterialNames() {
+  return _core_model->_material_list;
+}
+
+std::list<std::string> Cal3dModel::getMeshNames() {
+  std::list<std::string> l;
+  for (Cal3dCoreModel::MeshMap::const_iterator I = _core_model->_meshes.begin(); I != _core_model->_meshes.end(); ++I) {
+    l.push_back(I->first);
+  }
+  return l;
+}
 } /* namespace Sear */

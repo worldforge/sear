@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: CoreModelHandler.h,v 1.4 2003-03-06 21:04:14 simon Exp $
+// $Id: CoreModelHandler.h,v 1.5 2003-03-14 11:02:42 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_COREMODELHANDLER_H
 #define SEAR_LOADERS_CAL3D_COREMODELHANDLER_H 1
@@ -10,10 +10,6 @@
 #include <sigc++/object_slot.h>
 #include <string>
 #include <map>
-
-namespace varconf {
-  class Config;
-}
 
 namespace Sear {
 
@@ -30,7 +26,7 @@ public:
   void shutdown();
 
   void loadCoreModel(const std::string &filename);
-  Cal3dModel *instantiateModel(const std::string &model, varconf::Config &config);
+  Cal3dModel *instantiateModel(const std::string &model);
     
 private:
   bool _initialised;

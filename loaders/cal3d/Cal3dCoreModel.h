@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.4 2003-03-06 21:04:14 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.5 2003-03-14 11:02:42 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H 1
@@ -16,17 +16,22 @@
 #include <varconf/Config.h>
 #include <cal3d/cal3d.h>
 
+// Forward declare carconf::Config
 namespace varconf {
   class Config;
 }
 
 namespace Sear {
+
+// Forward declarations
 class Cal3dModel;
 	
 class Cal3dCoreModel : public SigC::Object {
 public:
+  // Allow Cal3dModel to access our private parts
   friend class Cal3dModel;
-	
+
+  // Typedefs for out data structures  
   typedef std::map <std::string, unsigned int> MeshMap;
   typedef std::map <std::string, unsigned int> AnimationMap;
   typedef std::list <std::string> MaterialList;
@@ -35,40 +40,89 @@ public:
   typedef std::map<std::string, unsigned int> PartMap;
   typedef std::map<std::string, unsigned int> SetMap;
  
+  /**
+   * Default constructor
+   */ 
   Cal3dCoreModel();
+
+  /**
+   * Destructor
+   */ 
   ~Cal3dCoreModel();
 
+  /**
+   * Create an instance of the core model based on config file
+   * @param filename Cal3d config file
+   */ 
   void init(const std::string &filename);
+
+  /**
+   * Clean up this object
+   */ 
   void shutdown();
 
+  /**
+   * Returns pointer to the Cal3d core model
+   * @return Pointer to cal3d core model
+   */
   CalCoreModel *getCalCoreModel() const { return _core_model; }
-  Cal3dModel *instantiate(varconf::Config &config);
- 
-  //Accessors
-  float getScale() const { return _scale; }
-  AnimationMap getAnimationMap() const { return _animations; }
- 
 
+  /**
+   * Crate a Cal3d model based upon this core model
+   * @return pointer to new cal3d model
+   */ 
+  Cal3dModel *instantiate();
  
+  /**
+   * Get the scale this model should be rendered at
+   * @return Scale to render model at
+   */ 
+  float getScale() const { return _scale; }
+  
 private:
+  /**
+   * This function processes a cal3d config file
+   * @param filename cal3d config file
+   */ 
   void readConfig(const std::string &filename);
+
+  /**
+   * This function is the varconf callback called everytime a line is read
+   * from the config file. It is used to get the mesh, material and animation
+   * names before they are loaded.
+   * @param section The section of the config file the entry is in
+   * @param key the key to get the entry
+   * @param config Reference to the config object containing the data
+   */ 
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+
+  /**
+   * Callback used by varconf when it detects an error
+   * @param message The error message
+   */ 
   void varconf_error_callback(const char *message);
 
+  /**
+   * Function to load textures. Determines whether it is a cal3d raw file or a 
+   * normal image. If its a normal image, it passes control to the System load
+   * function, else loads it up itself.
+   * @param strFilename image filename
+   * @return The texture object id
+   */ 
   unsigned int loadTexture(const std::string &strFilename);
   
-  bool _initialised;
-  CalCoreModel *_core_model;
+  bool _initialised; ///< Flag indicating whether object has been initialised
+  CalCoreModel *_core_model; ///< Pointer to the cal3d core model we represent
 
-  float _scale;
-  MeshMap _meshes;
-  AnimationMap _animations;
-  MaterialList _material_list;
-  MaterialsMap _materials;
-  PartMap _parts;
-  SetMap _sets;
-  
+  float _scale; ///< The scale the model should be rendered at
+  MeshMap _meshes; ///< Mapping between mesh name and id
+  AnimationMap _animations; ///< Mapping between animation and id
+  MaterialList _material_list; ///< List of material names
+  MaterialsMap _materials; ///< Mapping between material part and set to id
+  PartMap _parts; ///< Mapping between part name and id
+  SetMap _sets; ///< mapping between set name and id  
 };
+
 } /* namespace Sear */
 
-#endif /* SEAR__H */
+#endif /* SEAR_LOADERS_CAL3d_CAL3DCOREMODEL_H */
