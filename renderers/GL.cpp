@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.52 2002-12-24 18:08:17 simon Exp $
+// $Id: GL.cpp,v 1.53 2002-12-27 00:44:57 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -82,36 +82,42 @@ static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
 inline GLuint GL::makeMask(GLuint bits) {
+  // Create an 8-bit mask with 'bits' set to 1
   return (0xFF >> (8 - bits));
 }
 
 inline WorldEntity *GL::getSelectedID(unsigned int i) {
-  if (i >= NUM_COLOURS) return NULL;
-  return entityArray[i];
+
+  if (i >= NUM_COLOURS) return NULL; // Check for array out of bounds
+  return entityArray[i]; // Return stored entity pointer
 }
 
 void GL::nextColour(WorldEntity *we) {
-  unsigned int ic = colour_index++;
-  entityArray[ic] = we;
-  glColor3ubv(colourArray[ic]);
+  entityArray[colour_index] = we; // Store entity in array slot
+  glColor3ubv(colourArray[colour_index]); // Set colour from appropriate index
+  ++colour_index; // Increment counter for next pass
 }
 
 inline void GL::resetColours(){
-  colour_index = 1;
+  colour_index = 1; // Set index to 1 as 0 is black and counts as unused
 }
 
 void GL::buildColourSet() {
+  // Get the bits info from OpenGL
   glGetIntegerv (GL_RED_BITS, &redBits);
   glGetIntegerv (GL_GREEN_BITS, &greenBits);
   glGetIntegerv (GL_BLUE_BITS, &blueBits);
 
+  // Create masks
   redMask = makeMask(redBits);
   greenMask = makeMask(greenBits);
   blueMask = makeMask(blueBits);
+  // Calculate shifts
   redShift =   greenBits + blueBits;
   greenShift =  blueBits;
   blueShift = 0;
   
+  // Pre-Calculate each colour and store in array
   for (unsigned int indx = 0; indx < NUM_COLOURS; ++indx) {
     GLubyte red = (indx & (redMask << redShift)) << (8 - redBits);
     GLubyte green = (indx & (greenMask << greenShift)) << (8 - greenBits);
@@ -1075,6 +1081,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
       // Scale Object
       float scale = model_record->scale;
+      // Do not perform scaling if it is to zero or has no effect
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
@@ -1361,6 +1368,7 @@ inline void GL::getFrustum(float frust[6][4]) {
   /* Get the current MODELVIEW matrix from OpenGraphics */
   glGetFloatv(GL_MODELVIEW_MATRIX, modl );
   Frustum::getFrustum(frust, proj, modl);
+  // Copy frustum - local copy plus one from graphics object
   for (int i = 0; i < 6; ++i) {
     for (int j = 0; j < 4; ++j) {
       frustum[i][j] = frust[i][j];
