@@ -1,4 +1,7 @@
 2nd August 2002, Simon Goodall
+ * Added an NPlane model type. like billboard and impsoter, but makes model from N planes. Only works for odd values of N such as 3 or 5
+
+2nd August 2002, Simon Goodall
  * Added two-sided-lighting option to state loader
  * Fixed state change bug where current state was never set
  * Fixed model by type bug where only one model of a type was actually rendered
