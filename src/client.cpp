@@ -75,6 +75,7 @@ bool Client::init() {
   Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
   Eris::Logged.connect(SigC::slot(this, &Client::Log));
   return true;
+  
 }
 
 void Client::shutdown() {
@@ -514,5 +515,25 @@ void Client::GotAllCharacters() {
     _system->pushMessage(ge.GetId().c_str(), CONSOLE_MESSAGE);
   }
 }
+
+void Client::registerCommands(Console *console) {
+  console->registerCommand(std::string("connect"), this);
+}
+
+void Client::runCommand(const std::string &command, const std::string &args) {
+  std::deque<std::string> tokens;
+  if (command == "connect") {
+    tokenise(tokens, args);
+    std::string server = tokens.front();
+    tokens.pop_front();
+    int port = 0;
+    cast_stream(tokens.front(), port);
+  
+    if (port) connect(server, port);
+    else connect(server, DEFAULT_PORT);
+  }
+	
+}
+
 
 }

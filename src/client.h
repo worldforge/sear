@@ -45,18 +45,19 @@
 #define CLIENT_STATUS_LOGGED_IN    (2)
 #define CLIENT_STATUS_IN_WORLD     (3)
 
+#include "ConsoleObject.h"
+
 namespace Sear {
 
 class WorldEntity;
 class Console;
 class System;
 
-class Client :public SigC::Object {
+class Client :public SigC::Object, public ConsoleObject {
 
 public:
   Client(System *system, const std::string &client_name);
-  ~Client() {
-  }
+  ~Client() { }
 
   bool init();
   void shutdown();
@@ -79,6 +80,9 @@ public:
   int listRooms();
 
   void updateSystem();
+  
+  void registerCommands(Console *);
+  void runCommand(const std::string &command, const std::string &args);
   
 protected:
   //Callbacks

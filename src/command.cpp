@@ -70,19 +70,19 @@ void System::runCommand(const std::string &command) {
   if (toke != CMD_TOGGLE_CONSOLE)  pushMessage(command, CONSOLE_MESSAGE);
   try {
     if (strcasecmp(tok, CMD_QUIT) == 0) _system_running = false;
-    else if (strcasecmp(tok, CMD_CONNECT) == 0) {
-      std::string arg1 = nextToken();
-      std::string arg2 = nextToken();
-      if (arg2.empty()) {
-        if (_client) err = _client->connect(arg1);
-        else Log::writeLog("Client not created", Log::ERROR);
-      } else {
-        int i=0;
-	cast_stream(arg2, i);
-        if (_client) err = _client->connect(arg1, i);
-        else Log::writeLog("Client not created", Log::ERROR);
-      }
-    }
+//    else if (strcasecmp(tok, CMD_CONNECT) == 0) {
+//      std::string arg1 = nextToken();
+//      std::string arg2 = nextToken();
+//      if (arg2.empty()) {
+//        if (_client) err = _client->connect(arg1);
+//        else Log::writeLog("Client not created", Log::ERROR);
+//      } else {
+//        int i=0;
+//	cast_stream(arg2, i);
+//        if (_client) err = _client->connect(arg1, i);
+//        else Log::writeLog("Client not created", Log::ERROR);
+//      }
+//    }
     else if (strcasecmp(tok, CMD_DISCONNECT) == 0) err = _client->disconnect();
     else if (strcasecmp(tok, CMD_RECONNECT) == 0) err = _client->reconnect();
     else if (strcasecmp(tok, CMD_ACCOUNT_CREATE) == 0) {
@@ -243,10 +243,10 @@ void System::runCommand(const std::string &command) {
       std::string arg4 = remainingTokens();
       System::instance()->getEventHandler()->addEvent(Event(arg1, arg4, arg2, arg3));
     }
-    else if (strcasecmp(tok, CMD_RUN_SCRIPT) == 0) {
-      std::string arg1 = processHome(nextToken());
-      runScript(arg1);
-    }
+//    else if (strcasecmp(tok, CMD_RUN_SCRIPT) == 0) {
+//      std::string arg1 = processHome(nextToken());
+//      runScript(arg1);
+//    }
     else if (strcasecmp(tok, CMD_LOAD_OBJECT_FILE) == 0) {
       std::string arg1 = processHome(nextToken());
       if (_ol) _ol->readFiles(arg1);
@@ -313,18 +313,21 @@ void System::runCommand(const std::string &command) {
       WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
       if (we) we->displayInfo();
     }
-    else if (strcasecmp(tok, "cd") == 0) {
-      std::string dir = remainingTokens();
-      if (dir.empty()) return;
-      chdir(dir.c_str());
+//    else if (strcasecmp(tok, "cd") == 0) {
+//      std::string dir = remainingTokens();
+//      if (dir.empty()) return;
+//      chdir(dir.c_str());
+//    }
+//    else if (strcasecmp(tok, "enable_dir_prefix") == 0) {
+//      _prefix_cwd = true;
+//    }
+//    else if (strcasecmp(tok, "disable_dir_prefix") == 0) {
+//      _prefix_cwd = false;
+//    }
+    else {
+      _console->runCommand(tok, remainingTokens());
     }
-    else if (strcasecmp(tok, "enable_dir_prefix") == 0) {
-      _prefix_cwd = true;
-    }
-    else if (strcasecmp(tok, "disable_dir_prefix") == 0) {
-      _prefix_cwd = false;
-    }
-    else Log::writeLog("Unknown command", Log::ERROR);
+//    else Log::writeLog("Unknown command", Log::ERROR);
   } catch (...) {
     Log::writeLog("Caught unknown exception", Log::ERROR);
   }

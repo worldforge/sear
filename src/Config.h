@@ -12,9 +12,7 @@ namespace Sear {
 
 class Config {
 public:
-  Config() : 
-    _attributes(std::map<std::string, std::string>())
-  {}
+  Config() {}
   ~Config() {}
   
   bool init() {

@@ -107,6 +107,10 @@ bool System::init() {
   Bindings::init();
   
   _console = new Console(this);
+
+  registerCommands(_console);
+  _client->registerCommands(_console);
+  
   
   Log::writeLog("Running startup scripts", Log::INFO);
   std::string install_location = install_path + "/" + SCRIPTS_DIR + "/" + STARTUP_SCRIPT;
@@ -642,6 +646,34 @@ void System::switchCursor(int cursor) {
     case(1): SDL_SetCursor(_cursor_pickup); break;
     case(2): SDL_SetCursor(_cursor_touch); break;
   }
+}
+
+void System::registerCommands(Console *console) {
+  console->registerCommand("quit", this);
+  console->registerCommand("exit", this);
+  console->registerCommand("getat", this);
+  console->registerCommand("setat", this);
+  console->registerCommand("cd", this);
+  console->registerCommand("enable_dir_prefix", this);
+  console->registerCommand("disable_dir_prefix", this);
+  console->registerCommand("run_script", this);
+}
+
+void System::runCommand(const std::string &command, const std::string &args) {
+  if (command == "exit" || command == "quit") _system_running = false;
+  else if (command == "getat") {
+	  
+  }
+  else if (command == "setat") {
+
+  }
+  else if (command == "cd") {
+    if (args.empty()) return;
+    chdir(args.c_str());
+  }
+  else if (command == "enable_dir_prefix") _prefix_cwd = true;  
+  else if (command == "disable_dir_prefix") _prefix_cwd = false;
+  else if (command == "run_script") runScript(processHome(args));
 }
 
 } /* namespace Sear */

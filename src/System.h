@@ -9,6 +9,8 @@
 #include <SDL/SDL_image.h>
 #include <string>
 
+#include "ConsoleObject.h"
+
 namespace Sear {
 
 class Render;
@@ -33,7 +35,9 @@ typedef enum {
 #define ACTION_PICKUP (1)
 #define ACTION_TOUCH (2)
 
-class System {
+
+
+class System : public ConsoleObject{
 public:
   System();
   ~System();
@@ -103,6 +107,9 @@ public:
  float getNightTime() { return _night_time; }
  
   static const int MESSAGE_LIFE = 5000;
+
+  void registerCommands(Console *);
+  void runCommand(const std::string &command, const std::string &args);
 protected:
  
   int action;

@@ -238,4 +238,13 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
  if (count == 0 || count == 2) return bbox;
  else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
 }
+
+
+void tokenise (std::deque<std::string> &tokens, const std::string &input) {
+   std::string buf;
+   SSTREAM ss(input);
+   while (ss>>buf) tokens.push_back(buf);
+}
+
+
 } /* namespace Sear */

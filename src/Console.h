@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 #include <list>
+#include <map>
 
 #define MAX_MESSAGES (5)
 #define FONT_HEIGHT  (15)
@@ -36,6 +37,7 @@
 
 namespace Sear {
 
+class ConsoleObject;
 class System;
 class Render;
 
@@ -60,6 +62,9 @@ public:
   void toggleConsole();
   bool consoleStatus() { return showConsole; }
 
+  void registerCommand(const std::string &command, ConsoleObject *object);
+  void runCommand(const std::string &command, const std::string &args);
+
 protected:
   typedef std::pair<std::string, unsigned int> screenMessage;
 
@@ -74,6 +79,9 @@ protected:
   int panel_id;
   System *_system;
   Render *_renderer;
+
+  std::map<std::string, ConsoleObject*> _registered_commands;
+  
 };
 
 } /* namespace Sear */

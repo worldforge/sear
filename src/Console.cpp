@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "Console.h"
-//#include "Renderer.h"
+#include "ConsoleObject.h"
 #include "System.h"
 #include "Render.h"
 
@@ -110,4 +110,15 @@ void Console::toggleConsole() {
   showConsole = !showConsole;
 }
 
+void Console::registerCommand(const std::string &command, ConsoleObject *object) {
+  Log::writeLog(std::string("registering: ") + command, Log::INFO);
+  _registered_commands[command] = object;
+}
+
+void Console::runCommand(const std::string &command, const std::string &args) {
+  Log::writeLog(std::string("Running: ") + command, Log::INFO);
+  ConsoleObject* con_obj = _registered_commands[command];
+  if (con_obj) con_obj->runCommand(command, args);
+  else Log::writeLog(std::string("Unknown command: ") + command, Log::ERROR);
+}
 } /* namespace Sear */

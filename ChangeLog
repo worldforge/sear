@@ -1,4 +1,7 @@
 10th July 2002, Simon Goodall
+ * Console command registering implemented. Need to migrate existing system to new
+
+10th July 2002, Simon Goodall
  * Re-implemented Frustum culling
  * Stateloader file now loaded via console command instead of hardcoded location
  * Fixed console text bugs caused by wrong state in use

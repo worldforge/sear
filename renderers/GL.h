@@ -26,14 +26,8 @@ class SkyBox;
 class Camera;
 class WorldEntity;
 class Client;
-//class Model;
 class Character;
-class BoundBox;
-class BillBoard;
-class Impostor;
-class WireFrame;
 class Models;
-//class MultiModels;
 class ModelHandler;
 
 class GL : public Render {

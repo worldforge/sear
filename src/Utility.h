@@ -12,6 +12,8 @@
 #include <string>
 #include "config.h"
 
+#include <deque>
+
 #ifdef HAVE_SSTREAM
 #include <sstream>
 #define END_STREAM "" 
@@ -26,6 +28,7 @@ typedef std::strstream SSTREAM;
 #endif
 
 namespace Sear {
+
 
 template <class T>
 T deg_to_rad(const T & t) {
@@ -82,6 +85,9 @@ WFMath::Quaternion QuatMul(const WFMath::Quaternion &q1, const WFMath::Quaternio
 WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, float t);
 
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
+
+void tokenise(std::deque<std::string> &tokens, const std::string &input);
+
 
 } /* namespace Sear */
 #endif /* _UTILITY_H_ */
