@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.33 2004-10-28 09:30:54 simon Exp $
+// $Id: 3ds.cpp,v 1.34 2004-10-28 10:43:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -183,12 +183,16 @@ void ThreeDS::render(bool select_mode) {
           glGenBuffersARB(1, &ro->vb_vertex_data);
           glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
           glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->vertex_data, GL_STATIC_DRAW_ARB);
-          glGenBuffersARB(1, &ro->vb_normal_data);
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
-          glGenBuffersARB(1, &ro->vb_texCoords_data);
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
+          if (ro->normal_data != NULL) {
+            glGenBuffersARB(1, &ro->vb_normal_data);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
+          }
+          if (ro->texture_data != NULL) {
+            glGenBuffersARB(1, &ro->vb_texCoords_data);
+            glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
+          }
         }
 
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -196,10 +200,14 @@ void ThreeDS::render(bool select_mode) {
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
         glVertexPointer(3, GL_FLOAT, 0, NULL);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-        glNormalPointer(GL_FLOAT, 0, NULL);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-        glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+        if (ro->normal_data != NULL) {
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+          glNormalPointer(GL_FLOAT, 0, NULL);
+        }
+        if (ro->texture_data != NULL) {
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+          glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+        }
         // Draw object
         glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
         // Reset states

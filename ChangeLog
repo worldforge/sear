@@ -1,3 +1,7 @@
+2004-10-28  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp: Fix segfault on objects with no texture/normal data
+
 2004-10-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/System.cpp: Remove the test Toplevel window, as it causes
