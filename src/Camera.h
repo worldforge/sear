@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.8 2002-11-12 23:59:22 simon Exp $
+// $Id: Camera.h,v 1.9 2002-11-13 19:39:27 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -75,6 +75,8 @@ protected:
   
   const static char * const KEY_camera_min_distance = "camera_min_distance";
   const static char * const KEY_camera_max_distance = "camera_max_distance";
+
+  const static char * const KEY_save_camera_position = "save_camera_position";
   
   // Default config values
   const static float DEFAULT_camera_distance = 5.0f;
@@ -87,6 +89,8 @@ protected:
   
   const static float DEFAULT_camera_min_distance = 5.0f;
   const static float DEFAULT_camera_max_distance = 25.0f;
+
+  const static bool DEFAULT_save_camera_position = false;
   
   static const char * const ZOOM_IN = "+camera_zoom_in";
   static const char * const ZOOM_OUT = "+camera_zoom_out";
@@ -121,6 +125,7 @@ protected:
   float _z_pos;
 
   bool _initialised;
+  bool _save_camera_position;
 };
 
 } /* namespace Sear */

@@ -44,6 +44,10 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#ifdef DEBUG
+#include "common/mmgr.h"
+#endif
+
 Sear::Render *render = NULL;
 Sear::System *sys = NULL;
 Sear::Camera *_camera = NULL;

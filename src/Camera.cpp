@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.11 2002-11-12 23:59:22 simon Exp $
+// $Id: Camera.cpp,v 1.12 2002-11-13 19:39:27 simon Exp $
 
 #include <string>
 
@@ -37,7 +37,8 @@ Camera::Camera() :
   _zoom_speed(0.0f),
   _rotation_speed(0.0f),
   _elevation_speed(0.0f),
-  _initialised(false)
+  _initialised(false),
+  _save_camera_position(false)
 { }
 
 Camera::~Camera() {
@@ -51,8 +52,6 @@ bool Camera::init() {
   _x_pos = dist_sqr * cos(_elevation) * cos(_rotation);
   _y_pos = dist_sqr * cos(_elevation) * sin(_rotation);
   _z_pos = _distance * sin(_elevation);
-  // Write config now so defaults will get stored
-  writeConfig();
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Camera::varconf_callback));
   _initialised = true;
   return true;
@@ -60,6 +59,7 @@ bool Camera::init() {
 
 void Camera::shutdown() {
   if (debug) Log::writeLog("Shutting down camera.", Log::LOG_DEFAULT);
+  writeConfig();
   _initialised = false;
 }
 
@@ -111,14 +111,19 @@ void Camera::readConfig() {
   _min_distance = (!temp.is_double()) ? (DEFAULT_camera_min_distance) : ((double)(temp));
   temp = general.getItem(CAMERA, KEY_camera_max_distance);
   _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
+
+  temp = general.getItem(CAMERA, KEY_save_camera_position);
+  _save_camera_position = (!temp.is_bool()) ? (DEFAULT_save_camera_position) : ((bool)(temp));
 }
 
 void Camera::writeConfig() {
   varconf::Config &general = System::instance()->getGeneral();
-
-  general.setItem(CAMERA, KEY_camera_distance, _distance);
-  general.setItem(CAMERA, KEY_camera_rotation, _rotation);
-  general.setItem(CAMERA, KEY_camera_elevation, _elevation);
+  
+  if (_save_camera_position) {
+    general.setItem(CAMERA, KEY_camera_distance, _distance);
+    general.setItem(CAMERA, KEY_camera_rotation, _rotation);
+    general.setItem(CAMERA, KEY_camera_elevation, _elevation);
+  }
 
   general.setItem(CAMERA, KEY_camera_zoom_speed, _zoom_speed);
   general.setItem(CAMERA, KEY_camera_rotation_speed, _rotation_speed);
@@ -126,6 +131,8 @@ void Camera::writeConfig() {
   
   general.setItem(CAMERA, KEY_camera_min_distance, _min_distance);
   general.setItem(CAMERA, KEY_camera_max_distance, _max_distance);
+
+  general.setItem(CAMERA, KEY_save_camera_position, _save_camera_position);
 }
 
 void Camera::registerCommands(Console *console) {
@@ -196,6 +203,10 @@ void Camera::varconf_callback(const std::string &section, const std::string &key
     else if (key == KEY_camera_max_distance) {
       temp = config.getItem(CAMERA, KEY_camera_max_distance);
       _max_distance = (!temp.is_double()) ? (DEFAULT_camera_max_distance) : ((double)(temp));
+    }
+    else if (key == KEY_save_camera_position) {
+      temp = config.getItem(CAMERA, KEY_save_camera_position);
+      _save_camera_position = (!temp.is_bool()) ? (DEFAULT_save_camera_position) : ((bool)(temp));
     }
   }
 }

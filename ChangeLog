@@ -1,3 +1,6 @@
+13th November 2002, Simon Goodall
+ * Camera position now saved according to user defined boolean option. "save_camera_position". default is false
+
 12th November 2002, Simon Goodall
  * Fixed up model_viewer so it now compiles again. still a few got problems.
  * System's varconf config objects now actual objects and not pointers
