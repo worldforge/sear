@@ -97,6 +97,10 @@ StateProperties *StateLoader::readRecord(FILE *state_file) {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       sp->lighting = (std::string(string_data) == "true") ? (true) : (false);
     }
+    else if (tag == "two_sided_lighting") {
+      sscanf(str, "%*s = %s\n", &string_data[0]);  
+      sp->two_sided_lighting = (std::string(string_data) == "true") ? (true) : (false);
+    }
     else if (tag == "textures") {
       sscanf(str, "%*s = %s\n", &string_data[0]);  
       sp->textures = (std::string(string_data) == "true") ? (true) : (false);

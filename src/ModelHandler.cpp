@@ -14,6 +14,7 @@
 #include "loaders/BoundBox_Loader.h"
 #include "loaders/BillBoard_Loader.h"
 #include "loaders/Impostor_Loader.h"
+#include "loaders/NPlane_Loader.h"
 #include "loaders/WireFrame_Loader.h"
 
 #include "Exception.h"
@@ -21,13 +22,16 @@
 #include "ModelHandler.h"
 #include "ModelLoader.h"
 #include "ObjectLoader.h"
+#include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
 
 
 namespace Sear {
 
-ModelHandler::ModelHandler()
+ModelHandler::ModelHandler() :
+  detail_level(1.0f)
+	
 {
   // TODO: this is not the place
   new Cal3d_Loader(this);
@@ -35,6 +39,7 @@ ModelHandler::ModelHandler()
   new BillBoard_Loader(this);
   new WireFrame_Loader(this);
   new Impostor_Loader(this);
+  new NPlane_Loader(this);
   new ThreeDS_Loader(this);
 }
 
@@ -79,6 +84,7 @@ Model *ModelHandler::getModel(WorldEntity *we) {
 
   // If entity already has an associated model, return it.
   if (_models[id]) return _models[id];
+///  if (_models[type]) return _models[type];
   
   // Get object type record
   ObjectProperties *op = we->getObjectProperties();
@@ -86,20 +92,22 @@ Model *ModelHandler::getModel(WorldEntity *we) {
   std::string object_type = "";
   std::string data_source = "";
   Model *model = NULL;
+
   static Config *model_config = System::instance()->getModel();
+
   object_type = we->type();
+
   std::set<std::string> parents_list = we->getType()->getParentsAsSet();
   std::set<std::string>::const_iterator I = parents_list.begin();
-
   while(!model) {
     op = ol->getObjectProperties(object_type);
-//    if (!op) continue;
     if (op) {
       data_source = model_config->getAttribute(object_type);
       if (op->model_by_type) {
         if (_models[object_type]) {
-          _models[id] = _models[object_type];
-          return _models[id];
+          model = _models[object_type];
+	  break;
+          //return _models[id];
         }
       }
       if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(we, op, data_source);
@@ -123,7 +131,11 @@ Model *ModelHandler::getModel(WorldEntity *we) {
     model->setFlag("ModelByType", true);
     _models[object_type] = model;
   }
-  
+  if (!model) Log::writeLog(id, Log::LOG_ERROR);
+
+  if (model) {
+    model->setSelectState(System::instance()->getStateLoader()->getStateProperties(op->select_state));
+  }
   return model; 
 }
 
@@ -150,5 +162,24 @@ void ModelHandler::checkModelTimeout(const std::string &id) {
   }
 }
 
+void ModelHandler::lowerDetail() {
+  detail_level -= 0.05f;
+  if (detail_level < 0.0f) detail_level = 0.0f;
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
+    if (I->second) {
+      I->second->setDetailLevel(detail_level);
+    }
+  }
+}
+
+void ModelHandler::raiseDetail() {
+  detail_level += 0.05f;
+  if (detail_level > 1.0f) detail_level = 1.0f;
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
+    if (I->second) {
+      I->second->setDetailLevel(detail_level);
+    }
+  }
+}
 
 } /* namespace Sear */

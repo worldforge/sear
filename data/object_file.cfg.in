@@ -30,8 +30,9 @@ draw_members = false
 outline = true
 end_of_record
 object_type = pig
-model_type = 3ds
-state = 3ds
+model_type = billboard
+state = billboard
+select_state = select_billboard
 draw_self = true
 draw_members = false
 end_of_record
@@ -108,4 +109,12 @@ draw_members = true
 width = 10.0
 height = 10.0
 model_by_type = true
+end_of_record
+object_type = thing
+model_type = boundbox
+state = boundbox
+select_state = select
+draw_self = true
+draw_members = false
+outline = true
 end_of_record

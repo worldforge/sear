@@ -12,7 +12,8 @@ sear_LDADD = \
 	../loaders/libLoaderBillBoard.a \
 	../loaders/libLoaderImpostor.a \
 	../loaders/libLoaderCal3d.a \
-	../loaders/libLoader3ds.a 
+	../loaders/libLoader3ds.a \
+	../loaders/libLoaderNPlane.a 
 
 sear_SOURCES = \
 	Bindings.cpp \

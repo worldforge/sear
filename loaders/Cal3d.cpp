@@ -606,13 +606,4 @@ void Cal3d::action(const std::string &action) {
   }
 }
 
-void Cal3d::setFlag(const std::string &flag, bool state) {
-  if (flag == "outline") _outline = state;
-}
-
-bool Cal3d::getFlag(const std::string &flag) {
-  if (flag == "outline") return _outline;
-  return false;
-}
-
 } /* namespace Sear */

@@ -1,6 +1,6 @@
 INCLUDES = -I..
 
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderCal3d.a libLoader3ds.a
+noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderCal3d.a libLoader3ds.a libLoaderNPlane.a
 
 libLoaderWireFrame_a_SOURCES = \
 	WireFrame.cpp WireFrame.h \
@@ -25,3 +25,7 @@ libLoaderCal3d_a_SOURCES = \
 libLoader3ds_a_SOURCES = \
 	3ds.cpp 3ds.h \
 	3ds_Loader.cpp 3ds_Loader.h
+
+libLoaderNPlane_a_SOURCES = \
+	NPlane.cpp NPlane.h \
+	NPlane_Loader.cpp NPlane_Loader.h

@@ -1,3 +1,10 @@
+2nd August 2002, Simon Goodall
+ * Added two-sided-lighting option to state loader
+ * Fixed state change bug where current state was never set
+ * Fixed model by type bug where only one model of a type was actually rendered
+ * Re-implemented detail level control
+ * Fixed outlining bug where using alternate method caused problems for cal3d and bound/boxes
+
 1st August 2002, Simon Goodall
  * Updated Factory.h and WorldEntity class to accomodate changes to Eris
  * Graphics class introduced which performs the generic rendering functions, while Render now only does the specific ones

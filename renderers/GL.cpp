@@ -18,33 +18,33 @@
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 
-#include "../common/Config.h"
-#include "../common/Log.h"
-#include "../common/Utility.h"
+#include "common/Config.h"
+#include "common/Log.h"
+#include "common/Utility.h"
 
-#include "../src/Camera.h"
-#include "../src/System.h"
-#include "../src/Terrain.h"
-#include "../src/Sky.h"
-#include "../src/WorldEntity.h"
-#include "../src/Console.h"
-#include "../src/ObjectLoader.h"
-#include "../src/Frustum.h"
-#include "../src/Graphics.h"
-#include "../src/Model.h"
-#include "../src/ModelHandler.h"
+#include "src/Camera.h"
+#include "src/System.h"
+#include "src/Terrain.h"
+#include "src/Sky.h"
+#include "src/WorldEntity.h"
+#include "src/Console.h"
+#include "src/ObjectLoader.h"
+#include "src/Frustum.h"
+#include "src/Graphics.h"
+#include "src/Model.h"
+#include "src/ModelHandler.h"
 
-#include "../terrain/ROAM.h"
-#include "../sky/SkyBox.h"
+#include "terrain/ROAM.h"
+#include "sky/SkyBox.h"
 
-#include "../src/default_image.xpm"
-#include "../src/default_font.xpm"
+#include "src/default_image.xpm"
+#include "src/default_font.xpm"
 
 #include "GL.h"
 
 namespace Sear {
 
-static float _halo_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
+static float _halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
 
 inline GLuint GL::makeMask(GLint bits) {
   return (0xFF >> (8 - bits));
@@ -112,7 +112,7 @@ void GL::buildColourSet() {
     ic += indx & (blueMask << blueShift);
     colourSet.insert(ic);
   }
-  Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_DEFAULT);
+  Log::writeLog(std::string("Number of colours: ") + string_fmt(colourSet.size()), Log::LOG_INFO);
 }
 
 
@@ -186,6 +186,7 @@ void GL::init() {
   createDefaults();
   splash_id = requestTexture(splash_texture);
   initFont();
+  initLighting();
   // TODO: initialisation need to go into system
   setupStates();
 #ifdef DEBUG  
@@ -198,12 +199,9 @@ void GL::initLighting() {
   Log::writeLog("Render: initialising lighting", Log::LOG_DEFAULT);
   float gambient[4] = {0.1f, 0.1f,0.1f, 1.0f};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT,gambient);
-//  glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE); // Should make this specific to billboard and impostors and not globally relevant
   // Light values and coordinates
            
   // Setup and enable light 0
-  //glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-  
   glLightfv(GL_LIGHT0, GL_AMBIENT, lights[LIGHT_CHARACTER].ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, lights[LIGHT_CHARACTER].diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
@@ -432,6 +430,7 @@ void GL::stateChange(const std::string &state) {
 
 void GL::stateChange(StateProperties *sp) {
   if (!sp) {
+    Log::writeLog("NULL State", Log::LOG_ERROR);
     return;
     // throw Exception("StateProperties is NULL");
   }
@@ -445,7 +444,6 @@ void GL::stateChange(StateProperties *sp) {
       _state_map[change] = list;
     }
     glCallList(list);
-    _cur_state = sp;
   } else { 
     if (sp->alpha_test) glEnable(GL_ALPHA_TEST);
     else glDisable(GL_ALPHA_TEST);
@@ -453,6 +451,8 @@ void GL::stateChange(StateProperties *sp) {
     else glDisable(GL_BLEND);
     if (sp->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
     else glDisable(GL_LIGHTING);
+    if (sp->two_sided_lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
     if (sp->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
     else glDisable(GL_TEXTURE_2D);
     if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
@@ -468,6 +468,7 @@ void GL::stateChange(StateProperties *sp) {
     if (sp->fog) glEnable(GL_FOG);
     else glDisable(GL_FOG);
   }
+  _cur_state = sp;
 }
 
 
@@ -513,7 +514,6 @@ void GL::procEvent(int x, int y) {
   selected_id = getSelectedID(ic);
   if (selected_id != activeID) {
     activeID = selected_id;
-    if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
     if (!activeID.empty()) Log::writeLog(std::string("ActiveID: ") + activeID, Log::LOG_DEFAULT);
   }
 }
@@ -679,6 +679,10 @@ void GL::stateDisplayList(GLuint &list, StateProperties *previous_state, StatePr
   if (previous_state->lighting != next_state->lighting) {
     if (next_state->lighting && checkState(RENDER_LIGHTING)) glEnable(GL_LIGHTING);
     else glDisable(GL_LIGHTING);
+  }
+  if (previous_state->lighting != next_state->lighting) {
+    if (next_state->lighting && checkState(RENDER_LIGHTING)) glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+    else glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);
   }
   if (previous_state->textures != next_state->textures) {
     if (next_state->textures && checkState(RENDER_TEXTURES)) glEnable(GL_TEXTURE_2D);
@@ -930,6 +934,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
 
 void GL::drawMessageQueue(std::map<std::string, Queue> queue) {
   glColor4fv(yellow);
+  stateChange("font");
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
       WorldEntity *we = (WorldEntity*)*J;
@@ -957,9 +962,8 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 }
 
 void GL::drawOutline(Model *model, bool use_stencil) {
-  // TODO Work out why the stencil has stopped working. Is this to do with the states?
+  StateProperties *sp = _cur_state; // Store current state
   if (checkState(RENDER_STENCIL) && use_stencil) { // Using Stencil Buffer
-    StateProperties *sp = _cur_state; // Store current state
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, -1, 1);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -974,12 +978,13 @@ void GL::drawOutline(Model *model, bool use_stencil) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_STENCIL_TEST);
     glColor4fv(white);
-    stateChange(sp); // Restore state
   } else { // Just use solid colour on object 
+    stateChange(model->getSelectState());
     glColor4fv(_halo_colour);  
     model->render(true);
     glColor4fv(white);
   }
+  stateChange(sp); // Restore state
 }
 
 void GL::createDefaults() {
@@ -990,7 +995,7 @@ void GL::createDefaults() {
   glGenTextures(1, &texture_id);
 
   if (texture_id == 0) {
-    Log::writeLog("Error creating deafult font", Log::LOG_ERROR);
+    Log::writeLog("Error creating default texture", Log::LOG_ERROR);
     return;
   }
 
@@ -1015,7 +1020,7 @@ void GL::createDefaults() {
   glGenTextures(1, &texture_id);
 
   if (texture_id == 0) {
-    Log::writeLog("Error creating deafult font", Log::LOG_ERROR);	 
+    Log::writeLog("Error creating default font", Log::LOG_ERROR);
     return;
   }
 
@@ -1105,6 +1110,12 @@ inline void GL::applyQuaternion(WFMath::Quaternion quaternion) {
   glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
 }
   
+void GL::applyCharacterLighting(float x, float y, float z) {
+  float ps[] = {x, y, z, 1.0f};
+  glLightfv(GL_LIGHT0,GL_POSITION, ps);
+}
+
+
 void GL::applyLighting() {
   float tim = _system->getTimeOfDay();
   float dawn_time = _system->getDawnTime();
@@ -1158,5 +1169,19 @@ inline void GL::renderActiveName() {
   print(x_pos, y_pos, active_name.c_str(), 1);
 }
 
+inline void GL::getFrustum(float frust[6][4]) {
+  float  proj[16];
+  float  modl[16];
+  /* Get the current PROJECTION matrix from OpenGraphics */
+  glGetFloatv(GL_PROJECTION_MATRIX, proj );
+  /* Get the current MODELVIEW matrix from OpenGraphics */
+  glGetFloatv(GL_MODELVIEW_MATRIX, modl );
+  Frustum::getFrustum(frust, proj, modl);
+  for (int i = 0; i < 6; i++) {
+    for (int j = 0; j < 4; j++) {
+      frustum[i][j] = frust[i][j];
+    }
+  }
+}
   
 } /* namespace Sear */

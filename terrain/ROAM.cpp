@@ -135,4 +135,11 @@ void ROAM::writeConfig() {
   general->setAttribute(KEY_terrain_scale, string_fmt(_terrain_scale));
 }
 
+void ROAM::lowerDetail() { 
+  gLand->lowerDetail();
+}
+
+void ROAM::raiseDetail() {
+  gLand->raiseDetail();
+}
 } /* namespace Sear */

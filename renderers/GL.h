@@ -104,7 +104,8 @@ public:
   void applyLighting();
   inline void resetSelection();
   inline void renderActiveName();
-  float frustum[6][4];
+  inline void applyCharacterLighting(float x, float y, float z);
+  inline void getFrustum(float [6][4]);
   
 protected:
   System *_system;
@@ -126,6 +127,8 @@ protected:
   int splash_id;
   static GL *_instance;
 
+  float frustum[6][4];
+  
   std::string activeID;
   std::string active_name;
   int x_pos;

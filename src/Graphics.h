@@ -32,16 +32,6 @@ class Graphics {
 public:
 
 typedef enum {
-  RENDER_UNKNOWN = 0,
-  RENDER_LIGHTING,
-  RENDER_TEXTURES,
-  RENDER_SHADOWS,
-  RENDER_FPS,
-  RENDER_STENCIL,
-  RENDER_LAST_STATE
-} RenderState;
-
-typedef enum {
   RES_INVALID = 0,
   RES_POINT,
   RES_LINES,
@@ -74,7 +64,7 @@ typedef enum {
   float getLightLevel();
   void buildQueues(WorldEntity *we, int depth, bool select_mode); 
   void drawScene(const std::string &command ,bool, float);
-  void updateDetailLevels();	  
+  void updateDetailLevels(float);
   
   std::string getActiveID();
 
@@ -85,9 +75,6 @@ typedef enum {
   Terrain* getTerrain() { return _terrain; }
   Sky* getSky() { return _sky; }
  
-  void setState(RenderState rs, bool state) { _renderState[rs] = state; }
-  bool checkState(RenderState rs) { return _renderState[rs]; }
-
   void setupStates();
   void readConfig();
   void writeConfig();
@@ -97,7 +84,6 @@ typedef enum {
   WFMath::Quaternion getCameraOrientation() { return orient; }
 
 protected:
-  bool _renderState[RENDER_LAST_STATE];
   System *_system;
   Render *_renderer;
   Character *_character;

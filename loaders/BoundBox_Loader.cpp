@@ -47,6 +47,7 @@ Model *BoundBox_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const s
   }
   model->init(bboxCheck(bbox), std::string("boundbox_") + type, op->wrap_texture);
   model->setInUse(true);
+  model->setFlag("outline", op->outline);
   return model;
 }
 

@@ -18,6 +18,7 @@
 #include "System.h"
 #include "WorldEntity.h"
 
+#include <set>
 
 namespace Sear {
 
@@ -53,12 +54,10 @@ void WorldEntity::handleTalk(const std::string &msg) {
 
 void WorldEntity::renderMessages() {
   if (messages.empty()) return;
-//int i = 0;
   //Convert messages into char arrays up x characters long
   std::list<std::string> mesgs = std::list<std::string>();
   std::list<screenMessage>::reverse_iterator I;
   for (I = messages.rbegin(); I != messages.rend(); I++) {
-//  for (I = messages.end(); I != messages.begin(); I++) {
     const std::string str = (const std::string)((*I).first);
     std::list<std::string> message_list = std::list<std::string>();
     int pos = 0;
@@ -76,7 +75,6 @@ void WorldEntity::renderMessages() {
       if (str1.empty()) break; // No more text, end loop
       // Add text to mesgs list
       message_list.push_back(str1);
-//      mesgs.push_back(str1);
       pos += string_size;
     }
     std::list<std::string>::reverse_iterator K;
@@ -86,7 +84,7 @@ void WorldEntity::renderMessages() {
      
   }
   // Render text strings
-  Render *renderer = System::instance()->getGraphics()->getRender();
+  static Render *renderer = System::instance()->getGraphics()->getRender();
   std::list<std::string>::iterator J;
   for (J = mesgs.begin(); J != mesgs.end(); J++) {	  
     std::string str = (*J);
@@ -167,12 +165,15 @@ void WorldEntity::displayInfo() {
 }
 
 std::string WorldEntity::type() {
-  return getType()->getName();
-  
+  Eris::TypeInfo *ti = getType();
+  if (ti) return ti->getName();
+  else return "";
 }
 
 std::string WorldEntity::parent() {
-  return *getType()->getParentsAsSet().begin();
+  Eris::TypeInfo *ti = getType();
+  if (ti) return *ti->getParentsAsSet().begin();
+  return "";
 }
 
 } /* namespace Sear */

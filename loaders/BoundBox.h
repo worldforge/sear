@@ -38,7 +38,7 @@ public:
    * Cleans up object
    */ 
   void shutdown();
- float getScale() { return 1.0f; } 
+  float getScale() { return 1.0f; } 
   void render(bool); 
 
   bool useTextures() { return _use_textures; }

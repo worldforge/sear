@@ -24,9 +24,9 @@ public:
   virtual bool useTextures() { return false; }
   virtual void action(const std::string &action) {}
 
-  virtual void setFlag(const std::string &flag, bool state) {}
+  virtual void setFlag(const std::string &flag, bool state) { _flag_map[flag] = state; }
   
-  virtual bool getFlag(const std::string &flag) { return false; }
+  virtual bool getFlag(const std::string &flag) { return _flag_map[flag]; }
 
   bool getInUse() { return _in_use;}
   void setInUse(bool in_use) { _in_use = in_use; }
@@ -54,6 +54,7 @@ public:
 
 private:
   bool _in_use;
+  std::map<std::string, bool> _flag_map;
   
 };
 

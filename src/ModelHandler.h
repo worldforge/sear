@@ -44,8 +44,12 @@ public:
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
 
   void checkModelTimeout(const std::string &);
+
+  void lowerDetail();
+  void raiseDetail();
   
 protected:
+  float detail_level;
   unsigned int _number_of_models; //required?
   // Will not be an array as not dynamic -> a map would be better 
   std::map<std::string, ModelLoader*> _model_loaders;

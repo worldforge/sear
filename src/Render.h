@@ -121,6 +121,8 @@ typedef std::list<WorldEntity*> Queue;
   void setState(RenderState rs, bool state) { _renderState[rs] = state; }
   bool checkState(RenderState rs) { return _renderState[rs]; }
 
+  virtual void applyCharacterLighting(float x, float y, float z) =0;
+  virtual void getFrustum(float [6][4]) =0;
 protected:
   bool  _renderState[RENDER_LAST_STATE];
 

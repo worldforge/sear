@@ -28,7 +28,8 @@ void ObjectLoader::init() {
   strcat(op->state, "default\0");
   strcat(op->select_state, "select\0");
   op->width = 1.0f;
-  op->height = 1.0f;	 
+  op->height = 1.0f;
+  op->num_planes = 1;
   op->texture_scale = 1.0f;
   op->material_properties = mp;
   op->lighting_properties = NULL;
@@ -166,6 +167,9 @@ int ObjectLoader::readRecord(FILE *object_file, ObjectProperties *op) {
     }
     else if (tag == "height") {
       sscanf(str, "%*s = %f", &op->height);
+    }
+    else if (tag == "num_planes") {
+      sscanf(str, "%*s = %d", &op->num_planes);
     }
     else if (tag == "texture_scale") {
       sscanf(str, "%*s = %f", &op->texture_scale);

@@ -1,6 +1,4 @@
 BUGS
- * Some problems with Atlas stuff in Character.cpp -> Need to check with James
-
  * Still some object selection bugs.
    - For the most part selection works as expected, athough there still arises some occasions where an object will not get selected!
 

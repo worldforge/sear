@@ -46,8 +46,8 @@ public:
   float getHeight(float, float);
   int ground_id; 
 
-  void lowerDetail() { };//gLand->lowerDetail(); }
-  void raiseDetail() { };//gLand->raiseDetail(); }
+  void lowerDetail();
+  void raiseDetail();
   
   static float _water_level;
   void readConfig();

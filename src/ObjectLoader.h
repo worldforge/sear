@@ -50,6 +50,7 @@ typedef struct {
   char select_state[OBJECT_LOADER_MAX_SIZE];
   float width;
   float height;
+  int num_planes;
   float texture_scale;
   MaterialProperties *material_properties;
   LightingProperties *lighting_properties;

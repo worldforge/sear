@@ -58,6 +58,7 @@ public:
   void render(bool, bool, bool);
   void shutdown();
   void update(float elapsedSeconds);
+  void setDetailLevel(float level) { setLodLevel(level); }
   void setLodLevel(float lodLevel);
   void setMotionBlend(float *pMotionBlend, float delay);
   void setState(int state, float delay);
@@ -65,14 +66,10 @@ public:
   bool useTextures() { return _use_textures; }
   void action(const std::string &action);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
-  void setFlag(const std::string &flag, bool state);
-  bool getFlag(const std::string &flag);
- 
   
 protected:
   unsigned int loadTexture(const std::string& strFilename);
   void renderMesh(bool bWireframe, bool bLight, bool);
-  bool _outline;
 };
 
 } /* namespace Sear */

@@ -17,6 +17,7 @@ typedef struct {
   bool alpha_test;
   bool blend;
   bool lighting;
+  bool two_sided_lighting;
   bool textures;
   bool colour_material;
   bool depth_test;
