@@ -1,0 +1,6 @@
+load_general @prefix@/share/sear/data/general.cfg
+load_bindings @prefix@/share/sear/data/bindings.cfg
+load_object_file @prefix@/share/sear/data/object_file.cfg
+load_models @prefix@/share/sear/data/models.cfg
+load_general ~/general.cfg
+load_bindings ~/bindings.cfg

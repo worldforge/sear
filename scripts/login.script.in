@@ -1,0 +1,3 @@
+event 2 1 100 keypress connect
+event 2 2 1 keypress login
+event 2 1 1000 keypress take

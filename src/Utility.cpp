@@ -1,0 +1,223 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+
+#include "Utility.h"
+
+#include <wfmath/quaternion.h>
+
+#include <string>
+
+#define DELTA 0.0
+#include <math.h>
+
+
+void ReduceToUnit(float vector[3]) {
+  float length;
+  
+  // Calculate the length of the vector		
+  length = sqrt((vector[0]*vector[0]) + (vector[1]*vector[1]) + (vector[2]*vector[2]));
+
+  // Keep the program from blowing up by providing an exceptable
+  // value for vectors that may calculated too close to zero.
+  if(length == 0.0f) length = 1.0f;
+
+  // Dividing each element by the length will result in a
+  // unit normal vector.
+  vector[0] /= length;
+  vector[1] /= length;
+  vector[2] /= length;
+}
+
+// ---------------------------------------------------------------------
+// Points p1, p2, & p3 specified in counter clock-wise order
+//
+void calcNormal(float v[3][3], float out[3]) {
+  float v1[3],v2[3];
+  static const int x = 0;
+  static const int y = 1;
+  static const int z = 2;
+
+  // Calculate two vectors from the three points
+  v1[x] = v[0][x] - v[1][x];
+  v1[y] = v[0][y] - v[1][y];
+  v1[z] = v[0][z] - v[1][z];
+
+  v2[x] = v[1][x] - v[2][x];
+  v2[y] = v[1][y] - v[2][y];
+  v2[z] = v[1][z] - v[2][z];
+
+  // Take the cross product of the two vectors to get
+  // the normal vector which will be stored in out
+  out[x] = v1[y]*v2[z] - v1[z]*v2[y];
+  out[y] = v1[z]*v2[x] - v1[x]*v2[z];
+  out[z] = v1[x]*v2[y] - v1[y]*v2[x];
+
+  // Normalize the vector (shorten length to one)
+  ReduceToUnit(out);
+}
+
+WFMath::Quaternion MatToQuat(float m[4][4]) {
+  float  tr, s, q[4];
+  int    i, j, k;
+  int nxt[3] = {1, 2, 0};
+  float x, y, z, w;
+  
+  tr = m[0][0] + m[1][1] + m[2][2];
+
+  // check the diagonal
+  if (tr > 0.0) {
+    s = sqrt (tr + 1.0);
+    w = s / 2.0;
+    s = 0.5 / s;
+    x = (m[1][2] - m[2][1]) * s;
+    y = (m[2][0] - m[0][2]) * s;
+    z = (m[0][1] - m[1][0]) * s;
+  } else {		
+    // diagonal is negative
+    i = 0;
+    if (m[1][1] > m[0][0]) i = 1;
+    if (m[2][2] > m[i][i]) i = 2;		
+    j = nxt[i];
+    k = nxt[j];
+    s = sqrt ((m[i][i] - (m[j][j] + m[k][k])) + 1.0);    
+    q[i] = s * 0.5;
+    if (s != 0.0) s = 0.5 / s;
+    q[3] = (m[j][k] - m[k][j]) * s;
+    q[j] = (m[i][j] + m[j][i]) * s;
+    q[k] = (m[i][k] + m[k][i]) * s;
+    x = q[0];
+    y = q[1];
+    z = q[2];
+    w = q[3];
+  }
+  return WFMath::Quaternion(w, x, y, z);
+}
+
+//void QuatToMatrix(WFMath::Quaternion quat, float m[4][4]) {
+void QuatToMatrix(WFMath::Quaternion quat, float m[4][4]) {
+//  float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+  float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+  // calculate coefficients
+  x2 = quat.vector().x() + quat.vector().x();
+  y2 = quat.vector().y() + quat.vector().y();
+  z2 = quat.vector().z() + quat.vector().z();
+  xx = quat.vector().x() * x2;
+  xy = quat.vector().x() * y2;
+  xz = quat.vector().x() * z2;
+  yy = quat.vector().y() * y2;
+  yz = quat.vector().y() * z2;
+  zz = quat.vector().z() * z2;
+  wx = quat.scalar() * x2;
+  wy = quat.scalar() * y2;
+  wz = quat.scalar() * z2;
+
+  m[0][0] = 1.0 - (yy + zz);
+  m[0][1] = xy - wz;
+  m[0][2] = xz + wy;
+  m[0][3] = 0.0;
+             
+  m[1][0] = xy + wz;
+  m[1][1] = 1.0 - (xx + zz);
+  m[1][2] = yz - wx;
+  m[1][3] = 0.0;
+  
+  m[2][0] = xz - wy;
+  m[2][1] = yz + wx;  
+  m[2][2] = 1.0 - (xx + yy);
+  m[2][3] = 0.0;
+    
+  m[3][0] = 0;
+  m[3][1] = 0;
+  m[3][2] = 0;
+  m[3][3] = 1;  
+}
+
+
+WFMath::Quaternion EulerToQuat(float roll, float pitch, float yaw) {
+  float cr, cp, cy, sr, sp, sy, cpcy, spsy;
+  float w, x, y, z;
+  // calculate trig identities
+  cr = cos(roll/2);
+  cp = cos(pitch/2);
+  cy = cos(yaw/2);
+  sr = sin(roll/2);
+  sp = sin(pitch/2);
+  sy = sin(yaw/2);
+		
+  cpcy = cp * cy;
+  spsy = sp * sy;
+		
+  w = cr * cpcy + sr * spsy;
+  x = sr * cpcy - cr * spsy;
+  y = cr * sp * cy + sr * cp * sy;
+  z = cr * cp * sy - sr * sp * cy;
+
+  return WFMath::Quaternion(w, x , y, z);
+}
+
+
+WFMath::Quaternion QuatMul(const WFMath::Quaternion &q1, const WFMath::Quaternion &q2) {
+  float A, B, C, D, E, F, G, H;
+  float w, x, y, z;
+  A = (q1.scalar() + q1.vector().x())*(q2.scalar() + q2.vector().x());
+  B = (q1.vector().z() - q1.vector().y())*(q2.vector().y() - q2.vector().z());
+  C = (q1.scalar() - q1.vector().x())*(q2.vector().y() + q2.vector().z()); 
+  D = (q1.vector().y() + q1.vector().z())*(q2.scalar() - q2.vector().x());
+  E = (q1.vector().x() + q1.vector().z())*(q2.vector().x() + q2.vector().y());
+  F = (q1.vector().x() - q1.vector().z())*(q2.vector().x() - q2.vector().y());
+  G = (q1.scalar() + q1.vector().y())*(q2.scalar() - q2.vector().z());
+  H = (q1.scalar() - q1.vector().y())*(q2.scalar() + q2.vector().z());
+
+  w = B + (-E - F + G + H) /2;
+  x = A - (E + F + G + H)/2; 
+  y = C + (E - F + G - H)/2; 
+  z = D + (E - F - G + H)/2;
+
+  return WFMath::Quaternion(w, x, y, z);
+}
+
+WFMath::Quaternion QuatSlerp(WFMath::Quaternion from, WFMath::Quaternion to, float t) {
+  
+  float to1[4];
+  double omega, cosom, sinom, scale0, scale1;
+  float w, x, y, z;
+
+  // calc cosine
+  cosom = from.vector().x() * to.vector().x() + from.vector().y() * to.vector().y() + from.vector().z() * to.vector().z() + from.scalar() * to.scalar();
+  				      
+  // adjust signs (if necessary)
+				      
+  if ( cosom <0.0 ){ cosom = -cosom; to1[0] = - to.vector().x();
+    to1[1] = - to.vector().y();
+    to1[2] = - to.vector().z();    
+    to1[3] = - to.scalar();    
+  } else  {
+     to1[0] = to.vector().x();     
+     to1[1] = to.vector().y();     
+     to1[2] = to.vector().z();   
+     to1[3] = to.scalar();	
+  }
+  
+  
+  // calculate coefficients
+  if ( (1.0 - cosom) > DELTA ) {				      
+    // standard case (slerp)
+    omega = acos(cosom);
+    sinom = sin(omega);
+    scale0 = sin((1.0 - t) * omega) / sinom;
+    scale1 = sin(t * omega) / sinom;
+  } else {        
+    // "from" and "to" quaternions are very close 
+    //  ... so we can do a linear interpolation
+    scale0 = 1.0 - t;
+    scale1 = t;
+  }  
+  // calculate final values
+  x = scale0 * from.vector().x() + scale1 * to1[0];
+  y = scale0 * from.vector().y() + scale1 * to1[1];
+  z = scale0 * from.vector().z() + scale1 * to1[2];
+  w = scale0 * from.scalar() + scale1 * to1[3]; 
+
+  return WFMath::Quaternion(w, x, y, z);
+}
