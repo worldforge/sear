@@ -2,4 +2,4 @@
 iconfile = "sear_icon.bmp"
 
 [terrain]
-height_map = "agrilan_hm.png"
+height_map = "mason_hm.png"
