@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.8 2002-12-14 14:46:36 simon Exp $
+// $Id: Landscape.h,v 1.9 2003-02-17 16:14:03 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -127,6 +127,10 @@ public:
   void SetVisibility();
   bool m_isVisible;
   float min_height, max_height;
+
+  unsigned int texture_id;
+  std::string texture_name_id;
+  
 };
 
 } /* namespace Sear */
