@@ -1,0 +1,37 @@
+%define name sear-updater
+%define version 20040714
+%define release 1
+
+Summary: Sear - an 3D client for Worldforge
+Name: %{name}
+Version: %{version}
+Release: %{release}
+URL: http://www.worldforge.org/dev/eng/clients/sear/
+# TODO make sure this is correct
+Copyright: GPL
+Group: Amusements/Games
+BuildRoot: %{_tmppath}/build-%{name}
+BuildArchitectures: noarch
+Requires: sear >= @VERSION@
+
+%description
+Sear is a 3D client for MMORPGs using the Worldforge system. 
+written by Simon Goodall <sear@simongoodall.co.uk>
+This is the updater for use with Sear
+
+
+%prep
+rm -rf ${RPM_BUILD_ROOT}
+
+%build
+
+%install
+mkdir -p $RPM_BUILD_ROOT/%{_datadir}/sear
+cp WFUT.jar $RPM_BUILD_ROOT/%{_datadir}/sear
+
+%clean
+rm -rf ${RPM_BUILD_ROOT}
+
+%files
+%defattr(-,root,root)
+%{_datadir}/sear/WFUT.jar
