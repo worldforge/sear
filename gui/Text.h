@@ -21,7 +21,7 @@ protected:
   std::string m_content;
   float m_scale;
 public:
-  explicit Text(const std::string &, float scale = 0.7f);
+  explicit Text(const std::string &, float scale = 0.8f);
   virtual ~Text();
 
   const std::string & content() const {

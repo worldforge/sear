@@ -24,9 +24,9 @@ protected:
   Window * m_frame;
   std::string m_title;
 
-  static const int m_border = 4;
+  const unsigned int m_border;
 public:
-  explicit Toplevel(const std::string & title);
+  explicit Toplevel(const std::string & title, unsigned int border = 4);
   virtual ~Toplevel();
 
   Widget * getContents() const {

@@ -11,12 +11,12 @@
 
 namespace Sear {
 
-Dialogue::Dialogue(const std::string & title) : Toplevel(title),
-                                                m_contentBox(new VBox())
+Dialogue::Dialogue(const std::string & title) : Toplevel(title, 0),
+                                                m_contentBox(new VBox(0))
 {
   setContents(m_contentBox);
 
-  HBox * hb = new HBox();
+  HBox * hb = new HBox(0);
   m_contentBox->push_back(hb);
 
   hb->push_back(new Button("O"));

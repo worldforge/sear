@@ -19,7 +19,7 @@ namespace Sear {
 TextEntry::TextEntry(int size, const std::string & text) :
            m_frame(new Frame()), m_text(new Text("")),
            m_caret(new Caret(16 * m_text->scale())), m_input(text),
-           m_textOffset(0), m_size(size), m_border(4)
+           m_textOffset(0), m_size(size), m_border(2)
 {
   m_frame->down();
   m_caretPos = m_input.size();

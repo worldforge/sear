@@ -8,7 +8,7 @@
 
 namespace Sear {
 
-Box::Box() : m_packing(4)
+Box::Box(int packing) : m_packing(packing)
 {
 }
 
@@ -23,7 +23,7 @@ Widget * Box::push_back(Widget * w)
     return w;
 }
 
-VBox::VBox()
+VBox::VBox(int packing) : Box(packing)
 {
 }
 
@@ -50,7 +50,7 @@ void VBox::map(Window * win, int x, int y, int & w, int & h)
   std::cout << "VBox::map returning " << w << "," << h << std::endl << std::flush;
 }
 
-HBox::HBox()
+HBox::HBox(int packing) : Box(packing)
 {
 }
 

@@ -15,9 +15,11 @@ namespace Sear {
 static const int min_width = 20;
 static const int min_height = 20;
 
-Toplevel::Toplevel(const std::string & title) : m_contents(0),
+Toplevel::Toplevel(const std::string & title, unsigned int border) :
+                                                m_contents(0),
                                                 m_frame(new Frame()),
-                                                m_title(title)
+                                                m_title(title),
+                                                m_border(border)
 {
   m_frame->setSize(min_width, min_height);
 }

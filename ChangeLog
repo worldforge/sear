@@ -1,5 +1,21 @@
 2004-12-31  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Box.cpp, gui/Box.h: Make the packing size a constructor
+	  parameter.
+
+	* gui/Button.cpp, gui/TextEntry.cpp: Reduce the border size of buttons
+	  and textentrys to reduce wasted space.
+
+	* gui/Toplevel.cpp, gui/Toplevel.h: Make border a construction
+	  parameter.
+
+	* gui/Text.h: Scale down default text size a little.
+
+	* gui/Dialogue.cpp: Make border and packing 0 so the decorations look
+	  better.
+
+2004-12-31  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/Workspace.cpp: Turn coord system upside down to match what people
 	  expect in guis.
 

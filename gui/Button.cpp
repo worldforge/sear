@@ -13,7 +13,7 @@
 
 namespace Sear {
 
-Button::Button(const std::string & text) : m_frame(new Frame()), m_border(4),
+Button::Button(const std::string & text) : m_frame(new Frame()), m_border(2),
                                            m_pressed(false)
 {
     m_contents = new Label(text);

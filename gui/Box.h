@@ -20,7 +20,7 @@ private:
   Box(const Box &);
   const Box & operator=(const Box &);
 protected:
-  Box();
+  Box(int packing = 2);
 
   std::list<Widget *> m_boxContents;
   unsigned int m_packing;
@@ -41,7 +41,7 @@ private:
   VBox(const VBox &);
   const VBox & operator=(const VBox &);
 public:
-  VBox();
+  VBox(int packing = 2);
   virtual ~VBox();
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
@@ -53,7 +53,7 @@ private:
   HBox(const HBox &);
   const HBox & operator=(const HBox &);
 public:
-  HBox();
+  HBox(int packing = 2);
   virtual ~HBox();
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
