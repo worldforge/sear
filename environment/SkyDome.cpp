@@ -252,7 +252,7 @@ void SkyDome::render()
   }
   glTexCoordPointer(2, GL_FLOAT, 0, m_texCoords);
   // Renderdome
-  glDrawArrays(GL_QUADS, 0, m_size);
+  glDrawArrays(GL_QUADS, 0, m_size * 4);
 
   // Render Cloud layer one
   glEnable(GL_BLEND);
