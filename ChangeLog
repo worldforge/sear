@@ -1,4 +1,7 @@
 29th October 2002, Simon Goodall
+ * Removed last update due to problems
+
+29th October 2002, Simon Goodall
  * Sear now uses XPM loader from SDL_image, instead of own version.
 
 21st October 2002, Simon Goodall

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.7 2002-10-29 18:00:07 simon Exp $
+// $Id: Utility.h,v 1.8 2002-10-30 10:03:06 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -87,7 +87,7 @@ void QuatToMatrix(WFMath::Quaternion quat, float m[4][4]);
 
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
-//unsigned char *xpm_to_image(const char * image[], unsigned int &width, unsigned int &height);
+unsigned char *xpm_to_image(const char * image[], unsigned int &width, unsigned int &height);
 
 class Tokeniser {
 public:
