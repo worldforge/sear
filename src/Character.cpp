@@ -2,18 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.29 2004-01-26 14:08:49 alriddoch Exp $
+// $Id: Character.cpp,v 1.30 2004-03-11 16:21:00 simon Exp $
 
 #include <math.h>
 #include <string>
 #include <SDL/SDL.h>
 
-#include <Atlas/Objects/Operation/Move.h>
-#include <Atlas/Objects/Operation/Touch.h>
-#include <Atlas/Objects/Operation/Talk.h>
-
 #include <varconf/Config.h>
-#include <wfmath/atlasconv.h>
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 #include <Eris/Avatar.h>
@@ -92,12 +87,6 @@ namespace Sear {
   static const float DEFAULT_character_rotate_speed = 20.0f;
 
 const float Character::CMD_modifier = 9999.9f;
-//Atlas keys
-static const std::string VELOCITY = "velocity";
-static const std::string ORIENTATION = "orientation";
-static const std::string LOC = "loc";
-static const std::string ID = "id";
-static const std::string POS = "pos";
 
 //actions
 static const std::string STOPPED = "stopped_";
@@ -310,32 +299,23 @@ void Character::writeConfig() {
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {
   assert ((_initialised == true) && "Character not initialised");	
-//  if (!_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
   if (quantity == 0) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
   }
+  
+  Eris::EntityPtr te = Eris::World::Instance()->lookup(target);
+  if(!te) {
+    Log::writeLog("No target " + target + " to give " + string_fmt(quantity) + " items of " + name + " to", Log::LOG_DEFAULT);
+    return;
+  }
+
   Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
-      Atlas::Objects::Operation::Move move;
-      Atlas::Message::Element::MapType args;
-      Atlas::Message::Element::ListType pos;
-      pos.push_back(_self->GetPos().x());
-      pos.push_back(_self->GetPos().y());
-      pos.push_back(_self->GetPos().z());
-      args[POS] = pos;
-      args[LOC] = target;
-      args[ID] = we->getID();
-      move.setFrom(_self->getID());
-      move.setArgs(Atlas::Message::Element::ListType(1, args));
-//      move.setSerialno(Eris::getNewSerialno());
-      Eris::Connection::Instance()->send(move);
+      _avatar->place(we, te, _self->GetPos());
       quantity--;
     }
   }

@@ -1,3 +1,10 @@
+11th March 2004, Simon Goodall
+ * Applied patch from ron to replace my atlas "give" with eris' give
+
+2nd March 2004, Simon Goodall
+ * Updated iss file
+ * Set correct version nums for sage and eris
+
 2nd March 2004, Simon Goodall
  * Bump version number to 0.4.7
  * convert to using SDL_main
