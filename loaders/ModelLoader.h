@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.28 2004-06-26 15:48:02 simon Exp $
+// $Id: ModelLoader.h,v 1.1 2005-01-06 16:33:42 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.5 2004-06-24 15:20:13 simon Exp $
+// $Id: ModelRecord.cpp,v 1.1 2005-01-06 16:33:42 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"

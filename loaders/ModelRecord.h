@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.10 2004-06-24 15:20:13 simon Exp $
+// $Id: ModelRecord.h,v 1.1 2005-01-06 16:33:42 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
