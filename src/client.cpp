@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.52 2004-02-06 12:16:09 simon Exp $
+// $Id: client.cpp,v 1.53 2004-03-30 11:36:47 simon Exp $
 
 #include "System.h"
 
@@ -418,7 +418,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
   world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
   if (_factory) delete _factory;
-  _factory = new Factory();
+  _factory = new Factory(*_connection->getTypeService());
   world->registerFactory(_factory);
   return 0;
 }
@@ -455,7 +455,7 @@ int Client::takeCharacter(const std::string &id) {
   world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
   world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
   if (_factory) delete _factory;
-  _factory = new Factory();
+  _factory = new Factory(*_connection->getTypeService());
   world->registerFactory(_factory);
   return 0;
 }

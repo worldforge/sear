@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.9 2003-12-06 22:29:52 simon Exp $
+// $Id: StateManager.cpp,v 1.10 2004-03-30 11:36:47 simon Exp $
 
 /*
  * TODO
@@ -348,12 +348,13 @@ void StateManager::stateChange(StateID state) {
     else glDisable(GL_FOG);
     if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
     else glDisable(GL_RESCALE_NORMAL);
-    if (sp->alpha_function != 0) {
+    // TODO is this broken? 0 could be a valid state....
+//    if (sp->alpha_function != 0) {
       glAlphaFunc(sp->alpha_function, sp->alpha_value);
-    }
-    if (sp->blend_src_function != 0) {
+//    }
+//    if (sp->blend_src_function != 0) {
       glBlendFunc(sp->blend_src_function, sp->blend_dest_function);
-    }
+  //  }
   }
   _current_state = state;
 }
@@ -417,7 +418,8 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
     if (next_state->rescale_normals) glEnable(GL_RESCALE_NORMAL);
     else glDisable(GL_RESCALE_NORMAL);
   }
-  if ((next_state->alpha_function != previous_state->alpha_function) || (next_state->alpha_value != previous_state->alpha_value)) glAlphaFunc(next_state->alpha_function, next_state->alpha_value);
+//  if ((next_state->alpha_function != previous_state->alpha_function) || (next_state->alpha_value != previous_state->alpha_value)) 
+glAlphaFunc(next_state->alpha_function, next_state->alpha_value);
   glBlendFunc(next_state->blend_src_function, next_state->blend_dest_function);
   glEndList();
 }

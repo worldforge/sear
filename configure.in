@@ -151,7 +151,7 @@ UNSUSED=0
 UNSUSED=0
 ])
 
-PKG_CHECK_MODULES(PKGCHECKS, varconf-1.0 >= 0.6.0 eris-1.2 >= 0.9.8 sage >= 0.1.0,
+PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 varconf-1.0 >= 0.6.0 eris-1.2 >= 1.1.1.0 sage >= 0.1.1,
 	[
 		CPPFLAGS="$CPPFLAGS $PKGCHECKS_CFLAGS"
 		LIBS="$LIBS $PKGCHECKS_LIBS"
@@ -248,8 +248,7 @@ AC_OUTPUT([
 	loaders/Makefile
 	loaders/cal3d/Makefile
 	renderers/Makefile
-	terrain/Makefile
-	sky/Makefile
+	environment/Makefile
 	data/Makefile
 	scripts/Makefile
 	sear.spec

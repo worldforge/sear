@@ -1,3 +1,6 @@
+30th March 2004, Simon Goodall
+ * Initial mercator support - imported code from apogee - prob wont compile
+
 11th March 2004, Simon Goodall
  * Applied patch from ron to replace my atlas "give" with eris' give
 

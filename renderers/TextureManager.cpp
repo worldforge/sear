@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.12 2003-12-06 22:29:52 simon Exp $
+// $Id: TextureManager.cpp,v 1.13 2004-03-30 11:36:47 simon Exp $
 
 #include "TextureManager.h"
 
@@ -38,7 +38,7 @@
 #ifdef DEBUG
 static const bool debug = true;
 #else
-static const bool debug = true;
+static const bool debug = false;
 #endif
 
 namespace Sear {
@@ -259,28 +259,46 @@ TextureObject TextureManager::loadTexture(const std::string &name, SDL_Surface *
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, &largest_supported_anisotropy);
   }
+
+
+  // Taken from Apogee
+  int format, fmt;
+  int bpp = surface->format->BitsPerPixel;
+                                                                                
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+    if (surface->format->Rshift > surface->format->Bshift) {
+#else // SDL_BYTEORDER == SDL_LIL_ENDIAN
+    if (surface->format->Rshift < surface->format->Bshift) {
+#endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
+        format = (bpp == 24) ? GL_BGR : GL_BGRA;
+    } else {
+        format = (bpp == 24) ? GL_RGB : GL_RGBA;
+    }
+    fmt = (bpp == 24) ? 3 : 4;
+
+/*
   // TODO make this support more texture formats
 //  int type = (int)_texture_config.getItem(texture_name, KEY_type);
   int depth = surface->format->BytesPerPixel;
   switch (depth) {
     case 1: depth = GL_ALPHA; break;
     case 2: depth = GL_ALPHA; break;
-    case 3: depth = GL_RGB; break;
-    case 4: depth = GL_RGBA; break;
+    case 3: depth = 3;break;//GL_RGB; break;
+    case 4: depth = 4;break;//GL_RGBA; break;
     default: depth = GL_RGBA; break;
   }
-
+*/
   // build image - use mip mapping if requested
   bool mipmap = (bool)_texture_config.getItem(texture_name, KEY_mipmap);
   if (mipmap) {
     if (use_sgis_generate_mipmap) {
       glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      glTexImage2D(GL_TEXTURE_2D, 0, depth, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+      glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
     } else {
-      gluBuild2DMipmaps(GL_TEXTURE_2D, depth, surface->w, surface->h, depth, GL_UNSIGNED_BYTE, surface->pixels);
+      gluBuild2DMipmaps(GL_TEXTURE_2D, fmt, surface->w, surface->h, format, GL_UNSIGNED_BYTE, surface->pixels);
     }
   } else {
-   glTexImage2D(GL_TEXTURE_2D, 0, depth, surface->w, surface->h, 0, depth, GL_UNSIGNED_BYTE, surface->pixels);
+   glTexImage2D(GL_TEXTURE_2D, 0, fmt, surface->w, surface->h, 0, format, GL_UNSIGNED_BYTE, surface->pixels);
   }
 
   // Set texture priority if requested

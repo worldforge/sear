@@ -23,8 +23,7 @@ sear_LDADD = \
 	libSear.a \
 	../common/libCommon.a \
 	../renderers/libRendererGL.a \
-	../terrain/libTerrainROAM.a \
-	../sky/libSkyBox.a \
+	../environment/libEnvironment.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderNPlane.a \
@@ -56,6 +55,7 @@ libSear_a_SOURCES = \
 	EventHandler.cpp \
 	EventHandler.h \
 	Exception.h \
+	Factory.cpp \
 	Factory.h \
 	Graphics.cpp \
 	Graphics.h \
@@ -67,10 +67,8 @@ libSear_a_SOURCES = \
 	Render.h \
 	Sound.cpp \
 	Sound.h \
-	Sky.h \
 	System.cpp \
 	System.h \
-	Terrain.h \
 	WorldEntity.cpp \
 	WorldEntity.h \
 	ModelHandler.cpp \
