@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.25 2004-05-23 21:28:36 jmt Exp $
+// $Id: TextureManager.cpp,v 1.26 2004-05-24 18:47:11 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,6 +26,7 @@
 // Default texture maps
 #include "default_image.xpm"
 #include "default_font.xpm"
+#include "default_font.h"
 
 
 #ifdef USE_MMGR
@@ -574,6 +575,7 @@ TextureID TextureManager::createDefaultFont() {
 */
 
   GLuint texture;
+#if 0
 
   unsigned int width, height;
 
@@ -591,6 +593,23 @@ TextureID TextureManager::createDefaultFont() {
   glPrioritizeTextures(1, &texture, &priority);
   
   delete [] data;
+#else
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, texture_font_internalFormat,
+               texture_font_width, texture_font_height, 0,
+               texture_font_format, GL_UNSIGNED_BYTE, texture_font_pixels);
+  if (glGetError() != 0) {
+      std::cerr << "Failed to load font texture" << std::endl << std::flush;
+  }
+  GLfloat priority = 1.0f;
+  glPrioritizeTextures(1, &texture, &priority);
+
+#endif
 
 
   // store into texture array

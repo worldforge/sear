@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.16 2004-04-28 14:06:03 simon Exp $
+// $Id: StateManager.cpp,v 1.17 2004-05-24 18:47:11 alriddoch Exp $
 
 /*
  * TODO
@@ -138,7 +138,7 @@ void StateManager::init() {
   //even if no files have been loaded into Sear
   font_state->state = "font";
   font_state->alpha_test = true;
-  font_state->blend = false;
+  font_state->blend = true;
   font_state->lighting = false;
   font_state->two_sided_lighting = false;
   font_state->textures[0] = true;

@@ -1,5 +1,11 @@
 2004-05-24  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/TextureManager.cpp, renderers/StateManager.cpp,
+	  renderers/default_font.h: Use pure alpha texture for font,
+	  and enable blending and get smoother less aliased text.
+
+2004-05-24  Al Riddoch  <alriddoch@zepler.org>
+
 	* gui/*: Updated ground work for gui widgets.
 
 2004-05-23  James Turner  <james@worldforge.org>
