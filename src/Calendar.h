@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.h,v 1.6 2005-03-04 17:58:24 simon Exp $
+// $Id: Calendar.h,v 1.7 2005-04-06 13:36:08 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -106,171 +106,171 @@ public:
    * Returns number of seconds per minute
    * @return Seconds per minute
    */ 
-  unsigned int getSecondsPerMinute() const { return _seconds_per_minute; }
+  unsigned int getSecondsPerMinute() const { return m_seconds_per_minute; }
   
   /**
    * Returns number of minutes per hour
    * @return Minutes per hour
    */
-  unsigned int getMinutesPerHour() const { return _minutes_per_hour; }
+  unsigned int getMinutesPerHour() const { return m_minutes_per_hour; }
   
   /**
    * Returns number of hours per day
    * @return Hours per day
    */
-  unsigned int getHoursPerDay() const { return _hours_per_day; }
+  unsigned int getHoursPerDay() const { return m_hours_per_day; }
   
   /**
    * Returns number of days per week
    * @return Days per week
    */ 
-  unsigned int getDaysPerWeek() const { return _days_per_week; }
+  unsigned int getDaysPerWeek() const { return m_days_per_week; }
   
   /**
    * Returns number of weeks per month
    * @return Weeks per month
    */
-  unsigned int getWeeksPerMonth() const { return _weeks_per_month; }
+  unsigned int getWeeksPerMonth() const { return m_weeks_per_month; }
   
   /**
    * Returns number of months per year
    * @param Months per year
    */
-  unsigned int getMonthsPerYear() const { return _months_per_year; }
+  unsigned int getMonthsPerYear() const { return m_months_per_year; }
   
   /**
    * Return current seconds
    * @return Current seconds
    */
-  double getSeconds() const { return _seconds; }
+  double getSeconds() const { return m_seconds; }
   
   /**
    * Return minutes
    * @return Current minutes
    */
-  unsigned int getMinutes() const { return _minutes; }
+  unsigned int getMinutes() const { return m_minutes; }
   
   /**
    * Return hours
    * Current hours
    */ 
-  unsigned int getHours() const { return _hours; }
+  unsigned int getHours() const { return m_hours; }
   
   /**
    * Return days
    * @return Current days
    */ 
-  unsigned int getDays() const { return _days; }
+  unsigned int getDays() const { return m_days; }
   
   /**
    * Return weeks
    * @return Current weeks
    */ 
-  unsigned int getWeeks() const { return _weeks; }
+  unsigned int getWeeks() const { return m_weeks; }
   
   /**
    * Return months
    * @return Current months
    */ 
-  unsigned int getMonths() const { return _months; }
+  unsigned int getMonths() const { return m_months; }
   
   /*
    * Return years
    * @return Current years
    */ 
-  unsigned int getYears() const { return _years; }
+  unsigned int getYears() const { return m_years; }
 
   /**
    * Returns current Time area
    * @return Current time area
    */ 
-  TimeArea getTimeArea() const { return _time_area; }
+  TimeArea getTimeArea() const { return m_time_area; }
   
   /**
    * Return start hour for dawn
    * @return Dawn start hour
    */ 
-  unsigned int getDawnStart() const { return _dawn_start; }
+  unsigned int getDawnStart() const { return m_dawn_start; }
 
   /**
    * Return start hour for day
    * @return Day start hour
    */ 
-  unsigned int getDayStart() const { return _day_start; }
+  unsigned int getDayStart() const { return m_day_start; }
 
   /**
    * Return start hour for dusk
    * @return Dusk start hour
    */ 
-  unsigned int getDuskStart() const { return _dusk_start; }
+  unsigned int getDuskStart() const { return m_dusk_start; }
 
   /**
    * Return start hour for night
    * @return Night start hour
    */ 
-  unsigned int getNightStart() const { return _night_start; }
+  unsigned int getNightStart() const { return m_night_start; }
   
   /**
    * Return number of seconds in current time area
    * @return Seconds in time area
    */ 
-  double getTimeInArea() const { return _time_in_area; }
+  double getTimeInArea() const { return m_time_in_area; }
   
   /**
    * Return name of day
    * @return Day name
    */
-  std::string getDayName() const { return _current_day_name; }
+  std::string getDayName() const { return m_current_day_name; }
   
   /**
    * Return name of month
    * @return Month name
    */
-  std::string getMonthName() const { return _current_month_name; }  
+  std::string getMonthName() const { return m_current_month_name; }  
 
   
 private:
-  bool _initialised; ///< Calendar initialisation state
+  bool m_initialised; ///< Calendar initialisation state
   
-  unsigned int _seconds_per_minute; ///< Number of seconds in a minute
-  unsigned int _minutes_per_hour;   ///< Number of minutes in an hour
-  unsigned int _hours_per_day;      ///< Number of hours in a day
-  unsigned int _days_per_week;      ///< Number of days in a week
-  unsigned int _weeks_per_month;    ///< Number of weeks in a month
-  unsigned int _months_per_year;    //</ Number of months in a year
+  unsigned int m_seconds_per_minute; ///< Number of seconds in a minute
+  unsigned int m_minutes_per_hour;   ///< Number of minutes in an hour
+  unsigned int m_hours_per_day;      ///< Number of hours in a day
+  unsigned int m_days_per_week;      ///< Number of days in a week
+  unsigned int m_weeks_per_month;    ///< Number of weeks in a month
+  unsigned int m_months_per_year;    //</ Number of months in a year
 
   // Current time and date values
   WFMath::TimeStamp m_ts;
-  double _seconds; ///< Current seconds
+  double m_seconds; ///< Current seconds
   double m_server_seconds; ///< Predicted server seconds
-  double _seconds_counter; ///< Number of seconds passed in current day
-  unsigned int _minutes; ///< Current minutes
-  unsigned int _hours; ///< Current hour
-  unsigned int _days; ///< Current day
-  unsigned int _weeks; ///< Current week
-  unsigned int _months; ///< Current month
-  unsigned int _years; ///< Current years
+  double m_seconds_counter; ///< Number of seconds passed in current day
+  unsigned int m_minutes; ///< Current minutes
+  unsigned int m_hours; ///< Current hour
+  unsigned int m_days; ///< Current day
+  unsigned int m_weeks; ///< Current week
+  unsigned int m_months; ///< Current month
+  unsigned int m_years; ///< Current years
   
-  TimeArea _time_area; ///< The current time area
-  unsigned int _dawn_start; ///< Hour in which dawn starts
-  unsigned int _day_start; ///< Hour in which day starts
-  unsigned int _dusk_start; ///< Hour in which dusk starts
-  unsigned int _night_start; ///< Hour in which night starts
+  TimeArea m_time_area; ///< The current time area
+  unsigned int m_dawn_start; ///< Hour in which dawn starts
+  unsigned int m_day_start; ///< Hour in which day starts
+  unsigned int m_dusk_start; ///< Hour in which dusk starts
+  unsigned int m_night_start; ///< Hour in which night starts
 
-  double _time_in_area; ///< Time duration in current time area
+  double m_time_in_area; ///< Time duration in current time area
   
   /**
    * Mapping between number and name
    */  
   typedef std::map<unsigned int, std::string> NameMap;
   
-  NameMap _day_names;   ///< Mapping for day names
-  NameMap _month_names; ///< Mapping for month names
+  NameMap m_day_names;   ///< Mapping for day names
+  NameMap m_month_names; ///< Mapping for month names
 
-  std::string _current_day_name;   ///< Name of current day
-  std::string _current_month_name; ///< Name of current month
+  std::string m_current_day_name;   ///< Name of current day
+  std::string m_current_month_name; ///< Name of current month
 
-  SigC::Connection _config_connection; ///< Connection object for signal
+  SigC::Connection m_config_connection; ///< Connection object for signal
 };
 	
 } /* namespace Sear */

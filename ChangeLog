@@ -1,5 +1,10 @@
 2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Calendar.cpp, src/Calendar.h: Change member variable prefix to m_.
+	  Intialise TimeStamp with epochStart().
+
+2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/client.cpp, src/client.h: Add a setStatus function to make sure 
 	  the system object and character avatar pointer is consistent with the
 	  current state of entry into the game world. Delay passing the avatar
