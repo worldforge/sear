@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.23 2005-01-06 12:46:54 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.24 2005-02-18 11:10:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -75,9 +75,9 @@ Cal3dCoreModel::~Cal3dCoreModel() {
 void Cal3dCoreModel::init(const std::string &filename) {
   if (_initialised) shutdown();	
   // open the model configuration file
-  _core_model = new CalCoreModel();
+  _core_model = new CalCoreModel("dummy");
   // create a core model instance
-  if(!_core_model->create("dummy")) {
+  if(!_core_model) {
     CalError::printLastError();
     return;
   }
@@ -88,7 +88,6 @@ void Cal3dCoreModel::init(const std::string &filename) {
 
 void Cal3dCoreModel::shutdown() {
   if (_core_model) {
-    _core_model->destroy();
     delete _core_model;
     _core_model = NULL;
   }

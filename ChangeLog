@@ -1,3 +1,8 @@
+2005-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dModel.cpp, 
+	  loaders/cal3d/Cal3dModel.h, README: Update for Cal3d 0.10.0
+
 2005-01-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/Makefile.am, src/Makefile.am: Move cal3d link to main binary

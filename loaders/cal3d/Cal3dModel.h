@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.8 2005-01-06 12:46:54 simon Exp $
+// $Id: Cal3dModel.h,v 1.9 2005-02-18 11:10:32 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -72,7 +72,7 @@ private:
 
   Cal3dCoreModel *_core_model;
   float _height;
-  CalModel m_calModel;
+  CalModel *m_calModel;
   float m_lodLevel;
   float m_renderScale;
 //  static float _walk_blend[];

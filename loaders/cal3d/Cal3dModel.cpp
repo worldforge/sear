@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.16 2005-01-06 12:46:54 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.17 2005-02-18 11:10:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -53,6 +53,7 @@ Cal3dModel::Cal3dModel(Render *render) :
   Model(render),
   _initialised(false),
   _core_model(NULL),
+  m_calModel(NULL),
   m_rotate(90.0f)
 {
   m_renderScale = 1.0f;
@@ -69,21 +70,21 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
   assert(core_model && "Core model is NULL");
   _core_model = core_model;
   // create the model instance from the loaded core model
-  if(!m_calModel.create(_core_model->getCalCoreModel())) {
+  if(!(m_calModel = new CalModel(_core_model->getCalCoreModel()))) {
     CalError::printLastError();
     return false;
   }
 
   // attach all meshes to the model
   for(int meshId = 0; meshId < _core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
-    m_calModel.attachMesh(meshId);
+    m_calModel->attachMesh(meshId);
   }
 
   // Set default material set
-  m_calModel.setMaterialSet(0);
+  m_calModel->setMaterialSet(0);
 
   // set initial animation state
-  m_calModel.getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
+  m_calModel->getMixer()->blendCycle(_core_model->_animations[STANDING], 1.0f, 0.0f);
 
   m_renderScale = _core_model->getScale();
 
@@ -95,7 +96,7 @@ bool Cal3dModel::init(Cal3dCoreModel *core_model) {
 void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode) {
   // get the renderer of the model
   CalRenderer *pCalRenderer;
-  pCalRenderer = m_calModel.getRenderer();
+  pCalRenderer = m_calModel->getRenderer();
 
   // begin the rendering loop
   if(!pCalRenderer->beginRendering()) return;
@@ -182,41 +183,44 @@ void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
 
 void Cal3dModel::update(float time_elapsed) {
   // update the model
-  m_calModel.update(time_elapsed);
+  m_calModel->update(time_elapsed);
 }
 
 void Cal3dModel::shutdown() {
   // destroy the model instance
-  m_calModel.destroy();
+  if (m_calModel) {
+    delete m_calModel;
+    m_calModel = NULL;
+  }
   _initialised = false;
 }
 
 void Cal3dModel::setLodLevel(float lodLevel) {
   m_lodLevel = lodLevel;
   // set the new lod level in the cal model renderer
-  m_calModel.setLodLevel(m_lodLevel);
+  m_calModel->setLodLevel(m_lodLevel);
 }
 
 void Cal3dModel::action(const std::string &action) {
   Cal3dCoreModel::AnimationMap animations = _core_model->_animations;
   if (action == "standing") {
-    m_calModel.getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
-    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.2f);
-    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.2f);
+    m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
+    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
   } else if (action == "walking") {
-    m_calModel.getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
-    m_calModel.getMixer()->clearCycle(animations[RUNNING],  0.2f);
-    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.2f);
+    m_calModel->getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
+    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
   } else if (action == "running") {
-    m_calModel.getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
-    m_calModel.getMixer()->clearCycle(animations[WALKING],  0.2f);
-    m_calModel.getMixer()->clearCycle(animations[STANDING],  0.2f);
+    m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
+    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
   } else {
 //    std::string act = *(animations.find(action)->);
     if (animations.find(action) != animations.end()) {
-      m_calModel.getMixer()->executeAction(animations[action], 0.0f, 0.0f);
+      m_calModel->getMixer()->executeAction(animations[action], 0.0f, 0.0f);
     } else {
-      m_calModel.getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
+      m_calModel->getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
     }
   }
 }
@@ -252,7 +256,7 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
   for (Cal3dCoreModel::MeshMap::const_iterator J = _core_model->_meshes.begin(); J != _core_model->_meshes.end(); ++J) {
     std::string name = J->first;
     if (name.find("_") != std::string::npos)
-      m_calModel.detachMesh(_core_model->_meshes[name]);
+      m_calModel->detachMesh(_core_model->_meshes[name]);
   }
 
   // Attach meshes and set materials 
@@ -263,7 +267,7 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
     // Attach mesh
     if (_core_model->_meshes.find(name + "_" + value) 
       != _core_model->_meshes.end()) {
-      m_calModel.attachMesh(_core_model->_meshes[name + "_" + value]);
+      m_calModel->attachMesh(_core_model->_meshes[name + "_" + value]);
     // Set material set
     
     Atlas::Message::Element::MapType::const_iterator K = materials.find(name);
@@ -284,7 +288,7 @@ void Cal3dModel::setAppearance(Atlas::Message::Element::MapType &map) {
 }
 
 void Cal3dModel::setMaterialSet(unsigned int set) {
-  m_calModel.setMaterialSet(set);
+  m_calModel->setMaterialSet(set);
 }
 
 void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
@@ -292,7 +296,7 @@ void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
   //TODO make this do the correct thing!
 //  m_calModel.setMaterialSet(set);
   // Get mesh name
-  CalMesh *mesh = m_calModel.getMesh(msh);
+  CalMesh *mesh = m_calModel->getMesh(msh);
   if (mesh) {
     mesh->setMaterialSet(set - 1);
   }
