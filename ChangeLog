@@ -1,4 +1,7 @@
-26th January 2004, Al Riddoch
+28th January 2004, Simon Goodall
+ * Allow models to be translated in x/y/z
+
+26th January 2004, Simon Goodall
  * Some initial work for VBO's
 
 26th January 2004, Al Riddoch

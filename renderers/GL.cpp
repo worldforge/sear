@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.71 2004-01-26 22:06:59 simon Exp $
+// $Id: GL.cpp,v 1.72 2004-01-28 19:52:59 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -854,7 +854,8 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
       // TODO remove terrain->getHeight when server handles its own z coords
       translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
-     
+      // Move object to correct position
+      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
       // Rotate Model
       rotateObject(object_record, model_record);
 

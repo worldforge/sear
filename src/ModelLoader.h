@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.18 2003-06-12 15:32:17 nowhere Exp $
+// $Id: ModelLoader.h,v 1.19 2004-01-28 19:52:59 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -36,6 +36,9 @@ public:
     ModelRecord * model_record = new ModelRecord();
     model_record->id = model_id;
     model_record->scale = (double)model_config.getItem(model_id, ModelRecord::SCALE);
+    model_record->offset_x = (double)model_config.getItem(model_id, ModelRecord::OFFSET_X);
+    model_record->offset_y = (double)model_config.getItem(model_id, ModelRecord::OFFSET_Y);
+    model_record->offset_z = (double)model_config.getItem(model_id, ModelRecord::OFFSET_Z);
     
     model_record->state_name = (std::string)model_config.getItem(model_id, ModelRecord::STATE);
     model_record->state = System::instance()->getGraphics()->getRender()->getStateID(model_record->state_name);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.7 2003-05-02 20:24:55 simon Exp $
+// $Id: ModelRecord.h,v 1.8 2004-01-28 19:52:59 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -20,7 +20,8 @@ public:
     state_name("default"),
     select_state_name("select"),
     model_by_type(false),
-    rotation_style(Graphics::ROS_NONE)
+    rotation_style(Graphics::ROS_NONE),
+    offset_x(0.0f), offset_y(0.0f), offset_z(0.0f)
   {}
     
   ~ModelRecord() {}
@@ -39,8 +40,12 @@ public:
   bool outline;
   Model *model;	
   Graphics::RotationStyle rotation_style;
+  float offset_x, offset_y, offset_z;
 
   static const std::string SCALE;
+  static const std::string OFFSET_X;
+  static const std::string OFFSET_Y;
+  static const std::string OFFSET_Z;
   static const std::string STATE;
   static const std::string SELECT_STATE;
   static const std::string MODEL_BY_TYPE;
