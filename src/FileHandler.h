@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.h,v 1.8 2004-06-26 15:48:02 simon Exp $
+// $Id: FileHandler.h,v 1.9 2005-01-09 16:09:44 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -64,6 +64,12 @@ public:
     and $HOME/.sear on Unix. If the directory cannot be located, it will
     fall back to '.' */
     std::string getUserDataPath() const;
+
+ /**
+  * Make a directory with the given name
+  */
+  bool mkdir(const std::string &dirname) const;
+
 protected:
   FileList  _searchpaths;
 

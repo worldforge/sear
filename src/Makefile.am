@@ -76,6 +76,10 @@ libSear_a_SOURCES = \
 	ActionHandler.h \
 	Bindings.cpp \
 	Bindings.h \
+	CacheManager.cpp \
+	CacheManager.h \
+	CacheObject.cpp \
+	CacheObject.h \
 	Character.cpp \
 	Character.h \
 	client.cpp \

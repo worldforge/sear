@@ -1,3 +1,15 @@
+2005-01-09  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/CacheManager.cpp, src/CacheManager.h, src/CacheObject.cpp,
+	  src/CacheObject.h, src/Makefile.am: Add initial code for a Cache 
+	  Manager. Aim is that we can convert 3D objects to an internal format
+	  and save directly to disk for subsequent faster loading. Does not
+	  need to take care of endinaness etc. as its only intended to use data
+	  created and stroed on the local machine. Could possible use for
+	  textures too.
+	* src/FileHandler.cpp, src/FileHandler.h: Create a wrapper function for 
+	  mkdir.
+
 2005-01-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Text.cpp: Sort out some float to int conversion warnings.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.13 2004-07-19 11:22:14 simon Exp $
+// $Id: FileHandler.cpp,v 1.14 2005-01-09 16:09:44 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -229,6 +229,17 @@ bool FileHandler::exists(const std::string& file) const
     
     return false;
 #endif
+}
+
+bool FileHandler::mkdir(const std::string &dirname) const {
+int err = 0;
+#ifdef __WIN32__
+       err =  _mkdir(dirname.c_str()); 
+#else
+       err =  mkdir(dirname.c_str(), 0755);
+#endif
+  return (err == 0);
+
 }
 
 } /* namespace Sear */
