@@ -1,4 +1,7 @@
 20th August 2002, Simon Goodall
+ * Added option to play and stop music. "/play_music file" plays the track. "/stop_music" stops the music
+
+20th August 2002, Simon Goodall
  * Improved sound by changing from SDL-sound to SDL_mixer. This allows multiple sounds to be played at once
 
 20th August 2002, Simon Goodall
