@@ -1,3 +1,6 @@
+6th March 2002, Simon Goodall
+ * Updated cal3d loader to take height and default material set def
+
 5th March 2002, Simon Goodall
  * Re-write of cal3d loader code. uses varconf format file for configuration and will allow material properties to be over-ridden
  * Fixed changelog dates - mix up in years and dates (oops)
