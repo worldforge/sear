@@ -13,6 +13,7 @@
 #include "src/Render.h"
 #include "src/System.h"
 #include "src/Graphics.h"
+#include "src/Calendar.h"
 
 #include "renderers/RenderSystem.h"
 
@@ -193,15 +194,23 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
-static int counter = 0;
+//static int counter = 0;
 
 void SkyDome::render()
 {
   glColor3f(1.0f, 1.0f, 1.0f);
-  ++counter;
-  #define INCR 24000
-  counter = counter % INCR;
-  float val = (float)(counter) / (float)INCR;
+//  ++counter;
+//  #define INCR 24000
+//  counter = counter % INCR;
+//  float val = (float)(counter) / (float)INCR;
+  Calendar *cal = System::instance()->getCalendar();
+  float val = cal->getHours();
+  val *= (float)cal->getMinutesPerHour();
+  val += (float)cal->getMinutes();
+  val *= (float)cal->getSecondsPerMinute();
+  val += (float)cal->getSeconds();
+
+  val /= (float)(cal->getSecondsPerMinute() * cal->getMinutesPerHour() * cal->getHoursPerDay());
 
   glEnableClientState(GL_VERTEX_ARRAY);
  

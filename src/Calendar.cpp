@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.8 2004-05-14 12:17:21 simon Exp $
+// $Id: Calendar.cpp,v 1.9 2004-05-14 12:43:15 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -128,8 +128,10 @@ void Calendar::shutdown() {
 
 void Calendar::serverUpdate(double time) {
 //  if (debug)
-  std::cout << "Current: " << _seconds << " - Server: " << time << std::endl;
+//  std::cout << "Current: " << _seconds << " - Server: " << time << std::endl;
   double diff = time - m_server_seconds;
+  // TODO make this change gradual if too large
+  // Could perhaps use the event manager to throw a series of events?
   /*
   if (abs(diff) < 60.0) {
     _seconds = time;

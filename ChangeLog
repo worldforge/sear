@@ -1,4 +1,7 @@
 14th May 2004, Simon Goodall
+ * Link skydome to calendar
+
+14th May 2004, Simon Goodall
  * Allow cmd line parsing of args for general config
  * Link server time to calendar
 
