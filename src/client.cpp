@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.37 2002-12-10 19:36:50 simon Exp $
+// $Id: client.cpp,v 1.38 2002-12-24 14:56:25 simon Exp $
 
 #include "System.h"
 
@@ -127,7 +127,7 @@ void Client::shutdown() {
     _player = NULL;
   }
   if (_connection) {
-    delete _connection;
+//    delete _connection;
     _connection = NULL;
   }
   if (_factory) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.50 2002-12-24 14:17:07 simon Exp $
+// $Id: System.cpp,v 1.51 2002-12-24 14:56:25 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,7 @@
 
 #include "ActionHandler.h"
 #include "Bindings.h"
+#include "Calender.h"
 #include "Camera.h"
 #include "Character.h"
 #include "client.h"
@@ -92,6 +93,7 @@ System::System() :
   _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
+  _calender(NULL),
   _console(NULL),
   _character(NULL),
   _seconds_per_day(60.0f * 60.0f * 24.0f),
@@ -181,6 +183,9 @@ bool System::init() {
   
   _object_handler = new ObjectHandler();
   _object_handler->init();
+ 
+  _calender = new Calender();
+  _calender->init();
   
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _textures.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
@@ -204,6 +209,7 @@ bool System::init() {
   _action_handler->registerCommands(_console);
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
+  _calender->registerCommands(_console);
 
   try { 
     sound = new Sound();
@@ -219,6 +225,8 @@ bool System::init() {
     _script_engine->runScript(*I);
   }
   readConfig();
+
+  
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   _system_running = true;
 
@@ -259,6 +267,11 @@ void System::shutdown() {
     _graphics = NULL;
   }
 
+  if (_calender) {
+    _calender->shutdown();
+    delete _calender;
+    _calender = NULL;
+  }
   writeConfig();
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   std::list<std::string> shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
@@ -298,6 +311,7 @@ void System::shutdown() {
     delete _state_loader;
     _state_loader = NULL;
   }
+
   // Are these actually needed ? or does SDL clean then up too? 
 //  if (_icon) SDL_FreeSurface(_icon);
 //  if (_cursor_default) SDL_FreeCursor(_cursor_default);
@@ -444,6 +458,7 @@ void System::mainLoop() {
         // Stop processing events if we are quiting
         if (!_system_running) break;
       }
+      _calender->update(time_elapsed);
       _event_handler->poll();
       _client->poll();
       _graphics->drawScene(command, false, time_elapsed);

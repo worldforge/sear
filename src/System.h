@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.24 2002-12-24 14:17:07 simon Exp $
+// $Id: System.h,v 1.25 2002-12-24 14:56:25 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -24,6 +24,7 @@
 namespace Sear {
 class ActionHandler;
 class Render;
+class Calender;
 class Client;
 class EventHandler;
 class FileHandler;
@@ -165,6 +166,7 @@ protected:
   StateLoader *_state_loader;
   ActionHandler *_action_handler;
   ObjectHandler *_object_handler;
+  Calender *_calender;
 
   std::list<std::string> additional_paths;
   
