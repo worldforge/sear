@@ -1,4 +1,7 @@
 28th April 2004, Simon Goodall
+ * Do not try and render acitveName string if its empty
+
+28th April 2004, Simon Goodall
  * Fix uninitialised variable that could cause variable substitution to fail
  * Fix missing call to GL invalidate
 
