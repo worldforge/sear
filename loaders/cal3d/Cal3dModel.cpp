@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.14 2004-06-30 12:44:21 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.15 2004-12-31 15:38:16 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -212,12 +212,12 @@ void Cal3dModel::action(const std::string &action) {
     m_calModel.getMixer()->clearCycle(animations[WALKING],  0.2f);
     m_calModel.getMixer()->clearCycle(animations[STANDING],  0.2f);
   } else {
-//    std::string act = *animations.find(action);
-//    if (*animations.find(action) != ) {
-//      m_calModel.getMixer()->executeAction(animations[action], 0.0f, 0.0f);
-//    } else {
+//    std::string act = *(animations.find(action)->);
+    if (animations.find(action) != animations.end()) {
+      m_calModel.getMixer()->executeAction(animations[action], 0.0f, 0.0f);
+    } else {
       m_calModel.getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
- //   }
+    }
   }
 }
 

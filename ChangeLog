@@ -1,5 +1,13 @@
 2004-12-31  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Character.cpp, src/Character.h: Change member variables to begin
+	  with m_. Add setAction command to set the action parameter of 
+	  character.
+	* loaders/cal3d/Cal3dModel.cpp: Play animation of requested action if
+	  found, else play the default.
+
+2004-12-31  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/TerrainRenderer.h, environment.TerrainRenderer.cpp: Use 
 	  VBO's to render terrain if available, or else fallback to display 
 	  lists.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.23 2004-06-28 20:14:20 alriddoch Exp $
+// $Id: Character.h,v 1.24 2004-12-31 15:38:15 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -88,9 +88,9 @@ public:
   void say(const std::string&);
   void make(const std::string&type, const std::string &name);
 
-  float getAngle() { return _angle; }
-  WFMath::Quaternion getOrientation() { return _orient; }
-  WorldEntity *getSelf() { return _self; }
+  float getAngle() { return m_angle; }
+  WFMath::Quaternion getOrientation() { return m_orient; }
+  WorldEntity *getSelf() { return m_self; }
   void toggleRunModifier();
 
   void readConfig();
@@ -104,29 +104,30 @@ public:
   void setApp();
   void clearApp();
   void setHeight(float);
+  void setAction(const std::string &action);
 private:
-  WorldEntity *_self;
-  Eris::Avatar *_avatar;
-  float _walk_speed;
-  float _run_speed;
-  float _rotate_speed;
+  WorldEntity *m_self;
+  Eris::Avatar *m_avatar;
+  float m_walk_speed;
+  float m_run_speed;
+  float m_rotate_speed;
 
-  float _angle;
-  float _rate;
-  float _speed;
-  float _strafe_speed;
+  float m_angle;
+  float m_rate;
+  float m_speed;
+  float m_strafe_speed;
 
-  unsigned int _lastUpdate;
-  bool _updateScheduled;
+  unsigned int m_lastUpdate;
+  bool m_updateScheduled;
 
-  WFMath::Quaternion _orient;
+  WFMath::Quaternion m_orient;
 
-  unsigned int _time; ///< Used to record time since last server update
+  unsigned int m_time; ///< Used to record time since last server update
 
-  bool _run_modifier; ///< Flag storing run/walk state. True means run
+  bool m_run_modifier; ///< Flag storing run/walk state. True means run
 
   void Recontainered(Eris::Entity*, Eris::Entity*);
-  bool _initialised; ///< Initialisation state of character object
+  bool m_initialised; ///< Initialisation state of character object
 
   void varconf_callback(const std::string &key, const std::string &section, varconf::Config &config);
 

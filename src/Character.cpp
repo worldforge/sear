@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.49 2004-11-06 21:45:53 alriddoch Exp $
+// $Id: Character.cpp,v 1.50 2004-12-31 15:38:15 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -114,98 +114,98 @@ static const std::string GUISE = "guise";
 static const std::string HEIGHT = "height";
 
 Character::Character(Eris::Avatar *avatar) :
-  _avatar(avatar),
-  _walk_speed(0.0f),
-  _run_speed(0.0f),
-  _rotate_speed(0.0f),
-  _angle(0.0f),
-  _rate(0.0f),
-  _speed(0.0f),
-  _strafe_speed(0.0f),
-  _lastUpdate(SDL_GetTicks()),
-  _updateScheduled(false),
-  _orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
-  _time(0),
-  _run_modifier(false),
-  _initialised(false)
+  m_avatar(avatar),
+  m_walk_speed(0.0f),
+  m_run_speed(0.0f),
+  m_rotate_speed(0.0f),
+  m_angle(0.0f),
+  m_rate(0.0f),
+  m_speed(0.0f),
+  m_strafe_speed(0.0f),
+  m_lastUpdate(SDL_GetTicks()),
+  m_updateScheduled(false),
+  m_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
+  m_time(0),
+  m_run_modifier(false),
+  m_initialised(false)
 {
   //assert ((self != NULL) && "Character self is NULL");
-  _self = (WorldEntity*)_avatar->getEntity();
-  _self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
+  m_self = static_cast<WorldEntity*>(m_avatar->getEntity());
+  m_self->Recontainered.connect(SigC::slot(*this, &Character::Recontainered));
 }
 
 Character::~Character() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
 }
 
 bool Character::init() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
   float divisor, zaxis;
-//  if (!_self) {
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return false;
 //  }
   readConfig();
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
-  _orient = _self->getOrientation();
-  divisor = sqrt(square(_orient.vector().x()) + square(_orient.vector().y()) + square(_orient.vector().z()));
-  zaxis = (divisor != 0.0f) ? (_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
-  _angle = -2.0f * acos(_self->getOrientation().scalar()) * zaxis;
-  _initialised = true;
+  m_orient = m_self->getOrientation();
+  divisor = sqrt(square(m_orient.vector().x()) + square(m_orient.vector().y()) + square(m_orient.vector().z()));
+  zaxis = (divisor != 0.0f) ? (m_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
+  m_angle = -2.0f * acos(m_self->getOrientation().scalar()) * zaxis;
+  m_initialised = true;
   return true;
 }
 
 void Character::shutdown() {
   writeConfig();
-  _initialised = false;
+  m_initialised = false;
 }
 
 void Character::moveForward(float speed) {
-  assert ((_initialised == true) && "Character not initialised");	
-//  if (!_self) {
+  assert ((m_initialised == true) && "Character not initialised");	
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
-  _speed += speed;
+  m_speed += speed;
   updateLocals(true);
 }
 
 void Character::strafe(float speed) {
-  assert ((_initialised == true) && "Character not initialised");	
-//  if (!_self) {
+  assert ((m_initialised == true) && "Character not initialised");	
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
-  _strafe_speed += speed;
+  m_strafe_speed += speed;
   updateLocals(true);
 }
 
 void Character::rotate(float rate) {
-  assert ((_initialised == true) && "Character not initialised");
-//  if (!_self) {
+  assert ((m_initialised == true) && "Character not initialised");
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
   std::cout << "Character::rotate" << std::endl << std::flush;
-  if (rate != CMD_modifier) _rate += rate * _rotate_speed;
+  if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
   updateLocals(true);
   // FIXME 0.0f is not safe to test for.
-  if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+  if (m_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
 void Character::rotateImmediate(float rot)
 {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
 
   float angle = deg_to_rad(rot);
-  _angle += angle;
+  m_angle += angle;
   // Only send to server if we haven't recently.
-  bool send = ((SDL_GetTicks() - _lastUpdate) > 1000);
+  bool send = ((SDL_GetTicks() - m_lastUpdate) > 1000);
   updateLocals(send);
   // If we don't send, we need to schedule an update.
-  if (!send && !_updateScheduled) {
+  if (!send && !m_updateScheduled) {
     System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_SEND, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
-    _updateScheduled = true;
+    m_updateScheduled = true;
   }
 }
 
@@ -213,89 +213,89 @@ void Character::sendUpdate()
 {
   // Send update of our rotation etc to server.
   updateLocals(true);
-  _updateScheduled = false;
+  m_updateScheduled = false;
 }
 
 void Character::setMovementSpeed(float speed) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
 
-  _speed = speed;
+  m_speed = speed;
   updateLocals(true);
 }
 
 void Character::setStrafeSpeed(float speed) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
 
-  _strafe_speed = speed;
+  m_strafe_speed = speed;
   updateLocals(true);
 }
 
 void Character::setRotationRate(float rate) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
 
-  _rate = rate * _rotate_speed;
+  m_rate = rate * m_rotate_speed;
   // FIXME 0.0f is not safe to test for.
-  if (_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+  if (m_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
 void Character::updateLocals(bool send_to_server) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   float x, y, z;
   float mod_speed;
   float angle;
   unsigned int ticks;
-//  if (!_self) {
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
   static ActionHandler *ac = System::instance()->getActionHandler();
-  static float old_speed = _speed;
-  static bool old_run = _run_modifier;
-  static std::string type = _self->type();
-  if (old_speed != _speed || old_run != _run_modifier) {
-    if (_speed ==  0.0f) {
+  static float old_speed = m_speed;
+  static bool old_run = m_run_modifier;
+  static std::string type = m_self->type();
+  if (old_speed != m_speed || old_run != m_run_modifier) {
+    if (m_speed ==  0.0f) {
       ac->handleAction(std::string(STOPPED) + type, NULL);
-    } else if (_run_modifier) {
+    } else if (m_run_modifier) {
       ac->handleAction(std::string(RUNNING) + type, NULL);
     } else {
       ac->handleAction(std::string(WALKING) + type, NULL);
     }
-    old_speed = _speed;
-    old_run = _run_modifier;
+    old_speed = m_speed;
+    old_run = m_run_modifier;
   }
   ticks = SDL_GetTicks();
-  angle = deg_to_rad(_rate * ((ticks - _time) / 1000.0f));
-  _angle += angle;
+  angle = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
+  m_angle += angle;
 //  if (_angle == WFMath::Pi) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
-  mod_speed = (_run_modifier) ? (_speed * _run_speed) : (_speed * _walk_speed);
+  mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
   z = 0.0f;
-  y = mod_speed * -sin(_angle);
-  x = mod_speed * cos(_angle);
-  mod_speed = (_run_modifier) ? (_strafe_speed * _run_speed) : (_strafe_speed * _walk_speed);
+  y = mod_speed * -sin(m_angle);
+  x = mod_speed * cos(m_angle);
+  mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
   z += 0.0f;
   static const float PI_BY_2 = WFMath::Pi / 2.0f;
-  y += mod_speed * -sin(_angle + PI_BY_2);
-  x += mod_speed * cos(_angle + PI_BY_2);
-  _time = ticks;
-  _orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -_angle);
+  y += mod_speed * -sin(m_angle + PI_BY_2);
+  x += mod_speed * cos(m_angle + PI_BY_2);
+  m_time = ticks;
+  m_orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -m_angle);
   if (send_to_server) {
-    updateMove(WFMath::Vector<3>(x, y, z), _orient);
-    _lastUpdate = ticks;
+    updateMove(WFMath::Vector<3>(x, y, z), m_orient);
+    m_lastUpdate = ticks;
   }
 }
 
 void Character::updateMove(const WFMath::Vector<3> & direction,
                            const WFMath::Quaternion & orient) {
-  assert ((_initialised == true) && "Character not initialised");
-  _avatar->moveInDirection(direction, orient);
+  assert ((m_initialised == true) && "Character not initialised");
+  m_avatar->moveInDirection(direction, orient);
 }
 
 void Character::getEntity(const std::string &id) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
 
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
-  _avatar->place(e, _avatar->getEntity());
+  m_avatar->place(e, m_avatar->getEntity());
 }
 
 void Character::dropEntity(const std::string &name, int quantity) {
@@ -305,61 +305,61 @@ void Character::dropEntity(const std::string &name, int quantity) {
   }
   Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
-    WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
+  for (unsigned int i = 0; (quantity) && (i < m_self->getNumMembers()); ++i) {
+    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getMember(i));
     if (we->getName() == name) {
-      _avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
+      m_avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
       quantity--;
     }
   }
 }
 
 void Character::touchEntity(const std::string &id) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
-  _avatar->touch(e);
+  m_avatar->touch(e);
 }
 
 void Character::wieldEntity(const std::string &name) {
-  for (unsigned int i = 0; i < _self->getNumMembers(); ++i) {
-    WorldEntity *we = (WorldEntity*)_avatar->getEntity()->getMember(i);
+  for (unsigned int i = 0; i < m_self->getNumMembers(); ++i) {
+    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getMember(i));
     Eris::StringSet wep = we->getInherits();
     if ((we->getName() == name) || (wep.find(name) != wep.end())) {
       Atlas::Objects::Operation::Wield w;
-      w.setFrom(_self->getID());
+      w.setFrom(m_self->getID());
       Atlas::Message::Element::MapType arg;
       arg["id"] = we->getID();
       arg["objtype"] = "obj";
       Atlas::Message::Element::ListType & args = w.getArgs();
       args.push_back(arg);
-      _avatar->getWorld()->getConnection()->send(w);
+      m_avatar->getWorld()->getConnection()->send(w);
       return;
     }
   }
 }
 
 void Character::useToolOnEntity(const std::string & id) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   if (id.empty()) return;
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
   Atlas::Objects::Operation::Use u;
-  u.setFrom(_self->getID());
+  u.setFrom(m_self->getID());
   Atlas::Message::Element::MapType arg;
   arg["id"] = e->getID();
   arg["objtype"] = "obj";
   Atlas::Message::Element::ListType & args = u.getArgs();
   args.push_back(arg);
-  _avatar->getWorld()->getConnection()->send(u);
+  m_avatar->getWorld()->getConnection()->send(u);
 }
 
 void Character::displayInventory() {
-  assert ((_initialised == true) && "Character not initialised");	
-//  if (!_self) return;
+  assert ((m_initialised == true) && "Character not initialised");	
+//  if (!m_self) return;
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; i < _self->getNumMembers(); ++i)
-    inventory[_self->getMember(i)->getName()]++;
+  for (unsigned int i = 0; i < m_self->getNumMembers(); ++i)
+    inventory[m_self->getMember(i)->getName()]++;
   for (std::map<std::string, int>::const_iterator I = inventory.begin(); I != inventory.end(); ++I) {
 //    std::cout << I->second << " - " << I->first << std::endl;
   std::string quantity = string_fmt(I->second);
@@ -370,31 +370,31 @@ void Character::displayInventory() {
 }
 
 void Character::say(const std::string &msg) {
-  assert ((_initialised == true) && "Character not initialised");
-  _avatar->say(msg);
+  assert ((m_initialised == true) && "Character not initialised");
+  m_avatar->say(msg);
 }
 
 void Character::make(const std::string &type, const std::string &name) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Create c;
-  c.setFrom(_self->getID());
+  c.setFrom(m_self->getID());
   Atlas::Message::Element::MapType msg;
-  msg["loc"] = _self->getContainer()->getID();
-  WFMath::Point<3> pos = _self->getPosition() + WFMath::Vector<3>(2,0,0);
+  msg["loc"] = m_self->getContainer()->getID();
+  WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
   msg["pos"] = pos.toAtlas();
   msg["name"] = name;
   msg["parents"] = Atlas::Message::Element::ListType(1, type);
   c.setArgs(Atlas::Message::Element::ListType(1, msg));
-  _avatar->getWorld()->getConnection()->send(c);
+  m_avatar->getWorld()->getConnection()->send(c);
 }
 
 void Character::toggleRunModifier() {
-  assert ((_initialised == true) && "Character not initialised");	
-//  if (!_self) {
+  assert ((m_initialised == true) && "Character not initialised");	
+//  if (!m_self) {
 //    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
 //    return;
 //  }
-  _run_modifier = !_run_modifier;
+  m_run_modifier = !m_run_modifier;
   updateLocals(true);
 }
 
@@ -402,23 +402,23 @@ void Character::readConfig() {
   varconf::Variable temp;
   varconf::Config &general = System::instance()->getGeneral();
   temp = general.getItem(SECTION_character, KEY_character_walk_speed);
-  _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
+  m_walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
   temp = general.getItem(SECTION_character, KEY_character_run_speed);
-  _run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
+  m_run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
   temp = general.getItem(SECTION_character, KEY_character_rotate_speed);
-  _rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
+  m_rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
 }
 
 void Character::writeConfig() {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   varconf::Config &general = System::instance()->getGeneral();
-  general.setItem(SECTION_character, KEY_character_walk_speed, _walk_speed);
-  general.setItem(SECTION_character, KEY_character_run_speed, _run_speed);
-  general.setItem(SECTION_character, KEY_character_rotate_speed, _rotate_speed);
+  general.setItem(SECTION_character, KEY_character_walk_speed, m_walk_speed);
+  general.setItem(SECTION_character, KEY_character_run_speed, m_run_speed);
+  general.setItem(SECTION_character, KEY_character_rotate_speed, m_rotate_speed);
 }
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   if (quantity == 0) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
@@ -432,17 +432,17 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
 
   Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
-    WorldEntity *we = (WorldEntity*)_self->getMember(i);
+  for (unsigned int i = 0; (quantity) && (i < m_self->getNumMembers()); ++i) {
+    WorldEntity *we = (WorldEntity*)m_self->getMember(i);
     if (we->getName() == name) {
-      _avatar->place(we, te, WFMath::Point<3>(0,0,0));
+      m_avatar->place(we, te, WFMath::Point<3>(0,0,0));
       quantity--;
     }
   }
 }
 
 void Character::registerCommands(Console *console) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   console->registerCommand(MOVE_FORWARD, this);
   console->registerCommand(MOVE_BACKWARD, this);
   console->registerCommand(MOVE_STOP_FORWARD, this);
@@ -475,10 +475,12 @@ void Character::registerCommands(Console *console) {
   console->registerCommand("clear_app", this);
   console->registerCommand("read_app", this);
   console->registerCommand("set_height", this);
+  console->registerCommand("set_action", this);
+  console->registerCommand("wave", this);
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(args);
    if (command == MOVE_FORWARD) moveForward(1);
@@ -545,17 +547,23 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     ObjectHandler *object_handler = System::instance()->getObjectHandler();
     Atlas::Message::Element::MapType mt;
     ObjectRecord *record = NULL;
-    if (object_handler) record = object_handler->getObjectRecord(_self->getID());
-    if (_self->hasProperty(GUISE)) { // Read existing values
-      mt = _self->getProperty(GUISE).asMap();
+    if (object_handler) record = object_handler->getObjectRecord(m_self->getID());
+    if (m_self->hasProperty(GUISE)) { // Read existing values
+      mt = m_self->getProperty(GUISE).asMap();
       if (record) record->setAppearance(mt);
     } else { // Set defaults and send to server
       if (record) {
         record->setAppearance(mt);
-        _self->setProperty(GUISE, mt);
+        m_self->setProperty(GUISE, mt);
         setApp();
       }
     }
+  }
+  else if (command == "set_action") {
+    setAction(args);
+  }
+  else if (command == "wave") {
+    setAction("wave");
   }
 //   else if (command == SET_MESH) {
  //   ObjectHandler *object_handler = _system->getObjectHandler();
@@ -564,7 +572,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
  // }
 }
 void Character::Recontainered(Eris::EntityPtr entity1, Eris::EntityPtr entity2) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   if (debug) {
     std::cout << "Recontainered" << std::endl;
     if (entity1) std::cout << "Entity1: " << entity1->getType()->getName() << std::endl;
@@ -576,20 +584,20 @@ void Character::Recontainered(Eris::EntityPtr entity1, Eris::EntityPtr entity2) 
 }
 
 void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
-  assert ((_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");	
   varconf::Variable temp;
   if (section == CHARACTER) {
     if (key == KEY_character_walk_speed) {
       temp = config.getItem(CHARACTER, KEY_character_walk_speed);
-      _walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
+      m_walk_speed = (!temp.is_double()) ? (DEFAULT_character_walk_speed) : ((double)(temp));
     }
     else if (key == KEY_character_run_speed) {
       temp = config.getItem(CHARACTER, KEY_character_run_speed);
-      _run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
+      m_run_speed = (!temp.is_double()) ? (DEFAULT_character_run_speed) : ((double)(temp));
     }
     else if (key == KEY_character_rotate_speed) {
       temp = config.getItem(CHARACTER, KEY_character_rotate_speed);
-      _rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
+      m_rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
     }
   }
 }
@@ -597,8 +605,8 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
 void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
   if (!name.empty()) {
     Atlas::Message::Element::MapType mt;
-    if (_self->hasProperty(GUISE)) {
-      mt = _self->getProperty(GUISE).asMap();
+    if (m_self->hasProperty(GUISE)) {
+      mt = m_self->getProperty(GUISE).asMap();
     }
     Atlas::Message::Element::MapType::iterator I = mt.find(map);
     if (I != mt.end()) {
@@ -608,66 +616,81 @@ void Character::setAppearance(const std::string &map, const std::string &name, c
       m[name] = value;
       mt[map] = m;
     }
-    _self->setProperty(GUISE, mt);
+    m_self->setProperty(GUISE, mt);
   }
   setApp();
 }
 
 void Character::clearApp() {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
   set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
 
   Atlas::Message::Element::MapType msg;
   const Atlas::Message::Element::MapType mt;
-  msg["id"] = _self->getID();
+  msg["id"] = m_self->getID();
   msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  _avatar->getWorld()->getConnection()->send(set);
+  m_avatar->getWorld()->getConnection()->send(set);
 }
 
 
 
 void Character::setApp() {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
   set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
-//  set.setFrom(_self->getID());
-//  set.setFrom(_self->getID());
+//  set.setFrom(m_self->getID());
+//  set.setFrom(m_self->getID());
 
   Atlas::Message::Element::MapType msg;
-  const Atlas::Message::Element::MapType mt = _self->getProperty(GUISE).asMap();
+  const Atlas::Message::Element::MapType mt = m_self->getProperty(GUISE).asMap();
 
-//  msg["loc"] = _self->getContainer()->getID();
-//  WFMath::Point<3> pos = _self->getPosition() + WFMath::Vector<3>(2,0,0);
+//  msg["loc"] = m_self->getContainer()->getID();
+//  WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
 //  msg["pos"] = pos.toAtlas();
 //  msg["parents"] = Atlas::Message::Element::ListType(1, arg);
 
-//  set.sendFrom(_self->getID());
-  msg["id"] = _self->getID();
+//  set.sendFrom(m_self->getID());
+  msg["id"] = m_self->getID();
   msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  _avatar->getWorld()->getConnection()->send(set);
+  m_avatar->getWorld()->getConnection()->send(set);
 }
 
 
 void Character::setHeight(float height) {
-  assert ((_initialised == true) && "Character not initialised");
+  assert ((m_initialised == true) && "Character not initialised");
   Atlas::Objects::Operation::Set set;
   set.setFrom(System::instance()->getClient()->getPlayer()->getAccountID());
 
   Atlas::Message::Element::MapType msg;
-  msg["id"] = _self->getID();
+  msg["id"] = m_self->getID();
   msg["objtype"] = "obj";
   msg[HEIGHT] = height;
 
   set.setArgs(Atlas::Message::Element::ListType(1, msg));
-  _avatar->getWorld()->getConnection()->send(set);
+  m_avatar->getWorld()->getConnection()->send(set);
 }
+
+void Character::setAction(const std::string &action) {
+  assert ((m_initialised == true) && "Character not initialised");
+  Atlas::Objects::Operation::Set set;
+  set.setFrom(m_self->getID());
+
+  Atlas::Message::Element::MapType msg;
+  msg["id"] = m_self->getID();
+  msg["objtype"] = "obj";
+  msg["action"] = action;
+
+  set.setArgs(Atlas::Message::Element::ListType(1, msg));
+  m_avatar->getWorld()->getConnection()->send(set);
+}
+
 
 
 } /* namespace Sear */
