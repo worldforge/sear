@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.17 2002-09-08 16:15:01 simon Exp $
+// $Id: Render.h,v 1.18 2002-09-26 17:17:46 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -11,6 +11,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <pair.h>
 
 #include <wfmath/axisbox.h>
 
@@ -30,6 +31,8 @@ class BoundBox;
 class BillBoard;
 class Impostor;
 class WorldEntity;
+class ModelRecord;
+class ObjectRecord;
 
 #define PERSPECTIVE (0)
 #define ORTHOGRAPHIC (1)
@@ -48,7 +51,11 @@ typedef enum {
   RENDER_LAST_STATE
 } RenderState;
 
-typedef std::list<WorldEntity*> Queue;
+//typedef std::pair<ObjectRecord*, ModelRecord*> QueueItem;
+typedef std::pair<ObjectRecord*, std::string> QueueItem;
+//typedef std::pair<std::string, std::string> QueueItem;
+typedef std::list<QueueItem> Queue;
+typedef std::map<std::string, Queue> QueueMap;
 
   Render() {
   }
@@ -110,15 +117,16 @@ typedef std::list<WorldEntity*> Queue;
   
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotate(float angle, float x, float y, float z) =0;
-  virtual void rotateObject(WorldEntity *we, int type) =0;
+//  virtual void rotateObject(WorldEntity *we, int type) =0;
+  virtual void rotateObject(ObjectRecord *, ModelRecord *) =0;
   virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) =0;
   virtual unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) =0;
-  virtual void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) =0;
-  virtual void drawMessageQueue(std::map<std::string, Queue> queue) =0;
+  virtual void drawQueue(QueueMap queue, bool select_mode, float time_elapsed) =0;
+  virtual void drawMessageQueue(QueueMap queue) =0;
 
 //  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
 

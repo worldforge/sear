@@ -2,33 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.6 2002-09-08 00:24:53 simon Exp $
+// $Id: ModelHandler.h,v 1.7 2002-09-26 17:17:46 simon Exp $
 
 #ifndef SEAR_MODELHANDLER_H
 #define SEAR_MODELHANDLER_H 1
 
-/* This class will provide THE place for models.
- * New models will be created through this class
- * Existing objects will be references to data
- * stored in this class.
- * This class should also take care of recycling unused
- * models or unloading them after a certain timeout value
- * This is the only class that shoud know about the specific 
- * sub classes of MultiModel and Model
- */ 
-
 #include <map>
 #include <string>
-
-#include "ObjectLoader.h"
 
 namespace Sear {
 
 // Forward Declarationa
-class Model;
 class ModelLoader;
+class ModelRecord;
+class ObjectRecord;
 class Render;
-class WorldEntity;
 	
 class ModelHandler {
 public:
@@ -38,29 +26,20 @@ public:
   void init();
   void shutdown();
   
-  /*
-   * Obtains a model for the given WorldEntity we
-   */ 
-  Model *getModel(Render *, WorldEntity *we);
-  Model *getModel(Render *, const std::string&, ObjectProperties *op);
+  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &model_id);
 
-  /*
-   * Sets up a callback to use to load a model with model_type
-   */ 
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
   void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
 
   void checkModelTimeout(const std::string &);
-
-  void lowerDetail();
-  void raiseDetail();
   
 protected:
-  float detail_level;
-  unsigned int _number_of_models; //required?
-  // Will not be an array as not dynamic -> a map would be better 
-  std::map<std::string, ModelLoader*> _model_loaders;
-  std::map<std::string, Model*> _models;
+  typedef std::map<std::string, ModelLoader*> ModelLoaderMap;
+  typedef std::map<std::string, ModelRecord*> ModelRecordMap;
+  typedef std::map<std::string, ModelRecord*> ObjectRecordMap;
+  ModelLoaderMap _model_loaders;
+  ModelRecordMap _model_records;
+  ObjectRecordMap _object_map;
   bool _initialised;
 };
 

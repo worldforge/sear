@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.6 2002-09-08 13:08:20 simon Exp $
+// $Id: Slice.cpp,v 1.7 2002-09-26 17:17:46 simon Exp $
 
 #include "common/Utility.h"
 
@@ -34,7 +34,6 @@ namespace Sear {
 Slice::Slice(Render *render) : Model(render),
   _use_textures(true),
   slicings(NULL),
-  _trunk_model(NULL),
   _initialised(false)
 {}
 
@@ -42,10 +41,9 @@ Slice::~Slice() {
   if (_initialised) shutdown();
 }
   
-bool Slice::init(const std::string &type, float width, float height, Model *trunk_model, unsigned int num_slicings, unsigned int slices_per_slicing) {
+bool Slice::init(const std::string &type, float width, float height, unsigned int num_slicings, unsigned int slices_per_slicing) {
   if (_initialised) shutdown();
   _type = type;
-  _trunk_model = trunk_model;
   _num_slicings = num_slicings;
   _slices_per_slicing = slices_per_slicing;
   slicings = (Slicing**)malloc(_num_slicings * sizeof(Slicing*));
@@ -115,7 +113,6 @@ void Slice::shutdown() {
 
 void Slice::render(bool select_mode) {
   if (!_render) return;
-  if (_trunk_model) _trunk_model->render(select_mode);
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.22 2002-09-21 15:42:00 simon Exp $
+// $Id: Cal3d.cpp,v 1.23 2002-09-26 17:17:46 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -516,7 +516,7 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 void Cal3d::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
     static float scale = _height * getScale();
-//    _render->scaleObject(scale);
+    _render->scaleObject(scale);
     _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
   }
@@ -629,39 +629,39 @@ void Cal3d::setState(int state, float delay)
 void Cal3d::action(const std::string &action) {
   if (action == "standing") {
     if (grip) {
-      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.0f);
-      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 0.3f, 0.0f);
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.1f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 0.3f, 0.1f);
     } else {
-      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 1.0f, 0.0f);
-      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 1.0f, 0.1f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.1f);
     }
-    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.0f);
-    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.1f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.1f);
 //  }  else if (action == "funky") {
 //    setState(STATE_FANCY, 0);
 //  }  else if (action == "strut") {
 //    setMotionBlend((float *)&_strut_blend[0], 0);
   } else if (action == "walking") {
     if (grip) {
-      m_calModel.getMixer()->blendCycle(grip_animation, 0.3f, 0.0f);
-      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 0.7f, 0.0f);
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.3f, 0.1f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 0.7f, 0.1f);
     } else {
-      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 1.0f, 0.0f);
-      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 1.0f, 0.1f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.1f);
     }
     
-    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.0f);
-    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.1f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.1f);
   } else if (action == "running") {
     if (grip) {
-      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.0f);
-      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 0.3f, 0.0f);
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.1f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 0.3f, 0.1f);
     } else {
-      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 1.0f, 0.0f);
-      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 1.0f, 0.1f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.1f);
     }
-    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.0f);
-    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.1f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.1f);
   } else if (action.substr(0,11) == "change_set_") {
 //    int i = 0;
 ///   cast_stream(action.substr(11), i);

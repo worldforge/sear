@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.18 2002-09-08 13:08:21 simon Exp $
+// $Id: WorldEntity.cpp,v 1.19 2002-09-26 17:17:46 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -15,7 +15,8 @@
 #include "Event.h"
 #include "EventHandler.h"
 #include "Graphics.h"
-#include "ModelHandler.h"
+#include "ObjectHandler.h"
+#include "src/ObjectRecord.h"
 #include "Model.h"
 #include "Render.h"
 #include "WorldEntity.h"
@@ -196,16 +197,16 @@ std::string WorldEntity::parent() {
 }
 
 void WorldEntity::checkActions() {
-  ModelHandler *model_handler = System::instance()->getModelHandler();
+  ObjectHandler *object_handler = System::instance()->getObjectHandler();
 
   // TODO possibility to link into action handler
   
   if (hasProperty("action")) {
     std::string action = getProperty("action").AsString();
     if (action != last_action) {
-      Model *model = NULL;
-      if (model_handler) model = model_handler->getModel(NULL, this);
-      if (model) model->action(action);
+      ObjectRecord *record;
+      if (object_handler) record = object_handler->getObjectRecord(getID());
+      if (record) record->action(action);
       last_action = action;
     }
   } else {
@@ -215,9 +216,9 @@ void WorldEntity::checkActions() {
   if (hasProperty("mode")) {
     std::string mode = getProperty("mode").AsString();
     if (mode != last_mode) {
-      Model *model = NULL;
-      if (model_handler) model = model_handler->getModel(NULL, this);
-      if (model) model->action(mode);
+      ObjectRecord *record;
+      if (object_handler) record = object_handler->getObjectRecord(getID());
+      if (record) record->action(mode);
       last_mode = mode;
     }
   } else {

@@ -1,6 +1,6 @@
 INCLUDES = -I..
 
-bin_PROGRAMS = model_viewer
+bin_PROGRAMS = #model_viewer
 
 model_viewer_LDADD = \
 	../src/libSear.a \

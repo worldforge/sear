@@ -43,6 +43,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{prefix}/share/%{name}/*
 %{prefix}/bin/%{name}
+%{prefix}/bin/model_viewer
 %doc README COPYING AUTHORS
 
 

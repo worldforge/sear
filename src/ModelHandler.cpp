@@ -2,14 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.21 2002-09-08 13:41:37 simon Exp $
+// $Id: ModelHandler.cpp,v 1.22 2002-09-26 17:17:46 simon Exp $
 
 #include "System.h"
 #include <set>
 #include <string.h>
 
 #include <varconf/Config.h>
-#include <Eris/TypeInfo.h>
+//#include <Eris/TypeInfo.h>
 
 #include "config.h"
 
@@ -24,19 +24,20 @@
 #include "loaders/Slice_Loader.h"
 
 #include "Exception.h"
-#include "Model.h"
+//#include "Model.h"
 #include "ModelHandler.h"
 #include "ModelLoader.h"
-#include "ObjectLoader.h"
+#include "ModelRecord.h"
+#include "ObjectRecord.h"
+//#include "ObjectLoader.h"
 #include "Render.h"
-#include "StateLoader.h"
-#include "WorldEntity.h"
+//#include "StateLoader.h"
+//#include "WorldEntity.h"
 
 
 namespace Sear {
 
 ModelHandler::ModelHandler() :
-  detail_level(1.0f),
   _initialised(false)
 	
 {
@@ -52,153 +53,69 @@ ModelHandler::ModelHandler() :
 }
 
 ModelHandler::~ModelHandler() {
-  //TODO: Check that clean up has been performed
   if (_initialised) shutdown();
 }
 
 void ModelHandler::init() {
   if (_initialised) shutdown();
   // TODO: Do  clean up if required
-  _model_loaders = std::map<std::string, ModelLoader*>();
-  _models = std::map<std::string, Model*>();
+  _model_loaders = ModelLoaderMap();
+  _model_records = ModelRecordMap();
   _initialised = true;
 }
 
 void ModelHandler::shutdown() {
-  // Clear up model loaders
-  for (std::map<std::string, ModelLoader*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
-    if (I->second) {
-      I->second->shutdown();
-      delete I->second;
-      _model_loaders[I->first] = NULL;
-    }
-  } 
- // Clear Up Model
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
-    if (I->second) {
-      I->second->shutdown();
-      delete I->second;
-      _models[I->first] = NULL;
-    }
-  }
+  // Clean up model loaders
+//  for (ModelLoaderMap::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
+//    if (I->second) {
+//      I->second->shutdown();
+//      delete I->second;
+//      _model_loaders[I->first] = NULL;
+//    }
+//  } 
+ // Clean Up Models
+//  for (ModelRecordMap::iterator I = _models.begin(); I != _models.end(); ++I) {
+//    if (I->second) {
+//      I->second->shutdown();
+//      delete I->second;
+//      _models[I->first] = NULL;
+//    }
+//  }
   _initialised = false;
 }
   
-Model *ModelHandler::getModel(Render *render, WorldEntity *we) {
-  // Check for NULL pointer	
-  if (!we) throw Exception("WorldEntity is NULL");
+ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id) {
+  // Model loaded for this object?
+  if (_object_map[record->id + model_id]) return _object_map[record->id + model_id];
   
-  // Get model details
-  // TODO: find out whether typeinfo will ever be more than two layers
-  std::string type = we->type();
-  std::string parent = we->parent();
-  std::string id = we->getID();
-
-  // If entity already has an associated model, return it.
-  if (_models[id]) return _models[id];
-///  if (_models[type]) return _models[type];
-  if (!render) return NULL;
+  if (_model_records[model_id]) {
+    if (_model_records[model_id]);
+    _object_map[record->id + model_id] = _model_records[model_id];
+    return _model_records[model_id];
+  }
+  if (!render) {
+    cerr << "renderer is null" << endl;	  
+    return NULL;
+  }
+  if (!record) {
+    cerr << "record is NULL" << endl;
+    return NULL;
+  }
+  ModelRecord *model = NULL;
+  varconf::Config *model_config = System::instance()->getModelRecords();
+  std::string model_loader = (std::string)model_config->getItem(model_id, ModelRecord::MODEL_LOADER);
   
-  // Get object type record
-  ObjectProperties *op = we->getObjectProperties();
-  ObjectLoader *ol = System::instance()->getObjectLoader();
-  std::string object_type = "";
-  std::string data_source = "";
-  Model *model = NULL;
-  ModelStruct *ms = (ModelStruct*)malloc(sizeof(ModelStruct));
-  memset(ms, 0, sizeof(ModelStruct));
-  ms->type = type.c_str();
-  ms->parent = parent.c_str();
-  static varconf::Config *model_config = System::instance()->getModel();
-
-  object_type = we->type();
-
-  std::set<std::string> parents_list = we->getType()->getParentsAsSet();
-  std::set<std::string>::const_iterator I = parents_list.begin();
-  while(!model) {
-    op = ol->getObjectProperties(object_type);
-    if (op) {
-      data_source = model_config->getItem(op->model_type, object_type);
-      ms->file_name = data_source.c_str();
-      if (op->model_by_type) {
-        if (_models[object_type]) {
-          model = _models[object_type];
-	  break;
-        }
-      }
-      ms->width = op->width;
-      ms->height = op->height;
-      ms->wrap_texture = op->wrap_texture;
-      ms->scale = op->scale;
-      ms->num_planes = op->num_planes;
-      ms->num_slicings = op->num_slicings;
-      ms->slices_per_slicing = op->slices_per_slicing;
-      ms->hasBBox = we->hasBBox();
-      ms->bbox = we->getBBox();
-      ms->multi_textures = op->multi_textures;
-      if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(render, *ms);
-    }
-    if (!model) {
-      if (I == parents_list.end()) {
-        if (object_type == "default") break;
-	else object_type = "default";
-      } else {
-        object_type = *I;
-        I++;
-      }    
-    }
+  if (_model_loaders[model_loader]) model = _model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
+  else {
+    cerr << "No loader found: " << model_loader << endl;
+    return NULL;
   }
-  if (!op) Log::writeLog("ERROR OP IS NULL", Log::LOG_ERROR);
-  _models[id] = model;
-  we->setObjectProperties(op);
 
-  _models[id] = model;
-  if (op->model_by_type) {
-    model->setFlag("ModelByType", true);
-    _models[object_type] = model;
-  }
-  if (!model) Log::writeLog(id, Log::LOG_ERROR);
-
-  if (model) {
-    model->setSelectState(System::instance()->getStateLoader()->getStateProperties(op->select_state));
-  }
-  free(ms);
+  if (model->model_by_type)  _model_records[model_id] = model;
+  _object_map[record->id + model_id] = model;
   return model; 
 }
 
-Model *ModelHandler::getModel(Render *render, const std::string &object_type, ObjectProperties *op) {
-  if (!render) return NULL;
-  // Get object type record
-//  System
-  ObjectLoader *ol = System::instance()->getObjectLoader();
-  Model *model = NULL;
-
-  static varconf::Config *model_config = System::instance()->getModel();
-  if(ol->getObjectProperties(object_type)) {
-    memcpy(op,ol->getObjectProperties(object_type), sizeof(ObjectProperties));
-  }
-  if (op) {
-    ModelStruct *ms = (ModelStruct*)malloc(sizeof(ModelStruct));
-    memset(ms, 0, sizeof(ModelStruct));
-    ms->type = object_type.c_str();
-    ms->parent = NULL;
-    ms->width = op->width;
-    ms->height = op->height;
-    ms->wrap_texture = op->wrap_texture;
-    ms->scale = op->scale;
-    ms->num_planes = op->num_planes;
-    ms->num_slicings = op->num_slicings;
-    ms->slices_per_slicing = op->slices_per_slicing;
-    ms->hasBBox = false;
-    ms->bbox = WFMath::AxisBox<3>();
-    ms->multi_textures = op->multi_textures;
-    std::string data_source = model_config->getItem(op->model_type, object_type);
-    ms->file_name = data_source.c_str();
-    if (_model_loaders[op->model_type]) model = _model_loaders[op->model_type]->loadModel(render, *ms);
-    free (ms);
-  }
-  return model; 
-}
 void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoader *model_loader) {
   // Check for bad values	
   if (model_type.empty()) throw Exception("No type specified");
@@ -215,35 +132,15 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
   if (_model_loaders[model_type] == model_loader) _model_loaders[model_type] = NULL;
 }
 void ModelHandler::checkModelTimeout(const std::string &id) {
-  Model *model = _models[id];
-  if (!model) return;
-  if (!model->getInUse()) {
-    if (model->getFlag("ModelByType")) return;
-    Log::writeLog(std::string("Unloading model for ") + id, Log::LOG_INFO);
-    model->shutdown();
-    delete model;
-    _models[id] = NULL;
-  }
-}
-
-void ModelHandler::lowerDetail() {
-  detail_level -= 0.05f;
-  if (detail_level < 0.0f) detail_level = 0.0f;
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
-    if (I->second) {
-      I->second->setDetailLevel(detail_level);
-    }
-  }
-}
-
-void ModelHandler::raiseDetail() {
-  detail_level += 0.05f;
-  if (detail_level > 1.0f) detail_level = 1.0f;
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
-    if (I->second) {
-      I->second->setDetailLevel(detail_level);
-    }
-  }
+//  Model *model = _models[id];
+//  if (!model) return;
+//  if (!model->getInUse()) {
+//    if (model->getFlag("ModelByType")) return;
+//    Log::writeLog(std::string("Unloading model for ") + id, Log::LOG_INFO);
+//    model->shutdown();
+//    delete model;
+//    _models[id] = NULL;
+//  }
 }
 
 } /* namespace Sear */

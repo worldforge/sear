@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.h,v 1.4 2002-09-07 23:27:06 simon Exp $
+// $Id: Slice.h,v 1.5 2002-09-26 17:17:46 simon Exp $
 
 #ifndef SEAR_SLICE_H
 #define SEAR_SLICE_H 1
@@ -30,7 +30,7 @@ public:
   Slice(Render*);
   ~Slice();
   
-  bool init(const std::string &, float width, float height, Model *trunk_model, unsigned int num_slicings, unsigned int slices_per_slicing);
+  bool init(const std::string &, float width, float height, unsigned int num_slicings, unsigned int slices_per_slicing);
   void shutdown();
   
   void render(bool); 
@@ -42,7 +42,6 @@ protected:
   bool _use_textures;
   std::string _type;
   Slicing **slicings;
-  Model *_trunk_model;
   unsigned int _num_slicings;
   unsigned int _slices_per_slicing;
   bool _initialised;

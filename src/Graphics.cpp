@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.10 2002-09-08 13:08:21 simon Exp $
+// $Id: Graphics.cpp,v 1.11 2002-09-26 17:17:46 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -25,7 +25,10 @@
 #include "Frustum.h"
 #include "Model.h"
 #include "ModelHandler.h"
+#include "ModelRecord.h"
+#include "ObjectRecord.h"
 #include "ObjectLoader.h"
+#include "ObjectHandler.h"
 #include "Render.h"
 #include "Sky.h"
 #include "Terrain.h"
@@ -154,7 +157,7 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
     WorldEntity *root = NULL; 
     if ((root = (WorldEntity *)world->getRootEntity())) {
       if (_character) _character->updateLocals(false);
-      _render_queue = std::map<std::string, Queue>();
+      _render_queue = Render::QueueMap();
       buildQueues(root, 0, select_mode);
       _renderer->drawQueue(_render_queue, select_mode, time_elapsed);
       if (!select_mode) _renderer->drawMessageQueue(_render_queue);
@@ -190,17 +193,57 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
       // Get assinged object prop	    
-      ObjectProperties *op = we->getObjectProperties();
-      if (!op) { // No op? then the model hasn't been created yet so create it
-        _model_handler->getModel(_renderer, we); // Allocates a model and an ObjectProperties
-        op = we->getObjectProperties(); // Obtain newly assigned op
-      }
+  //    ObjectProperties *op = we->getObjectProperties();
+//      if (!op) { // No op? then the model hasn't been created yet so create it
+//        _model_handler->getModel(_renderer, ); // Allocates a model and an ObjectProperties
+//        op = we->getObjectProperties(); // Obtain newly assigned op
+//      }
       // Seems that sometimes the models don't get an op
       // TODO something about this
-      if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
-      if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->select_state].push_back(we);
-      if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->state].push_back(we);
-      if (op->draw_members) {
+//      if (!op) return; // Why is this required? getModel should guarantee that op is valid, or it would send an error msg
+//      if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->select_state].push_back(we);
+//      if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->state].push_back(we);
+//      if (op->draw_self && select_mode) _render_queue[op->select_state].push_back(we);
+      ObjectHandler *object_handler = _system->getObjectHandler();
+      ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
+      if (!object_record) {
+        object_record = object_handler->getObjectRecord(we->type());
+	object_handler->copyObjectRecord(we->getID(), object_record);
+        object_record = object_handler->getObjectRecord(we->getID());
+      }
+      if (!object_record) {
+        object_record = object_handler->getObjectRecord(we->parent());
+	object_handler->copyObjectRecord(we->getID(), object_record);
+        object_record = object_handler->getObjectRecord(we->getID());
+      }
+      if (!object_record) {
+        object_record = object_handler->getObjectRecord("default");
+	object_handler->copyObjectRecord(we->getID(), object_record);
+        object_record = object_handler->getObjectRecord(we->getID());
+      }
+      if (!object_record) {
+        std::cout << "No Record found" << endl;	      
+        return;   
+      }
+      object_record->name = we->getName();
+      object_record->id = we->getID();
+      if (we->hasBBox()) {
+        object_record->bbox = we->getBBox();
+      } else {
+        WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+        WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
+        object_record->bbox = WFMath::AxisBox<3>(lc, hc);
+      }
+
+      object_record->position = we->getAbsPos();
+      object_record->orient = we->getAbsOrient();
+      // TODO determine what model queue to use.
+      // TODO if queue is empty switch to another
+      for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+        if (!select_mode) _render_queue[_system->getModelRecords()->getItem(*I, "state")].push_back(Render::QueueItem(object_record, *I));
+	else _render_queue[_system->getModelRecords()->getItem(*I, "select_state")].push_back(Render::QueueItem(object_record, *I));
+      }
+      if (object_record->draw_members) {
         for (unsigned int i = 0; i < we->getNumMembers(); ++i) {
           buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode);
         }
@@ -254,14 +297,14 @@ void Graphics::writeComponentConfig() {
 }
 
 void Graphics::updateDetailLevels(float frame_rate) {
-  ModelHandler *model_handler = _system->getModelHandler();	
-  if (frame_rate < _lower_frame_rate_bound) {
-    if (model_handler) model_handler->lowerDetail();
-    if (_terrain) _terrain->lowerDetail();
-  } else if (frame_rate > _upper_frame_rate_bound) {
-    if (model_handler) model_handler->raiseDetail();
-    if (_terrain) _terrain->raiseDetail();
-  }
+//  ModelHandler *model_handler = _system->getModelHandler();	
+//  if (frame_rate < _lower_frame_rate_bound) {
+//    if (model_handler) model_handler->lowerDetail();
+//    if (_terrain) _terrain->lowerDetail();
+//  } else if (frame_rate > _upper_frame_rate_bound) {
+//    if (model_handler) model_handler->raiseDetail();
+//    if (_terrain) _terrain->raiseDetail();
+//  }
 }
 
 } /* namespace Sear */

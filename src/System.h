@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.19 2002-09-21 14:20:31 simon Exp $
+// $Id: System.h,v 1.20 2002-09-26 17:17:46 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -26,7 +26,7 @@ class Client;
 class EventHandler;
 class FileHandler;
 class ModelHandler;
-class ObjectLoader;
+class ObjectHandler;
 class StateLoader;
 class Console;
 class Character;
@@ -88,12 +88,16 @@ public:
   varconf::Config *getGeneral() { return _general; }
   varconf::Config *getTexture() { return _textures; }
   varconf::Config *getModel() { return _models; } 
-  ObjectLoader *getObjectLoader() { return _ol; }
+  
+  varconf::Config *getModelRecords() { return _model_records; }
+  varconf::Config *getObjectRecords() { return _object_records; }
+  
   StateLoader *getStateLoader() { return _sl; }
   EventHandler *getEventHandler() { return _event_handler; }
   ModelHandler *getModelHandler() { return _model_handler; }
   ActionHandler *getActionHandler() { return _action_handler; }
   FileHandler *getFileHandler() { return _file_handler; }
+  ObjectHandler *getObjectHandler() { return _object_handler; }
   
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
@@ -154,9 +158,9 @@ protected:
   EventHandler *_event_handler;
   FileHandler *_file_handler;
   ModelHandler *_model_handler;
-  ObjectLoader *_ol;
   StateLoader *_sl;
   ActionHandler *_action_handler;
+  ObjectHandler *_object_handler;
 
   std::list<std::string> additional_paths;
   
@@ -169,6 +173,10 @@ protected:
   varconf::Config *_general;
   varconf::Config *_textures;
   varconf::Config *_models;
+
+  varconf::Config *_model_records;
+  varconf::Config *_object_records;
+  
   Console *_console;
   Character *_character;
  
@@ -267,7 +275,8 @@ private:
   static const char * const DISABLE_DIR_PREFIX = "disable_dir_prefix";
 
   static const char * const RUN_SCRIPT = "run_script";
-  static const char * const LOAD_OBJECT_FILE = "load_object_file";
+  static const char * const LOAD_MODEL_RECORDS = "load_model_records";
+  static const char * const LOAD_OBJECT_RECORDS = "load_object_records";
   static const char * const LOAD_STATE_FILE = "load_state_file";
   static const char * const LOAD_GENERAL_CONFIG = "load_general";
   static const char * const LOAD_KEY_BINDINGS = "load_bindings";

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.35 2002-09-21 14:20:31 simon Exp $
+// $Id: System.cpp,v 1.36 2002-09-26 17:17:46 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +30,7 @@
 #include "FileHandler.h"
 #include "Graphics.h"
 #include "ModelHandler.h"
+#include "ObjectHandler.h"
 #include "ObjectLoader.h"
 #include "Render.h"
 #include "Sound.h"
@@ -55,7 +56,10 @@ System::System() :
   _icon(NULL),
   _event_handler(NULL),
   _file_handler(NULL),
-  _ol(NULL),
+  _model_handler(NULL),
+  _sl(NULL),
+  _action_handler(NULL),
+  _object_handler(NULL),
   _console(NULL),
   _character(NULL),
   _prefix_cwd(false),
@@ -121,23 +125,27 @@ bool System::init() {
     _file_handler->addSearchPath(*I);
   }
   
-  _ol = new ObjectLoader();
-  _ol->init();
-
   _sl = new StateLoader();
   _sl->init();
+  
+  _object_handler = new ObjectHandler();
+  _object_handler->init();
   
   _general = new varconf::Config();
   _textures = new varconf::Config();
   _models = new varconf::Config();
+  _model_records = new varconf::Config();
 
   _general->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _textures->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _models->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  _model_records->sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  
   
   _general->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _textures->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _models->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  _model_records->sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
   
@@ -147,6 +155,8 @@ bool System::init() {
   _client->registerCommands(_console);
   _action_handler->registerCommands(_console);
   _file_handler->registerCommands(_console);
+  _object_handler->registerCommands(_console);
+
   try { 
     sound = new Sound();
     sound->init();
@@ -184,16 +194,24 @@ void System::shutdown() {
     _client = NULL;
   }
   
-  if (_ol) {
-    _ol->shutdown();
-    delete _ol;
-    _ol = NULL;
-  }
   if (_action_handler) {
     _action_handler->shutdown();
     delete _action_handler;
     _action_handler = NULL;
   }
+/*
+  if (_file_handler) {
+    _file_handler->shutdown();
+    delete _file_handler;
+    _file_handler = NULL;
+  }
+  */
+  if (_object_handler) {
+    _object_handler->shutdown();
+    delete _object_handler;
+    _object_handler = NULL;
+  }
+  
   if (_graphics) {
     _graphics->writeConfig();
     _graphics->writeComponentConfig();
@@ -783,7 +801,7 @@ void System::registerCommands(Console *console) {
   console->registerCommand(ENABLE_DIR_PREFIX, this);
   console->registerCommand(DISABLE_DIR_PREFIX, this);
   console->registerCommand(RUN_SCRIPT, this);
-  console->registerCommand(LOAD_OBJECT_FILE, this);
+  console->registerCommand(LOAD_MODEL_RECORDS, this);
   console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
   console->registerCommand(LOAD_TEXTURE_CONFIG, this);
@@ -838,9 +856,6 @@ void System::runCommand(const std::string &command, const std::string &args) {
   else if (command == ENABLE_DIR_PREFIX) _prefix_cwd = true;  
   else if (command == DISABLE_DIR_PREFIX) _prefix_cwd = false;
   else if (command == RUN_SCRIPT) runScript(processHome(args));
-  else if (command == LOAD_OBJECT_FILE) {
-    if (_ol) _ol->readFiles(processHome(args));
-  }
   else if (command == LOAD_STATE_FILE) {
     if (_sl) _sl->readFiles(processHome(args));
   }
@@ -854,7 +869,30 @@ void System::runCommand(const std::string &command, const std::string &args) {
       }
     }
   }
-  else if (command == LOAD_TEXTURE_CONFIG) {
+  else if (command == LOAD_MODEL_RECORDS) {
+	  cout << args << endl;
+    if (_model_records) {
+      _process_records = _prefix_cwd;
+      cout << _model_records->readFromFile(processHome(args)) << endl;
+      if (_process_records) {
+	_process_records = false;
+        processRecords();
+      }
+    } else {
+      cerr << "no model records" << endl;
+    }
+  }
+/*  else if (command == LOAD_OBJECT_RECORDS) {
+    if (_object_records) {
+      _process_records = _prefix_cwd;
+      _object_records->readFromFile(processHome(args));
+      if (_process_records) {
+	_process_records = false;
+        processRecords();
+      }
+    }
+  }
+ */ else if (command == LOAD_TEXTURE_CONFIG) {
     if (_textures) {
       _process_records = _prefix_cwd;
       _textures->readFromFile(processHome(args));

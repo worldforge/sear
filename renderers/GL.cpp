@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.31 2002-09-21 14:20:30 simon Exp $
+// $Id: GL.cpp,v 1.32 2002-09-26 17:17:46 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -29,6 +29,8 @@
 #include "src/Graphics.h"
 #include "src/Model.h"
 #include "src/ModelHandler.h"
+#include "src/ModelRecord.h"
+#include "src/ObjectRecord.h"
 #include "src/ObjectLoader.h"
 #include "src/Sky.h"
 #include "src/System.h"
@@ -854,17 +856,18 @@ void GL::rotate(float angle, float x, float y, float z) {
   glRotatef(angle, x, y, z);
 }
 
-void GL::rotateObject(WorldEntity *we, int type) {
-  if (!we) return; // THROW ERROR;
-  switch (type) {
+//void GL::rotateObject(WorldEntity *we, int type) {
+void GL::rotateObject(ObjectRecord *object_record, ModelRecord *model_record) {
+//  if (!we) return; // THROW ERROR;
+  switch (model_record->rotation_style) {
     case Graphics::ROS_NONE: return; break;
     case Graphics::ROS_POSITION: {
-       WFMath::Point<3> pos = we->getPosition();
+       WFMath::Point<3> pos = object_record->position;
        glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
        break;
     }       
     case Graphics::ROS_NORMAL: {
-      applyQuaternion(we->getAbsOrient());
+      applyQuaternion(object_record->orient);
       break;
     }
     case Graphics::ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
@@ -1023,47 +1026,54 @@ unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned
   return texture;
 }
 
-void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
+void GL::drawQueue(QueueMap queue, bool select_mode, float time_elapsed) {
   static StateLoader *state_loader = System::instance()->getStateLoader();
-  static ModelHandler *model_handler = _system->getModelHandler();
-  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
+//  static ModelHandler *model_handler = _system->getModelHandler();
+  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
     stateChange(state_loader->getStateProperties(I->first));
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
-
-      WorldEntity *we = (WorldEntity *)*J;
+      ObjectRecord *object_record = J->first;
+      ModelRecord *model_record = _system->getModelHandler()->getModel(this, object_record, J->second);
+      if (!model_record) {
+        cerr << "No model record!" << endl;	      
+        continue;
+      }
+      Model *model = model_record->model;
+//      WorldEntity *we = (WorldEntity *)*J;
       // Get model
-      Model *model = model_handler->getModel(this, we);
+  //    Model *model = model_handler->getModel(this, we->getType());
       if (!model) {  // ERROR GETTING MODEL
 	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
         continue;
       }
-      ObjectProperties *op = we->getObjectProperties(); 
+//      ObjectProperties *op = we->getObjectProperties(); 
       glPushMatrix();
 
       // Translate Model
-      WFMath::Point<3> pos = we->getAbsPos();
+      WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
       // TODO remove terrain->getHeight when server handles its own z coords
       translateObject(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
      
       // Rotate Model
-      if (model->rotationStyle()) rotateObject(we, model->rotationStyle());
+      rotateObject(object_record, model_record);
+      
 
       // Scale Object
-      float scale = op->scale;
-      if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+//      float scale = op->scale;
+//      if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
 
       // Update Model
       model->update(time_elapsed);
       
       // Draw Model
       if (select_mode) {
-        nextColour(we->getID());
+        nextColour(object_record->id);
 	model->render(true);
       } else {
-        if (we->getID() == activeID) {
-          active_name = we->getName();
-	  drawOutline(model, checkState(RENDER_STENCIL) && op->outline);
+        if (object_record->id == activeID) {
+          active_name = object_record->name;
+	  drawOutline(model, checkState(RENDER_STENCIL) && model_record->outline);
 	}
 	else model->render(false);
       }
@@ -1073,15 +1083,16 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
   }
 }
 
-void GL::drawMessageQueue(std::map<std::string, Queue> queue) {
+void GL::drawMessageQueue(QueueMap queue) {
+#if(0)
   glColor4fv(yellow);
   stateChange("font");
-  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); ++I) {
+  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
       WorldEntity *we = (WorldEntity*)*J;
       glPushMatrix();
       WFMath::Point<3> pos = we->getAbsPos();
-      glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
+     glTranslatef(pos.x(), pos.y(), pos.z() + terrain->getHeight(pos.x(), pos.y()));
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient2 /= _graphics->getCameraOrientation(); 
       applyQuaternion(orient2);
@@ -1092,14 +1103,18 @@ void GL::drawMessageQueue(std::map<std::string, Queue> queue) {
       glPopMatrix();
     }
   }
+#endif
 }
  
 inline float GL::distFromNear(float x, float y, float z) {
-  return Frustum::distFromNear(frustum, x, y, z);
+	return 1.0f;
+	
+//  return Frustum::distFromNear(frustum, x, y, z);
 }
 	
 inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
-  return Frustum::patchInFrustum(frustum, bbox);
+	return 1;
+//  return Frustum::patchInFrustum(frustum, bbox);
 }
 
 void GL::drawOutline(Model *model, bool use_stencil) {
@@ -1316,7 +1331,7 @@ inline void GL::getFrustum(float frust[6][4]) {
   glGetFloatv(GL_PROJECTION_MATRIX, proj );
   /* Get the current MODELVIEW matrix from OpenGraphics */
   glGetFloatv(GL_MODELVIEW_MATRIX, modl );
-  Frustum::getFrustum(frust, proj, modl);
+  //Frustum::getFrustum(frust, proj, modl);
   for (int i = 0; i < 6; ++i) {
     for (int j = 0; j < 4; ++j) {
       frustum[i][j] = frust[i][j];

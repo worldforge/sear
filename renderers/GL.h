@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.16 2002-09-08 16:15:01 simon Exp $
+// $Id: GL.h,v 1.17 2002-09-26 17:17:46 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -29,11 +29,11 @@ class Camera;
 class WorldEntity;
 class Model;
 class Graphics;
+class ObjectRecord;
+class ModelRecord;
 
 class GL : public Render {
 
-typedef std::list<WorldEntity*> Queue;
-	
 public:
   GL();
   GL(System *, Graphics *);
@@ -90,15 +90,16 @@ public:
 
   void translateObject(float x, float y, float z);
   void rotate(float angle, float x, float y, float z);
-  void rotateObject(WorldEntity *we, int type);
+//  void rotateObject(WorldEntity *we, int type);
+  void rotateObject(ObjectRecord *, ModelRecord *);
   void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data);
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
-  void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
-  void drawMessageQueue(std::map<std::string, Queue> queue);
+  void drawQueue(QueueMap queue, bool select_mode, float time_elapsed);
+  void drawMessageQueue(QueueMap queue);
   void drawOutline(Model *, bool);
  
   inline void store();

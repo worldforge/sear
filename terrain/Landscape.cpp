@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
+// $Id: Landscape.cpp,v 1.7 2002-09-26 17:17:46 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -14,7 +14,6 @@
 
 #include "src/Camera.h"
 #include "src/Render.h"
-#include "src/ObjectLoader.h"
 
 #include "Landscape.h"
 #include "ROAM.h"
@@ -133,11 +132,6 @@ void Landscape::render() {
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
   _renderer->translateObject(-100.0f, -100.0f, 0.0f);
 
-  ObjectLoader *ol = System::instance()->getObjectLoader();
-  ObjectProperties *op = ol->getObjectProperties("terrain");
-  if (!op) op = ol->getObjectProperties("default");
-  
-//  _renderer->processObjectProperties(op);  
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
 
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	

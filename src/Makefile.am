@@ -75,4 +75,8 @@ libSear_a_SOURCES = \
 	FileHandler.cpp \
 	FileHandler.h \
 	default_image.xpm \
-	default_font.xpm 
+	default_font.xpm \
+	ObjectRecord.h \
+	ModelRecord.h \
+	ObjectHandler.h \
+	ObjectHandler.cpp
