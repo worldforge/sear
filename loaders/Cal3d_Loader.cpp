@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.9 2002-09-07 23:27:06 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.10 2002-09-21 14:20:30 simon Exp $
 
 #include "src/ModelHandler.h"
 
@@ -21,8 +21,11 @@ Cal3d_Loader::~Cal3d_Loader() {
 
 Model *Cal3d_Loader::loadModel(Render *render, ModelStruct &ms) {
   Cal3d *model = new Cal3d(render);
-  
-  if (!model->init(ms.file_name)) {
+  float height = 1.0f;
+  if (ms.hasBBox) {
+    height = abs(ms.bbox.highCorner().z() - ms.bbox.lowCorner().z());
+  }
+  if (!model->init(ms.file_name, height)) {
     model->shutdown();
     delete (model);
     return NULL;

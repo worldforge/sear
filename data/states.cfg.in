@@ -49,6 +49,7 @@ cull_face = false
 cull_face_cw = false
 stencil = false
 fog = true
+rescale_normals = true
 end_of_state
 state = character_no_texture
 alpha_test = false
@@ -56,12 +57,13 @@ blend = false
 lighting = true
 two_sided_lighting = false
 textures = false
-colour_material = true
+colour_material = false
 depth_test = true
 cull_face = false
 cull_face_cw = false
 stencil = false
 fog = true
+rescale_normals = true
 end_of_state
 state = boundbox
 alpha_test = false
@@ -80,11 +82,11 @@ state = billboard
 alpha_test = true
 blend = false
 lighting = true
-two_sided_lighting = true
+two_sided_lighting = false
 textures = true
 colour_material = false
 depth_test = true
-cull_face = false
+cull_face = true
 cull_face_cw = false
 stencil = false
 fog = true
@@ -140,6 +142,7 @@ cull_face = false
 cull_face_cw = false
 stencil = false
 fog = true
+rescale_normals = true
 end_of_state
 state = splash
 alpha_test = false
@@ -219,6 +222,48 @@ cull_face_cw = false
 stencil = false
 fog = false
 end_of_state
+<<<<<<< states.cfg.in
+state = 3ds_no_texture
+alpha_test = true
+blend = false
+lighting = true
+two_sided_lighting = false
+textures = false
+colour_material = false
+depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = true
+rescale_normals = true
+end_of_state
+state = slice
+alpha_test = true
+blend = true
+lighting = true
+two_sided_lighting = true
+textures = true
+colour_material = false
+depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = true
+end_of_state
+state = slice_select
+alpha_test = true
+blend = false
+lighting = false
+two_sided_lighting = false
+textures = true
+colour_material = false
+depth_test = true
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = false
+end_of_state
+=======
 state = slice
 alpha_test = true
 blend = true
@@ -232,3 +277,4 @@ cull_face_cw = false
 stencil = false
 fog = fog
 end_of_state
+>>>>>>> 1.9

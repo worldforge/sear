@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.8 2002-09-07 23:27:06 simon Exp $
+// $Id: NPlane.cpp,v 1.9 2002-09-21 14:20:30 simon Exp $
 
 #include "common/Utility.h"
 
@@ -31,37 +31,58 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
   _type = type;
   _num_planes = num_planes;
   float rads_per_segment = WFMath::Pi / (float)num_planes;
-  _vertex_data = (float*)malloc(4 * num_planes * 3 * sizeof(float));
-  _normal_data = (float*)malloc(4 * num_planes * 3 * sizeof(float));
-  _texture_data = (float*)malloc(4 * num_planes * 2 * sizeof(float));
+  _vertex_data = (float*)malloc(8 * num_planes * 3 * sizeof(float));
+  _normal_data = (float*)malloc(8 * num_planes * 3 * sizeof(float));
+  _texture_data = (float*)malloc(8 * num_planes * 2 * sizeof(float));
   float in[3][3];
   float out[3];
   for (unsigned int i = 0; i < num_planes; i++) {
     float x = width * cos ((float)i * rads_per_segment) / 2.0f;
     float y = width * sin ((float)i * rads_per_segment) / 2.0f;
-    in[0][0] = _vertex_data[12 * i + 0] = x;
-    in[0][1] = _vertex_data[12 * i + 1] = y;
-    in[0][2] = _vertex_data[12 * i + 2] = 0.0f;
-    in[1][0] = _vertex_data[12 * i + 3] = -x;
-    in[1][1] = _vertex_data[12 * i + 4] = -y;
-    in[1][2] = _vertex_data[12 * i + 5] = 0.0f;
-    in[2][0] = _vertex_data[12 * i + 6] = -x;
-    in[2][1] = _vertex_data[12 * i + 7] = -y;
-    in[2][2] = _vertex_data[12 * i + 8] = height;
-    _vertex_data[12 * i + 9] = x;
-    _vertex_data[12 * i + 10] = y;
-    _vertex_data[12 * i + 11] = height;
+    in[0][0] = _vertex_data[24 * i + 0] = x;
+    in[0][1] = _vertex_data[24 * i + 1] = y;
+    in[0][2] = _vertex_data[24 * i + 2] = 0.0f;
+    in[1][0] = _vertex_data[24 * i + 3] = -x;
+    in[1][1] = _vertex_data[24 * i + 4] = -y;
+    in[1][2] = _vertex_data[24 * i + 5] = 0.0f;
+    in[2][0] = _vertex_data[24 * i + 6] = -x;
+    in[2][1] = _vertex_data[24 * i + 7] = -y;
+    in[2][2] = _vertex_data[24 * i + 8] = height;
+    _vertex_data[24 * i + 9] = x;
+    _vertex_data[24 * i + 10] = y;
+    _vertex_data[24 * i + 11] = height;
+
+    _vertex_data[24 * i + 12] = -x;
+    _vertex_data[24 * i + 13] = y;
+    _vertex_data[24 * i + 14] = 0.0f;
+    _vertex_data[24 * i + 15] = x;
+    _vertex_data[24 * i + 16] = -y;
+    _vertex_data[24 * i + 17] = 0.0f;
+    _vertex_data[24 * i + 18] = x;
+    _vertex_data[24 * i + 19] = -y;
+    _vertex_data[24 * i + 20] = height;
+    _vertex_data[24 * i + 21] = -x;
+    _vertex_data[24 * i + 22] = y;
+    _vertex_data[24 * i + 23] = height;
     calcNormal(in, out);
-    for (unsigned int j = 0; j < 4; j++) {
-      _normal_data[12 * i + 3 * j + 0] = out[0];
-      _normal_data[12 * i + 3 * j + 1] = out[1];
-      _normal_data[12 * i + 3 * j + 2] = out[2];
+    for (unsigned int j = 0; j < 4; ++j) {
+      _normal_data[24 * i + 6 * j + 0] = out[0];
+      _normal_data[24 * i + 6 * j + 1] = out[1];
+      _normal_data[24 * i + 6 * j + 2] = out[2];
+      _normal_data[24 * i + 6 * j + 3] = _normal_data[24 * i + 6 * j + 0];
+      _normal_data[24 * i + 6 * j + 4] = _normal_data[24 * i + 6 * j + 1];
+      _normal_data[24 * i + 6 * j + 5] = _normal_data[24 * i + 6 * j + 2]; 
     }
    
-    _texture_data[8 * i + 0] = 0.0f; _texture_data[8 * i + 1] = 0.0f;
-    _texture_data[8 * i + 2] = 1.0f; _texture_data[8 * i + 3] = 0.0f;
-    _texture_data[8 * i + 4] = 1.0f; _texture_data[8 * i + 5] = 1.0f;
-    _texture_data[8 * i + 6] = 0.0f; _texture_data[8 * i + 7] = 1.0f;
+    _texture_data[16 * i + 0] = 0.0f; _texture_data[16 * i + 1] = 0.0f;
+    _texture_data[16 * i + 2] = 1.0f; _texture_data[16 * i + 3] = 0.0f;
+    _texture_data[16 * i + 4] = 1.0f; _texture_data[16 * i + 5] = 1.0f;
+    _texture_data[16 * i + 6] = 0.0f; _texture_data[16 * i + 7] = 1.0f;
+
+    _texture_data[16 * i + 8] = 1.0f; _texture_data[16 * i + 9] = 0.0f;
+    _texture_data[16 * i + 10] = 0.0f; _texture_data[16 * i + 11] = 0.0f;
+    _texture_data[16 * i + 12] = 0.0f; _texture_data[16 * i + 13] = 1.0f;
+    _texture_data[16 * i + 14] = 1.0f; _texture_data[16 * i + 15] = 1.0f;
     
   }
   _initialised = true;
@@ -87,7 +108,7 @@ void NPlane::render(bool select_mode) {
   } else {
     _render->switchTexture(_render->requestMipMap("nplane", _type, true));
   }
-  _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
+  _render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 8, _vertex_data, _texture_data, _normal_data);
 }
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BillBoard.cpp,v 1.12 2002-09-07 23:27:05 simon Exp $
+// $Id: BillBoard.cpp,v 1.13 2002-09-21 14:20:30 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -34,15 +34,30 @@ bool BillBoard::init(const std::string &type, float _width, float _height) {
   _vertex_data[2][0] =  width_by_2; _vertex_data[2][1] = 0.0f; _vertex_data[2][2] = _height;
   _vertex_data[3][0] =  width_by_2; _vertex_data[3][1] = 0.0f; _vertex_data[3][2] = 0.0f;
 
-  _texture_data[0][0] = 0.0f; _texture_data[0][1] = 0.0f;
-  _texture_data[1][0] = 0.0f; _texture_data[1][1] = 1.0f;
-  _texture_data[2][0] = 1.0f; _texture_data[2][1] = 1.0f;
-  _texture_data[3][0] = 1.0f; _texture_data[3][1] = 0.0f;
+  _vertex_data[4][0] =  width_by_2; _vertex_data[4][1] = 0.0f; _vertex_data[4][2] = 0.0f;
+  _vertex_data[5][0] =  width_by_2; _vertex_data[5][1] = 0.0f; _vertex_data[5][2] = _height;
+  _vertex_data[6][0] = -width_by_2; _vertex_data[6][1] = 0.0f; _vertex_data[6][2] = _height;
+  _vertex_data[7][0] = -width_by_2; _vertex_data[7][1] = 0.0f; _vertex_data[7][2] = 0.0f;
+
+  _texture_data[0][0] = 1.0f; _texture_data[0][1] = 0.0f;
+  _texture_data[1][0] = 1.0f; _texture_data[1][1] = 1.0f;
+  _texture_data[2][0] = 0.0f; _texture_data[2][1] = 1.0f;
+  _texture_data[3][0] = 0.0f; _texture_data[3][1] = 0.0f;
+  
+  _texture_data[4][0] = 0.0f; _texture_data[4][1] = 0.0f;
+  _texture_data[5][0] = 0.0f; _texture_data[5][1] = 1.0f;
+  _texture_data[6][0] = 1.0f; _texture_data[6][1] = 1.0f;
+  _texture_data[7][0] = 1.0f; _texture_data[7][1] = 0.0f;
 
   _normal_data[0][1] = 0.0f; _normal_data[0][2] = -1.0f; _normal_data[0][2] = 0.0f;
   _normal_data[1][1] = 0.0f; _normal_data[1][2] = -1.0f; _normal_data[1][2] = 0.0f;
   _normal_data[2][1] = 0.0f; _normal_data[2][2] = -1.0f; _normal_data[2][2] = 0.0f;
   _normal_data[3][1] = 0.0f; _normal_data[3][2] = -1.0f; _normal_data[3][2] = 0.0f;
+
+  _normal_data[4][1] = 0.0f; _normal_data[4][2] = 1.0f; _normal_data[4][2] = 0.0f;
+  _normal_data[5][1] = 0.0f; _normal_data[5][2] = 1.0f; _normal_data[5][2] = 0.0f;
+  _normal_data[6][1] = 0.0f; _normal_data[6][2] = 1.0f; _normal_data[6][2] = 0.0f;
+  _normal_data[7][1] = 0.0f; _normal_data[7][2] = 1.0f; _normal_data[7][2] = 0.0f;
   _initialised = true;
   return true;
 }

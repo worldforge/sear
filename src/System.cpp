@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.34 2002-09-09 12:16:29 simon Exp $
+// $Id: System.cpp,v 1.35 2002-09-21 14:20:31 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -602,6 +602,20 @@ void System::runScript(const std::string &file_name) {
   const int MAX_LINE_SIZE = 256;
   char string_data[MAX_LINE_SIZE];
   Log::writeLog(std::string("System: Running script - ") + file_name, Log::LOG_DEFAULT);
+  std::string old_file_dir = _file_dir;
+  std::string::size_type pos = file_name.find_last_of("/");
+  if (pos == std::string::npos) {
+    pos = file_name.find_last_of("\\");
+  }
+  if (pos == std::string::npos) { 
+    _file_dir = "./";
+  } else {
+    if (file_name.c_str()[0] == '/' || file_name.c_str()[0] == '\\') {
+      _file_dir = file_name.substr(0, pos);
+    } else {
+      _file_dir += "/" + file_name.substr(0, pos);
+    }
+  }
   script_file = fopen(processHome(file_name).c_str(), "r");
   char cur_dir[257];
   memset(cur_dir, '\0', 257);
@@ -612,17 +626,13 @@ void System::runScript(const std::string &file_name) {
     Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::LOG_ERROR);
     return;
   }
-//  try {
-    while (!feof(script_file)) {
-      fscanf(script_file, "%[^\n]\n", &string_data[0]);
-      runCommand(std::string(string_data));
-    }
-//  } catch (...) {
-    // TODO be more discriminate on errors
-//    Log::writeLog("Caught an Exception while running script. Script aborted", Log::LOG_ERROR);
-//  }
+  while (!feof(script_file)) {
+    fscanf(script_file, "%[^\n]\n", &string_data[0]);
+    runCommand(std::string(string_data));
+  }
   chdir(cur_dir);
   _prefix_cwd = pre_cwd; // Restore setting
+  _file_dir = old_file_dir;
   fclose(script_file);
 }
 
@@ -791,6 +801,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(GET_TIME, this);
   console->registerCommand("normalise_on", this);
   console->registerCommand("normalise_off", this);
+  console->registerCommand("cd_this_dir", this);
+  console->registerCommand("search_run_script", this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -919,6 +931,13 @@ void System::runCommand(const std::string &command, const std::string &args) {
 
   else if (command == "normalise_on") glEnable(GL_NORMALIZE);
   else if (command == "normalise_off") glDisable(GL_NORMALIZE);
+  else if (command == "cd_this_dir") chdir(_file_dir.c_str());
+  else if (command == "search_run_script") {
+    FileHandler::FileList l = _file_handler->getAllinSearchPaths(args);
+    for (FileHandler::FileList::const_iterator I = l.begin(); I != l.end(); ++I) {
+      runScript(*I);
+    }
+  }
   
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }

@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.h,v 1.14 2002-09-07 23:27:06 simon Exp $
+// $Id: Cal3d.h,v 1.15 2002-09-21 14:20:30 simon Exp $
 
 #ifndef SEAR_CAL3D_H
 #define SEAR_CAL3D_H 1
 
 #include <map>
+#include <string>
 
 #include <cal3d/cal3d.h>
 
@@ -21,6 +22,10 @@ class Render;
 	
 class Cal3d : public Model {
 public:
+  static const std::string STANDING;
+  static const std::string WALKING;
+  static const std::string RUNNING;
+	/*
   typedef enum {
     IDLE = 0,
     WALK,
@@ -29,9 +34,15 @@ public:
     WAVE,
     SHOOT_ARROW,
     FUNKY,
+    TAKE_AXE,
+    STOW_AXE,
+    LIMP,
+    DEFAULT,
+    GRIP_AXE,
     NUM_ANIMATIONS
   } Animation;
-
+  */
+/*
   typedef enum {
     AXE = 0,
     SWORD,
@@ -39,11 +50,14 @@ public:
     BOW,
     NUM_WEAPONS
   } Weapons;
-
+*/
   class ModelAnimPair {
 public:	  
     CalCoreModel *m_calCoreModel;
-    int m_animationId[NUM_ANIMATIONS]; 
+    std::map<std::string ,int> animation_map;
+    std::map<std::string ,int> mesh_map;
+    std::map<std::string ,int> material_map;
+    std::map<std::string ,int> part_map;
   };
   static const int STATE_IDLE;
   static const int STATE_FANCY;
@@ -52,10 +66,17 @@ public:
 // member variables
 protected:
   int m_state;
+
+
+  int grip_animation;
+  int take_animation;
+  int stow_animation;
+  int equip_hand_mesh;
+  int equip_belt_mesh;
+  bool grip;
   ModelAnimPair *map;
 //  CalCoreModel *m_calCoreModel;
   CalModel m_calModel;
-  int m_weaponId[NUM_WEAPONS];
   int m_animationCount;
   int m_meshId[32];
   int m_meshCount;
@@ -84,7 +105,7 @@ public:
   void getMotionBlend(float *pMotionBlend);
   float getScale();
   int getState();
-  bool init(const std::string& strFilename);
+  bool init(const std::string& strFilename, float);
   void render(bool select_mode) { render(true, true, select_mode); }
   void render(bool, bool, bool);
   void shutdown();
@@ -107,6 +128,7 @@ protected:
   static std::map<std::string, ModelAnimPair*> core_models;
 
   bool _initialised;
+  float _height;
 };
 
 } /* namespace Sear */

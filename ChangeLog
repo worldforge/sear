@@ -1,6 +1,17 @@
+21st September 2002, Simon Goodall
+ * Changed billboard/imposter/nplane to have two polygons, instead of one. Allows backface culling and removes two-sided lighting
+ * Added a spec file for the media.
+
+11th September 2002, Simon Goodall
+ * Cally models now scale to height of bounding box. Requires cally config file to have the scale option set to unit height
+
 9th September 2002, Simon Goodall
  * Fixed states file so Slice models now blend with lighting enabled.
  * Added check so if sound doesn't initialise, Sear still runs
+
+8th September 2002, Simon Goodall
+ * New console command; cd_this_dir - when run in a script, will change the current dir to the directory the script is located
+ * Fixed bug where default textures were not properly set up. caused by not including the section name when they were stored
 
 8th September 2002, Simon Goodall
  * Fixed bug in model loaders where the model was still used even if it failed its init call

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Impostor.cpp,v 1.12 2002-09-07 23:27:06 simon Exp $
+// $Id: Impostor.cpp,v 1.13 2002-09-21 14:20:30 simon Exp $
 
 #include "src/System.h"
 #include "src/Render.h"
@@ -33,28 +33,56 @@ bool Impostor::init(const std::string &type, float _width, float _height, bool m
   _vertex_data[1][0] = -width_by_2; _vertex_data[1][1] = 0.0f; _vertex_data[1][2] = _height;
   _vertex_data[2][0] =  width_by_2; _vertex_data[2][1] = 0.0f; _vertex_data[2][2] = _height;
   _vertex_data[3][0] =  width_by_2; _vertex_data[3][1] = 0.0f; _vertex_data[3][2] = 0.0f;
-  _vertex_data[4][0] = 0.0f; _vertex_data[4][1] = -width_by_2; _vertex_data[4][2] = 0.0f;
-  _vertex_data[5][0] = 0.0f; _vertex_data[5][1] = -width_by_2; _vertex_data[5][2] = _height;
-  _vertex_data[6][0] = 0.0f; _vertex_data[6][1] = width_by_2; _vertex_data[6][2] = _height;
-  _vertex_data[7][0] = 0.0f; _vertex_data[7][1] = width_by_2; _vertex_data[7][2] = 0.0f;
+  _vertex_data[4][0] =  width_by_2; _vertex_data[4][1] = 0.0f; _vertex_data[4][2] = 0.0f;
+  _vertex_data[5][0] =  width_by_2; _vertex_data[5][1] = 0.0f; _vertex_data[5][2] = _height;
+  _vertex_data[6][0] = -width_by_2; _vertex_data[6][1] = 0.0f; _vertex_data[6][2] = _height;
+  _vertex_data[7][0] = -width_by_2; _vertex_data[7][1] = 0.0f; _vertex_data[7][2] = 0.0f;
+
+  _vertex_data[8][0] = 0.0f; _vertex_data[8][1] = -width_by_2; _vertex_data[8][2] = 0.0f;
+  _vertex_data[9][0] = 0.0f; _vertex_data[9][1] = -width_by_2; _vertex_data[9][2] = _height;
+  _vertex_data[10][0] = 0.0f; _vertex_data[10][1] = width_by_2; _vertex_data[10][2] = _height;
+  _vertex_data[11][0] = 0.0f; _vertex_data[11][1] = width_by_2; _vertex_data[11][2] = 0.0f;
+  _vertex_data[12][0] = 0.0f; _vertex_data[12][1] = width_by_2; _vertex_data[12][2] = 0.0f;
+  _vertex_data[13][0] = 0.0f; _vertex_data[13][1] = width_by_2; _vertex_data[13][2] = _height;
+  _vertex_data[14][0] = 0.0f; _vertex_data[14][1] = -width_by_2; _vertex_data[14][2] = _height;
+  _vertex_data[15][0] = 0.0f; _vertex_data[15][1] = -width_by_2; _vertex_data[15][2] = 0.0f;
 
   _texture_data[0][0] = 0.0f; _texture_data[0][1] = 0.0f;
   _texture_data[1][0] = 0.0f; _texture_data[1][1] = 1.0f;
   _texture_data[2][0] = 1.0f; _texture_data[2][1] = 1.0f;
   _texture_data[3][0] = 1.0f; _texture_data[3][1] = 0.0f;
-  _texture_data[4][0] = 0.0f; _texture_data[4][1] = 0.0f;
-  _texture_data[5][0] = 0.0f; _texture_data[5][1] = 1.0f;
-  _texture_data[6][0] = 1.0f; _texture_data[6][1] = 1.0f;
-  _texture_data[7][0] = 1.0f; _texture_data[7][1] = 0.0f;
+  _texture_data[4][0] = 1.0f; _texture_data[4][1] = 0.0f;
+  _texture_data[5][0] = 1.0f; _texture_data[5][1] = 1.0f;
+  _texture_data[6][0] = 0.0f; _texture_data[6][1] = 1.0f;
+  _texture_data[7][0] = 0.0f; _texture_data[7][1] = 0.0f;
+
+  _texture_data[8][0] = 0.0f; _texture_data[8][1] = 0.0f;
+  _texture_data[9][0] = 0.0f; _texture_data[9][1] = 1.0f;
+  _texture_data[10][0] = 1.0f; _texture_data[10][1] = 1.0f;
+  _texture_data[11][0] = 1.0f; _texture_data[11][1] = 0.0f;
+  _texture_data[12][0] = 1.0f; _texture_data[12][1] = 0.0f;
+  _texture_data[13][0] = 1.0f; _texture_data[13][1] = 1.0f;
+  _texture_data[14][0] = 0.0f; _texture_data[14][1] = 1.0f;
+  _texture_data[15][0] = 0.0f; _texture_data[15][1] = 0.0f;
 
   _normal_data[0][1] = 0.0f; _normal_data[0][2] = -1.0f; _normal_data[0][2] = 0.0f;
   _normal_data[1][1] = 0.0f; _normal_data[1][2] = -1.0f; _normal_data[1][2] = 0.0f;
   _normal_data[2][1] = 0.0f; _normal_data[2][2] = -1.0f; _normal_data[2][2] = 0.0f;
   _normal_data[3][1] = 0.0f; _normal_data[3][2] = -1.0f; _normal_data[3][2] = 0.0f;
+  _normal_data[0][1] = 0.0f; _normal_data[0][2] = 1.0f; _normal_data[0][2] = 0.0f;
+  _normal_data[1][1] = 0.0f; _normal_data[1][2] = 1.0f; _normal_data[1][2] = 0.0f;
+  _normal_data[2][1] = 0.0f; _normal_data[2][2] = 1.0f; _normal_data[2][2] = 0.0f;
+  _normal_data[3][1] = 0.0f; _normal_data[3][2] = 1.0f; _normal_data[3][2] = 0.0f;
+
   _normal_data[4][1] = 1.0f; _normal_data[4][2] = 0.0f; _normal_data[4][2] = 0.0f;
   _normal_data[5][1] = 1.0f; _normal_data[5][2] = 0.0f; _normal_data[5][2] = 0.0f;
   _normal_data[6][1] = 1.0f; _normal_data[6][2] = 0.0f; _normal_data[6][2] = 0.0f;
   _normal_data[7][1] = 1.0f; _normal_data[7][2] = 0.0f; _normal_data[7][2] = 0.0f;
+
+  _normal_data[4][1] = -1.0f; _normal_data[4][2] = 0.0f; _normal_data[4][2] = 0.0f;
+  _normal_data[5][1] = -1.0f; _normal_data[5][2] = 0.0f; _normal_data[5][2] = 0.0f;
+  _normal_data[6][1] = -1.0f; _normal_data[6][2] = 0.0f; _normal_data[6][2] = 0.0f;
+  _normal_data[7][1] = -1.0f; _normal_data[7][2] = 0.0f; _normal_data[7][2] = 0.0f;
   _initialised = true;
   return true;
 }
@@ -82,14 +110,14 @@ void Impostor::render(bool select_mode) {
     } else {
       _render->switchTexture(_render->requestTexture("impostor_front", _type, true));
     }
-    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    _render->renderArrays(Graphics::RES_QUADS, 0, 8, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
     if (select_mode) {
       _render->switchTexture(_render->requestTextureMask("impostor_side", _type, true));
     } else {
       _render->switchTexture(_render->requestTexture("impostor_side", _type, true));
     }
-    _render->renderArrays(Graphics::RES_QUADS, 4, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    _render->renderArrays(Graphics::RES_QUADS, 8, 8, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   }
 }
 

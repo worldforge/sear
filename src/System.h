@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.18 2002-09-08 00:24:53 simon Exp $
+// $Id: System.h,v 1.19 2002-09-21 14:20:31 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -219,6 +219,9 @@ protected:
 
   bool _mouse_move_select;
   bool _prefix_cwd;
+
+  std::string _current_dir;
+  std::string _file_dir;
 
   float _current_time;
   float _seconds;

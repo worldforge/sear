@@ -1,5 +1,5 @@
 [general]
-iconfile = "/opt/worldforge/share/sear/data/sear_icon.bmp"
+iconfile = "sear_icon.bmp"
 
 [terrain]
-height_map = "/opt/worldforge/share/sear/data/agrilan_hm.png"
+height_map = "agrilan_hm.png"

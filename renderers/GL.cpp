@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.30 2002-09-08 16:15:01 simon Exp $
+// $Id: GL.cpp,v 1.31 2002-09-21 14:20:30 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -227,7 +227,7 @@ void GL::initLighting() {
   glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lights[LIGHT_CHARACTER].kc);
   glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, lights[LIGHT_CHARACTER].kl);
   glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lights[LIGHT_CHARACTER].kq);
-  glEnable(GL_LIGHT0);
+//  glEnable(GL_LIGHT0);
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, blackLight);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, blackLight);
@@ -1152,7 +1152,7 @@ void GL::createDefaults() {
 
   free (data);
   textureList.push_back(texture_id);
-  texture_map["default"] = next_id++;
+  texture_map["defaultdefault"] = next_id++;
   
   //Create Default Font
   Log::writeLog("Building Default Font Texture", Log::LOG_INFO);
@@ -1178,7 +1178,7 @@ void GL::createDefaults() {
 
   free (data);
   textureList.push_back(texture_id);
-  texture_map["default_font"] = next_id++;
+  texture_map["defaultdefault_font"] = next_id++;
 }
  
 inline void GL::switchTexture(int texture) {

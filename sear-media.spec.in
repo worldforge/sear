@@ -31,7 +31,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %install
 cd ..
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT%{prefix}/share/$PACKAGE@
+mkdir -p $RPM_BUILD_ROOT%{prefix}/share/@PACKAGE@
 cp -R media.script %{name}-%{version} $RPM_BUILD_ROOT%{prefix}/share/@PACKAGE@
 
 %clean

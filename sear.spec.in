@@ -9,7 +9,7 @@ Name: %{name}
 Version: %{version}
 Release: %{release}
 Source0: %{name}-%{version}.tar.gz
-URL: http://www.ecs.soton.ac.uk/~sg399/sear/index.html
+URL: http://www.worldforge.org/dev/eng/clients/sear/
 Copyright: GPL
 Group: Games
 BuildRoot: /var/tmp/%{name}-buildroot

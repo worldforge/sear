@@ -1,8 +1,0 @@
-
-[cal3d]
-
-character = "/opt/worldforge/share/sear/data/cally.cal"
-settler = "/opt/worldforge/share/sear/data/paladin.cal"
-farmer = "/opt/worldforge/share/sear/data/paladin.cal"
-skeleton = "/opt/worldforge/share/sear/data/skeleton.cal"
-

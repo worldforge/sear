@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.20 2002-09-08 16:15:01 simon Exp $
+// $Id: Cal3d.cpp,v 1.21 2002-09-21 14:20:30 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -16,6 +16,7 @@
 
 #include "Cal3d.h"
 
+#include <string>
 
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
@@ -27,9 +28,13 @@ const int Cal3d::STATE_IDLE = 0;
 const int Cal3d::STATE_FANCY = 1;
 const int Cal3d::STATE_MOTION = 2;
 
-float Cal3d::_strut_blend[] = {1.0, 0.0, 0.0};
-float Cal3d::_walk_blend[] = {0.0, 1.0, 0.0};
-float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
+float Cal3d::_strut_blend[] = {0.5, 0.0, 0.0, 0.5};
+float Cal3d::_walk_blend[] = {0.0, 0.5, 0.0, 0.5};
+float Cal3d::_run_blend[] = {0.0, 0.0, 0.5, 0.5};
+
+const std::string Cal3d::STANDING = "standing";
+const std::string Cal3d::WALKING = "walking";
+const std::string Cal3d::RUNNING = "running";
 
 //std::map<std::string, CalCoreModel*> Cal3d::core_models = std::map<std::string, CalCoreModel*>();
 std::map<std::string, Cal3d::ModelAnimPair*> Cal3d::core_models = std::map<std::string, Cal3d::ModelAnimPair*>();
@@ -51,6 +56,8 @@ Cal3d::Cal3d(Render *render) :
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
   _use_textures = false;
+  grip = false;
+  _height = 1.0f;
 }
 
 //----------------------------------------------------------------------------//
@@ -68,15 +75,6 @@ Cal3d::~Cal3d()
 
 void Cal3d::executeAction(int action)
 {
-  switch(action)
-  {
-    case 0:
-      m_calModel.getMixer()->executeAction(map->m_animationId[WAVE], 0.3f, 0.3f);
-      break;
-    case 1:
-      m_calModel.getMixer()->executeAction(map->m_animationId[SHOOT_ARROW], 0.3f, 0.3f);
-      break;
-  }
 }
 
 //----------------------------------------------------------------------------//
@@ -182,8 +180,9 @@ unsigned int Cal3d::loadTexture(const std::string& strFilename)
 // Initialize the model                                                       //
 //----------------------------------------------------------------------------//
 
-bool Cal3d::init(const std::string& strFilename) {
+bool Cal3d::init(const std::string& strFilename, float height) {
   if (_initialised) shutdown();	
+  _height = height;
   if (core_models[strFilename]) {
     map = core_models[strFilename];
   } else {
@@ -203,7 +202,6 @@ bool Cal3d::init(const std::string& strFilename) {
     }
     map = new Cal3d::ModelAnimPair();
     map->m_calCoreModel = new CalCoreModel();
-    memset(map->m_animationId, 0, NUM_ANIMATIONS);
     // create a core model instance
     if(!map->m_calCoreModel->create("dummy"))
     {
@@ -213,6 +211,13 @@ bool Cal3d::init(const std::string& strFilename) {
 
     // initialize the data path
     std::string strPath;
+    // Get the path of this file
+    // Will be overwritten by any entry in the config file
+    std::string::size_type pos = strFilename.find_last_of("/");
+    if (pos == std::string::npos) pos = strFilename.find_last_of("\\");
+    if (pos != std::string::npos) strPath = strFilename.substr(0, pos) + "/";
+
+    cout << "PATH: " << strPath << endl;
 
     // initialize the animation count
     int animationCount;
@@ -293,57 +298,12 @@ bool Cal3d::init(const std::string& strFilename) {
           return false;
         }
       }
-      else if(strKey == "animation_idle") {
-        map->m_animationId[IDLE] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[IDLE] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_walk") {
-        map->m_animationId[WALK] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[WALK] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_run") {
-        map->m_animationId[RUN] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[RUN] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_strut") {
-        map->m_animationId[STRUT] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[STRUT] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_wave") {
-        map->m_animationId[WAVE] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[WAVE] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_shoot_arrow") {
-        map->m_animationId[SHOOT_ARROW] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[SHOOT_ARROW] == -1) {
-          CalError::printLastError();
-          return false;
-        }
-        animationCount++;
-      }
-      else if(strKey == "animation_funky") {
-        map->m_animationId[FUNKY] = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
-        if(map->m_animationId[FUNKY] == -1) {
+      else if(strKey.substr(0, 10) == "animation_") {
+	std::string anim_string = strKey.substr(10);
+	int animation = map->m_calCoreModel->loadCoreAnimation(strPath + strData);
+	map->animation_map[anim_string] = animation;
+//	       	map->m_animationId[IDLE]
+        if(animation == -1) {
           CalError::printLastError();
           return false;
         }
@@ -366,24 +326,19 @@ bool Cal3d::init(const std::string& strFilename) {
           CalError::printLastError();
           return false;
         }
-	std::string weapon = strKey.substr(5);
-	//Not best way. should do like with textures and use numbers.
-	//that way makes a more generic approach
-	//however textual rep is easier to use
-	if (weapon == "axe") m_weaponId[AXE] = code;
-	else if (weapon == "sword") m_weaponId[SWORD] = code;
-	else if (weapon == "staff") m_weaponId[STAFF] = code;
-	else if (weapon == "bow") m_weaponId[BOW] = code;
+	std::string mesh = strKey.substr(5);
+	map->mesh_map[mesh] = code;
       }
       else if(strKey.substr(0,8) == "material") {
 	int length =  strKey.substr(9).find_first_of("_");
 	std::string set = strKey.substr(9, length);
 	if (material_set_map[set] == 0) {
-          material_set_map[set] = set_counter++;
+          map->material_map[set] = material_set_map[set] = set_counter++;
 	}
 	std::string part = strKey.substr(9 + length + 1);
 	if (material_part_map[part] == 0) {
-          material_part_map[part] = part_counter++;
+          map->part_map[part] = material_part_map[part] = part_counter++;
+          
 	}
         // load core material
 	int code = map->m_calCoreModel->loadCoreMaterial(strPath + strData);
@@ -462,7 +417,7 @@ bool Cal3d::init(const std::string& strFilename) {
 
   // set initial animation state
   m_state = STATE_IDLE;
-  m_calModel.getMixer()->blendCycle(map->m_animationId[IDLE], 1.0f, 0.0f);
+  m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 1.0f, 0.0f);
 
   instance_count++;
   _initialised = true;
@@ -562,6 +517,8 @@ void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 
 void Cal3d::render(bool useTextures, bool useLighting, bool select_mode) {
   if (_render) {
+    static float scale = _height * getScale();
+//    _render->scaleObject(scale);
     _render->rotate(90.0f,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);
   }
@@ -622,11 +579,11 @@ void Cal3d::setMotionBlend(float *pMotionBlend, float delay)
   m_motionBlend[1] = pMotionBlend[1];
   m_motionBlend[2] = pMotionBlend[2];
 
-  m_calModel.getMixer()->clearCycle(map->m_animationId[IDLE], delay);
-  m_calModel.getMixer()->clearCycle(map->m_animationId[FUNKY], delay);
-  m_calModel.getMixer()->blendCycle(map->m_animationId[STRUT], m_motionBlend[0], delay);
-  m_calModel.getMixer()->blendCycle(map->m_animationId[WALK], m_motionBlend[1], delay);
-  m_calModel.getMixer()->blendCycle(map->m_animationId[RUN], m_motionBlend[2], delay);
+  m_calModel.getMixer()->clearCycle(map->animation_map["idle"], delay);
+  m_calModel.getMixer()->clearCycle(map->animation_map["funky"], delay);
+  m_calModel.getMixer()->blendCycle(map->animation_map["strut"], m_motionBlend[0], delay);
+  m_calModel.getMixer()->blendCycle(map->animation_map["walk"], m_motionBlend[1], delay);
+  m_calModel.getMixer()->blendCycle(map->animation_map["run"], m_motionBlend[2], delay);
 
   m_state = STATE_MOTION;
 }
@@ -642,64 +599,144 @@ void Cal3d::setState(int state, float delay)
   {
     if(state == STATE_IDLE)
     {
-      m_calModel.getMixer()->blendCycle(map->m_animationId[IDLE], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[FUNKY], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[STRUT], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[WALK], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[RUN], delay);
+      m_calModel.getMixer()->blendCycle(map->animation_map["idle"], 1.0f, delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["funky"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["strut"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["walk"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["run"], delay);
       m_state = STATE_IDLE;
     }
     else if(state == STATE_FANCY)
     {
-      m_calModel.getMixer()->clearCycle(map->m_animationId[IDLE], delay);
-      m_calModel.getMixer()->blendCycle(map->m_animationId[FUNKY], 1.0f, delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[STRUT], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[WALK], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[RUN], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["idle"], delay);
+      m_calModel.getMixer()->blendCycle(map->animation_map["funky"], 1.0f, delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["strut"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["walk"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["run"], delay);
       m_state = STATE_FANCY;
     }
     else if(state == STATE_MOTION)
     {
-      m_calModel.getMixer()->clearCycle(map->m_animationId[IDLE], delay);
-      m_calModel.getMixer()->clearCycle(map->m_animationId[FUNKY], delay);
-      m_calModel.getMixer()->blendCycle(map->m_animationId[STRUT], m_motionBlend[0], delay);
-      m_calModel.getMixer()->blendCycle(map->m_animationId[WALK], m_motionBlend[1], delay);
-      m_calModel.getMixer()->blendCycle(map->m_animationId[RUN], m_motionBlend[2], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["idle"], delay);
+      m_calModel.getMixer()->clearCycle(map->animation_map["funky"], delay);
+      m_calModel.getMixer()->blendCycle(map->animation_map["strut"], m_motionBlend[0], delay);
+      m_calModel.getMixer()->blendCycle(map->animation_map["walk"], m_motionBlend[1], delay);
+      m_calModel.getMixer()->blendCycle(map->animation_map["run"], m_motionBlend[2], delay);
+      m_calModel.getMixer()->blendCycle(grip_animation, m_motionBlend[3], delay);
       m_state = STATE_MOTION;
     }
   }
 }
 
 void Cal3d::action(const std::string &action) {
+  std::cout << action << endl;
   if (action == "standing") {
-    setState(STATE_IDLE, 0);
-  }  else if (action == "funky") {
-    setState(STATE_FANCY, 0);
-  }  else if (action == "strut") {
-    setMotionBlend((float *)&_strut_blend[0], 0);
+    if (grip) {
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 0.3f, 0.0f);
+    } else {
+      m_calModel.getMixer()->blendCycle(map->animation_map[STANDING], 1.0f, 0.0f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+    }
+    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.0f);
+//  }  else if (action == "funky") {
+//    setState(STATE_FANCY, 0);
+//  }  else if (action == "strut") {
+//    setMotionBlend((float *)&_strut_blend[0], 0);
   } else if (action == "walking") {
-    setMotionBlend((float *)&_walk_blend[0], 0);
+    if (grip) {
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.3f, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 0.7f, 0.0f);
+    } else {
+      m_calModel.getMixer()->blendCycle(map->animation_map[WALKING], 1.0f, 0.0f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+    }
+    
+    m_calModel.getMixer()->clearCycle(map->animation_map[RUNNING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.0f);
   } else if (action == "running") {
-    setMotionBlend((float *)&_run_blend[0], 0);
-  } else if (action == "wave") {
-    executeAction(0);
-  } else if (action == "shoot_arrow") {
-    executeAction(1);
+    if (grip) {
+      m_calModel.getMixer()->blendCycle(grip_animation, 0.7f, 0.0f);
+      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 0.3f, 0.0f);
+    } else {
+      m_calModel.getMixer()->blendCycle(map->animation_map[RUNNING], 1.0f, 0.0f);
+      m_calModel.getMixer()->clearCycle(grip_animation, 0.0f);
+    }
+    m_calModel.getMixer()->clearCycle(map->animation_map[WALKING],  0.0f);
+    m_calModel.getMixer()->clearCycle(map->animation_map[STANDING],  0.0f);
   } else if (action.substr(0,11) == "change_set_") {
-    int i = 0;
-    cast_stream(action.substr(11), i);
-    m_calModel.setMaterialSet(i);
+//    int i = 0;
+///   cast_stream(action.substr(11), i);
+    std::string set = action.substr(11);
+    m_calModel.setMaterialSet(map->material_map[set] - 1);
   }
-  else if (action.substr(0, 4) == "add_") {
-    int i = 0;
-    cast_stream(action.substr(4), i);
-    m_calModel.attachMesh(m_weaponId[i]);
+  else if (action.substr(0, 10) == "animation_") {
+    std::string anim = action.substr(10);
+    cout << "Animation: " << anim << endl;
+    m_calModel.getMixer()->executeAction(map->animation_map[anim], 0.3f, 0.3f);
   }
-  else if (action.substr(0, 7) == "remove_") {
-    int i = 0;
-    cast_stream(action.substr(7), i);
-    m_calModel.detachMesh(m_weaponId[i]);
+  else if (action.substr(0, 7) == "switch_") {
+    std::string anim = action.substr(7);
+    cout << "Switch: " << anim << endl;
+    for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
+      const int code = I->second;
+      std::string a = I->first;
+      if (a == anim) m_calModel.getMixer()->blendCycle(code, 0.5f, 0.0f);
+      else m_calModel.getMixer()->clearCycle(code, 0.0f);
+    }
   }
+  else if (action.substr(0, 6) == "blend_") {
+    std::string anim = action.substr(6);
+    cout << "Blend: " << anim << endl;
+    for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
+      const int code = I->second;
+      std::string a = I->first;
+      if (a == anim) m_calModel.getMixer()->blendCycle(code, 0.5f, 0.0f);
+      else m_calModel.getMixer()->clearCycle(code, 0.0f);
+    }
+  }
+  else if (action.substr(0, 9) == "add_mesh_") {
+    std::string mesh = action.substr(9);
+    cout << "Add: " << mesh << endl;
+    m_calModel.attachMesh(map->mesh_map[mesh]);
+  }
+  else if (action.substr(0, 12) == "remove_mesh_") {
+    std::string mesh = action.substr(12);
+    cout << "Remove: " << mesh << endl;
+    m_calModel.detachMesh(map->mesh_map[mesh]);
+  }
+  else if (action.substr(0, 10) == "set_equip_") {
+    m_calModel.detachMesh(equip_belt_mesh);
+    m_calModel.detachMesh(equip_hand_mesh);
+    std::string equip = action.substr(10);
+    take_animation = map->animation_map["take_" + equip];
+    stow_animation = map->animation_map["stow_" + equip];
+    grip_animation = map->animation_map["grip_" + equip];
+    equip_belt_mesh = map->mesh_map["belt_" + equip];
+    equip_hand_mesh = map->mesh_map["hand_" + equip];
+    grip = false;
+  }
+  else if (action.substr(0, 4) == "take") {
+   m_calModel.getMixer()->blendCycle(grip_animation, 0.5f, 0.0f);
+   m_calModel.getMixer()->executeAction(take_animation, 0.0f, 0.0f);
+   m_calModel.detachMesh(equip_belt_mesh);
+   m_calModel.attachMesh(equip_hand_mesh);
+   grip = true;
+  }
+  else if (action.substr(0, 4) == "stow") {
+   m_calModel.getMixer()->executeAction(stow_animation, 0.0f, 0.0f);
+   m_calModel.getMixer()->clearCycle(grip_animation,  0.0f);
+   m_calModel.attachMesh(equip_belt_mesh);
+   m_calModel.detachMesh(equip_hand_mesh);
+   grip = false;
+  }
+  else if (action == "clear_cycles") {
+    for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
+      const int code = I->second;
+      m_calModel.getMixer()->clearCycle(code, 0.0f);
+    }
+  } 
 }
 
 } /* namespace Sear */

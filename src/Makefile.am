@@ -53,6 +53,7 @@ libSear_a_SOURCES = \
 	Lobby.h \
 	main.cpp \
 	Model.h \
+	ModelStruct.h \
 	ObjectLoader.h \
 	ObjectLoader.cpp \
 	Render.h \

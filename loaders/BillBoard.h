@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BillBoard.h,v 1.4 2002-09-07 23:27:05 simon Exp $
+// $Id: BillBoard.h,v 1.5 2002-09-21 14:20:30 simon Exp $
 
 #ifndef SEAR_BILLBOARD_H
 #define SEAR_BILLBOARD_H 1
@@ -50,7 +50,7 @@ public:
   
 protected:
   bool _use_textures;
-  static const int _num_points = 4; // Number of points in billboard
+  static const int _num_points = 8; // Number of points in billboard
   std::string _type;
   float _vertex_data[_num_points][3]; // Vertex array data
   float _texture_data[_num_points][2]; // Texture co-ordintate array data
