@@ -10,8 +10,9 @@ Label::Label(const std::string & text) : m_text(text)
 {
 }
 
-void Label::render()
+void Label::show()
 {
+  // Map the relevant stuff
 }
 
 } // namespace Sear

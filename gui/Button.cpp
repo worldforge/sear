@@ -15,4 +15,9 @@ Button::Button(const std::string & text)
     m_children.insert(l);
 }
 
+void Button::show()
+{
+  // Map the required widget sizes
+}
+
 } // namespace Sear

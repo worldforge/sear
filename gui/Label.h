@@ -20,7 +20,7 @@ public:
   explicit Label(const std::string & text);
   virtual ~Label();
 
-  virtual void render();
+  virtual void show();
 };
 
 } // namespace Sear

@@ -1,3 +1,12 @@
+2004-06-03  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Button.cpp, gui/Button.h, gui/Container.cpp, gui/Container.h,
+	  gui/Graphic.h, gui/Label.cpp, gui/Label.h, gui/Widget.h,
+	  gui/Workspace.cpp, gui/Workspace.h: Add show interface to widgets
+	  for when they are ready to be rendered.
+
+	* gui/Toplevel.h, gui/Toplevel.cpp: Class for top level widgets.
+
 2004-06-03  James Turner  <james@worldforge.org>
 
 	* XCode project updates - want to be able to revert to this

@@ -14,4 +14,9 @@ Container::~Container()
 {
 }
 
+void Container::showAll()
+{
+  // Iterate over the contents showing all of them.
+}
+
 } // namespace Sear

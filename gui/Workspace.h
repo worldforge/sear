@@ -21,6 +21,7 @@ public:
   virtual ~Workspace();
 
   void draw();
+  void show();
 };
 
 } // namespace Sear

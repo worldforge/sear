@@ -23,7 +23,7 @@ public:
   explicit Button(const Graphic & graphic);
   virtual ~Button();
 
-  virtual void render() = 0;
+  virtual void show();
 };
 
 } // namespace Sear

@@ -61,4 +61,8 @@ void Workspace::draw()
   renderer->setViewMode(PERSPECTIVE);
 }
 
+void Workspace::show()
+{
+}
+
 } // namespace Sear

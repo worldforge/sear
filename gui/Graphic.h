@@ -19,8 +19,6 @@ private:
 public:
   Graphic();
   virtual ~Graphic();
-
-  virtual void render() = 0;
 };
 
 } // namespace Sear

@@ -10,19 +10,21 @@ namespace Sear {
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
 class Widget {
+private:
+  // Private and unimplemented to prevent slicing
+  Widget(const Widget &);
+  const Widget & operator=(const Widget &);
 protected:
   Widget * m_parent;
 
   Widget();
 
-private:
-  // Private and unimplemented to prevent slicing
-  Widget(const Widget &);
-  const Widget & operator=(const Widget &);
 public:
   virtual ~Widget();
 
   void setParent(Widget * );
+
+  virtual void show() = 0;
 };
 
 } // namespace Sear
