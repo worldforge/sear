@@ -81,4 +81,7 @@ libSear_a_SOURCES = \
 	ScriptEngine.cpp \
 	ScriptEngine.h \
 	Calender.cpp \
-	Calender.h
+	Calender.h \
+	Light.h \
+	LightManager.h \
+	LightManager.cpp
