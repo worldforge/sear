@@ -1,4 +1,7 @@
 22nd April 2004, Simon Goodall
+ * Update SkyDome to check existance of VBO's before using them
+
+22nd April 2004, Simon Goodall
  * Change GL_BGR anf GL_BGRA to use GL_BGR_EXT and GL_BGRA_EXT for win32
 
 22nd April 2004, Simon Goodall
