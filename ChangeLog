@@ -1,8 +1,12 @@
-4th February 2002, Simon Goodall
+5th March 2002, Simon Goodall
+ * Re-write of cal3d loader code. uses varconf format file for configuration and will allow material properties to be over-ridden
+ * Fixed changelog dates - mix up in years and dates (oops)
+
+4th March 2002, Simon Goodall
  * Changed terrain texture to use clamping to avoid problems on landscape boundaries
  * Removed landscape texture name output
 
-15th January 2002, Simon Goodall
+15th February 2003, Simon Goodall
  * Terrain now uses a different texture map per heightmap
  * Terrain now uses multitexturing
  * glLockArarys used if available
@@ -11,13 +15,13 @@
  * Add mechanism to detect correct version of varconf on systems with varconf
    for sigc++ 1.0 and 1.2 installed.
 
-15th January 2002, Simon Goodall
+15th January 2003, Simon Goodall
  * Fixed segfault caused by an entity having no parents
 
-14th January 2002, Simon Goodall
+14th January 2003, Simon Goodall
  * Fixed NULL pointer error in model loading code
 
-11th January 2002, Simon Goodall
+11th January 2003, Simon Goodall
  * Added display lists to Render object. Paintbox and 3DS models are now rendered by display lists
 
 24th December 2002, Simon Goodall
