@@ -114,8 +114,8 @@ void ROAM::loadHeightMap() {
     return;
   }
   i = 0;
-  for(y = 0; y < hMapHeight; y++) {
-    for(x = 0; x < hMapWidth; x++) {
+  for(y = 0; y < hMapHeight; ++y) {
+    for(x = 0; x < hMapWidth; ++x) {
       hMap[i++] = System::getPixel(terrain, x, hMapHeight - 1 - y) & 0xFF;
     }
   }

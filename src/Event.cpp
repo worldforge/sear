@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.8 2002-09-08 00:24:53 simon Exp $
+// $Id: Event.cpp,v 1.9 2002-09-08 13:08:21 simon Exp $
 
 #include "System.h"
 #include <string>
@@ -104,7 +104,7 @@ char *Event::stringToObject(const std::string &msg) {
   // Ideally will remove this
   unsigned int i;
   char *string = (char*)malloc(sizeof(char) * msg.size() + 1);
-  for (i = 0; i < msg.size(); i++) string[i] = msg[i];
+  for (i = 0; i < msg.size(); ++i) string[i] = msg[i];
   string[msg.size()] = '\0';
   return string;
 }

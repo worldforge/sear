@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Lobby.cpp,v 1.5 2002-09-08 00:24:53 simon Exp $
+// $Id: Lobby.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
 
 #include "Lobby.h"
 #include <iostream.h>
@@ -78,7 +78,7 @@ void Lobby::Disappearance(Eris::Room* room, const std::string&str) {
 
 void Lobby::Changed(const Eris::StringSet &ss) {
   std::cout << "Changed" << std::endl;
-  for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); I++) {
+  for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
     std::cout << *I << std::endl;
   }
 }
@@ -99,7 +99,7 @@ void Lobby::runCommand(const std::string &command, const std::string &args) {
   else if (command == LIST_ROOMS) {
     Eris::StringList sl = _lobby->getRooms();
     std::cout << "listing room"<< std::endl;
-    for (Eris::StringList::const_iterator I = sl.begin(); I != sl.end(); I++) {
+    for (Eris::StringList::const_iterator I = sl.begin(); I != sl.end(); ++I) {
       std::cout << *I << std::endl;
     }
   }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.5 2002-09-07 23:27:06 simon Exp $
+// $Id: Slice.cpp,v 1.6 2002-09-08 13:08:20 simon Exp $
 
 #include "common/Utility.h"
 
@@ -15,8 +15,8 @@
 
 /**
  * TODO
- * Clean up properly
- * Render Secondary slice first
+ * Clean up properly - done?
+ * Render Secondary slice first - done?
  * Need to optimise textures.
  * doubled sided polys?
  * Fix brightness balance due to blending
@@ -120,12 +120,6 @@ void Slice::render(bool select_mode) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-//  if (select_mode) {
-//    _render->switchTexture(_render->requestMipMapMask("slice", _type, true));
-//  } else {
-//    _render->switchTexture(_render->requestMipMap("slice", _type, true));
-//  }
-//  WFMath::Quaternion q = System::instance()->getGraphics()->getCameraOrientation();
   float camera_angle = System::instance()->getGraphics()->getCamera()->getRotation();
   Character *c = System::instance()->getCharacter();
   if (c) camera_angle += c->getAngle();
@@ -146,7 +140,6 @@ void Slice::render(bool select_mode) {
   }
   while (index_1 >= _num_slicings) index_1 -= _num_slicings;
   while (index_2 >= _num_slicings) index_2 -= _num_slicings;
-  //cout << index_1 << " " << index_2 << " " << transparency << endl; 
   int index;
   int i;
   // Render secondary slice
@@ -162,7 +155,7 @@ void Slice::render(bool select_mode) {
         _render->setColour(1.0f, 1.0f, 1.0f, 1.0f -  transparency);
         index = index_1;
       }
-      for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
+      for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
         ASlice *slice = *I;
         if (select_mode) {
           _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));
@@ -182,7 +175,7 @@ void Slice::render(bool select_mode) {
     _render->setColour(1.0f, 1.0f, 1.0f,  transparency);
   }
   i = 0;
-  for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); I++, i++) {
+  for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
     ASlice *slice = *I;
     if (select_mode) {
       _render->switchTexture(_render->requestMipMapMask("slice", _type + "_" + string_fmt(index) + "_" + string_fmt(i), true));

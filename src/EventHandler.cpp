@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: EventHandler.cpp,v 1.3 2002-09-08 00:24:53 simon Exp $
+// $Id: EventHandler.cpp,v 1.4 2002-09-08 13:08:21 simon Exp $
 
 #include "EventHandler.h"
 #include "Event.h"
@@ -17,7 +17,7 @@ void EventHandler::addEvent(Event event) {
 void EventHandler::poll() {
   std::list<Event>::iterator I;
   Event event;
-  for (I = _events.begin(); I != _events.end(); I++) {
+  for (I = _events.begin(); I != _events.end(); ++I) {
     event = *I;
     if (event.checkFireCondition()) {
       event.doEvent();

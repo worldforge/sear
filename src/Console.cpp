@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.20 2002-09-08 00:24:53 simon Exp $
+// $Id: Console.cpp,v 1.21 2002-09-08 13:08:21 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -114,13 +114,13 @@ void Console::renderConsoleMessages(const std::string &command) {
   _renderer->stateChange("font");
   _renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
-  for (I = console_messages.begin(), i = 0; I != console_messages.end(); I++, i++) {
+  for (I = console_messages.begin(), i = 0; I != console_messages.end(); ++I, ++i) {
     int j = console_messages.size() - i;
     _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y + j * FONT_HEIGHT - consoleOffset, (char*)(*I).c_str(), 0);
   }
   //Render current command string
   std::string str = CONSOLE_PROMPT_STRING + command + CONSOLE_CURSOR_STRING;
-  _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y - consoleOffset, (char *)str.c_str(), 0);
+  _renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y - consoleOffset, const_cast<char *>(str.c_str()), 0);
 }
 
 void Console::renderScreenMessages() {
@@ -134,7 +134,7 @@ void Console::renderScreenMessages() {
   //Get time so we can remove expired messages
   unsigned int current_time = _system->getTime();
   //Render messges
-  for (I = screen_messages.begin(), i = 0; I != screen_messages.end(); I++, i++) {
+  for (I = screen_messages.begin(), i = 0; I != screen_messages.end(); ++I, ++i) {
     const std::string str = (const std::string)((*I).first);
     _renderer->print(CONSOLE_TEXT_OFFSET_X, height - ((i + 1) * FONT_HEIGHT ), const_cast<char*>(str.c_str()), 0);
   }
@@ -211,7 +211,7 @@ void Console::runCommand(const std::string &command, const std::string &args) {
   }
   // This commands prints all currently registers commands to the Log File
   else if (command == LIST_CONSOLE_COMMANDS) {
-    for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); I++) {
+    for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); ++I) {
       // TODO - should we check to see if I->second is valid?
       Log::writeLog(I->first, Log::LOG_INFO);
     }

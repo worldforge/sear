@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.10 2002-09-08 00:24:53 simon Exp $
+// $Id: WorldEntity.h,v 1.11 2002-09-08 13:08:21 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -19,8 +19,6 @@
 namespace Sear {
 
 typedef std::pair<std::string, unsigned int> message;
-static const unsigned int WORLD_ENTITY_MESSAGE_LIFE = 5000;
-static const unsigned int WORLD_ENTITY_STRING_SIZE = 40;
 
 class WorldEntity : public Eris::Entity {
 public:
@@ -53,8 +51,8 @@ protected:
   std::list<message> messages;
   ObjectProperties *_op;
 
-  static int message_life;
-  static int string_size;
+  static const int message_life = 5000;
+  static const int string_size = 40;
   std::string last_action;
   std::string last_mode;
 };

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.14 2002-09-08 00:24:53 simon Exp $
+// $Id: Character.cpp,v 1.15 2002-09-08 13:08:21 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -196,7 +196,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
   }
   Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); i++) {
+  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
       Atlas::Objects::Operation::Move move;
@@ -235,9 +235,9 @@ void Character::touchEntity(const std::string &id) {
 void Character::displayInventory() {
   if (!_self) return;
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; i < _self->getNumMembers(); i++)
+  for (unsigned int i = 0; i < _self->getNumMembers(); ++i)
     inventory[_self->getMember(i)->getName()]++;
-  for (std::map<std::string, int>::const_iterator I = inventory.begin(); I != inventory.end(); I++) {
+  for (std::map<std::string, int>::const_iterator I = inventory.begin(); I != inventory.end(); ++I) {
 //    std::cout << I->second << " - " << I->first << std::endl;
   std::string quantity = string_fmt(I->second);
   std::string name = I->first;
@@ -306,7 +306,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   }
   Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); i++) {
+  for (unsigned int i = 0; (quantity) && (i < _self->getNumMembers()); ++i) {
     WorldEntity *we = (WorldEntity*)_self->getMember(i);
     if (we->getName() == name) {
       Atlas::Objects::Operation::Move move;

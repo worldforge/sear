@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.19 2002-09-08 00:24:53 simon Exp $
+// $Id: ModelHandler.cpp,v 1.20 2002-09-08 13:08:21 simon Exp $
 
 #include "System.h"
 #include <set>
@@ -74,7 +74,7 @@ void ModelHandler::init() {
 
 void ModelHandler::shutdown() {
   // Clear up model loaders
-  for (std::map<std::string, ModelLoader*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); I++ ) {
+  for (std::map<std::string, ModelLoader*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
     if (I->second) {
       I->second->shutdown();
       delete I->second;
@@ -82,7 +82,7 @@ void ModelHandler::shutdown() {
     }
   } 
  // Clear Up Model
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
     if (I->second) {
       I->second->shutdown();
       delete I->second;
@@ -237,7 +237,7 @@ void ModelHandler::checkModelTimeout(const std::string &id) {
 void ModelHandler::lowerDetail() {
   detail_level -= 0.05f;
   if (detail_level < 0.0f) detail_level = 0.0f;
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
     if (I->second) {
       I->second->setDetailLevel(detail_level);
     }
@@ -247,7 +247,7 @@ void ModelHandler::lowerDetail() {
 void ModelHandler::raiseDetail() {
   detail_level += 0.05f;
   if (detail_level > 1.0f) detail_level = 1.0f;
-  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); I++) {
+  for (std::map<std::string, Model*>::iterator I = _models.begin(); I != _models.end(); ++I) {
     if (I->second) {
       I->second->setDetailLevel(detail_level);
     }

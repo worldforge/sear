@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.5 2002-09-08 00:24:54 simon Exp $
+// $Id: Landscape.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -57,8 +57,8 @@ void Landscape::Init(unsigned char *hMap, int size) {
   map_size = size;
   patch_size = map_size / NUM_PATCHES_PER_SIDE;
   // Initialize all terrain patches
-  for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++)
-    for ( X=0; X < NUM_PATCHES_PER_SIDE; X++ ) {
+  for ( Y=0; Y < NUM_PATCHES_PER_SIDE; ++Y)
+    for ( X=0; X < NUM_PATCHES_PER_SIDE; ++X) {
       m_Patches[Y][X] = Patch(_renderer, _terrain, this);
       patch = &(m_Patches[Y][X]);
       patch->Init( X*patch_size, Y*patch_size, X*patch_size, Y*patch_size, hMap );
@@ -87,8 +87,8 @@ void Landscape::Reset() {
   gNumTrisRendered = 0;
 
   // Go through the patches performing resets, compute variances, and linking.
-  for ( Y=0; Y < NUM_PATCHES_PER_SIDE; Y++ )
-    for ( X=0; X < NUM_PATCHES_PER_SIDE; X++) {
+  for ( Y=0; Y < NUM_PATCHES_PER_SIDE; ++Y)
+    for ( X=0; X < NUM_PATCHES_PER_SIDE; ++X) {
       patch = &(m_Patches[Y][X]);
       // Reset the patch
       patch->Reset();
@@ -117,7 +117,7 @@ void Landscape::Tessellate() {
   // Perform Tessellation
   int nCount;
   Patch *patch = &(m_Patches[0][0]);
-  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; nCount++, patch++ )
+  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; ++nCount, ++patch)
     if (patch->isVisibile()) patch->Tessellate( );
 }
 
@@ -148,7 +148,7 @@ void Landscape::render() {
     // Do Nothing
   }
   
-  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; nCount++, patch++ ) if (patch->isVisibile()) patch->render();
+  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; ++nCount, ++patch) if (patch->isVisibile()) patch->render();
   patch = &(m_Patches[0][0]);
   
   _renderer->setColour(1.0f, 1.0f, 1.0f, 0.6f);
@@ -158,7 +158,7 @@ void Landscape::render() {
   } else {
     //Do Nothing
   }
-  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; nCount++, patch++ ) if (patch->isVisibile()) patch->renderWater();
+  for (nCount=0; nCount < NUM_PATCHES_PER_SIDE*NUM_PATCHES_PER_SIDE; ++nCount, ++patch) if (patch->isVisibile()) patch->renderWater();
 					
   // Check to see if we got close to the desired number of triangles.
   // Adjust the frame variance to a better value.

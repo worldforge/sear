@@ -1,4 +1,7 @@
 8th September 2002, Simon Goodall
+ * Minor optimisation - converted for loop variables from postfix to prefix ++
+
+8th September 2002, Simon Goodall
  * Removed uneccessary code from Utility class
  * Added test to configure to detect buggy stringstream and apply workaround
 

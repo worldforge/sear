@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.2 2002-09-08 00:24:53 simon Exp $
+// $Id: FileHandler.cpp,v 1.3 2002-09-08 13:08:21 simon Exp $
 
 #include <stdio.h>
 
@@ -19,7 +19,7 @@ void FileHandler::addSearchPath(const std::string &searchpath) {
   _searchpaths.push_back(searchpath);
 }
 void FileHandler::removeSearchPath(const std::string &searchpath) {
-  for (std::list<std::string>::iterator I = _searchpaths.begin(); I != _searchpaths.end(); I ++) {
+  for (std::list<std::string>::iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string path = *I;
     if (path == searchpath) {
       _searchpaths.erase(I);
@@ -29,7 +29,7 @@ void FileHandler::removeSearchPath(const std::string &searchpath) {
 }
 
 std::string FileHandler::findFile(const std::string &filename) {
-  for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); I ++) {
+  for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string path = *I;
     std::string file = path + "/" + filename;
     FILE *f = fopen(file.c_str(), "r");
@@ -43,7 +43,7 @@ std::string FileHandler::findFile(const std::string &filename) {
 
 FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filename) {
   FileList l;
-  for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); I ++) {
+  for (FileList::const_iterator I = _searchpaths.begin(); I != _searchpaths.end(); ++I) {
     std::string path = *I;
     std::string file = path + "/" + filename;
     FILE *f = fopen(file.c_str(), "r");

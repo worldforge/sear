@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.28 2002-09-08 00:24:52 simon Exp $
+// $Id: GL.cpp,v 1.29 2002-09-08 13:08:20 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -112,7 +112,7 @@ void GL::buildColourSet() {
   unsigned long indx;
   colourSet = std::set<int>();
   
-  for (indx = 0; indx < numPrims; indx++) {
+  for (indx = 0; indx < numPrims; ++indx) {
     int ic = 0;
     ic += indx & (redMask << redShift);
     ic += indx & (greenMask << greenShift);
@@ -259,7 +259,7 @@ void GL::initFont() {
     texture = getTextureID(font_id);
   }
   glBindTexture(GL_TEXTURE_2D, texture);
-  for (loop=0; loop<256; loop++) {
+  for (loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
     glNewList(base+loop,GL_COMPILE); // Start Building A List
@@ -542,7 +542,7 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
 inline GLuint GL::getTextureID(int texture_id) {
   int i;
   std::list<GLuint>::const_iterator I = textureList.begin();
-  for (i = 1; i < texture_id; i++, I++);
+  for (i = 1; i < texture_id; ++i, ++I);
   return *I;
 }
 
@@ -1020,7 +1020,7 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
     stateChange(state_loader->getStateProperties(I->first));
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
+    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
       WorldEntity *we = (WorldEntity *)*J;
       // Get model
@@ -1067,8 +1067,8 @@ void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float t
 void GL::drawMessageQueue(std::map<std::string, Queue> queue) {
   glColor4fv(yellow);
   stateChange("font");
-  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
+  for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); ++I) {
+    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
       WorldEntity *we = (WorldEntity*)*J;
       glPushMatrix();
       WFMath::Point<3> pos = we->getAbsPos();
@@ -1308,8 +1308,8 @@ inline void GL::getFrustum(float frust[6][4]) {
   /* Get the current MODELVIEW matrix from OpenGraphics */
   glGetFloatv(GL_MODELVIEW_MATRIX, modl );
   Frustum::getFrustum(frust, proj, modl);
-  for (int i = 0; i < 6; i++) {
-    for (int j = 0; j < 4; j++) {
+  for (int i = 0; i < 6; ++i) {
+    for (int j = 0; j < 4; ++j) {
       frustum[i][j] = frust[i][j];
     }
   }

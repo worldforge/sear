@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.17 2002-09-08 00:24:53 simon Exp $
+// $Id: WorldEntity.cpp,v 1.18 2002-09-08 13:08:21 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -23,9 +23,6 @@
 #include <set>
 
 namespace Sear {
-
-int WorldEntity::string_size = WORLD_ENTITY_STRING_SIZE;
-int WorldEntity::message_life = WORLD_ENTITY_MESSAGE_LIFE;
 
 WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
    Eris::Entity(ge, world),
@@ -66,7 +63,7 @@ void WorldEntity::renderMessages() {
   //Convert messages into char arrays up x characters long
   std::list<std::string> mesgs = std::list<std::string>();
   std::list<screenMessage>::reverse_iterator I;
-  for (I = messages.rbegin(); I != messages.rend(); I++) {
+  for (I = messages.rbegin(); I != messages.rend(); ++I) {
     const std::string str = (const std::string)((*I).first);
     std::list<std::string> message_list = std::list<std::string>();
     unsigned int pos = 0;
@@ -98,7 +95,7 @@ void WorldEntity::renderMessages() {
     }
     */
     std::list<std::string>::reverse_iterator K;
-    for (K = message_list.rbegin(); K != message_list.rend(); K++) {
+    for (K = message_list.rbegin(); K != message_list.rend(); ++K) {
       mesgs.push_back(*K);
     }
      
@@ -106,7 +103,7 @@ void WorldEntity::renderMessages() {
   // Render text strings
   static Render *renderer = System::instance()->getGraphics()->getRender();
   std::list<std::string>::iterator J;
-  for (J = mesgs.begin(); J != mesgs.end(); J++) {	  
+  for (J = mesgs.begin(); J != mesgs.end(); ++J) { 
     std::string str = (*J);
     renderer->newLine();
     renderer->print3D((char*)str.c_str(), 0);
@@ -144,14 +141,14 @@ void WorldEntity::translateAbsPos(WFMath::Point<3> p) {
   abs_pos = p;
   WFMath::Point<3> pos = _position;
   WFMath::Point<3> child_pos = WFMath::Point<3>(p.x() + pos.x(), p.y() + pos.y(), p.z() + pos.z());
-  for (unsigned int i = 0; i < getNumMembers(); i++)
+  for (unsigned int i = 0; i < getNumMembers(); ++i)
     ((WorldEntity*)getMember(i))->translateAbsPos(child_pos);
 }
 
 void WorldEntity::rotateAbsOrient(WFMath::Quaternion q) {
   abs_orient = q;
   WFMath::Quaternion child_orient = q / getOrientation();
-  for (unsigned int i = 0; i < getNumMembers(); i++)
+  for (unsigned int i = 0; i < getNumMembers(); ++i)
     ((WorldEntity*)getMember(i))->rotateAbsOrient(child_orient);
 }
 

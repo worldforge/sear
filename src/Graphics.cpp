@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.9 2002-09-08 00:24:53 simon Exp $
+// $Id: Graphics.cpp,v 1.10 2002-09-08 13:08:21 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -201,7 +201,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
       if (op->draw_self && select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->select_state].push_back(we);
       if (op->draw_self && !select_mode && Frustum::sphereInFrustum(frustum, we, _terrain)) _render_queue[op->state].push_back(we);
       if (op->draw_members) {
-        for (unsigned int i = 0; i < we->getNumMembers(); i++) {
+        for (unsigned int i = 0; i < we->getNumMembers(); ++i) {
           buildQueues((WorldEntity*)we->getMember(i), depth + 1, select_mode);
         }
       }

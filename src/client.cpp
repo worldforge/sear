@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.29 2002-09-08 00:24:53 simon Exp $
+// $Id: client.cpp,v 1.30 2002-09-08 13:08:21 simon Exp $
 
 #include "System.h"
 
@@ -446,7 +446,7 @@ int Client::listRooms() {
   _system->pushMessage("Room Listings:", CONSOLE_MESSAGE);
   Log::writeLog("Client::listRooms: Start of list", Log::LOG_INFO);
   Eris::StringList i = _lobby->getRooms();
-  for (Eris::StringList::iterator I=i.begin(); I != i.end(); I++) {
+  for (Eris::StringList::iterator I=i.begin(); I != i.end(); ++I) {
     _system->pushMessage(I->c_str(), CONSOLE_MESSAGE);
   }
   Log::writeLog("End of List", Log::LOG_INFO);
@@ -545,7 +545,7 @@ void Client::GotAllCharacters() {
   if (_player == NULL) throw Exception ("Player is NULL");
 //  if (_lobby == NULL) throw Exception("Lobby is NULL");
   Eris::CharacterList l = _player->getCharacters();
-  for (Eris::CharacterList::iterator I=l.begin(); I != l.end(); I++) {
+  for (Eris::CharacterList::iterator I=l.begin(); I != l.end(); ++I) {
     Atlas::Objects::Entity::GameEntity ge = *I;
     _system->pushMessage(ge.GetId().c_str(), CONSOLE_MESSAGE);
   }
@@ -691,6 +691,7 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 
 void Client::getServers() {
   if (!_meta) {
+    // TODO put this into a config file
     std::string metaserver = "metaserver.worldforge.org";
     _meta = new Eris::Meta("", metaserver, 10);
     _meta->GotServerCount.connect(SigC::slot(*this, &Client::gotServerCount));
@@ -724,7 +725,7 @@ void Client::receivedServerInfo(Eris::ServerInfo sInfo) {
 void Client::completedServerList() {
   Eris::ServerList l = _meta -> getGameServerList ();
   Log::writeLog("Listing hostnames...", Log::LOG_INFO);
-  for(Eris::ServerList::iterator i = l.begin(); i != l.end(); i++) {
+  for(Eris::ServerList::iterator i = l.begin(); i != l.end(); ++i) {
     Eris::ServerInfo inf = *i;
     Log::writeLog(std::string("Hostname: ") + (i)->getHostname(), Log::LOG_INFO);
     //HINT: Always use .c_str() for compatibility to MSVC

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.5 2002-09-08 00:24:53 simon Exp $
+// $Id: Frustum.cpp,v 1.6 2002-09-08 13:08:21 simon Exp $
 
 #include "common/Utility.h"
 
@@ -116,7 +116,7 @@ void Frustum::getFrustum(float frustum[6][4], float proj[16], float modl[16]) {
 
 bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
   int p;
-  for( p = 0; p < 6; p++ )
+  for( p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ) return false;
   return true;
 } 
@@ -135,7 +135,7 @@ int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {
 
   WFMath::AxisBox<3> bbox = WFMath::AxisBox<3>(lowCorner, highCorner);
 
-  for( p = 0; p < 6; p++ ) {
+  for( p = 0; p < 6; ++p) {
     c = 0;
     if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
     if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
@@ -157,7 +157,7 @@ int Frustum::patchInFrustum(float frustum[6][4], WFMath::AxisBox<3> bbox) {
   int c;
   int c2 = 0;
 
-  for( p = 0; p < 6; p++ ) {
+  for( p = 0; p < 6; ++p) {
     c = 0;
     if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
     if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
@@ -187,7 +187,7 @@ bool Frustum::sphereInFrustum(float frustum[6][4], WorldEntity *we, Terrain *ter
   y = b.getCenter().y() + we->getAbsPos().y();
   z = b.getCenter().z() + we->getAbsPos().z() + terrain->getHeight(we->getAbsPos().x(), we->getAbsPos().y());
   radius = b.radius();
-  for( p = 0; p < 6; p++ )
+  for( p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )
       return false;
     return true;

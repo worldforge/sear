@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.32 2002-09-08 00:24:53 simon Exp $
+// $Id: System.cpp,v 1.33 2002-09-08 13:08:21 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,7 +65,7 @@ System::System() :
   int i;
   _instance = this;
   // Initialise system states
-  for (i = 1; i < SYS_LAST_STATE; i++) _systemState[i] = false;
+  for (i = 1; i < SYS_LAST_STATE; ++i) _systemState[i] = false;
 }
 
 System::~System() {
@@ -117,7 +117,7 @@ bool System::init() {
   _file_handler->addSearchPath(home_path);
   _file_handler->addSearchPath(".");
 
-  for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); I++) {
+  for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); ++I) {
     _file_handler->addSearchPath(*I);
   }
   
@@ -155,7 +155,7 @@ bool System::init() {
   Log::writeLog("Running startup scripts", Log::LOG_INFO);
 
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
-  for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); I++) {
+  for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     runScript(*I);
   }
   readConfig();
@@ -202,7 +202,7 @@ void System::shutdown() {
   writeConfig();
   Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   std::list<std::string> shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
-  for (std::list<std::string>::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); I++) {
+  for (std::list<std::string>::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
     runScript(*I);
   }
   Bindings::shutdown();
@@ -955,7 +955,7 @@ void System::processRecords() {
 }
 
 void System::addSearchPaths(std::list<std::string> l) {
-  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); I++) {	
+  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {	
     additional_paths.push_back(*I);
   }
 }
