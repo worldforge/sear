@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.23 2004-05-19 17:52:20 simon Exp $
+// $Id: ModelLoader.h,v 1.24 2004-05-20 10:57:20 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -85,7 +85,7 @@ public:
     if (model_config.findItem(model_id, ModelRecord::MODEL_BY_TYPE)) {
       model_record->model_by_type = model_config.getItem(model_id, ModelRecord::MODEL_BY_TYPE);
     } else {
-      model_record->model_by_type = "wireframe";
+      model_record->model_by_type = false;
     }
     // Get preferred outline method 
     if (model_config.findItem(model_id, ModelRecord::OUTLINE)) {

@@ -79,6 +79,7 @@ public:
     return m_renderState[state];
   }
 
+  void resize(int width, int height);
 
 private:
   static RenderSystem m_instance;

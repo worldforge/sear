@@ -144,4 +144,8 @@ void RenderSystem::writeConfig() {
 //  m_stateManager->writeConfig();
 } 
 
+void RenderSystem::resize(int width, int height) {
+  assert(m_initialised);
+  dynamic_cast<GL*>(m_renderer)->resize(width, height);
+}
 } // namespace Sear

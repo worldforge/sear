@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.13 2004-05-19 17:52:20 simon Exp $
+// $Id: TextureManager.h,v 1.14 2004-05-20 10:57:20 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -107,9 +107,10 @@ public:
       m_names[m_texture_counter] = name;
       id = m_texture_counter++;
       // If we have run out of space, allocate some more
-      if (m_texture_counter >= (int)m_texture_map.size()) {
+
+      if (m_texture_counter >= (int)m_textures.size()) {
         // Double size allocation
-        int new_size = 2 * m_texture_map.size();
+        int new_size = 2 * m_textures.size();
         m_textures.resize(new_size);
         m_names.resize(new_size);
       }

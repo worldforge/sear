@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.88 2004-05-19 17:52:20 simon Exp $
+// $Id: System.cpp,v 1.89 2004-05-20 10:57:20 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -612,6 +612,10 @@ void System::handleEvents(const SDL_Event &event) {
         renderer->procEvent(m_width / 2, m_height / 2);
         if (_character) _character->getEntity(renderer->getActiveID());
       }
+      break;
+    }
+    case SDL_VIDEORESIZE: {
+      RenderSystem::getInstance().resize(event.resize.w, event.resize.h);
       break;
     }
     case SDL_QUIT: {

@@ -225,7 +225,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     fflush(stdout);
   }
   //Create Window
-  int flags = SDL_OPENGL;
+  int flags = SDL_OPENGL | SDL_RESIZABLE;
   int bpp = info->vfmt->BitsPerPixel;
   if (m_fullscreen) flags |= SDL_FULLSCREEN;
   if (!(m_width && m_height)) {
@@ -1501,6 +1501,32 @@ void GL::cleanVBOMesh(Mesh &mesh) {
     glDeleteBuffersARB(1, &mesh.normal_vbo);
     mesh.normal_vbo = 0;
   }
+}
+
+void GL::resize(int width, int height) {
+  m_width = width;
+  m_height = height;
+  int flags = SDL_OPENGL | SDL_RESIZABLE;
+  const SDL_VideoInfo *info = SDL_GetVideoInfo();
+  if (!info) {
+    Log::writeLog("Error quering video", Log::LOG_DEFAULT);
+    return;// false;
+  }
+  int bpp = info->vfmt->BitsPerPixel;
+  if (m_fullscreen) flags |= SDL_FULLSCREEN;
+  if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
+
+  //Is this the correct way to free a window?
+  m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
+  if (m_screen == NULL ) {
+    std::cerr << "Unable to set " << m_width << " x " << m_height << " video: " << SDL_GetError() << std::endl;
+    Environment::getInstance().invalidate();
+    createWindow(m_width, m_height, m_fullscreen);
+    RenderSystem::getInstance().invalidate();
+    Environment::getInstance().invalidate(); 
+    return;
+  }
+ setViewMode(PERSPECTIVE);
 }
 
 } // namespace Sear

@@ -1,3 +1,8 @@
+20th May 2004, Simon Goodall
+ * Fix problem with texture vector resize
+ * Fix problem with cal3d animations running too fast (varconf init error)
+ * Add support for resizing the window by dragging borders. Needs testing on Win32 and Mac systems.
+
 19th May 2004, Simon Goodall
  * Further varconf checks
  * Resize texture vectors if limit is reached.

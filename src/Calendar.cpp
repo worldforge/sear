@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.11 2004-05-17 13:43:46 simon Exp $
+// $Id: Calendar.cpp,v 1.12 2004-05-20 10:57:20 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -130,6 +130,9 @@ void Calendar::serverUpdate(double time) {
 //  if (debug)
 //  std::cout << "Current: " << _seconds << " - Server: " << time << std::endl;
   double diff = time - m_server_seconds;
+  // If the difference is bigger than 1000.0 seconds, then there is a 
+  // problem. Requires checking eris / the server.
+//  assert(abs(diff) < 1000.0);
   // TODO make this change gradual if too large
   // Could perhaps use the event manager to throw a series of events?
   /*

@@ -123,6 +123,7 @@ public:
   void playList(unsigned int list) { glCallList(list); }
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
+  void resize(int width, int height);
 
 protected:
   System *_system;
