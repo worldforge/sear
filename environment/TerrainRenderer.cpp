@@ -131,7 +131,7 @@ void TerrainRenderer::generateAlphaTextures(Mercator::Segment * map)
 
 void TerrainRenderer::drawRegion(Mercator::Segment * map)
 {
-    float harray[(segSize+1)*(segSize+1)*3];
+    float * harray = new float[(segSize+1)*(segSize+1)*3];
     float * narray = map->getNormals();
     if (narray == 0) {
         std::cout << "Populating normals" << std::endl << std::flush;
@@ -188,6 +188,8 @@ void TerrainRenderer::drawRegion(Mercator::Segment * map)
             glEnable(GL_TEXTURE_2D);
         }
     }
+
+    delete [] harray;
 
     // This restores the state we want to be in for the first pass of
     // the next segment

@@ -1,3 +1,8 @@
+2004-06-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* environment/TerrainRenderer.cpp: Be sure to use heap allocation
+	  to big arrays, rather than stack.
+
 2004-06-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/3ds.cpp: Only render meshes directly if the 3ds file does
