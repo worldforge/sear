@@ -340,7 +340,6 @@ AC_OUTPUT([
 	Makefile
 	interfaces/Makefile
 	common/Makefile
-	script/Makefile
 	src/Makefile
 	loaders/Makefile
 	loaders/cal3d/Makefile
