@@ -37,6 +37,8 @@ public:
   void renderTerrain(const WFMath::Point<3> &pos);
   void renderSea();
 
+  void invalidate();
+
 private:
   bool m_initialised;
 

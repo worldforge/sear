@@ -26,6 +26,10 @@ class TerrainRenderer
 
     Mercator::Terrain m_terrain;
 
+    void invalidate() {
+      m_displayLists.clear();
+    }
+
   protected:
     DisplayListStore m_displayLists;
     int m_numLineIndeces;

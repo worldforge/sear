@@ -9,7 +9,7 @@ namespace Sear {
 Environment  Environment::instance;
 
 void Environment::init() {
-  if (m_initialised) return;
+  if (m_initialised) shutdown();
   m_terrain = new TerrainRenderer();
   m_skyDome = new SkyDome();
 
@@ -54,4 +54,10 @@ void Environment::renderTerrain(const WFMath::Point<3> &pos) {
 void Environment::renderSea() {
   m_terrain->renderSea();
 }
+
+void Environment::invalidate() {
+  m_terrain->invalidate();
+  m_skyDome->invalidate();
+}
+
 }

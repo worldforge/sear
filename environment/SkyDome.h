@@ -36,6 +36,8 @@ public:
   void domeInit(float radius, int levels, int segments);
   void render(float radius, int levels, int segments);
 
+  void invalidate() {}
+
 private:
   bool m_initialised;
   float *m_verts, *m_texCoords;
