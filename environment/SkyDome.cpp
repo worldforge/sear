@@ -210,9 +210,9 @@ void SkyDome::render(float radius, int levels, int segments) {
 
   glColor3f(1.0f, 1.0f, 1.0f);
   ++counter;
-  counter = counter % 24000;
- 
- float val = (float)(counter) / 24000.0f;
+#define INCR 24000
+  counter = counter % INCR;
+ float val = (float)(counter) / (float)INCR;
 
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -227,6 +227,9 @@ void SkyDome::render(float radius, int levels, int segments) {
     glTranslatef(val , 0.0f,0.0f);
   glMatrixMode(GL_MODELVIEW);
 
+// Quick hack so we dont call readpixels every frame
+static int delay = 0;
+if (++delay == 20) {
 glBegin(GL_QUADS);
 glTexCoord2i(0,0);
 glVertex3f(-1.0f, -1.0f, 1.0f);
@@ -250,12 +253,10 @@ glVertex3f(1.0f, -1.0f, -1.0f);
 glVertex3f(1.0f, 1.0f, -1.0f);
 glEnd(); 
 
-// Quick hack so we dont call readpixels every frame
-static int delay = 0;
-if (++delay == 20) {
 GLfloat i[4];
 glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT, &i);
 glFogfv(GL_FOG_COLOR,i);
+glClearColor(i[0], i[1], i[2], i[3]); // Colour used to clear window
  delay = 0;
 }
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texA);

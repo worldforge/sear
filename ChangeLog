@@ -1,3 +1,10 @@
+19th April 2004, Simon Goodall
+ * Fix water transparency.
+ * Draw water last to transparency work correctly
+ * Water level now raises and lowers
+ * Added player shadow from appogee
+ * More skydome bits
+
 19th April 2004, Al Riddoch
  * Add tracking of mouse clicks, for detection of dragging.
  * Implement mouse rotation of character in mouse_look mode, rather

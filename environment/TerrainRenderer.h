@@ -32,6 +32,7 @@ class TerrainRenderer
     unsigned short * const m_lineIndeces;
     int m_textures[8];
     int m_seaTexture;
+    int m_shadowTexture;
     GLuint m_alphaTextures[8];
     GLuint m_landscapeList;
     bool m_haveTerrain;
@@ -52,8 +53,10 @@ class TerrainRenderer
     void load(const std::string &) { }
 
     virtual void render( const PosType & camPos);
+    virtual void renderSea() {
+      drawSea(m_terrain);
+}
     virtual void select( const PosType & camPos);
-
   friend class Environment;
 };
 }

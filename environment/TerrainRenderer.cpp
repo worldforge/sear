@@ -7,7 +7,7 @@
 //#include "Texture.h"
 #include <sage/GLU.h>
 
-
+#include "src/System.h"
 #include <Mercator/Segment.h>
 #include <Mercator/FillShader.h>
 #include <Mercator/ThresholdShader.h>
@@ -36,7 +36,7 @@ void TerrainRenderer::enableRendererState()
     static const float diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
     static const float specular[] = { 0.f, 0.f, 0.f, 1.0f };
     static const float emission[] = { 0.f, 0.f, 0.f, 1.0f };
-    static const float shininess[] = { 0.0f };
+    static const float shininess[] = { 0.1f };
     glColor4f(1.f, 1.f, 1.f, 1.f);
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
@@ -186,6 +186,7 @@ void TerrainRenderer::drawRegion(Mercator::Segment * map)
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
     glDepthMask(GL_TRUE);
+    glActiveTexture(GL_TEXTURE0);
 
 }
 
@@ -272,24 +273,27 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
 
     Terrain::Segmentstore::const_iterator I = segs.begin();
     glEnable(GL_BLEND);
+glDisable(GL_TEXTURE_2D);
+            glColor4f(0.8f, 0.8f, 1.f, 0.6f);
+glEnable(GL_COLOR_MATERIAL);
     for (; I != segs.end(); ++I) {
         const Terrain::Segmentcolumn & col = I->second;
         Terrain::Segmentcolumn::const_iterator J = col.begin();
         for (; J != col.end(); ++J) {
             glPushMatrix();
-            glTranslatef(I->first * segSize, J->first * segSize, 0.0f);
+            glTranslatef(I->first * segSize, J->first * segSize, 0.1f * sin(System::instance()->getTime() / 10000.0f));
             GLfloat vertices[] = { 0.f, 0.f, 0.f,
                                    segSize, 0, 0.f,
                                    segSize, segSize, 0.f,
                                    0, segSize, 0.f };
             glVertexPointer(3, GL_FLOAT, 0, vertices);
-            RenderSystem::getInstance().switchTexture(0, m_seaTexture);
-            glColor4f(0.8f, 0.8f, 1.f, 0.6f);
             glDrawArrays(GL_QUADS, 0, 4);
             glPopMatrix();
         }
     }
+glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
 }
 
 TerrainRenderer::TerrainRenderer() :
@@ -306,6 +310,7 @@ m_terrain(Terrain::SHADED),
     m_textures[3] = RenderSystem::getInstance().requestTexture("dark.png");
     m_textures[4] = RenderSystem::getInstance().requestTexture("snow.png");
     m_seaTexture = RenderSystem::getInstance().requestTexture("water");
+    m_shadowTexture = RenderSystem::getInstance().requestTexture("shadow");
 //    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);
@@ -346,14 +351,82 @@ void TerrainRenderer::render( const PosType & camPos)
         m_haveTerrain = true;
     }
     drawMap(m_terrain, camPos);
-    drawSea( m_terrain);
-//    drawShadow(WFMath::Point<2>(camPos.x(), camPos.y()), .5f);
+//    drawSea( m_terrain);
+    drawShadow(WFMath::Point<2>(camPos.x(), camPos.y()), .5f);
 }
 
 void TerrainRenderer::select( const PosType & camPos)
 {
     drawMap(m_terrain, camPos);
-    // selectTerrain(m_terrain);
 }
+
+void TerrainRenderer::drawShadow(const WFMath::Point<2> & pos, float radius)
+{
+    int nx = lrintf(floor(pos.x() - radius)),
+        ny = lrintf(floor(pos.y() - radius)),
+        fx = lrintf(ceil(pos.x() + radius)),
+        fy = lrintf(ceil(pos.y() + radius));
+    unsigned dx = fx - nx,
+             dy = fy - ny,
+             diameter = std::max(dx, dy),
+             size = diameter + 1;
+    fx = nx + diameter;
+    fy = ny + diameter;
+    float * vertices = new float[size * size * 3];
+    float * texcoords = new float[size * size * 2];
+    float * vptr = vertices - 1;
+    float * tptr = texcoords - 1;
+    for(int y = ny; y <= fy; ++y) {
+        for(int x = nx; x <= fx; ++x) {
+            *++vptr = x;
+            *++vptr = y;
+            *++vptr = m_terrain.get(x, y);
+            *++tptr = ((float)x - pos.x() + radius) / (radius * 2);
+            *++tptr = ((float)y - pos.y() + radius) / (radius * 2);
+        }
+    }
+    GLushort * indices = new GLushort[diameter * size * 2];
+    GLushort * iptr = indices - 1;
+    int numind = 0;
+    for(GLuint i = 0; i < diameter; ++i) {
+        // This ensures that we are drawing the same triangles
+        // in the same order as they are done in the original terrain
+        // passes
+        if ((i + nx) & 1) {
+            for(GLshort j = diameter; j >= 0; --j) {
+                *++iptr = j * size + i + 1;
+                *++iptr = j * size + i;
+                numind += 2;
+            }
+        } else {
+            for(GLuint j = 0; j <= diameter; ++j) {
+                *++iptr = j * size + i;
+                *++iptr = j * size + i + 1;
+                numind += 2;
+            }
+        }
+    }
+//    GLuint shTexture = Texture::get("shadow.png", false);
+    RenderSystem::getInstance().switchTexture(0, m_shadowTexture);
+   
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+//    glBindTexture(GL_TEXTURE_2D, shTexture);
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                                                                                
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+            glDepthMask(GL_FALSE);
+    glDrawElements(GL_TRIANGLE_STRIP, numind, GL_UNSIGNED_SHORT, indices);
+            glDepthMask(GL_TRUE);
+                                                                                
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisable(GL_BLEND);
+//    glDisable(GL_TEXTURE_2D);
+                                                                                
+                                                                                
+}
+
 
 }

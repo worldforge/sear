@@ -51,4 +51,7 @@ void Environment::renderTerrain(const WFMath::Point<3> &pos) {
   m_terrain->render(pos);
 }
 
+void Environment::renderSea() {
+  m_terrain->renderSea();
+}
 }

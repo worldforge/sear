@@ -35,6 +35,7 @@ public:
 
   void renderSky();
   void renderTerrain(const WFMath::Point<3> &pos);
+  void renderSea();
 
 private:
   bool m_initialised;
