@@ -39,8 +39,8 @@ mesh=skeleton_thigh_right.cmf
 mesh=skeleton_upperarm_left.cmf
 mesh=skeleton_upperarm_right.cmf
 
-material=skeleton_bone.crf
-material=skeleton_hair1.crf
-material=skeleton_hair2.crf
-material=skeleton_hair3.crf
+material_default_bone=skeleton_bone.crf
+material_default_hair1=skeleton_hair1.crf
+material_default_hair2=skeleton_hair2.crf
+material_default_hair3=skeleton_hair3.crf
 

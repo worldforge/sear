@@ -197,8 +197,9 @@ GLuint Cal3d::loadTexture(const std::string& strFilename)
 // Initialize the model                                                       //
 //----------------------------------------------------------------------------//
 
-bool Cal3d::init(const std::string& strFilename)
-{
+bool Cal3d::init(const std::string& strFilename) {
+  static unsigned int set_counter = 1;
+  static unsigned int part_counter = 1;
   if (core_models[strFilename]) {
     m_calCoreModel = core_models[strFilename];
   } else {
@@ -365,17 +366,27 @@ bool Cal3d::init(const std::string& strFilename)
           return false;
         }
       }
-      else if(strKey == "material")
-      {
+      else if(strKey.substr(0,8) == "material") {
+	int length =  strKey.substr(9).find_first_of("_");
+	std::string set = strKey.substr(9, length);
+	if (material_set_map[set] == 0) {
+          material_set_map[set] = set_counter++;
+	}
+	std::string part = strKey.substr(9 + length + 1);
+	if (material_part_map[part] == 0) {
+          material_part_map[part] = part_counter++;
+	}
         // load core material
-        if(m_calCoreModel->loadCoreMaterial(strPath + strData) == -1)
-        {
+	int code = m_calCoreModel->loadCoreMaterial(strPath + strData);
+        if(code == -1) {
           CalError::printLastError();
           return false;
         }
+        material_map[code] = material_set_map[set];
+        part_map[code] = material_part_map[part];
+	std::cout << set << " - " << part << std::endl;
       }
-      else
-      {
+      else {
         Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::LOG_ERROR);
         return false;
       }
@@ -418,7 +429,7 @@ bool Cal3d::init(const std::string& strFilename)
       m_calCoreModel->createCoreMaterialThread(materialId);
   
       // initialize the material thread
-      m_calCoreModel->setCoreMaterialId(materialId, 0, materialId);
+      m_calCoreModel->setCoreMaterialId(part_map[materialId] - 1, material_map[materialId] - 1, materialId);
     }
     core_models[strFilename] = m_calCoreModel;
   }
@@ -663,6 +674,10 @@ void Cal3d::action(const std::string &action) {
     executeAction(0);
   } else if (action == "shoot_arrow") {
     executeAction(1);
+  } else if (action.substr(0,11) == "change_set_") {
+    int i = 0;
+    cast_stream(action.substr(11), i);
+    m_calModel.setMaterialSet(i);
   }
 }
 

@@ -36,8 +36,8 @@ mesh=cally_thigh_right.cmf
 mesh=cally_upperarm_left.cmf
 mesh=cally_upperarm_right.cmf
 
-material=cally_skin.crf
-material=cally_ponytail.crf
-material=cally_chest.crf
-material=cally_pelvis.crf
+material_default_skin=cally_skin.crf
+material_default_ponytail=cally_ponytail.crf
+material_default_chest=cally_chest.crf
+material_default_pelvis=cally_pelvis.crf
 

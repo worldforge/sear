@@ -116,6 +116,8 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_5) model->action("wave");
       else if (event.key.keysym.sym == SDLK_6) model->action("shoot_arrow");
       else if (event.key.keysym.sym == SDLK_7) model->action("funky");
+      else if (event.key.keysym.sym == SDLK_8) model->action("change_set_0");
+      else if (event.key.keysym.sym == SDLK_9) model->action("change_set_1");
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       break;
     }
@@ -145,7 +147,13 @@ void display() {
   // Set up view port
 //  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //  glLoadIdentity();
-//  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
+//  glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);a
+  static float ambient[] = {1.0f, 1.0f, 1.0f, 1.0f};
+  static float diffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
+  glEnable(GL_LIGHT0);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+//  glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
 
   render->beginFrame();
   glClear(GL_COLOR_BUFFER_BIT);
@@ -174,7 +182,6 @@ void display() {
   render->stateChange(op->state);
   // Don't want any fog or lighitng effects
   glDisable(GL_FOG);
-  glDisable(GL_LIGHTING);
   glColor3f(1.0f, 1.0f, 1.0f);
 
   glRotatef(y_angle, 1.0f, 0.0f, 0.0f);

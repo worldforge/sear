@@ -90,6 +90,10 @@ protected:
 
   static int instance_count;
   static std::map<std::string, CalCoreModel*> core_models;
+  std::map<int, int> material_map;
+  std::map<int, int> part_map;
+  std::map<std::string, int> material_set_map;
+  std::map<std::string, int> material_part_map;
 };
 
 } /* namespace Sear */
