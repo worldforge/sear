@@ -6,12 +6,13 @@ AppPublisher=Simon Goodall
 AppPublisherURL=http://www.worldforge.org/dev/eng/clients/sear
 AppSupportURL=http://www.worldforge.org/dev/eng/clients/sear
 AppUpdatesURL=http://www.worldforge.org/dev/eng/clients/sear
-DefaultDirName={pf}\Sear
+DefaultDirName={pf}\WorldForge\Sear
 DefaultGroupName=Sear
 AllowNoIcons=yes
 InfoAfterFile=Readme.txt
 Uninstallable=yes
 UninstallFilesDir={app}\uninst
+UninstallDisplayIcon={app}\Sear.exe
 UninstallDisplayName=Sear
 OutputBaseFilename=sear_win32_setup-@SEAR_VERSION@
 
