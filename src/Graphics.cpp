@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.19 2002-10-21 20:09:59 simon Exp $
+// $Id: Graphics.cpp,v 1.20 2002-10-24 09:24:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -242,6 +242,19 @@ void Graphics::drawInventory(const std::string &command ,bool, float) {
 void Graphics::drawWorld(const std::string& command, bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
+/*
+Camera coords
+//Should be stored in camera object an updated as required
+x = cos elevation * cos rotation * distance * distance;
+y = cos elevation * din rotation * distance * distance;
+z = sin elevation * distance;
+
+((CAMERA + CHAR_POS) - ENTITY_POS)^2 = D^2
+
+Compare D^2 to choose what detail level to use
+
+*/
+
 	
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
