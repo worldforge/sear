@@ -247,32 +247,34 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
 
 void Tokeniser::initTokens(const std::string &tokens) {
   token_string = tokens;
-  try {
+//  try {
     last_pos = token_string.find_first_not_of(delimeters, 0);
     pos = token_string.find_first_of(delimeters, last_pos);
-  } catch (...) {
-
-  }
+//  } catch (...) {
+//
+//  }
  
 }
 
 std::string Tokeniser::nextToken() {
-  try {
+  if (last_pos == string::npos) return "";
+//  try {
     std::string token = token_string.substr(last_pos, pos - last_pos);
     last_pos = token_string.find_first_not_of(delimeters, pos);
     pos = token_string.find_first_of(delimeters, last_pos);
     return token;
-  } catch (...) {
-    return "";
-  }
+//  } catch (...) {
+//    return "";
+//  }
 }
 
 std::string Tokeniser::remainingTokens() {
-  try {
+  if (last_pos == string::npos) return "";
+//try {  
     return token_string.substr(last_pos, token_string.size() - last_pos);
-  } catch (...) {
-    return "";
-  }
+//  } catch (...) {
+//    return "";
+//  }
 }                                
 
   
