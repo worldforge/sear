@@ -29,11 +29,6 @@ Button::~Button()
 {
 }
 
-void Button::show()
-{
-  // Map the required widget sizes
-}
-
 void Button::map(Window * win, int x, int y, int & w, int & h)
 {
   int cw = 0, ch = 0;

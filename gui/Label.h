@@ -24,7 +24,6 @@ public:
   explicit Label(const std::string & text);
   virtual ~Label();
 
-  virtual void show();
   virtual void map(Window * w, int x, int y, int & w, int & h);
 };
 

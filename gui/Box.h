@@ -29,7 +29,6 @@ public:
 
   Widget * push_back(Widget *);
   void render();
-  virtual void show();
 };
 
 class VBox : public Box {

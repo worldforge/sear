@@ -23,16 +23,6 @@ Widget * Box::push_back(Widget * w)
     return w;
 }
 
-void Box::show()
-{
-  std::list<Widget *>::const_iterator I = m_boxContents.begin();
-  std::list<Widget *>::const_iterator Iend = m_boxContents.end();
-  for (; I != Iend; ++I) {
-    (*I)->show();
-  }
-  
-}
-
 VBox::VBox()
 {
 }

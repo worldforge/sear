@@ -1,5 +1,14 @@
 2004-10-19  Al Riddoch  <alriddoch@zepler.org>
 
+	* gui/Box.cpp, gui/Box.h, gui/Button.cpp, gui/Button.h,
+	  gui/Container.cpp, gui/Container.h, gui/Label.cpp, gui/Label.h,
+	  gui/TextEntry.h, gui/Toplevel.cpp, gui/Toplevel.h, gui/Widget.h,
+	  gui/Workspace.cpp, gui/Workspace.h: Remove obsolete show()
+	  virtual function, and replace with single show function on
+	  Workspace.
+
+2004-10-19  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/System.cpp: Remove obsolete call to obsolete showAll() method.
 
 2004-10-11  Simon Goodall  <sear@simongoodall.co.uk>

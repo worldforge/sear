@@ -20,12 +20,4 @@ void Container::addChild(Widget * w)
   m_children.insert(w);
 }
 
-void Container::show()
-{
-  std::set<Widget *>::const_iterator I = m_children.begin();
-  for(; I != m_children.end(); ++I) {
-    (*I)->show();
-  }
-}
-
 } // namespace Sear

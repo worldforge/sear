@@ -37,23 +37,6 @@ void Toplevel::setPos(int x, int y)
   m_frame->setPos(x, y);
 }
 
-void Toplevel::show()
-{
-  Container::show();
-
-  Workspace * ws = dynamic_cast<Workspace *>(m_parent);
-
-  if (ws == 0) {
-    std::cerr << "Toplevel parent is not a Workspace"
-              << std::endl << std::flush;
-    return;
-  }
-
-  RootWindow * rw = ws->getRootWindow();
-  int width, height;
-  map(rw, 0, 0, width, height);
-}
-
 void Toplevel::map(Window * win, int x, int y, int & w, int & h)
 {
   int cw = 0, ch = 0;

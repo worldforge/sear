@@ -42,7 +42,6 @@ public:
   virtual ~TextEntry();
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
-  virtual void show() { }
 
   void onKeyPress(SDLKey, Uint16);
   void onPressed();

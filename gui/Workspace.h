@@ -44,6 +44,7 @@ public:
   void draw();
   void handleEvent(const SDL_Event &);
   void addToplevel(Toplevel *);
+  void show();
 
   virtual void map(Window * win, int x, int y, int & w, int & h);
 };

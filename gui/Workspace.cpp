@@ -171,6 +171,15 @@ void Workspace::addToplevel(Toplevel * t)
   addChild(t);
 }
 
+void Workspace::show()
+{
+  int width, height;
+  std::set<Widget *>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    (*I)->map(m_rootWindow, 0, 0, width, height);
+  }
+}
+
 void Workspace::map(Window *, int, int, int &, int &)
 {
 }

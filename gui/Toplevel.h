@@ -36,7 +36,6 @@ public:
   void setContents(Widget *);
   void setPos(int x, int y);
 
-  virtual void show();
   virtual void map(Window * win, int x, int y, int & w, int & h);
 };
 

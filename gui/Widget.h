@@ -28,7 +28,6 @@ public:
 
   void setParent(Widget * );
 
-  virtual void show() = 0;
   /// Create necessary window primitives, and map them into the space provided.
   ///
   /// @param w window this widget should be mapped into

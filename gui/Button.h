@@ -32,7 +32,6 @@ public:
   explicit Button(const Graphic & graphic);
   virtual ~Button();
 
-  virtual void show();
   virtual void map(Window * win, int x, int y, int & w, int & h);
 
   // Called by event callbacks

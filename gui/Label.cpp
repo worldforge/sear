@@ -17,11 +17,6 @@ Label::~Label()
 {
 }
 
-void Label::show()
-{
-  // Map the relevant stuff
-}
-
 void Label::map(Window * win, int x, int y, int & w, int & h)
 {
   String * s = new String(m_text);
