@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.11 2002-12-03 22:10:55 simon Exp $
+// $Id: ROAM.h,v 1.12 2002-12-07 14:13:41 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -68,8 +68,8 @@ protected:
   static const char * const KEY_height_map = "height_map";
   static const char * const KEY_terrain_scale = "terrain_scale";
  
-  static const char * const KEY_num_x_landscapes = "number_x_landscapes";
-  static const char * const KEY_num_y_landscapes = "number_y_landscapes";
+  static const char * const KEY_num_x_landscapes = "num_x_landscapes";
+  static const char * const KEY_num_y_landscapes = "num_y_landscapes";
   static const char * const KEY_landscape = "landscape_";
   
   
