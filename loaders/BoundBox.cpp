@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.20 2004-04-22 10:51:32 simon Exp $
+// $Id: BoundBox.cpp,v 1.21 2004-04-26 15:45:20 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
@@ -225,6 +225,16 @@ bool BoundBox::init(WFMath::AxisBox<3> _bbox, const std::string &type, bool _wra
 
 void BoundBox::shutdown() {
   _initialised = false;
+  if (_render) {
+    _render->freeList(_list);
+    _render->freeList(_list_select);
+  }
+  _list = 0;
+  _list_select =0;
+}
+
+void BoundBox::invalidate() {
+  // Clear up display lists
   if (_render) {
     _render->freeList(_list);
     _render->freeList(_list_select);

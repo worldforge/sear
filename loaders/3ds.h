@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.10 2003-03-06 23:50:38 simon Exp $
+// $Id: 3ds.h,v 1.11 2004-04-26 15:45:20 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -44,6 +44,8 @@ public:
    */
   void shutdown();
   void render(bool);
+
+  void invalidate();
 
 protected:
   typedef struct {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.8 2003-04-23 19:41:57 simon Exp $
+// $Id: BoundBox.h,v 1.9 2004-04-26 15:45:20 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -43,6 +43,8 @@ public:
    */ 
   void shutdown();
   void render(bool); 
+
+  void invalidate();
 
   bool useTextures() { return _use_textures; }
   

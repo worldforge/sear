@@ -1,4 +1,7 @@
 26th April 2004, Simon Goodall
+ * Added invalidate stuff to models
+
+26th April 2004, Simon Goodall
  * Removed getPixel function as it is not used
 
 26th April 2004, Simon Goodall

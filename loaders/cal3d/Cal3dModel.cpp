@@ -1,16 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.9 2004-04-22 10:51:32 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.10 2004-04-26 15:45:20 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
 #include <string>
-
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"

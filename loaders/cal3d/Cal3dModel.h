@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.5 2004-04-22 10:51:32 simon Exp $
+// $Id: Cal3dModel.h,v 1.6 2004-04-26 15:45:20 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -28,6 +28,9 @@ public:
 
   bool init(Cal3dCoreModel *);
   void shutdown();
+
+  void invalidate() {}
+
   float getLodLevel() const { return m_lodLevel; }
   float getScale() const { return m_renderScale; }
   void render(bool select_mode) { render(true, true, select_mode); }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.5 2003-04-23 19:41:57 simon Exp $
+// $Id: NPlane.h,v 1.6 2004-04-26 15:45:20 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -23,7 +23,9 @@ public:
   
   bool init(const std::string &, unsigned int num_planes, float width, float height);
   void shutdown();
-  
+ 
+  void invalidate() {}
+ 
   void render(bool); 
   bool useTextures() { return  _use_textures; }
 

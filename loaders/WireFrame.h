@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.5 2003-03-06 23:50:38 simon Exp $
+// $Id: WireFrame.h,v 1.6 2004-04-26 15:45:20 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -22,7 +22,9 @@ public:
   
   bool init(WFMath::AxisBox<3>);
   void shutdown();
-  
+ 
+  void invalidate()  {}
+ 
   void render(bool);
   bool useTextures() { return false; }
   

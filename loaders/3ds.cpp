@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.25 2004-04-22 10:51:32 simon Exp $
+// $Id: 3ds.cpp,v 1.26 2004-04-26 15:45:20 simon Exp $
 
 
 #include <iostream>
@@ -98,9 +98,21 @@ void ThreeDS::shutdown() {
     material_map.erase(material_map.begin());
   }
   _initialised = false;
-  _render->freeList(_list);
+  if (_render) {
+    _render->freeList(_list);
+    _render->freeList(_list_select);
+  }
   _list = 0;
-  _render->freeList(_list_select);
+  _list_select = 0;
+}
+
+void ThreeDS::invalidate() {
+  // Clean up display lists
+  if (_render) {
+    _render->freeList(_list);
+    _render->freeList(_list_select);
+  }
+  _list = 0;
   _list_select = 0;
 }
 

@@ -1,9 +1,8 @@
-
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.18 2004-04-22 10:51:32 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.19 2004-04-26 15:45:20 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -12,12 +11,10 @@
 #include <varconf/Config.h>
 
 #include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 
 #include "src/FileHandler.h"
 #include "common/Utility.h"
 #include "src/System.h"
-#include "src/Graphics.h"
 #include "src/Render.h"
 
 #include "src/Exception.h"
@@ -287,7 +284,7 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
 }
 
 Cal3dModel *Cal3dCoreModel::instantiate() {
-  Cal3dModel *model = new Cal3dModel(System::instance()->getGraphics()->getRender());
+  Cal3dModel *model = new Cal3dModel(RenderSystem::getInstance().getRenderer());
   model->init(this);
   return model;
 }
