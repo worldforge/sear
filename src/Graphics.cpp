@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.50 2004-06-07 22:05:25 jmt Exp $
+// $Id: Graphics.cpp,v 1.51 2004-06-08 23:29:03 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -213,12 +213,13 @@ Compare D^2 to choose what detail level to use
       }
       // Translate camera getDist() units away from the character. Allows closups or large views
       _renderer->translateObject(0.0f, _camera->getDistance(), -1.0f);
+      _renderer->applyCharacterLighting(0.5, 0, 0.5);
       _renderer->applyQuaternion(orient);
       
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
       _renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
-      _renderer->applyCharacterLighting(x, y, z + height);
+      // _renderer->applyCharacterLighting(x, y, z + height);
 
       _renderer->getFrustum(frustum);
     }

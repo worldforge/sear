@@ -101,18 +101,18 @@
   static const std::string KEY_texture_scale = "texture_scale";
   
   // Default config values
-  static const float DEFAULT_character_light_kc = 1.0f;
-  static const float DEFAULT_character_light_kl = 0.0f;
-  static const float DEFAULT_character_light_kq = 0.0f;
+  static const float DEFAULT_character_light_kc = 2.0f;
+  static const float DEFAULT_character_light_kl = 0.2f;
+  static const float DEFAULT_character_light_kq = 0.05f;
 
   static const float DEFAULT_character_light_ambient_red = 0.0f;
   static const float DEFAULT_character_light_ambient_green = 0.0f;
   static const float DEFAULT_character_light_ambient_blue = 0.0f;
   static const float DEFAULT_character_light_ambient_alpha = 0.0f;
   
-  static const float DEFAULT_character_light_diffuse_red = 0.0f;
-  static const float DEFAULT_character_light_diffuse_green = 0.0f;
-  static const float DEFAULT_character_light_diffuse_blue = 0.0f;
+  static const float DEFAULT_character_light_diffuse_red = 1.0f;
+  static const float DEFAULT_character_light_diffuse_green = 1.0f;
+  static const float DEFAULT_character_light_diffuse_blue = 0.9f;
   static const float DEFAULT_character_light_diffuse_alpha = 0.0f;
 
   static const float DEFAULT_character_light_specular_red = 0.0f;
@@ -482,7 +482,7 @@ void GL::initLighting() {
   glLightf(GL_LIGHT0, GL_CONSTANT_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_constant);
   glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_linear);
   glLightf(GL_LIGHT0, GL_QUADRATIC_ATTENUATION, lights[LIGHT_CHARACTER].attenuation_quadratic);
-//  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT0);
   
   glLightfv(GL_LIGHT1, GL_AMBIENT, blackLight);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, blackLight);
