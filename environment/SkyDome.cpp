@@ -10,9 +10,9 @@
 #include <sage/GL.h>
 #include <math.h>
 #include <iostream>
-#include "src/Render.h"
+#include "renderers/Render.h"
 #include "src/System.h"
-#include "src/Graphics.h"
+#include "renderers/Graphics.h"
 #include "src/Calendar.h"
 
 #include "renderers/RenderSystem.h"

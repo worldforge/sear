@@ -26,15 +26,15 @@
 #include "common/Utility.h"
 
 #include "src/Calendar.h"
-#include "src/Camera.h"
+#include "Camera.h"
 #include "src/Console.h"
 #include "src/Exception.h"
-#include "src/Frustum.h"
-#include "src/Graphics.h"
-#include "src/Model.h"
-#include "src/ModelHandler.h"
-#include "src/ModelRecord.h"
-#include "src/ObjectRecord.h"
+#include "Frustum.h"
+#include "Graphics.h"
+#include "loaders/Model.h"
+#include "loaders/ModelHandler.h"
+#include "loaders/ModelRecord.h"
+#include "loaders/ObjectRecord.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
@@ -181,7 +181,6 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   if (m_screen != NULL) destroyWindow();
   
   if (debug) std::cout << "GL: Creating Window" << std::endl;
-
   // Set new window size etc..
   m_width = width;
   m_height = height;
@@ -190,6 +189,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   // TODO check return values
   SDL_InitSubSystem(SDL_INIT_VIDEO);
   SDL_EnableUNICODE(1);
+
 
   //Request Open GL window attributes
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
@@ -215,8 +215,10 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     if (videoModes == 0) {
       printf("No modes available!\n");
     } else if (videoModes == (SDL_Rect **)-1) {
-      printf("All resolutions available.\n");     } else{
-      /* Print valid modes */         printf("Available Modes\n");
+      printf("All resolutions available.\n");
+    } else{
+      /* Print valid modes */
+      printf("Available Modes\n");
       for(int i=0; videoModes[i]; ++i) {
         float aspect = (float)videoModes[i]->w / (float)videoModes[i]->h;
         printf("  %d x %d -- %f\n", videoModes[i]->w, videoModes[i]->h, aspect);

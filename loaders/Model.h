@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.8 2004-06-21 10:18:34 simon Exp $
+//$Id: Model.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -12,8 +12,8 @@
 
 #include <Atlas/Message/Element.h>
 
-#include "Render.h"
-#include "Graphics.h"
+#include "renderers/Render.h"
+#include "renderers/Graphics.h"
 
 namespace Sear {
 

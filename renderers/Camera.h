@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.14 2004-04-12 15:28:50 alriddoch Exp $
+// $Id: Camera.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1

@@ -2,15 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: WireFrame_Loader.h,v 1.7 2002-11-12 23:59:22 simon Exp $
+// $Id: WireFrame_Loader.h,v 1.8 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_WIREFRAME_LOADER_H
 #define SEAR_WIREFRAME_LOADER_H 1
 
-#include "src/ModelLoader.h"
+#include "ModelLoader.h"
 
 namespace Sear {
 
+class ModelHandler;
 // Forward Declarations
 	
 class WireFrame_Loader : public ModelLoader {

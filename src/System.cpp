@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.106 2004-10-28 10:37:04 alriddoch Exp $
+// $Id: System.cpp,v 1.107 2005-01-06 12:46:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,7 +26,7 @@
 #include "ActionHandler.h"
 #include "Bindings.h"
 #include "Calendar.h"
-#include "Camera.h"
+#include "renderers/Camera.h"
 #include "Character.h"
 #include "client.h"
 #include "conf.h"
@@ -35,10 +35,10 @@
 #include "EventHandler.h"
 #include "Exception.h"
 #include "FileHandler.h"
-#include "Graphics.h"
-#include "ModelHandler.h"
-#include "ObjectHandler.h"
-#include "Render.h"
+#include "renderers/Graphics.h"
+#include "loaders/ModelHandler.h"
+#include "loaders/ObjectHandler.h"
+#include "renderers/Render.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
 #include "System.h"
@@ -218,6 +218,7 @@ bool System::init(int argc, char *argv[]) {
   _console = new Console(this);
   _console->init();
   registerCommands(_console);
+
   _client->registerCommands(_console);
   _script_engine->registerCommands(_console);
   _action_handler->registerCommands(_console);
@@ -225,6 +226,7 @@ bool System::init(int argc, char *argv[]) {
   _object_handler->registerCommands(_console);
   _calendar->registerCommands(_console);
 
+// TODO this is leaked
     Editor* edit = new Editor();
     edit->registerCommands(_console);
 
@@ -275,7 +277,7 @@ bool System::init(int argc, char *argv[]) {
   } catch (Exception &e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
-  
+
   RenderSystem::getInstance().init();
   renderer = RenderSystem::getInstance().getRenderer();
   _graphics = new Graphics(this);
@@ -290,6 +292,7 @@ bool System::init(int argc, char *argv[]) {
   for (FileHandler::FileList::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     _script_engine->runScript(*I);
   }
+
 //  if (debug) {
 //    for (int i = 0; i < argc; ++i) {
 //      std::cout << argv[i] << std::endl;
@@ -301,7 +304,7 @@ bool System::init(int argc, char *argv[]) {
   RenderSystem::getInstance().readConfig();
   _graphics->readConfig();
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
-  
+
   // Try and create the window
   bool success;
   if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, false))) {
@@ -314,6 +317,7 @@ bool System::init(int argc, char *argv[]) {
   }
   if (!success) return false;
 
+  // TODO:these are probably leaked, however freeing them often causes a segfault!
   if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
   SDL_WM_SetIcon(_icon, NULL);
   if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
@@ -364,7 +368,13 @@ void System::shutdown() {
     _graphics = NULL;
   }
 
+  RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
+
+ if (_workspace)  {
+   delete _workspace;
+   _workspace = NULL;
+ }
 
   if (_calendar) {
     _calendar->shutdown();

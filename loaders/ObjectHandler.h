@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.3 2003-03-23 19:51:49 simon Exp $
+// $Id: ObjectHandler.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_OBJECTHANDLER_H
 #define SEAR_OBJECTHANDLER_H 1

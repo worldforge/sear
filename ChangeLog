@@ -1,3 +1,30 @@
+2005-01-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Camera.cpp, src/Camera.h, src/Frustum.cpp, src/Frustum.h, 
+	  src/Graphics.cpp, src/Graphics.h, src/Light.h, src/LightManager.cpp,
+	  src/LightManager.h, src/Render.h: Moved to renderers directory as this
+	  is the more logical place for them.
+	* src/Model.h, src/Modelhandler.cpp, src/ModelHandler.h,
+	  src/ModelLoader.h, src/ObjectRecord.h, src/ObjectHandler.cpp, 
+	  src/ObjectHandler.h: Moved to loaders directory as this is the more
+	  logical place for them.
+	* src/ModelStruct.h: Removed as not used.
+	* renderers/Graphics.cpp: Delete compass and lightmanager if created.
+	* renderers/Graphics.h: Remove ModelHandler refs as not required.
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Change member
+	  variables to start with m_. Default to using BoundBox loader if
+	  specified loader is not found.
+	* src/Makefile.am, renders/Makefile.am, loaders/Makefile.am: Move
+	  entries to correct makefile. Combine loaders libs into one.
+	* src/Character.cpp: Make use of setAction for pickup, touch, drop,
+	  wield, use and give actions.
+	* renderers/TextureManager.cpp: Clean up sprites. Add function to find
+	  next possible texture size for a given size.
+	* renderers/Sprite.cpp: Use printf instead of cerr in construction to
+	  avoid valgrind error.
+	* src/System.cpp: Clean up workspace object on shutdown
+	* Other files: Updated include paths
+
 2005-01-02  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/TextEntry.cpp, gui/TextEntry.h: Add support for obscured text

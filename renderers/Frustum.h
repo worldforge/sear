@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//$Id: Frustum.h,v 1.8 2004-06-20 18:43:35 simon Exp $
+//$Id: Frustum.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_FRUSTUM_H
 #define SEAR_FRUSTUM_H 1

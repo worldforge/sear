@@ -2,14 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.h,v 1.5 2002-11-12 23:59:22 simon Exp $
+// $Id: NPlane_Loader.h,v 1.6 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_NPLANE_LOADER_H
 #define SEAR_NPLANE_LOADER_H 1
 
-#include "src/ModelLoader.h"
+#include "ModelLoader.h"
 
 namespace Sear {
+class ModelHandler;
 
 class NPlane_Loader : public ModelLoader {
 public:	

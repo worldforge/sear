@@ -1,7 +1,7 @@
 #include "Editor.h"
 #include "System.h"
-#include "Graphics.h"
-#include "Render.h"
+#include "renderers/Graphics.h"
+#include "renderers/Render.h"
 
 #include <Eris/Entity.h>
 #include <Eris/World.h>

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.39 2004-06-11 00:53:13 alriddoch Exp $
+// $Id: Render.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1

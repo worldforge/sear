@@ -4,7 +4,7 @@
 
 #include "Compass.h"
 #include "renderers/RenderSystem.h"
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include <Eris/World.h>
 #include <Eris/Entity.h>

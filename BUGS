@@ -1,3 +1,8 @@
+Random Crashes on ATI based hardware. Typically when in the game world. More often on Win32. Valgrind reports numerous errors in the GL library. Perhaps something to do with this.
+
+Need to check init functions. They do not always clean up in event of failure (e.g. System::init();
+
+
 Many warning are given about initialised values in Sear::Frustrum::patchInFrustrum,
 with the error being in wfmath/point.h lines 199, 203 and 207
 

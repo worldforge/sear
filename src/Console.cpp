@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.32 2004-10-11 10:46:39 simon Exp $
+// $Id: Console.cpp,v 1.33 2005-01-06 12:46:55 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -13,8 +13,8 @@
 #include "Bindings.h"
 #include "Console.h"
 #include "System.h"
-#include "Graphics.h"
-#include "Render.h"
+#include "renderers/Graphics.h"
+#include "renderers/Render.h"
 #include "FileHandler.h"
 
 #include "renderers/RenderSystem.h"

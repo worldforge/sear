@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.7 2004-06-13 18:21:01 simon Exp $
+// $Id: Cal3dModel.h,v 1.8 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -12,8 +12,8 @@
 
 #include <cal3d/cal3d.h>
 #include "Cal3dCoreModel.h"
-#include "src/Model.h"
-#include "src/Graphics.h"
+#include "Model.h"
+#include "renderers/Graphics.h"
 
 
 namespace Sear {

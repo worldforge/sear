@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.6 2004-06-21 15:56:03 simon Exp $
+// $Id: ObjectRecord.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_OBJECTRECORD_H
 #define SEAR_OBJECTRECORD_H 1
@@ -15,9 +15,9 @@
 #include <wfmath/quaternion.h>
 
 #include "src/System.h"
-#include "src/Model.h"
-#include "src/ModelHandler.h"
-#include "src/ModelRecord.h"
+#include "Model.h"
+#include "ModelHandler.h"
+#include "ModelRecord.h"
 
 namespace Sear {
 

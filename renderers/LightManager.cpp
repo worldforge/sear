@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.6 2004-06-30 12:44:21 simon Exp $
+// $Id: LightManager.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: LightManager.h,v 1.2 2004-06-26 07:02:36 simon Exp $
+// $Id: LightManager.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_LIGHTMANAGER_H
 #define SEAR_LIGHTMANAGER_H 1

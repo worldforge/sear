@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.50 2004-12-31 15:38:15 simon Exp $
+// $Id: Character.cpp,v 1.51 2005-01-06 12:46:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -29,10 +29,10 @@
 #include "System.h"
 #include "Character.h"
 #include "Console.h"
-#include "Render.h"
-#include "Graphics.h"
-#include "ObjectHandler.h"
-#include "ObjectRecord.h"
+#include "renderers/Render.h"
+#include "renderers/Graphics.h"
+#include "loaders/ObjectHandler.h"
+#include "loaders/ObjectRecord.h"
 
 #include "common/Use.h"
 #include "common/Wield.h"
@@ -296,6 +296,7 @@ void Character::getEntity(const std::string &id) {
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
   m_avatar->place(e, m_avatar->getEntity());
+  setAction("pickup");
 }
 
 void Character::dropEntity(const std::string &name, int quantity) {
@@ -312,6 +313,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
       quantity--;
     }
   }
+  setAction("drop");
 }
 
 void Character::touchEntity(const std::string &id) {
@@ -319,6 +321,7 @@ void Character::touchEntity(const std::string &id) {
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
   m_avatar->touch(e);
+  setAction("touch");
 }
 
 void Character::wieldEntity(const std::string &name) {
@@ -334,6 +337,7 @@ void Character::wieldEntity(const std::string &name) {
       Atlas::Message::Element::ListType & args = w.getArgs();
       args.push_back(arg);
       m_avatar->getWorld()->getConnection()->send(w);
+      setAction("wield");
       return;
     }
   }
@@ -352,6 +356,7 @@ void Character::useToolOnEntity(const std::string & id) {
   Atlas::Message::Element::ListType & args = u.getArgs();
   args.push_back(arg);
   m_avatar->getWorld()->getConnection()->send(u);
+  setAction("use");
 }
 
 void Character::displayInventory() {
@@ -439,6 +444,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
       quantity--;
     }
   }
+  setAction("give");
 }
 
 void Character::registerCommands(Console *console) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.15 2004-04-27 15:07:01 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.16 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -14,10 +14,10 @@
 
 #include "common/Utility.h"
 
-#include "src/Model.h"
-#include "src/ModelHandler.h"
-#include "src/ModelRecord.h"
-#include "src/ObjectRecord.h"
+#include "Model.h"
+#include "ModelHandler.h"
+#include "ModelRecord.h"
+#include "ObjectRecord.h"
 
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"

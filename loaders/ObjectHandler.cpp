@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.9 2004-06-26 15:48:02 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -11,8 +11,8 @@
 
 #include "common/Log.h"
 
+#include "src/Console.h"
 #include "ObjectHandler.h"
-#include "Console.h"
 #include "ObjectRecord.h"
 
 

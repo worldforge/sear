@@ -1,23 +1,23 @@
 SUBDIRS = cal3d
-
-LIB3DS_LIBS = libLoader3ds.a
-
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a $(LIB3DS_LIBS)
+noinst_LIBRARIES = libModelLoader.a 
 
 INCLUDES = -I$(top_srcdir)
 
-libLoaderWireFrame_a_SOURCES = \
-	WireFrame.cpp WireFrame.h \
-	WireFrame_Loader.cpp WireFrame_Loader.h
+libModelLoader_a_SOURCES = \
+	ModelHandler.cpp ModelHandler.h \
+	ObjectHandler.cpp ObjectHandler.h \
+	WireFrame.cpp WireFrame_Loader.cpp \
+	WireFrame.h WireFrame_Loader.h \
+	BoundBox.cpp BoundBox_Loader.cpp \
+	BoundBox.h BoundBox_Loader.h \
+	NPlane.cpp NPlane_Loader.cpp \
+	NPlane.h NPlane_Loader.h \
+	3ds.cpp 3ds_Loader.cpp \
+	3ds.h 3ds_Loader.h \
+	ModelRecord.cpp ModelRecord.h \
+	ModelLoader.h \
+	Model.h \
+	ObjectRecord.h 
 
-libLoaderBoundBox_a_SOURCES = \
-	BoundBox.cpp BoundBox.h \
-	BoundBox_Loader.cpp BoundBox_Loader.h
-
-libLoader3ds_a_SOURCES = \
-	3ds.cpp 3ds.h \
-	3ds_Loader.cpp 3ds_Loader.h
-
-libLoaderNPlane_a_SOURCES = \
-	NPlane.cpp NPlane.h \
-	NPlane_Loader.cpp NPlane_Loader.h
+libModelLoader_a_LIBADD = \
+	cal3d/libLoaderCal3d.a

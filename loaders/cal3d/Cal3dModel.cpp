@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.15 2004-12-31 15:38:16 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.16 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -16,7 +16,7 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 #include "src/System.h"
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include "renderers/RenderSystem.h"
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.22 2004-06-13 18:21:01 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.23 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -19,7 +19,7 @@
 #include "src/FileHandler.h"
 #include "common/Utility.h"
 #include "src/System.h"
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include "src/Exception.h"
 

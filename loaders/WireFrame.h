@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.6 2004-04-26 15:45:20 simon Exp $
+// $Id: WireFrame.h,v 1.7 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -11,7 +11,7 @@
 
 #include "common/types.h"
 
-#include "src/Model.h"
+#include "Model.h"
 
 namespace Sear {
 

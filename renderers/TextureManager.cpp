@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.31 2004-07-14 10:10:31 simon Exp $
+// $Id: TextureManager.cpp,v 1.32 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,19 @@ static const bool debug = true;
 static const bool debug = false;
 #endif
 namespace Sear {
+
+// Find the next largest power of 2 to i, but no bigger than the max texture
+// size we are allowed
+inline int scaleDimension(int i) {
+  GLint texSize;
+  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+  int n = 2;
+  while (n < i && n <= texSize) {
+    n <<= 1;
+  }
+  if (n > texSize) return texSize;
+  else return n;
+}
 
 // Config section name
 static const std::string SECTION_texture_manager = "texture_manager";
@@ -196,6 +209,12 @@ void TextureManager::shutdown()
   // Unload all textures
   for (unsigned int i = 1; i < m_textures.size(); ++i) {
     unloadTexture(m_textures[i]);
+  }
+
+  // Clean up sprites
+  while (!m_sprites.empty()) {
+   delete m_sprites.begin()->second;
+    m_sprites.erase(m_sprites.begin());
   }
 
   m_last_textures.clear();

@@ -2,15 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.16 2004-06-20 18:43:35 simon Exp $
+// $Id: Frustum.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 
 #include "common/Utility.h"
 
-#include "System.h"
-#include "WorldEntity.h"
+#include "src/System.h"
+#include "src/WorldEntity.h"
 #include "Frustum.h"
 #include "environment/Environment.h"
 

@@ -20,8 +20,8 @@
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 
-#include "src/Light.h"
-#include "src/Render.h"
+#include "Light.h"
+#include "Render.h"
 #include "RenderSystem.h"
 
 namespace Sear {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.59 2004-06-13 18:21:01 simon Exp $
+// $Id: client.cpp,v 1.60 2005-01-06 12:46:55 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -39,11 +39,10 @@
 #include "EventHandler.h"
 #include "Event.h"
 #include "Lobby.h"
-#include "Render.h"
-#include "ModelHandler.h"
-#include "Model.h"
-#include "ObjectHandler.h"
-#include "ObjectRecord.h"
+#include "renderers/Render.h"
+#include "loaders/Model.h"
+#include "loaders/ObjectHandler.h"
+#include "loaders/ObjectRecord.h"
 #include "Exception.h"
 #include "WorldEntity.h"
 
@@ -559,22 +558,11 @@ if (debug)  Log::writeLog(std::string("Appearance: ") + e->getName(), Log::LOG_I
   ObjectHandler *object_handler = System::instance()->getObjectHandler();
   if (object_handler) record = object_handler->getObjectRecord(e->getID());
   if (record) record->setAppearance(mt);
-
-//  ((WorldEntity *)e)->handleMove();
-//  static ModelHandler *mh =  _system->getModelHandler();
-//  Model *m = mh->getModel(NULL, (WorldEntity*)e);
-//  if (m) m->setInUse(true);
-//  ((WorldEntity *)e)->displayInfo();
   
 }
 
 void Client::Disappearance(Eris::Entity *e){
   if (debug) Log::writeLog("Disappearance: " + e->getName(), Log::LOG_INFO);
-//  static ModelHandler *mh =  _system->getModelHandler();
-//  Model *m = mh->getModel(NULL, (WorldEntity*)e);
-//  if (m) m->setInUse(false);
-  // Delete model after 1 minute
- // _system->getEventHandler()->addEvent(Event(EF_FREE_MODEL, Event::stringToObject(e->getID()), EC_TIME, 60000 + System::instance()->getTime()));
 }
 
 void Client::RootEntityChanged(Eris::Entity *e) {

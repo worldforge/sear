@@ -6,7 +6,7 @@
 
 #include "renderers/RenderSystem.h"
 
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include <sage/sage.h>
 #include <sage/GL.h>

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Light.h,v 1.4 2004-06-30 12:44:21 simon Exp $
+// $Id: Light.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1

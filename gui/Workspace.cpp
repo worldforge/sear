@@ -9,8 +9,8 @@
 #include "gui/focus.h"
 
 #include "src/System.h"
-#include "src/Graphics.h"
-#include "src/Render.h"
+#include "renderers/Graphics.h"
+#include "renderers/Render.h"
 
 #include "renderers/RenderSystem.h"
 
@@ -30,6 +30,7 @@ Workspace::Workspace(System * system) : m_system(system),
 
 Workspace::~Workspace()
 {
+  delete m_rootWindow;
 }
 
 void Workspace::draw()

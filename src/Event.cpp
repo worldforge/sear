@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.16 2004-06-15 01:09:35 alriddoch Exp $
+// $Id: Event.cpp,v 1.17 2005-01-06 12:46:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -13,11 +13,11 @@
 #include <Eris/World.h>
 
 #include "common/Log.h"
+#include "loaders/ModelHandler.h"
 
 #include "Event.h"
 #include "WorldEntity.h"
-#include "ModelHandler.h"
-#include "Render.h"
+#include "renderers/Render.h"
 #include "Character.h"
 
 

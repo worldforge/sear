@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.43 2004-09-29 10:50:25 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.44 2005-01-06 12:46:55 simon Exp $
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -23,11 +23,11 @@
 #include "Console.h"
 #include "Event.h"
 #include "EventHandler.h"
-#include "Graphics.h"
-#include "ObjectHandler.h"
-#include "src/ObjectRecord.h"
-#include "Model.h"
-#include "Render.h"
+#include "renderers/Graphics.h"
+#include "loaders/ObjectHandler.h"
+#include "loaders/ObjectRecord.h"
+#include "loaders/Model.h"
+#include "renderers/Render.h"
 #include "WorldEntity.h"
 #include "ActionHandler.h"
 

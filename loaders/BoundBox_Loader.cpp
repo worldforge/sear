@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.23 2004-05-19 17:52:19 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.24 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -17,10 +17,10 @@
 
 #include "common/Utility.h"
 
-#include "src/Graphics.h"
-#include "src/ModelHandler.h"
-#include "src/ModelRecord.h"
-#include "src/ObjectRecord.h"
+#include "renderers/Graphics.h"
+#include "ModelHandler.h"
+#include "ModelRecord.h"
+#include "ObjectRecord.h"
 
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.9 2004-04-26 15:45:20 simon Exp $
+// $Id: BoundBox.h,v 1.10 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -14,7 +14,7 @@
 
 #include <wfmath/axisbox.h>
 
-#include "src/Model.h"
+#include "Model.h"
 
 #include "common/types.h"
 

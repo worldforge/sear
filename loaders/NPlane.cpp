@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.21 2004-04-27 15:07:01 simon Exp $
+// $Id: NPlane.cpp,v 1.22 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -11,7 +11,7 @@
 #include "common/Utility.h"
 
 #include "src/System.h"
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include "NPlane.h"
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: 3ds.h,v 1.14 2004-10-28 09:30:54 simon Exp $
+// $Id: 3ds.h,v 1.15 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -16,7 +16,7 @@
 
 #include "common/types.h"
 
-#include "src/Model.h"
+#include "Model.h"
 
 namespace Sear {
 

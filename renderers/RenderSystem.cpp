@@ -12,8 +12,8 @@
 #include "TextureManager.h"
 #include "StateManager.h"
 
-#include "src/Render.h"
-#include "renderers/GL.h"
+#include "Render.h"
+#include "GL.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.17 2004-05-17 10:39:28 simon Exp $
+// $Id: Camera.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,9 +15,9 @@
 #include "common/Log.h"
 
 #include "Camera.h"
-#include "System.h"
-#include "conf.h"
-#include "Console.h"
+#include "src/System.h"
+#include "src/conf.h"
+#include "src/Console.h"
 
 
 #ifdef USE_MMGR

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.15 2004-06-21 12:20:31 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.16 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -12,9 +12,9 @@
 
 #include "src/System.h"
 
-#include "src/ModelHandler.h"
-#include "src/ModelRecord.h"
-#include "src/ObjectRecord.h"
+#include "ModelHandler.h"
+#include "ModelRecord.h"
+#include "ObjectRecord.h"
 
 #include "3ds_Loader.h"
 #include "3ds.h"

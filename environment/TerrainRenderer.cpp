@@ -10,7 +10,7 @@
 
 #include "renderers/RenderSystem.h"
 
-#include "src/Render.h"
+#include "renderers/Render.h"
 
 #include <sage/GLU.h>
 

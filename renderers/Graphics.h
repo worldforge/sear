@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.17 2004-07-29 18:27:02 simon Exp $
+// $Id: Graphics.h,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -27,7 +27,6 @@ class Config;
 
 namespace Sear {
 class TerrainRenderer;
-class ModelHandler;
 class BillBoard;
 class BoundBox;
 class Camera;
@@ -101,7 +100,6 @@ protected:
   Render *_renderer;
   Character *_character;
   Camera *_camera;
-  ModelHandler *_model_handler;
 
   WFMath::Quaternion orient;
 

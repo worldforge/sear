@@ -1,40 +1,38 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.36 2004-06-15 20:37:05 simon Exp $
+// $Id: ModelHandler.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 
-#include "System.h"
 #include <set>
 #include <string.h>
 
 #include <Atlas/Message/Element.h>
 
-
 #include <varconf/Config.h>
 
-
 #include "common/Log.h"
-#include "loaders/3ds_Loader.h"
-#include "loaders/cal3d/Cal3d_Loader.h"
-#include "loaders/BoundBox_Loader.h"
-#include "loaders/NPlane_Loader.h"
-#include "loaders/WireFrame_Loader.h"
-
 
 #include "src/Event.h"
 #include "src/EventHandler.h"
-#include "Exception.h"
-#include "ModelHandler.h"
-#include "ModelLoader.h"
+#include "src/Exception.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
-#include "Render.h"
-#include "WorldEntity.h"
+#include "renderers/Render.h"
+#include "src/System.h"
+#include "src/WorldEntity.h"
+
+#include "ModelHandler.h"
+#include "ModelLoader.h"
+#include "3ds_Loader.h"
+#include "cal3d/Cal3d_Loader.h"
+#include "BoundBox_Loader.h"
+#include "NPlane_Loader.h"
+#include "WireFrame_Loader.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -49,24 +47,24 @@
 namespace Sear {
 
 ModelHandler::ModelHandler() :
-  _initialised(false)
+  m_initialised(false)
 	
 {
   // TODO: this is not the place
   // create all the model loaders
-  new Cal3d_Loader(this);
+//  new Cal3d_Loader(this);
   new BoundBox_Loader(this);
-  new WireFrame_Loader(this);
-  new NPlane_Loader(this);
-  new ThreeDS_Loader(this);
+//  new WireFrame_Loader(this);
+//  new NPlane_Loader(this);
+//  new ThreeDS_Loader(this);
 }
 
 ModelHandler::~ModelHandler() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
 }
 
 void ModelHandler::init() {
-  if (_initialised) shutdown();
+  if (m_initialised) shutdown();
   // TODO another method would be better - or a clean up of the event system
   System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
   // Add default record
@@ -75,19 +73,19 @@ void ModelHandler::init() {
   model_config.setItem("default", ModelRecord::STATE, "default");
   model_config.setItem("default", ModelRecord::SELECT_STATE, "select");
   model_config.setItem("default", ModelRecord::OUTLINE, false);
-  _initialised = true;
+  m_initialised = true;
 }
 
 void ModelHandler::shutdown() {
   // Clean up model loaders
-  while (!_model_loaders.empty()) {
-    ModelLoader *ml = _model_loaders.begin()->second;
+  while (!m_model_loaders.empty()) {
+    ModelLoader *ml = m_model_loaders.begin()->second;
     if (ml) delete (ml);
-    _model_loaders.erase(_model_loaders.begin());
+    m_model_loaders.erase(m_model_loaders.begin());
   }
   // Delete all unique records
-  while (!_object_map.empty()) {
-    ModelRecord *mr = _object_map.begin()->second;
+  while (!m_object_map.empty()) {
+    ModelRecord *mr = m_object_map.begin()->second;
     if (mr) {
       if (!mr->model_by_type) { // If model_by_type then record is not unique
         if (mr->model) {
@@ -98,11 +96,11 @@ void ModelHandler::shutdown() {
         delete mr;
       }
     }
-    _object_map.erase(_object_map.begin());
+    m_object_map.erase(m_object_map.begin());
   }
   // Delete all remaining records
-  while (!_model_records.empty()) {
-    ModelRecord *mr = _model_records.begin()->second;
+  while (!m_model_records.empty()) {
+    ModelRecord *mr = m_model_records.begin()->second;
     if (mr) {
       if (mr->model) {
 	mr->model->shutdown();
@@ -111,18 +109,18 @@ void ModelHandler::shutdown() {
       }
       delete mr;
     }
-    _model_records.erase(_model_records.begin());
+    m_model_records.erase(m_model_records.begin());
   }
-  _initialised = false;
+  m_initialised = false;
 }
   
 ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
   // Model loaded for this object?
-  if (_object_map[record->id + model_id]) return _object_map[record->id + model_id];
+  if (m_object_map[record->id + model_id]) return m_object_map[record->id + model_id];
   
-  if (_model_records[model_id]) {
-    _object_map[record->id + model_id] = _model_records[model_id];
-    return _model_records[model_id];
+  if (m_model_records[model_id]) {
+    m_object_map[record->id + model_id] = m_model_records[model_id];
+    return m_model_records[model_id];
   }
   // No existing model found, load up a new one
   if (!render) {
@@ -137,8 +135,15 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   varconf::Config &model_config = System::instance()->getModelRecords();
   std::string model_loader = (std::string)model_config.getItem(model_id, ModelRecord::MODEL_LOADER);
 
-  if (model_loader.empty()) return NULL; 
-  if (_model_loaders[model_loader]) model = _model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
+  if (model_loader.empty()) {
+    printf("Model Loader not defined. Using BoundBox.\n");
+    model_loader = "boundbox";
+  }
+  if (m_model_loaders.find(model_loader) == m_model_loaders.end()) {
+    printf("Unknown Model Loader. Using BoundBox.\n");
+    model_loader = "boundbox";
+  }
+  if (m_model_loaders[model_loader]) model = m_model_loaders[model_loader]->loadModel(render, record, model_id, model_config);
   else {
     std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
@@ -157,8 +162,8 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   }
 	  
   // If model is a generic one, add it to the generic list
-  if (model->model_by_type)  _model_records[model_id] = model;
-  _object_map[record->id + model_id] = model;
+  if (model->model_by_type) m_model_records[model_id] = model;
+  m_object_map[record->id + model_id] = model;
   return model; 
 }
 
@@ -169,40 +174,40 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
   // Throw error if we already have a loader for this type
   // TODO: decide whether we should override existing loaders with new one.
   // TODO throw execption is not a good idea as this method gets called via a constructor
-  //if (_model_loaders[model_type]) throw Exception("Model loader already exists for this type!");
+  //if (m_model_loaders[model_type]) throw Exception("Model loader already exists for this type!");
   // If all is well, assign loader
-  _model_loaders[model_type] = model_loader;
+  m_model_loaders[model_type] = model_loader;
 }
 
 void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader) {
   // Only unregister a model laoder if it is properly registered
-  if (_model_loaders[model_type] == model_loader) _model_loaders[model_type] = NULL;
+  if (m_model_loaders[model_type] == model_loader) m_model_loaders[model_type] = NULL;
 }
 
 void ModelHandler::checkModelTimeouts() {
   // TODO what about records with no model?
   if (debug) std::cout << "Checking Timeouts" << std::endl;
   std::set<ModelRecord*> expired_set;
-  for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
+  for (ModelRecordMap::iterator I = m_model_records.begin(); I != m_model_records.end(); ++I) {
     ModelRecord *record = I->second;
     if (record) {
       Model *model = record->model;
       if (model) {
         if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
           expired_set.insert(record);
-          _model_records[I->first] = NULL;
+          m_model_records[I->first] = NULL;
         }
       }
     }
   }
-  for (ObjectRecordMap::iterator I = _object_map.begin(); I != _object_map.end(); ++I) {
+  for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     ModelRecord *record = I->second;
     if (record) {
       Model *model = record->model;
       if (model) {
         if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
           expired_set.insert(record);
-          _object_map[I->first] = NULL;
+          m_object_map[I->first] = NULL;
         }
       }
     }

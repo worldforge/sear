@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.61 2004-10-20 14:16:25 simon Exp $
+// $Id: Graphics.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -18,23 +18,22 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 #include "environment/Environment.h"
-#include "renderers/GL.h"
+#include "GL.h"
 #include "renderers/Sprite.h"
 #include "Camera.h"
-#include "Character.h"
-#include "Console.h"
-#include "Exception.h"
+#include "src/Character.h"
+#include "src/Console.h"
+#include "src/Exception.h"
 #include "Frustum.h"
 #include "Light.h"
 #include "LightManager.h"
-#include "Model.h"
-#include "ModelHandler.h"
-#include "ModelRecord.h"
-#include "ObjectRecord.h"
-#include "ObjectHandler.h"
+#include "loaders/Model.h"
+#include "loaders/ModelRecord.h"
+#include "loaders/ObjectRecord.h"
+#include "loaders/ObjectHandler.h"
 #include "Render.h"
-#include "System.h"
-#include "WorldEntity.h"
+#include "src/System.h"
+#include "src/WorldEntity.h"
 
 #include "renderers/RenderSystem.h"
 #include "gui/Compass.h"
@@ -122,6 +121,8 @@ Graphics::Graphics(System *system) :
   _camera(NULL),
   _num_frames(0),
   _frame_time(0),
+  _lower_frame_rate_bound(DEFAULT_lower_frame_rate_bound),
+  _upper_frame_rate_bound(DEFAULT_upper_frame_rate_bound),
   _initialised(false),
   m_compass(NULL),
   tr(NULL)
@@ -134,21 +135,25 @@ Graphics::~Graphics() {
 
 void Graphics::init() {
   if (_initialised) shutdown();
+  // Read  Graphics config options
   readConfig();
+  // Add callbeck to detect updated options
   _system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
-  
+  // Register console commands
   RenderSystem::getInstance().registerCommands(_system->getConsole());
 
-//  ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
-//  ((GL*)_renderer)->getStateManager()->registerCommands(_system->getConsole());
+  // Create the default camera
   _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
   
-    m_compass = new Compass(580.f, 50.f);
-    m_compass->setup();
-    
-   m_lm = new LightManager();
+  // Create the compass
+  m_compass = new Compass(580.f, 50.f);
+  m_compass->setup();
+
+  // Create the LightManager    
+  m_lm = new LightManager();
+
   _initialised = true;
 }
 
@@ -160,9 +165,16 @@ void Graphics::shutdown() {
     delete _camera;
     _camera = NULL;
   }
-  
-  delete m_compass;
-  delete m_lm;
+ 
+  if (m_compass) {
+    delete m_compass;
+    m_compass = NULL;
+  } 
+  if (m_lm) {  
+    m_lm->shutdown();
+    delete m_lm;
+    m_lm = NULL;
+  }
   _initialised = false;
 }
 
@@ -317,7 +329,6 @@ Compare D^2 to choose what detail level to use
 
 
 void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list) {
-  _model_handler = _system->getModelHandler();
   we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {

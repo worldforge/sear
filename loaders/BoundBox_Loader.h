@@ -2,17 +2,18 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: BoundBox_Loader.h,v 1.7 2002-11-12 23:59:22 simon Exp $
+// $Id: BoundBox_Loader.h,v 1.8 2005-01-06 12:46:54 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_LOADER_H
 #define SEAR_BOUNDBOX_LOADER_H 1
 
-#include "src/ModelLoader.h"
+#include "ModelLoader.h"
 
 
 namespace Sear {
 
 // Forward Declarations
+class ModelHandler;
 	
 class BoundBox_Loader : public ModelLoader {
 public:	

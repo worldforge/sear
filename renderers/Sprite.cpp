@@ -11,8 +11,8 @@
 
 #include "src/System.h"
 #include "src/FileHandler.h"
-#include "src/Render.h"
-#include "src/Graphics.h"
+#include "Render.h"
+#include "Graphics.h"
 
 using std::cerr;
 using std::endl;
@@ -61,11 +61,11 @@ SpriteData::SpriteData(const std::string& spriteName) :
 {   
     assert(!spriteName.empty());
     m_name = spriteName;
-    
     // Check if the texture has a filename specified
     if (!getSpriteConfig().findItem(spriteName, "filename")) {
-        cerr << "Sprite " << spriteName << " has no filename defined" << endl;
-        return;
+      // cerr causes an error in valgrind.
+      fprintf(stderr, "Sprite %s has no filename defined\n", spriteName.c_str());
+//        std::cerr << "Sprite " << spriteName << " has no filename defined" << std::endl;
     }
 }
 
