@@ -1,4 +1,8 @@
 22nd December 2002, Simon Goodall
+ * configure.in changes to remove warnings on newer autoconf versions
+ * acconfig.h no longer required
+
+22nd December 2002, Simon Goodall
  * Guard against possible seg fault if we request a colour id greater than allowed
 
 21st December 2002, Simon Goodall

@@ -4,8 +4,8 @@ AC_INIT(src/main.cpp)
 AM_CONFIG_HEADER(config.h)
 
 dnl Detect the canonical host and target build environment
-dnl AC_CANONICAL_HOST
-dnl AC_CANONICAL_TARGET
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
 
 dnl Initialise automake
 SEAR_MAJOR_VERSION=0
@@ -56,7 +56,7 @@ AC_ARG_WITH(glgooey,
   [
     if test "$enableval" = "yes"; then
       with_glgooey=yes
-      AC_DEFINE(HAVE_GLGOOEY)
+      AC_DEFINE(HAVE_GLGOOEY, 1, "Compile Sear with GLGooey support")
       AC_MSG_WARN(Compiling with GLGooey support)
     else
       AC_MSG_WARN(Compiling without GLGooey support)
@@ -101,13 +101,11 @@ int main(int argc, char**argv) {
   return 1;
 } 
 ], [
-  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 1)
+  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 1, "We need the stringstreeam workaround")
   AC_MSG_WARN(Using sstream workaround.)
 ],[
-  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 0)
   AC_MSG_WARN(Not using sstream workaround.)
 ],[
-  AC_DEFINE(NEEDS_SSTREAM_WORKAROUND, 0)
   AC_MSG_WARN(Not using sstream workaround.)
 ])
 dnl Check Atlas
@@ -295,7 +293,7 @@ if test "x$prefix" != xNONE; then
 fi
 
 
-AC_DEFINE_UNQUOTED(INSTALLDIR,"$PREFIX")
+AC_DEFINE_UNQUOTED(INSTALLDIR,"$PREFIX","Install prefix")
 
 AC_CHECK_HEADERS(sstream strstream, [ found_string_stream=yes break ],
                                     [ found_string_stream=no ])
