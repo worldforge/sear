@@ -1,3 +1,6 @@
+UI is confusing if active entity is not visible. How can we ensure that an
+entity stops being the active entity if its no longer on screen?
+
 Handle disconnection cleanly. May be attempt a re-connect.
 
  Idea:

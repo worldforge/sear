@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.48 2004-11-03 20:07:08 alriddoch Exp $
+// $Id: Character.cpp,v 1.49 2004-11-06 21:45:53 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -341,6 +341,7 @@ void Character::wieldEntity(const std::string &name) {
 
 void Character::useToolOnEntity(const std::string & id) {
   assert ((_initialised == true) && "Character not initialised");
+  if (id.empty()) return;
   Eris::EntityPtr e = Eris::World::Instance()->lookup(id);
   if (!e) return;
   Atlas::Objects::Operation::Use u;

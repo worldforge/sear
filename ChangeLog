@@ -1,3 +1,7 @@
+2004-11-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Don't send use if there is no focus entity.
+
 2004-11-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp: Add objtype to args of Use and Wield ops.
