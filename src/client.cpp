@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.48 2003-09-27 13:53:18 simon Exp $
+// $Id: client.cpp,v 1.49 2004-01-19 11:27:05 simon Exp $
 
 #include "System.h"
+
+#include <Atlas/Objects/Entity/GameEntity.h>
 
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
