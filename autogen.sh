@@ -36,10 +36,5 @@ echo autoconf...
 
 autoconf
 
-# Default install is /opt/worldforge
-
-CONFIGUREFLAGS="--prefix=/opt/worldforge"
-echo Running: configure $CONFIGUREFLAGS
-./configure $CONFIGUREFLAGS $@
 
 exit 0

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.1 2003-03-15 17:18:49 simon Exp $
+// $Id: StateManager.cpp,v 1.2 2003-04-23 19:41:57 simon Exp $
 
 /*
  * TODO
@@ -243,6 +243,7 @@ void StateManager::stateChange(StateID state) {
   assert(_initialised == true);
   if (_current_state == state) return; // No need to do anything
   StateProperties *sp = _states[state];
+  // If state doesn't exist, take first one
   if (!sp) {
     sp = _states[0];
     state = 0;
@@ -251,6 +252,7 @@ void StateManager::stateChange(StateID state) {
   if (_current_state != -1) {
 //    std::string change = std::string(_cur_state->state) + std::string("_to_") + std::string(sp->state);
     GLuint list = _state_change_vector[_current_state][state];
+    // Check whether we need to generate a display list
     if (!glIsList(list)) {
       list = glGenLists(1);
       buildStateChange(list, _states[_current_state], sp);

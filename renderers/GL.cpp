@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.61 2003-03-23 19:51:49 simon Exp $
+// $Id: GL.cpp,v 1.62 2003-04-23 19:41:57 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -237,7 +237,6 @@ GL::GL() :
   near_clip(RENDER_NEAR_CLIP),
   next_id(1), // was 0 error?
   base(0),
-  textureList(std::vector<GLuint>()),
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
@@ -259,7 +258,6 @@ GL::GL(System *system, Graphics *graphics) :
   near_clip(RENDER_NEAR_CLIP),
   next_id(1),
   base(0),
-  textureList(std::vector<GLuint>()),
   activeEntity(NULL),
   terrain(NULL),
   _cur_state(NULL),
@@ -323,7 +321,7 @@ void GL::initWindow(int width, int height) {
   setupExtensions();
   _texture_manager->init();
   splash_id = requestTexture(TEXTURE_splash_texture);
-      initFont();
+  initFont();
 
 }
   
@@ -369,14 +367,13 @@ void GL::initLighting() {
 }
 
 void GL::initFont() {
-  int loop;
   float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
   if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
   font_id = requestTexture(DEFAULT_FONT);
   switchTexture(font_id);
-  for (loop=0; loop<256; ++loop) {
+  for (int loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
     glNewList(base+loop,GL_COMPILE); // Start Building A List
@@ -436,14 +433,11 @@ void GL::print3D(const char *string, int set) {
 
 inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
-//  float m[16];
-//  glLoadTransposeMatrixfARB(&m);
 }
 
 void GL::stateChange(const std::string &state) {
-  StateLoader *state_loader = _system->getStateLoader();
-  if (state_loader) stateChange(state_loader->getStateProperties(state));
-
+  assert(_system->getStateLoader() != NULL);
+  stateChange(_system->getStateLoader()->getStateProperties(state));
 }
 
 void GL::stateChange(StateProperties *sp) {
@@ -512,14 +506,11 @@ void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) 
 }
 
 void GL::procEvent(int x, int y) {
-  unsigned int ic;
-//  static std::string selected_id;
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
   _graphics->drawScene("", true, 0);
-  y = window_height - y;
   x_pos = x;
-  y_pos = y;
+  y_pos = window_height - y;
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
 // TODO pre-cache 8 - bits?
@@ -528,8 +519,7 @@ void GL::procEvent(int x, int y) {
   GLubyte green = i[1] >> (8 - greenBits);// & greenMask;
   GLubyte blue = i[2] >> (8 - blueBits);// & blueMask;
 
-  ic = 0;
-  ic += red;
+  unsigned int ic = red;
   ic <<= redBits;
   ic += green;
   ic <<= greenBits;
@@ -751,7 +741,7 @@ inline void GL::translateObject(float x, float y, float z) {
   glTranslatef(x, y, z);
 }
 
-void GL::rotate(float angle, float x, float y, float z) {
+inline void GL::rotate(float angle, float x, float y, float z) {
   glRotatef(angle, x, y, z);
 }
 
@@ -781,7 +771,7 @@ void GL::rotateObject(ObjectRecord *object_record, ModelRecord *model_record) {
   }
 }
 
-void GL::scaleObject(float scale) {
+inline void GL::scaleObject(float scale) {
   glScalef(scale, scale, scale);
 }
 
@@ -1080,7 +1070,7 @@ void GL::drawSplashScreen() {
   stateChange(SPLASH);
   #ifndef _WIN32
     // TODO Need to find a win32 version
-    usleep(sleep_time);
+    //usleep(sleep_time);
   #endif
   setViewMode(ORTHOGRAPHIC);
   

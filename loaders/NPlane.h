@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.4 2003-03-06 23:50:38 simon Exp $
+// $Id: NPlane.h,v 1.5 2003-04-23 19:41:57 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -37,6 +37,9 @@ private:
   Normal *_normal_data;
   Texel *_texture_data;
   bool _initialised;
+
+
+  int tex_1, tex_2;
 };
 
 } /* namespace Sear */ 

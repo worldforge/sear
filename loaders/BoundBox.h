@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.7 2003-03-06 23:50:38 simon Exp $
+// $Id: BoundBox.h,v 1.8 2003-04-23 19:41:57 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -56,6 +56,8 @@ private:
   bool _initialised;
   unsigned int _list;
   unsigned int _list_select;
+
+  int texture;
 };
 
 } /* namespace Sear */

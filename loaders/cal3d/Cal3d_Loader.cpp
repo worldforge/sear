@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.4 2003-03-14 11:02:42 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.5 2003-04-23 19:41:57 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -56,11 +56,13 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
     std::cerr << "Unable to load model" << std::endl;	  
     return NULL;
   }
+  std::cerr << "Assigning height" << std::endl << std::flush;
   // Set model height    
   float height = 1.0f;
   height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
   model->setHeight(height);
 
+  std::cerr << "Assigning texture set" << std::endl << std::flush;
   // Set model default texture set
   if (model_config.findItem(model_id, "default_set")) {
     varconf::Variable v = model_config.getItem(model_id, "default_set");
@@ -72,6 +74,7 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
   }
   // Check for meshes
   
+  std::cerr << "Assigning parts" << std::endl << std::flush;
   // Check for individual part assignments
   std::list<std::string> materials = model->getMeshNames();
   for (std::list<std::string>::const_iterator I = materials.begin(); I != materials.end(); ++I) {
@@ -85,6 +88,9 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
     }
   }
   model_record->model = model;
+
+  std::cerr << "Model Created" << std::endl << std::flush;
+  
   return model_record;
 }
 

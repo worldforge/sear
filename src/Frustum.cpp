@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.9 2003-03-06 23:50:38 simon Exp $
+// $Id: Frustum.cpp,v 1.10 2003-04-23 19:41:58 simon Exp $
 
 #include "common/Utility.h"
 
@@ -135,7 +135,6 @@ bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
 } 
 
 int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {  
-  int p;
   int c;
   int c2 = 0;
   if (!we->hasBBox()) return true;
@@ -148,7 +147,7 @@ int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {
 
   WFMath::AxisBox<3> bbox = WFMath::AxisBox<3>(lowCorner, highCorner);
 
-  for( p = 0; p < 6; ++p) {
+  for(int p = 0; p < 6; ++p) {
     c = 0;
     if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
     if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
@@ -166,11 +165,10 @@ int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {
 
 
 int Frustum::patchInFrustum(float frustum[6][4], WFMath::AxisBox<3> bbox) {  
-  int p;
   int c;
   int c2 = 0;
 
-  for( p = 0; p < 6; ++p) {
+  for(int p = 0; p < 6; ++p) {
     c = 0;
     if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
     if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
@@ -191,16 +189,13 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
 }
 
 bool Frustum::sphereInFrustum(float frustum[6][4], WFMath::AxisBox<3> &bbox, WFMath::Point<3> &pos, Terrain *terrain) {
-//  return true;	
-  int p;
   float x, y, z, radius;
-//  WFMath::AxisBox<3> bbox = bboxCheck(we->getBBox());
   WFMath::Ball<3> b = bbox.boundingSphere();
   x = b.getCenter().x() + pos.x();
   y = b.getCenter().y() + pos.y();
   z = b.getCenter().z() + pos.z() + terrain->getHeight(pos.x(), pos.y());
   radius = b.radius();
-  for( p = 0; p < 6; ++p)
+  for(int p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )
       return false;
     return true;

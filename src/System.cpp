@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.55 2003-03-23 19:51:49 simon Exp $
+// $Id: System.cpp,v 1.56 2003-04-23 19:41:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -370,15 +370,13 @@ void System::createWindow(bool fullscreen) {
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
-  const SDL_VideoInfo *info;
-  info = SDL_GetVideoInfo();
+  const SDL_VideoInfo *info = SDL_GetVideoInfo();
   if (!info) {
     Log::writeLog("Error quering video", Log::LOG_DEFAULT);
   }
   //Create Window
   int flags = SDL_OPENGL;
-  int bpp = 0;
-  bpp = info->vfmt->BitsPerPixel;
+  int bpp = info->vfmt->BitsPerPixel;
   if (fullscreen) flags |= SDL_FULLSCREEN;
   if (!(_width && _height)) {
     Log::writeLog(std::string("Invalid resolution: ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_ERROR);
@@ -397,7 +395,7 @@ void System::createWindow(bool fullscreen) {
   }
 
   // Check OpenGL flags
-  int value = 0;
+  int value;
   if (debug) {
     SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
     Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
@@ -488,9 +486,6 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   { 
-#ifdef HAVE_GLGOOEY
-          Gooey::WindowManager::instance().onLeftButtonDown(event.button.x, event.button.y);
-#endif
           renderer->procEvent(event.button.x, event.button.y);
           switch (action) {
             case (ACTION_DEFAULT): break;
@@ -507,9 +502,6 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONUP: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   { 
-#ifdef HAVE_GLGOOEY
-          Gooey::WindowManager::instance().onLeftButtonUp(event.button.x, event.button.y);
-#endif
           break;
         }
         break;
@@ -517,9 +509,6 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_MOUSEMOTION: {
-#ifdef HAVE_GLGOOEY
-      Gooey::WindowManager::instance().onMouseMove(event.button.x, event.button.y);
-#endif
       if (_mouse_move_select) renderer->procEvent(event.button.x, event.button.y);
       break;
     } 
@@ -692,12 +681,9 @@ bool System::fileExists(const std::string &file_name) {
 }
 
 std::string System::processHome(const std::string &input) {
-  std::string output;
   int i = input.find("~");
   if (i == -1) return input;
-  output = input.substr(0, i);
-  output += home_path;
-  output += input.substr(i + 1);
+  std::string output = input.substr(0, i) + home_path + input.substr(i + 1);
   return output;
 }
 
@@ -730,7 +716,6 @@ void System::writeConfig() {
 
   _general.setItem(SYSTEM, KEY_window_width, _width);
   _general.setItem(SYSTEM, KEY_window_height, _height);
-  
 }
 
 SDL_Cursor *System::buildCursor(const char *image[]) {
@@ -817,7 +802,7 @@ void System::runCommand(const std::string &command) {
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {
-  Tokeniser tokeniser = Tokeniser();
+  Tokeniser tokeniser;
   tokeniser.initTokens(args);
   if (command == EXIT || command == QUIT) _system_running = false;
   else if (command == GET_ATTRIBUTE) {

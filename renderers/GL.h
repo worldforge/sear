@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.30 2003-03-23 19:51:49 simon Exp $
+// $Id: GL.h,v 1.31 2003-04-23 19:41:57 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -97,8 +97,8 @@ public:
   void translateObject(float x, float y, float z);
   void rotate(float angle, float x, float y, float z);
 //  void rotateObject(WorldEntity *we, int type);
-  void rotateObject(ObjectRecord *, ModelRecord *);
-  void scaleObject(float scale);
+  inline void rotateObject(ObjectRecord *, ModelRecord *);
+  inline void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.26 2003-03-23 19:51:49 simon Exp $
+// $Id: Graphics.cpp,v 1.27 2003-04-23 19:41:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -189,8 +189,10 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
     // Only update on a viewable frame
     _frame_time += time_elapsed;
     _frame_rate = (float)_num_frames++ /_frame_time;
-    if (_renderer->checkState(Render::RENDER_FPS))  _renderer->drawFPS(_frame_rate);
+//    if (_renderer->checkState(Render::RENDER_FPS))  _renderer->drawFPS(_frame_rate);
     if (_frame_time > 1.0f) {
+      std::string fr = string_fmt(_frame_rate);
+      SDL_WM_SetCaption(fr.c_str(), fr.c_str());
       _num_frames = 0;
       _frame_time = 0;
     }

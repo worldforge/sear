@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.4 2003-03-23 19:51:49 simon Exp $
+// $Id: TextureManager.cpp,v 1.5 2003-04-23 19:41:57 simon Exp $
 
 #include "TextureManager.h"
 
@@ -98,6 +98,7 @@ void TextureManager::init() {
   setupGLExtensions();
   // Create _last_textures
   _last_textures = new TextureID[_texture_units];
+  for (unsigned int i = 0; i < _texture_units;_last_textures[i++] = -1);
   // Setup default texture properties
   _default_texture = createDefaultTexture();
   if (_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
@@ -293,7 +294,6 @@ void TextureManager::switchTexture(TextureID texture_id) {
 }
 
 void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
-  return switchTexture(texture_id);
   assert((_initialised == true) && "TextureManager not initialised");
   if (texture_id == -1) texture_id = _default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
@@ -308,7 +308,7 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
 
 void TextureManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   if (!config.findItem(section, KEY_path)) {
-    std::cout << "New Texture: " << section << std::endl;
+    if (debug) std::cout << "New Texture: " << section << std::endl;
     char cwd[256];
     memset(cwd, '\0', 256);
     getcwd(cwd, 355);
@@ -333,6 +333,8 @@ int TextureManager::getFilter(const std::string &filter_name) {
 }
 
 void TextureManager::setupGLExtensions() {
+  // Get number of texture units
+  // We write to a tempory as _texture_units is a uint
   int tex_units;
   glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &tex_units);
   _texture_units = tex_units;
@@ -552,7 +554,7 @@ TextureID TextureManager::createDefaultFont() {
 
 
 void TextureManager::registerCommands(Console *console) {
-  std::cout << "REGISTERING COMMANDS" << std::endl;
+  if (debug) std::cout << "Registering commands" << std::endl;
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
 }
 
