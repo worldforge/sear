@@ -1,6 +1,6 @@
-INCLUDES = -I..
-
 noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderBillBoard.a libLoaderImpostor.a libLoaderCal3d.a libLoader3ds.a libLoaderNPlane.a
+
+INCLUDES = -I..
 
 libLoaderWireFrame_a_SOURCES = \
 	WireFrame.cpp WireFrame.h \

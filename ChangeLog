@@ -1,3 +1,8 @@
+7th August 2002, Simon Goodall
+ * Updated makefile.am's to be able to create a distribution
+ * Updated configure.in to point the user to web locations for missing libraries
+ * Included replacement files for media pack
+
 6th August 2002, Simon Goodall
  * Fixed seg fault caused by specifying 0x0 window size
  * Converted Sear to use varconf instead of own Config system. This has caused the format of the configuration file (excluding object and state loader files) to have changed to accomodate the varconf format. Additionally the definition of keys has changed to work with varconf. See src/Bindings.cpp for the new values.

@@ -1,6 +1,6 @@
-INCLUDES = -I..
-
 bin_PROGRAMS = sear
+
+INCLUDES = -I..
 
 sear_LDADD = \
 	../common/libCommon.a \
@@ -27,6 +27,7 @@ sear_SOURCES = \
 	conf.h \
 	Console.cpp \
 	Console.h \
+	ConsoleObject.h \
 	cursors.h \
 	Event.cpp \
 	Event.h \
@@ -37,11 +38,11 @@ sear_SOURCES = \
 	Graphics.cpp \
 	Graphics.h \
 	main.cpp \
-	Models.h \
+	Model.h \
 	ObjectLoader.h \
 	ObjectLoader.cpp \
 	Render.h \
-	SkyBox.h \
+	Sky.h \
 	System.cpp \
 	System.h \
 	Terrain.h \
@@ -53,4 +54,6 @@ sear_SOURCES = \
 	StateLoader.cpp \
 	StateLoader.h \
 	Frustum.cpp \
-	Frustum.h
+	Frustum.h \
+	default_image.xpm \
+	default_font.xpm

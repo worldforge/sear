@@ -1,6 +1,6 @@
-INCLUDES = -I..
-
 noinst_LIBRARIES = libTerrainROAM.a 
+
+INCLUDES = -I..
 
 libTerrainROAM_a_SOURCES = \
 	Landscape.cpp Landscape.h \

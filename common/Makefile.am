@@ -1,6 +1,6 @@
-INCLUDES = -I..
-
 noinst_LIBRARIES = libCommon.a 
+
+INCLUDES = -I..
 
 libCommon_a_SOURCES = \
 	Log.cpp Log.h \
