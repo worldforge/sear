@@ -16,10 +16,10 @@
 
 namespace Sear {
 
-TextEntry::TextEntry(int size, const std::string & text) :
+TextEntry::TextEntry(int size, const std::string & text, bool obscure) :
            m_frame(new Frame()), m_text(new Text("")),
            m_caret(new Caret(16 * m_text->scale())), m_input(text),
-           m_textOffset(0), m_size(size), m_border(2)
+           m_textOffset(0), m_size(size), m_border(2), m_obscure(obscure)
 {
   m_frame->down();
   m_caretPos = m_input.size();
@@ -38,7 +38,11 @@ void TextEntry::setText()
   if (m_caretPos < m_textOffset) {
     m_textOffset = m_caretPos ;
   }
-  m_text->content() = m_input.substr(m_textOffset, std::min(m_size, m_input.size() - m_textOffset));
+  if (m_obscure) {
+    m_text->content() = std::string(std::min(m_size, m_input.size()) - m_textOffset, '*');
+  } else {
+    m_text->content() = m_input.substr(m_textOffset, std::min(m_size, m_input.size() - m_textOffset));
+  }
   m_caret->setPos((m_caretPos - m_textOffset) * 10 * m_text->scale() + m_border + 4, m_border);
 }
 

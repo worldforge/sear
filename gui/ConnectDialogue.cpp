@@ -19,9 +19,12 @@ ConnectDialogue::ConnectDialogue() : Dialogue("Connect to Server")
 
   m_connectButton->Clicked.connect(SigC::slot(*this, &ConnectDialogue::connect));
 
-  HBox * hb = new HBox;
-  hb->push_back(m_hostEntry);
-  hb->push_back(m_connectButton);
+  VBox * vb = new VBox(2, 4);
+  vb->push_back(m_hostEntry);
+  vb->push_back(m_connectButton);
+
+  HBox * hb = new HBox(2, 4);
+  hb->push_back(vb);
 
   setPane(hb);
 }

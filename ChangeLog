@@ -1,3 +1,19 @@
+2005-01-02  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/TextEntry.cpp, gui/TextEntry.h: Add support for obscured text
+	  entry for passwords and the like.
+
+	* gui/Frame.cpp: Tweak the default colour a bit, for better looks.
+
+	* gui/Dialogue.cpp: Fix packing.
+
+	* gui/Box.cpp, gui/Box.h: Add support for end padding in boxes.
+
+	* gui/ConnectDialogue.cpp: Re-arrange contents.
+
+	* gui/LoginDialogue.cpp, gui/LoginDialogue.h: New dialogue
+	  for account creation or login.
+
 2005-01-01  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Button.cpp, gui/Button.h: Virtualise mechanism for hooking

@@ -35,10 +35,11 @@ protected:
   unsigned int m_size;
   unsigned int m_border;
   unsigned int m_caretPos;
+  bool m_obscure;
 
   void setText();
 public:
-  explicit TextEntry(int size, const std::string & text);
+  explicit TextEntry(int size, const std::string & text, bool obscure = false);
   virtual ~TextEntry();
 
   virtual void map(Window * win, int x, int y, int & w, int & h);

@@ -33,7 +33,7 @@ void Frame::render(Render * renderer)
 
   glVertexPointer(2, GL_SHORT, 0, coords);
 
-  renderer->setColour(1.0f, 1.0f, 1.0f, 0.2f);
+  renderer->setColour(0.5f, 0.5f, 0.5f, 0.4f);
   glDrawArrays(GL_QUADS, 0, 4);
 
   if (m_down) {

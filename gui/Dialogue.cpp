@@ -12,7 +12,7 @@
 namespace Sear {
 
 Dialogue::Dialogue(const std::string & title) : Toplevel(title, 0),
-                                                m_contentBox(new VBox)
+                                                m_contentBox(new VBox(0))
 {
   setContents(m_contentBox);
 

@@ -15,6 +15,7 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    Dialogue.cpp Dialogue.h \
                    Panel.cpp Panel.h \
                    ConnectDialogue.cpp ConnectDialogue.h \
+                   LoginDialogue.cpp LoginDialogue.h \
                    Button.cpp Button.h \
                    ToggleButton.cpp ToggleButton.h \
                    Box.cpp Box.h \
