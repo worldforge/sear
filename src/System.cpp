@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.103 2004-10-18 21:23:37 alriddoch Exp $
+// $Id: System.cpp,v 1.104 2004-10-20 14:16:25 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -538,6 +538,7 @@ void System::handleEvents(const SDL_Event &event) {
       if (_console->consoleStatus()) {
         // Keys that still execute bindings with console open 
         if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
+            (event.key.keysym.sym == SDLK_CARET) ||
             (event.key.keysym.sym == SDLK_F1) ||
             (event.key.keysym.sym == SDLK_F2) ||
             (event.key.keysym.sym == SDLK_F3) ||

@@ -1,3 +1,9 @@
+2004-10-11  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/System.cpp: Allow caret key to close console for German keyboards
+	* src/Graphics.cpp: Only check entity bbox once for each list of models
+	  to draw for that entity
+
 2004-10-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/TextEntry.cpp, gui/TextEntry.h: Handle text differently
