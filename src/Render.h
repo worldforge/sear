@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.30 2003-06-12 20:34:53 simon Exp $
+// $Id: Render.h,v 1.31 2004-01-26 22:06:59 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -64,6 +64,13 @@ typedef std::list<WorldEntity*> MessageList;
   Render() {
   }
   virtual ~Render() {}
+
+
+   
+  virtual void renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture)=0;
+  virtual void vboMesh(Mesh &mesh)=0;
+  virtual void cleanVBOMesh(Mesh &mesh) =0;
+
   virtual void init() =0;
   virtual void initWindow(int width, int height) =0;
   virtual void shutdown() =0;

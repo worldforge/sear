@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.70 2003-12-03 11:08:18 simon Exp $
+// $Id: GL.cpp,v 1.71 2004-01-26 22:06:59 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -1230,6 +1230,113 @@ void GL::setTextureScale(unsigned int unit, float scale) {
   glScalef(scale, scale, 1.0f);
   glMatrixMode(GL_MODELVIEW);
   glActiveTextureARB(GL_TEXTURE0_ARB);
+}
+void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
+  if (!use_multitexturing) multitexture = false;
+  // TODO: Reduce ClientState switches
+  bool textures = checkState(RENDER_TEXTURES);
+  bool lighting = checkState(RENDER_LIGHTING);
+ 
+  if (!mesh.vertex_array) {
+    Log::writeLog("No Vertex Data", Log::LOG_ERROR);
+    return; //throw Exception(""); 
+  }
+
+  if (mesh.vertex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);
+  glVertexPointer(3, GL_FLOAT, 0, (float*)mesh.vertex_array);
+  glEnableClientState(GL_VERTEX_ARRAY);
+  if (textures && mesh.tex_coord_array) {
+    if (multitexture) {
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
+      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
+      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
+    } else {	    
+      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
+      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+  }
+  if (lighting && mesh.normal_array) {
+    if (mesh.normal_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.normal_vbo);
+    glNormalPointer(GL_FLOAT, 0, (float*)mesh.normal_array);
+    glEnableClientState(GL_NORMAL_ARRAY);
+  }
+
+  switch (mesh.data_type) {
+    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (Graphics::RES_POINT): glDrawArrays(GL_POINT, offset, mesh.number_of_points); break;
+    case (Graphics::RES_LINES): glDrawArrays(GL_LINES, offset, mesh.number_of_points); break;
+    case (Graphics::RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, mesh.number_of_points); break;
+    case (Graphics::RES_QUADS): glDrawArrays(GL_QUADS, offset, mesh.number_of_points); break;
+    case (Graphics::RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, mesh.number_of_points); break;
+    case (Graphics::RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, mesh.number_of_points); break;
+    case (Graphics::RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, mesh.number_of_points); break;
+    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
+  }
+ 
+  glDisableClientState(GL_VERTEX_ARRAY);
+  if (lighting && mesh.normal_array) glDisableClientState(GL_NORMAL_ARRAY);
+  if (textures && mesh.tex_coord_array) {
+    if (multitexture)  {
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    } else {
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    }
+  }
+}
+
+void GL::vboMesh(Mesh &mesh) {
+  if (sage_ext[GL_ARB_vertex_buffer_object]) {
+    if (mesh.vertex_array) {
+      glGenBuffersARB(1, &mesh.vertex_vbo);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);
+      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 3 * sizeof(float), mesh.vertex_array, GL_STATIC_DRAW_ARB);
+      //delete [] mesh.vertex_array;
+      mesh.vertex_array = NULL;
+    }
+    if (mesh.tex_coord_array) {
+      glGenBuffersARB(1, &mesh.tex_vbo);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
+      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 2 * sizeof(float), mesh.tex_coord_array, GL_STATIC_DRAW_ARB);
+//      delete [] mesh.tex_coord_array;
+      mesh.tex_coord_array = NULL;
+    }
+    if (mesh.normal_array) {
+      glGenBuffersARB(1, &mesh.normal_vbo);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.normal_vbo);
+      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 3 * sizeof(float), mesh.normal_array, GL_STATIC_DRAW_ARB);
+//      delete [] mesh.normal_array;
+      mesh.normal_array = NULL;
+    }
+  } else {
+    mesh.vertex_vbo = 0;
+    mesh.tex_vbo = 0;
+    mesh.normal_vbo = 0;
+  }
+}
+
+void GL::cleanVBOMesh(Mesh &mesh) {
+
+  if (mesh.vertex_vbo) {
+    glDeleteBuffersARB(1, &mesh.vertex_vbo);
+    mesh.vertex_vbo = 0;
+  }
+  if (mesh.tex_vbo) {
+    glDeleteBuffersARB(1, &mesh.tex_vbo);
+    mesh.tex_vbo = 0;
+  }
+  if (mesh.normal_vbo) {
+    glDeleteBuffersARB(1, &mesh.normal_vbo);
+    mesh.normal_vbo = 0;
+  }
 }
 
 } /* namespace Sear */

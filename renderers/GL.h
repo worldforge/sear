@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.34 2003-07-03 10:25:36 simon Exp $
+// $Id: GL.h,v 1.35 2004-01-26 22:06:59 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -43,6 +43,11 @@ class GL : public Render, public SigC::Object {
 public:
   GL();
   GL(System *, Graphics *);
+
+   
+  void renderMeshArrays( Mesh &mesh, unsigned int offset, bool multitexture);
+  void vboMesh( Mesh &mesh);
+  void cleanVBOMesh(Mesh &mesh);
   
   ~GL();
   void init();
