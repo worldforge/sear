@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## For top-level sear directory
 
-SUBDIRS = src
+SUBDIRS = loaders renderers src tools
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \

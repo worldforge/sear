@@ -4,9 +4,10 @@
 
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
+#include "../src/Models.h"
 #include "../src/ModelHandler.h"
 #include "../src/WorldEntity.h"
-#include "../src/GL_Render.h"
+#include "../renderers/GL.h"
 #include "../src/ObjectLoader.h"
 
 #include <string>
@@ -30,7 +31,7 @@ Models *WireFrame_Loader::loadModel(WorldEntity *we, ObjectProperties *op, const
     WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);
   }
-  model->init(GL_Render::bboxCheck(bbox));
+  model->init(GL::bboxCheck(bbox));
   return model;
 }
 

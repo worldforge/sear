@@ -11,7 +11,7 @@
 #include "../src/Log.h"
 #include "../src/Utility.h"
 
-#include "../src/GL_Render.h"
+#include "../renderers/GL.h"
 
 //----------------------------------------------------------------------------//
 // Static member variables initialization                                     //
@@ -405,7 +405,7 @@ bool Cal3d::init(const std::string& strFilename)
 
 void Cal3d::renderMesh(bool useTextures, bool useLighting, bool select_mode)
 {
-  GL_Render *renderer = GL_Render::instance();
+  GL *renderer = GL::instance();
   // get the renderer of the model
   CalRenderer *pCalRenderer;
   pCalRenderer = m_calModel.getRenderer();

@@ -1,6 +1,7 @@
 bin_PROGRAMS = sear
 
 sear_LDADD = \
+	../renderers/libRendererGL.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderBillBoard.a \
@@ -30,8 +31,6 @@ sear_SOURCES = \
 	EventHandler.h \
 	Exception.h \
 	Factory.h \
-	GL_Render.cpp \
-	GL_Render.h \
 	Landscape.cpp \
 	Landscape.h \
 	Log.cpp \

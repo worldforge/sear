@@ -7,6 +7,8 @@
 
 #include "../src/ModelLoader.h"
 
+#include "../src/ObjectLoader.h"
+
 #include <string>
 
 namespace Sear {
@@ -14,7 +16,7 @@ namespace Sear {
 // Forward Declarations
 class Models;
 class ModelHandler;
-class ObjectProperties;
+//class ObjectProperties;
 	
 class BoundBox_Loader : public ModelLoader {
 public:	

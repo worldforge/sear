@@ -11,7 +11,7 @@
 #include <list>
 #include <map>
 
-#include "Render.h"
+#include "../src/Render.h"
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
@@ -34,15 +34,15 @@ class Models;
 //class MultiModels;
 class ModelHandler;
 
-class GL_Render : public Render {
+class GL : public Render {
 
 typedef std::list<WorldEntity*> Queue;
 	
 public:
-  GL_Render();
-  GL_Render(System *);
+  GL();
+  GL(System *);
   
-  ~GL_Render();
+  ~GL();
   void init();
   void initWindow(int width, int height);
   void shutdown() {};
@@ -63,7 +63,7 @@ public:
   
   void initModels();
   GLuint getTextureID(int texture_id);
-  static GL_Render *instance() { return _instance; }
+  static GL *instance() { return _instance; }
   void buildColourSet();
   void drawScene(const std::string &,bool);
   void drawTextRect(int, int, int, int, int);
@@ -110,7 +110,7 @@ public:
   unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp);
   void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed);
 
-  static WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox);
+  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
   
 protected:
@@ -135,7 +135,7 @@ protected:
 
   int font_id;
   int splash_id;
-  static GL_Render *_instance;
+  static GL *_instance;
 
   std::string activeID;
   std::string active_name;

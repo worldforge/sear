@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 #include "BillBoard.h"
-#include "../src/GL_Render.h"
+#include "../renderers/GL.h"
 
 namespace Sear {
 
@@ -41,8 +41,8 @@ void BillBoard::shutdown() {
 }
 
 void BillBoard::render(bool) {
-  GL_Render::instance()->switchTexture(GL_Render::instance()->requestTexture(_type));
-  GL_Render::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+  GL::instance()->switchTexture(GL::instance()->requestTexture(_type));
+  GL::instance()->renderArrays(Models::QUADS, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
 }
 

@@ -2,41 +2,41 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "GL_Render.h"
+#include "GL.h"
 
 #include <GL/glu.h>
 
-#include "Camera.h"
-#include "System.h"
-#include "Config.h"
-#include "Terrain.h"
-#include "SkyBox.h"
-#include "Camera.h"
-#include "WorldEntity.h"
-#include "Console.h"
-#include "Utility.h"
+#include "../src/Camera.h"
+#include "../src/System.h"
+#include "../src/Config.h"
+#include "../src/Terrain.h"
+#include "../src/SkyBox.h"
+#include "../src/Camera.h"
+#include "../src/WorldEntity.h"
+#include "../src/Console.h"
+#include "../src/Utility.h"
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 //#include <Eris/TypeInfo.h>
 //#include "model.h"
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
-#include "Character.h"
-#include "ObjectLoader.h"
+#include "../src/Character.h"
+#include "../src/ObjectLoader.h"
 
-#include "Models.h"
+#include "../src/Models.h"
 #include <unistd.h>
 
-#include "ModelHandler.h"
+#include "../src/ModelHandler.h"
 
-#include "Log.h"
+#include "../src/Log.h"
 
-#include "conf.h"
+#include "../src/conf.h"
 
 namespace Sear {
 
-float GL_Render::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
-float GL_Render::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
+float GL::_halo_blend_colour[4] = {1.0f, 0.0f, 1.0f, 0.4f};
+float GL::_halo_colour[3] = {1.0f, 0.0f, 1.0f};
 
 //.TODO put this into a class
 	
@@ -55,7 +55,7 @@ GLuint makeMask(GLint bits) {
   int greenShift;
   int blueShift;
   
-void GL_Render::buildColourSet() {
+void GL::buildColourSet() {
   unsigned int numPrims = 500;
   glGetIntegerv (GL_RED_BITS, &redBits);
   glGetIntegerv (GL_GREEN_BITS, &greenBits);
@@ -126,9 +126,9 @@ GLfloat  ambientLight[]  = { 0.75f, 0.75f, 0.75f, 1.0f };
 GLfloat  diffuseLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 GLfloat  specularLight[]  = { 1.0f,  1.0f, 1.0f, 1.0f };
 
-GL_Render *GL_Render::_instance = NULL;
+GL *GL::_instance = NULL;
 
-GL_Render::GL_Render() :
+GL::GL() :
   _system(NULL),
   window_width(0),
   window_height(0),
@@ -149,7 +149,7 @@ GL_Render::GL_Render() :
   _instance = this;
 }
 
-GL_Render::GL_Render(System *system) :
+GL::GL(System *system) :
   _system(system),
   window_width(0),
   window_height(0),
@@ -170,7 +170,7 @@ GL_Render::GL_Render(System *system) :
   _instance = this;
 }
 
-GL_Render::~GL_Render() {
+GL::~GL() {
   writeConfig();
   shutdownFont();
 
@@ -206,7 +206,7 @@ GL_Render::~GL_Render() {
   }
 }
 
-void GL_Render::initWindow(int width, int height) {
+void GL::initWindow(int width, int height) {
   Log::writeLog("Render: Initilising Renderer", Log::DEFAULT);
   Log::writeLog(std::string("GL_VENDER: ") + string_fmt(glGetString(GL_VENDOR)), Log::DEFAULT);
   Log::writeLog(std::string("GL_RENDERER: ") + string_fmt(glGetString(GL_RENDERER)), Log::DEFAULT);
@@ -236,7 +236,7 @@ void GL_Render::initWindow(int width, int height) {
   window_height = height;
 }
   
-void GL_Render::init() {
+void GL::init() {
   readConfig();
   setupStates();
   splash_id = requestTexture(splash_texture);
@@ -257,7 +257,7 @@ void GL_Render::init() {
   mh = new ModelHandler();
 }
 
-void GL_Render::initLighting() {
+void GL::initLighting() {
   Log::writeLog("Render: initialising lighting", Log::DEFAULT);
   float gambient[4] = {0.1f, 0.1f,0.1f, 1.0f};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT,gambient);
@@ -288,7 +288,7 @@ void GL_Render::initLighting() {
   glEnable(GL_LIGHT1);
 }
 
-void GL_Render::initFont() {
+void GL::initFont() {
   int loop;
   float cx;  // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
@@ -316,12 +316,12 @@ void GL_Render::initFont() {
   }// Loop Until All 256 Are Built
 }
 
-void GL_Render::shutdownFont() {
+void GL::shutdownFont() {
   Log::writeLog("Render: Shutting down fonts", Log::DEFAULT);
   glDeleteLists(base,256); // Delete All 256 Display Lists
 }
 
-void GL_Render::print(GLint x, GLint y, const char * string, int set) {
+void GL::print(GLint x, GLint y, const char * string, int set) {
   if (set > 1) set = 1;
   glBindTexture(GL_TEXTURE_2D, getTextureID(font_id)); // Select Our Font Texture
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
@@ -340,7 +340,7 @@ void GL_Render::print(GLint x, GLint y, const char * string, int set) {
   glPopMatrix(); // Restore The Old Projection Matrix
 }
 
-void GL_Render::print3D(const char *string, int set) {
+void GL::print3D(const char *string, int set) {
   if (set > 1) set = 1;
   glBindTexture(GL_TEXTURE_2D, getTextureID(font_id)); // Select Our Font Texture
   glPushMatrix(); // Store The Projection Matrix
@@ -349,11 +349,11 @@ void GL_Render::print3D(const char *string, int set) {
   glPopMatrix(); // Restore The Old Projection Matrix
 }
 
-void GL_Render::newLine() {
+void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
 
-int GL_Render::requestTexture(const std::string &texture_name, bool clamp) {
+int GL::requestTexture(const std::string &texture_name, bool clamp) {
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[texture_name];
@@ -374,7 +374,7 @@ int GL_Render::requestTexture(const std::string &texture_name, bool clamp) {
   return next_id++;
 }
 
-int GL_Render::requestMipMap(const std::string &texture_name, bool clamp) {
+int GL::requestMipMap(const std::string &texture_name, bool clamp) {
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[texture_name];
@@ -392,7 +392,7 @@ int GL_Render::requestMipMap(const std::string &texture_name, bool clamp) {
   return next_id++;
 }
 
-int GL_Render::requestTextureMask(const std::string &texture_name, bool clamp) {
+int GL::requestTextureMask(const std::string &texture_name, bool clamp) {
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
   int id = texture_map[texture_name + "_mask"];
@@ -413,7 +413,7 @@ int GL_Render::requestTextureMask(const std::string &texture_name, bool clamp) {
   return next_id++;
 }
 
-void GL_Render::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
+void GL::createTexture(SDL_Surface *surface, unsigned int texture, bool clamp) {
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -427,7 +427,7 @@ void GL_Render::createTexture(SDL_Surface *surface, unsigned int texture, bool c
   glTexImage2D(GL_TEXTURE_2D, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, surface->w, surface->h, 0, (surface->format->BytesPerPixel == 3) ? GL_RGB : GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
 }
  
-void GL_Render::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
+void GL::createMipMap(SDL_Surface *surface, unsigned int texture, bool clamp)  {
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
@@ -441,7 +441,7 @@ void GL_Render::createMipMap(SDL_Surface *surface, unsigned int texture, bool cl
   gluBuild2DMipmaps(GL_TEXTURE_2D, 3, surface->w, surface->h, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
 }
 
-void GL_Render::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clamp) {
+void GL::createTextureMask(SDL_Surface *surface, unsigned int texture, bool clamp) {
   int i;
   glBindTexture(GL_TEXTURE_2D, texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -470,14 +470,14 @@ void GL_Render::createTextureMask(SDL_Surface *surface, unsigned int texture, bo
   }
 }
 
-inline GLuint GL_Render::getTextureID(int texture_id) {
+inline GLuint GL::getTextureID(int texture_id) {
   int i;
   std::list<GLuint>::const_iterator I = textureList.begin();
   for (i = 1; i < texture_id; i++, I++);
   return *I;
 }
 
-void GL_Render::drawScene(const std::string& command, bool select_mode) {
+void GL::drawScene(const std::string& command, bool select_mode) {
 //	select_mode = true;
   if (select_mode) resetColors();
   active_name = "";
@@ -705,7 +705,7 @@ if (!select_mode) _system->getConsole()->draw(command);
 //  CheckError();
 }
 
-void GL_Render::buildQueues(WorldEntity *we, int depth) {
+void GL::buildQueues(WorldEntity *we, int depth) {
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
       std::string type = we->type();
@@ -736,7 +736,7 @@ void GL_Render::buildQueues(WorldEntity *we, int depth) {
   }
 }
 
-void GL_Render::stateChange(State state) {
+void GL::stateChange(State state) {
   if (state == current_state) return; 
   current_state = state;
   if (stateProperties[state].alpha_test) glEnable(GL_ALPHA_TEST);
@@ -762,7 +762,7 @@ void GL_Render::stateChange(State state) {
 }
 
 
-void GL_Render::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
+void GL::drawTextRect(GLint x, GLint y, GLint width, GLint height, int texture) {
 
   glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
 
@@ -792,7 +792,7 @@ void GL_Render::drawTextRect(GLint x, GLint y, GLint width, GLint height, int te
 
 }
 
-void GL_Render::procEvent(int x, int y) {
+void GL::procEvent(int x, int y) {
   unsigned int ic;
   std::string selected_id;
   GLubyte i[3];
@@ -823,25 +823,25 @@ void GL_Render::procEvent(int x, int y) {
 }
 
 
-int GL_Render::patchInFrustum(WFMath::AxisBox<3> bbox) {  
+int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {  
   return true;
 }
 
-float GL_Render::distFromNear(float x, float y, float z) {
+float GL::distFromNear(float x, float y, float z) {
   return 1.0f;//(frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-void GL_Render::setCallyState(int i) {
+void GL::setCallyState(int i) {
 }
 
-void GL_Render::setCallyMotion(float f1, float f2, float f3) {
+void GL::setCallyMotion(float f1, float f2, float f3) {
 }
 
 
-void GL_Render::executeCallyAction(int action) {
+void GL::executeCallyAction(int action) {
 }
 
-WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox) {
+WFMath::AxisBox<3> GL::bboxCheck(WFMath::AxisBox<3> bbox) {
   int count = 0;
   if (bbox.lowCorner().x() + bbox.lowCorner().y() + bbox.lowCorner().z() + bbox.highCorner().x() + bbox.highCorner().y() + bbox.highCorner().z()  == 0.0f) {
     // BBOX has no size!! or is equidistant sround origin!!!!!
@@ -858,7 +858,7 @@ WFMath::AxisBox<3> GL_Render::bboxCheck(WFMath::AxisBox<3> bbox) {
 //  return bbox;
 }
 
-void GL_Render::CheckError() {
+void GL::CheckError() {
   GLenum err = glGetError();
   std::string msg;
   switch (err) {
@@ -874,7 +874,7 @@ void GL_Render::CheckError() {
   Log::writeLog(msg, Log::ERROR);
 }
 
-void GL_Render::buildDisplayLists() {
+void GL::buildDisplayLists() {
   if (glIsList(states)) glDeleteLists(states, LAST_STATE);
   setupStates();
   states = glGenLists(LAST_STATE);
@@ -905,12 +905,12 @@ void GL_Render::buildDisplayLists() {
   }
 }
 
-void GL_Render::readConfig() {
+void GL::readConfig() {
   std::string temp;
   Config *general = _system->getGeneral();
   Log::writeLog("Loading Renderer Config", Log::DEFAULT);
   if (!general) {
-    Log::writeLog("GL_Render: Error - General config object does not exist!", Log::ERROR);
+    Log::writeLog("GL: Error - General config object does not exist!", Log::ERROR);
     return;
   }
 
@@ -990,10 +990,10 @@ void GL_Render::readConfig() {
   
 }  
 
-void GL_Render::writeConfig() {
+void GL::writeConfig() {
   Config *general = _system->getGeneral();
   if (!general) {
-    Log::writeLog("GL_Render: Error - General config object does not exist!", Log::ERROR);
+    Log::writeLog("GL: Error - General config object does not exist!", Log::ERROR);
     return;
   }
   
@@ -1042,7 +1042,7 @@ void GL_Render::writeConfig() {
   general->setAttribute(KEY_far_clip_dist, string_fmt(_far_clip_dist));
 }  
 
-void GL_Render::stateDisplayList(GLuint list, State previous_state, State next_state) {
+void GL::stateDisplayList(GLuint list, State previous_state, State next_state) {
   glNewList(list, GL_COMPILE);
   if (stateProperties[previous_state].alpha_test != stateProperties[next_state].alpha_test) {
     if (stateProperties[next_state].alpha_test) glEnable(GL_ALPHA_TEST);
@@ -1086,7 +1086,7 @@ void GL_Render::stateDisplayList(GLuint list, State previous_state, State next_s
 }
 
 
-void GL_Render::setupStates() {
+void GL::setupStates() {
   glAlphaFunc(GL_GREATER, 0.1f);
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   glFogi(GL_FOG_MODE, GL_LINEAR);
@@ -1224,7 +1224,7 @@ void GL_Render::setupStates() {
   stateChange(FONT);
 }
 
-void GL_Render::nextState(int desired_state) {
+void GL::nextState(int desired_state) {
   if (desired_state == _current_state) return;
   if ((_current_state == BILLBOARD_TO_FONT) && (desired_state == FONT_TO_SKYBOX)) _current_state = PANEL_TO_FONT; // Skip states if required!
   if ((_current_state == PANEL_TO_FONT) && (desired_state == FONT_TO_PANEL)) _current_state = BILLBOARD_TO_FONT; // Skip states if required!
@@ -1249,16 +1249,16 @@ void GL_Render::nextState(int desired_state) {
 }
 
 
-void GL_Render::readComponentConfig() {
+void GL::readComponentConfig() {
   if (camera) camera->readConfig();
   if (terrain) terrain->readConfig();
 }
 
-void GL_Render::translateObject(float x, float y, float z) {
+void GL::translateObject(float x, float y, float z) {
   glTranslatef(x, y, z);
 }
 
-void GL_Render::rotateObject(WorldEntity *we, int type) {
+void GL::rotateObject(WorldEntity *we, int type) {
   if (!we) return; // THROW ERROR;
   switch (type) {
     case Models::NONE: return; break;
@@ -1282,7 +1282,7 @@ void GL_Render::rotateObject(WorldEntity *we, int type) {
 }
 
 
-void GL_Render::setViewMode(int type) {
+void GL::setViewMode(int type) {
 //  Perspective
 //  Isometric
 //  Othographic
@@ -1290,7 +1290,7 @@ void GL_Render::setViewMode(int type) {
 
 }
 
-void GL_Render::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
+void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
 	return;
   if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   (float[4])ambient);
   if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   (float[4])diffuse);
@@ -1300,7 +1300,7 @@ void GL_Render::setMaterial(float *ambient, float *diffuse, float *specular, flo
   else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
 }
 
-void GL_Render::renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
+void GL::renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -1337,7 +1337,7 @@ void GL_Render::renderArrays(unsigned int type, unsigned int number_of_points, f
   if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-void GL_Render::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {
+void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -1371,7 +1371,7 @@ void GL_Render::renderElements(unsigned int type, unsigned int number_of_points,
   if (textures && texture_data) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
-unsigned int GL_Render::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
+unsigned int GL::createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) {
   unsigned int texture = 0;
  glGenTextures(1, &texture);
   // TODO: Check for valid texture generation and return error
@@ -1389,7 +1389,7 @@ unsigned int GL_Render::createTexture(unsigned int width, unsigned int height, u
   return texture;
 }
 
-void GL_Render::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
+void GL::drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {
   for (std::map<std::string, Queue>::const_iterator I = queue.begin(); I != queue.end(); I++) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); J++) {
 

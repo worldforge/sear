@@ -11,7 +11,6 @@
 
 namespace Sear {
 
-class GL_Render;
 class Render;
 class Client;
 class EventHandler;

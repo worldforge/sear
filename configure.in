@@ -190,6 +190,7 @@ AC_OUTPUT([
 	Makefile
 	src/Makefile
 	loaders/Makefile
+	renderers/Makefile
 	sear.spec
 	data/bindings.cfg
 	data/general.cfg

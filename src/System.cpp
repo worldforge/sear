@@ -4,7 +4,7 @@
 
 #include "System.h"
 #include "Render.h"
-#include "GL_Render.h"
+#include "../renderers/GL.h"
 #include "client.h"
 #include "Camera.h"
 #include "Bindings.h"
@@ -279,7 +279,7 @@ void System::createWindow(bool fullscreen) {
     renderer->shutdown();
     delete renderer;
   }// else {
-    renderer = new GL_Render(this);
+    renderer = new GL(this);
     _console->init();
     renderer->init();
     renderer->initWindow(_width, _height);

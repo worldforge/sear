@@ -14,8 +14,9 @@
 
 #include <string>
 
-class ObjectProperties;
-
+//class ObjectProperties;
+#include <iostream>
+#include "ObjectLoader.h"
 namespace Sear {
 
 // Forward Declarationa
@@ -29,8 +30,10 @@ public:
 
   virtual void init() {}
   virtual void shutdown() {}
+
+  // TODO: why did =0; suddenly stop working?
   
-  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) { return 0; }
+  virtual Models *loadModel(WorldEntity *we, ObjectProperties *op, const std::string &data_source) { cout << "WATCHA" << endl; return 0; }
   
   
 };

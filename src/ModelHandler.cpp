@@ -11,6 +11,7 @@
 #include "System.h"
 #include "Config.h"
 #include "ObjectLoader.h"
+#include "Log.h"
 
 #include "../loaders/Cal3d_Loader.h"
 #include "../loaders/BoundBox_Loader.h"
@@ -40,7 +41,10 @@ void ModelHandler::init() {
 }
 
 void ModelHandler::shutdown() {
- // Clear Up Models
+ //// Clear Up Models
+//  for (std::map<std::string, Models*>::iterator I = _model_loaders.begin(); I != _model_loaders.end(); I++) {
+////    if (I->second) ((Models*)*(I->second))->shutdown();
+//  }
 }
   
 Models *ModelHandler::getModel(WorldEntity *we) {
@@ -81,7 +85,7 @@ Models *ModelHandler::getModel(WorldEntity *we) {
   if (data_source.empty()) data_source = System::instance()->getModel()->getAttribute("default");
   Models *model = NULL;
   if (_model_loaders[model_type]) model = _model_loaders[model_type]->loadModel(we, op, data_source);
-  else ; // Ignore error 
+  else Log::writeLog("No ModelLoader available", Log::ERROR); 
   _models[id] = model;
   
   return model; 

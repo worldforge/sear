@@ -3,7 +3,6 @@ Determine why some characters are not properly rotated
 Re-implement Object Selected
 Re-implement Model un-loading
 Re-implement per type models
-Re-write Render.h based on new usage
 Create a default built-in texture to use if others do not exist
 Re-implement model type conversion / downgrading
 

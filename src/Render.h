@@ -20,6 +20,15 @@
 
 namespace Sear {
 
+class Camera;
+class Terrain;
+class SkyBox;
+class BoundBox;
+class BillBoard;
+class Impostor;
+class WorldEntity;
+
+
 typedef enum {
   RENDER_UNKNOWN = 0,
   RENDER_LIGHTING,
@@ -29,13 +38,6 @@ typedef enum {
   RENDER_STENCIL,
   RENDER_LAST_STATE
 } RenderState;
-
-class Camera;
-class Terrain;
-class SkyBox;
-class BoundBox;
-class BillBoard;
-class Impostor;
 
 
 #define FONT_TO_SKYBOX          (0)
@@ -48,9 +50,11 @@ class Impostor;
 #define FONT_TO_PANEL           (7)
 #define PANEL_TO_FONT           (8)
 #define LAST_CHANGE             (9)
+
 class Render {
 
 public:
+typedef std::list<WorldEntity*> Queue;
 typedef enum {
   SKYBOX = 0,
   TERRAIN,
@@ -123,8 +127,25 @@ typedef enum {
 protected:
   bool _renderState[RENDER_LAST_STATE];
 private:
-  	
-};
+  
+public:
+
+  int requestTextureMask(const std::string&, bool clamp = false) {}
+  void createTextureMask(SDL_Surface*, unsigned int, bool) {}
+  
+  void translateObject(float x, float y, float z) {}
+  void rotateObject(WorldEntity *we, int type) {}
+  void setViewMode(int type) {}
+  void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {}
+  void renderArrays(unsigned int type, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data) {}
+  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, float *vertex_data, float *texture_data, float *normal_data) {}
+  unsigned int createTexture(unsigned int width, unsigned int height, unsigned int depth, unsigned char *data, bool clamp) { return 0;}
+  void drawQueue(std::map<std::string, Queue> queue, bool select_mode, float time_elapsed) {}
+
+//  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
+
+  };  
 
 } /* namespace Sear */
+
 #endif /* _RENDER_H_ */
