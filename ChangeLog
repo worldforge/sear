@@ -1,4 +1,7 @@
 2nd April 2004, Simon Goodall
+ * Fixed bug where texture_2d state was becoming inconsistent with expected value
+
+2nd April 2004, Simon Goodall
  * Fixed texture loading and switching in terrain
  * Fixed terrain state record 
 

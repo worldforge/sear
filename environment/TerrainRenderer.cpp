@@ -85,7 +85,7 @@ void TerrainRenderer::disableRendererState()
     glDisable(GL_TEXTURE_GEN_T);
 
     glActiveTexture(GL_TEXTURE0);
-    glDisable(GL_TEXTURE_2D);
+//    glDisable(GL_TEXTURE_2D);
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
 
