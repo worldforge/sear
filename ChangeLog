@@ -1,4 +1,7 @@
 19th August 2002, Simon Goodall
+ * Modified console so all commands now start with a '/' excluding those already beginning with a '+' or '-'. All other entries will be classified as speech.
+
+19th August 2002, Simon Goodall
  * Fixed SEGFAULT caused by object having no parent type specified in model loaders
 
 19th August 2002, Simon Goodall

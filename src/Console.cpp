@@ -131,15 +131,21 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
   _registered_commands[command] = object;
 }
 
-void Console::runCommand(const std::string &command_string) {
-  if (command_string.empty()) return; // Ignore no commanc
+void Console::runCommand(const std::string &command) {
+  if (command.empty()) return; // Ignore no command
+  char c = command.c_str()[0];
+  if ((c != '/' && c != '+' && c != '-')) {
+    runCommand(std::string("/say ") + command);
+    return; 
+  }
+  std::string command_string = (c == '/')? command.substr(1) : command;
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(command_string);
-  std::string command = tokeniser.nextToken();
+  std::string cmd = tokeniser.nextToken();
   std::string args = tokeniser.remainingTokens();
-  ConsoleObject* con_obj = _registered_commands[command];
-  if (command != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
-  if (con_obj) con_obj->runCommand(command, args);
+  ConsoleObject* con_obj = _registered_commands[cmd];
+  if (cmd != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
+  if (con_obj) con_obj->runCommand(cmd, args);
   else {
     Log::writeLog(std::string("Unknown command: ") + command, Log::LOG_ERROR);
     pushMessage("Unknown command" , CONSOLE_MESSAGE, 0);

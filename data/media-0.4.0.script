@@ -1,2 +1,2 @@
-enable_dir_prefix
-load_textures textures.cfg
+/enable_dir_prefix
+/load_textures textures.cfg
