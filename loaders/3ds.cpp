@@ -15,13 +15,20 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "src/System.h"
+#include "src/Graphics.h"
+#include "src/Render.h"
+
+
 #include "3ds.h"
+
+#include <iostream>
 
 Lib3dsFile* model = NULL;
 GLuint treemodel_list = 0;
 
 namespace Sear {
-void draw3dsFile(Lib3dsFile * node);
+void render_node(Lib3dsNode * node, Lib3dsFile * file);
 
 ThreeDS::ThreeDS()
 {
@@ -125,27 +132,45 @@ void ThreeDS::shutdown() {
 }
 
 void ThreeDS::render(bool) {
-  draw3dsFile(model);
+  {
+    Lib3dsNode *p;
+    for (p=model->nodes; p!=0; p=p->next) {
+//    p=model->nodes;
+//    render_node(p, model);
+//    p=p->next;
+    render_node(p, model);
+    }
+ }
+//  draw3dsFile(model);
 }
 
 
-void draw3dsFile(Lib3dsFile * node)
+void render_node(Lib3dsNode *node, Lib3dsFile *file)
 {
-  if (!node) {
-    Log::writeLog("No model to render", Log::LOG_ERROR);
-    return;
-  }
-  int num_meshes = 0;
-  if (!treemodel_list) {
-    Lib3dsMesh *mesh;
-    for (mesh=node->meshes; mesh!=0; mesh=mesh->next) {
 
-      treemodel_list=glGenLists(1);
-      glNewList(treemodel_list, GL_COMPILE);
+  {
+    Lib3dsNode *p;
+    for (p=node->childs; p!=0; p=p->next) {
+      render_node(p, file);
+    }
+  }
+  if (node->type==LIB3DS_OBJECT_NODE) {
+    if (strcmp(node->name,"$$$DUMMY")==0) {
+      return;
+    }
+
+    if (!node->user.d) {
+      Lib3dsMesh *mesh=lib3ds_file_mesh_by_name(file, node->name);
+      if (!mesh) {
+        return;
+      }
+
+      node->user.d=glGenLists(1);
+      glNewList(node->user.d, GL_COMPILE);
 
       {
         unsigned p;
-        Lib3dsVector *normalL = (Lib3dsVector *)malloc(3*sizeof(Lib3dsVector)*mesh->faces);
+        Lib3dsVector *normalL=(Lib3dsVector*)malloc(3*sizeof(Lib3dsVector)*mesh->faces);
 
         {
           Lib3dsMatrix M;
@@ -155,16 +180,13 @@ void draw3dsFile(Lib3dsFile * node)
         }
         lib3ds_mesh_calculate_normals(mesh, normalL);
 
-        for (p = 0; p < mesh->faces; ++p) {
+        for (p=0; p<mesh->faces; ++p) {
           Lib3dsFace *f=&mesh->faceL[p];
-//          Lib3dsMaterial *mat=0;
-//          GLint texture = -1;
-//          if (f->material[0]) {
-//            mat=lib3ds_file_material_by_name(model, f->material);
-//          }else{
-//            mat=node->materials;
-//          }
-//          if (mat) {
+          Lib3dsMaterial *mat=0;
+          if (f->material[0]) {
+            mat=lib3ds_file_material_by_name(file, f->material);
+          }
+          if (mat) {
 //            static GLfloat a[4]={0,0,0,1};
 //            float s;
 //            glMaterialfv(GL_FRONT, GL_AMBIENT, a);
@@ -172,39 +194,36 @@ void draw3dsFile(Lib3dsFile * node)
 //            glMaterialfv(GL_FRONT, GL_SPECULAR, mat->specular);
 //            s = pow(2, 10.0*mat->shininess);
 //            if (s>128.0) {
-//              s=128.0;
-//            }
-//            glMaterialf(GL_FRONT, GL_SHININESS, s);
-//            if (mat->texture1_map.name[0]) {
-//                texture = Texture::get(mat->texture1_map.name);
-//            }
-//          } else {
-//            Lib3dsRgba a={0.2, 0.2, 0.2, 1.0};
+  //            s=128.0;
+    //        }
+      //      glMaterialf(GL_FRONT, GL_SHININESS, s);
+            if (mat->texture1_map.name[0]) {
+//	    cout << mat->texture1_map.name << endl;
+	      Render *rend = System::instance()->getGraphics()->getRender();
+	      int i = rend->getTextureID(rend->requestTexture(mat->texture1_map.name));
+	      glBindTexture(GL_TEXTURE_2D, i);
+//	      int i = rend->requestTexture(mat->texture1_map.name);
+//	      rend->switchTexture(i);
+            }
+          }
+          else {
+  //          Lib3dsRgba a={0.2, 0.2, 0.2, 1.0};
 //            Lib3dsRgba d={0.8, 0.8, 0.8, 1.0};
 //            Lib3dsRgba s={0.0, 0.0, 0.0, 1.0};
 //            glMaterialfv(GL_FRONT, GL_AMBIENT, a);
 //            glMaterialfv(GL_FRONT, GL_DIFFUSE, d);
 //            glMaterialfv(GL_FRONT, GL_SPECULAR, s);
-//          }
+          }
           {
-//            if (texture != -1) {
-//                glEnable(GL_TEXTURE_2D);
-//                glBindTexture(GL_TEXTURE_2D, texture);
-//            }
             int i;
             glBegin(GL_TRIANGLES);
               glNormal3fv(f->normal);
               for (i=0; i<3; ++i) {
                 glNormal3fv(normalL[3*p+i]);
-//                if (texture != -1) {
-//                    glTexCoord2fv(mesh->texelL[f->points[i]]);
-//                }
+                 glTexCoord2fv(mesh->texelL[f->points[i]]);
                 glVertex3fv(mesh->pointL[f->points[i]].pos);
               }
             glEnd();
-//            if (texture != -1) {
-//                glDisable(GL_TEXTURE_2D);
-//            }
           }
         }
 
@@ -213,22 +232,19 @@ void draw3dsFile(Lib3dsFile * node)
 
       glEndList();
     }
-  }
 
-    if (treemodel_list) {
+    if (node->user.d) {
       Lib3dsObjectData *d;
 
       glPushMatrix();
-      // d=&node->data.object;
-      // glMultMatrixf(&node->matrix[0][0]);
-      // glTranslatef(-d->pivot[0], -d->pivot[1], -d->pivot[2]);
-      glScalef(0.1f, 0.1f, 0.1f);
-      glCallList(treemodel_list);
-      /*glutSolidSphere(50.0, 20,20);*/
+      glScalef(0.05f, 0.05f, 0.05f);
+      d=&node->data.object;
+      glMultMatrixf(&node->matrix[0][0]);
+      glTranslatef(-d->pivot[0], -d->pivot[1], -d->pivot[2]);
+      glCallList(node->user.d);
       glPopMatrix();
     }
-
-
+  }
 }
 
 } /* namespace Sear */

@@ -47,7 +47,6 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
     _vertex_data[12 * i + 10] = y;
     _vertex_data[12 * i + 11] = height;
     calcNormal(in, out);
-//   continue;
     for (unsigned int j = 0; j < 4; j++) {
       _normal_data[12 * i + 3 * j + 0] = out[0];
       _normal_data[12 * i + 3 * j + 1] = out[1];
@@ -70,15 +69,14 @@ void NPlane::shutdown() {
 }
 
 void NPlane::render(bool select_mode) {
+  //TODO, should we use one texture for the whole model, or one per plane?
   static Render *render = System::instance()->getGraphics()->getRender();
   if (select_mode) {
     render->switchTexture(render->requestTextureMask(_type));
   } else {
     render->switchTexture(render->requestTexture(_type));
   }
-  for (unsigned int i = 0; i < _num_planes; i++) {
-    render->renderArrays(Graphics::RES_QUADS, i * 4, 4, _vertex_data, _texture_data, _normal_data);
-  }
+  render->renderArrays(Graphics::RES_QUADS, 0, _num_planes * 4, _vertex_data, _texture_data, _normal_data);
 }
 
 } /* namespace Sear */
