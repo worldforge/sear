@@ -101,9 +101,9 @@
   static const std::string KEY_texture_scale = "texture_scale";
   
   // Default config values
-  static const float DEFAULT_character_light_kc = 2.0f;
+  static const float DEFAULT_character_light_kc = 0.5f;
   static const float DEFAULT_character_light_kl = 0.2f;
-  static const float DEFAULT_character_light_kq = 0.05f;
+  static const float DEFAULT_character_light_kq = 0.15f;
 
   static const float DEFAULT_character_light_ambient_red = 0.0f;
   static const float DEFAULT_character_light_ambient_green = 0.0f;
