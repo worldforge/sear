@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: StateLoader.h,v 1.6 2002-10-20 13:22:26 simon Exp $
+// $Id: StateLoader.h,v 1.7 2003-03-13 19:44:16 simon Exp $
 
 #ifndef SEAR_STATELOADER_H
 #define SEAR_STATELOADER_H 1
@@ -33,6 +33,10 @@ typedef struct {
   bool stencil;
   bool fog;
   bool rescale_normals;
+  float alpha_value;
+  unsigned int alpha_function;
+  unsigned int blend_src_function;
+  unsigned int blend_dest_function;
 } StateProperties;
 
 class StateLoader : public SigC::Object {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: StateLoader.cpp,v 1.11 2003-03-06 23:50:38 simon Exp $
+// $Id: StateLoader.cpp,v 1.12 2003-03-13 19:44:16 simon Exp $
 
 #include "StateLoader.h"
 
@@ -40,6 +40,32 @@ static const std::string CULL_FACE_CW = "cull_face_cw";
 static const std::string STENCIL = "stencil";
 static const std::string FOG = "fog";
 static const std::string RESCALE_NORMALS = "rescale_normals";
+static const std::string ALPHA_FUNCTION = "alpha_function";
+static const std::string ALPHA_VALUE = "alpha_value";
+static const std::string BLEND_SRC_FUNCTION = "blend_src_function";
+static const std::string BLEND_DEST_FUNCTION = "blend_dest_function";
+
+static const std::string ALPHA_greater = "greater";
+static const std::string ALPHA_less = "less";
+static const std::string ALPHA_equal = "equal";
+static const std::string ALPHA_notequal = "notequal";
+static const std::string ALPHA_gequal = "greater_or_equal";
+static const std::string ALPHA_lequal = "less_or_equal";
+static const std::string ALPHA_always = "always";
+static const std::string ALPHA_never = "never";
+static const std::string BLEND_zero = "zero";
+static const std::string BLEND_one = "one";
+static const std::string BLEND_dst_color = "dst_colour";
+static const std::string BLEND_one_minus_dst_color = "one_minus_dst_colour";
+static const std::string BLEND_src_alpha = "src_alpha";
+static const std::string BLEND_one_minus_src_alpha = "one_minus_src_alpha";
+static const std::string BLEND_dst_alpha = "dst_alpha";
+static const std::string BLEND_one_minus_dst_alpha = "one_minus_dst_alpha";
+static const std::string BLEND_constant_color_ext = "constant_colour_ext";
+static const std::string BLEND_one_minus_constant_color_ext = "one_minus_constant_color_ext";
+static const std::string BLEND_constant_alpha_ext = "constant_alpha_ext";
+static const std::string BLEND_one_minus_constant_alpha_ext = "one_minus_constant_alpha_ext";
+static const std::string BLEND_src_alpha_saturate = "src_alpha_saturate";
 
 StateLoader::StateLoader() :
   _initialised(false)
@@ -69,6 +95,10 @@ void StateLoader::init() {
   default_state->stencil = false;
   default_state->fog = false;
   default_state->rescale_normals = false;
+  default_state->alpha_function = GL_GREATER;
+  default_state->alpha_value = 0.1f;
+  default_state->blend_src_function = GL_SRC_ALPHA;
+  default_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
 
   //Create a font state so we can still see text
   //even if no files have been loaded into Sear
@@ -85,6 +115,10 @@ void StateLoader::init() {
   font_state->stencil = false;
   font_state->fog = false;
   font_state->rescale_normals = false;
+  default_state->alpha_function = GL_GREATER;
+  default_state->alpha_value = 0.1f;
+  default_state->blend_src_function = GL_SRC_ALPHA;
+  default_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
 
   _state_properties["default"] = default_state;
   _state_properties["font"] = font_state;
@@ -127,6 +161,10 @@ void StateLoader::varconf_callback(const std::string &section, const std::string
       record->stencil = false;
       record->fog = false;
       record->rescale_normals = false;
+      record_state->alpha_function = GL_GREATER;
+      record_state->alpha_value = 0.1f;
+      record_state->blend_src_function = GL_SRC_ALPHA;
+      record_state->blend_dest_function = GL_ONE_MINUS_SRC_SRC_ALPHA;
       _state_properties[section] = record;
       if (debug) Log::writeLog(std::string("Adding State: ") + section, Log::LOG_INFO);
   }
@@ -143,10 +181,41 @@ void StateLoader::varconf_callback(const std::string &section, const std::string
   else if (key == STENCIL) record->stencil = (bool)config.getItem(section, key);
   else if (key == FOG) record->fog = (bool)config.getItem(section, key);
   else if (key == RESCALE_NORMALS) record->rescale_normals = (bool)config.getItem(section, key);
+  else if (key == ALPHA_FUNCTION) record->alpha_function = getAlphaFunction((std::string)config.getItem(section, key));
+  else if (key == ALPHA_VALUE) record->alpha_value = (double)config.getItem(section, key);
+  else if (key == BLEND_SRC_FUNCTION) record->blend_src_function = getBlendFunction((std::string)config.getItem(section, key));
+  else if (key == BLEND_DEST_FUNCTION) record->blend_dest_function = getBlendFunction((std::string)config.getItem(section, key));
 }
 
 void StateLoader::varconf_error_callback(const char *message) {
   Log::writeLog(message, Log::LOG_ERROR);
+}
+
+unsigned int StateLoader::getAlphaFunction(const std::string &alpha_function) {
+  if (alpha_function == ALPHA_greater) return GL_GREATER;
+  if (alpha_function == ALPHA_less) return GL_LESS;
+  if (alpha_function == ALPHA_equal) return GL_EQUAL;
+  if (alpha_function == ALPHA_notequal) return GL_NOTEQUA:;
+  if (alpha_function == ALPHA_gequal) return GL_GEQUAL;
+  if (alpha_function == ALPHA_lequal) return GL_LEQUAL;
+  if (alpha_function == ALPHA_always) return GL_ALWAYS;
+  if (alpha_function == ALPHA_never) return GL_NEVER;
+}
+
+unsigned int StateLoader::getBlendFunction(const std::string &blend_function) {
+  if (blend_function == BLEND_zero) return GL_ZERO;
+  if (blend_function == BLEND_one) return GL_ONE;
+  if (blend_function == BLEND_dst_color) return GL_DST_COLOR;
+  if (blend_function == BLEND_one_minus_dst_color) return GL_ONE_MINUS_DST_COLOR;
+  if (blend_function == BLEND_src_alpha) return GL_SRC_ALPHA;
+  if (blend_function == BLEND_one_minus_src_alpha) return GL_ONE_MINUS_SRC_ALPHA;
+  if (blend_function == BLEND_dst_alpha) return GL_DST_ALPHA;
+  if (blend_function == BLEND_one_minus_dst_alpha) return GL_ONE_MINUS_DST_ALPHA;
+  if (blend_function == BLEND_constant_color_ext) return GL_CONSTANT_COLOR_EXT;
+  if (blend_function == BLEND_one_minus_constant_color_ext) return GL_ONE_MINUS_CONSTANT_COLOR_EXT;
+  if (blend_function == BLEND_constant_alpha_ext) return GL_CONSTANT_ALPHA_EXT;
+  if (blend_function == BLEND_one_minus_constant_alpha_ext) return GL_ONE_MINUS_CONSTANT_ALPHA_EXT;
+  if (blend_function == BLEND_src_alpha_saturate) return GL_SRC_ALPHA_SATURATE;
 }
 
 } /* namespace Sear */
