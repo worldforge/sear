@@ -63,29 +63,27 @@ float SkyDome::m_box[] = VERTEX_COORDS;
 float SkyDome::m_quad_v[] = QUAD_COORDS;
 float SkyDome::m_quad_t[] = QUAD_TEX;
 
-  SkyDome::SkyDome() :
-    m_initialised(false),
+SkyDome::SkyDome(float radius, int levels, int segments) :
     m_verts(NULL), m_texCoords(NULL),
     m_vb_verts(0), m_vb_texCoords(0)
-  {}
-
-SkyDome::~SkyDome() {
-  if (m_verts) {
-    delete [] m_verts;
-    m_verts = NULL;
-  }
-
-  if (m_texCoords) {
-    delete [] m_texCoords;
-    m_texCoords = NULL;
-  }
-
+{
+    m_size = segments * levels;
+    // disable for now
+    sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
+    domeInit(radius, levels, segments);
 }
 
-float *SkyDome::genVerts(float radius, int levels, int segments) {
-  int size = segments * levels;
+SkyDome::~SkyDome()
+{
+    delete [] m_verts;
+    delete [] m_texCoords;
+}
+
+float *SkyDome::genVerts(float radius, int levels, int segments)
+{
+
   int vert_counter = -1;
-  float *verts = new float[size * 3 * 4];
+  float *verts = new float[m_size * 3 * 4];
   float levelInc = M_PI / (float)levels / 2.0f;
   float segmentInc = (2.0f * M_PI) / (float)segments;
   for (int i = 0; i < levels; ++i) {
@@ -134,9 +132,9 @@ float *SkyDome::genVerts(float radius, int levels, int segments) {
   return verts;
 }
  
-float *SkyDome::genTexCoords(float radius, int levels, int segments)  {
-  int size = segments * levels;
-  float *tex = new float[size * 2 * 4];
+float *SkyDome::genTexCoords(float radius, int levels, int segments)
+{
+  float *tex = new float[m_size * 2 * 4];
   int tex_counter = -1;
 
   for (int i = 0; i < levels; ++i) {
@@ -166,18 +164,16 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   m_verts = genVerts(radius, levels, segments);  
   m_texCoords = genTexCoords(radius, levels, segments);  
 
-  int size = segments * levels;
-
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     glGenBuffersARB(1, &m_vb_verts);
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_verts);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * 3 * 4 * sizeof(float), m_verts, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_size * 3 * 4 * sizeof(float), m_verts, GL_STATIC_DRAW_ARB);
     delete [] m_verts;
     m_verts = NULL;
 
     glGenBuffersARB(1, &m_vb_texCoords);
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texCoords);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * 2 * 4 * sizeof(float), m_texCoords, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_size * 2 * 4 * sizeof(float), m_texCoords, GL_STATIC_DRAW_ARB);
     delete [] m_texCoords;
     m_texCoords = NULL;
     
@@ -185,17 +181,10 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
-void SkyDome::render(float radius, int levels, int segments) {
-// disable for now
-sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
-  static int done = 0;
-  static int size = segments * levels;
-  static int counter = 0;
-  if (!done)	 {
-    domeInit(radius , levels, segments);
-    done = 1;
-  }
+static counter = 0;
 
+void SkyDome::render()
+{
   glColor3f(1.0f, 1.0f, 1.0f);
   ++counter;
   #define INCR 24000
@@ -242,7 +231,7 @@ sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
   }
   glTexCoordPointer(2, GL_FLOAT, 0, m_texCoords);
   // Renderdome
-  glDrawArrays(GL_QUADS, 0, size * 4);
+  glDrawArrays(GL_QUADS, 0, m_size);
 
   // Render Cloud layer one
   glEnable(GL_BLEND);

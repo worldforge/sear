@@ -13,34 +13,21 @@ namespace Sear {
 
 class SkyDome {
 public:
-  SkyDome();
+  SkyDome(float radius, int level, int segments);
   virtual ~SkyDome();
   
-  void init() {
-  }
-
-  void shutdown() {
-    if (m_verts) {
-      delete [] m_verts;
-      m_verts = NULL;
-    }
-    if (m_texCoords) {
-      delete [] m_texCoords;
-      m_texCoords = NULL;
-    }
-  }
-
-  float *genVerts(float radius, int levels, int segments);
+  void render();
+  void invalidate() {}
+    
+private:
+    float *genVerts(float radius, int levels, int segments);
   float *genTexCoords(float radius, int levels, int segments);
 
   void domeInit(float radius, int levels, int segments);
-  void render(float radius, int levels, int segments);
-
-  void invalidate() {}
-
-private:
-  bool m_initialised;
+  
   float *m_verts, *m_texCoords;
+  int m_size;
+  
   unsigned int m_vb_verts, m_vb_texCoords;
   static float m_box[];
   static float m_quad_v[];

@@ -1,3 +1,8 @@
+26th April 2004, James Turner
+ * Move SkyDome init path into it's constructor
+ * Remove statics that stop SkyDome re-initing correctly
+ * Make re-init of Environment assert, should never happen (for now)
+
 26th April 2004, Simon Goodall
  * More initialisation order fixes
  * Some code cleanups
