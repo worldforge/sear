@@ -1,3 +1,6 @@
+30th August 2002, Simon Goodall
+ * Code changes for new Metaserver design
+
 27th August 2002, Simon Goodall
  * Added message "Cannot SAY, not in game yet" when entering a non-command string into console before entering game world
 

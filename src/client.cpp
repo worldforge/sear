@@ -86,7 +86,7 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
-  if (_meta) delete _meta;
+//  if (_meta) delete _meta;
   if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
   if (_connection) delete _connection;
@@ -674,9 +674,7 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 }
 
 void Client::getServers() {
-  if (_meta) {
-    _meta->refresh();
-  } else {
+  if (!_meta) {
     std::string metaserver = "metaserver.worldforge.org";
     _meta = new Eris::Meta("", metaserver, 10);
     _meta->GotServerCount.connect(SigC::slot(*this, &Client::gotServerCount));
@@ -684,6 +682,7 @@ void Client::getServers() {
     _meta->ReceivedServerInfo.connect(SigC::slot(*this, &Client::receivedServerInfo));
     _meta->CompletedServerList.connect(SigC::slot(*this, &Client::completedServerList));
   }
+  _meta->refresh();
 }
 
 void Client::gotServerCount(int count) {
