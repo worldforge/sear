@@ -1,3 +1,6 @@
+21st October 2002, Simon Goodall
+ * Fixed clean up code for Cal3D models and  modelhandler so they remove all instances they create
+
 20th October 2002, Simon Goodall
  * Converted many string values to static decl's
  * Moved most Log::writeLog calls to debug mode only

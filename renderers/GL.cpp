@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.40 2002-10-21 20:12:04 simon Exp $
+// $Id: GL.cpp,v 1.41 2002-10-21 22:24:29 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -141,9 +141,9 @@ GL::GL() :
   window_height(0),
   fov(RENDER_FOV),
   near_clip(RENDER_NEAR_CLIP),
-  next_id(1),
+  next_id(1), // was 0 error?
   base(0),
-  textureList(std::list<GLuint>()),
+  textureList(std::vector<GLuint>()),
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false)
@@ -160,7 +160,7 @@ GL::GL(System *system, Graphics *graphics) :
   near_clip(RENDER_NEAR_CLIP),
   next_id(1),
   base(0),
-  textureList(std::list<GLuint>()),
+  textureList(std::vector<GLuint>()),
   terrain(NULL),
   _cur_state(NULL),
   _initialised(false)
@@ -551,11 +551,13 @@ void GL::createMipMapMask(SDL_Surface *surface, unsigned int texture, bool clamp
   }
 }
 
-inline GLuint GL::getTextureID(int texture_id) {
-  int i;
-  std::list<GLuint>::const_iterator I = textureList.begin();
-  for (i = 1; i < texture_id; ++i, ++I);
-  return *I;
+inline GLuint GL::getTextureID(unsigned int texture_id) {
+  if (texture_id > textureList.size()) return 0;
+  return textureList[texture_id - 1]; // texture id's start at 1
+//	int i;
+//  std::list<GLuint>::const_iterator I = textureList.begin();
+//  for (i = 1; i < texture_id; ++i, ++I);
+//  return *I;
 }
 
 void GL::stateChange(const std::string &state) {

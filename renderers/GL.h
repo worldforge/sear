@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.19 2002-09-27 15:46:42 simon Exp $
+// $Id: GL.h,v 1.20 2002-10-21 22:24:29 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -10,6 +10,7 @@
 #include <GL/gl.h>
 #include <SDL/SDL.h>
 #include <string>
+#include <vector>
 #include <list>
 #include <map>
 #include <set>
@@ -59,7 +60,7 @@ public:
   void createTextureMask(SDL_Surface*, unsigned int, bool);
   void createMipMapMask(SDL_Surface*, unsigned int, bool);
   
-  GLuint getTextureID(int texture_id);
+  GLuint getTextureID(unsigned int texture_id);
   static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
@@ -129,7 +130,7 @@ protected:
   
   int next_id;
   GLuint base;
-  std::list<GLuint> textureList;
+  std::vector<GLuint> textureList;
 
   int font_id;
   int splash_id;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.34 2002-10-21 20:09:59 simon Exp $
+// $Id: client.cpp,v 1.35 2002-10-21 22:24:29 simon Exp $
 
 #include "System.h"
 
@@ -119,7 +119,7 @@ bool Client::init() {
 void Client::shutdown() {
   if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
-  if (_connection) delete _connection;
+//  if (_connection) delete _connection;
   if (_factory) delete _factory;
   if (_meta) delete _meta;
   if (&Eris::PollDefault::instance()) delete &Eris::PollDefault::instance();
@@ -416,7 +416,9 @@ int Client::takeCharacter(const std::string &id) {
   world->EntityDelete.connect(SigC::slot(*this, &Client::EntityDelete));
   world->Appearance.connect(SigC::slot(*this, &Client::Appearance));
   world->Disappearance.connect(SigC::slot(*this, &Client::Disappearance));
-  world->registerFactory(new Factory());
+  if (_factory) delete _factory;
+  _factory = new Factory();
+  world->registerFactory(_factory);
   return 0;
 }
 

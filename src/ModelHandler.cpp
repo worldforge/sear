@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.26 2002-10-21 20:09:59 simon Exp $
+// $Id: ModelHandler.cpp,v 1.27 2002-10-21 22:24:29 simon Exp $
 
 #include "System.h"
 #include <set>
@@ -73,24 +73,37 @@ void ModelHandler::init() {
 
 void ModelHandler::shutdown() {
   // Clean up model loaders
-  for (ModelLoaderMap::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
-    if (I->second) {
-//      I->second->shutdown();
-      delete I->second;
-      _model_loaders[I->first] = NULL;
-    }
-  } 
-// Clean Up Models
-  for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
-    if (I->second) {
-      Model *model = I->second->model;
-      if (model) {
-        model->shutdown();
-	delete model;
+  while (!_model_loaders.empty()) {
+    ModelLoader *ml = _model_loaders.begin()->second;
+    if (ml) delete (ml);
+    _model_loaders.erase(_model_loaders.begin());
+  }
+  while (!_object_map.empty()) {
+    ModelRecord *mr = _object_map.begin()->second;
+    if (mr) {
+      if (!mr->model_by_type) {
+        if (mr->model) {
+          mr->model->shutdown();
+          delete mr->model;
+          mr->model = NULL;
+        }
+        delete mr;
       }
-      delete I->second;
-      _model_records[I->first] = NULL;
     }
+    _object_map.erase(_object_map.begin());
+  }
+// Clean Up Models
+  while (!_model_records.empty()) {
+    ModelRecord *mr = _model_records.begin()->second;
+    if (mr) {
+      if (mr->model) {
+	mr->model->shutdown();
+        delete mr->model;
+        mr->model = NULL;
+      }
+      delete mr;
+    }
+    _model_records.erase(_model_records.begin());
   }
   _initialised = false;
 }
@@ -100,7 +113,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   if (_object_map[record->id + model_id]) return _object_map[record->id + model_id];
   
   if (_model_records[model_id]) {
-    if (_model_records[model_id]);
+    // if (_model_records[model_id]); // Huh? what was this here for?
     _object_map[record->id + model_id] = _model_records[model_id];
     return _model_records[model_id];
   }

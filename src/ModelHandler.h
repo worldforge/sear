@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.8 2002-09-26 20:23:03 simon Exp $
+// $Id: ModelHandler.h,v 1.9 2002-10-21 22:24:29 simon Exp $
 
 #ifndef SEAR_MODELHANDLER_H
 #define SEAR_MODELHANDLER_H 1
@@ -36,11 +36,11 @@ public:
   
 protected:
   typedef std::map<std::string, ModelLoader*> ModelLoaderMap;
-  typedef std::map<std::string, ModelRecord*> ModelRecordMap;
+  typedef std::map<std::string, ModelRecord*> ModelRecordMap; 
   typedef std::map<std::string, ModelRecord*> ObjectRecordMap;
-  ModelLoaderMap _model_loaders;
-  ModelRecordMap _model_records;
-  ObjectRecordMap _object_map;
+  ModelLoaderMap _model_loaders; // Stores all the model loaders
+  ModelRecordMap _model_records; // Stores all the model_by_type models
+  ObjectRecordMap _object_map; // Stores model for entity id and model_name
   bool _initialised;
 };
 

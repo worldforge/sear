@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3d.cpp,v 1.24 2002-10-21 20:12:04 simon Exp $
+// $Id: Cal3d.cpp,v 1.25 2002-10-21 22:24:28 simon Exp $
 
 //#include <GL/gl.h>
 #include <SDL/SDL.h>
@@ -177,7 +177,7 @@ unsigned int Cal3d::loadTexture(const std::string& strFilename)
   } else {
     SDL_Surface * image = System::loadImage(strFilename);
     textureId = _render->createTexture((unsigned int)image->w, (unsigned int)image->h,(unsigned int)image->format->BytesPerPixel,(unsigned char *)image->pixels, false);
-    free(image);
+    SDL_FreeSurface(image);
   }
   return textureId;
 }
@@ -352,7 +352,7 @@ bool Cal3d::init(const std::string& strFilename, float height) {
         }
         material_map[code] = material_set_map[set];
         part_map[code] = material_part_map[part];
-	std::cout << set << " - " << part << std::endl;
+	if (debug) std::cout << set << " - " << part << std::endl;
       }
       else {
         Log::writeLog(strFilename + std::string("(") + string_fmt(line) + std::string("): Invalid syntax."), Log::LOG_ERROR);
@@ -547,13 +547,20 @@ void Cal3d::shutdown()
   instance_count--;
   // destroy the model instance
   m_calModel.destroy();
+
   // Hopefully removes all core models once last cal3d has been removed
   // This should really be handled elsewhere
   if (instance_count == 0) {
-    for (std::map<std::string, ModelAnimPair*>::const_iterator I = core_models.begin(); I != core_models.end(); I++) {
-      (I->second)->m_calCoreModel->destroy();
-    }
     while(!core_models.empty()) {
+      ModelAnimPair *mp =  core_models.begin()->second;
+      if (mp) {
+        CalCoreModel *core = mp->m_calCoreModel;
+        if (core) {
+          core->destroy();
+          delete core;
+	}
+	delete mp;
+      }
       core_models.erase(core_models.begin());
     }
 //  map->m_calCoreModel->destroy();
@@ -676,12 +683,12 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 10) == "animation_") {
     std::string anim = action.substr(10);
-    std::cout << "Animation: " << anim << std::endl;
+    if (debug) std::cout << "Animation: " << anim << std::endl;
     m_calModel.getMixer()->executeAction(map->animation_map[anim], 0.3f, 0.3f);
   }
   else if (action.substr(0, 7) == "switch_") {
     std::string anim = action.substr(7);
-    std::cout << "Switch: " << anim << std::endl;
+    if (debug) std::cout << "Switch: " << anim << std::endl;
     for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
       const int code = I->second;
       std::string a = I->first;
@@ -691,7 +698,7 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 6) == "blend_") {
     std::string anim = action.substr(6);
-    std::cout << "Blend: " << anim << std::endl;
+    if (debug) std::cout << "Blend: " << anim << std::endl;
     for (std::map<std::string, int>::const_iterator I = map->animation_map.begin(); I != map->animation_map.end(); ++I) {
       const int code = I->second;
       std::string a = I->first;
@@ -701,12 +708,12 @@ void Cal3d::action(const std::string &action) {
   }
   else if (action.substr(0, 9) == "add_mesh_") {
     std::string mesh = action.substr(9);
-    std::cout << "Add: " << mesh << std::endl;
+    if (debug) std::cout << "Add: " << mesh << std::endl;
     m_calModel.attachMesh(map->mesh_map[mesh]);
   }
   else if (action.substr(0, 12) == "remove_mesh_") {
     std::string mesh = action.substr(12);
-    std::cout << "Remove: " << mesh << std::endl;
+    if (debug) std::cout << "Remove: " << mesh << std::endl;
     m_calModel.detachMesh(map->mesh_map[mesh]);
   }
   else if (action.substr(0, 10) == "set_equip_") {
