@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.31 2003-07-15 11:11:22 simon Exp $
+// $Id: Graphics.cpp,v 1.32 2003-11-09 12:59:13 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -268,13 +268,17 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
       ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
       if (object_record && object_record->type.empty()) object_record->type = we->getID();
       if (!object_record) {
-        object_record = object_handler->getObjectRecord(we->type());
+        std::string type = we->type();
+        varconf::Config::inst()->clean(type);
+        object_record = object_handler->getObjectRecord(type);
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
         if (object_record) object_record->type = we->type();
       }
       if (!object_record) {
-        object_record = object_handler->getObjectRecord(we->parent());
+        std::string parent = we->parent();
+        varconf::Config::inst()->clean(parent);
+        object_record = object_handler->getObjectRecord(parent);
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
         if (object_record) object_record->type = we->parent();
