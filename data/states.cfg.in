@@ -142,3 +142,15 @@ cull_face_cw = false
 stencil = false
 fog = true
 end_of_state
+state = splash
+alpha_test = false
+blend = false
+lighting = false
+textures = true
+colour_material = false
+depth_test = false
+cull_face = false
+cull_face_cw = false
+stencil = false
+fog = false
+end_of_state
