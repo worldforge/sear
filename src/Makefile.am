@@ -19,7 +19,6 @@ sear_SOURCES = \
 	client.cpp \
 	client.h \
 	cmd.h \
-	command.cpp \
 	Config.cpp \
 	conf.h \
 	Config.h \

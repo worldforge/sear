@@ -89,9 +89,8 @@ void Client::Log(Eris::LogLevel lvl, const std::string &msg) {
 }
 
 int Client::connect(const std::string &host, int port) {
-  std::string msg = "Connecting to " + string_fmt(host) + " on port " + string_fmt(port);
-  Log::writeLog(msg , Log::DEFAULT);
-  if (_connection == NULL) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
+  Log::writeLog(std::string("Connecting to ") + host + std::string(" on port ") + string_fmt(port) , Log::DEFAULT);
+  if (!_connection) throw ClientException("Connection object is NULL", ClientException::NO_CONNECTION_OBJECT);
   if (_connection->isConnected()) throw ClientException("Already Connected", ClientException::ALREADY_CONNECTED);
   if (host.empty()) throw ClientException("No hostname given", ClientException::NO_HOSTNAME);
   Log::writeLog("Calling Connect", Log::INFO);
@@ -389,7 +388,7 @@ int Client::logout() {
 }
 
 int Client::getCharacters() {
-  _player->refreshCharacterInfo();
+  if (_player) _player->refreshCharacterInfo();
   return 0;
 }
 
@@ -517,23 +516,55 @@ void Client::GotAllCharacters() {
 }
 
 void Client::registerCommands(Console *console) {
-  console->registerCommand(std::string("connect"), this);
+  //TODO: we could register the commands as they become available?
+  console->registerCommand(SERVER_CONNECT, this);
+  console->registerCommand(SERVER_RECONNECT, this);
+  console->registerCommand(SERVER_DISCONNECT, this);
+  console->registerCommand(ACCOUNT_CREATE, this);
+  console->registerCommand(ACCOUNT_LOGIN, this);
+  console->registerCommand(ACCOUNT_LOGOUT, this);
+  console->registerCommand(CHARACTER_LIST, this);
+  console->registerCommand(CHARACTER_CREATE, this);
+  console->registerCommand(CHARACTER_TAKE, this);
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
-  std::deque<std::string> tokens;
-  if (command == "connect") {
-    tokenise(tokens, args);
-    std::string server = tokens.front();
-    tokens.pop_front();
-    int port = 0;
-    cast_stream(tokens.front(), port);
-  
-    if (port) connect(server, port);
-    else connect(server, DEFAULT_PORT);
+  Tokeniser tokeniser = Tokeniser();
+  tokeniser.initTokens(args);
+  if (command == SERVER_CONNECT) {
+    std::string server = tokeniser.nextToken();
+    std::string port_string = tokeniser.nextToken();
+    if (port_string.empty()) {
+      connect(server, DEFAULT_PORT);
+    } else {
+      int port = 0;
+      cast_stream(port_string, port);
+      connect(server, port);
+    }
   }
-	
+  else if (command == SERVER_RECONNECT)  reconnect();
+  else if (command == SERVER_DISCONNECT) disconnect();
+  else if (command == ACCOUNT_CREATE) {
+    std::string user_name = tokeniser.nextToken();
+    std::string password = tokeniser.nextToken();
+    std::string full_name = tokeniser.remainingTokens();
+    createAccount(user_name, full_name, password);
+  }
+  else if (command == ACCOUNT_LOGIN) {
+    std::string user_name = tokeniser.nextToken();
+    std::string password = tokeniser.nextToken();
+    login(user_name, password);
+  }
+  else if (command == ACCOUNT_LOGOUT) logout();
+  else if (command == CHARACTER_LIST) getCharacters();
+  else if (command == CHARACTER_CREATE) {
+    std::string name = tokeniser.nextToken();
+    std::string type = tokeniser.nextToken();
+    std::string sex = tokeniser.nextToken();
+    std::string desc = tokeniser.remainingTokens();
+    createCharacter(name, type, sex, desc);
+  }
+  else if (command == CHARACTER_TAKE) takeCharacter(args);
 }
 
-
-}
+} /* namespace Sear */

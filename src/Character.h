@@ -5,10 +5,9 @@
 #ifndef _CHARACTER_H_
 #define _CHARACTER_H_ 1
 
+#include "ConsoleObject.h"
+
 #include <string>
-
-//#include <SDL/SDL.h>
-
 #include <wfmath/quaternion.h>
 
 namespace Sear {
@@ -16,7 +15,7 @@ namespace Sear {
 class Client;
 class WorldEntity;
 
-class Character {
+class Character : public ConsoleObject{
 public:
   Character(WorldEntity*, System*);
   ~Character();
@@ -45,13 +44,12 @@ public:
   void readConfig();
   void writeConfig();
 
+  void registerCommands(Console*);
+  void runCommand(const std::string &, const std::string &);
+	
   static const float CMD_modifier = 9999.9f;
   
 protected:
-  static const char * const CMD_character_run_args = "0 0 1";
-  static const char * const CMD_character_walk_args = "1 0 0";
-
-
   static const int server_update_interval = 500;
 
   static const char * const KEY_character_walk_speed = "character_walk_speed";
@@ -79,6 +77,33 @@ protected:
   unsigned int _time;
 
   bool _run_modifier;
+
+private:
+  static const char * const MOVE_FORWARD = "+character_move_forward";
+  static const char * const MOVE_BACKWARD = "+character_move_backward";
+  static const char * const MOVE_STOP_FORWARD = "-character_move_forward";
+  static const char * const MOVE_STOP_BACKWARD = "-character_move_backward";
+ 
+  static const char * const ROTATE_LEFT = "+character_rotate_left";
+  static const char * const ROTATE_RIGHT = "+character_rotate_right";
+  static const char * const ROTATE_STOP_LEFT = "-character_rotate_left";
+  static const char * const ROTATE_STOP_RIGHT = "-character_rotate_right";
+ 
+  static const char * const STRAFE_LEFT = "+character_strafe_left";
+  static const char * const STRAFE_RIGHT = "+character_strafe_right";
+  static const char * const STRAFE_STOP_LEFT = "-character_strafe_left";
+  static const char * const STRAFE_STOP_RIGHT = "-character_strafe_right";
+
+  static const char * const RUN = "+run";
+  static const char * const STOP_RUN = "-run";
+  static const char * const TOGGLE_RUN = "toggle_run";
+  
+  static const char * const SAY = "say";
+  static const char * const PICKUP = "pickup";
+  static const char * const TOUCH = "touch";
+  static const char * const DROP = "drop";
+  static const char * const GIVE = "give";
+  static const char * const DISPLAY_INVENTORY = "inventory";
 };
 
 } /* namespace Sear */

@@ -26,14 +26,7 @@
 #define CONSOLE_MESSAGE 0x1
 #define SCREEN_MESSAGE  0x2
 
-
-/*
- * AIMS
- * Eventually have a register cmd function
- * This will allow removal of command.cpp
- * AND allow commands to by dynamically added in the future plugin system
- */ 
-
+#include "ConsoleObject.h"
 
 namespace Sear {
 
@@ -41,7 +34,7 @@ class ConsoleObject;
 class System;
 class Render;
 
-class Console {
+class Console : public ConsoleObject {
 public:
   Console(System *system) :
     animateConsole(0),
@@ -63,6 +56,7 @@ public:
   bool consoleStatus() { return showConsole; }
 
   void registerCommand(const std::string &command, ConsoleObject *object);
+  void runCommand(const std::string &command);
   void runCommand(const std::string &command, const std::string &args);
 
 protected:
@@ -81,6 +75,9 @@ protected:
   Render *_renderer;
 
   std::map<std::string, ConsoleObject*> _registered_commands;
+ 
+  static const char * const TOGGLE_CONSOLE = "toggle_console";
+  static const char * const LIST_CONSOLE_COMMANDS = "list_commands";
   
 };
 

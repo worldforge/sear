@@ -58,7 +58,7 @@ public:
   void runScript(const std::string&);
   void pushMessage(const std::string &msg, int type, int = MESSAGE_LIFE);
   bool fileExists(const std::string &);
-  std::string processHome(std::string);
+  std::string processHome(const std::string &);
 
   unsigned int getTime() const { return SDL_GetTicks(); }
 
@@ -209,6 +209,34 @@ protected:
 private:
   bool _systemState[SYS_LAST_STATE];
   bool _system_running;
+
+
+  static const char * const EXIT = "exit";
+  static const char * const QUIT = "quit";
+
+  static const char * const GET_ATTRIBUTE = "getat";
+  static const char * const SET_ATTRIBUTE = "setat";
+
+  static const char * const CHANGE_DIRECTORY = "cd";
+ 
+  static const char * const ENABLE_DIR_PREFIX = "enable_dir_prefix";
+  static const char * const DISABLE_DIR_PREFIX = "disable_dir_prefix";
+
+  static const char * const RUN_SCRIPT = "run_script";
+  static const char * const LOAD_OBJECT_FILE = "load_object_file";
+  static const char * const LOAD_STATE_FILE = "load_state_file";
+  static const char * const LOAD_GENERAL_CONFIG = "load_general";
+  static const char * const LOAD_KEY_BINDINGS = "load_bindings";
+  static const char * const LOAD_TEXTURE_CONFIG = "load_textures";
+  static const char * const LOAD_MODEL_CONFIG = "load_models";
+  static const char * const SAVE_GENERAL_CONFIG = "save_general";
+  static const char * const SAVE_KEY_BINDINGS = "save_bindings";
+  static const char * const READ_CONFIG = "read_config";
+  static const char * const BIND_KEY = "bind";
+  static const char * const KEY_PRESS = "keypress";
+  static const char * const TOGGLE_FULLSCREEN = "toggle_fullscreen";
+  static const char * const ADD_EVENT = "event";
+  static const char * const IDENTIFY_ENTITY = "identify";
 };
 
 } /* namespace Sear */

@@ -88,7 +88,22 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
 void tokenise(std::deque<std::string> &tokens, const std::string &input);
 
+class Tokeniser {
+public:
+  Tokeniser() {}
+  ~Tokeniser() {}
 
+  void initTokens(const std::string &tokens);
+  std::string Tokeniser::nextToken();
+  std::string Tokeniser::remainingTokens();
+
+protected:
+  std::string::size_type pos, last_pos;
+  std::string token_string;
+  static const std::string delimeters;
+};
+
+  
 } /* namespace Sear */
 #endif /* _UTILITY_H_ */
 

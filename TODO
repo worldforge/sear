@@ -1,22 +1,16 @@
-Determine why some characters are not properly rotated 
-Re-implement Object Selected
-Re-implement Model un-loading
-Re-implement per type models
-Create a default built-in texture to use if others do not exist
-Re-implement model type conversion / downgrading
-REMOVE GL_RENDER from loaders, should only be using the render interface
-
+ * Determine why some characters are not properly rotated 
+ * Re-implement Model un-loading
+ * Re-implement per type models
+ * Create a default built-in texture to use if others do not exist
+ * Re-implement model type conversion / downgrading
+ * REMOVE GL_RENDER from loaders, should only be using the render interface
  * Move terrain and skybox code to separate dir's / libs
- * Add a stand alone option
+ * Add a stand alone option -> ModelViewer
  * Add a command history
  * Check for OpenGL hardware -> ie if vendor == NONE report error
  * In game menu for configuration
  * Improve memory usage
  * Add a BSP tree or equivalent
- * Set system to "register" console commands.
-   - Have a map,  <std::string, void *> where arg 2 is a function pointer.
-   - Function pointer takes a string for its args and it proccesses string as needed.
-   - Sets pointer to NULL when finished.
  * Update configure + autogen to provide better help. -> IE if not found, goto www...
  * Move OpenGL code into one object
  * Make OpenGL Render class a plugin
@@ -26,8 +20,6 @@ REMOVE GL_RENDER from loaders, should only be using the render interface
  * Improve terrain engine
  * Allow mulitple terrains
  * Add support to create custom font textures from say freetype
-
- * Build in an option in the render to make a model a billboard. IE take existing billboard code and put into a separate method.
 
  * Add a sky dome
    Use the new MultiModels interface to specify a sphere as a multimodel. Each layer of the sphere will be one model. The top and bottom layers of a sphere can be made using triangle fans, the intermediate layer can use triangle striping.

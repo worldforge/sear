@@ -1,3 +1,8 @@
+19th July 2002, Simon Goodall
+ * Console commands fully migrated.
+ * Tokeniser code now in own class,
+ * Fixed segfalut caused by not providing the exact number of arguments to a console command
+
 10th July 2002, Simon Goodall
  * Console command registering implemented. Need to migrate existing system to new
 

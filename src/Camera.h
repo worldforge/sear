@@ -14,9 +14,14 @@
  *  character's head) and the view plane
  */ 
 
+#include "ConsoleObject.h"
+#include <string>
+
 namespace Sear {
 
-class Camera {
+class Console;
+	
+class Camera : public ConsoleObject{
 public:
   Camera();
   ~Camera();
@@ -42,6 +47,9 @@ public:
 
   void readConfig();
   void writeConfig();
+ 
+  void registerCommands(Console *console);
+  void runCommand(const std::string &command, const std::string &args);
   
 protected:
   // General key values
@@ -67,6 +75,19 @@ protected:
   
   const static float DEFAULT_camera_min_distance = 5.0f;
   const static float DEFAULT_camera_max_distance = 25.0f;
+  
+  static const char * const ZOOM_IN = "+camera_zoom_in";
+  static const char * const ZOOM_OUT = "+camera_zoom_out";
+  static const char * const ZOOM_STOP_IN = "-camera_zoom_in";
+  static const char * const ZOOM_STOP_OUT = "-camera_zoom_out";
+  static const char * const ROTATE_LEFT = "+camera_rotate_left";
+  static const char * const ROTATE_RIGHT = "+camera_rotate_right";
+  static const char * const ROTATE_STOP_LEFT = "-camera_rotate_left";
+  static const char * const ROTATE_STOP_RIGHT = "-camera_rotate_right";
+  static const char * const ELEVATE_UP = "+camera_elevate_up";
+  static const char * const ELEVATE_DOWN = "+camera_elevate_down";
+  static const char * const ELEVATE_STOP_UP = "-camera_elevate_up";
+  static const char * const ELEVATE_STOP_DOWN = "-camera_elevate_down";
   
   float _distance;  // distance from focus
   float _rotation;  // horizontal rotation

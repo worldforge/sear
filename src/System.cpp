@@ -18,7 +18,7 @@
 #include "StateLoader.h"
 #include "cmd.h"
 #include "Utility.h"
-
+#include "WorldEntity.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -68,7 +68,7 @@ bool System::init() {
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
     Log::writeLog("Error initializing Eris", Log::ERROR);
-    throw Exception("");
+    throw Exception("ERIS INIT");
   }
   
   SDL_EnableUNICODE(1);
@@ -155,11 +155,6 @@ void System::shutdown() {
     delete _ol;
     _ol = NULL;
   }
-  if (_console) {
-    _console->shutdown();
-    delete _console;
-    _console = NULL;
-  }
   if (renderer) {
     renderer->shutdown();
     delete renderer;
@@ -193,6 +188,11 @@ void System::shutdown() {
     delete _models;
     _models = NULL;
   }	  
+  if (_console) {
+    _console->shutdown();
+    delete _console;
+    _console = NULL;
+  }
   
   if (_icon) delete _icon;
   if (_cursor_default) SDL_FreeCursor(_cursor_default);
@@ -503,9 +503,14 @@ void System::runScript(const std::string &file_name) {
     Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::ERROR);
     return;
   }
-  while (!feof(script_file)) {
-    fscanf(script_file, "%[^\n]\n", &string_data[0]);
-    runCommand(std::string(string_data));
+  try {
+    while (!feof(script_file)) {
+      fscanf(script_file, "%[^\n]\n", &string_data[0]);
+      runCommand(std::string(string_data));
+    }
+  } catch (...) {
+    // TODO be more discriminate on errors
+    Log::writeLog("Caught an Exception while running script. Script aborted", Log::ERROR);
   }
   chdir(cur_dir);
   _prefix_cwd = pre_cwd; // Restore setting
@@ -522,9 +527,9 @@ bool System::fileExists(const std::string &file_name) {
   return false;
 }
 
-std::string System::processHome(std::string input) {
+std::string System::processHome(const std::string &input) {
   std::string output;
-  int i =input.find("~");
+  int i = input.find("~");
   if (i == -1) return input;
   output = input.substr(0, i);
   output += home_path;
@@ -541,6 +546,7 @@ void System::setCharacter(Character *character) {
   _character = character;
   // Assuming init has no bee performed
   _character->init();
+  _character->registerCommands(_console);
 }
 
 void System::readConfig() {
@@ -649,31 +655,115 @@ void System::switchCursor(int cursor) {
 }
 
 void System::registerCommands(Console *console) {
-  console->registerCommand("quit", this);
-  console->registerCommand("exit", this);
-  console->registerCommand("getat", this);
-  console->registerCommand("setat", this);
-  console->registerCommand("cd", this);
-  console->registerCommand("enable_dir_prefix", this);
-  console->registerCommand("disable_dir_prefix", this);
-  console->registerCommand("run_script", this);
+  console->registerCommand(QUIT, this);
+  console->registerCommand(EXIT, this);
+  console->registerCommand(GET_ATTRIBUTE, this);
+  console->registerCommand(SET_ATTRIBUTE, this);
+  console->registerCommand(CHANGE_DIRECTORY, this);
+  console->registerCommand(ENABLE_DIR_PREFIX, this);
+  console->registerCommand(DISABLE_DIR_PREFIX, this);
+  console->registerCommand(RUN_SCRIPT, this);
+  console->registerCommand(LOAD_OBJECT_FILE, this);
+  console->registerCommand(LOAD_STATE_FILE, this);
+  console->registerCommand(LOAD_GENERAL_CONFIG, this);
+  console->registerCommand(LOAD_TEXTURE_CONFIG, this);
+  console->registerCommand(LOAD_KEY_BINDINGS, this);
+  console->registerCommand(LOAD_MODEL_CONFIG, this);
+  console->registerCommand(SAVE_GENERAL_CONFIG, this);
+  console->registerCommand(SAVE_KEY_BINDINGS, this);
+  console->registerCommand(READ_CONFIG, this);
+  console->registerCommand(BIND_KEY, this);
+  console->registerCommand(KEY_PRESS, this);
+  console->registerCommand(TOGGLE_FULLSCREEN, this);
+  console->registerCommand(ADD_EVENT, this);
+  console->registerCommand(IDENTIFY_ENTITY, this);
+}
+
+void System::runCommand(const std::string &command) {
+  _console->runCommand(command);
 }
 
 void System::runCommand(const std::string &command, const std::string &args) {
-  if (command == "exit" || command == "quit") _system_running = false;
-  else if (command == "getat") {
-	  
+  Log::writeLog(command, Log::DEFAULT);
+  Tokeniser tokeniser = Tokeniser();
+  tokeniser.initTokens(args);
+  if (command == EXIT || command == QUIT) _system_running = false;
+  else if (command == GET_ATTRIBUTE) {
+    if (_general) pushMessage(_general->getAttribute(args), CONSOLE_MESSAGE);
   }
-  else if (command == "setat") {
-
+  else if (command == SET_ATTRIBUTE) {
+    std::string key = tokeniser.nextToken();
+    std::string value = tokeniser.remainingTokens();
+    if (_general) _general->setAttribute(key, value);
   }
-  else if (command == "cd") {
+  else if (command == CHANGE_DIRECTORY) {
     if (args.empty()) return;
     chdir(args.c_str());
   }
-  else if (command == "enable_dir_prefix") _prefix_cwd = true;  
-  else if (command == "disable_dir_prefix") _prefix_cwd = false;
-  else if (command == "run_script") runScript(processHome(args));
+  else if (command == ENABLE_DIR_PREFIX) _prefix_cwd = true;  
+  else if (command == DISABLE_DIR_PREFIX) _prefix_cwd = false;
+  else if (command == RUN_SCRIPT) runScript(processHome(args));
+  else if (command == LOAD_OBJECT_FILE) {
+    if (_ol) _ol->readFiles(processHome(args));
+  }
+  else if (command == LOAD_STATE_FILE) {
+    if (_sl) _sl->readFiles(processHome(args));
+  }
+  else if (command == LOAD_GENERAL_CONFIG) {
+    if (_general) _general->loadConfig(processHome(args));
+    else cout << "ARG" << endl;
+  }
+  else if (command == LOAD_TEXTURE_CONFIG) {
+    if (_textures) _textures->loadConfig(processHome(args), _prefix_cwd);
+    else cout << "ARG" << endl;
+  }
+  else if (command == LOAD_MODEL_CONFIG) {
+    if (_models) _models->loadConfig(processHome(args));
+  }
+  else if (command == LOAD_KEY_BINDINGS) {
+    Bindings::loadBindings(processHome(args));
+  }
+  else if (command == SAVE_GENERAL_CONFIG) {
+    if (_general) {
+      if (args.empty()) _general->saveConfig();
+      else _general->saveConfig(processHome(args));
+    }
+  }
+  else if (command == SAVE_KEY_BINDINGS) {
+    if (args.empty()) Bindings::saveBindings();
+    else Bindings::saveBindings(processHome(args));
+  }
+  else if (command == READ_CONFIG) {
+    readConfig();
+    if (renderer) {
+      renderer->readConfig();
+      renderer->readComponentConfig();
+    }
+    if (_character)_character->readConfig();
+  }
+  else if (command == BIND_KEY) {
+    std::string key = tokeniser.nextToken();
+    std::string value = tokeniser.remainingTokens();
+    Bindings::bind(key, value);
+  }
+  else if (command == KEY_PRESS) {
+    runCommand(Bindings::getBinding(args));
+  }
+  else if (command == TOGGLE_FULLSCREEN) toggleFullscreen();
+  else if (command == ADD_EVENT) {
+    std::string event_function = tokeniser.nextToken();
+    std::string extra = tokeniser.nextToken();
+    std::string event_condition = tokeniser.nextToken();
+    std::string target = tokeniser.remainingTokens();
+    getEventHandler()->addEvent(Event(event_function, target, event_condition, extra));
+  }
+  else if (command == IDENTIFY_ENTITY) {
+    Eris::World *world = Eris::World::Instance();
+    if (!world) return;
+    WorldEntity *we = ((WorldEntity*)(world->lookup(renderer->getActiveID())));
+    if (we) we->displayInfo();  
+  }
+  else Log::writeLog(std::string("Command not found: - ") + command, Log::ERROR);
 }
 
 } /* namespace Sear */

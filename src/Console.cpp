@@ -6,7 +6,7 @@
 #include "ConsoleObject.h"
 #include "System.h"
 #include "Render.h"
-
+#include "Utility.h"
 #include "Log.h"
 
 namespace Sear {
@@ -14,6 +14,8 @@ namespace Sear {
 bool Console::init() {
   _renderer = _system->getRenderer();
   panel_id = _renderer->requestTexture("ui_panel");
+  registerCommand(TOGGLE_CONSOLE, this);
+  registerCommand(LIST_CONSOLE_COMMANDS, this);
   return true;
 }
 
@@ -115,10 +117,29 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
   _registered_commands[command] = object;
 }
 
-void Console::runCommand(const std::string &command, const std::string &args) {
-  Log::writeLog(std::string("Running: ") + command, Log::INFO);
+void Console::runCommand(const std::string &command_string) {
+  Tokeniser tokeniser = Tokeniser();
+  tokeniser.initTokens(command_string);
+  std::string command = tokeniser.nextToken();
+  std::string args = tokeniser.nextToken();
   ConsoleObject* con_obj = _registered_commands[command];
+  if (command != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
   if (con_obj) con_obj->runCommand(command, args);
-  else Log::writeLog(std::string("Unknown command: ") + command, Log::ERROR);
+  else {
+    Log::writeLog(std::string("Unknown command: ") + command, Log::ERROR);
+    pushMessage("Unknown command" , CONSOLE_MESSAGE, 0);
+  }
 }
+
+void Console::runCommand(const std::string &command, const std::string &args) {
+  if (command == TOGGLE_CONSOLE) {
+    toggleConsole();
+  }
+  else if (command == LIST_CONSOLE_COMMANDS) {
+    for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); I++) {
+      Log::writeLog(I->first, Log::INFO);
+    }
+  }
+}
+
 } /* namespace Sear */

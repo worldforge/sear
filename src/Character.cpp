@@ -27,6 +27,8 @@
 
 #include "Log.h"
 
+#include "Console.h"
+#include "Render.h"
 
 namespace Sear {
 
@@ -245,10 +247,6 @@ void Character::toggleRunModifier() {
   }
   _run_modifier = !_run_modifier;
   updateLocals(true);
-//  if (_run_modifier) _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_run_args));
-//  else _system->runCommand(std::string(CMD_CALLY_SET_MOTION) + std::string(" ") + std::string(CMD_character_walk_args));
-//  if (_run_modifier) _system->getModelHandler()->getModel(_self)->action("run");
-//  else _system->getModelHandler()->getModel(_self)->action("walk");
 }
 
 void Character::readConfig() {
@@ -309,4 +307,79 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   }
 }
 
+void Character::registerCommands(Console *console) {
+  console->registerCommand(MOVE_FORWARD, this);
+  console->registerCommand(MOVE_BACKWARD, this);
+  console->registerCommand(MOVE_STOP_FORWARD, this);
+  console->registerCommand(MOVE_STOP_BACKWARD, this);
+
+  console->registerCommand(ROTATE_LEFT, this);
+  console->registerCommand(ROTATE_RIGHT, this);
+  console->registerCommand(ROTATE_STOP_LEFT, this);
+  console->registerCommand(ROTATE_STOP_RIGHT, this);
+
+  console->registerCommand(STRAFE_LEFT, this);
+  console->registerCommand(STRAFE_RIGHT, this);
+  console->registerCommand(STRAFE_STOP_LEFT, this);
+  console->registerCommand(STRAFE_STOP_RIGHT, this);
+
+  console->registerCommand(RUN, this);
+  console->registerCommand(STOP_RUN, this);
+  console->registerCommand(TOGGLE_RUN, this);
+
+  console->registerCommand(PICKUP, this);
+  console->registerCommand(DROP, this);
+  console->registerCommand(GIVE, this);
+  console->registerCommand(DISPLAY_INVENTORY, this);
+  console->registerCommand(TOUCH, this);
+  console->registerCommand(SAY, this);
 }
+
+void Character::runCommand(const std::string &command, const std::string &args) {
+   std::deque<std::string> tokens;
+   if (command == MOVE_FORWARD) moveForward(1);
+   else if (command == MOVE_BACKWARD) moveForward(-1);
+   else if (command == MOVE_STOP_FORWARD) moveForward(-1);
+   else if (command == MOVE_STOP_BACKWARD) moveForward( 1);
+   
+   else if (command == ROTATE_LEFT) rotate(-1);
+   else if (command == ROTATE_RIGHT) rotate( 1);
+   else if (command == ROTATE_STOP_LEFT) rotate( 1);
+   else if (command == ROTATE_STOP_RIGHT) rotate(-1);
+
+   else if (command == STRAFE_LEFT) strafe(-1);
+   else if (command == STRAFE_RIGHT) strafe( 1);
+   else if (command == STRAFE_STOP_LEFT) strafe( 1);
+   else if (command == STRAFE_STOP_RIGHT) strafe(-1); 
+
+   else if (command == RUN || command == STOP_RUN || command == TOGGLE_RUN) toggleRunModifier();
+
+   else if (command == SAY) say(args);
+   else if (command == GIVE) {
+     int quantity = 0;
+     cast_stream(tokens.front(), quantity);
+     tokens.pop_front();
+     std::string item = tokens.front(); tokens.pop_front();
+     while (!tokens.empty()) {
+       item += " ";
+       item += tokens.front(); tokens.pop_front();
+     }
+     giveEntity(item, quantity, _system->getRenderer()->getActiveID());
+   }
+   else if (command == DROP) {
+     int quantity = 0;
+     cast_stream(tokens.front(), quantity); 
+     tokens.pop_front();
+     std::string item = tokens.front(); tokens.pop_front();
+     while (!tokens.empty()) {
+       item += " ";
+       item += tokens.front(); tokens.pop_front();
+     }
+     dropEntity(item, quantity);
+   }
+   else if (command == PICKUP) _system->setAction(ACTION_PICKUP);
+   else if (command == TOUCH) _system->setAction(ACTION_TOUCH);
+   else if (command == DISPLAY_INVENTORY) displayInventory();
+}
+
+} /* namespace Sear */

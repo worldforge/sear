@@ -123,6 +123,18 @@ protected:
 
   int _status;
   std::string _client_name;
+private:
+  static const char * const SERVER_CONNECT = "connect";
+  static const char * const SERVER_RECONNECT = "reconnect";
+  static const char * const SERVER_DISCONNECT = "disconnect";
+  static const char * const ACCOUNT_CREATE = "create";
+  static const char * const ACCOUNT_LOGIN = "login";
+  static const char * const ACCOUNT_LOGOUT = "logout";
+  static const char * const CHARACTER_LIST = "get";
+  static const char * const CHARACTER_CREATE = "add";
+  static const char * const CHARACTER_TAKE = "take";
+
+  
 };
 
 } /* namespace Sear */

@@ -6,7 +6,7 @@
 #include "System.h"
 #include "Config.h"
 #include "conf.h"
-
+#include "Console.h"
 #include "Utility.h"
 #include <string>
 #include "Log.h"
@@ -36,7 +36,7 @@ bool Camera::init() {
   return true;
 }
 
-void shutdown() {
+void Camera::shutdown() {
   Log::writeLog("Shutting down camera.", Log::DEFAULT);
 }
 
@@ -100,6 +100,40 @@ void Camera::writeConfig() {
   
   general->setAttribute(KEY_camera_min_distance, string_fmt(_min_distance));
   general->setAttribute(KEY_camera_max_distance, string_fmt(_max_distance));
+}
+
+void Camera::registerCommands(Console *console) {
+  console->registerCommand(ZOOM_IN, this);
+  console->registerCommand(ZOOM_OUT, this);
+  console->registerCommand(ZOOM_STOP_IN, this);
+  console->registerCommand(ZOOM_STOP_OUT, this);
+
+  console->registerCommand(ROTATE_LEFT, this);
+  console->registerCommand(ROTATE_RIGHT, this);
+  console->registerCommand(ROTATE_STOP_LEFT, this);
+  console->registerCommand(ROTATE_STOP_RIGHT, this);
+
+  console->registerCommand(ELEVATE_UP, this);
+  console->registerCommand(ELEVATE_DOWN, this);
+  console->registerCommand(ELEVATE_STOP_UP, this);
+  console->registerCommand(ELEVATE_STOP_DOWN, this);
+}
+
+void Camera::runCommand(const std::string &command, const std::string &args) {
+  if (command == ZOOM_IN) zoom(-1);
+  else if (command == ZOOM_OUT) zoom(1);
+  else if (command == ZOOM_STOP_IN) zoom(1);
+  else if (command == ZOOM_STOP_OUT) zoom(-1);
+
+  else if (command == ROTATE_LEFT) rotate(-1);
+  else if (command == ROTATE_RIGHT) rotate(1);
+  else if (command == ROTATE_STOP_LEFT) rotate(1);
+  else if (command == ROTATE_STOP_RIGHT) rotate(-1);
+
+  else if (command == ELEVATE_UP) elevate(1);
+  else if (command == ELEVATE_DOWN) elevate(-1);
+  else if (command == ELEVATE_STOP_UP) elevate(-1);
+  else if (command == ELEVATE_STOP_DOWN) elevate(1);
 }
 
 }

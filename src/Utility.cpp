@@ -246,5 +246,33 @@ void tokenise (std::deque<std::string> &tokens, const std::string &input) {
    while (ss>>buf) tokens.push_back(buf);
 }
 
+const std::string Tokeniser::delimeters = " ";
 
+void Tokeniser::initTokens(const std::string &tokens) {
+  token_string = std::string(tokens);
+  last_pos = token_string.find_first_not_of(delimeters, 0);
+//  if (last_pos != string::npos)
+	  pos = token_string.find_first_of(delimeters, last_pos);
+}
+
+std::string Tokeniser::nextToken() {
+  try {
+    std::string token = token_string.substr(last_pos, pos - last_pos);
+    last_pos = token_string.find_first_not_of(delimeters, pos);
+    pos = token_string.find_first_of(delimeters, last_pos);
+    return token;
+  } catch (...) {
+    return "";
+  }
+}
+
+std::string Tokeniser::remainingTokens() {
+  try {     	  
+    return token_string.substr(last_pos, token_string.size() - last_pos);
+  } catch (...) {
+    return "";
+  }
+}                                
+
+  
 } /* namespace Sear */
