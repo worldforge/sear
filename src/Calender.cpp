@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Calender.cpp,v 1.1 2002-12-24 15:12:37 simon Exp $
+// $Id: Calender.cpp,v 1.2 2002-12-24 16:15:34 simon Exp $
 
 #include "Calender.h"
 #include "common/Utility.h"
@@ -13,13 +13,15 @@
 
 #ifdef DEBUG
   static const bool debug = true;
+  #include "common/mmgr.h"
 #else
   static const bool debug = false;
 #endif
 
+// Config section name
 static const std::string CALENDER = "calender";
 
-// Config Options
+// Config Key names
 static const std::string KEY_SECONDS_PER_MINUTE = "seconds_per_minute";
 static const std::string KEY_MINUTES_PER_HOUR = "minutes_per_hour";
 static const std::string KEY_HOURS_PER_DAY = "hours_per_day";
@@ -27,15 +29,17 @@ static const std::string KEY_DAYS_PER_WEEK = "days_per_week";
 static const std::string KEY_WEEKS_PER_MONTH = "weeks_per_month";
 static const std::string KEY_MONTHS_PER_YEAR = "months_per_year";
 
+// Config Key prefix's for day and month names
+static const std::string KEY_DAY_NAME = "day_name_";
+static const std::string KEY_MONTH_NAME = "month_name_";
+
+// Default config values
 static const unsigned int DEFAULT_SECONDS_PER_MINUTE = 60;
 static const unsigned int DEFAULT_MINUTES_PER_HOUR = 20;
 static const unsigned int DEFAULT_HOURS_PER_DAY = 24;
 static const unsigned int DEFAULT_DAYS_PER_WEEK = 7;
 static const unsigned int DEFAULT_WEEKS_PER_MONTH = 4;
 static const unsigned int DEFAULT_MONTHS_PER_YEAR = 12;
-
-static const std::string KEY_DAY_NAME = "day_name_";
-static const std::string KEY_MONTH_NAME = "month_name_";
 
 // Console Commands
 static const std::string GET_TIME = "get_time";
@@ -59,7 +63,7 @@ Calender::Calender() :
   _months_per_year(DEFAULT_MONTHS_PER_YEAR),
   _seconds(0.0f),
   _minutes(0),
-  _hours(12),
+  _hours(12), // Default start time is noon
   _days(0),
   _months(0),
   _years(0)
@@ -70,49 +74,61 @@ Calender::~Calender() {
 }
 
 void Calender::init() {
-  if (_initialised) shutdown();
+  if (_initialised) shutdown(); // shutdown first if we are already initialised
+  // Read in initial config
   readConfig();
+  // Bind signal to config for further updates
   _config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calender::config_update));
   
   _initialised = true;
 }
 
 void Calender::shutdown() {
+  // Save config
   writeConfig();
+  // Remove update signal
   _config_connection.disconnect();
   _initialised = false;
 }
 
 void Calender::update(float time_elapsed) {
   _seconds += time_elapsed;
-  
+  // Check for seconds overflow  
   if (_seconds >= _seconds_per_minute) {
     ++_minutes;
     _seconds -= _seconds_per_minute;
   } 
+  // Check for minutes overflow
   if (_minutes >= _minutes_per_hour) {
     ++_hours;
     _minutes -= _minutes_per_hour;
   }
+  // Check for hours overflow
   if (_hours >= _hours_per_day) {
     ++_days;
+    // Update day name
     _current_day_name = _day_names[_days];
     _hours -= _hours_per_day;
   }
+  // Check for days overflow
   if (_days >= _days_per_week) {
     ++_weeks;
     _days -= _days_per_week;
+    // Update day name
     _current_day_name = _day_names[_days];
   }
+  // Check for weeks overflow
   if (_weeks >= _weeks_per_month) {
     ++_months;
+    // Update month name
     _current_month_name = _month_names[_months];
     _weeks -= _weeks_per_month;
-
   }
+  // Check for months overflow
   if (_months >= _months_per_year) {
     ++_years;
     _months -= _months_per_year;
+    // Update month name
     _current_month_name = _month_names[_months];
   }
 }
@@ -172,7 +188,6 @@ void Calender::writeConfig() {
 
 void Calender::config_update(const std::string &section, const std::string &key, varconf::Config &config) {
   if (section == CALENDER) {
-    // Config to update
     varconf::Variable temp;
     if (key == KEY_SECONDS_PER_MINUTE) {
       temp = config.getItem(CALENDER, KEY_SECONDS_PER_MINUTE);
@@ -242,6 +257,7 @@ void Calender::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == SET_DAYS) {
     cast_stream(args, _days);
+    // Update day name as well
     _current_day_name = _day_names[_days];
   }
   else if (command == SET_WEEKS) {
@@ -249,12 +265,12 @@ void Calender::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == SET_MONTHS) {
     cast_stream(args, _months);
+    // Update Month name as well
     _current_month_name = _month_names[_months];
   }
   else if (command == SET_YEARS) {
     cast_stream(args, _years);
   }
 }
-
 
 } /* namespace Sear */
