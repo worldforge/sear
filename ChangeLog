@@ -1,3 +1,7 @@
+2004-11-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Calendar.h: Add sigc++ include required for sigc++ 2.0.
+
 2004-11-07  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Text.h, gui/Text.cpp, gui/TextEntry.h, gui/TextEntry.cpp,

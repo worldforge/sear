@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.h,v 1.4 2004-05-14 12:17:21 simon Exp $
+// $Id: Calendar.h,v 1.5 2004-11-08 02:13:47 alriddoch Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -10,6 +10,7 @@
 #include <string>
 
 #include <sigc++/object_slot.h>
+#include <sigc++/connection.h>
 #include <varconf/Config.h>
 #include "interfaces/ConsoleObject.h"
 
