@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.20 2004-04-27 12:57:35 simon Exp $
+// $Id: TextureManager.cpp,v 1.21 2004-04-27 14:00:16 simon Exp $
 
 #include "TextureManager.h"
 
@@ -573,10 +573,11 @@ void TextureManager::invalidate() {
   // Backup texture counter
   int texCount = m_texture_counter;
   // reset so default textures are assigned correctly
-  m_texture_counter = 1;
+  m_texture_counter = m_default_texture;
   m_default_texture = createDefaultTexture();
   if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
   
+  m_texture_counter = m_default_font;
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
   // restore texture counter
