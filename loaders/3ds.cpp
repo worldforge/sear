@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.28 2004-06-16 12:39:49 alriddoch Exp $
+// $Id: 3ds.cpp,v 1.29 2004-06-19 16:37:52 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -262,6 +262,7 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
               v_counter = n_counter = t_counter = 0;
 	      
               ro = new RenderObject;
+	      ro->texture_id = 0;
 //              memset(ro, 0, sizeof(RenderObject));
 	      ro->texture_id = texture_id;
               ro->num_points = 3 * mesh->faces;
@@ -319,6 +320,7 @@ void ThreeDS::render_file(Lib3dsFile *file) {
       unsigned int n_counter = 0;
       unsigned int t_counter = 0;
       RenderObject *ro = new RenderObject;
+	      ro->texture_id = 0;
 //      memset(ro, 0, sizeof(RenderObject));
       render_objects.push_back(ro);
       ro->num_points = 3 * mesh->faces;

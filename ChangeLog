@@ -1,3 +1,6 @@
+2004-06-15  Simon Goodall  <simon@simongoodall.co.uk>
+	* loaders/3ds.cpp: Fix segfault on models with no texture through using unitialised values;
+ 
 2004-06-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* environment/TerrainRenderer.cpp: Re-arrange terrain shaders, for

@@ -1,3 +1,17 @@
+ * Update TODO
+ * Finish migration of rendering code to behing RenderSystem. (Rest of Graphics +  some System stuff)
+ * Move all model loader / render code into loaders/ section and create a Global object (like RenderSystem).
+  - Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
+  - Needs models to query and check for updates from associated world entity's
+
+ * Make greater use of vertex buffer objectsOD
+ * Improve media efficiency 
+  - run meshes through poly reductioner
+  - Make textures smaller
+
+
+-------------------------------------------------------------------------------
+
  * Terrain engine improvements
   - Allow paging of terrain segments
   - Allow terrain to "wrap"
