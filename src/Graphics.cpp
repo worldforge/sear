@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.35 2004-04-07 11:18:39 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.36 2004-04-07 13:33:29 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -208,7 +208,7 @@ Compare D^2 to choose what detail level to use
       _renderer->applyQuaternion(orient);
       
 //      if (_terrain) z -= _terrain->getHeight(x, y);
-      z += Environment::getInstance().getHeight(x, y);
+//      z += Environment::getInstance().getHeight(x, y);
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
       _renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     

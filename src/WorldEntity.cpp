@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.29 2003-09-27 13:53:18 simon Exp $
+// $Id: WorldEntity.cpp,v 1.30 2004-04-07 13:33:29 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -21,6 +21,7 @@
 #include "Render.h"
 #include "WorldEntity.h"
 
+#include "environment/Environment.h"
 #include <set>
 
 #ifdef HAVE_CONFIG
@@ -162,6 +163,18 @@ WFMath::Quaternion WorldEntity::getAbsOrient() {
 WFMath::Point<3> WorldEntity::getAbsPos() {
   WFMath::Point<3> pos = GetPos();
   WFMath::Point<3> new_pos = WFMath::Point<3>(abs_pos.x() + pos.x(), abs_pos.y() + pos.y(), abs_pos.z() + pos.z());
+
+  // Set Z coord to terrain height if required
+  if (hasProperty(MODE)) {
+    std::string mode = getProperty(MODE).asString();
+    if (mode == "walking" || mode == "running" || mode == "standing") {
+      new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
+    }
+  }
+  Eris::Entity *loc = getContainer(); // getLocation();
+  if (loc && loc->hasProperty("terrain")) {  
+    new_pos.z() = Environment::getInstance().getHeight(new_pos.x(), new_pos.y());
+  }
   return new_pos;
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.75 2004-04-07 11:18:39 alriddoch Exp $
+// $Id: GL.cpp,v 1.76 2004-04-07 13:33:29 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -854,7 +854,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
       // Translate Model
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
-      translateObject(pos.x(), pos.y(), pos.z() + env->getHeight(pos.x(), pos.y()));
+      translateObject(pos.x(), pos.y(), pos.z() );//+ env->getHeight(pos.x(), pos.y()));
       // Move object to correct position
       translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
       // Rotate Model
@@ -893,7 +893,7 @@ void GL::drawMessageQueue(MessageList &list) {
     WorldEntity *we = (WorldEntity*)*I;
     glPushMatrix();
     WFMath::Point<3> pos = we->getAbsPos();
-    glTranslatef(pos.x(), pos.y(), pos.z() + env->getHeight(pos.x(), pos.y()));
+    glTranslatef(pos.x(), pos.y(), pos.z());// + env->getHeight(pos.x(), pos.y()));
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= _graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
