@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.4 2003-03-06 21:04:14 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.5 2003-03-06 22:46:08 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -119,21 +119,23 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   for (MeshMap::const_iterator I = _meshes.begin(); I != _meshes.end(); ++I) {
     std::string mesh_name = I->first;
     int mesh = _core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
-    if (!mesh) {
+    if (mesh == -1) {
       std::cerr << "Error loading mesh - " << path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name) << std::endl;
       CalError::printLastError();
+    } else {
+      _meshes[mesh_name] = mesh;
     }
-    _meshes[mesh_name] = mesh;
   }
   // Load all animations
   for (AnimationMap::const_iterator I = _animations.begin(); I != _animations.end(); ++I) {
     std::string animation_name = I->first;
     int animation = _core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
-    if (!animation) {
+    if (animation == -1) {
       std::cerr << "Error loading animation - " << path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name) << std::endl;
       CalError::printLastError();
+    } else {
+      _animations[animation_name] = animation;
     }
-    _animations[animation_name] = animation;
   }
   // Load all materials
   for (MaterialList::const_iterator I = _material_list.begin(); I != _material_list.end(); ++I) {
@@ -143,21 +145,22 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
     std::string part = material_name.substr(length + 1);
     
     int material = _core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
-    if (!material) {
+    if (material == -1) {
       std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
       CalError::printLastError();
+    } else {
+      _materials[set][part] = material;
     }
-    _materials[set][part] = material;
     // Create material thread and assign material to a set;
-    if (_parts[part] == 0) {
-      _parts[part] = part_counter++;
-      std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
-    }
     if (_sets[set] == 0) {
       _sets[set] = set_counter++;
       std::cout << "Creating set " << set << " with id  " << _sets[set] << std::endl;
     }
-     _core_model->createCoreMaterialThread(_parts[part]);
+    if (_parts[part] == 0) {
+      _parts[part] = part_counter++;
+      std::cout << "Creating part " << part << " with id  " << _parts[part] << std::endl;
+    }
+    _core_model->createCoreMaterialThread(_parts[part] - 1);
 //     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
     _core_model->setCoreMaterialId(_parts[part] - 1, _sets[set] - 1, material);    
@@ -173,19 +176,19 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
       // Check all keys
       if (config.findItem(section, KEY_ambient_red)) {
         material->getAmbientColor().red = (int)config.getItem(section, KEY_ambient_red);
-	std::cout << "Setting ambient red to " << (int)material->getAmbientColor().red << std::endl;
+//	std::cout << "Setting ambient red to " << (int)material->getAmbientColor().red << std::endl;
       }
       if (config.findItem(section, KEY_ambient_green)) {
         material->getAmbientColor().green = (int)config.getItem(section, KEY_ambient_green);
-	std::cout << "Setting ambient green to " << (int)material->getAmbientColor().green << std::endl;
+//	std::cout << "Setting ambient green to " << (int)material->getAmbientColor().green << std::endl;
       }
       if (config.findItem(section, KEY_ambient_blue)) {
         material->getAmbientColor().blue = (int)config.getItem(section, KEY_ambient_blue);
-	std::cout << "Setting ambient blue to " << (int)material->getAmbientColor().blue << std::endl;
+//	std::cout << "Setting ambient blue to " << (int)material->getAmbientColor().blue << std::endl;
       }
       if (config.findItem(section, KEY_ambient_alpha)) {
         material->getAmbientColor().alpha = (int)config.getItem(section, KEY_ambient_alpha);
-	std::cout << "Setting ambient alpha to " << (int)material->getAmbientColor().alpha << std::endl;
+//	std::cout << "Setting ambient alpha to " << (int)material->getAmbientColor().alpha << std::endl;
       } 
       if (config.findItem(section, KEY_diffuse_red)) {
         material->getDiffuseColor().red = (int)config.getItem(section, KEY_diffuse_red);
@@ -219,10 +222,12 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
           std::string texture = (std::string)config.getItem(section, key);
+	  std::cout << texture << std::endl;
           unsigned int textureId = loadTexture(path + texture);
           material->setMapUserData(i, (Cal::UserData)textureId);
         } else { // Use default texture
           std::string texture = material->getMapFilename(i);
+	  std::cout << texture << std::endl;
 	  if (texture.empty()) continue;
           unsigned int textureId = loadTexture(path + texture);
           material->setMapUserData(i, (Cal::UserData)textureId);
