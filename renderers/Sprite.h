@@ -49,7 +49,9 @@ private:
     static varconf::Config& getSpriteConfig();
     
     void load();
-
+    /** helper method invoked when the load fails for some reason */
+    void loadFail();
+    
     unsigned int twoN(unsigned int size);
 
     void addRef()

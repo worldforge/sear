@@ -22,4 +22,4 @@ mkinstalldirs
 *.spec
 stamp-h
 stamp-h1
-
+build

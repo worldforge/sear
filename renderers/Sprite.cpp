@@ -57,6 +57,7 @@ void Sprite::draw(Render* r)
 
 SpriteData::SpriteData(const std::string& spriteName) :
     m_refCount(0),
+    m_valid(false),
     m_textureId(0)
 {   
     assert(!spriteName.empty());
@@ -65,6 +66,7 @@ SpriteData::SpriteData(const std::string& spriteName) :
     // Check if the texture has a filename specified
     if (!getSpriteConfig().findItem(spriteName, "filename")) {
         cerr << "Sprite " << spriteName << " has no filename defined" << endl;
+        
         return;
     }
   
@@ -79,11 +81,12 @@ SpriteData::~SpriteData()
 
 void SpriteData::invalidate()
 {
-    if (glIsTexture(m_textureId)) {
+    if (m_valid && glIsTexture(m_textureId)) {
         glDeleteTextures(1, &m_textureId);
     }
     
     m_textureId = 0;
+    m_valid = false;
 }
 
 unsigned int SpriteData::twoN(unsigned int size)
@@ -98,6 +101,8 @@ unsigned int SpriteData::twoN(unsigned int size)
 
 void SpriteData::load()
 {
+    assert(!m_valid);
+    
 // read config file
     std::string filename = getSpriteConfig().getItem(m_name, "filename");
     System::instance()->getFileHandler()->expandString(filename);
@@ -106,6 +111,7 @@ void SpriteData::load()
     SDL_Surface *img = TextureManager::loadImage(filename.c_str());
     if (img == NULL) {
         cerr << "sprite '" << m_name << "' failed to load src image at " << filename << endl;
+        loadFail();
         return;
     }
     
@@ -179,6 +185,16 @@ void SpriteData::load()
     m_ph = (float) m_height / textur_h;
     
     RenderSystem::getInstance().getTextureManager()->clearLastTexture(0);
+    m_valid = true;
+}
+
+void SpriteData::loadFail()
+{
+    m_valid = false;
+    
+    m_textureId = 1;
+    m_pw = m_ph = 1;
+    m_width = m_height = 64;
 }
 
 void SpriteData::draw(Render* render)

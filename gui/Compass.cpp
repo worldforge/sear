@@ -40,7 +40,7 @@ void Compass::update(double cameraRotation)
     WFMath::Quaternion q = focus->getOrientation();
     
     Eris::Entity* ent = focus->getContainer();
-    while (ent != Eris::World::Instance()->getRootEntity()) {
+    while (ent && (ent != Eris::World::Instance()->getRootEntity())) {
         q *= ent->getOrientation();
         ent = ent->getContainer();
     }
@@ -69,13 +69,13 @@ void Compass::draw(Render*r, bool select)
     r->store();
     
     r->translateObject(-3.0f, -3.0f, 0.01f);
-    r->rotate(-m_angle, 0.0f, 0.0f, 1.0f);
+    r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
     m_needleShadow.draw(r);
     
     r->restore();
     
 // finally draw the needle
-    r->rotate(-m_angle, 0.0f, 0.0f, 1.0f);
+    r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
     m_compassNeedle.draw(r);
         
     r->setViewMode(PERSPECTIVE);
