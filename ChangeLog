@@ -1,4 +1,7 @@
 26th September 2002, Simon Goodall 
+ * Camera height is noe based upon character height
+
+26th September 2002, Simon Goodall 
  * Re-implemented frustum culling
 
 26th September 2002, Simon Goodall 

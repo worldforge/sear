@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.12 2002-09-26 18:56:16 simon Exp $
+// $Id: Graphics.cpp,v 1.13 2002-09-26 19:06:32 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -139,10 +139,10 @@ void Graphics::drawScene(const std::string& command, bool select_mode, float tim
       _renderer->applyQuaternion(orient);
       
       if (_terrain) z -= _terrain->getHeight(-x, -y);
-      
-      _renderer->translateObject(x, y, z - 2.0f); //Translate to accumulated position - Also adjust so origin is nearer head level
+      float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+      _renderer->translateObject(x, y, z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
-      _renderer->applyCharacterLighting(-x, -y, -z + 2.0f);
+      _renderer->applyCharacterLighting(-x, -y, -z + height);
 
       _renderer->getFrustum(frustum);
     }
@@ -230,7 +230,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
         return;   
       }
       object_record->name = we->getName();
-      //object_record->name = we->getName();
+      object_record->type = "default";
       object_record->id = we->getID();
       if (we->hasBBox()) {
         object_record->bbox = we->getBBox();
