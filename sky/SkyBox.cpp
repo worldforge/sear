@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: SkyBox.cpp,v 1.8 2002-10-21 20:12:04 simon Exp $
+// $Id: SkyBox.cpp,v 1.9 2002-11-27 00:38:47 simon Exp $
 
 #include "common/Log.h"
 
@@ -43,7 +43,7 @@ bool SkyBox::init() {
   texture_id[TEXTURE_SKY_DAY_WEST]     = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_WEST, true);
   texture_id[TEXTURE_SKY_DAY_EAST]     = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_EAST, true);
   texture_id[TEXTURE_SKY_DAY_TOP]      = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_TOP, true);
-  texture_id[TEXTURE_SKY_DAY_BOTTOM]   = _renderer->requestTexture("skyBox", CONFIG_SKY_DAY_BOTTOM, true);
+  texture_id[TEXTURE_SKY_DAY_BOTTOM]   = _renderer->requestTexture("skybox", CONFIG_SKY_DAY_BOTTOM, true);
   texture_id[TEXTURE_SKY_NIGHT_NORTH]  = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_NORTH, true);
   texture_id[TEXTURE_SKY_NIGHT_SOUTH]  = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_SOUTH, true);
   texture_id[TEXTURE_SKY_NIGHT_WEST]   = _renderer->requestTexture("skybox", CONFIG_SKY_NIGHT_WEST, true);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.9 2002-11-26 18:03:33 simon Exp $
+// $Id: ROAM.h,v 1.10 2002-11-27 00:38:48 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -44,7 +44,7 @@ public:
 
 //  Landscape *getLandscape() { return gLand; }
   
-//  float getHeight(float, float);
+  float getHeight(float, float);
 
   void lowerDetail();
   void raiseDetail();
@@ -67,18 +67,20 @@ protected:
   static const char * const KEY_height_map = "height_map";
   static const char * const KEY_terrain_scale = "terrain_scale";
  
-  static const char * const KEY_num_x_landscapes = "number_of_x_landscapes";
-  static const char * const KEY_num_y_landscapes = "number_of_y_landscapes";
+  static const char * const KEY_num_x_landscapes = "number_x_landscapes";
+  static const char * const KEY_num_y_landscapes = "number_y_landscapes";
   static const char * const KEY_landscape = "landscape_";
   
   
   void render();
   static int loadHeightMap(unsigned char **, const std::string&);
  
-  unsigned int num_landscapes;
+//  unsigned int num_landscapes;
+  unsigned int _num_x_landscapes;
+  unsigned int _num_y_landscapes;
   unsigned char **_height_maps;
   float last_time;
-  Landscape *_landscapes;
+  Landscape **_landscapes;
   
   System *_system;
   Render *_renderer;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.cpp,v 1.6 2002-10-21 20:12:04 simon Exp $
+// $Id: Patch.cpp,v 1.7 2002-11-27 00:38:47 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -57,8 +57,8 @@ void Patch::Split(TriTreeNode *tri) {
   // If this triangle is not in a proper diamond, force split our base neighbor
   if ( tri->BaseNeighbor && (tri->BaseNeighbor->BaseNeighbor != tri) ) Split(tri->BaseNeighbor);
   // Create children and link into mesh
-  tri->LeftChild  = Landscape::AllocateTri();
-  tri->RightChild = Landscape::AllocateTri();
+  tri->LeftChild  = _landscape->AllocateTri();
+  tri->RightChild = _landscape->AllocateTri();
 
   // If creation failed, just exit. 
   if ( !tri->LeftChild ) return;
@@ -121,11 +121,11 @@ void Patch::RecursTessellate( TriTreeNode *tri,
     // Extremely slow distance metric (sqrt is used).
     // Replace this with a faster one!
 	 
-    float distance = _renderer->distFromNear(centerX - 100, centerY - 100, _landscape->getHeight(centerX - 100, centerY - 100));
+    float distance = _renderer->distFromNear(centerX, centerY, _landscape->getHeight(centerX, centerY));
 
     // Egads!  A division too?  What's this world coming to!
     // This should also be replaced with a faster operation.
-    TriVariance = ((float)m_CurrentVariance[node] * _landscape->map_size * 2)/distance;	// Take both distance and variance into consideration
+    TriVariance = ((float)m_CurrentVariance[node] * (_landscape->map_size+1) * 2)/distance;	// Take both distance and variance into consideration
   }
   if ( (node >= var_depth) ||	// IF we do not have variance info for this node, then we must have gotten here by splitting, so continue down to the lowest level.
   (TriVariance > _landscape->gFrameVariance))	// OR if we are not below the variance tree, test for variance.
@@ -154,9 +154,9 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
 	  // A leaf node!  Output a triangle to be rendered.
     // Actual number of rendered triangles...
     _landscape->gNumTrisRendered++;
-    float leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
-    float rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
-    float apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
+    float leftZ  = m_HeightMap[(leftY *(_landscape->map_size+1))+leftX ];
+    float rightZ = m_HeightMap[(rightY*(_landscape->map_size+1))+rightX];
+    float apexZ  = m_HeightMap[(apexY *(_landscape->map_size+1))+apexX ];
 
     leftZ  -= (leftZ  < 127.0f) ? (10.0f) : (0.0f);
     rightZ -= (rightZ < 127.0f) ? (10.0f) : (0.0f);
@@ -243,6 +243,8 @@ void Patch::RecursRender( TriTreeNode *tri, int leftX, int leftY, int rightX, in
       vertex_data[v_counter][0] = apexX;
       vertex_data[v_counter][1] = apexY;
       vertex_data[v_counter++][2] = apexZ;
+
+//cout << leftX << " " << leftY << " " << leftZ << endl;
       
 //    } else {
 //      float fColor = (60.0f + leftZ) / 256.0f;
@@ -275,7 +277,7 @@ unsigned char Patch::RecursComputeVariance( int leftX,  int leftY,  unsigned cha
   unsigned char myVariance;
 
   // Get the height value at the middle of the Hypotenuse
-  unsigned char centerZ  = m_HeightMap[(centerY * _landscape->map_size) + centerX];
+  unsigned char centerZ  = m_HeightMap[(centerY * (_landscape->map_size+1)) + centerX];
 
   // Variance of this triangle is the actual height at it's hypotenuse midpoint minus the interpolated height.
   // Use values passed on the stack instead of re-accessing the Height Field.
@@ -321,7 +323,7 @@ void Patch::Init( int heightX, int heightY, int worldX, int worldY, unsigned cha
   m_WorldY = worldY;
 
   // Store pointer to first byte of the height data for this patch.
-  m_HeightMap = &hMap[heightY * _landscape->map_size + heightX];
+  m_HeightMap = &hMap[heightY * (_landscape->map_size+1) + heightX];
 
   // Initialize flags
   m_VarianceDirty = 1;
@@ -352,9 +354,9 @@ void Patch::Reset() {
 void Patch::ComputeVariance() {
   // Compute variance on each of the base triangles...
   m_CurrentVariance = m_VarianceLeft;
-  RecursComputeVariance(0, _landscape->patch_size, m_HeightMap[_landscape->patch_size * _landscape->map_size], _landscape->patch_size, 0, m_HeightMap[_landscape->patch_size], 0, 0, m_HeightMap[0], 1);
+  RecursComputeVariance(0, _landscape->patch_size, m_HeightMap[_landscape->patch_size * (_landscape->map_size+1)], _landscape->patch_size, 0, m_HeightMap[_landscape->patch_size], 0, 0, m_HeightMap[0], 1);
   m_CurrentVariance = m_VarianceRight;
-  RecursComputeVariance(_landscape->patch_size, 0, m_HeightMap[ _landscape->patch_size], 0, _landscape->patch_size, m_HeightMap[ _landscape->patch_size * _landscape->map_size], _landscape->patch_size, _landscape->patch_size, m_HeightMap[(_landscape->patch_size * _landscape->map_size) + _landscape->patch_size], 1);
+  RecursComputeVariance(_landscape->patch_size, 0, m_HeightMap[ _landscape->patch_size], 0, _landscape->patch_size, m_HeightMap[ _landscape->patch_size * (_landscape->map_size+1)], _landscape->patch_size, _landscape->patch_size, m_HeightMap[(_landscape->patch_size * (_landscape->map_size+1)) + _landscape->patch_size], 1);
   // Clear the dirty flag for this patch
   m_VarianceDirty = 0;
 }
@@ -363,12 +365,15 @@ void Patch::ComputeVariance() {
 // Set patch's visibility flag.
 //
 void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int rightX, int rightY ) {
-  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX -100, m_WorldY-100, _landscape->getHeight(m_WorldX-100, m_WorldY -100));
-  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size - 100, m_WorldY+_landscape->patch_size - 100, _landscape->getHeight(m_WorldX+_landscape->patch_size-100, m_WorldY+_landscape->patch_size-100));
+  int m_WorldX = this->m_WorldX + _landscape->offset_x;
+  int m_WorldY = this->m_WorldY + _landscape->offset_y;
+  WFMath::Point<3> corner1 = WFMath::Point<3>(m_WorldX, m_WorldY, _landscape->getHeight(m_WorldX, m_WorldY));
+  WFMath::Point<3> corner2 = WFMath::Point<3>(m_WorldX + _landscape->patch_size, m_WorldY+_landscape->patch_size, _landscape->getHeight(m_WorldX+_landscape->patch_size, m_WorldY+_landscape->patch_size));
   int i = _renderer->patchInFrustum(WFMath::AxisBox<3>(corner1,corner2));//, point);
 
   if (i != 0) m_isVisible = 1;
   else m_isVisible = 0;
+  m_isVisible = 1;
 
 }
 
@@ -377,6 +382,8 @@ void Patch::SetVisibility() {// int eyeX, int eyeY, int leftX, int leftY, int ri
 //
 void Patch::Tessellate() {
   // Split each of the base triangles
+  int m_WorldX = this->m_WorldX + _landscape->offset_x;
+  int m_WorldY = this->m_WorldY + _landscape->offset_y;
   m_CurrentVariance = m_VarianceLeft;
   RecursTessellate (&m_BaseLeft, m_WorldX, m_WorldY+_landscape->patch_size, m_WorldX+_landscape->patch_size, m_WorldY, m_WorldX, m_WorldY, 1);
   m_CurrentVariance = m_VarianceRight;
@@ -418,9 +425,9 @@ void Patch::RecursRenderWater( TriTreeNode *tri, int leftX, int leftY, int right
   } else {							
 	  // A leaf node!  Output a triangle to be rendered.
     // Actual number of rendered triangles...
-    float leftZ  = m_HeightMap[(leftY *_landscape->map_size)+leftX ];
-    float rightZ = m_HeightMap[(rightY*_landscape->map_size)+rightX];
-    float apexZ  = m_HeightMap[(apexY *_landscape->map_size)+apexX ];
+    float leftZ  = m_HeightMap[(leftY *(_landscape->map_size+1))+leftX ];
+    float rightZ = m_HeightMap[(rightY*(_landscape->map_size+1))+rightX];
+    float apexZ  = m_HeightMap[(apexY *(_landscape->map_size+1))+apexX ];
 
     // Perform polygon coloring based on a height sample
     if (leftZ <=  Landscape::waterlevel || rightZ <=  Landscape::waterlevel || apexZ <=  Landscape::waterlevel) {

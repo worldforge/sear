@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.h,v 1.3 2002-11-26 18:03:33 simon Exp $
+// $Id: Landscape.h,v 1.4 2002-11-27 00:38:47 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_LANDSCAPE_H
@@ -55,15 +55,18 @@ protected:
   unsigned char *m_HeightMap;										// HeightMap of the Landscape
   Patch m_Patches[NUM_PATCHES_PER_SIDE][NUM_PATCHES_PER_SIDE];	// Array of patches
   
-  static int	m_NextTriNode;										// Index to next free TriTreeNode
-  static TriTreeNode m_TriPool[POOL_SIZE];						// Pool of TriTree nodes for splitting
+//  static 
+	  int	m_NextTriNode;										// Index to next free TriTreeNode
+//  static 
+	  TriTreeNode m_TriPool[POOL_SIZE];						// Pool of TriTree nodes for splitting
 
 
-  static int GetNextTriNode() { return m_NextTriNode; }
+//  static
+	  int GetNextTriNode() { return m_NextTriNode; }
 
-  static void SetNextTriNode( int nNextNode ) { m_NextTriNode = nNextNode; }
+//  static
+	  void SetNextTriNode( int nNextNode ) { m_NextTriNode = nNextNode; }
 
-  Landscape *_right,  *_bottom;
   
 public:
   Landscape(Render *renderer, ROAM *terrain, Landscape *right, Landscape *bottom) :
@@ -76,14 +79,15 @@ public:
     _bottom(bottom)
   {}
   virtual ~Landscape() {}
-  static TriTreeNode *AllocateTri();
+//  static
+	  TriTreeNode *AllocateTri();
  
-  virtual void Init(unsigned char *hMap, int size);
+  virtual void Init(unsigned char *hMap, int size, int offset_x, int offset_y);
   virtual void Reset();
   virtual void Tessellate();
   virtual void render();
 
-  static Landscape *_instance;
+  //static Landscape *_instance;
   
   float gFrameVariance;
   int gNumTrisRendered;
@@ -94,8 +98,12 @@ public:
   Render *_renderer;
   ROAM *_terrain;
 
+  Landscape *_right,  *_bottom;
   int map_size;
   int patch_size;
+ 
+  int offset_x;
+  int offset_y;
   
   float getHeight(float x, float y);
 

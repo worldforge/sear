@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.10 2002-11-26 18:03:33 simon Exp $
+// $Id: Landscape.cpp,v 1.11 2002-11-27 00:38:47 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -33,8 +33,8 @@ namespace Sear {
 // ---------------------------------------------------------------------
 // Definition of the static member variables
 //
-int Landscape::m_NextTriNode;
-TriTreeNode Landscape::m_TriPool[POOL_SIZE];
+//int Landscape::m_NextTriNode;
+//TriTreeNode Landscape::m_TriPool[POOL_SIZE];
 
 float Landscape::waterlevel = 0.0f;
 
@@ -48,25 +48,29 @@ TriTreeNode *Landscape::AllocateTri() {
   if ( m_NextTriNode >= POOL_SIZE ) return NULL;
   pTri = &(m_TriPool[m_NextTriNode++]);
   pTri->LeftChild = pTri->RightChild = NULL;
+
+  pTri->l = this;
   return pTri;
 }
 
 // ---------------------------------------------------------------------
 // Initialize all patches
 //
-void Landscape::Init(unsigned char *hMap, int size) {
+void Landscape::Init(unsigned char *hMap, int size, int offsetx, int offsety) {
   Patch *patch;
   int X, Y;
   // Store the Height Field array
   m_HeightMap = hMap;
   map_size = size;
+  offset_x = offsetx;
+  offset_y = offsety;
   patch_size = map_size / NUM_PATCHES_PER_SIDE;
   // Initialize all terrain patches
   for ( Y=0; Y < NUM_PATCHES_PER_SIDE; ++Y)
     for ( X=0; X < NUM_PATCHES_PER_SIDE; ++X) {
       m_Patches[Y][X] = Patch(_renderer, _terrain, this);
       patch = &(m_Patches[Y][X]);
-      patch->Init( X*patch_size, Y*patch_size, X*patch_size, Y*patch_size, hMap );
+      patch->Init(X*patch_size, Y*patch_size, X*patch_size, Y*patch_size, hMap );
       patch->ComputeVariance();
     }  
 }
@@ -105,33 +109,31 @@ void Landscape::Reset() {
         // Link all the patches together.
 	if ( X > 0 ) patch->GetBaseLeft()->LeftNeighbor = m_Patches[Y][X-1].GetBaseRight();
 	else patch->GetBaseLeft()->LeftNeighbor = NULL;	// Link to bordering Landscape here..
-        if ( X < (NUM_PATCHES_PER_SIDE-1) ) patch->GetBaseRight()->LeftNeighbor = m_Patches[Y][X+1].GetBaseLeft();
-	else {
-	  if (_right) {
-            Patch *p = _right->getPatch(0, Y);
-	    if (p) p = p->GetBaseLeft();
-            patch->GetBaseRight()->LeftNeighbor = p;
-	  }
-	  else {
-            patch->GetBaseRight()->LeftNeighbor = NULL; // Link to bordering Landscape here..
-	  }
-
+  
+  	if ( X < (NUM_PATCHES_PER_SIDE-1) ) patch->GetBaseRight()->LeftNeighbor = m_Patches[Y][X+1].GetBaseLeft();
+	else if (_right) {
+          Patch *p = _right->getPatch(0, Y);
+          if (p) {
+            patch->GetBaseRight()->LeftNeighbor = p->GetBaseLeft();
+	    if (p->GetBaseLeft()) p->GetBaseLeft()->LeftNeighbor = patch->GetBaseRight();
+          }
+          else patch->GetBaseRight()->LeftNeighbor = NULL;
+        } else {
+          patch->GetBaseRight()->LeftNeighbor = NULL; // Link to bordering Landscape here..
 	}
 	if ( Y > 0 ) patch->GetBaseLeft()->RightNeighbor = m_Patches[Y-1][X].GetBaseRight();
 	else patch->GetBaseLeft()->RightNeighbor = NULL; // Link to bordering Landscape here..
 	if ( Y < (NUM_PATCHES_PER_SIDE-1) ) patch->GetBaseRight()->RightNeighbor = m_Patches[Y+1][X].GetBaseLeft();
-	else {
-	  if (_bottom) {
-            Patch *p = _bottom->getPatch(X, 0);
-	    if (p) p = p->GetBaseLeft();
-            patch->GetBaseRight()->RightNeighbor = p;
+	else if (_bottom) {
+          Patch *p = _bottom->getPatch(X, 0);
+          if (p) {
+	    patch->GetBaseRight()->RightNeighbor = p->GetBaseLeft();
+	    if (p->GetBaseLeft()) p->GetBaseLeft()->RightNeighbor = patch->GetBaseRight();
 	  }
-	  else {
-            patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
-	  }
-
-
-        else patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
+          else patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
+        } else {
+          patch->GetBaseRight()->RightNeighbor = NULL; // Link to bordering Landscape here..
+	}
       }
     }
 }
@@ -157,7 +159,7 @@ void Landscape::render() {
   Patch *patch = &(m_Patches[0][0]);
   // Scale the terrain by the terrain scale specified at compile time.
 //  glScalef(MULT_SCALE_LAND, MULT_SCALE_LAND, MULT_SCALE_HEIGHT);
-  _renderer->translateObject(Terrain::map_size >> 1, Terrain::map_size >> 1, 0.0f);
+  _renderer->translateObject(offset_x, offset_y, 0.0f);
 
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f);
 
@@ -190,13 +192,13 @@ void Landscape::render() {
 
 float Landscape::getHeight(float x, float y) {
   float height;
-  float mod_x = x + Terrain::map_size >> 1;
-  float mod_y = y + Terrain::map_size >> 1;
-  if (mod_x < 0 || mod_x >= Terrain::map_size || mod_y < 0 || mod_y >= Terrain::map_size) return 0.0f;
-  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * Terrain::map_size];
-  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * Terrain::map_size];
-  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * Terrain::map_size];
-  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * Terrain::map_size];
+  float mod_x = x + (ROAM::map_size >> 1);
+  float mod_y = y + (ROAM::map_size >> 1);
+  if (mod_x < 0 || mod_x >= ROAM::map_size || mod_y < 0 || mod_y >= ROAM::map_size) return 0.0f;
+  float h1 = m_HeightMap[(int)(mod_x) + (int)mod_y * ROAM::map_size];
+  float h2 = m_HeightMap[(int)(mod_x + 1) +  (int)mod_y * ROAM::map_size];
+  float h3 = m_HeightMap[(int)(mod_x + 1) + (int)(mod_y + 1) * ROAM::map_size];
+  float h4 = m_HeightMap[(int)(mod_x)+(int)(mod_y + 1) * ROAM::map_size];
   float x_m = (float)x - (float)((int)x);
   float y_m = (float)y - (float)((int)y);
   float h = x_m * (h2 - h1 + h3 - h4) + y_m * (h3 - h2 + h4 - h1);
