@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.7 2003-03-08 14:32:23 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.8 2003-03-11 18:40:54 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -222,9 +222,10 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
           std::string texture = (std::string)config.getItem(section, key);
-	  std::cout << texture << std::endl;
           unsigned int textureId = loadTexture(path + texture);
-	  if (material->getMapCount() < i) {
+	  if (material->getMapCount() <= i) {
+            // Increase the space available to store data
+	    material->reserve(i + 1);
             if (!material->setMap(i, CalCoreMaterial::Map())) {
               std::cerr << "Error setting map data" << std::endl;
             }
@@ -320,17 +321,9 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   return textureId;
 }
 
-Cal3dModel *Cal3dCoreModel::instantiate(varconf::Config &config) {
+Cal3dModel *Cal3dCoreModel::instantiate() {
   Cal3dModel *model = new Cal3dModel(System::instance()->getGraphics()->getRender());
   model->init(this);
-  if (config.findItem("model", "default_set")) {
-    varconf::Variable v = config.getItem("model", "default_set");
-    if (v.is_int()) {
-      model->setMaterialSet((int)v);
-    } else { // Assume we have a string
-      model->setMaterialSet((std::string)v);
-    }
-  }
   return model;
 }
 
