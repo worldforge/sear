@@ -7,6 +7,8 @@
 
 #include "gui/Container.h"
 
+#include <SDL/SDL.h>
+
 namespace Sear {
 
 class RootWindow;
@@ -27,7 +29,9 @@ public:
 
   void draw();
   void show();
+  void handleEvent(const SDL_Event &);
   void addToplevel(Toplevel *);
+
 };
 
 } // namespace Sear

@@ -62,6 +62,10 @@ void Workspace::show()
 {
 }
 
+void Workspace::handleEvent(const SDL_Event &)
+{
+}
+
 void Workspace::addToplevel(Toplevel * t)
 {
   addChild(t);

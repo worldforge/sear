@@ -1,3 +1,8 @@
+2004-06-07  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Workspace.cpp, gui/Workspace.h, src/System.cpp: Pass
+	  SDL events to the gui code.
+
 2004-06-05  Al Riddoch  <alriddoch@zepler.org>
 
 	* environment/TerrainRenderer.cpp: Implement culling entire terrain

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.92 2004-06-04 01:54:23 alriddoch Exp $
+// $Id: System.cpp,v 1.93 2004-06-07 11:22:56 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -435,6 +435,7 @@ void System::mainLoop() {
 }
 
 void System::handleEvents(const SDL_Event &event) {
+  _workspace->handleEvent(event);
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
