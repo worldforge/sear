@@ -18,7 +18,7 @@ public:
   virtual ~SkyDome();
   
   void render();
-  void invalidate() {}
+  void invalidate();
     
 private:
     float* genVerts(float radius, int levels, int segments);
@@ -42,6 +42,10 @@ private:
   TextureID m_textures[5];
   
   std::vector<Color_4> m_horizonColors;
+
+  float m_radius;
+  int m_levels;
+  int m_segments;
 };
 
 } // namespace Sear

@@ -1,3 +1,9 @@
+2004-10-28  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/SkyDome.cpp, environment/SkyDome.h: Re-Enable VBO's and 
+	  write invalidate code
+	* loaders/3ds.cpp, loaders/3ds.h: Add VBO support
+
 2004-10-27  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Window.cpp: Remove some excessive verbose debug output.

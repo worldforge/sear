@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2004 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.32 2004-06-23 17:24:49 simon Exp $
+// $Id: 3ds.cpp,v 1.33 2004-10-28 09:30:54 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -11,6 +11,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <sage/sage.h>
 #include <sage/GL.h>
 
 #include <lib3ds/mesh.h>
@@ -33,6 +34,7 @@
 #include "renderers/RenderSystem.h"
 
 #include <iostream>
+
 
 
 #ifdef USE_MMGR
@@ -93,6 +95,21 @@ void ThreeDS::shutdown() {
       if (ro->vertex_data) delete [] (ro->vertex_data);
       if (ro->texture_data) delete [] (ro->texture_data);
       if (ro->normal_data) delete [] (ro->normal_data);
+
+      if (glIsBufferARB(ro->vb_vertex_data)) {
+        glDeleteBuffersARB(1, &ro->vb_vertex_data);
+        ro->vb_vertex_data = 0;
+      }
+      if (glIsBufferARB(ro->vb_texCoords_data)) {
+        glDeleteBuffersARB(1, &ro->vb_texCoords_data);
+        ro->vb_texCoords_data = 0;
+      }
+      if (glIsBufferARB(ro->vb_normal_data)) {
+        glDeleteBuffersARB(1, &ro->vb_normal_data);
+        ro->vb_normal_data = 0;
+      }
+
+
       delete ro;
     }
     render_objects.erase(render_objects.begin());
@@ -116,6 +133,23 @@ void ThreeDS::invalidate() {
   if (_render) {
     _render->freeList(_list);
     _render->freeList(_list_select);
+  }
+  for (std::list<RenderObject*>::const_iterator I = render_objects.begin(); I != render_objects.end(); ++I) {
+    RenderObject *ro = *I;
+    if (ro) {
+      if (glIsBufferARB(ro->vb_vertex_data)) {
+        glDeleteBuffersARB(1, &ro->vb_vertex_data);
+        ro->vb_vertex_data = 0;
+      }
+      if (glIsBufferARB(ro->vb_texCoords_data)) {
+        glDeleteBuffersARB(1, &ro->vb_texCoords_data);
+        ro->vb_texCoords_data = 0;
+      }
+      if (glIsBufferARB(ro->vb_normal_data)) {
+        glDeleteBuffersARB(1, &ro->vb_normal_data);
+        ro->vb_normal_data = 0;
+      }
+    }
   }
   _list = 0;
   _list_select = 0;
@@ -143,7 +177,39 @@ void ThreeDS::render(bool select_mode) {
       } else {
         RenderSystem::getInstance().switchTexture(0);
       }
-      _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
+      if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+        // Generate VBO's if required
+        if (!glIsBufferARB(ro->vb_vertex_data)) {
+          glGenBuffersARB(1, &ro->vb_vertex_data);
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
+          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->vertex_data, GL_STATIC_DRAW_ARB);
+          glGenBuffersARB(1, &ro->vb_normal_data);
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
+          glGenBuffersARB(1, &ro->vb_texCoords_data);
+          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
+        }
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
+        glVertexPointer(3, GL_FLOAT, 0, NULL);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
+        glNormalPointer(GL_FLOAT, 0, NULL);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
+        glTexCoordPointer(2, GL_FLOAT, 0, NULL);
+        // Draw object
+        glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
+        // Reset states
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+      } else {
+        _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
+      }
     }
   }
 }

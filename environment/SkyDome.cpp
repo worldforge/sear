@@ -78,11 +78,12 @@ float SkyDome::m_quad_t[] = QUAD_TEX;
 
 SkyDome::SkyDome(float radius, int levels, int segments) :
     m_verts(NULL), m_texCoords(NULL),
-    m_vb_verts(0), m_vb_texCoords(0)
+    m_vb_verts(0), m_vb_texCoords(0),
+    m_radius(radius), m_levels(levels), m_segments(segments)
 {
     m_size = segments * (levels + 1); // extra level for the skirt
     // disable for now
-    sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
+//    sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
     domeInit(radius, levels, segments);
 }
 
@@ -208,6 +209,19 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
+void SkyDome::invalidate() {
+  if (glIsBufferARB(m_vb_verts)) {
+    glDeleteBuffersARB(1, &m_vb_verts);
+    m_vb_verts = 0;
+  }
+  if (glIsBufferARB(m_vb_texCoords)) {
+    glDeleteBuffersARB(1, &m_vb_texCoords);
+    m_vb_texCoords = 0;
+  }
+
+  domeInit(m_radius, m_levels, m_segments);
+}
+
 void SkyDome::getHorizonColors()
 {
     m_horizonColors.clear();
@@ -330,9 +344,9 @@ glDisable(GL_BLEND);
   // Render large polygon for cloud layer
   // TODO split into smaller polys
   // turn down edges so its not so flat looking
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-  }
+//  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
+//    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+//  }
   
   glVertexPointer(3, GL_FLOAT, 0, &m_quad_v[0]);
   glTexCoordPointer(2, GL_FLOAT, 0, &m_quad_t[0]);
@@ -362,9 +376,9 @@ glDisable(GL_BLEND);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
   // Disable vertex buffer objects
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-  }
+//  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { 
+//    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+//  }
 }
 
 } /* namespace Sear */
