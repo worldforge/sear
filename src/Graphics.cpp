@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.34 2004-04-06 11:57:59 simon Exp $
+// $Id: Graphics.cpp,v 1.35 2004-04-07 11:18:39 alriddoch Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -173,7 +173,7 @@ Compare D^2 to choose what detail level to use
 */
 
 	
-      float x = 0.0f, y = 0.0f, z = 0.0f; // Initial camera position
+  WFMath::Point<3> pos(0,0,0); // Initial camera position
   Eris::World *world = Eris::World::Instance();
   if (_system->checkState(SYS_IN_WORLD) && world) {
     if (!_character) _character = _system->getCharacter();
@@ -183,10 +183,10 @@ Compare D^2 to choose what detail level to use
       static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
       orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
-      WFMath::Point<3> pos = focus->getAbsPos();
-      x = -pos.x();
-      y = -pos.y();
-      z = -pos.z();
+      pos = focus->getAbsPos();
+      float x = pos.x(),
+            y = pos.y(),
+            z = pos.z();
       
       // Apply camera rotations
       orient /= WFMath::Quaternion(y_vector, _camera->getElevation());
@@ -207,12 +207,12 @@ Compare D^2 to choose what detail level to use
       _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
       _renderer->applyQuaternion(orient);
       
-//      if (_terrain) z -= _terrain->getHeight(-x, -y);
- z -= Environment::getInstance().getHeight(-x, -y);
+//      if (_terrain) z -= _terrain->getHeight(x, y);
+      z += Environment::getInstance().getHeight(x, y);
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
-      _renderer->translateObject(x, y, z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
+      _renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
-      _renderer->applyCharacterLighting(-x, -y, -z + height);
+      _renderer->applyCharacterLighting(x, y, z + height);
 
       _renderer->getFrustum(frustum);
     }
@@ -225,7 +225,7 @@ Compare D^2 to choose what detail level to use
 
 _renderer->stateChange(_renderer->getStateID("terrain"));
   glEnableClientState(GL_VERTEX_ARRAY);
-  Environment::getInstance().render(WFMath::Point<3>(x, y, z));
+  Environment::getInstance().render(pos);
   glDisableClientState(GL_VERTEX_ARRAY);
 
       _renderer->restore();

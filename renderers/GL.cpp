@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.74 2004-04-06 11:57:58 simon Exp $
+// $Id: GL.cpp,v 1.75 2004-04-07 11:18:39 alriddoch Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -147,9 +147,9 @@ namespace Sear {
   static const float DEFAULT_speech_offset_y = 0.0f;
   static const float DEFAULT_speech_offset_z = 0.0f;
 
-  static const float DEFAULT_fog_start = 20.0f;
-  static const float DEFAULT_fog_end = 35.0f;
-  static const float DEFAULT_far_clip_dist = 100.0f;
+  static const float DEFAULT_fog_start = 100.0f;
+  static const float DEFAULT_fog_end = 150.0f;
+  static const float DEFAULT_far_clip_dist = 1000.0f;
   static const float DEFAULT_texture_scale = 10.0f;
 
 static bool use_ext_compiled_vertex_array = false;
@@ -232,8 +232,8 @@ GL::GL() :
   splash_id(-1),
   activeEntity(NULL),
   _cur_state(NULL),
-  _fog_start(20.0f),
-  _fog_end(35.0f),
+  _fog_start(100.0f),
+  _fog_end(150.0f),
   _light_level(1.0f),
   _initialised(false),
 	env(NULL),
@@ -256,8 +256,8 @@ GL::GL(System *system, Graphics *graphics) :
   splash_id(-1),
   activeEntity(NULL),
   _cur_state(NULL),
-  _fog_start(20.0f),
-  _fog_end(35.0f),
+  _fog_start(100.0f),
+  _fog_end(150.0f),
   _light_level(1.0f),
   _initialised(false),
 	env(NULL),
