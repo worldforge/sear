@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.54 2004-04-17 15:55:45 simon Exp $
+// $Id: client.cpp,v 1.55 2004-04-23 10:11:00 simon Exp $
 
 #include "System.h"
 
@@ -431,7 +431,11 @@ int Client::takeCharacter(const std::string &id) {
   if (!_connection->isConnected()) throw Exception("not connected");
   if (_player == NULL) throw Exception("Player is NULL");
   if (_lobby == NULL) throw Exception("lobby is NULL");
-  if (id.empty()) throw Exception("No ID");
+  if (id.empty()) {
+    m_takeFirst = true;
+    getCharacters();
+    return 0;
+  }
 
   Log::writeLog("Client::takeCharacter: Taking character - " + id, Log::LOG_INFO);
   _system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
@@ -617,6 +621,10 @@ void Client::GotAllCharacters() {
   for (Eris::CharacterMap::iterator I=m.begin(); I != m.end(); ++I) {
 //    Atlas::Objects::Entity::GameEntity ge = *I->first;
     _system->pushMessage(I->first.c_str(), CONSOLE_MESSAGE);
+    if (m_takeFirst) {
+      takeCharacter(I->first.c_str());
+      m_takeFirst = false;
+    }
   }
 }
 

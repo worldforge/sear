@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.13 2003-03-23 19:51:49 simon Exp $
+// $Id: client.h,v 1.14 2004-04-23 10:11:00 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -142,6 +142,7 @@ protected:
   int _status;
   std::string _client_name;
   bool _initialised;
+  bool  m_takeFirst;
 };
 
 } /* namespace Sear */
