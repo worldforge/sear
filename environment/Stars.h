@@ -1,3 +1,5 @@
+#ifndef SEAR_STARS_H
+#define SEAR_STARS_H
 
 #include "common/types.h"
 
@@ -17,3 +19,5 @@ private:
 };
 
 } // of namespace Sear
+
+#endif // of SEAR_STARS_H

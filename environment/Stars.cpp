@@ -5,7 +5,7 @@
 #include "Stars.h"
 
 
-#include <sage/gl.h>
+#include <sage/GL.h>
 #include <wfmath/vector.h>
 #include <wfmath/MersenneTwister.h>
 

@@ -2,12 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: types.h,v 1.4 2004-06-07 22:05:25 jmt Exp $
+// $Id: types.h,v 1.5 2004-06-07 22:15:10 jmt Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1
-
-#include <sage/gl.h>
 
 namespace Sear {
 
@@ -36,10 +34,10 @@ typedef struct {
 } Texel;
 
 typedef struct {
-    GLubyte r;
-    GLubyte g;
-    GLubyte b;
-    GLubyte a;
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
+  unsigned char a;
 } Color_4;
 
 typedef unsigned int TextureObject;

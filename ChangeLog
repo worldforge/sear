@@ -1,5 +1,10 @@
 2004-06-07  James Turner  <james@worldforge.org>
 
+	* Fix linux compilation of stars code. Thank goodness
+	  I have a Loonix box these days.
+	  
+2004-06-07  James Turner  <james@worldforge.org>
+
 	* Add star rendering to the environment code. Very simple while the
 	  renderer integration issues are sorted out; in the future, will use
 	  point sprites and colors. 
