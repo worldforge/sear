@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.37 2004-04-26 15:38:38 simon Exp $
+// $Id: System.h,v 1.38 2004-04-26 20:26:51 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -78,12 +78,6 @@ public:
   void shutdown();
 
   /**
-   * Creates a window at pre-determined size
-   * @param fullscreen Flag indicating whether to create window in fullscreen mode
-   */ 
-  void createWindow(bool fullscreen);
-
-  /**
    * This is the main program loop. Will loop until an exit condition has been met.
    */ 
   void mainLoop();
@@ -94,11 +88,6 @@ public:
    * @param icon Icon title
    */
   void setCaption(const std::string &title, const std::string &icon); 
-
-  /**
-   * This toggles the fullscreen flag of the window
-   */ 
-  void toggleFullscreen();
 
   /**
    * This toggles the mlook flag
@@ -183,11 +172,6 @@ public:
    */ 
   varconf::Config &getGeneral() { return _general; }
   /**
-   * Get the Texure Config object
-   * @return Reference to texture config object
-   */ 
-  varconf::Config &getTexture() { return _textures; }
-  /**
    * Get the Model Config object
    * @return Reference to model config object
    */ 
@@ -204,7 +188,6 @@ public:
   varconf::Config &getObjectRecords() { return _object_records; }
  
   ScriptEngine *getScriptEngine() const { return _script_engine; }
-//  StateLoader *getStateLoader() const { return _state_loader; }
   EventHandler *getEventHandler() const { return _event_handler; }
   ModelHandler *getModelHandler() const { return _model_handler; }
   ActionHandler *getActionHandler() const { return _action_handler; }
@@ -234,7 +217,6 @@ protected:
   void handleEvents(const SDL_Event &);
   void handleAnalogueControllers();
 
-  bool fullscreen;
   bool mouseLook;
   SDL_Surface *screen;
   Graphics *_graphics;
@@ -258,7 +240,6 @@ protected:
   EventHandler *_event_handler; ///< Pointer to event handler object
   FileHandler *_file_handler; ///< Pointer to file handler object
   ModelHandler *_model_handler; ///< Pointer to model handler object
-//  StateLoader *_state_loader; ///< Pointer to state loader object
   ActionHandler *_action_handler; ///< Pointer to action handler object
   ObjectHandler *_object_handler; ///< Pointer to object handler object
   Calendar *_calendar; ///< Pointer to calender object
@@ -272,7 +253,6 @@ protected:
 //  static const std::string SHUTDOWN_SCRIPT;
  
   varconf::Config _general;
-  varconf::Config _textures;
   varconf::Config _models;
 
   varconf::Config _model_records;

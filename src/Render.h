@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.34 2004-04-26 15:32:31 simon Exp $
+// $Id: Render.h,v 1.35 2004-04-26 20:26:50 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -44,9 +44,7 @@ typedef enum {
   RENDER_LAST_STATE
 } RenderState;
 
-//typedef std::pair<ObjectRecord*, ModelRecord*> QueueItem;
 typedef std::pair<ObjectRecord*, std::string> QueueItem;
-//typedef std::pair<std::string, std::string> QueueItem;
 typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
@@ -54,8 +52,6 @@ typedef std::list<WorldEntity*> MessageList;
   Render() {
   }
   virtual ~Render() {}
-
-
    
   virtual void renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture)=0;
   virtual void vboMesh(Mesh &mesh)=0;
@@ -81,14 +77,8 @@ typedef std::list<WorldEntity*> MessageList;
   
   virtual float getLightLevel() =0;
   
-//  virtual int requestTexture(const std::string &texture_name) =0;
-//  virtual int requestTextureMask(const std::string &texture_name) =0;
   virtual void buildColourSet() =0;
-//  virtual unsigned int getTextureID(unsigned int texture_id)=0;
-//  virtual void drawScene(const std::string &,bool, float) =0;
   virtual void drawTextRect(int, int, int, int, int) =0;
-//  virtual void stateChange(int) = 0;
-//  virtual int getStateID(const std::string &state) = 0;
   virtual void setColour(float red, float blue , float green, float alpha) =0;
 	  
   virtual void procEvent(int, int) =0;
@@ -108,7 +98,6 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotate(float angle, float x, float y, float z) =0;
-//  virtual void rotateObject(WorldEntity *we, int type) =0;
   virtual void rotateObject(ObjectRecord *, ModelRecord *) =0;
   virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;
@@ -116,10 +105,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
-//  virtual void drawMessageQueue(QueueMap queue) =0;
   virtual void drawMessageQueue(MessageList &list) =0;
-
-//  static WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) { return WFMath::AxisBox<3>();}
 
   void setState(RenderState rs, bool state) { _renderState[rs] = state; }
   bool checkState(RenderState rs) { return _renderState[rs]; }

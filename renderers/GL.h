@@ -29,7 +29,6 @@
 namespace Sear {
 
 class System;
-class Environment;
 class Camera;
 class WorldEntity;
 class Model;
@@ -195,8 +194,6 @@ protected:
   bool m_fontInitialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
-
-  Environment *env;
 };
 
 

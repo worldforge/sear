@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.9 2004-04-26 15:32:30 simon Exp $
+// $Id: TextureManager.h,v 1.10 2004-04-26 20:26:50 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -10,9 +10,7 @@
 #include <string>
 #include <map>
 #include <vector>
-
 #include <cassert>
-
 #include <SDL/SDL.h>
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -108,6 +106,9 @@ public:
       m_texture_map[name] = m_texture_counter;
       m_names[m_texture_counter] = name;
       id = m_texture_counter++;
+if (id == 12 || id == 14) {
+std::cout << "texture_name: " << texture_name << std::endl;
+}
     }
     return id;
   }
@@ -120,7 +121,6 @@ public:
    * @return ID for texture.
    */ 
   GLuint loadTexture(const std::string &texture_name);
-//  TextureObjectloadTexture(TextureID texture_id);
 
   /**
    * Unloads the specified texture from the OpenGL system
@@ -133,26 +133,6 @@ public:
    * @param texture_object TextureObject to unload
    */ 
   void unloadTexture(GLuint texture_object);
-
-  /**
-   * Returns the textureID associated with a given texture
-   * @param texture_name Name of texture
-   * @return TextureID of texture. 0 if not loaded, -1 if error during loading
-   */ 
-//  TextureID getTextureID(const std::string &texture_name) {
-//    TextureID id = m_texture_map[texture_name];
-//    if (id == 0) id = loadTexture(texture_name);
-//    return id;
-//  }
-
-  /**
-   * Returns TextureObject for a given TextureID
-   * @param texture TextureID of texture
-   * @return TextureObject of texture
-   */
-//  TextureObject getTextureObject(TextureID texture) {
-//    return m_textures[texture];
-//  }
 
   /**
    * This is the standard function to switch textures. Will only
@@ -169,10 +149,9 @@ public:
    */ 
   void switchTexture(unsigned int texture_unit, TextureID texture_id);
 
-  void setScale(float scale) {
-    setScale(scale, scale);
-  }
+  void setScale(float scale) { setScale(scale, scale); }
   void setScale(float scale_x, float scale_y);
+
   void setScale(unsigned int texture_unit, float scale) {
     setScale(texture_unit, scale, scale);
   }
@@ -192,10 +171,11 @@ private:
   TextureMap m_texture_map; ///< Mapping between texture name and its TextureID
   TextureVector m_textures; ///< Used to translate a TextureID to a TextureObject
   NameVector m_names; 
-  unsigned int m_texture_counter; ///< Keeps track of last allocated TextureID
+  int m_texture_counter; ///< Keeps track of last allocated TextureID
   std::vector<TextureID> m_last_textures;
   unsigned int m_texture_units;
   TextureID m_default_texture;
+  TextureID m_default_font;
 
   /**
    * This function is used to setup the required OpenGL texture extensions

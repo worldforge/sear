@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.77 2004-04-26 15:38:38 simon Exp $
+// $Id: System.cpp,v 1.78 2004-04-26 20:26:51 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,7 +44,7 @@
 #include "System.h"
 #include "WorldEntity.h"
 #include "renderers/RenderSystem.h"
-
+#include "environment/Environment.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -76,7 +76,6 @@ namespace Sear {
 
   static const std::string LOAD_MODEL_RECORDS = "load_model_records";
   static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
-//  static const std::string LOAD_STATE_FILE = "load_state_file";
   static const std::string LOAD_GENERAL_CONFIG = "load_general";
   static const std::string LOAD_KEY_BINDINGS = "load_bindings";
   static const std::string LOAD_MODEL_CONFIG = "load_models";
@@ -110,7 +109,6 @@ System *System::_instance = NULL;
 System::System() :
   repeat(false),
   action(ACTION_DEFAULT),
-  fullscreen(0),
   mouseLook(0),
   screen(NULL),
   _graphics(NULL),
@@ -126,7 +124,6 @@ System::System() :
   _event_handler(NULL),
   _file_handler(NULL),
   _model_handler(NULL),
-//  _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
   _calendar(NULL),
@@ -170,7 +167,6 @@ bool System::init() {
     throw Exception("ERIS INIT");
   }
   
-  SDL_EnableUNICODE(1);
 
 #ifdef __WIN32__
   const char *homedrive;
@@ -210,8 +206,6 @@ bool System::init() {
   for (std::list<std::string>::const_iterator I = additional_paths.begin(); I != additional_paths.end(); ++I) {
     _file_handler->addSearchPath(*I);
   }
-//  _state_loader = new StateLoader();
-//  _state_loader->init();
   
   _object_handler = new ObjectHandler();
   _object_handler->init();
@@ -221,13 +215,11 @@ bool System::init() {
  
   // Connect signals for record processing 
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-  _textures.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   _model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
   // Connect signals for error messages
   _general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-  _textures.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   _model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
@@ -273,7 +265,8 @@ bool System::init() {
   _graphics->init();
   _graphics->registerCommands(_console);
   _graphics->setRenderer(renderer);
-
+ 
+  Environment::getInstance().init();
 
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
@@ -362,12 +355,6 @@ void System::shutdown() {
     _console = NULL;
   }
  
-//  if (_state_loader) {
-//    _state_loader->shutdown();
-//    delete _state_loader;
-//    _state_loader = NULL;
-//  }
-
   // Are these actually needed ? or does SDL clean then up too? 
 //  if (_icon) SDL_FreeSurface(_icon);
 //  if (_cursor_default) SDL_FreeCursor(_cursor_default);
@@ -387,112 +374,17 @@ bool System::initVideo() {
 #ifdef DEBUG
 //#warning "PARACHUTE IS DISABLED"
   // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
-  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE) < 0 ) {
+  if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else
   // We want release versions to die quietly
-  if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0 ) {
+  if (SDL_Init(SDL_INIT_JOYSTICK) < 0 ) {
 #endif
     Log::writeLog(std::string("Unable to init SDL: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
     return false;
   } 
   return true;
 }
-#if(0)
-void System::createWindow(bool fullscreen) {
-  if (debug) Log::writeLog("Creating Window", Log::LOG_INFO);
-  //Request Open GL window attributes
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
-  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
-  const SDL_VideoInfo *info = SDL_GetVideoInfo();
-  if (!info) {
-    Log::writeLog("Error quering video", Log::LOG_DEFAULT);
-  }
 
-SDL_Rect **videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
-                                                                                
-    /* Check is there are any modes available */
-    if(videoModes == 0){
-        printf("No modes available!\n");
-    } else if (videoModes == (SDL_Rect **)-1) {
-        printf("All resolutions available.\n");     } else{
-        /* Print valid modes */         printf("Available Modes\n");
-        for(int i=0; videoModes[i]; ++i) {
-float aspect = (float)videoModes[i]->w / (float)videoModes[i]->h;
-             printf("  %d x %d -- %f\n", videoModes[i]->w, videoModes[i]->h, aspect);
-        }     }
-    fflush(stdout);
-
-
-
-  //Create Window
-  int flags = SDL_OPENGL;
-  int bpp = info->vfmt->BitsPerPixel;
-  if (fullscreen) flags |= SDL_FULLSCREEN;
-  if (!(_width && _height)) {
-    Log::writeLog(std::string("Invalid resolution: ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_ERROR);
-    _system_running = false;
-    exit(1);
-  }
-  if (debug) Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
-
-  //Is this the correct way to free a window?
-  if (screen) SDL_FreeSurface(screen);
-  screen = SDL_SetVideoMode(_width, _height, bpp, flags);
-  if (screen == NULL ) {
-    Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);
-    _system_running = false;
-    exit(1);
-  }
-
-  // Check OpenGL flags
-  int value;
-  if (debug) {
-    SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
-    Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
-    Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
-    Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
-    Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
-    Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
-    Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
-  }
-
-  SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
-  if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
-  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
-  SDL_WM_SetIcon(_icon, NULL);
-  if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
-  if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP); 
-  if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
-  if (debug) Log::writeLog("Creating Renderer", Log::LOG_INFO);
-  
-  // Delete grpahics object if it already exists
-  if (_graphics) {
-    _graphics->shutdown();
-    delete _graphics;
-  }
-  _graphics = new Graphics(this);
-  _graphics->init();
-
-  _graphics->registerCommands(_console);
-  _graphics->getRender()->initWindow(_width, _height);
-
-  renderer = _graphics->getRender();
-  pushMessage("Loading, Please wait...", 2, 100);
-
-  // Don't think we need this anymore
-//  _graphics->drawScene("", false, 0); // Render scene one before producing colour set
-  renderer->buildColourSet();
-}
-#endif
 void System::mainLoop() {
   SDL_Event event;
   static float last_time = 0.0f;
@@ -810,12 +702,6 @@ void System::setCaption(const std::string &title, const std::string &icon) {
   SDL_WM_SetCaption(title.c_str(), icon.c_str());
 }
 
-void System::toggleFullscreen() {
-  fullscreen = ! fullscreen;
-  // If fullscreen fails, create a new window with the fullscreen flag (un)set
-  if (!SDL_WM_ToggleFullScreen(screen)) ;//createWindow(fullscreen);
-}
-
 void System::toggleMouselook() {
   std::cout << "System::toggleMouselook()" << std::endl << std::flush;
   mouseLook = ! mouseLook;
@@ -985,9 +871,6 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     std::string value = tokeniser.remainingTokens();
     _general.setItem(section, key, value);
   }
-//  else if (command == LOAD_STATE_FILE) {
-//    if (_state_loader) _state_loader->readFiles(processHome(args));
-//  }
   else if (command == LOAD_GENERAL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
   System::instance()->getFileHandler()->expandString(args);
@@ -1046,7 +929,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == KEY_PRESS) {
     runCommand(Bindings::getBinding(args));
   }
-  else if (command == TOGGLE_FULLSCREEN) toggleFullscreen();
+  else if (command == TOGGLE_FULLSCREEN) RenderSystem::getInstance().toggleFullscreen();
   else if (command == TOGGLE_MLOOK) toggleMouselook();
   else if (command == ADD_EVENT) {
     std::string event_function = tokeniser.nextToken();

@@ -1,3 +1,6 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
 #include "Environment.h"
 
@@ -60,4 +63,4 @@ void Environment::invalidate() {
   m_skyDome->invalidate();
 }
 
-}
+} // namespace Sear

@@ -2,11 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.12 2004-04-26 17:37:51 simon Exp $
+// $Id: StateManager.cpp,v 1.13 2004-04-26 20:26:50 simon Exp $
 
 /*
  * TODO
- * Allow states flushing
  * custom of default settings
  * */
 
@@ -97,8 +96,8 @@ void StateManager::init() {
   if (_initialised) shutdown();
   if (debug) std::cout << "State Loader: Initialising." << std::endl;
 
-  _state_counter = 1;
   _current_state = -1;
+  _state_counter = 1;
 
   _states.resize(256);
   _name_state_vector.resize(256);
@@ -282,8 +281,6 @@ StateID StateManager::getState(const std::string &state_name) const {
   return S->second;
 }
   
-
-
 int StateManager::getAlphaFunction(const std::string &alpha_function) {
   if (alpha_function == ALPHA_greater) return GL_GREATER;
   if (alpha_function == ALPHA_less) return GL_LESS;

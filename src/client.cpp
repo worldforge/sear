@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.55 2004-04-23 10:11:00 simon Exp $
+// $Id: client.cpp,v 1.56 2004-04-26 20:26:51 simon Exp $
 
 #include "System.h"
 
@@ -97,7 +97,8 @@ Client::Client(System *system, const std::string &client_name) :
   _factory(NULL),
   _status(CLIENT_STATUS_DISCONNECTED),
   _client_name(client_name),
-  _initialised(false)
+  _initialised(false),
+  m_takeFirst(false)
 {
   assert((system != NULL) && "System is NULL");
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.18 2004-04-26 15:32:30 simon Exp $
+// $Id: TextureManager.cpp,v 1.19 2004-04-26 20:26:50 simon Exp $
 
 #include "TextureManager.h"
 
@@ -98,14 +98,16 @@ TextureManager::TextureManager() :
 void TextureManager::init() {
   if (m_initialised) shutdown();
   if (debug) std::cout << "Initialising TextureManager" << std::endl;
-  readConfig(System::instance()->getGeneral());
   m_textures.resize(256);
   m_names.resize(256);
 
   m_initialised = true;
+ 
+  //readConfig(System::instance()->getGeneral());
 }
 
 void TextureManager::initGL() {
+  assert((m_initialised == true) && "TextureManager not initialised");
   setupGLExtensions();
   m_last_textures.resize(m_texture_units);
   for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
@@ -114,13 +116,15 @@ void TextureManager::initGL() {
   if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
 
   // create default font
-  TextureID m_default_font = createDefaultFont();
+  m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
+
 }
 
 void TextureManager::shutdown() {
+  if (!m_initialised) return;
   // Unload all textures
-  for (unsigned int i = 1; i < m_texture_counter; ++i) {
+  for (int i = 1; i < m_texture_counter; ++i) {
     unloadTexture(m_textures[i]);
   }
   // Clear map and vector
@@ -135,6 +139,8 @@ void TextureManager::shutdown() {
 }
 
 void TextureManager::readConfig(varconf::Config &config) {
+  assert((m_initialised == true) && "TextureManager not initialised");
+  
   // Read in max number of textures for multitexturing
   // Read in pixel format settings
 
@@ -142,6 +148,7 @@ void TextureManager::readConfig(varconf::Config &config) {
 }
 
 void TextureManager::writeConfig(varconf::Config &config) {
+  assert((m_initialised == true) && "TextureManager not initialised");
 }
 
 void TextureManager::readTextureConfig(const std::string &filename) {
@@ -195,6 +202,7 @@ std::cout << "Loading Texture: " << texture_name << std::endl;
 }
 
 GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface, bool mask) {
+  assert((m_initialised == true) && "TextureManager not initialised");
   std::string texture_name(name);
   m_texture_config.clean(texture_name);
   // If we have requested a mask, filter pixels
@@ -333,12 +341,12 @@ void TextureManager::unloadTexture(const std::string &texture_name) {
   m_texture_map[texture_name] = 0;
 }
 
-void TextureManager::unloadTexture(unsigned int texture_id) {
+void TextureManager::unloadTexture(GLuint texture_id) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (glIsTexture(texture_id)) glDeleteTextures(1, &texture_id);
 }
 
-void TextureManager::switchTexture( TextureID texture_id) {
+void TextureManager::switchTexture(TextureID texture_id) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (texture_id == m_last_textures[0]) return;
   GLuint to = m_textures[texture_id];
@@ -346,16 +354,19 @@ void TextureManager::switchTexture( TextureID texture_id) {
     m_texture_config.clean(m_names[texture_id]);
     to = loadTexture(m_names[texture_id]);
     if (to == 0) {
-      std::cerr << "Cannot find " << m_names[texture_id] << " id " << texture_id <<  std::endl;
+      std::cerr << "Cannot find " << m_names[texture_id] << " ID " << texture_id <<  std::endl;
       to = m_textures[m_default_texture];
     }
     m_textures[texture_id] = to;
+    if (to == 12 || to ==14) {
+std::cout << "Name: " <<  m_names[texture_id] << std::endl;
+   }
   }
   glBindTexture(GL_TEXTURE_2D, to);
   m_last_textures[0] = texture_id;  
 }
 
-void TextureManager::switchTexture(unsigned int texture_unit,  TextureID texture_id) {
+void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (texture_id == m_last_textures[texture_unit]) return;
 //  if (texture_id == -1) texture_id = m_default_texture;
@@ -378,6 +389,7 @@ void TextureManager::switchTexture(unsigned int texture_unit,  TextureID texture
 }
 
 void TextureManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  assert((m_initialised == true) && "TextureManager not initialised");
 //  if (!config.findItem(section, KEY_path)) {
 //    if (debug) std::cout << "New Texture: " << section << std::endl;
 //    char cwd[256];
@@ -404,6 +416,8 @@ int TextureManager::getFilter(const std::string &filter_name) {
 }
 
 void TextureManager::setupGLExtensions() {
+  assert((m_initialised == true) && "TextureManager not initialised");
+  
   // Get number of texture units
   // We write to a tempory as m_texture_units is a uint
   int tex_units;
@@ -417,6 +431,7 @@ void TextureManager::setupGLExtensions() {
 }
 
 void TextureManager::setScale(float scale_x, float scale_y) {
+  assert((m_initialised == true) && "TextureManager not initialised");
   glMatrixMode(GL_TEXTURE);
   glLoadIdentity();
   glScalef(scale_x, scale_y, 1.0f);
@@ -424,6 +439,7 @@ void TextureManager::setScale(float scale_x, float scale_y) {
 }
 
 void TextureManager::setScale(unsigned int texture_unit, float scale_x, float scale_y) {
+  assert((m_initialised == true) && "TextureManager not initialised");
   glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
   glMatrixMode(GL_TEXTURE);
   glLoadIdentity();
@@ -433,6 +449,7 @@ void TextureManager::setScale(unsigned int texture_unit, float scale_x, float sc
 }
 
 TextureID TextureManager::createDefaultTexture() {
+  assert((m_initialised == true) && "TextureManager not initialised");
   std::string texture_name = "default_texture";
   // Load texture into memory
   /*
@@ -475,8 +492,7 @@ TextureID TextureManager::createDefaultTexture() {
 }
 
 TextureID TextureManager::createDefaultFont() {
-//  assert((m_initialised == true) && "TextureManager not initialised");
-  
+  assert((m_initialised == true) && "TextureManager not initialised");
   std::string texture_name = "default_font";
 /*
   m_texture_config.setItem(texture_name, KEY_mask, false);
@@ -526,11 +542,13 @@ TextureID TextureManager::createDefaultFont() {
 
 
 void TextureManager::registerCommands(Console *console) {
+  assert((m_initialised == true) && "TextureManager not initialised");
   if (debug) std::cout << "Registering commands" << std::endl;
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
 }
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
+  assert((m_initialised == true) && "TextureManager not initialised");
   if (command == CMD_LOAD_TEXTURE_CONFIG) {
     std::string a = arguments;
     System::instance()->getFileHandler()->expandString(a);
@@ -539,6 +557,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
 }
 
 void TextureManager::invalidate() {
+  assert((m_initialised == true) && "TextureManager not initialised");
   // TODO unload textures first.
   for (unsigned int i = 0; i < m_textures.size(); i++) {
     // Unload texture if its still valid
@@ -558,12 +577,11 @@ void TextureManager::invalidate() {
   m_texture_counter = 1;
   m_default_texture = createDefaultTexture();
   if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
-  TextureID m_default_font = createDefaultFont();
   
+  m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
   // restore texture counter
   m_texture_counter = texCount;
- 
 }
 
 SDL_Surface *TextureManager::loadImage(const  std::string &filename) {

@@ -4,7 +4,6 @@
 
 #include "TerrainRenderer.h"
 
-//#include "Texture.h"
 #include <sage/GLU.h>
 
 #include "src/System.h"
@@ -272,12 +271,12 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
     const Terrain::Segmentstore & segs = t.getTerrain();
 
     Terrain::Segmentstore::const_iterator I = segs.begin();
-glDisable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-glDisable(GL_TEXTURE_2D);
-            glColor4f(0.8f, 0.8f, 1.f, 0.6f);
-glNormal3f(0.0f,0.0f,1.0f);
-glEnable(GL_COLOR_MATERIAL);
+    glDisable(GL_TEXTURE_2D);
+    glColor4f(0.8f, 0.8f, 1.f, 0.6f);
+    glNormal3f(0.0f,0.0f,1.0f);
+    glEnable(GL_COLOR_MATERIAL);
     for (; I != segs.end(); ++I) {
         const Terrain::Segmentcolumn & col = I->second;
         Terrain::Segmentcolumn::const_iterator J = col.begin();
@@ -293,18 +292,17 @@ glEnable(GL_COLOR_MATERIAL);
             glPopMatrix();
         }
     }
-glEnable(GL_CULL_FACE);
-glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_COLOR_MATERIAL);
     glDisable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
 }
 
 TerrainRenderer::TerrainRenderer() :
-m_terrain(Terrain::SHADED),
+    m_terrain(Terrain::SHADED),
     m_numLineIndeces(0),
     m_lineIndeces(new unsigned short[(segSize + 1) * (segSize + 1) * 2]),
     m_landscapeList(0), m_haveTerrain(false)
-
 {
 
     m_textures[0] = RenderSystem::getInstance().requestTexture("granite.png");
@@ -314,11 +312,6 @@ m_terrain(Terrain::SHADED),
     m_textures[4] = RenderSystem::getInstance().requestTexture("snow.png");
     m_seaTexture = RenderSystem::getInstance().requestTexture("water");
     m_shadowTexture = RenderSystem::getInstance().requestTexture("shadow");
-//    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
-//    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
-//    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);
-//    m_textures[3] = Texture::get("dark.png", true, GL_LINEAR_MIPMAP_NEAREST);
-//    m_textures[4] = Texture::get("snow.png", true, GL_LINEAR_MIPMAP_NEAREST);
 
     int idx = -1;
     for (unsigned int i = 0; i < (segSize + 1) - 1; ++i) {
@@ -344,23 +337,13 @@ m_terrain(Terrain::SHADED),
     m_terrain.addShader(new Mercator::HighShader(35.f)); // Snow
 }
 
-TerrainRenderer::~TerrainRenderer()
-{
-}
-
 void TerrainRenderer::render( const PosType & camPos)
 {
     if (!m_haveTerrain) {
         m_haveTerrain = true;
     }
     drawMap(m_terrain, camPos);
-//    drawSea( m_terrain);
     drawShadow(WFMath::Point<2>(camPos.x(), camPos.y()), .5f);
-}
-
-void TerrainRenderer::select( const PosType & camPos)
-{
-    drawMap(m_terrain, camPos);
 }
 
 void TerrainRenderer::drawShadow(const WFMath::Point<2> & pos, float radius)

@@ -1,3 +1,7 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+
 #ifndef SEAR_ENVIRONMENT_H
 #define SEAR_EnVIRONMENT_H
 
@@ -48,6 +52,6 @@ private:
 
 };
 
-}
+} // namespace Sear
 
 #endif

@@ -52,16 +52,11 @@ class TerrainRenderer
     void readTerrain();
   public:
     TerrainRenderer();
-    virtual ~TerrainRenderer();
-
-    void load(const std::string &) { }
+    virtual ~TerrainRenderer() {}
 
     virtual void render( const PosType & camPos);
-    virtual void renderSea() {
-      drawSea(m_terrain);
-}
-    virtual void select( const PosType & camPos);
-  friend class Environment;
+    virtual void renderSea() { drawSea(m_terrain); }
+    friend class Environment;
 };
 }
 #endif // APOGEE_TERRAIN_RENDERER_H

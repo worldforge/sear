@@ -15,7 +15,7 @@
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 
-#include "sear_icon.xpm"
+//#include "sear_icon.xpm"
 #include "RenderSystem.h"
 
 #include "common/Log.h"
@@ -34,9 +34,9 @@
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
-#include "environment/Environment.h"
 #include "GL.h"
 
+#include "environment/Environment.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -188,6 +188,7 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 
   // TODO check return values
   SDL_InitSubSystem(SDL_INIT_VIDEO);
+  SDL_EnableUNICODE(1);
 
   //Request Open GL window attributes
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
@@ -304,7 +305,6 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
-  env->init();
 }
 void GL::destroyWindow() {
   RenderSystem::getInstance().invalidate();
@@ -320,7 +320,11 @@ void GL::toggleFullscreen() {
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
 //  if (!SDL_WM_ToggleFullScreen(m_screen)) {
     destroyWindow();
+    RenderSystem::getInstance().invalidate();
+    Environment::getInstance().invalidate();
     createWindow(m_width, m_height, m_fullscreen);
+    RenderSystem::getInstance().invalidate();
+    Environment::getInstance().invalidate();
 //  }
 }
 void GL::checkError() {
@@ -416,8 +420,7 @@ GL::GL() :
   _fog_start(100.0f),
   _fog_end(150.0f),
   _light_level(1.0f),
-  m_initialised(false),
-  env(NULL)
+  m_initialised(false)
 {
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
@@ -435,7 +438,6 @@ void GL::shutdown() {
 
 void GL::init() {
   if (m_initialised) shutdown();
-  env = &Environment::getInstance();
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
 
@@ -711,9 +713,6 @@ void GL::writeConfig() {
   general.setItem(RENDER, KEY_fog_end, _fog_end);
   general.setItem(RENDER, KEY_far_clip_dist, _far_clip_dist);
 }  
-
-
-
 
 void GL::setupStates() {
   // TODO: should this be in the init?

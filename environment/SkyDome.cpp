@@ -186,6 +186,8 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
 }
 
 void SkyDome::render(float radius, int levels, int segments) {
+// disable for now
+sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
   static int done = 0;
   static int size = segments * levels;
   static int counter = 0;
