@@ -1,3 +1,7 @@
+26th April 2004, Al Riddoch
+ * Removed old sky and terrain code
+ * Removed slice loader code as it isn't used
+
 25th April 2004, Al Riddoch
  * Started work on new gui code.
 

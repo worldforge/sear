@@ -2,7 +2,7 @@ SUBDIRS = cal3d
 
 LIB3DS_LIBS = libLoader3ds.a
 
-noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a libLoaderSlice.a $(LIB3DS_LIBS)
+noinst_LIBRARIES = libLoaderWireFrame.a libLoaderBoundBox.a libLoaderNPlane.a $(LIB3DS_LIBS)
 
 INCLUDES = -I..
 
@@ -21,7 +21,3 @@ libLoader3ds_a_SOURCES = \
 libLoaderNPlane_a_SOURCES = \
 	NPlane.cpp NPlane.h \
 	NPlane_Loader.cpp NPlane_Loader.h
-
-libLoaderSlice_a_SOURCES = \
-	Slice.cpp Slice.h \
-	Slice_Loader.cpp Slice_Loader.h
