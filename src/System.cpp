@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.37 2002-09-26 18:56:16 simon Exp $
+// $Id: System.cpp,v 1.38 2002-09-26 20:23:03 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -82,6 +82,7 @@ bool System::init() {
   if (!initVideo()) return false;
   _event_handler = new EventHandler(this);
   _model_handler = new ModelHandler();
+  _model_handler->init();
   _client = new Client(this, CLIENT_NAME);
   if(!_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.11 2002-09-26 17:17:46 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.12 2002-09-26 20:23:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -49,7 +49,7 @@ ModelRecord *NPlane_Loader::loadModel(Render *render, ObjectRecord *record, cons
     // TODO: what happens if we still cannot find a texture?
 
 //  }
-  std::string type = record->name;
+  std::string type = record->type;
   float width =  (double)model_config->getItem(model_id, "width");
   float height =  (double)model_config->getItem(model_id, "height");
   int num_planes = (int)model_config->getItem(model_id, "num_planes");

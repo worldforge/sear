@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.22 2002-09-26 17:17:46 simon Exp $
+// $Id: ModelHandler.cpp,v 1.23 2002-09-26 20:23:03 simon Exp $
 
 #include "System.h"
 #include <set>
@@ -23,6 +23,9 @@
 #include "loaders/WireFrame_Loader.h"
 #include "loaders/Slice_Loader.h"
 
+
+#include "src/Event.h"
+#include "src/EventHandler.h"
 #include "Exception.h"
 //#include "Model.h"
 #include "ModelHandler.h"
@@ -59,28 +62,34 @@ ModelHandler::~ModelHandler() {
 void ModelHandler::init() {
   if (_initialised) shutdown();
   // TODO: Do  clean up if required
-  _model_loaders = ModelLoaderMap();
+//  _model_loaders = ModelLoaderMap();
   _model_records = ModelRecordMap();
+  // TODO stop this
+  System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
   _initialised = true;
 }
 
 void ModelHandler::shutdown() {
   // Clean up model loaders
-//  for (ModelLoaderMap::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
-//    if (I->second) {
+  for (ModelLoaderMap::iterator I = _model_loaders.begin(); I != _model_loaders.end(); ++I) {
+    if (I->second) {
 //      I->second->shutdown();
-//      delete I->second;
-//      _model_loaders[I->first] = NULL;
-//    }
-//  } 
- // Clean Up Models
-//  for (ModelRecordMap::iterator I = _models.begin(); I != _models.end(); ++I) {
-//    if (I->second) {
-//      I->second->shutdown();
-//      delete I->second;
-//      _models[I->first] = NULL;
-//    }
-//  }
+      delete I->second;
+      _model_loaders[I->first] = NULL;
+    }
+  } 
+// Clean Up Models
+  for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
+    if (I->second) {
+      Model *model = I->second->model;
+      if (model) {
+        model->shutdown();
+	delete model;
+      }
+      delete I->second;
+      _model_records[I->first] = NULL;
+    }
+  }
   _initialised = false;
 }
   
@@ -131,6 +140,48 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
   // Only unregister a model laoder if it is properly registered
   if (_model_loaders[model_type] == model_loader) _model_loaders[model_type] = NULL;
 }
+
+void ModelHandler::checkModelTimeouts() {
+  // TODO what about records with no model?
+  cout << "Checking Timeouts" << endl;
+  std::set<ModelRecord*> expired_set;
+  for (ModelRecordMap::iterator I = _model_records.begin(); I != _model_records.end(); ++I) {
+    ModelRecord *record = I->second;
+    if (record) {
+      Model *model = record->model;
+      if (model) {
+        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+          expired_set.insert(record);
+          _model_records[I->first] = NULL;
+        }
+      }
+    }
+  }
+  for (ObjectRecordMap::iterator I = _object_map.begin(); I != _object_map.end(); ++I) {
+    ModelRecord *record = I->second;
+    if (record) {
+      Model *model = record->model;
+      if (model) {
+        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+          expired_set.insert(record);
+          _object_map[I->first] = NULL;
+        }
+      }
+    }
+  }
+  while (!expired_set.empty()) {
+    ModelRecord *record = *expired_set.begin();
+    if (record) {
+      cout << "Unloading: " << record->id << endl;
+      Model *model = record->model;
+      if (model) delete model;
+      delete record;
+    }
+    expired_set.erase(expired_set.begin());
+  }
+  System::instance()->getEventHandler()->addEvent(Event(EF_FREE_MODELS, NULL, EC_TIME, 60000 + System::instance()->getTime()));
+}
+
 void ModelHandler::checkModelTimeout(const std::string &id) {
 //  Model *model = _models[id];
 //  if (!model) return;

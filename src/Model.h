@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+//$Id: Model.h,v 1.4 2002-09-26 20:23:03 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -44,12 +44,17 @@ public:
   void setSelectState(StateProperties *sp) { _select_state = sp; }
  
   StateProperties *getSelectState() { return _select_state; }
+  float getLastTime() { return _last_time; }
+  void setLastTime(float t) { _last_time = t; }
+  
 protected: 
   Render *_render;
+  float _last_time;
 private:
   bool _in_use;
   std::map<std::string, bool> _flag_map;
   StateProperties *_select_state;
+  
   
 };
 

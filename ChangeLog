@@ -1,5 +1,9 @@
 26th September 2002, Simon Goodall 
- * Camera height is noe based upon character height
+ * Re-implemented model unloading
+ * Fixed bug where model was selected upon available record, but texture was selected upon its original type.
+
+26th September 2002, Simon Goodall 
+ * Camera height is now based upon character height
 
 26th September 2002, Simon Goodall 
  * Re-implemented frustum culling

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.20 2002-09-26 17:17:46 simon Exp $
+// $Id: System.h,v 1.21 2002-09-26 20:23:03 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -73,6 +73,7 @@ public:
   void addSearchPaths(std::list<std::string> l);
   
   unsigned int getTime() const { return SDL_GetTicks(); }
+  float getTimef() const { return (float)SDL_GetTicks() / 1000.0f; }
 
   void setState(SystemState ss, bool state) { _systemState[ss] = state; }
   bool checkState(SystemState ss) { return _systemState[ss]; }

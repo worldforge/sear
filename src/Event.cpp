@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.9 2002-09-08 13:08:21 simon Exp $
+// $Id: Event.cpp,v 1.10 2002-09-26 20:23:03 simon Exp $
 
 #include "System.h"
 #include <string>
@@ -68,6 +68,11 @@ void Event::doEvent() {
     case (EF_FREE_MODEL): {
       System::instance()->getModelHandler()->checkModelTimeout(std::string((char *)_target));
       free(_target);
+      break;
+    }
+    case (EF_FREE_MODELS): {
+      System::instance()->getModelHandler()->checkModelTimeouts();
+//      free(_target);
       break;
     }
     default: break;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.33 2002-09-26 18:56:16 simon Exp $
+// $Id: GL.cpp,v 1.34 2002-09-26 20:23:03 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -1065,6 +1065,7 @@ void GL::drawQueue(QueueMap queue, bool select_mode, float time_elapsed) {
 
       // Update Model
       model->update(time_elapsed);
+      model->setLastTime(System::instance()->getTimef());
       
       // Draw Model
       if (select_mode) {

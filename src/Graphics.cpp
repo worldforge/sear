@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.13 2002-09-26 19:06:32 simon Exp $
+// $Id: Graphics.cpp,v 1.14 2002-09-26 20:23:03 simon Exp $
 
 #include "System.h"
 #include <varconf/Config.h>
@@ -206,31 +206,30 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode) {
 //      if (op->draw_self && select_mode) _render_queue[op->select_state].push_back(we);
       ObjectHandler *object_handler = _system->getObjectHandler();
       ObjectRecord *object_record = object_handler->getObjectRecord(we->getID());
-//      object_record->type = we->getID();
+      if (object_record && object_record->type.empty()) object_record->type = we->getID();
       if (!object_record) {
         object_record = object_handler->getObjectRecord(we->type());
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
-//        object_record->type = we->type();
+        if (object_record) object_record->type = we->type();
       }
       if (!object_record) {
         object_record = object_handler->getObjectRecord(we->parent());
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
-//        object_record->type = we->parent();
+        if (object_record) object_record->type = we->parent();
       }
       if (!object_record) {
         object_record = object_handler->getObjectRecord("default");
 	object_handler->copyObjectRecord(we->getID(), object_record);
         object_record = object_handler->getObjectRecord(we->getID());
-//        object_record->type = "default";
+        if (object_record) object_record->type = "default";
       }
       if (!object_record) {
         std::cout << "No Record found" << endl;	      
         return;   
       }
       object_record->name = we->getName();
-      object_record->type = "default";
       object_record->id = we->getID();
       if (we->hasBBox()) {
         object_record->bbox = we->getBBox();

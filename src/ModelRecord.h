@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.1 2002-09-26 17:17:46 simon Exp $
+// $Id: ModelRecord.h,v 1.2 2002-09-26 20:23:03 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -27,6 +27,7 @@ public:
  
   float scale;
   float offset[3];
+  std::string id;
   std::string state;
   std::string select_state;
   std::string model_loader;

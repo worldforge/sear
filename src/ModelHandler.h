@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.7 2002-09-26 17:17:46 simon Exp $
+// $Id: ModelHandler.h,v 1.8 2002-09-26 20:23:03 simon Exp $
 
 #ifndef SEAR_MODELHANDLER_H
 #define SEAR_MODELHANDLER_H 1
@@ -31,6 +31,7 @@ public:
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
   void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
 
+  void checkModelTimeouts();
   void checkModelTimeout(const std::string &);
   
 protected:

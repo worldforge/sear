@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Impostor_Loader.cpp,v 1.15 2002-09-26 17:17:46 simon Exp $
+// $Id: Impostor_Loader.cpp,v 1.16 2002-09-26 20:23:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -63,7 +63,7 @@ ModelRecord *Impostor_Loader::loadModel(Render *render, ObjectRecord *record, co
 //      // TODO: what happens if we still cannot find a texture?
 //    }
  // }
-  std::string type = record->name;
+  std::string type = record->type;
   float width =  (double)model_config->getItem(model_id, "width");
   float height =  (double)model_config->getItem(model_id, "height");
   bool multi_textures = (bool)model_config->getItem(model_id, "multi_textures");
