@@ -13,6 +13,7 @@ libGui_a_SOURCES = Window.cpp Window.h \
                    Toplevel.cpp Toplevel.h \
                    Button.cpp Button.h \
                    Box.cpp Box.h \
+                   TextEntry.cpp TextEntry.h \
                    Graphic.cpp Graphic.h \
                    Compass.cpp Compass.h \
                    event.h

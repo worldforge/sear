@@ -30,6 +30,7 @@ protected:
   void mouseMotion(Window &, short, short);
   void mouseDown(Window &, short, short);
   void mouseUp(Window &, short, short);
+  void keyPress(Window &, short, short, SDLKey, Uint16);
 
 public:
   Workspace(System *);

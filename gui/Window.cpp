@@ -97,4 +97,25 @@ void Window::mouseUp(short x, short y)
   }
 }
 
+void Window::keyPress(short x, short y, SDLKey ks, Uint16 ch)
+{
+  if (m_parent != 0) {
+    std::cout << "CHILD K " << x << " " << y << std::endl << std::flush;
+  }
+  std::set<Window *>::const_iterator I = m_children.begin();
+  for(; I != m_children.end(); ++I) {
+    Window & w = **I;
+    short rx = x - w.m_x,
+          ry = y - w.m_y;
+    if ((rx < 0) || (rx >= w.m_w) ||
+        (ry < 0) || (ry >= w.m_h)) {
+      continue;
+    }
+    w.keyPress(rx, ry, ks, ch);
+  }
+  if (m_eventMask & KEY_PRESS) {
+    // MouseUp.emit();
+  }
+}
+
 } // namespace Sear

@@ -44,4 +44,4 @@ public:
 
 } // namespace Sear
 
-#endif // SEAR_GUI_WIDGET_H
+#endif // SEAR_GUI_BUTTON_H

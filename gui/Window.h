@@ -9,6 +9,8 @@
 
 #include <sigc++/signal.h>
 
+#include <SDL/SDL.h>
+
 #include <set>
 
 namespace Sear {
@@ -63,6 +65,7 @@ public:
   void mouseMotion(short, short);
   void mouseDown(short, short);
   void mouseUp(short, short);
+  void keyPress(short, short, SDLKey, Uint16);
 
   virtual void render(Render *) = 0;
 

@@ -59,7 +59,7 @@ void Workspace::mouseMotion(Window & w, short x, short y)
         (ry < 0) || (ry >= c.h())) {
       continue;
     }
-    mouseMotion(c, rx, ry);
+    // mouseMotion(c, rx, ry);
     c.mouseMotion(rx, ry);
   }
 }
@@ -96,31 +96,49 @@ void Workspace::mouseUp(Window & w, short x, short y)
   }
 }
 
+// FIXME Why pass in the window? Its always rootWindow.
+void Workspace::keyPress(Window & w, short x, short y, SDLKey ks, Uint16 ch)
+{
+  const std::set<Window *> & children = w.getChildren();
+  std::set<Window *>::const_iterator I = children.begin();
+  for(; I != children.end(); ++I) {
+    Window & c = **I;
+    short rx = x - c.x(),
+          ry = y - c.y();
+    if ((rx < 0) || (rx >= c.w()) ||
+        (ry < 0) || (ry >= c.h())) {
+      continue;
+    }
+    c.keyPress(rx, ry, ks, ch);
+  }
+}
+
 void Workspace::handleEvent(const SDL_Event & event)
 {
   assert(m_rootWindow != 0);
   Render *renderer = m_system->getGraphics()->getRender();
 
+  short x = event.motion.x;
+  short y = renderer->getWindowHeight() - event.motion.y;
+
   switch (event.type) {
     case SDL_MOUSEMOTION: {
-        short x = event.motion.x;
-        short y = renderer->getWindowHeight() - event.motion.y;
         mouseMotion(*m_rootWindow, x, y);
       }
       break;
     case SDL_MOUSEBUTTONDOWN: {
-        short x = event.motion.x;
-        short y = renderer->getWindowHeight() - event.motion.y;
         mouseDown(*m_rootWindow, x, y);
       }
       break;
     case SDL_MOUSEBUTTONUP: {
-        short x = event.motion.x;
-        short y = renderer->getWindowHeight() - event.motion.y;
         mouseUp(*m_rootWindow, x, y);
       }
       break;
-    case SDL_KEYDOWN:
+    case SDL_KEYDOWN: {
+        keyPress(*m_rootWindow, x, y, event.key.keysym.sym,
+                                      event.key.keysym.unicode);
+      }
+      break;
     case SDL_KEYUP:
       // This is the type of event we are interested in
     default:
