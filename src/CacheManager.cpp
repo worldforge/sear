@@ -2,9 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CacheManager.cpp,v 1.2 2005-01-10 11:32:03 simon Exp $
+// $Id: CacheManager.cpp,v 1.3 2005-01-14 17:43:20 demitar Exp $
 
 #include <stdlib.h>
+#include <cassert>
 
 #ifdef __WIN32__
   #include <direct.h>

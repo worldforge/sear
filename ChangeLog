@@ -1,3 +1,7 @@
+2005-01-14  Anders Petersson  <demitar@worldforge.org>
+
+	* gui/Dialogue.cpp, src/CacheManager.cpp:  #include <cassert>
+
 2005-01-10  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/CacheManager.cpp: Add return values on init/shutdown.

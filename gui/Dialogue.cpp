@@ -8,6 +8,7 @@
 #include "gui/Button.h"
 
 #include <iostream>
+#include <cassert>
 
 namespace Sear {
 
