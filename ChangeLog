@@ -1,5 +1,13 @@
 2005-03-22  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/CameraSystem.cpp, renderers/CameraSystem.h: Remove const
+	  from readConfig as getItem is a non-const method. Pass readConfig 
+	  calls to all camera objects currently registered.
+	* loaders/cal3d/Cal3dCoreModel.cpp: Set m_initialised to true on init.
+
+
+2005-03-22  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/TerrainRenderer.cpp: Remove call to segment->invalidate
 	  which removed the normal buffer causing some wierd lighting with 
 	  vertex arrays.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.25 2005-03-15 17:55:04 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.26 2005-03-22 14:52:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -86,11 +86,14 @@ int Cal3dCoreModel::init(const std::string &filename) {
 //  std::cerr << "reading config" << std::endl << std::flush;
   readConfig(filename);
  // std::cerr << "done reading config" << std::endl << std::flush;
+
+  m_initialised = true;
+
   return 0;
 }
 
 int Cal3dCoreModel::shutdown() {
-  assert(m_initialised);
+  assert(m_initialised == true);
 //  if (m_core_model) {
   delete m_core_model;
   m_core_model = NULL;

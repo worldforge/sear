@@ -58,7 +58,7 @@ public:
     m_current = i; 
   }
 
-  void readConfig(const varconf::Config &config);
+  void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
 
 private:

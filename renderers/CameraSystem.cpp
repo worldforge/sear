@@ -138,9 +138,11 @@ void CameraSystem::update(double time_elapsed) {
   }
 }
 
-void CameraSystem::readConfig(const varconf::Config &config) {
+void CameraSystem::readConfig(varconf::Config &config) {
   assert(m_initialised == true);
-
+  for (unsigned int i = 0; i < m_cameras.size(); ++i) {
+    m_cameras[i]->readConfig(config);
+  }
 }
 
 void CameraSystem::writeConfig(varconf::Config &config) {
