@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.28 2003-12-06 22:29:53 simon Exp $
+// $Id: Console.cpp,v 1.29 2004-04-17 15:55:45 simon Exp $
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -14,6 +14,7 @@
 #include "Render.h"
 #include "FileHandler.h"
 
+#include "renderers/RenderSystem.h"
 #ifdef HAVE_CONFIG
   #include "config.h"
 #endif
@@ -135,12 +136,12 @@ void Console::renderConsoleMessages(const std::string &command) {
   int i;
   //Render console panel
   int consoleOffset = CONSOLE_HEIGHT - consoleHeight;
-  renderer->stateChange(renderer->getStateID(PANEL));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(PANEL));
   //Make panel slightly transparent
   renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  if (panel_id == 0) panel_id = renderer->requestTexture(PANEL);
+  if (panel_id == 0) panel_id = RenderSystem::getInstance().requestTexture(PANEL);
   renderer->drawTextRect(0, 0, renderer->getWindowWidth(), consoleHeight, panel_id);
-  renderer->stateChange(renderer->getStateID(FONT));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
   for (I = console_messages.begin(), i = 0; I != console_messages.end(); ++I, ++i) {
@@ -158,7 +159,7 @@ void Console::renderScreenMessages() {
   if (screen_messages.empty()) return;	
   std::list<screenMessage>::const_iterator I;
   int i;
-  renderer->stateChange(renderer->getStateID(FONT));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   // Get screen height so we can calculate offset correctly
   int height = renderer->getWindowHeight();

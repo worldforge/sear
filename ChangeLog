@@ -1,3 +1,8 @@
+17th April 2004, Simon Goodall
+ * Added skydome code
+ * Changed fog colour to match lower skydome colour
+ * Added a globally accessable RenderSystem class to handle common rendering tasks such as texture changing and state changing.
+
 12th April 2004, Al Riddoch
  * Add support to camera for immediate changes, and implement mouse controlled
    camera.

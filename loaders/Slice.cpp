@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Slice.cpp,v 1.14 2003-12-03 11:08:17 simon Exp $
+// $Id: Slice.cpp,v 1.15 2004-04-17 15:55:45 simon Exp $
 
 #include "common/Utility.h"
 
@@ -12,6 +12,8 @@
 #include "src/Character.h"
 
 #include "Slice.h"
+
+#include "renderers/RenderSystem.h"
 
 /**
  * TODO
@@ -169,9 +171,9 @@ void Slice::render(bool select_mode) {
       for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
         ASlice *slice = *I;
         if (select_mode) {
-          _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
+          RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
         } else {
-          _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
+          RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
         }
         _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
       }
@@ -189,9 +191,9 @@ void Slice::render(bool select_mode) {
   for (Slicing::const_iterator I = slicings[index]->begin(); I != slicings[index]->end(); ++I, ++i) {
     ASlice *slice = *I;
     if (select_mode) {
-      _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
+      RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i) + "_mask"));
     } else {
-      _render->switchTexture(_render->requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
+      RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture( _type + "_" + string_fmt(index) + "_" + string_fmt(i)));
     }
     _render->renderArrays(Graphics::RES_QUADS, 0, 4, &slice->vertex_data[0], &slice->texture_data[0], &slice->normal_data[0], false);
   }

@@ -5,7 +5,7 @@
 #ifndef APOGEE_TERRAIN_RENDERER_H
 #define APOGEE_TERRAIN_RENDERER_H
 
-
+#include <sage/sage.h>
 #include <sage/GL.h>
 
 #include <Mercator/Terrain.h>
@@ -31,6 +31,7 @@ class TerrainRenderer
     int m_numLineIndeces;
     unsigned short * const m_lineIndeces;
     int m_textures[8];
+    int m_seaTexture;
     GLuint m_alphaTextures[8];
     GLuint m_landscapeList;
     bool m_haveTerrain;

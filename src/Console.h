@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Console.h,v 1.12 2003-03-23 19:51:49 simon Exp $
+// $Id: Console.h,v 1.13 2004-04-17 15:55:45 simon Exp $
 
 #ifndef SEAR_CONSOLE_H
 #define SEAR_CONSOLE_H 1
@@ -12,6 +12,7 @@
 #include <map>
 
 #include "interfaces/ConsoleObject.h"
+
 
 #define MAX_MESSAGES (5)
 #define FONT_HEIGHT  (15)

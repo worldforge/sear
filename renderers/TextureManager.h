@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.7 2003-07-15 11:11:22 simon Exp $
+// $Id: TextureManager.h,v 1.8 2004-04-17 15:55:45 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -20,6 +20,8 @@
 
 #include <varconf/Config.h>
 
+#include "RenderSystem.h"
+
 /*
  TODO
 
@@ -36,7 +38,7 @@
 namespace Sear {
 
   typedef unsigned int TextureObject; ///< OpenGL reference to texture
-  typedef int TextureID; ///< TextureManager reference to texture
+//  typedef int TextureID; ///< TextureManager reference to texture
 /**
  * This class handles everything to do with textures. 
  * Expected usuage is to call requestTexture to initially load the texture
@@ -178,7 +180,9 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &arguments);
   void setupGLExtensions();
-  
+ 
+  void invalidate();
+ 
 private:
   bool _initialised; ///< Flag indicating whether object has had init called
   varconf::Config _texture_config; ///< Config object for all texture

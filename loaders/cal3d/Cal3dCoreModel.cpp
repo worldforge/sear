@@ -3,7 +3,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.15 2003-12-06 22:29:52 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.16 2004-04-17 15:55:45 simon Exp $
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
@@ -21,6 +21,8 @@
 #include "src/Render.h"
 
 #include "src/Exception.h"
+
+#include "renderers/RenderSystem.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -274,7 +276,7 @@ void Cal3dCoreModel::varconf_error_callback(const char *message) {
 
 unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
   unsigned int textureId;
-  textureId = System::instance()->getGraphics()->getRender()->requestTexture(strFilename);
+  textureId = RenderSystem::getInstance().requestTexture(strFilename);
   return textureId;
 }
 

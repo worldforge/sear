@@ -1,13 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.36 2004-04-01 21:24:26 simon Exp $
+// $Id: GL.h,v 1.37 2004-04-17 15:55:45 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
 
-#include <GL/gl.h>
+#include <sage/GL.h>
 #include <SDL/SDL.h>
 #include <string>
 #include <vector>
@@ -23,7 +23,6 @@
 #include "src/Light.h"
 #include "src/Render.h"
 
-#include "TextureManager.h"
 #include "StateManager.h"
 
 namespace Sear {
@@ -60,27 +59,9 @@ public:
   void print3D(const char* string, int set);
   inline void newLine();
 
-  TextureID requestTexture(const std::string &texture_name) {
-    assert(_texture_manager != NULL);
-    return _texture_manager->requestTextureID(texture_name, false);
-  }
- 
-  TextureID requestTextureMask(const std::string &texture_name) {
-    assert(_texture_manager != NULL);
-    return _texture_manager->requestTextureID(texture_name, true);
-  }
- 
   static GL *instance() { return _instance; }
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
-//  void stateChange(const std::string &state);
-//  void stateChange(StateProperties *state);
-  void stateChange(StateID state) {
-    _state_manager->stateChange(state);
-  }
-  StateID getStateID(const std::string &state) {
-    return _state_manager->getState(state);
-  } 
   float distFromNear(float,float,float);  
   void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
 
@@ -90,15 +71,6 @@ public:
   int getWindowWidth() { return window_width; }
   int getWindowHeight() { return window_height; }
 
-  void switchTexture(TextureID texture) {
-    assert(_texture_manager != NULL);
-    _texture_manager->switchTexture(texture);
-  }
-  void switchTexture(unsigned int unit, TextureID texture) {
-    assert(_texture_manager != NULL);
-    _texture_manager->switchTexture(unit, texture);
-  }
-  
   std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
@@ -141,8 +113,6 @@ public:
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void setTextureScale(unsigned int unit, float scale);
-  TextureManager *getTextureManager() const { return _texture_manager; }
-  StateManager *getStateManager() const { return _state_manager; }
 protected:
   System *_system;
   Graphics *_graphics;
@@ -154,11 +124,8 @@ protected:
   float _far_clip_dist;
   float _texture_scale;
 
-  std::map<std::string, int> texture_map;
-  
   int next_id;
   GLuint base;
-  std::vector<GLuint> textureList;
 
   int font_id;
   int splash_id;
@@ -223,10 +190,6 @@ protected:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 
   Environment *env;
-
-
-  TextureManager *_texture_manager;
-  StateManager *_state_manager;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.6 2003-12-06 22:29:53 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.7 2004-04-17 15:55:45 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -100,6 +100,7 @@ void ScriptEngine::runScript(const std::string &file_name) {
       pos = string_data.find("#");
       string_data = string_data.substr(0, pos);
 //      if(string_data[pos] != '#') 
+printf("Exec: %s\n", string_data.c_str());
       System::instance()->getConsole()->runCommand(std::string(string_data));
     }
   } catch (...) {

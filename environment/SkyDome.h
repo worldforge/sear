@@ -2,11 +2,11 @@
 #ifndef SEAR_SKYDOME_H
 #define SEAR_SKYDOME_H 1
 
-#include <math.h>
 #include <sage/sage.h>
-#include <sage/GL.h>
+//#include <sage/GL.h>
+#include <math.h>
 #include <iostream>
-#include "renderers/TextureManager.h"
+#include "renderers/RenderSystem.h"
 
 
 namespace Sear {
@@ -44,14 +44,14 @@ public:
   float *genTexCoordsB(float radius, int levels, int segments);
 
   void domeInit(float radius, int levels, int segments);
-  void renderDome(float radius, int levels, int segments);
+  void render(float radius, int levels, int segments);
 
 private:
   bool m_initialised;
   float *m_verts, *m_texA, *m_texB;
-  GLuint m_vb_verts, m_vb_texA, m_vb_texB;
+  unsigned int m_vb_verts, m_vb_texA, m_vb_texB;
 
-  TextureObject m_textures[5];
+  TextureID m_textures[5];
 };
 
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.53 2004-03-30 11:36:47 simon Exp $
+// $Id: client.cpp,v 1.54 2004-04-17 15:55:45 simon Exp $
 
 #include "System.h"
 
@@ -56,8 +56,8 @@
   static const bool debug = false;
 #endif
 #ifdef DEBUG
-  #define DEBUG_ERIS 1
-  #define ERIS_LOG_LEVEL 1
+  #define DEBUG_ERIS 0
+  #define ERIS_LOG_LEVEL 0
 #elif defined(NDEBUG)
   #define DEBUG_ERIS 0
   #define ERIS_LOG_LEVEL 0

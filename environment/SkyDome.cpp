@@ -6,10 +6,12 @@
 #include "src/System.h"
 #include "src/Graphics.h"
 
+#include "renderers/RenderSystem.h"
 
 #define SQR(X) ((X))
 
-#define zFac(z)  (  sin(  z) * sin(z))
+#define zFac(z) 1.0f 
+//#define zFac(z)  (  sin(  z) * sin(z))
 
 #include "SkyDome.h"
 
@@ -107,33 +109,39 @@ float *SkyDome::genTexCoordsB(float radius, int levels, int segments)  {
       float x,y,z;
       
       z = zFac(a2);
+
+      x = sin(a1) * z;
+      y = -cos(a1) * z;
+z = exp(1.0-x) * exp(1.0-y);
+      tex[++tex_counter] = x / z;
+      tex[++tex_counter] = y/z;
+      
+      z = 1.0f;;//zFac(a2);
+
+      x = sin(a11) * z;
+      y = -cos(a11) * z;
+z = exp(1.0-x) * exp(1.0-y);
+
+      tex[++tex_counter] = (x )/z;
+      tex[++tex_counter] = (y )/z;
+      
+      z = 1.0f;;//zFac(a22);
+
+      x = sin(a11) * z;
+      y = -cos(a11) * z;
+z = exp(1.0-x) * exp(1.0-y);
+      tex[++tex_counter] = (x )/z;
+      tex[++tex_counter] = (y )/z;
+      
+      z =1.0f;;// zFac(a22);
+
       x = sin(a1) * z;
       y = -cos(a1) * z;
 
-      tex[++tex_counter] = x;// * z;
-      tex[++tex_counter] = y;//*z;
-      
-      z = zFac(a2);
-      x = sin(a11) * z;
-      y = -cos(a11) * z;
+z = exp(1.0-x) * exp(1.0-y);
 
-      tex[++tex_counter] = (x );//*z;
-      tex[++tex_counter] = (y );//*z;
-      
-      z = zFac(a22);
-      x = sin(a11) * z;
-      y = -cos(a11) * z;
- 
-      tex[++tex_counter] = (x );//*z;
-      tex[++tex_counter] = (y );//*z;
-      
-      z = zFac(a22);
-      x = sin(a1) * z;
-      y = -cos(a1) * z;
-
-
-      tex[++tex_counter] = (x );//*z;
-      tex[++tex_counter] = (y );//*z;
+      tex[++tex_counter] = (x )/z;
+      tex[++tex_counter] = (y )/z;
     }
   }
   return tex;
@@ -149,11 +157,12 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
  // {
   //  std::cerr << "Error loading sky textures" << std::endl;
   //}
-  m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("atmosphere");
-//  m_texutes[1] = System::instance()->getRenderer()->requestTexture("glow");
-  m_textures[2] = System::instance()->getGraphics()->getRender()->requestTexture("cloud_layer_1");
-//  m_textures[3] = System::instance()->getRenderer()->requestTexture("cloud_layer_2");
-//  m_texutes[4] = System::instance()->getRenderer()->requestTexture("star_field");
+  m_textures[0] = RenderSystem::getInstance().requestTexture("atmosphere");
+//  m_RenderSystem::getInstance().requestTexture("glow");
+  m_textures[1] = RenderSystem::getInstance().requestTexture("cloud_layer_1");
+  m_textures[2] = RenderSystem::getInstance().requestTexture("cloud_layer_2");
+//  m_tRenderSystem::getInstance().requestTexture("cloud_layer_2");
+//  m_RenderSystem::getInstance().requestTexture("star_field");
 
   m_verts = genVerts(radius, levels, segments);  
   m_texA = genTexCoordsA(radius, levels, segments);  
@@ -190,10 +199,10 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
 
 }
 
-void SkyDome::renderDome(float radius, int levels, int segments) {
-static int done = 0;
+void SkyDome::render(float radius, int levels, int segments) {
+  static int done = 0;
   static int size = segments * levels;
-static int counter = 0;
+  static int counter = 0;
   if (!done)	 {
     domeInit(radius , levels, segments);
     done = 1;
@@ -211,62 +220,90 @@ static int counter = 0;
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_verts);
   glVertexPointer(3, GL_FLOAT, 0, m_verts);
 
-//  glBindTexture(GL_TEXTURE_2D, textures[4].texID);
-//  glTexCoordPointer(2, GL_FLOAT, 0, texB);
- // glDrawArrays(GL_QUADS, 0, size* 4);
-
+  RenderSystem::getInstance().switchTexture(m_textures[0]);
   glMatrixMode(GL_TEXTURE);
-    glPushMatrix();
+  glPushMatrix();
     glLoadIdentity();
     glTranslatef(val , 0.0f,0.0f);
-//glScalef(0.01f, 0.01f, 1.0f);
   glMatrixMode(GL_MODELVIEW);
-  glEnable(GL_BLEND);
-//glEnable(GL_ALPHA);
 
-  
+glBegin(GL_QUADS);
+glTexCoord2i(0,0);
+glVertex3f(-1.0f, -1.0f, 1.0f);
+glVertex3f(1.0f, -1.0f, 1.0f);
+glVertex3f(1.0f, -1.0f, -1.0f);
+glVertex3f(-1.0f, -1.0f, -1.0f);
+
+glVertex3f(-1.0f, 1.0f, 1.0f);
+glVertex3f(1.0f, 1.0f, 1.0f);
+glVertex3f(1.0f, 1.0f, -1.0f);
+glVertex3f(-1.0f, 1.0f, -1.0f);
+
+glVertex3f(-1.0f, 1.0f, 1.0f);
+glVertex3f(-1.0f, -1.0f, 1.0f);
+glVertex3f(-1.0f, -1.0f, -1.0f);
+glVertex3f(-1.0f, 1.0f, -1.0f);
+
+glVertex3f(1.0f, 1.0f, 1.0f);
+glVertex3f(1.0f, -1.0f, 1.0f);
+glVertex3f(1.0f, -1.0f, -1.0f);
+glVertex3f(1.0f, 1.0f, -1.0f);
+glEnd(); 
+
+// Quick hack so we dont call readpixels every frame
+static int delay = 0;
+if (++delay == 20) {
+GLfloat i[4];
+glReadPixels(0,0,1,1,GL_RGBA,GL_FLOAT, &i);
+glFogfv(GL_FOG_COLOR,i);
+ delay = 0;
+}
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texA);
   glTexCoordPointer(2, GL_FLOAT, 0, m_texA);
   
-  glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+  RenderSystem::getInstance().switchTexture(m_textures[0]);
   glDrawArrays(GL_QUADS, 0, size * 4);
 
-//  glMatrixMode(GL_TEXTURE);
-//    glScalef(0.01f, 0.01, 1.0f);
-//  glMatrixMode(GL_MODELVIEW);
-
-  //glBindTexture(GL_TEXTURE_2D, m_textures[1].texID);
-//  glTexCoordPointer(2, GL_FLOAT, 1, verts);
+  glEnable(GL_BLEND);
+  RenderSystem::getInstance().switchTexture(m_textures[1]);
+  glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+#define DIST 100.0f
+glBegin(GL_QUADS);
+glTexCoord2i(0,0);
+glVertex3f(-DIST, DIST, 1.0f);
+glTexCoord2i(5,0);
+glVertex3f(DIST, DIST, 1.0f);
+glTexCoord2i(5,5);
+glVertex3f(DIST, -DIST, 1.0f);
+glTexCoord2i(0,5);
+glVertex3f(-DIST, -DIST, 1.0f);
+glEnd();
+//  glTexCoordPointer(2, GL_FLOAT, 0, m_texB);
 //  glDrawArrays(GL_QUADS, 0, size* 4);
+  glMatrixMode(GL_TEXTURE);
+    glTranslatef(val , 0.0f,0.0f);
+  glMatrixMode(GL_MODELVIEW);
 
-  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texB);
-  glTexCoordPointer(2, GL_FLOAT, 0, m_texB);
-
-  glBindTexture(GL_TEXTURE_2D, m_textures[2]);
-  glDrawArrays(GL_QUADS, 0, size * 4);
-
+  RenderSystem::getInstance().switchTexture(m_textures[2]);
+glBegin(GL_QUADS);
+glTexCoord2i(0,0);
+glVertex3f(-DIST, DIST, 1.0f);
+glTexCoord2i(5,0);
+glVertex3f(DIST, DIST, 1.0f);
+glTexCoord2i(5,5);
+glVertex3f(DIST, -DIST, 1.0f);
+glTexCoord2i(0,5);
+glVertex3f(-DIST, -DIST, 1.0f);
+glEnd();
 
   glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-//  glMatrixMode(GL_TEXTURE);
-//    glPushMatrix();
-//    glLoadIdentity();
-////    glTranslatef(val , 0.0f,0.0f);
- // glMatrixMode(GL_MODELVIEW);
 
-
-//  glBindTexture(GL_TEXTURE_2D, m_textures[3].texID);
-//  glTexCoordPointer(2, GL_FLOAT, 0, texB);
-//  glDrawArrays(GL_QUADS, 0, size* 4);
-
-
+  glDisable(GL_BLEND);
   glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  glMatrixMode(GL_TEXTURE);
-    glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 }
 

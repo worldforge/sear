@@ -1,14 +1,16 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.18 2003-07-15 11:11:21 simon Exp $
+// $Id: BoundBox.cpp,v 1.19 2004-04-17 15:55:45 simon Exp $
 
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
 
 #include "BoundBox.h"
+
+#include "renderers/RenderSystem.h"
 
 #ifdef HAVE_CONFIG
   #include "config.h"
@@ -255,7 +257,7 @@ void BoundBox::render(bool select_mode) {
 //      _list = _render->getNewList();
   //    _render->beginRecordList(_list);
       _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      _render->switchTexture(_render->requestTexture(_type ));
+      RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(_type ));
       _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0], &_texture_data[0], &_normal_data[0], false);
 //      _render->endRecordList();
     } 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.36 2004-04-07 13:33:29 simon Exp $
+// $Id: Graphics.cpp,v 1.37 2004-04-17 15:55:45 simon Exp $
 #include <sage/sage.h>
 
 #ifdef HAVE_CONFIG_H
@@ -95,8 +95,11 @@ void Graphics::init() {
   _system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
   _renderer = new GL(_system, this);
   _renderer->init();
-  ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
-  ((GL*)_renderer)->getStateManager()->registerCommands(_system->getConsole());
+  
+  RenderSystem::getInstance().registerCommands(_system->getConsole());
+
+//  ((GL*)_renderer)->getTextureManager()->registerCommands(_system->getConsole());
+//  ((GL*)_renderer)->getStateManager()->registerCommands(_system->getConsole());
   _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
@@ -195,20 +198,20 @@ Compare D^2 to choose what detail level to use
       if (_character) orient /= WFMath::Quaternion(z_vector,  _character->getAngle());
 
       // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
-//      if (!select_mode) {
-//	_renderer->store();
-//        _renderer->applyQuaternion(orient);
+      if (!select_mode) {
+	_renderer->store();
+       _renderer->applyQuaternion(orient);
 //renderDome(1.0f, 30,30);
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("sky_0"));
+  Environment::getInstance().renderSky();
 //        _sky->draw(); //Draw the sky box
-//	_renderer->restore();
-//      }
+	_renderer->restore();
+      }
 
       // Translate camera getDist() units away from the character. Allows closups or large views
       _renderer->translateObject(0.0f, _camera->getDistance(), 0.0f);
       _renderer->applyQuaternion(orient);
       
-//      if (_terrain) z -= _terrain->getHeight(x, y);
-//      z += Environment::getInstance().getHeight(x, y);
       float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
       _renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
     
@@ -223,9 +226,9 @@ Compare D^2 to choose what detail level to use
       _renderer->store();
   //    _terrain->draw();
 
-_renderer->stateChange(_renderer->getStateID("terrain"));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
   glEnableClientState(GL_VERTEX_ARRAY);
-  Environment::getInstance().render(pos);
+  Environment::getInstance().renderTerrain(pos);
   glDisableClientState(GL_VERTEX_ARRAY);
 
       _renderer->restore();

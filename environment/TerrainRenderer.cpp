@@ -17,11 +17,7 @@
 
 #include <iostream>
 
-
-#include "src/System.h"
-#include "src/Graphics.h"
-#include "src/Render.h"
-
+#include "renderers/RenderSystem.h"
 
 namespace Sear {
 
@@ -159,7 +155,7 @@ void TerrainRenderer::drawRegion(Mercator::Segment * map)
         // Set up the first texture unit with the ground texture
 //        glActiveTexture(GL_TEXTURE0);
 //        glBindTexture(GL_TEXTURE_2D, m_textures[texNo]);
-System::instance()->getGraphics()->getRender()->switchTexture(0, m_textures[texNo]);
+        RenderSystem::getInstance().switchTexture(0, m_textures[texNo]);
 
         // Set up the second texture unit with the alpha texture
         // This is not required for the first pass, as the first pass
@@ -287,6 +283,7 @@ void TerrainRenderer::drawSea( Mercator::Terrain & t)
                                    segSize, segSize, 0.f,
                                    0, segSize, 0.f };
             glVertexPointer(3, GL_FLOAT, 0, vertices);
+            RenderSystem::getInstance().switchTexture(0, m_seaTexture);
             glColor4f(0.8f, 0.8f, 1.f, 0.6f);
             glDrawArrays(GL_QUADS, 0, 4);
             glPopMatrix();
@@ -303,11 +300,12 @@ m_terrain(Terrain::SHADED),
 
 {
 
-m_textures[0] = System::instance()->getGraphics()->getRender()->requestTexture("granite.png");
-m_textures[1] = System::instance()->getGraphics()->getRender()->requestTexture("sand.png");
-m_textures[2] = System::instance()->getGraphics()->getRender()->requestTexture("rabbithill_grass_hh.png");
-m_textures[3] = System::instance()->getGraphics()->getRender()->requestTexture("dark.png");
-m_textures[4] = System::instance()->getGraphics()->getRender()->requestTexture("snow.png");
+    m_textures[0] = RenderSystem::getInstance().requestTexture("granite.png");
+    m_textures[1] = RenderSystem::getInstance().requestTexture("sand.png");
+    m_textures[2] = RenderSystem::getInstance().requestTexture("rabbithill_grass_hh.png");
+    m_textures[3] = RenderSystem::getInstance().requestTexture("dark.png");
+    m_textures[4] = RenderSystem::getInstance().requestTexture("snow.png");
+    m_seaTexture = RenderSystem::getInstance().requestTexture("water");
 //    m_textures[0] = Texture::get("granite.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[1] = Texture::get("sand.png", true, GL_LINEAR_MIPMAP_NEAREST);
 //    m_textures[2] = Texture::get("rabbithill_grass_hh.png", true, GL_LINEAR_MIPMAP_NEAREST);

@@ -4,17 +4,23 @@
 #include <stdlib.h>
 
 #include <wfmath/point.h>
+#include <wfmath/quaternion.h>
 
 namespace Sear {
+
 class TerrainRenderer;
+class SkyDome;
 
 class Environment {
   Environment() :
-    m_terrain(NULL)
+    m_initialised(false),
+    m_terrain(NULL),
+    m_skyDome(NULL)
   {}
 
 public:
   ~Environment() {
+    if (m_initialised) shutdown();
   }
 
   void init();
@@ -27,10 +33,15 @@ public:
   float getHeight(float x, float y);
   void setBasePoint(int x, int y, float z);
 
-  void render(const WFMath::Point<3> &pos);
+  void renderSky();
+  void renderTerrain(const WFMath::Point<3> &pos);
+
 private:
+  bool m_initialised;
+
   static Environment instance;
   TerrainRenderer *m_terrain;
+  SkyDome *m_skyDome;
 
 };
 

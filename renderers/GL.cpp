@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.76 2004-04-07 13:33:29 simon Exp $
+// $Id: GL.cpp,v 1.77 2004-04-17 15:55:45 simon Exp $
 
 #include <SDL/SDL_image.h>
 
@@ -236,9 +236,9 @@ GL::GL() :
   _fog_end(150.0f),
   _light_level(1.0f),
   _initialised(false),
-	env(NULL),
-  _texture_manager(NULL),
-  _state_manager(NULL)
+	env(NULL)
+//  _texture_manager(NULL),
+//  _state_manager(NULL)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -260,9 +260,9 @@ GL::GL(System *system, Graphics *graphics) :
   _fog_end(150.0f),
   _light_level(1.0f),
   _initialised(false),
-	env(NULL),
-  _texture_manager(NULL),
-  _state_manager(NULL)
+	env(NULL)
+//  _texture_manager(NULL),
+//  _state_manager(NULL)
 {
   _instance = this;
   memset(entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -275,12 +275,12 @@ GL::~GL() {
 void GL::shutdown() {
   writeConfig();
   shutdownFont();
-  _texture_manager->shutdown();
-  delete _texture_manager;
-  _texture_manager = NULL;
-  _state_manager->shutdown();
-  delete _state_manager;
-  _state_manager = NULL;
+//  _texture_manager->shutdown();
+//  delete _texture_manager;
+//  _texture_manager = NULL;
+//  _state_manager->shutdown();
+//  delete _state_manager;
+//  _state_manager = NULL;
   _initialised = false;
 }
 
@@ -324,12 +324,12 @@ void GL::initWindow(int width, int height) {
 
   setViewMode(PERSPECTIVE);
   setupExtensions();
-  _texture_manager->init();
-  _state_manager->init();
+//  _texture_manager->init();
+//  _state_manager->init();
   //splash_id = requestTexture(TEXTURE_splash_texture);
-Environment::getInstance().init();
+  RenderSystem::getInstance().init();
+  Environment::getInstance().init();
   initFont();
-
 }
   
 void GL::init() {
@@ -339,11 +339,7 @@ void GL::init() {
   
   // Most of this should be elsewhere
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
-  _texture_manager = new TextureManager();
-  _state_manager = new StateManager();
   readConfig();
-//  splash_id = requestTexture(TEXTURE_splash_texture);
-//  initFont();
   initLighting();
   // TODO: initialisation need to go into system?
   setupStates();
@@ -381,8 +377,8 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
-  font_id = requestTexture(DEFAULT_FONT);
-  switchTexture(font_id);
+  font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
+  RenderSystem::getInstance().switchTexture(font_id);
   for (int loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
     cy=(float)(loop/16)/16.0f; // Y Position Of Current Character
@@ -409,7 +405,7 @@ void GL::shutdownFont() {
 
 void GL::print(int x, int y, const char * string, int set) {
   if (set > 1) set = 1;
-  switchTexture(font_id);
+  RenderSystem::getInstance().switchTexture(font_id);
   glMatrixMode(GL_PROJECTION); // Select The Projection Matrix
   glPushMatrix();
   glLoadIdentity(); // Reset The Projection Matrix
@@ -434,7 +430,7 @@ void GL::print3D(const char *string, int set) {
 //    texture = default_id;
 //  }
 //  glBindTexture(GL_TEXTURE_2D, texture);
-  switchTexture(font_id);
+  RenderSystem::getInstance().switchTexture(font_id);
   glPushMatrix();
   glListBase(base-32+(128*set)); // Choose The Font Set (0 or 1)
   glCallLists(strlen(string),GL_BYTE,string); // Write The Text To The Screen
@@ -446,9 +442,7 @@ inline void GL::newLine() {
 }
 
 void GL::drawTextRect(int x, int y, int width, int height, int texture) {
-  switchTexture(texture);
-  // TODO should use switchTexture
-//  glBindTexture(GL_TEXTURE_2D, getTextureID(texture));
+  RenderSystem::getInstance().switchTexture(texture);
   setViewMode(ORTHOGRAPHIC);
   // TODO: make into arrays?
   glBegin(GL_QUADS);
@@ -835,7 +829,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 //  static MoelHandler *model_handler = _system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
-    stateChange(I->first);
+    RenderSystem::getInstance().switchState(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
       ObjectRecord *object_record = J->first;
@@ -888,7 +882,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
 
 void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
-  stateChange(getStateID(FONT));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
     WorldEntity *we = (WorldEntity*)*I;
     glPushMatrix();
@@ -915,7 +909,7 @@ inline int GL::patchInFrustum(WFMath::AxisBox<3> bbox) {
 
 void GL::drawOutline(ModelRecord *model_record) {
 //  StateProperties *sp = _cur_state; // Store current state
-  StateID cur_state = _state_manager->getCurrentState();
+  StateID cur_state = RenderSystem::getInstance().getCurrentState();
   Model *model = model_record->model;
   bool use_stencil = checkState(RENDER_STENCIL) && model_record->outline;
   if (use_stencil) { // Using Stencil Buffer
@@ -926,7 +920,7 @@ void GL::drawOutline(ModelRecord *model_record) {
     model->render(false);
     glPopMatrix();
     //TODO hard code halo in static const variable
-    stateChange(model_record->select_state);
+    RenderSystem::getInstance().switchState(model_record->select_state);
     glStencilFunc(GL_NOTEQUAL, -1, 1);
     glColor4fv(_halo_colour);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -935,12 +929,12 @@ void GL::drawOutline(ModelRecord *model_record) {
     glDisable(GL_STENCIL_TEST);
     glColor4fv(white);
   } else { // Just use solid colour on object 
-    stateChange(model_record->select_state);
+    RenderSystem::getInstance().switchState(model_record->select_state);
     glColor4fv(_halo_colour);  
     model->render(true);
     glColor4fv(white);
   }
-  stateChange(cur_state); // Restore state
+  RenderSystem::getInstance().switchState(cur_state); // Restore state
 }
 
 
@@ -971,14 +965,13 @@ inline void GL::endFrame(bool select_mode) {
   
 inline void GL::drawFPS(float fps) {
   std::string frame_rate_string = string_fmt(fps).substr(0, 4);
-  stateChange(getStateID(FONT));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   glColor4fv(red);
   print(10, 100, frame_rate_string.c_str(), 0);
 }
   
 void GL::drawSplashScreen() {
-//  stateChange(getStateID("default"));
-  stateChange(getStateID(SPLASH));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(SPLASH));
   #ifndef _WIN32
     // TODO Need to find a win32 version
 //    usleep(sleep_time);
@@ -987,9 +980,9 @@ void GL::drawSplashScreen() {
   
   glColor4fv(white);
 //  std::cout << splash_id << std::endl;
-  if (splash_id == -1) splash_id = requestTexture(TEXTURE_splash_texture);
+  if (splash_id == -1) splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
 //  std::cout << splash_id << std::endl;
-  switchTexture(splash_id);
+  RenderSystem::getInstance().switchTexture(splash_id);
   // TODO into vertex array?
   glBegin(GL_QUADS); 
     glTexCoord2i(0, 0); glVertex2f(0.0f, 0.0f);
@@ -1050,7 +1043,7 @@ void GL::applyLighting() {
   }
    
   fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
-  glFogfv(GL_FOG_COLOR, fog_colour);
+//  glFogfv(GL_FOG_COLOR, fog_colour);
   float sun_pos[] = {lights[LIGHT_SUN].position[0], 0.0f, 100.0f, 1.0f};
   lights[LIGHT_SUN].ambient[0] = lights[LIGHT_SUN].ambient[1] = lights[LIGHT_SUN].ambient[2] = _light_level * 0.5f;
   lights[LIGHT_SUN].diffuse[0] = lights[LIGHT_SUN].diffuse[1] = lights[LIGHT_SUN].diffuse[2] = _light_level;
@@ -1064,7 +1057,7 @@ inline void GL::resetSelection() {
 }
 
 inline void GL::renderActiveName() {
-  stateChange(getStateID(FONT));
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   glColor4fv(activeNameColour);
   print(x_pos, y_pos, active_name.c_str(), 1);
 }

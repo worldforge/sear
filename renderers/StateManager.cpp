@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.10 2004-03-30 11:36:47 simon Exp $
+// $Id: StateManager.cpp,v 1.11 2004-04-17 15:55:45 simon Exp $
 
 /*
  * TODO
@@ -433,6 +433,14 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
     std::string a = arguments;
     System::instance()->getFileHandler()->expandString(a);
     readFiles(a);
+  }
+}
+
+void StateManager::invalidate() {
+  for (unsigned int i = 0; i < 256; ++i) {
+    for (unsigned int j = 0; j < 256; ++j) {
+      _state_change_vector[i][j] = 0; 
+    }
   }
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.72 2004-04-12 15:28:50 alriddoch Exp $
+// $Id: System.cpp,v 1.73 2004-04-17 15:55:45 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -260,8 +260,8 @@ bool System::init() {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
   }
   
-  _width = 640; _height = 480;
-  //_width = 800; _height = 600;
+  //_width = 640; _height = 480;
+  _width = 800; _height = 600;
   createWindow(false);
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
@@ -272,7 +272,6 @@ bool System::init() {
   _general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
   
   _command_history_iterator = _command_history.begin();
-  _graphics->initST();
   _system_running = true;
   _initialised = true;
   return true;
@@ -981,6 +980,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
 //  }
   else if (command == LOAD_GENERAL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
+  System::instance()->getFileHandler()->expandString(args);
     _general.readFromFile(processHome(args));
     if (_process_records) {
       _process_records = false;
@@ -989,6 +989,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == LOAD_MODEL_RECORDS) {
     _process_records = _script_engine->prefixEnabled();
+  System::instance()->getFileHandler()->expandString(args);
     _model_records.readFromFile(processHome(args));
     if (_process_records) {
       _process_records = false;
@@ -997,19 +998,23 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
  else if (command == LOAD_MODEL_CONFIG) {
     _process_records = _script_engine->prefixEnabled();
+  System::instance()->getFileHandler()->expandString(args);
     _models.readFromFile(processHome(args));
     if (_process_records) {
       _process_records = false;
       processRecords();
     }
+  System::instance()->getFileHandler()->expandString(args);
   }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(processHome(args));
   }
   else if (command == SAVE_GENERAL_CONFIG) {
+  System::instance()->getFileHandler()->expandString(args);
     _general.writeToFile(processHome(args));
   }
   else if (command == SAVE_KEY_BINDINGS) {
+  System::instance()->getFileHandler()->expandString(args);
     Bindings::saveBindings(processHome(args));
   }
   else if (command == READ_CONFIG) {

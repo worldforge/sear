@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: StateManager.h,v 1.4 2003-06-11 23:07:57 simon Exp $
+// $Id: StateManager.h,v 1.5 2004-04-17 15:55:45 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -13,6 +13,8 @@
 
 #include <sigc++/object_slot.h>
 #include "interfaces/ConsoleObject.h"
+
+#include "RenderSystem.h"
 
 namespace varconf {
   class Config;
@@ -46,7 +48,7 @@ typedef struct {
   int blend_dest_function;
 } StateProperties;
 
-typedef int StateID;
+//typedef int StateID;
 typedef std::map<std::string, StateID> StateNameMap;
 typedef std::vector<std::string> NameStateVector;
 typedef std::vector<StateProperties*> StateVector;
@@ -77,6 +79,9 @@ public:
   void runCommand(const std::string &command, const std::string &arguments);
   
   StateID getCurrentState() const { return _current_state; }
+
+  void invalidate();
+
 private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.19 2004-01-28 19:52:59 simon Exp $
+// $Id: ModelLoader.h,v 1.20 2004-04-17 15:55:45 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -11,7 +11,7 @@
 
 #include <varconf/Config.h>
 
-#include "src/Graphics.h"
+#include "renderers/RenderSystem.h"
 #include "src/ModelRecord.h"
 #include "src/ObjectRecord.h"
 
@@ -41,11 +41,11 @@ public:
     model_record->offset_z = (double)model_config.getItem(model_id, ModelRecord::OFFSET_Z);
     
     model_record->state_name = (std::string)model_config.getItem(model_id, ModelRecord::STATE);
-    model_record->state = System::instance()->getGraphics()->getRender()->getStateID(model_record->state_name);
+    model_record->state = RenderSystem::getInstance().requestState(model_record->state_name);
     model_config.setItem(model_id, "state_num", model_record->state);
     
     model_record->select_state_name = (std::string)model_config.getItem(model_id, ModelRecord::SELECT_STATE);
-    model_record->select_state = System::instance()->getGraphics()->getRender()->getStateID(model_record->select_state_name);
+    model_record->select_state = RenderSystem::getInstance().requestState(model_record->select_state_name);
     model_config.setItem(model_id, "select_state_num", model_record->select_state);
     
     model_record->model_by_type = model_config.getItem(model_id, ModelRecord::MODEL_BY_TYPE);

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.13 2004-03-30 11:36:47 simon Exp $
+// $Id: TextureManager.cpp,v 1.14 2004-04-17 15:55:45 simon Exp $
 
 #include "TextureManager.h"
 
@@ -323,7 +323,7 @@ void TextureManager::unloadTexture(unsigned int texture_id) {
   if (glIsTexture(texture_id)) glDeleteTextures(1, &texture_id);
 }
 
-void TextureManager::switchTexture(TextureID texture_id) {
+void TextureManager::switchTexture( TextureID texture_id) {
   assert((_initialised == true) && "TextureManager not initialised");
   if (texture_id == _last_textures[0]) return;
   TextureObject to = _textures[texture_id];
@@ -340,13 +340,13 @@ void TextureManager::switchTexture(TextureID texture_id) {
   _last_textures[0] = texture_id;  
 }
 
-void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
+void TextureManager::switchTexture(unsigned int texture_unit,  TextureID texture_id) {
   assert((_initialised == true) && "TextureManager not initialised");
   if (texture_id == _last_textures[texture_unit]) return;
-  if (texture_id == -1) texture_id = _default_texture;
+//  if (texture_id == -1) texture_id = _default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
   if (texture_unit >= _texture_units) return; // Check we have enough texture units
-  TextureObject to = _textures[texture_id];
+  TextureObject to = (texture_id == -1) ? (_textures[_default_texture]) : (_textures[texture_id]);
   if (to == 0) {
     to = loadTexture(_names[texture_id]);
     if (to == 0) {
@@ -622,4 +622,10 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     readTextureConfig(a);
   }
 }
+
+void TextureManager::invalidate() {
+  for (unsigned int i = 0; i < _textures.size(); _textures[i++] = 0);
+  setupGLExtensions();
+}
+
 } /* namespace Sear */

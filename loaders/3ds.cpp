@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001-2002 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.23 2003-12-03 11:08:17 simon Exp $
+// $Id: 3ds.cpp,v 1.24 2004-04-17 15:55:45 simon Exp $
 
 
 #include <iostream>
@@ -26,6 +26,8 @@
 
 
 #include "3ds.h"
+
+#include "renderers/RenderSystem.h"
 
 #include <iostream>
 
@@ -136,7 +138,7 @@ void ThreeDS::render(bool select_mode) {
             }	    
           }
           if (current_texture != ro->texture_id) {
-            if (ro->texture_data) _render->switchTexture(ro->texture_id);
+            if (ro->texture_data) RenderSystem::getInstance().switchTexture(ro->texture_id);
             current_texture = ro->texture_id;
           }
           _render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
@@ -216,19 +218,19 @@ void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
 	    */
           if (mat->texture1_map.name[0]) {
 //	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->texture1_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
 	  }  
 	  else if (mat->texture2_map.name[0]) {
 //	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->texture2_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture2_map.name);
 	  }  
 	  else if (mat->reflection_map.name[0]) {
 //	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->reflection_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->reflection_map.name);
 	  }  
 	  else if (mat->bump_map.name[0]) {
 //	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->bump_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->bump_map.name);
 	  }  
 	  if (texture_id != -1) {
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
@@ -343,19 +345,19 @@ void ThreeDS::render_file(Lib3dsFile *file) {
 	    */
           if (mat->texture1_map.name[0]) {
 //	    std::cout << "3DS Texture 1 Name: " << mat->texture1_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->texture1_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
 	  }  
 	  else if (mat->texture2_map.name[0]) {
 //	    std::cout << "3DS Texture 2 Name: " << mat->texture2_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->texture2_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->texture2_map.name);
 	  }  
 	  else if (mat->reflection_map.name[0]) {
 //	    std::cout << "3DS Reflection Name: " << mat->reflection_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->reflection_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->reflection_map.name);
 	  }  
 	  else if (mat->bump_map.name[0]) {
 //	    std::cout << "3DS Bump Name: " << mat->bump_map.name << std::endl;
-	    texture_id = _render->requestTexture(mat->bump_map.name);
+	    texture_id = RenderSystem::getInstance().requestTexture(mat->bump_map.name);
 	  }  
 	  if (texture_id != -1) {
 	    if (current_texture == 0) ro->texture_id = current_texture = texture_id;
