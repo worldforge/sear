@@ -1238,7 +1238,7 @@ void GL::applyLighting() {
       break;
     }
   }
-   
+  if (_light_level > 0.15f) _light_level = 0.15f; 
   fog_colour[0] = fog_colour[1] = fog_colour[2] = fog_colour[3] = 0.5f * _light_level;
 //  glFogfv(GL_FOG_COLOR, fog_colour);
   float sun_pos[] = {lights[LIGHT_SUN].position[0], 0.0f, 100.0f, 1.0f};

@@ -1,3 +1,6 @@
+2004-06-22  Simon Goodall  <simon@simongoodall.co.uk>
+	* renderers/GL.cpp: clamp min light level to 0.15f so we can still see at night
+
 2004-06-21  Simon Goodall  <simon@simongoodall.co.uk>
 	* src/ObjectRecord.h: Fix bug where updated bbox from server would ignore scale_height option in model records
 
