@@ -1,3 +1,7 @@
+2004-06-22  James Turner  <james@worldforge.org>
+
+	* Make joystick axes configurable in general.cfg
+
 2004-06-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp: Add objtype to arguments of Set ops for

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.94 2004-06-15 13:25:36 alriddoch Exp $
+// $Id: System.cpp,v 1.95 2004-06-21 09:06:15 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,6 +104,12 @@ namespace Sear {
   static const std::string KEY_window_width = "width";
   static const std::string KEY_window_height = "height";
   static const std::string KEY_media_root = "media_root";
+  
+  static const std::string SECTION_INPUT = "input";
+  static const std::string KEY_STRAFE_AXIS = "strafe_axis";
+  static const std::string KEY_MOVE_AXIS = "move_axis";
+  static const std::string KEY_PAN_AXIS = "pan_axis";
+  static const std::string KEY_ELEVATION_AXIS = "elevation_axis";
   
   //Config default values
   static const int DEFAULT_window_width = 640;
@@ -231,6 +237,26 @@ bool System::init(int argc, char *argv[]) {
     int buttons = SDL_JoystickNumButtons(_controller);
     std::cout << "Got a joystick with " << axes << " axes, and " <<
               buttons << " buttons." << std::endl << std::flush;
+              
+    if (m_general.findItem(SECTION_INPUT, KEY_STRAFE_AXIS))
+        m_axisBindings[m_general.getItem(SECTION_INPUT, KEY_STRAFE_AXIS)] = AXIS_STRAFE;
+    else
+        m_axisBindings[0] = AXIS_STRAFE;
+        
+    if (m_general.findItem(SECTION_INPUT, KEY_MOVE_AXIS))
+        m_axisBindings[m_general.getItem(SECTION_INPUT, KEY_MOVE_AXIS)] = AXIS_MOVE;
+    else
+        m_axisBindings[1] = AXIS_MOVE;
+        
+    if (m_general.findItem(SECTION_INPUT, KEY_PAN_AXIS))
+        m_axisBindings[m_general.getItem(SECTION_INPUT, KEY_PAN_AXIS)] = AXIS_PAN;
+    else
+        m_axisBindings[2] = AXIS_PAN;
+    
+    if (m_general.findItem(SECTION_INPUT, KEY_ELEVATION_AXIS))
+        m_axisBindings[m_general.getItem(SECTION_INPUT, KEY_ELEVATION_AXIS)] = AXIS_ELEVATE;
+    else
+        m_axisBindings[3] = AXIS_ELEVATE;
   }
 
   try { 
@@ -572,52 +598,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_JOYAXISMOTION: {
-      switch (event.jaxis.axis) {
-        case 0: // Left right move
-          if (_character != NULL) {
-            if (abs(event.jaxis.value) > 3200) {
-              _character->setStrafeSpeed(event.jaxis.value / 10000.f);
-            } else {
-                std::cout << "X too small" << std::endl << std::flush;
-              _character->setStrafeSpeed(0);
-            }
-          }
-          break;
-        case 1: // For back move
-          if (_character != NULL) {
-            if (abs(event.jaxis.value) > 3200) {
-              _character->setMovementSpeed(event.jaxis.value / -10000.f);
-            } else {
-                std::cout << "Y too small" << std::endl << std::flush;
-              _character->setMovementSpeed(0);
-            }
-          }
-          break;
-        case 4: // Left right view
-          if (_character != NULL) {
-            if (abs(event.jaxis.value) > 3200) {
-              _character->setRotationRate(event.jaxis.value / 10000.f);
-            } else {
-                std::cout << "X too small" << std::endl << std::flush;
-              _character->setRotationRate(0);
-            }
-          }
-          break;
-        case 5: // Up down view
-          Graphics * g = getGraphics();
-          if (g != NULL) {
-            Camera * c = g->getCamera();
-            if (c != NULL) {
-              if (abs(event.jaxis.value) > 3200) {
-                c->setElevationSpeed(event.jaxis.value / 10000.f);
-              } else {
-                std::cout << "Y too small" << std::endl << std::flush;
-                c->setElevationSpeed(0);
-              }
-            }
-          }
-          break;
-      }
+      handleJoystickMotion(event);
       break;
     }
     case SDL_JOYBUTTONDOWN: {
@@ -705,6 +686,56 @@ void System::handleAnalogueControllers() {
               << std::endl << std::flush;
   }
 #endif
+}
+
+void System::handleJoystickMotion(const SDL_Event& event)
+{
+    if (!m_axisBindings.count(event.jaxis.axis)) return;
+    if (_character == NULL) return;
+    
+    switch (m_axisBindings[event.jaxis.axis]) {
+    case AXIS_STRAFE: // Left right move
+        if (abs(event.jaxis.value) > 3200) {
+          _character->setStrafeSpeed(event.jaxis.value / 10000.f);
+        } else {
+            std::cout << "X too small" << std::endl << std::flush;
+          _character->setStrafeSpeed(0);
+        }
+        break;
+          
+    case AXIS_MOVE: // For back move
+        if (abs(event.jaxis.value) > 3200) {
+          _character->setMovementSpeed(event.jaxis.value / -10000.f);
+        } else {
+            std::cout << "Y too small" << std::endl << std::flush;
+          _character->setMovementSpeed(0);
+        }
+      break;
+          
+    case AXIS_PAN: // Left right view
+        if (abs(event.jaxis.value) > 3200) {
+          _character->setRotationRate(event.jaxis.value / 10000.f);
+        } else {
+            std::cout << "X too small" << std::endl << std::flush;
+          _character->setRotationRate(0);
+        }
+        break;
+          
+    case AXIS_ELEVATE: // Up down view
+          Graphics * g = getGraphics();
+          if (g != NULL) {
+            Camera * c = g->getCamera();
+            if (c != NULL) {
+              if (abs(event.jaxis.value) > 3200) {
+                c->setElevationSpeed(event.jaxis.value / 10000.f);
+              } else {
+                std::cout << "Y too small" << std::endl << std::flush;
+                c->setElevationSpeed(0);
+              }
+            }
+          }
+          break;
+    } // of axis switch
 }
 
 void System::setCaption(const std::string &title, const std::string &icon) {

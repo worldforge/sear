@@ -809,6 +809,7 @@
 			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1 $(value)";
 			};
 			isa = PBXBuildStyle;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.47 2004-06-13 18:21:01 simon Exp $
+// $Id: System.h,v 1.48 2004-06-21 09:06:15 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -201,7 +201,8 @@ protected:
   
   void handleEvents(const SDL_Event &);
   void handleAnalogueControllers();
-
+  void handleJoystickMotion(const SDL_Event& e);
+  
   bool mouseLook;
   SDL_Surface *screen;
   Graphics *_graphics;
@@ -263,6 +264,15 @@ protected:
   bool _process_records;
   void processRecords();
   Sound *sound;
+  
+  typedef enum {
+    AXIS_STRAFE,
+    AXIS_MOVE,
+    AXIS_PAN,
+    AXIS_ELEVATE
+  } InputAxis;
+  
+  std::map<int, InputAxis> m_axisBindings;
   
 public:
   void varconf_callback(const std::string &, const std::string &, varconf::Config &);
