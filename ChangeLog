@@ -1,4 +1,10 @@
 26th September 2002, Simon Goodall 
+ * Fixed bug with NPlane loader where back faces got confused
+ * Removed billboard and impostor loaders. NPlane loader provides there functionality.
+ * Fixed bug where dropping an entity (and probably giving too) caused sear to hang
+ * Fixed bug where stringstream work around was never implemented
+
+26th September 2002, Simon Goodall 
  * Fixes to outline code which was using wrong values for states
  * Removed some now unused members from Model class
 

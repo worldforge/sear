@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.9 2002-09-21 14:20:30 simon Exp $
+// $Id: NPlane.cpp,v 1.10 2002-09-26 22:11:39 simon Exp $
 
 #include "common/Utility.h"
 
@@ -39,6 +39,7 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
   for (unsigned int i = 0; i < num_planes; i++) {
     float x = width * cos ((float)i * rads_per_segment) / 2.0f;
     float y = width * sin ((float)i * rads_per_segment) / 2.0f;
+    cout << "Plane: " << i << " X: " << x << " Y: " << y <<endl;
     in[0][0] = _vertex_data[24 * i + 0] = x;
     in[0][1] = _vertex_data[24 * i + 1] = y;
     in[0][2] = _vertex_data[24 * i + 2] = 0.0f;
@@ -52,18 +53,18 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
     _vertex_data[24 * i + 10] = y;
     _vertex_data[24 * i + 11] = height;
 
-    _vertex_data[24 * i + 12] = -x;
+    _vertex_data[24 * i + 12] = x;
     _vertex_data[24 * i + 13] = y;
-    _vertex_data[24 * i + 14] = 0.0f;
-    _vertex_data[24 * i + 15] = x;
+    _vertex_data[24 * i + 14] = height;
+    _vertex_data[24 * i + 15] = -x;
     _vertex_data[24 * i + 16] = -y;
-    _vertex_data[24 * i + 17] = 0.0f;
-    _vertex_data[24 * i + 18] = x;
+    _vertex_data[24 * i + 17] = height;
+    _vertex_data[24 * i + 18] = -x;
     _vertex_data[24 * i + 19] = -y;
-    _vertex_data[24 * i + 20] = height;
-    _vertex_data[24 * i + 21] = -x;
+    _vertex_data[24 * i + 20] = 0.0f;
+    _vertex_data[24 * i + 21] = x;
     _vertex_data[24 * i + 22] = y;
-    _vertex_data[24 * i + 23] = height;
+    _vertex_data[24 * i + 23] = 0.0f;
     calcNormal(in, out);
     for (unsigned int j = 0; j < 4; ++j) {
       _normal_data[24 * i + 6 * j + 0] = out[0];
@@ -79,10 +80,10 @@ bool NPlane::init(const std::string &type, unsigned int num_planes, float width,
     _texture_data[16 * i + 4] = 1.0f; _texture_data[16 * i + 5] = 1.0f;
     _texture_data[16 * i + 6] = 0.0f; _texture_data[16 * i + 7] = 1.0f;
 
-    _texture_data[16 * i + 8] = 1.0f; _texture_data[16 * i + 9] = 0.0f;
-    _texture_data[16 * i + 10] = 0.0f; _texture_data[16 * i + 11] = 0.0f;
-    _texture_data[16 * i + 12] = 0.0f; _texture_data[16 * i + 13] = 1.0f;
-    _texture_data[16 * i + 14] = 1.0f; _texture_data[16 * i + 15] = 1.0f;
+    _texture_data[16 * i + 8] =  0.0f; _texture_data[16 * i + 9] =  1.0f;
+    _texture_data[16 * i + 10] = 1.0f; _texture_data[16 * i + 11] = 1.0f;
+    _texture_data[16 * i + 12] = 1.0f; _texture_data[16 * i + 13] = 0.0f;
+    _texture_data[16 * i + 14] = 0.0f; _texture_data[16 * i + 15] = 0.0f;
     
   }
   _initialised = true;

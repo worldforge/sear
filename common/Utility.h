@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.5 2002-09-08 12:21:50 simon Exp $
+// $Id: Utility.h,v 1.6 2002-09-26 22:11:39 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -45,7 +45,7 @@ template <class out_value, class in_value>
 void cast_stream(const in_value &in, out_value &out) {
   std::stringstream ss;
   ss << in;
-#ifdef NEED_SSTREAM_WORKAROUND
+#ifdef NEEDS_SSTREAM_WORKAROUND
   std::stringstream sss(ss.str());
   sss >> out;
 #else

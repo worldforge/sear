@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.23 2002-09-26 20:23:03 simon Exp $
+// $Id: ModelHandler.cpp,v 1.24 2002-09-26 22:11:39 simon Exp $
 
 #include "System.h"
 #include <set>
@@ -17,8 +17,6 @@
 #include "loaders/3ds_Loader.h"
 #include "loaders/Cal3d_Loader.h"
 #include "loaders/BoundBox_Loader.h"
-#include "loaders/BillBoard_Loader.h"
-#include "loaders/Impostor_Loader.h"
 #include "loaders/NPlane_Loader.h"
 #include "loaders/WireFrame_Loader.h"
 #include "loaders/Slice_Loader.h"
@@ -47,9 +45,7 @@ ModelHandler::ModelHandler() :
   // TODO: this is not the place
   new Cal3d_Loader(this);
   new BoundBox_Loader(this);
-  new BillBoard_Loader(this);
   new WireFrame_Loader(this);
-  new Impostor_Loader(this);
   new NPlane_Loader(this);
   new Slice_Loader(this);
   new ThreeDS_Loader(this);

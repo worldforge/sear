@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.15 2002-09-08 13:08:21 simon Exp $
+// $Id: Character.cpp,v 1.16 2002-09-26 22:11:39 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -356,7 +356,8 @@ void Character::registerCommands(Console *console) {
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
-   std::deque<std::string> tokens;
+  Tokeniser tokeniser = Tokeniser();
+  tokeniser.initTokens(args);
    if (command == MOVE_FORWARD) moveForward(1);
    else if (command == MOVE_BACKWARD) moveForward(-1);
    else if (command == MOVE_STOP_FORWARD) moveForward(-1);
@@ -376,25 +377,17 @@ void Character::runCommand(const std::string &command, const std::string &args) 
 
    else if (command == SAY) say(args);
    else if (command == GIVE) {
+     std::string quantity_str = tokeniser.nextToken();
+     std::string item = tokeniser.remainingTokens();
      int quantity = 0;
-     cast_stream(tokens.front(), quantity);
-     tokens.pop_front();
-     std::string item = tokens.front(); tokens.pop_front();
-     while (!tokens.empty()) {
-       item += " ";
-       item += tokens.front(); tokens.pop_front();
-     }
+     cast_stream(quantity_str, quantity); 
      giveEntity(item, quantity, _system->getGraphics()->getRender()->getActiveID());
    }
    else if (command == DROP) {
+     std::string quantity_str = tokeniser.nextToken();
+     std::string item = tokeniser.remainingTokens();
      int quantity = 0;
-     cast_stream(tokens.front(), quantity); 
-     tokens.pop_front();
-     std::string item = tokens.front(); tokens.pop_front();
-     while (!tokens.empty()) {
-       item += " ";
-       item += tokens.front(); tokens.pop_front();
-     }
+     cast_stream(quantity_str, quantity); 
      dropEntity(item, quantity);
    }
    else if (command == PICKUP) _system->setAction(ACTION_PICKUP);

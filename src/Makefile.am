@@ -15,8 +15,6 @@ sear_LDADD = \
 	../sky/libSkyBox.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
-	../loaders/libLoaderBillBoard.a \
-	../loaders/libLoaderImpostor.a \
 	../loaders/libLoaderNPlane.a \
 	../loaders/libLoaderSlice.a \
 	$(CAL3D_LIBS) \
