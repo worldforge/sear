@@ -1,0 +1,87 @@
+18th June 2002, Simon Goodall
+ * Replaced unique colour counter code with a much faster implementation. The new implementation obtains the first 500 unique colours which should be greater than the possible amount of objects to be rendered.
+ * Fixed water feature
+ * Fixed a bug that stopped Sear working with Stage
+ * Added a change directory function to scripting engine
+ * Added ability to prefix current directory to entiries on loading into config data
+ * Media now moved into separate "Media Package"
+ * Probably more, but its been awhile
+
+22nd May 2002, Simon Goodall
+ * Fixed SEG fault caused by re-reading config before a character object was created
+ * Further updates for gcc 3 compilation
+ * Fixed problems in lighting caused by enabling two-sided lighting.
+ * Replaced colour splash with a "loading please wait message"
+ * Fixed potential mempry leak caused by toggling fullscreen in Win32
+ * System now deletes models that have not be unsed for over 1 min
+ * User def far_clip
+ * User def terrain_scale
+ * Fixed terrain loading bug
+
+16th May 2002, Simon Goodall
+ * Applied patch by Alriddoch to compile under gcc 3.01. This also reduced the far clipping plane from 1000 to the more reasonable value of 100
+ * Enabled two sided lighting to fix lighting problems with billboards and Impostors
+ * Fog now changes colour depending upon light level
+ * toggle_console now works with keys defined by braces, e.g. {F10}
+ * Allows different resolutions
+ * --enable-debug=no now turns off debug information from eris
+ * Names now appear over currently selected object
+ * Camera now has range limiting
+ * console command read_config will tell system to re-read the config values in the general config loader
+
+14th May 2002, Simon Goodall
+ * Fixed bug where time cycle sped up
+ * Stencil highlights now optional
+ * WireFrame now uses vertex arrays
+
+13th May 2002, Simon Goodall
+ * Fixed wire frame functionality. It was potentially using uninitialised bboxes
+ * Added frustum culling using sphere tests.
+ * Improved lighting system. Sun now moves and has user definable dawn/dusk times
+ * Added option in configure to enable debug information. Debug information is a possible cause of Sear hanging upon exit on some systems.
+ * Added use of video mode querying to provide additional startup information
+ * Moved lots of rendered code into vertex arrays to improve speed.
+ * Removed lots of redundant rendering code from GL_Render.cpp
+
+10th May 2002, Simon Goodall
+ * Fixed bug caused by setting install directory too late
+
+10th May 2002, Simon Goodall
+ * Added version string to command line arguments. use -v or --version
+ * Added help message to command line args. use -h or --help
+ * Use of sstream and strstream to perform type conversions
+ * Allows connection to a server on any port
+ * Allow creation of characters of different type` and sex
+ * Lots more messages on standard out
+ * Fixed bug that used the same cally model for a given type.
+ * Fixed bug where camera was not properly fixed to the vertical position of the character
+ * Added wire_frame queue
+ * System will downgrade none-existent model types until wire-frame is reached
+ * Minimised Open GL state changes
+ * Replaced OpenGL selection by a colour selection method. Improves accuracy and works with blending
+ * Added halo effect to selected entities
+ * Added different cursors depending upon current action
+ * Changed pickup and touch to effect the next entity selected and not the current one
+
+1st May 2002, Simon Goodall
+ * Entities are now drawn according to object properties
+ * New Object Properties; draw_self and draw_members; determine what gets drawn
+ * Object properties file contains entries for most structures so as to hide bbox lines
+ * toggle_console can now really be bound to any key instead of just back quote
+ * Changed configure.in to fix INSTALLDIR being set to NONE in some cases
+ * Added support for billboard / impostor styles of rendering
+ * Fixed problems as seen in the sky box where seams were visible. GL_CLAMP wasn't being set properly.
+ * Lots of internal changes. Hopefully much more stable now.
+ * System loads a float terrain if height map not found.
+
+27th April 2002, Simon Goodall
+ * Fixed possible seg faults caused by attempting to control character before having one
+ * Applied patch file by man-di fixing problems caused by previous definitions of M_PI
+
+25th April 2002, Simon Goodall
+ * Model height is now more in line with landscape height
+ * Tidied up code
+ * Fix seg fault that occurred if cyclient was run
+ * Changed way normals are calculated on terrain.
+
+Initial Change Log, Simon Goodall

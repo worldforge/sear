@@ -1,0 +1,192 @@
+dnl Initialise autoconf
+
+AC_INIT(src/main.cpp)
+AM_CONFIG_HEADER(config.h)
+
+dnl Detect the canonical host and target build environment
+dnl AC_CANONICAL_HOST
+dnl AC_CANONICAL_TARGET
+
+dnl Initialise automake
+SEAR_MAJOR_VERSION=0
+SEAR_MINOR_VERSION=3
+SEAR_MICRO_VERSION=2
+SEAR_VERSION=$SEAR_MAJOR_VERSION.$SEAR_MINOR_VERSION.$SEAR_MICRO_VERSION
+
+AC_SUBST(SEAR_VERSION)
+
+AM_INIT_AUTOMAKE(sear, $SEAR_VERSION)
+
+dnl Test for C++ compiler
+
+dnl AC_PROG_CC
+AC_PROG_CXX
+
+dnl Need libtool
+
+AM_PROG_LIBTOOL
+dnl AC_PROG_LIBTOOL
+
+dnl FLAGS='-Wall -ansi -I/usr/X11R6/include -I/usr/include'
+CXXFLAGS='-Wall -I/usr/include -I/usr/X11R6/include -I/usr/include'
+LIBS='-L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib'
+
+AC_HEADER_STDC
+
+AC_ARG_ENABLE(debug,
+  [  --enable-debug	enable debug information [default=no]],
+  [
+  if test "$enableval" = "yes"; then
+dnl    FLAGS="$FLAGS -g"
+    CXXFLAGS="$CXXFLAGS -g -O -DDEBUG"
+  else
+    CXXFLAGS="$CXXFLAGS -O3 -DNDEBUG"
+  fi
+],[])
+
+dnl Check SDL
+SDL_VERSION=1.2.2
+AM_PATH_SDL($SDL_VERSION)
+CFLAGS="$CFLAGS $SDL_CFLAGS"
+CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SDL_CFLAGS"
+LIBS="$LIBS $SDL_LIBS"
+
+AC_LANG_CPLUSPLUS
+AC_REQUIRE_CPP
+AC_CHECK_HEADERS(sstream strstream, [ found_string_stream=yes break ],
+                                    [ found_string_stream=no ])
+if test $found_string_stream == no ; then 
+    AC_MSG_ERROR(Couldn't find C++ string <-> stream conversion method.)
+fi
+
+dnl Check Eris
+ERIS_VERSION=0.9.5
+AM_PATH_ERIS($ERIS_VERSION)
+CFLAGS="$CFLAGS $ERIS_CFLAGS"
+CPPFLAGS="$CPPFLAGS $ERIS_CFLAGS"
+CXXFLAGS="$CXXFLAGS $ERIS_CFLAGS"
+LIBS="$LIBS $ERIS_LIBS"
+
+dnl Check Atlas
+
+ATLAS_VERSION=0.4.4
+AM_PATH_ATLAS($ATLAS_VERSION)
+CFLAGS="$CFLAGS $ATLAS_CFLAGS"
+CPPFLAGS="$CPPFLAGS $ATLAS_CFLAGS"
+CXXFLAGS="$CXXFLAGS $ATLAS_CFLAGS"
+LIBS="$LIBS $ATLAS_LIBS"
+
+dnl Check WFMath
+
+WFMATH_VERSION=0.2.7
+AM_PATH_WFMATH($WFMATH_VERSION)
+CFLAGS="$CFLAGS $WFMATH_CFLAGS"
+CPPFLAGS="$CPPFLAGS $WFMATH_CFLAGS"
+CXXFLAGS="$CXXFLAGS $WFMATH_CFLAGS"
+LIBS="$LIBS $WFMATH_LIBS"
+
+dnl Check skstream
+
+SKSTREAM_VERSION=0.2.2
+AM_PATH_SKSTREAM($SKSTREAM_VERSION)
+CFLAGS="$CFLAGS $SKSTREAM_CFLAGS"
+CPPFLAGS="$CPPFLAGS $SKSTREAM_CFLAGS"
+CXXFLAGS="$CXXFLAGS $SKSTREAM_CFLAGS"
+LIBS="$LIBS $SKSTREAM_LIBS"
+
+if test $cross_compiling == yes; then
+  LIBS="$LIBS -lwsock32"
+fi
+
+dnl Check Sigc++
+
+AM_PATH_SIGC(1.0.3,[
+	CPPFLAGS="$CPPFLAGS $SIGC_CFLAGS"
+	LDFLAGS="$LDFLAGS $SIGC_LIBS"
+	],
+	AC_MSG_ERROR(Couldn't find libsigc++ config [or config failed])
+)
+
+dnl Check other libs
+
+if test $cross_compiling == no; then
+
+  AC_CHECK_LIB(SDL_image,IMG_Load)
+  AC_CHECK_LIB(GL,glViewport)
+  AC_CHECK_LIB(GLU,gluPerspective)
+  AC_CHECK_LIB(cal3d,main)
+
+else 
+  dnl Assuming lib file names
+  LIBS="$LIBS -lopengl32 -lglu32"
+
+  AC_CHECK_HEADER(cal3d/cal3d.h,
+	[found_cal3d=yes break],
+	[found_cal3d=no])
+
+  if test $found_cal3d == yes; then
+	LIBS="$LIBS -lcal3d"
+  else
+	AC_MSG_ERROR(Error could not find Atlas)
+  fi
+
+  AC_CHECK_HEADER(SDL/SDL_image.h,
+	[found_sdl_image=yes break],
+	[found_sdl_image=no])
+
+  if test $found_sdl_image == yes; then
+	LIBS="$LIBS -lSDL_image"
+  else
+	AC_MSG_ERROR(Error could not find SDL_image)
+  fi
+
+  AC_CHECK_HEADER(GL/gl.h,
+	[found_gl=yes break],
+	[found_gl=no])
+
+  if test $found_gl == yes; then
+	LIBS="$LIBS -lopengl32"
+  else
+	AC_MSG_ERROR(Error could not find OpenGL)
+  fi
+  AC_CHECK_HEADER(GL/glu.h,
+	[found_glu=yes break],
+	[found_glu=no])
+
+  if test $found_glu == yes; then
+  	LIBS="$LIBS -lglu32"
+  else
+  	AC_MSG_ERROR(Error could not find GLU)
+  fi
+fi
+
+if test "x$prefix" != xNONE; then
+    PREFIX=$prefix
+  else
+    PREFIX=$ac_default_prefix
+fi
+
+
+AC_DEFINE_UNQUOTED(INSTALLDIR,"$PREFIX")
+
+AC_CHECK_HEADERS(sstream strstream, [ found_string_stream=yes break ],
+                                    [ found_string_stream=no ])
+if test $found_string_stream == no ; then 
+    AC_MSG_ERROR(Couldn't find C++ string <-> stream conversion method.)
+fi
+
+dnl Generate files
+AC_OUTPUT([
+	Makefile
+	src/Makefile
+	sear.spec
+	data/bindings.cfg
+	data/general.cfg
+	data/models.cfg
+	data/object_file.cfg
+	scripts/login.script
+	scripts/startup.script
+	scripts/shutdown.script
+	Sear.iss
+])

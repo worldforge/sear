@@ -1,0 +1,61 @@
+
+[Setup]
+AppName=Sear
+AppVerName=Sear @SEAR_VERSION@
+AppPublisher=Simon Goodall
+AppPublisherURL=http://www.ecs.soton.ac.uk/~sg399/sear/
+AppSupportURL=http://www.ecs.soton.ac.uk/~sg399/sear/
+AppUpdatesURL=http://www.ecs.soton.ac.uk/~sg399/sear/
+DefaultDirName={pf}\Sear
+DefaultGroupName=Sear
+AllowNoIcons=yes
+InfoAfterFile=Readme.txt
+Uninstallable=yes
+UninstallFilesDir={app}\uninst
+UninstallDisplayName=Sear
+OutputBaseFilename=sear_win32_setup-@SEAR_VERSION@
+
+[Tasks]
+Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"
+Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescription: "Additional icons:"; Flags: unchecked
+
+[Files]
+Source: "sear.exe"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "bindings.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "shutdown.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "startup.script"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "general.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "textures.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "zlib.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "COPYING"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "AUTHORS"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "jpeg.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "libpng1.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "models.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "object_file.cfg"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "Readme.txt"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "SDL.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "SDL_image.dll"; DestDir: "{app}"; CopyMode: alwaysoverwrite
+Source: "data\*.png"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
+Source: "data\*.cal"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
+Source: "data\*.bmp"; DestDir: "{app}\data"; CopyMode: alwaysoverwrite
+Source: "textures\*.*"; DestDir: "{app}\textures"; CopyMode: alwaysoverwrite
+Source: "cal3d_data\cally\*.*"; DestDir: "{app}\cal3d_data\cally"; CopyMode: alwaysoverwrite
+Source: "cal3d_data\paladin\*.*"; DestDir: "{app}\cal3d_data\paladin"; CopyMode: alwaysoverwrite
+Source: "cal3d_data\skeleton\*.*"; DestDir: "{app}\cal3d_data\skeleton"; CopyMode: alwaysoverwrite
+
+[INI]
+Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.ecs.soton.ac.uk/~sg399/sear/"
+
+[Icons]
+Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; IconFilename: "{app}\data\sear_icon.bmp"
+Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\data\sear_icon.bmp"
+Name: "{group}\Uninstall Sear"; Filename: "{app}\uninst"
+Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: desktopicon; IconFilename: "{app}\data\sear_icon.bmp"
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.exe"; Tasks: quicklaunchicon; IconFilename:"{app}\data\sear_icon.bmp"
+
+[UninstallDelete]
+Type: files; Name: "{app}\sear.url"
+Type: files; Name: "{app}\Sear.atlas-recvlog"
+Type: files; Name: "{app}\Sear.atlas-sendlog"
+

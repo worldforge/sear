@@ -1,0 +1,48 @@
+%define name @PACKAGE@
+%define version @VERSION@
+%define release 1
+
+#define a default prefix??
+
+Summary: Sear - an 3D client for Worldforge
+Name: %{name}
+Version: %{version}
+Release: %{release}
+Source0: %{name}-%{version}.tar.gz
+URL: http://www.ecs.soton.ac.uk/~sg399/sear/index.html
+Copyright: GPL
+Group: Games
+BuildRoot: /var/tmp/%{name}-buildroot
+Prefix: %{_prefix}
+
+%description
+Sear is a client for MMORPGs using the Worldforge system. 
+
+written by Simon Goodall <sear@simongoodall.co.uk>
+
+
+%prep
+rm -rf ${RPM_BUILD_ROOT}
+
+%setup -q 
+
+%build
+CFLAGS="$RPM_OPT_FLAGS" 
+./autogen.sh --prefix=%{prefix}
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make install prefix=$RPM_BUILD_ROOT/%{prefix}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+#update to others can read???
+%defattr(-,root,root)
+%{prefix}/share/%{name}/*
+%{prefix}/bin/%{name}
+
+
+# end of file
