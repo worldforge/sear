@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Patch.h,v 1.4 2002-09-08 00:24:54 simon Exp $
+// $Id: Patch.h,v 1.5 2002-11-26 15:24:00 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 #ifndef SEAR_PATCH_H
@@ -84,7 +84,8 @@ public:
 
 //  static const int n = (const int)(log(25)/log(2));
 //  static const int rdepth = 2*n -1;
-  static const int array_size = 3 * 2 * (int)((200.0f / 8.0f) * (200.0f / 8.0f));
+  // TODO the 400 should not be of a fixed size!!
+  static const int array_size = 3 * 2 * (int)((400.0f / 8.0f) * (400.0f / 8.0f));
   int v_counter, n_counter, t_counter;
   float vertex_data[array_size][3];
   float normal_data[array_size][3];
