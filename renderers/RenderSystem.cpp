@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-#ifdef HAVE_CONFIG
+#ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 

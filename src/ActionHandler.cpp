@@ -2,9 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.12 2004-04-27 12:57:35 simon Exp $
+// $Id: ActionHandler.cpp,v 1.13 2004-04-27 15:07:02 simon Exp $
 
-#ifdef HAVE_CONFIG
+#ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 

@@ -1,8 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.34 2004-04-22 10:51:32 simon Exp $
+// $Id: Character.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <math.h>
 #include <string>
@@ -26,9 +30,6 @@
 #include "Render.h"
 #include "Graphics.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

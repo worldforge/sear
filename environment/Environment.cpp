@@ -2,10 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+
 #include "Environment.h"
 
 #include "TerrainRenderer.h"
 #include "SkyDome.h"
+
+                                                                                
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 namespace Sear {
 

@@ -1,9 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.6 2003-12-06 22:29:53 simon Exp $
+// $Id: FileHandler.cpp,v 1.7 2004-04-27 15:07:02 simon Exp $
 
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 #include <algorithm>
 
 #include <stdio.h>
@@ -11,9 +14,6 @@
 #include "FileHandler.h"
 #include "Console.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

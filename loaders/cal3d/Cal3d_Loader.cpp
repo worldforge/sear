@@ -1,8 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.8 2003-12-06 22:29:52 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.9 2004-04-27 15:07:02 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <varconf/Config.h>
 
@@ -13,11 +17,7 @@
 #include "Cal3d_Loader.h"
 #include "Cal3dModel.h"
 #include "CoreModelHandler.h"
-//#include "CoreModelHandler.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

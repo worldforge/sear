@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.21 2004-04-27 14:00:16 simon Exp $
+// $Id: TextureManager.cpp,v 1.22 2004-04-27 15:07:02 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "TextureManager.h"
 
@@ -28,9 +32,6 @@
 #include "default_image.xpm"
 #include "default_font.xpm"
 
-#ifdef HAVE_CONFIG
-#include "config.h"
-#endif
 
 #ifdef USE_MMGR
 #include "common/mmgr.h"

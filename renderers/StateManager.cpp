@@ -2,14 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.14 2004-04-27 12:57:35 simon Exp $
+// $Id: StateManager.cpp,v 1.15 2004-04-27 15:07:02 simon Exp $
 
 /*
  * TODO
  * custom of default settings
  * */
 
-#ifdef HAVE_CONFIG
+#ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 

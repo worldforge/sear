@@ -1,11 +1,15 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.6 2003-08-05 14:31:33 simon Exp $
+// $Id: Calendar.cpp,v 1.7 2004-04-27 15:07:02 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "Calendar.h"
 #include "common/Utility.h"
@@ -14,9 +18,6 @@
 #include "src/Console.h"
 #include "src/System.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

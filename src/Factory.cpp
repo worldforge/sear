@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.2 2004-04-06 11:57:59 simon Exp $
+// $Id: Factory.cpp,v 1.3 2004-04-27 15:07:02 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "Factory.h"
 
@@ -17,6 +21,9 @@
 #include "Graphics.h"
 #include "environment/Environment.h"
 
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 namespace Sear {
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Log.cpp,v 1.6 2003-03-06 23:50:37 simon Exp $
+// $Id: Log.cpp,v 1.7 2004-04-27 15:07:01 simon Exp $
 
 #include "Log.h"
 #include <iostream>
@@ -13,7 +13,7 @@
  * only included in debug mode
  */ 
 
-#ifdef HAVE_CONFIG
+#ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
 

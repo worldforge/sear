@@ -1,8 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.7 2003-12-03 11:08:18 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.8 2004-04-27 15:07:02 simon Exp $
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <varconf/Config.h>
 
@@ -12,9 +15,6 @@
 #include "Console.h"
 #include "ObjectRecord.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

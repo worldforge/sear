@@ -1,10 +1,17 @@
+27th April 2004, Simon Goodall
+ * Moved config.h checks to top of code file
+ * Fixed config_h #ifdef's
+ * Added missing copyright info
+ * Updated copyright info
+ * Fix wrong dates in changelog
+
 27th April 2004, Al Riddoch
  * Re-write code that handles model map, so that NULLs never get inserted.
 
 26th April 2004, Simon Goodall
  * Correctly backup default texture and font numbers during an invalidate call
 
-26th April 2004, Simon Goodall
+27th April 2004, Simon Goodall
  * Some fixes for texture manager
  * Re-ordering of init to fix some texture issues
 

@@ -1,10 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.34 2004-04-26 14:01:47 simon Exp $
+// $Id: ModelHandler.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
 
-//#include "config.h"
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "System.h"
 #include <set>
@@ -29,10 +31,6 @@
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 #include "Render.h"
-
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

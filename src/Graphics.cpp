@@ -1,13 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.43 2004-04-26 20:26:50 simon Exp $
-#include <sage/sage.h>
+// $Id: Graphics.cpp,v 1.44 2004-04-27 15:07:02 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <sage/sage.h>
 
 #include <varconf/Config.h>
 #include <Eris/Entity.h>

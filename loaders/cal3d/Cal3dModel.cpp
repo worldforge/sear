@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.10 2004-04-26 15:45:20 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.11 2004-04-27 15:07:02 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -15,10 +19,6 @@
 #include "src/Render.h"
 
 #include "renderers/RenderSystem.h"
-
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

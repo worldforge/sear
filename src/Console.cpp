@@ -1,8 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.29 2004-04-17 15:55:45 simon Exp $
+// $Id: Console.cpp,v 1.30 2004-04-27 15:07:02 simon Exp $
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "common/Utility.h"
 #include "common/Log.h"
@@ -15,9 +18,6 @@
 #include "FileHandler.h"
 
 #include "renderers/RenderSystem.h"
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

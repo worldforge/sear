@@ -1,8 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.12 2003-03-06 23:50:38 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.13 2004-04-27 15:07:01 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <varconf/Config.h>
 
@@ -15,9 +19,6 @@
 #include "3ds_Loader.h"
 #include "3ds.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

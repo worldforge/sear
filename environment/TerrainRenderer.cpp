@@ -2,6 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2003 Alistair Riddoch
 
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+
 #include "TerrainRenderer.h"
 
 #include <sage/GLU.h>
@@ -17,6 +21,10 @@
 #include <iostream>
 
 #include "renderers/RenderSystem.h"
+
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 namespace Sear {
 
@@ -329,7 +337,7 @@ TerrainRenderer::TerrainRenderer() :
         // if (++i >= (segSize + 1) - 1) { break; }
     }
     m_numLineIndeces = ++idx;
-
+    // TODO these are leaked
     m_terrain.addShader(new Mercator::FillShader());
     m_terrain.addShader(new Mercator::BandShader(-2.f, 1.5f)); // Sandy beach
     m_terrain.addShader(new Mercator::GrassShader(1.f, 27.f, .5f, 1.f)); // Grass

@@ -1,8 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.14 2004-04-22 10:51:32 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.15 2004-04-27 15:07:01 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <string>
 
@@ -17,10 +21,6 @@
 
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
-
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

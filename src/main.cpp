@@ -1,8 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.16 2004-04-26 16:01:35 simon Exp $
+// $Id: main.cpp,v 1.17 2004-04-27 15:07:02 simon Exp $
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <unistd.h>
 #include <iostream>
@@ -16,9 +19,6 @@
 #include "System.h"
 #include "Exception.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

@@ -1,8 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.56 2004-04-26 20:26:51 simon Exp $
+// $Id: client.cpp,v 1.57 2004-04-27 15:07:02 simon Exp $
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "System.h"
 
@@ -42,9 +45,6 @@
 #include "Exception.h"
 #include "WorldEntity.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

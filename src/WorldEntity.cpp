@@ -1,8 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.34 2004-04-22 10:51:33 simon Exp $
+// $Id: WorldEntity.cpp,v 1.35 2004-04-27 15:07:02 simon Exp $
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -24,9 +27,6 @@
 #include "environment/Environment.h"
 #include <set>
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

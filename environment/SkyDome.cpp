@@ -2,6 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 #include <math.h>
@@ -15,6 +19,10 @@
 #define SQR(X) ((X))
 
 #include "SkyDome.h"
+                                                                          
+#ifdef USE_MMGR
+  #include "common/mmgr.h"
+#endif
 
 #define VERTEX_COORDS { \
   -1.0f,  1.0f,  1.0f,  \
