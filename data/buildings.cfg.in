@@ -1,0 +1,161 @@
+object_type = yetown_inn_deco_agril_1_sw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = yetown_inn_deco_agril_2_sw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = tower_sst_grey_deco_1_xl_us
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = tent_1_brown_s
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = tent_round_1_green_xl_se_10_us
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = ruin_deco_1_se
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = farmhouse_deco_1
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_vacant_deco_1_se
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_vacant_deco_2_se
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_vacant_deco_1_sw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_itemshop_deco_agril_1_sesw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = mansion_grey_deco_1_sw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_farmstand_deco_agril_1_sesw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = house_deco_4
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = house_deco_3
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = house_deco_2
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = house_deco_1
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_metalshop_deco_agril_1_sesw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shop_fishshop_deco_agril_1_sesw
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = shack_deco_1
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = farmhouse_deco_2
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = farmhouse_deco_3
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
+object_type = house_deco_5
+model_type = wireframe
+state = wireframe
+select_state = select
+draw_self = true
+draw_members = true
+end_of_record
