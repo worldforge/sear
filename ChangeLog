@@ -1,4 +1,9 @@
 21st August 2002, Simon Goodall
+ * Added support to loop sound files
+ * Added ActionHandler events for walking running, and stopped
+ * Stationary cally models now in idle pose
+
+21st August 2002, Simon Goodall
  * ActionHandler events now fire for dawn, dusk day and night
 
 21st August 2002, Simon Goodall

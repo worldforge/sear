@@ -42,6 +42,7 @@ protected:
  
   static float _walk_blend[];
   static float _run_blend[];
+  static float _swagger_blend[];
   
 // constructors/destructor
 public:

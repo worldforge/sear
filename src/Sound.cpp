@@ -58,10 +58,20 @@ Mix_Music *Sound::getMusic(const std::string &file_name) {
   return NULL;
 }
 
-void Sound::playsound(const std::string &file_name) {
+void Sound::playSound(const std::string &file_name) {
   // load sample.wav in to sample
  Mix_Chunk *sample = getSample(file_name);
- Mix_PlayChannel(-1, sample, 0);
+ Mix_PlayChannel(1, sample, 0);
+}
+
+void Sound::playSoundLoop(const std::string &file_name) {
+  // load sample.wav in to sample
+ Mix_Chunk *sample = getSample(file_name);
+ Mix_PlayChannel(2, sample, -1);
+}
+
+void Sound::stopSoundLoop() {
+  Mix_HaltChannel(2);
 }
 
 void Sound::playMusic(const std::string &file_name) {
@@ -77,12 +87,16 @@ void Sound::stopMusic() {
 }
 void Sound::registerCommands(Console *console) {
   console->registerCommand(PLAY_SOUND, this);
+  console->registerCommand(PLAY_SOUND_LOOP, this);
+  console->registerCommand(STOP_SOUND_LOOP, this);
   console->registerCommand(PLAY_MUSIC, this);
   console->registerCommand(STOP_MUSIC, this);
 }
 
 void Sound::runCommand(const std::string &command, const std::string &args) {
-  if (command == PLAY_SOUND) playsound(args);
+  if (command == PLAY_SOUND) playSound(args);
+  else if (command == PLAY_SOUND_LOOP) playSoundLoop(args);
+  else if (command == STOP_SOUND_LOOP) stopSoundLoop();
   else if (command == PLAY_MUSIC) playMusic(args);
   else if (command == STOP_MUSIC) stopMusic();
 }

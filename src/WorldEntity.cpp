@@ -25,6 +25,19 @@ namespace Sear {
 int WorldEntity::string_size = WORLD_ENTITY_STRING_SIZE;
 int WorldEntity::message_life = WORLD_ENTITY_MESSAGE_LIFE;
 
+WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
+   Eris::Entity(ge, world),
+   time(0),
+   abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
+   abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
+   messages(std::list<message>()),
+   _op(NULL)
+{
+
+}
+
+WorldEntity::~WorldEntity() {}
+
 void WorldEntity::handleMove() {
   SetVelocity();
   WorldEntity *we = (WorldEntity*)getContainer();
@@ -39,7 +52,9 @@ void WorldEntity::handleMove() {
   Model *model = NULL;
   if (model_handler) model = model_handler->getModel(NULL, this);
   if (model) {
-    if (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()) >= 7.0f) model->action("run");
+    float vel =  (SQR(_velocity.x()) + SQR(_velocity.y()) + SQR(_velocity.z()));
+    if (vel >= 7.0f) model->action("run");
+    else if (vel == 0.0f) model->action("idle");
     else model->action("walk");
   }
 }
@@ -58,14 +73,13 @@ void WorldEntity::renderMessages() {
   std::list<std::string> mesgs = std::list<std::string>();
   std::list<screenMessage>::reverse_iterator I;
   for (I = messages.rbegin(); I != messages.rend(); I++) {
-	  const std::string str = (const std::string)((*I).first);
-	  std::list<std::string> message_list = std::list<std::string>();
-	  unsigned int pos = 0;
-	  while (pos < str.length()) {
-		    message_list.push_back( std::string(str, pos, pos + string_size));
-		      pos+=string_size;
-	  }
-
+    const std::string str = (const std::string)((*I).first);
+    std::list<std::string> message_list = std::list<std::string>();
+    unsigned int pos = 0;
+    while (pos < str.length()) {
+      message_list.push_back( std::string(str, pos, pos + string_size));
+      pos+=string_size;
+    }
 
 
 /*
@@ -185,7 +199,7 @@ std::string WorldEntity::type() {
 std::string WorldEntity::parent() {
   Eris::TypeInfo *ti = getType();
   if (ti) {
-	  return *ti->getParentsAsSet().begin();
+    return *ti->getParentsAsSet().begin();
   }
   return "";
 }

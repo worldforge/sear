@@ -106,6 +106,20 @@ void Character::updateLocals(bool send_to_server) {
     Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
     return;
   }
+  static ActionHandler *ac = System::instance()->getActionHandler();
+  static float old_speed = _speed;
+  static bool old_run = _run_modifier;
+  if (old_speed != _speed || old_run != _run_modifier) {
+    if (_speed ==  0.0f) {
+      ac->handleAction("stopped", NULL);
+    } else if (_run_modifier) {
+      ac->handleAction("running", NULL);
+    } else {
+      ac->handleAction("walking", NULL);
+    }
+    old_speed = _speed;
+    old_run = _run_modifier;
+  }
   ticks = SDL_GetTicks();
   angle = deg_to_rad(_rate * ((ticks - _time) / 1000.0f));
   _angle += angle;

@@ -25,6 +25,7 @@ Model *Cal3d_Loader::loadModel(Render *render, ModelStruct &ms) {
     delete (model);
     return NULL;
   }
+  model->action("idle");
   return model;
 }
 

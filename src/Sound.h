@@ -26,7 +26,10 @@ public:
   Mix_Chunk *getSample(const std::string &file_name);
   Mix_Music *getMusic(const std::string &file_name);
 
-  void playsound(const std::string &);
+  void playSound(const std::string &);
+  void playSoundLoop(const std::string &);
+  void stopSoundLoop();
+  
   void playMusic(const std::string &);
   void stopMusic();
   
@@ -34,6 +37,8 @@ public:
   void runCommand(const std::string &command, const std::string &args);
 private:
   static const char * const PLAY_SOUND = "play_sound";
+  static const char * const PLAY_SOUND_LOOP = "play_sound_loop";
+  static const char * const STOP_SOUND_LOOP = "stop_sound_loop";
   static const char * const PLAY_MUSIC = "play_music";
   static const char * const STOP_MUSIC = "stop_music";
   std::map<std::string, Mix_Chunk*> sound_map;

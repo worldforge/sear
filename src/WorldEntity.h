@@ -22,16 +22,8 @@ static const unsigned int WORLD_ENTITY_STRING_SIZE = 40;
 
 class WorldEntity : public Eris::Entity {
 public:
-// TODO: move code to .cpp file
- WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
-   Eris::Entity(ge, world),
-   time(0),
-   abs_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
-   abs_pos(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
-   messages(std::list<message>()),
-   _op(NULL)
-   {}
-  ~WorldEntity() {}
+ WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world);
+  ~WorldEntity();
   void SetVelocity();
   WFMath::Point<3> GetPos(); 
   void handleMove();

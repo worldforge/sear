@@ -25,8 +25,9 @@ const int Cal3d::STATE_IDLE = 0;
 const int Cal3d::STATE_FANCY = 1;
 const int Cal3d::STATE_MOTION = 2;
 
-float Cal3d::_walk_blend[] = {0.8, 0.2, 0.0};
+float Cal3d::_walk_blend[] = {1.0, 0.0, 0.0};
 float Cal3d::_run_blend[] = {0.0, 0.0, 1.0};
+float Cal3d::_swagger_blend[] = {0.0, 1.0, 0.0};
 
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
@@ -591,10 +592,10 @@ void Cal3d::setState(int state, float delay)
 }
 
 void Cal3d::action(const std::string &action) {
-//  if (action == "idle") {
+  if (action == "idle") {
+    setState(STATE_IDLE, 0);
 //    setMotionBlend((float *)&_idle_blend[0], 0);
-//  } else
-	  if (action == "walk") {
+  } else if (action == "walk") {
     setMotionBlend((float *)&_walk_blend[0], 0);
   } else if (action == "run") {
     setMotionBlend((float *)&_run_blend[0], 0);
