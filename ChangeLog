@@ -1,3 +1,7 @@
+19th August 2002, Simon GoodalL
+ * Model Viewer now updates in real-time instead of a fixed value
+ * Better mouse interface for model viewer
+
 19th August 2002, Simon Goodall
  * Fixed error message "Not connected" when trying to login when already logged in
  * Model viewer now allows actions to be performed. Use number keys 1 through 4.  1 - Walk

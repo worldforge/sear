@@ -45,8 +45,11 @@
 
 Sear::Model *model = NULL;
 Sear::Render *render = NULL;
+Sear::System *sys = NULL;
 
 bool _system_running = true;
+float x_angle = 0.0f;
+float y_angle = 0.0f;
 
 Sear::ObjectProperties *op = NULL;
 
@@ -80,12 +83,13 @@ void reshape(int width, int height) {
 }
 
 void idle() {
-  model->update(0.005f);
+  static unsigned int last_time = 0;
+  float time = (((float)(sys->getTime() - last_time)) / 1000.0f);
+  model->update(time);
+  last_time = sys->getTime();
 }
 
 void handleEvents(const SDL_Event &event) {
-  static int old_x = -1;
-  static int old_y = -1;
   static bool mouse_down = false;
   switch (event.type) {
     case SDL_KEYDOWN: {
@@ -112,21 +116,10 @@ void handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONUP: mouse_down = false; break;
     case SDL_MOUSEMOTION: {
       if (!mouse_down) break;
-      int x = event.button.x;
-      int y = event.button.y;
-      if (old_x == -1) { // then its the first time
-        old_x = x;
-        old_y = y;
-        break;
-      }
-      int diff_x = old_x - x;
-      int diff_y = old_y - y;
-
-      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), (float)diff_x / 5.0f);
-      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), (float)diff_y / 5.0f);
-  
-      old_x = x;
-      old_y = y;
+      x_angle += (float)event.motion.xrel / 5.0f;
+      y_angle += (float)event.motion.yrel / 5.0f;
+//      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), (float)event.motion.xrel / 5.0f);
+//      q /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 1.0f, 0.0f), (float)event.motion.yrel / 5.0f);
       break;
     }			  
   }
@@ -161,9 +154,12 @@ void display() {
   glDisable(GL_FOG);
   glDisable(GL_LIGHTING);
   glColor3f(1.0f, 1.0f, 1.0f);
-     float rotation_matrix[4][4];
-     Sear::QuatToMatrix(q, rotation_matrix); //Get the rotation matrix for base rotation
-     glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+
+  glRotatef(y_angle, 1.0f, 0.0f, 0.0f);
+  glRotatef(x_angle, 0.0f, 0.0f, 1.0f);
+//     float rotation_matrix[4][4];
+//     Sear::QuatToMatrix(q, rotation_matrix); //Get the rotation matrix for base rotation
+//     glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
   glPushMatrix();
   
   if(op && op->scale) glScalef(op->scale, op->scale, op->scale); 
@@ -196,11 +192,11 @@ int main(int argc, char** argv) {
 
     exit(1);
   }
-  Sear::System *system = new Sear::System();
-  system->init();
-  system->createWindow(false);
-  render = system->getGraphics()->getRender();
-  Sear::ModelHandler *mh = system->getModelHandler();
+  sys = new Sear::System();
+  sys->init();
+  sys->createWindow(false);
+  render = sys->getGraphics()->getRender();
+  Sear::ModelHandler *mh = sys->getModelHandler();
   op = (Sear::ObjectProperties*)malloc(sizeof(Sear::ObjectProperties));
   model = mh->getModel(render, type, op);
             SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -218,10 +214,10 @@ int main(int argc, char** argv) {
     delete mh;
     mh = NULL;
   }
-  if (system) {
-    system->shutdown();
-    delete system;
-    system = NULL;
+  if (sys) {
+    sys->shutdown();
+    delete sys;
+    sys = NULL;
   }
   
 }
