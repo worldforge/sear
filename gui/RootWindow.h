@@ -15,6 +15,8 @@ class RootWindow : public Window {
 public:
   RootWindow();
   virtual ~RootWindow();
+
+  virtual void render(Render *);
 };
 
 } // namespace Sear

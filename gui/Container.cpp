@@ -3,3 +3,15 @@
 // Copyright (C) 2004 Alistair Riddoch
 
 #include "gui/Container.h"
+
+namespace Sear {
+
+Container::Container()
+{
+}
+
+Container::~Container()
+{
+}
+
+} // namespace Sear

@@ -9,12 +9,16 @@
 
 namespace Sear {
 
+class Render;
+
 /// Low level class defining any area of the screen in which we might be
 /// interested
 class Window {
 protected:
   Window * m_parent;
   std::set<Window *> m_children;
+  short m_x, m_y;
+  short m_w, m_h;
 
   Window();
 
@@ -24,6 +28,10 @@ private:
   const Window & operator=(const Window &);
 public:
   virtual ~Window();
+
+  virtual void render(Render *) = 0;
+  
+  void addChild(Window *);
 };
 
 } // namespace Sear

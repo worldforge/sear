@@ -1,3 +1,24 @@
+2004-06-03  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Window.h, gui/Window.cpp: Add coords and size, adding children,
+	  and the render interface which allows us to render windows
+	  as a hierarchy.
+
+	* gui/RootWindow.h, gui/RootWindow.cpp: Implement render to
+	  iterate over children.
+
+	* gui/Frame.h, gui/Frame.cpp: Fix render interface to comply with
+	  base class, and draw based on window coords.
+
+	* gui/Container.h, gui/Container.cpp: Remove render interface, as
+	  this widget type is not rendered. Implement constructor and
+	  destructor.
+
+	* gui/Workspace.h, gui/Workspace.cpp: Make workspace
+	  a container, so it can hold top level widgets. Implement
+	  rendering the rootwindow when draw is called. Add a demo
+	  widget.
+
 2004-06-02  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Workspace.cpp: Fix test gui drawing code, and make it use

@@ -19,7 +19,7 @@ public:
   Frame();
   virtual ~Frame();
 
-  void render();
+  virtual void render(Render *);
 };
 
 } // namespace Sear

@@ -25,8 +25,6 @@ private:
   const Container & operator=(const Container &);
 public:
   virtual ~Container();
-
-  virtual void render() = 0;
 };
 
 } // namespace Sear

@@ -12,4 +12,10 @@ Window::Window() : m_parent(0) {
 Window::~Window() {
 }
 
+void Window::addChild(Window * w)
+{
+    m_children.insert(w);
+    w->m_parent = this;
+}
+
 } // namespace Sear

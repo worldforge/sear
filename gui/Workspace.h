@@ -5,14 +5,14 @@
 #ifndef SEAR_GUI_WORKSPACE_H
 #define SEAR_GUI_WORKSPACE_H
 
-#include "gui/Widget.h"
+#include "gui/Container.h"
 
 namespace Sear {
 
 class RootWindow;
 class System;
 
-class Workspace : public Widget {
+class Workspace : public Container {
 protected:
   System * m_system;
   RootWindow * m_rootWindow;

@@ -5,10 +5,12 @@
 #include "gui/Workspace.h"
 
 #include "gui/RootWindow.h"
+#include "gui/Frame.h"
 
 #include "src/System.h"
 #include "src/Graphics.h"
 #include "src/Render.h"
+
 #include "renderers/RenderSystem.h"
 
 #include <sage/sage.h>
@@ -21,6 +23,9 @@ static const std::string WORKSPACE = "workspace";
 Workspace::Workspace(System * system) : m_system(system),
                                         m_rootWindow(new RootWindow())
 {
+    Frame * f = new Frame();
+
+    m_rootWindow->addChild(f);
 }
 
 Workspace::~Workspace()
@@ -34,15 +39,22 @@ void Workspace::draw()
   renderer->setViewMode(ORTHOGRAPHIC);
 
   glEnableClientState(GL_VERTEX_ARRAY);
+  glLineWidth(1.0f);
 
-  const GLshort coords[] = {300, 300, 300, 400, 400, 400, 400, 300};
-  glVertexPointer(2, GL_SHORT, 0, &coords[0]);
+#if 0
+  static const GLshort coords[] = {300, 300, 300, 400, 400, 400, 400, 300};
+  static const GLushort line_i[] = {0, 1, 2, 3, 0};
+  glVertexPointer(2, GL_SHORT, 0, coords);
 
   renderer->setColour(1.0f, 1.0f, 1.0f, 0.5f);
   glDrawArrays(GL_QUADS, 0, 4);
 
   renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);
-  glDrawArrays(GL_LINES, 0, 4);
+  glDrawElements(GL_LINE_STRIP, 5, GL_UNSIGNED_SHORT, line_i);
+#endif
+
+  // Render the gui recursively
+  m_rootWindow->render(renderer);
 
   glDisableClientState(GL_VERTEX_ARRAY);
 
