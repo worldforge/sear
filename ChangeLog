@@ -1,4 +1,8 @@
-2004-10-19  Al Riddoch  <alriddoch@zepler.org>
+2004-10-27  Al Riddoch  <alriddoch@zepler.org>
+
+	* gui/Window.cpp: Remove some excessive verbose debug output.
+
+2004-10-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* gui/Box.cpp, gui/Box.h, gui/Button.cpp, gui/Button.h,
 	  gui/Container.cpp, gui/Container.h, gui/Label.cpp, gui/Label.h,

@@ -45,9 +45,6 @@ void Window::setEvents(unsigned int ev)
 
 void Window::mouseMotion(short x, short y, short ox, short oy)
 {
-  if (m_parent != 0) {
-    std::cout << "CHILD " << x << " " << y << std::endl << std::flush;
-  }
   std::set<Window *>::const_iterator I = m_children.begin();
   for(; I != m_children.end(); ++I) {
     Window & w = **I;
@@ -61,12 +58,10 @@ void Window::mouseMotion(short x, short y, short ox, short oy)
     }
   }
   if (x < 0 || y < 0 || x >= m_w || y >= m_h) {
-    std::cout << "EXIT" << std::endl << std::flush;
     if (m_eventMask & MOUSE_LEAVE) {
       MouseLeave.emit();
     }
   } else if (ox < 0 || oy < 0 || ox >= m_w || oy >= m_h) {
-    std::cout << "ENTER" << std::endl << std::flush;
     if (m_eventMask & MOUSE_ENTER) {
       MouseEnter.emit();
     }
@@ -75,9 +70,6 @@ void Window::mouseMotion(short x, short y, short ox, short oy)
 
 void Window::mouseDown(short x, short y)
 {
-  if (m_parent != 0) {
-    std::cout << "CHILD B " << x << " " << y << std::endl << std::flush;
-  }
   std::set<Window *>::const_iterator I = m_children.begin();
   for(; I != m_children.end(); ++I) {
     Window & w = **I;
@@ -96,9 +88,6 @@ void Window::mouseDown(short x, short y)
 
 void Window::mouseUp(short x, short y)
 {
-  if (m_parent != 0) {
-    std::cout << "CHILD U " << x << " " << y << std::endl << std::flush;
-  }
   std::set<Window *>::const_iterator I = m_children.begin();
   for(; I != m_children.end(); ++I) {
     Window & w = **I;
