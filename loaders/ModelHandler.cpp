@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: ModelHandler.cpp,v 1.2 2005-01-09 18:28:11 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -52,11 +52,11 @@ ModelHandler::ModelHandler() :
 {
   // TODO: this is not the place
   // create all the model loaders
-//  new Cal3d_Loader(this);
+  new Cal3d_Loader(this);
   new BoundBox_Loader(this);
-//  new WireFrame_Loader(this);
-//  new NPlane_Loader(this);
-//  new ThreeDS_Loader(this);
+  new WireFrame_Loader(this);
+  new NPlane_Loader(this);
+  new ThreeDS_Loader(this);
 }
 
 ModelHandler::~ModelHandler() {

@@ -1,5 +1,9 @@
 2005-01-09  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelHandler.cpp: Add loaders that were mistakenly removed
+
+2005-01-09  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/CacheManager.cpp, src/CacheManager.h, src/CacheObject.cpp,
 	  src/CacheObject.h, src/Makefile.am: Add initial code for a Cache 
 	  Manager. Aim is that we can convert 3D objects to an internal format
