@@ -507,7 +507,7 @@ SDL_Surface *System::loadImage(const  std::string &filename) {
   Uint8 *rowhi, *rowlo;
   Uint8 *tmpbuf /*, tmpch*/;
   SDL_Surface *image;
-  int i,/* j*/;
+  int i/*, j*/;
   image = IMG_Load(filename.c_str());
   if ( image == NULL ) { 
     Log::writeLog(std::string("Unable to load ") + filename + std::string(": ") + string_fmt( SDL_GetError()), Log::LOG_ERROR);
