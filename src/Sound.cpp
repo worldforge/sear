@@ -3,7 +3,9 @@
 #include "Console.h"
 #include "common/Log.h"
 
-// $Id: Sound.cpp,v 1.12 2003-12-06 22:29:53 simon Exp $
+#include <unistd.h>
+
+// $Id: Sound.cpp,v 1.13 2004-02-25 11:53:57 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 

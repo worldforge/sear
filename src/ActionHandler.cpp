@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.10 2003-12-06 22:29:53 simon Exp $
+// $Id: ActionHandler.cpp,v 1.11 2004-02-25 11:53:57 simon Exp $
 
 #include "ActionHandler.h"
 
@@ -13,6 +13,8 @@
 #include "src/Console.h"
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"
+
+#include <unistd.h>
 
 #ifdef HAVE_CONFIG
   #include "config.h"
