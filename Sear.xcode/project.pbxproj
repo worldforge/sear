@@ -5,6 +5,20 @@
 	};
 	objectVersion = 39;
 	objects = {
+		C40284C60677863A0092793F = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = event.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C40284C70677863A0092793F = {
+			fileRef = C40284C60677863A0092793F;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		C40A910B06384C6D008E410D = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -21,6 +35,7 @@
 		};
 		C42B56B5063C666200EF8361 = {
 			children = (
+				C40284C60677863A0092793F,
 				C4A1C1FD0673A025005A6D40,
 				C4A1C1FE0673A025005A6D40,
 				C46B3EA10664EDC60096C26A,
@@ -660,18 +675,6 @@
 			settings = {
 			};
 		};
-		C48C8C3A0664E60E0065C287 = {
-			fileRef = C48C8C300664E60E0065C287;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		C48C8C3B0664E60E0065C287 = {
-			fileRef = C48C8C310664E60E0065C287;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		C48C8C3C0664E60E0065C287 = {
 			fileRef = C48C8C320664E60E0065C287;
 			isa = PBXBuildFile;
@@ -692,18 +695,6 @@
 		};
 		C48C8C3F0664E60E0065C287 = {
 			fileRef = C48C8C350664E60E0065C287;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		C48C8C400664E60E0065C287 = {
-			fileRef = C48C8C360664E60E0065C287;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		C48C8C410664E60E0065C287 = {
-			fileRef = C48C8C370664E60E0065C287;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -817,8 +808,7 @@
 			buildRules = (
 			);
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				COPY_PHASE_STRIP = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = "NDEBUG=1 $(value)";
 			};
 			isa = PBXBuildStyle;
@@ -915,15 +905,14 @@
 				C48ED2C506575D7F00248B2D,
 				C42B5A67065C1DAF0081425B,
 				C48C8C390664E60E0065C287,
-				C48C8C3B0664E60E0065C287,
 				C48C8C3D0664E60E0065C287,
 				C48C8C3F0664E60E0065C287,
-				C48C8C410664E60E0065C287,
 				C48C8C430664E61C0065C287,
 				C46B3EA40664EDC60096C26A,
 				C44D98930669D4F50006A176,
 				C448D28A066FCD6600E53100,
 				C4A1C2000673A025005A6D40,
+				C40284C70677863A0092793F,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -983,10 +972,8 @@
 				C48ED2C406575D7F00248B2D,
 				C42B5A66065C1DAF0081425B,
 				C48C8C380664E60E0065C287,
-				C48C8C3A0664E60E0065C287,
 				C48C8C3C0664E60E0065C287,
 				C48C8C3E0664E60E0065C287,
-				C48C8C400664E60E0065C287,
 				C46B3EA30664EDC60096C26A,
 				C44D98950669D6310006A176,
 				C448D287066FC45200E53100,
@@ -1031,6 +1018,8 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "../../libs/sage/build ../../libs/Atlas-C++_transitional/build ../../libs/varconf/build ../../libs/wfmath/build ../../libs/skstream/build ../../libs/eris_transitional/build ../../libs/mercator/build";
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 2;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = "\"VERSION=\\\"0.6.0\\\"\"";
