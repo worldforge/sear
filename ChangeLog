@@ -1,4 +1,7 @@
 17th May 2004, Simon Goodall
+ * Fix default calendar start time
+
+17th May 2004, Simon Goodall
  * Fix bug in sky dome where only a quarter of it was rendered
 
 17th May 2004, Simon Goodall
