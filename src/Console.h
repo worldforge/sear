@@ -6,7 +6,7 @@
 #define _CONSOLE_H_ 1
 
 //#include <stdlib.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <string>
 #include <list>
 #include <map>

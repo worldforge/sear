@@ -5,10 +5,10 @@
 #ifndef _SYSTEM_H_
 #define _SYSTEM_H_ 1
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
 #include <string>
 #include <list>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
 #include "ConsoleObject.h"
 
 namespace Sear {

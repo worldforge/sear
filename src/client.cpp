@@ -3,6 +3,7 @@
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
 
+#include "System.h"
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
 #include <Eris/Lobby.h>
@@ -22,7 +23,6 @@
 #include "Factory.h"
 #include "Character.h"
 
-#include "System.h"
 #include "EventHandler.h"
 #include "Event.h"
 #include "Render.h"
@@ -32,7 +32,6 @@
 #include "Exception.h"
 
 #include "Utility.h"
-
 #ifdef DEBUG
   #define DEBUG_ERIS 1
   #define ERIS_LOG_LEVEL 1

@@ -9,10 +9,10 @@
 #include <string>
 #include <map>
 
-#define OBJECT_LOADER_MAX_SIZE (128)
 
 namespace Sear {
-
+  static const unsigned int OBJECT_LOADER_MAX_SIZE = 128;
+	
 typedef struct {
   float ambient[4];
   float diffuse[4];

@@ -2,11 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#include "Frustum.h"
-
+#include "System.h"
 #include "Terrain.h"
 #include "WorldEntity.h"
 #include "Utility.h"
+#include "Frustum.h"
 
 namespace Sear {
 
@@ -189,5 +189,6 @@ bool Frustum::sphereInFrustum(float frustum[6][4], WorldEntity *we, Terrain *ter
       return false;
     return true;
 }
+
 
 } /* namespace Sear */

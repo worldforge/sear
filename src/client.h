@@ -5,8 +5,6 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_ 1
 
-#include <list>
-#include <map>
 #include <string>
 
 #include <Eris/Connection.h>

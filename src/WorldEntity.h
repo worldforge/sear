@@ -5,18 +5,19 @@
 #ifndef _WORLDENTITY_H_
 #define _WORLDENTITY_H_ 1
 
+#include <string>
+#include <list>
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
 
 #include "ObjectLoader.h"
 
-#define WORLD_ENTITY_MESSAGE_LIFE (5000)
-#define WORLD_ENTITY_STRING_SIZE  (40)
-
 namespace Sear {
 
 typedef std::pair<std::string, unsigned int> message;
+static const unsigned int WORLD_ENTITY_MESSAGE_LIFE = 5000;
+static const unsigned int WORLD_ENTITY_STRING_SIZE = 40;
 
 class WorldEntity : public Eris::Entity {
 public:
