@@ -218,7 +218,7 @@ PKG_CHECK_MODULES(VARCONF, varconf-0.5 >= $VARCONF_VERSION,
 			LIBS="$LIBS $VARCONF_LIBS"
 			 ],
 			AC_MSG_ERROR(Couldn't find VarConf or wrong version found. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/varconf and get at least version $VARCONF_VERSION)
-#		)
+		)
 	])
 AC_SUBST($VARCONF_VERSION)
 
