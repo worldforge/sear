@@ -162,7 +162,7 @@ static GLfloat _halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
 static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
 static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
+//static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
 static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
@@ -256,11 +256,6 @@ void GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
 //  if (value < 1) _general.setItem("render_options", "use_stencil_buffer", false);
 
-//  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
-//  SDL_WM_SetIcon(_icon, NULL);
-//  if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
-//  if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP);
-//  if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
                                                                                 
     std::string vendor = string_fmt(glGetString(GL_VENDOR));
     std::string renderer = string_fmt(glGetString(GL_RENDERER));

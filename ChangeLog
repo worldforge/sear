@@ -1,6 +1,8 @@
-2004-05-02 James Turner <james@worldforge.org>
+6th May 2004, Simon Goodall
+ * Fix cursors
 
-* Remove processHome from System. The functionality can be re-added
+2004-05-02 James Turner <james@worldforge.org>
+ * Remove processHome from System. The functionality can be re-added
   by modifying FileHandler::expandString if desired.
 
 29th April 2004, Simon Goodall

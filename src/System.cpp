@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.83 2004-05-02 14:17:20 jmt Exp $
+// $Id: System.cpp,v 1.84 2004-05-06 18:32:50 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -246,6 +246,13 @@ bool System::init() {
   _command_history_iterator = _command_history.begin();
 
   RenderSystem::getInstance().createWindow(_width, _height, false);
+
+  if (!_icon) _icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+  SDL_WM_SetIcon(_icon, NULL);
+  if (!_cursor_default) _cursor_default = buildCursor(CURSOR_DEFAULT);
+  if (!_cursor_pickup)  _cursor_pickup = buildCursor(CURSOR_PICKUP);
+  if (!_cursor_touch)   _cursor_touch = buildCursor(CURSOR_TOUCH);
+
   RenderSystem::getInstance().initContext();
 
   _system_running = true;
