@@ -13,6 +13,7 @@ sear_LDADD = \
 	../renderers/libRendererGL.a \
 	../terrain/libTerrainROAM.a \
 	../sky/libSkyBox.a \
+	../gui/libGui.a \
 	../loaders/libLoaderWireFrame.a \
 	../loaders/libLoaderBoundBox.a \
 	../loaders/libLoaderNPlane.a \
@@ -75,4 +76,6 @@ libSear_a_SOURCES = \
 	ObjectRecord.h \
 	ModelRecord.h \
 	ObjectHandler.h \
-	ObjectHandler.cpp
+	ObjectHandler.cpp \
+	ScriptEngine.cpp \
+	ScriptEngine.h

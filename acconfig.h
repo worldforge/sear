@@ -3,6 +3,6 @@
 
 #undef INSTALLDIR
 #undef NEEDS_SSTREAM_WORKAROUND
-
+#undef HAVE_GLGOOEY
 
 #endif

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.cpp,v 1.10 2002-09-26 20:23:03 simon Exp $
+// $Id: Event.cpp,v 1.11 2002-10-20 13:22:26 simon Exp $
 
 #include "System.h"
 #include <string>
@@ -40,7 +40,11 @@ Event::Event(const std::string ef, const std::string target, const std::string e
  _time = atoi(time.c_str());
  if (_ec == EC_TIME) _time += System::instance()->getTime(); 
 }
-  
+ 
+Event::~Event() {
+
+}
+
 void Event::doEvent() {
   switch (_ef) {
     case (EF_UNKNOWN): {

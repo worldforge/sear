@@ -1,264 +1,284 @@
-state = terrain
-alpha_test = false
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = true
-cull_face_cw = true
-stencil = false
-fog = true
-end_of_state
-state = water
-alpha_test = false
-blend = true
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = true
-cull_face_cw = true
-stencil = false
-fog = true
-end_of_state
-state = wireframe
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-end_of_state
-state = character
-alpha_test = false
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-rescale_normals = true
-end_of_state
-state = character_no_texture
-alpha_test = false
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-rescale_normals = true
-end_of_state
-state = boundbox
-alpha_test = false
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = true
-cull_face_cw = true
-stencil = false
-fog = true
-end_of_state
-state = billboard
-alpha_test = true
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = true
-cull_face_cw = false
-stencil = false
-fog = true
-end_of_state
-state = font
-alpha_test = true
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = panel
-alpha_test = false
-blend = true
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = halo
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-end_of_state
-state = 3ds
-alpha_test = true
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-rescale_normals = true
-end_of_state
-state = splash
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = select
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = select_billboard
-alpha_test = true
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = sky_0
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = sky_1
-alpha_test = false
-blend = true
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = false
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = default
-alpha_test = false
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
-state = 3ds_no_texture
-alpha_test = true
-blend = false
-lighting = true
-two_sided_lighting = false
-textures = false
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-rescale_normals = true
-end_of_state
-state = slice
-alpha_test = true
-blend = true
-lighting = true
-two_sided_lighting = true
-textures = true
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = true
-end_of_state
-state = slice_select
-alpha_test = true
-blend = false
-lighting = false
-two_sided_lighting = false
-textures = true
-colour_material = false
-depth_test = true
-cull_face = false
-cull_face_cw = false
-stencil = false
-fog = false
-end_of_state
+
+[terrain]
+
+alpha_test = "false"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "true"
+cull_face_cw = "true"
+stencil = "false"
+fog = "true"
+
+[water]
+
+alpha_test = "false"
+blend = "true"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "true"
+cull_face_cw = "true"
+stencil = "false"
+fog = "true"
+
+[wireframe]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+
+[character]
+
+alpha_test = "false"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+rescale_normals = "true"
+
+[character_no_texture]
+
+alpha_test = "false"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+rescale_normals = "true"
+
+[boundbox]
+
+alpha_test = "false"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "true"
+cull_face_cw = "true"
+stencil = "false"
+fog = "true"
+
+[billboard]
+
+alpha_test = "true"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "true"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+
+[font]
+
+alpha_test = "true"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "false"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[panel]
+
+alpha_test = "false"
+blend = "true"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "false"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[halo]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+
+[3ds]
+
+alpha_test = "true"
+blend = "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+rescale_normals = "true"
+
+[splash]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "false"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[select]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[select_billboard]
+
+alpha_test = "true"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[sky_0]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "false"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[sky_1]
+
+alpha_test = "false"
+blend = "true"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "false"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[default]
+
+alpha_test = "false"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"
+
+[3ds_no_texture]
+
+alpha_test = "true"
+blend =  "false"
+lighting = "true"
+two_sided_lighting = "false"
+textures = "false"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+rescale_normals = "true"
+
+[slice]
+
+alpha_test = "true"
+blend = "true"
+lighting = "true"
+two_sided_lighting = "true"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "true"
+
+[slice_select]
+
+alpha_test = "true"
+blend = "false"
+lighting = "false"
+two_sided_lighting = "false"
+textures = "true"
+colour_material = "false"
+depth_test = "true"
+cull_face = "false"
+cull_face_cw = "false"
+stencil = "false"
+fog = "false"

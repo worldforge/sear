@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.31 2002-09-26 17:17:46 simon Exp $
+// $Id: client.cpp,v 1.32 2002-10-20 13:22:26 simon Exp $
 
 #include "System.h"
 
@@ -37,6 +37,8 @@
 #include "Model.h"
 #include "Exception.h"
 #include "WorldEntity.h"
+
+#include "gui/ServerGui.h"
 
 #ifdef DEBUG
   #define DEBUG_ERIS 1
@@ -720,6 +722,7 @@ void Client::receivedServerInfo(Eris::ServerInfo sInfo) {
   << " Ping: "<< sInfo.getPing()
   << " Uptime: "<< sInfo.getUptime()
   << std::endl;
+  System::instance()->getGraphics()->sg->addServer(sInfo);
 }
 
 void Client::completedServerList() {

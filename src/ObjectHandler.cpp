@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.1 2002-09-26 17:17:46 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.2 2002-10-20 13:22:26 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -83,6 +83,9 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
   // If record does not exist, create it.
   if (!record) {
     record = new ObjectRecord();
+    record->name = section;
+    record->draw_self = true;
+    record->draw_members = true;
     _object_records[section] = record;
     Log::writeLog(std::string("Adding ObjectRecord: ") + section, Log::LOG_INFO);
   }

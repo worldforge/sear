@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Event.h,v 1.4 2002-09-26 20:23:03 simon Exp $
+// $Id: Event.h,v 1.5 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_EVENT_H
 #define SEAR_EVENT_H 1
@@ -34,6 +34,9 @@ public:
   Event();
   Event(EventFunction, void*, EventCondition, unsigned int);
   Event(const std::string, const std::string, const std::string, const std::string);
+
+  ~Event();
+  
   void doEvent();
   bool checkFireCondition();
   static char *stringToObject(const std::string &msg);

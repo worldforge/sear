@@ -2,20 +2,25 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: StateLoader.h,v 1.5 2002-09-08 00:24:53 simon Exp $
+// $Id: StateLoader.h,v 1.6 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_STATELOADER_H
 #define SEAR_STATELOADER_H 1
 
 #include <string>
-#include <stdio.h>
 #include <map>
 
+#include <sigc++/object_slot.h>
+
+
+namespace varconf {
+  class Config;
+}
+
 namespace Sear {
-  static const unsigned int MAX_STRING_SIZE = 256;
 
 typedef struct {
-  char state[MAX_STRING_SIZE];
+  std::string state;
   bool alpha_test;
   bool blend;
   bool lighting;
@@ -30,7 +35,7 @@ typedef struct {
   bool rescale_normals;
 } StateProperties;
 
-class StateLoader {
+class StateLoader : public SigC::Object {
 public:
   StateLoader();
   ~StateLoader();
@@ -38,19 +43,23 @@ public:
   void init();
   void shutdown();
   void readFiles(const std::string &);
-  std::map<std::string, StateProperties*> getMap() { return _state_properties; }
 
-  StateProperties *readRecord(FILE *);
+  std::map<std::string, StateProperties*> getMap() const { return _state_properties; }
+
   StateProperties *getStateProperties(const std::string &state) {
     StateProperties *sp = _state_properties[state];
     return ((sp) ? (sp) : (_state_properties["default"]));
   }
-
+  
 protected:
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+  void varconf_error_callback(const char *message);
+  
   std::map<std::string, StateProperties*> _state_properties;
   bool _initialised;
 
 };
 
 } /* namespace Sear */
+
 #endif /* SEAR_STATELOADER_H */

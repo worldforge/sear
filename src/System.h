@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.21 2002-09-26 20:23:03 simon Exp $
+// $Id: System.h,v 1.22 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -27,6 +27,7 @@ class EventHandler;
 class FileHandler;
 class ModelHandler;
 class ObjectHandler;
+class ScriptEngine;
 class StateLoader;
 class Console;
 class Character;
@@ -65,7 +66,6 @@ public:
   void toggleFullscreen();
 
   void runCommand(const std::string &);
-  void runScript(const std::string&);
   void pushMessage(const std::string &msg, int type, int = MESSAGE_LIFE);
   bool fileExists(const std::string &);
   std::string processHome(const std::string &);
@@ -92,13 +92,14 @@ public:
   
   varconf::Config *getModelRecords() { return _model_records; }
   varconf::Config *getObjectRecords() { return _object_records; }
-  
-  StateLoader *getStateLoader() { return _sl; }
-  EventHandler *getEventHandler() { return _event_handler; }
-  ModelHandler *getModelHandler() { return _model_handler; }
-  ActionHandler *getActionHandler() { return _action_handler; }
-  FileHandler *getFileHandler() { return _file_handler; }
-  ObjectHandler *getObjectHandler() { return _object_handler; }
+ 
+  ScriptEngine *getScriptEngine() const { return _script_engine; }
+  StateLoader *getStateLoader() const { return _state_loader; }
+  EventHandler *getEventHandler() const { return _event_handler; }
+  ModelHandler *getModelHandler() const { return _model_handler; }
+  ActionHandler *getActionHandler() const { return _action_handler; }
+  FileHandler *getFileHandler() const { return _file_handler; }
+  ObjectHandler *getObjectHandler() const { return _object_handler; }
   
   Console *getConsole() { return _console; }
   Character *getCharacter() { return _character; }
@@ -156,10 +157,11 @@ protected:
   int _height;
   int area;
 
+  ScriptEngine *_script_engine;
   EventHandler *_event_handler;
   FileHandler *_file_handler;
   ModelHandler *_model_handler;
-  StateLoader *_sl;
+  StateLoader *_state_loader;
   ActionHandler *_action_handler;
   ObjectHandler *_object_handler;
 
@@ -227,10 +229,8 @@ protected:
   SDL_Cursor *_cursor_touch;
 
   bool _mouse_move_select;
-  bool _prefix_cwd;
 
   std::string _current_dir;
-  std::string _file_dir;
 
   float _current_time;
   float _seconds;
@@ -242,8 +242,8 @@ protected:
   TimeArea _time_area;
 
   typedef struct {
-    const char *section;
-    const char *key;
+    char *section;
+    char *key;
     varconf::Config *config;
   } VarconfRecord;
 
@@ -270,12 +270,6 @@ private:
   static const char * const GET_ATTRIBUTE = "getat";
   static const char * const SET_ATTRIBUTE = "setat";
 
-  static const char * const CHANGE_DIRECTORY = "cd";
- 
-  static const char * const ENABLE_DIR_PREFIX = "enable_dir_prefix";
-  static const char * const DISABLE_DIR_PREFIX = "disable_dir_prefix";
-
-  static const char * const RUN_SCRIPT = "run_script";
   static const char * const LOAD_MODEL_RECORDS = "load_model_records";
   static const char * const LOAD_OBJECT_RECORDS = "load_object_records";
   static const char * const LOAD_STATE_FILE = "load_state_file";

@@ -1,3 +1,12 @@
+DATE, Simon Goodall
+ * Filled in missing initialisers in System
+ * Introduced optional dependancy on GLGooey. This will be the base for future GUI work. enable with configure option, --with-glgooey=yes
+ * Added a gui under the server screen. "/switch_mode server". Lists metaserver work too.
+ * Fixed a couple of memory leaks
+ * Converted ActionLoader to use varconf to read files
+ * Converted StateProperties to use varconf to read files
+ * Added built-in font state to stateloader so we can see font regardless of what have been loaded in. This may still be overwritten externally.
+
 09th October 2002, Al Riddoch
  * std:: namespace fixes. 
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: GuiHandler.cpp,v 1.1 2002-09-27 15:46:42 simon Exp $
+// $Id: GuiHandler.cpp,v 1.2 2002-10-20 13:22:26 simon Exp $
 
 
 
@@ -42,7 +42,15 @@ void GuiHandler::readGuiConfig(const std::string &file_name) {
 void GuiHandler::selectGui(const std::string &gui) {
   _current_gui = _gui_map[gui];
 }
-  
+
+void GuiHandler::render() {
+  cout << "Rendering current GUI" << endl;
+}
+
+void GuiHandler::render(const std::string &gui) {
+  cout << "Rendering GUI - " << gui << endl;
+}
+
 void GuiHandler::addComponent(const std::string &gui, Component *component) {
   _gui_map[gui].push_back(component);
 }

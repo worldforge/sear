@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.37 2002-10-09 17:13:39 alriddoch Exp $
+// $Id: GL.cpp,v 1.38 2002-10-20 13:22:26 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -162,7 +162,7 @@ void GL::shutdown() {
 }
 
 void GL::initWindow(int width, int height) {
-  Log::writeLog("Render: Initilising Renderer", Log::LOG_DEFAULT);
+  Log::writeLog("Render: Initialising Renderer", Log::LOG_DEFAULT);
   // TODO: put this into an info method 
   
   std::string vendor = string_fmt(glGetString(GL_VENDOR));
@@ -245,7 +245,7 @@ void GL::initFont() {
   int loop;
   float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
-  Log::writeLog("Render: Initilising Fonts", Log::LOG_DEFAULT);
+  Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
   base=glGenLists(256); // Creating 256 Display Lists
   font_id = requestTexture("ui", "font");
   GLuint texture = getTextureID(font_id);

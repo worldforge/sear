@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.40 2002-10-09 17:13:39 alriddoch Exp $
+// $Id: System.cpp,v 1.41 2002-10-20 13:22:26 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,9 +38,13 @@
 //#include "ObjectLoader.h"
 #include "Render.h"
 #include "Sound.h"
+#include "src/ScriptEngine.h"
 #include "StateLoader.h"
 #include "System.h"
 #include "WorldEntity.h"
+#ifdef HAVE_GLGOOEY
+#include "glgooey/WindowManager.h"
+#endif
 
 namespace Sear {
 
@@ -47,29 +55,53 @@ const std::string System::SHUTDOWN_SCRIPT = "shutdown.script";
 
 System::System() :
   repeat(false),
+  action(ACTION_DEFAULT),
   window_width(0),
   window_height(0),
   fullscreen(0),
   screen(NULL),
+  _graphics(NULL),
   renderer(NULL),
   _client(NULL),
   _icon(NULL),
+  button_down(false),
+  _width(0),
+  _height(0),
+  area(0),
+  _script_engine(NULL),
   _event_handler(NULL),
   _file_handler(NULL),
   _model_handler(NULL),
-  _sl(NULL),
+  _state_loader(NULL),
   _action_handler(NULL),
   _object_handler(NULL),
+  _general(NULL),
+  _textures(NULL),
+  _models(NULL),
+  _model_records(NULL),
+  _object_records(NULL),
   _console(NULL),
   _character(NULL),
-  _prefix_cwd(false),
+  _seconds_per_day(60.0f * 60.0f * 24.0f),
+  _seconds_per_minute(60.0f),
+  _minutes_per_hour(60.0f),
+  _hours_per_day(24.0f),
+  _mouse_move_select(false),
+  _current_time(0.0f),
+  _seconds(0.0f),
+  _dawn_time(6.0f),
+  _day_time(9.0f),
+  _dusk_time(18.0f),
+  _night_time(21.0f),
+  _time_area(NIGHT),
+  _process_records(false),
+  sound(NULL),
   _system_running(false),
   _initialised(false)
 {
-  int i;
   _instance = this;
   // Initialise system states
-  for (i = 1; i < SYS_LAST_STATE; ++i) _systemState[i] = false;
+  for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) _systemState[i] = false;
 }
 
 System::~System() {
@@ -80,7 +112,10 @@ System::~System() {
 bool System::init() {
   if (_initialised) shutdown();
   if (!initVideo()) return false;
-  _event_handler = new EventHandler(this);
+  _event_handler = new EventHandler();
+  _event_handler->init();
+  _script_engine = new ScriptEngine();
+  _script_engine->init();
   _model_handler = new ModelHandler();
   _model_handler->init();
   _client = new Client(this, CLIENT_NAME);
@@ -126,8 +161,8 @@ bool System::init() {
     _file_handler->addSearchPath(*I);
   }
   
-  _sl = new StateLoader();
-  _sl->init();
+  _state_loader = new StateLoader();
+  _state_loader->init();
   
   _object_handler = new ObjectHandler();
   _object_handler->init();
@@ -154,6 +189,7 @@ bool System::init() {
 
   registerCommands(_console);
   _client->registerCommands(_console);
+  _script_engine->registerCommands(_console);
   _action_handler->registerCommands(_console);
   _file_handler->registerCommands(_console);
   _object_handler->registerCommands(_console);
@@ -170,7 +206,7 @@ bool System::init() {
 
   std::list<std::string> startup_scripts = _file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
   for (std::list<std::string>::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
-    runScript(*I);
+    _script_engine->runScript(*I);
   }
   readConfig();
   _system_running = true;
@@ -200,13 +236,6 @@ void System::shutdown() {
     delete _action_handler;
     _action_handler = NULL;
   }
-/*
-  if (_file_handler) {
-    _file_handler->shutdown();
-    delete _file_handler;
-    _file_handler = NULL;
-  }
-  */
   if (_object_handler) {
     _object_handler->shutdown();
     delete _object_handler;
@@ -225,29 +254,56 @@ void System::shutdown() {
   Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   std::list<std::string> shutdown_scripts = _file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
   for (std::list<std::string>::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
-    runScript(*I);
+    _script_engine->runScript(*I);
   }
   Bindings::shutdown();
 
   if (_general) {
-//    _general->shutdown();
     delete _general;
     _general = NULL;
-  }	  
+  }          
   if (_textures) {
-//    _textures->shutdown();
     delete _textures;
     _textures = NULL;
-  }	  
+  }          
   if (_models) {
-//    _models->shutdown();
     delete _models;
     _models = NULL;
-  }	  
+  }
+  if (_model_records) {
+    delete _model_records;
+    _model_records = NULL;
+  }
+  if (_model_handler) {
+    _model_handler->shutdown();
+    delete _model_handler;
+    _model_handler = NULL;
+  }  
+  if (_event_handler) {
+    _event_handler->shutdown();
+    delete _event_handler;
+    _event_handler = NULL;
+  }  
+  if (_script_engine) {
+    _script_engine->shutdown();
+    delete _script_engine;
+    _script_engine = NULL;
+  }  
+  if (_file_handler) {
+//    _file_handler->shutdown();
+    delete _file_handler;
+    _file_handler = NULL;
+  }
   if (_console) {
     _console->shutdown();
     delete _console;
     _console = NULL;
+  }
+ 
+  if (_state_loader) {
+    _state_loader->shutdown();
+    delete _state_loader;
+    _state_loader = NULL;
   }
   
   if (_icon) delete _icon;
@@ -443,20 +499,38 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
         case (SDL_BUTTON_LEFT):   { 
+#ifdef HAVE_GLGOOEY
+          Gooey::WindowManager::instance().onLeftButtonDown(event.button.x, event.button.y);
+#endif
           renderer->procEvent(event.button.x, event.button.y);
-	  switch (action) {
+          switch (action) {
             case (ACTION_DEFAULT): break;
             case (ACTION_PICKUP):  if (_character) _character->getEntity(renderer->getActiveID()); break;
             case (ACTION_TOUCH): if (_character) _character->touchEntity(renderer->getActiveID()); break;
-	  }
-	  setAction(ACTION_DEFAULT);
-	  break;
+          }
+          setAction(ACTION_DEFAULT);
+          break;
+        }
+        break;
+      }
+      break;
+    }
+    case SDL_MOUSEBUTTONUP: {
+      switch (event.button.button) {
+        case (SDL_BUTTON_LEFT):   { 
+#ifdef HAVE_GLGOOEY
+          Gooey::WindowManager::instance().onLeftButtonUp(event.button.x, event.button.y);
+#endif
+          break;
         }
         break;
       }
       break;
     }
     case SDL_MOUSEMOTION: {
+#ifdef HAVE_GLGOOEY
+      Gooey::WindowManager::instance().onMouseMove(event.button.x, event.button.y);
+#endif
       if (_mouse_move_select) renderer->procEvent(event.button.x, event.button.y);
       break;
     } 
@@ -464,49 +538,49 @@ void System::handleEvents(const SDL_Event &event) {
      // Keys that still execute bindings with console open 
       if (_console->consoleStatus()) {
         if (!repeat) {
-	  SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	  command = "";
-	  repeat = true;
-	}
-	if (event.key.keysym.sym == SDLK_UP) {
+          SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+          command = "";
+          repeat = true;
+        }
+        if (event.key.keysym.sym == SDLK_UP) {
           // Previous command
-	  if (_command_history_iterator != _command_history.begin()) {
-	    _command_history_iterator--;
+          if (_command_history_iterator != _command_history.begin()) {
+            _command_history_iterator--;
             command = (*_command_history_iterator);
-	  }
-	}
-	else if (event.key.keysym.sym == SDLK_DOWN) {
+          }
+        }
+        else if (event.key.keysym.sym == SDLK_DOWN) {
           // next command
-	  if (_command_history_iterator != _command_history.end()) {
-	    _command_history_iterator++;
+          if (_command_history_iterator != _command_history.end()) {
+            _command_history_iterator++;
             if (_command_history_iterator != _command_history.end()) command = (*_command_history_iterator);
-	    else command = "";
-	  }
-	}
-	else if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
-	  (event.key.keysym.sym == SDLK_F1) ||
-	  (event.key.keysym.sym == SDLK_F2) ||
-	  (event.key.keysym.sym == SDLK_F3) ||
-	  (event.key.keysym.sym == SDLK_F4) ||
-	  (event.key.keysym.sym == SDLK_F5) ||
-	  (event.key.keysym.sym == SDLK_F6) ||
-	  (event.key.keysym.sym == SDLK_F7) ||
-	  (event.key.keysym.sym == SDLK_F8) ||
-	  (event.key.keysym.sym == SDLK_F9) ||
-	  (event.key.keysym.sym == SDLK_F10) ||
-	  (event.key.keysym.sym == SDLK_F11) ||
-	  (event.key.keysym.sym == SDLK_F12) ||
-	  (event.key.keysym.sym == SDLK_F13) ||
-	  (event.key.keysym.sym == SDLK_F14) ||
-	  (event.key.keysym.sym == SDLK_F15) ||
-	  (event.key.keysym.sym == SDLK_ESCAPE))
-	{
+            else command = "";
+          }
+        }
+        else if ((event.key.keysym.sym == SDLK_BACKQUOTE) ||
+          (event.key.keysym.sym == SDLK_F1) ||
+          (event.key.keysym.sym == SDLK_F2) ||
+          (event.key.keysym.sym == SDLK_F3) ||
+          (event.key.keysym.sym == SDLK_F4) ||
+          (event.key.keysym.sym == SDLK_F5) ||
+          (event.key.keysym.sym == SDLK_F6) ||
+          (event.key.keysym.sym == SDLK_F7) ||
+          (event.key.keysym.sym == SDLK_F8) ||
+          (event.key.keysym.sym == SDLK_F9) ||
+          (event.key.keysym.sym == SDLK_F10) ||
+          (event.key.keysym.sym == SDLK_F11) ||
+          (event.key.keysym.sym == SDLK_F12) ||
+          (event.key.keysym.sym == SDLK_F13) ||
+          (event.key.keysym.sym == SDLK_F14) ||
+          (event.key.keysym.sym == SDLK_F15) ||
+          (event.key.keysym.sym == SDLK_ESCAPE))
+        {
           runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
-	} else if (event.key.keysym.sym == SDLK_RETURN) {
-	  if (command.empty()) break;
+        } else if (event.key.keysym.sym == SDLK_RETURN) {
+          if (command.empty()) break;
           runCommand(command);
-	  _command_history.push_back(command);
-	  _command_history_iterator = _command_history.end();
+          _command_history.push_back(command);
+          _command_history_iterator = _command_history.end();
           command = "";
         } else if (event.key.keysym.sym == SDLK_DELETE || event.key.keysym.sym == SDLK_BACKSPACE) {
           if (command.length() > 0) {
@@ -514,13 +588,13 @@ void System::handleEvents(const SDL_Event &event) {
           }
         } else if (event.key.keysym.unicode < 0x80 && event.key.keysym.unicode > 0) {
           command = command + (char)event.key.keysym.unicode;
-	}
+        }
       } else {
         if (repeat) {
           SDL_EnableKeyRepeat(0, 0);
-	  command = "";
-	  repeat = false;
-	}
+          command = "";
+          repeat = false;
+        }
         runCommand(Bindings::getBinding(Bindings::idToString((int)event.key.keysym.sym)));
       }
       break;
@@ -615,45 +689,6 @@ SDL_Surface *System::loadImage(const  std::string &filename) {
 
 void System::pushMessage(const std::string &msg, int type, int duration) {
   if(_console) _console->pushMessage(msg, type, duration);
-}
-
-void System::runScript(const std::string &file_name) {
-  FILE *script_file = NULL;
-  const int MAX_LINE_SIZE = 256;
-  char string_data[MAX_LINE_SIZE];
-  Log::writeLog(std::string("System: Running script - ") + file_name, Log::LOG_DEFAULT);
-  std::string old_file_dir = _file_dir;
-  std::string::size_type pos = file_name.find_last_of("/");
-  if (pos == std::string::npos) {
-    pos = file_name.find_last_of("\\");
-  }
-  if (pos == std::string::npos) { 
-    _file_dir = "./";
-  } else {
-    if (file_name.c_str()[0] == '/' || file_name.c_str()[0] == '\\') {
-      _file_dir = file_name.substr(0, pos);
-    } else {
-      _file_dir += "/" + file_name.substr(0, pos);
-    }
-  }
-  script_file = fopen(processHome(file_name).c_str(), "r");
-  char cur_dir[257];
-  memset(cur_dir, '\0', 257);
-  getcwd(cur_dir, 256);
-  Log::writeLog(std::string("Current Directory: ") + cur_dir, Log::LOG_DEFAULT);
-  bool pre_cwd = _prefix_cwd; // Store current setting
-  if (!script_file) {
-    Log::writeLog(std::string("System: Error opening script file: ") + file_name, Log::LOG_ERROR);
-    return;
-  }
-  while (!feof(script_file)) {
-    fscanf(script_file, "%[^\n]\n", &string_data[0]);
-    runCommand(std::string(string_data));
-  }
-  chdir(cur_dir);
-  _prefix_cwd = pre_cwd; // Restore setting
-  _file_dir = old_file_dir;
-  fclose(script_file);
 }
 
 bool System::fileExists(const std::string &file_name) {
@@ -771,7 +806,7 @@ SDL_Cursor *System::buildCursor(const char *image[]) {
        case ' ':
          break;
       }
-    }	
+    }        
   }
   sscanf(image[4+row], "%d,%d", &hot_x, &hot_y);
   return SDL_CreateCursor(data, mask, 32, 32, hot_x, hot_y);
@@ -799,10 +834,6 @@ void System::registerCommands(Console *console) {
   console->registerCommand(EXIT, this);
   console->registerCommand(GET_ATTRIBUTE, this);
   console->registerCommand(SET_ATTRIBUTE, this);
-  console->registerCommand(CHANGE_DIRECTORY, this);
-  console->registerCommand(ENABLE_DIR_PREFIX, this);
-  console->registerCommand(DISABLE_DIR_PREFIX, this);
-  console->registerCommand(RUN_SCRIPT, this);
   console->registerCommand(LOAD_MODEL_RECORDS, this);
   console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
@@ -821,8 +852,6 @@ void System::registerCommands(Console *console) {
   console->registerCommand(GET_TIME, this);
   console->registerCommand("normalise_on", this);
   console->registerCommand("normalise_off", this);
-  console->registerCommand("cd_this_dir", this);
-  console->registerCommand("search_run_script", this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -851,65 +880,47 @@ void System::runCommand(const std::string &command, const std::string &args) {
     std::string value = tokeniser.remainingTokens();
     if (_general) _general->setItem(section, key, value);
   }
-  else if (command == CHANGE_DIRECTORY) {
-    if (args.empty()) return;
-    chdir(args.c_str());
-  }
-  else if (command == ENABLE_DIR_PREFIX) _prefix_cwd = true;  
-  else if (command == DISABLE_DIR_PREFIX) _prefix_cwd = false;
-  else if (command == RUN_SCRIPT) runScript(processHome(args));
   else if (command == LOAD_STATE_FILE) {
-    if (_sl) _sl->readFiles(processHome(args));
+    if (_state_loader) _state_loader->readFiles(processHome(args));
   }
   else if (command == LOAD_GENERAL_CONFIG) {
     if (_general) {
-      _process_records = _prefix_cwd;
+      _process_records = _script_engine->prefixEnabled();
       _general->readFromFile(processHome(args));
       if (_process_records) {
-	_process_records = false;
+        _process_records = false;
         processRecords();
       }
     }
   }
   else if (command == LOAD_MODEL_RECORDS) {
-    std::cout << args << std::endl;
     if (_model_records) {
-      _process_records = _prefix_cwd;
-      std::cout << _model_records->readFromFile(processHome(args)) << std::endl;
+      _process_records = _script_engine->prefixEnabled();
+      _model_records->readFromFile(processHome(args));
       if (_process_records) {
-	_process_records = false;
+        _process_records = false;
         processRecords();
       }
     } else {
       std::cerr << "no model records" << std::endl;
     }
   }
-/*  else if (command == LOAD_OBJECT_RECORDS) {
-    if (_object_records) {
-      _process_records = _prefix_cwd;
-      _object_records->readFromFile(processHome(args));
-      if (_process_records) {
-	_process_records = false;
-        processRecords();
-      }
-    }
-  }
- */ else if (command == LOAD_TEXTURE_CONFIG) {
+  else if (command == LOAD_TEXTURE_CONFIG) {
     if (_textures) {
-      _process_records = _prefix_cwd;
+      _process_records = _script_engine->prefixEnabled();
       _textures->readFromFile(processHome(args));
       if (_process_records) {
-	_process_records = false;
+        _process_records = false;
         processRecords();
       }
     }
   }
   else if (command == LOAD_MODEL_CONFIG) {
     if (_models) {
-      _process_records = _prefix_cwd;
+      _process_records = _script_engine->prefixEnabled();
       _models->readFromFile(processHome(args));
       if (_process_records) {
-	_process_records = false;
+        _process_records = false;
         processRecords();
       }
     }
@@ -971,13 +982,6 @@ void System::runCommand(const std::string &command, const std::string &args) {
 
   else if (command == "normalise_on") glEnable(GL_NORMALIZE);
   else if (command == "normalise_off") glDisable(GL_NORMALIZE);
-  else if (command == "cd_this_dir") chdir(_file_dir.c_str());
-  else if (command == "search_run_script") {
-    FileHandler::FileList l = _file_handler->getAllinSearchPaths(args);
-    for (FileHandler::FileList::const_iterator I = l.begin(); I != l.end(); ++I) {
-      runScript(*I);
-    }
-  }
   
   else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
 }
@@ -987,13 +991,13 @@ void System::varconf_error_callback(const char *error) {
 }
 
 void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  if (_process_records && _prefix_cwd) {
+  if (_process_records && _script_engine->prefixEnabled()) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {
       VarconfRecord *r = (VarconfRecord*)malloc(sizeof(VarconfRecord));
-      r->section = (const char *)malloc(section.size() * sizeof(char) + 1);
+      r->section = (char *)malloc(section.size() * sizeof(char) + 1);
       strcpy((char*)r->section, section.c_str()); 
-      r->key = (const char *)malloc(key.size() * sizeof(char) + 1);
+      r->key = (char *)malloc(key.size() * sizeof(char) + 1);
       strcpy((char*)r->key, key.c_str()); 
 //      r->key = key.c_str();
       r->config = &config;
@@ -1011,15 +1015,17 @@ void System::processRecords() {
     getcwd(cwd, 255);
     std::string val = std::string(cwd) + "/" + std::string(value);
     r->config->setItem(r->section, r->key, val);
+    free(r->key);
+    free(r->section);
     free(r);
     record_list.erase(record_list.begin());
   }
 }
 
 void System::addSearchPaths(std::list<std::string> l) {
-  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {	
+  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {        
     additional_paths.push_back(*I);
   }
 }
-	
+        
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.12 2002-09-26 20:23:03 simon Exp $
+// $Id: ModelLoader.h,v 1.13 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -32,7 +32,7 @@ public:
 
 //  virtual void registerModelLoader(ModelHandler *model_handler) = 0;
 //  virtual void unregisterModelLoader(ModelHandler *model_handler) = 0;
-  virtual ModelRecord *loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
+  virtual ModelRecord *loadModel(Render *, ObjectRecord *record, const std::string &model_id, varconf::Config *model_config) {
     ModelRecord * model_record = new ModelRecord();
     model_record->id = model_id;
     model_record->scale = (double)model_config->getItem(model_id, ModelRecord::SCALE);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.21 2002-09-27 15:46:43 simon Exp $
+// $Id: WorldEntity.cpp,v 1.22 2002-10-20 13:22:26 simon Exp $
 
 #include "System.h"
 #include <wfmath/axisbox.h>
@@ -25,6 +25,9 @@
 
 namespace Sear {
 
+static const std::string ACTION = "action";
+static const std::string MODE = "mode";
+	
 WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::World *world):
    Eris::Entity(ge, world),
    time(0),
@@ -36,6 +39,9 @@ WorldEntity::WorldEntity(const Atlas::Objects::Entity::GameEntity &ge, Eris::Wor
 }
 
 WorldEntity::~WorldEntity() {
+  while (!messages.empty()) {
+    messages.erase(messages.begin());
+  }
 }
 
 void WorldEntity::handleMove() {
@@ -76,28 +82,6 @@ void WorldEntity::renderMessages() {
       pos+=string_size;
     }
 
-
-/*
-    const std::string str = (const std::string)((*I).first);
-    std::list<std::string> message_list = std::list<std::string>();
-    int pos = 0;
-    while (true) {
-      std::string str1;
-      try {
-        str1 = str.substr(pos, pos + string_size); // Get first 40 characters
-      } catch (...) { // less than 40 characters left
-	try {
-          str1 = str.substr(pos);
-	} catch (...) { // no characters left
-          str1 = "";
-	}
-      }
-      if (str1.empty()) break; // No more text, end loop
-      // Add text to mesgs list
-      message_list.push_back(str1);
-      pos += string_size;
-    }
-    */
     std::list<std::string>::reverse_iterator K;
     for (K = message_list.rbegin(); K != message_list.rend(); ++K) {
       mesgs.push_back(*K);
@@ -105,7 +89,7 @@ void WorldEntity::renderMessages() {
      
   }
   // Render text strings
-  static Render *renderer = System::instance()->getGraphics()->getRender();
+  Render *renderer = System::instance()->getGraphics()->getRender();
   std::list<std::string>::iterator J;
   for (J = mesgs.begin(); J != mesgs.end(); ++J) { 
     std::string str = (*J);
@@ -204,8 +188,8 @@ void WorldEntity::checkActions() {
 
   // TODO possibility to link into action handler
   
-  if (hasProperty("action")) {
-    std::string action = getProperty("action").AsString();
+  if (hasProperty(ACTION)) {
+    std::string action = getProperty(ACTION).AsString();
     if (action != last_action) {
       ObjectRecord *record;
       if (object_handler) record = object_handler->getObjectRecord(getID());
@@ -216,8 +200,8 @@ void WorldEntity::checkActions() {
     last_action == "";
   }
 	 
-  if (hasProperty("mode")) {
-    std::string mode = getProperty("mode").AsString();
+  if (hasProperty(MODE)) {
+    std::string mode = getProperty(MODE).AsString();
     if (mode != last_mode) {
       ObjectRecord *record;
       if (object_handler) record = object_handler->getObjectRecord(getID());

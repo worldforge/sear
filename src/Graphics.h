@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.6 2002-09-27 15:46:43 simon Exp $
+// $Id: Graphics.h,v 1.7 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -16,6 +16,8 @@
 
 #include "Render.h"
 #include "src/ConsoleObject.h"
+
+//#include "gui/ServerGui.h"
 
 namespace Sear {
 
@@ -32,6 +34,7 @@ class System;
 class Character;
 class Console;
 
+class ServerGui;
 
 class Graphics :public ConsoleObject{
 
@@ -98,6 +101,7 @@ typedef enum {
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
+  ServerGui *sg;  
 protected:
   typedef enum {
     SPLASH = 0,

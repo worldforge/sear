@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.2 2002-09-08 00:24:53 simon Exp $
+// $Id: ActionHandler.h,v 1.3 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -12,14 +12,20 @@
 #include <map>
 #include <string>
 
+#include <sigc++/object_slot.h>
+
 #include "ConsoleObject.h"
+
+namespace varconf {
+  class Config;
+}
 
 namespace Sear {
 
 class Console;
 class WorldEntity;
 
-class ActionHandler : public ConsoleObject{
+class ActionHandler : public ConsoleObject, public SigC::Object {
 public:
   ActionHandler(System *system);
   ~ActionHandler();
@@ -30,16 +36,18 @@ public:
   void loadConfiguration(const std::string &filename);
   
   void handleAction(const std::string &action, WorldEntity *entity);
-	
+
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
 private:
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+  void varconf_error_callback(const char *message);
   
-  static const unsigned int MAX_STRING_SIZE = 1024;
+  
   typedef struct {
-    char action[MAX_STRING_SIZE];
-    char script[MAX_STRING_SIZE];
+    std::string action;
+    std::string script;
     bool entity_based;
   } ActionStruct;
   

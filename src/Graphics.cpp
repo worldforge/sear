@@ -2,9 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.16 2002-10-09 17:13:39 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.17 2002-10-20 13:22:26 simon Exp $
 
-#include "System.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
@@ -27,12 +30,36 @@
 #include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
-//#include "ObjectLoader.h"
 #include "ObjectHandler.h"
 #include "Render.h"
 #include "Sky.h"
+#include "System.h"
 #include "Terrain.h"
 #include "WorldEntity.h"
+
+#include "gui/ServerGui.h"
+
+#ifdef HAVE_GLGOOEY
+
+#include "glgooey/WindowManager.h"
+#include "glgooey/Rectangle.h"
+#include "glgooey/FrameWindow.h"
+#include "glgooey/CheckBox.h"
+#include "glgooey/CheckBoxGroup.h"
+#include "glgooey/Button.h"
+#include "glgooey/Panel.h"
+#include "glgooey/EditField.h"
+#include "glgooey/MultiTextButton.h"
+#include "glgooey/Font.h"
+#include "glgooey/ScrollBar.h"
+#include "glgooey/ListBox.h"
+#include "glgooey/ListControl.h"
+#include "glgooey/StaticText.h"
+#include "glgooey/ProgressBar.h"
+#include "glgooey/ComplexGridLayouter.h"
+#include "glgooey/StaticBitmap.h"
+#include "glgooey/TimeManager.h"
+#endif
 
 namespace Sear {
 
@@ -72,6 +99,7 @@ void Graphics::init() {
   _camera = new Camera();
   _camera->init();
   _camera->registerCommands(_system->getConsole());
+  sg = new ServerGui();
   _initialised = true;
 }
 
@@ -146,9 +174,14 @@ void Graphics::drawSplash(const std::string& command, bool select_mode, float ti
 
 void Graphics::drawServer(const std::string &command ,bool, float) {
   _renderer->drawSplashScreen();
-  _renderer->stateChange("font");
-  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
-  _renderer->print(20, 50, "Server Screen", 0);
+//  _renderer->stateChange("font");
+  //
+//  _renderer->setColour(1.0f, 0.0f, 0.0f, 1.0f);
+//  _renderer->print(20, 50, "Server Screen", 0);
+#ifdef HAVE_GLGOOEY
+  Gooey::WindowManager::instance().applicationResized(640, 480);
+  Gooey::WindowManager::instance().update();
+#endif
 #if(0)
   render background
   render connect button

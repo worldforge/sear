@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: GuiHandler.h,v 1.1 2002-09-27 15:46:42 simon Exp $
+// $Id: GuiHandler.h,v 1.2 2002-10-20 13:22:26 simon Exp $
 
 #ifndef SEAR_GUI_GUIHANDLER_H
 #define SEAR_GUI_GUIHANDLER_H 1
@@ -29,6 +29,9 @@ public:
   void readGuiConfig(const std::string &file_name);
   
   void selectGui(const std::string &gui);
+
+  void render();
+  void render(const std::string &gui);
   
   void addComponent(const std::string &gui, Component *component);
   void removeComponent(const std::string &gui, Component *component);
