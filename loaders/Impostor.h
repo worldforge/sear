@@ -17,7 +17,7 @@ public:
   Impostor(Render*);
   ~Impostor();
   
-  bool init(const std::string &, float width, float height);
+  bool init(const std::string &, float width, float height, bool multi_textures);
   void shutdown();
   
   void render(bool); 
@@ -27,6 +27,7 @@ public:
   
 private:
   bool _use_textures;
+  bool _multi_textures;
   static const int _num_points = 8;
   std::string _type;
   float _vertex_data[_num_points][3];

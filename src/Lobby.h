@@ -20,13 +20,15 @@ public:
 	
   void init(Eris::Lobby *lobby);
   void say(const std::string &speech);
+  void emote(const std::string &speech);
   void sayPrivate(const std::string &speech, const std::string &to);
   void shutdown();
   void render();
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-protected:	
+protected:
+  // Eris callbacks
   void privateChat(const std::string &src, const std::string &msg);
   void Entered(Eris::Room *room);
   void Talk(Eris::Room *room, const std::string &str1, const std::string &str2);

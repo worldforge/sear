@@ -2,17 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-#ifndef _CLIENT_H_
-#define _CLIENT_H_ 1
+#ifndef SEAR_CLIENT_H
+#define SEAR_CLIENT_H 1
 
 #include <string>
 
 #include <Eris/Connection.h>
-#include <Eris/Player.h>
-#include <Eris/Lobby.h>
-#include <Eris/World.h>
 #include <Eris/Log.h>
-
+#include <Eris/Player.h>
 #include <Atlas/Message/DecoderBase.h>
 
 #include "conf.h"
@@ -45,9 +42,18 @@
 #define CLIENT_STATUS_LOGGED_IN    (2)
 #define CLIENT_STATUS_IN_WORLD     (3)
 
+namespace Eris {
+  class Meta;
+  class Player;
+  class Connection;
+  class Lobby;
+  class Person;
+  class World;
+  class ServerInfo;
+}
 
 namespace Sear {
-
+class MetaserverService;
 class WorldEntity;
 class Console;
 class Lobby;
@@ -83,6 +89,7 @@ public:
   
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
+  void getServers();
   
 protected:
   //Callbacks
@@ -115,13 +122,19 @@ protected:
   void Disappearance(Eris::Entity*);
   void RootEntityChanged(Eris::Entity*);
 
+  //Metaserver
+  void gotServerCount(int count);
+  void gotFailure(const std::string& msg);
+  void receivedServerInfo(Eris::ServerInfo sInfo);
+  void completedServerList();
+
   System *_system;
 
   Eris::Connection* _connection;
   Eris::Player* _player;
   Eris::Lobby* _lobby;
-
   Lobby *the_lobby;
+  Eris::Meta *_meta;
   
   int _status;
   std::string _client_name;
@@ -136,8 +149,9 @@ private:
   static const char * const CHARACTER_CREATE = "add";
   static const char * const CHARACTER_TAKE = "take";
 
+  static const char * const GET_SERVERS = "get_servers";
   
 };
 
 } /* namespace Sear */
-#endif /* _CLIENT_H_ */
+#endif /* SEAR_CLIENT_H */

@@ -68,4 +68,4 @@ libSear_a_SOURCES = \
 	Frustum.cpp \
 	Frustum.h \
 	default_image.xpm \
-	default_font.xpm
+	default_font.xpm 

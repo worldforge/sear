@@ -10,14 +10,16 @@
 namespace Sear {
 
 Impostor::Impostor(Render *render) : Model(render),
-  _use_textures(true)
+  _use_textures(true),
+  _multi_textures(false)
 
 {}
 
 Impostor::~Impostor() {}
   
-bool Impostor::init(const std::string &type, float _width, float _height) {
+bool Impostor::init(const std::string &type, float _width, float _height, bool multi_textures) {
   _type = type;
+  _multi_textures = multi_textures;
   if (!_width) _width = 2.0f;
   if (!_height) _height = 2.0f;
   float width_by_2 = _width / 2.0f;
@@ -59,13 +61,28 @@ void Impostor::render(bool select_mode) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-  if (select_mode) {
-    _render->switchTexture(_render->requestTextureMask("impostor", _type));
+  if (!_multi_textures) {
+    if (select_mode) {
+      _render->switchTexture(_render->requestTextureMask("impostor", _type));
+    } else {
+      _render->switchTexture(_render->requestTexture("impostor", _type));
+    }
+    _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
   } else {
-    _render->switchTexture(_render->requestTexture("impostor", _type));
-  }
-  _render->renderArrays(Graphics::RES_QUADS, 0, _num_points, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+    if (select_mode) {
+      _render->switchTexture(_render->requestTextureMask("impostor_front", _type));
+    } else {
+      _render->switchTexture(_render->requestTexture("impostor_front", _type));
+    }
+    _render->renderArrays(Graphics::RES_QUADS, 0, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
 
+    if (select_mode) {
+      _render->switchTexture(_render->requestTextureMask("impostor_side", _type));
+    } else {
+      _render->switchTexture(_render->requestTexture("impostor_side", _type));
+    }
+    _render->renderArrays(Graphics::RES_QUADS, 4, 4, &_vertex_data[0][0], &_texture_data[0][0], &_normal_data[0][0]);
+  }
 }
 
 } /* namespace Sear */

@@ -6,11 +6,14 @@
 
 #include <Eris/Connection.h>
 #include <Eris/Player.h>
+#include <Eris/Log.h>
 #include <Eris/Lobby.h>
 #include <Eris/Entity.h>
 #include <Eris/World.h>
 #include <Eris/Person.h>
 #include <Eris/PollDefault.h>
+#include <Eris/Metaserver.h>
+#include <Eris/ServerInfo.h>
 #include <sigc++/object.h>
 #include <sigc++/slot.h>
 #include <sigc++/object_slot.h>
@@ -56,9 +59,10 @@ Client::Client(System *system, const std::string &client_name) :
   _connection(NULL),
   _player(NULL),
   _lobby(NULL),
+  the_lobby(NULL),
+  _meta(NULL),
   _status(CLIENT_STATUS_DISCONNECTED),
-  _client_name(client_name),
-  the_lobby(NULL)
+  _client_name(client_name)
 {
 }
 
@@ -82,6 +86,7 @@ bool Client::init() {
 }
 
 void Client::shutdown() {
+  if (_meta) delete _meta;
   if (the_lobby) delete the_lobby;	
   if (_player) delete _player;
   if (_connection) delete _connection;
@@ -541,6 +546,7 @@ void Client::registerCommands(Console *console) {
   console->registerCommand(CHARACTER_LIST, this);
   console->registerCommand(CHARACTER_CREATE, this);
   console->registerCommand(CHARACTER_TAKE, this);
+  console->registerCommand(GET_SERVERS, this);
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
@@ -661,7 +667,54 @@ void Client::runCommand(const std::string &command, const std::string &args) {
       Log::writeLog(e.getMessage(), Log::LOG_ERROR);
       _system->pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     }
+  } 
+  else if (command == GET_SERVERS) {
+    getServers();
   }
+}
+
+void Client::getServers() {
+  if (_meta) {
+    _meta->refresh();
+  } else {
+    std::string metaserver = "metaserver.worldforge.org";
+    _meta = new Eris::Meta("", metaserver, 10);
+    _meta->GotServerCount.connect(SigC::slot(*this, &Client::gotServerCount));
+    _meta->Failure.connect(SigC::slot(*this, &Client::gotFailure));
+    _meta->ReceivedServerInfo.connect(SigC::slot(*this, &Client::receivedServerInfo));
+    _meta->CompletedServerList.connect(SigC::slot(*this, &Client::completedServerList));
+  }
+}
+
+void Client::gotServerCount(int count) {
+  Log::writeLog(std::string("Server count: ") + string_fmt(count), Log::LOG_INFO);
+}
+
+void Client::gotFailure(const string& msg) {
+  Log::writeLog(msg, Log::LOG_ERROR);
+}
+
+void Client::receivedServerInfo(Eris::ServerInfo sInfo) {
+  std::cout << "Got serverinfo:\n\r"
+  << "Hostname: " <<sInfo.getHostname()
+  << "\n\rServerName: "<<sInfo.getServername()
+  << "\n\rRuleset: "<<sInfo.getRuleset()
+  << "\n\rServer Type: "<<sInfo.getServer()
+  << "\n\rClients: "<<sInfo.getNumClients()
+  << " Ping: "<< sInfo.getPing()
+  << " Uptime: "<< sInfo.getUptime()
+  << std::endl;
+}
+
+void Client::completedServerList() {
+  Eris::ServerList l = _meta -> getGameServerList ();
+  Log::writeLog("Listing hostnames...", Log::LOG_INFO);
+  for(Eris::ServerList::iterator i = l.begin(); i != l.end(); i++) {
+    Eris::ServerInfo inf = *i;
+    Log::writeLog(std::string("Hostname: ") + (i)->getHostname(), Log::LOG_INFO);
+    //HINT: Always use .c_str() for compatibility to MSVC
+  }
+  return;
 }
 
 } /* namespace Sear */

@@ -17,6 +17,7 @@ typedef struct {
   float width;
   float height;
   bool wrap_texture;
+  bool multi_textures;
   int num_planes;
   WFMath::AxisBox<3> bbox;
   bool hasBBox;

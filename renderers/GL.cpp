@@ -316,7 +316,7 @@ int GL::requestTexture(const std::string &section, const std::string &texture, b
   texture_config->clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
-  int id = texture_map[texture_name];
+  int id = texture_map[section + texture_name];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
@@ -330,7 +330,7 @@ int GL::requestTexture(const std::string &section, const std::string &texture, b
   createTexture(tmp, texture_id, clamp);
   free (tmp);
   textureList.push_back(texture_id);
-  texture_map[texture_name] = next_id;
+  texture_map[section + texture_name] = next_id;
   return next_id++;
 }
 
@@ -340,7 +340,7 @@ int GL::requestMipMap(const std::string &section, const std::string &texture, bo
   texture_config->clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
-  int id = texture_map[texture_name];
+  int id = texture_map[section + texture_name];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
@@ -351,7 +351,7 @@ int GL::requestMipMap(const std::string &section, const std::string &texture, bo
   createMipMap(tmp, texture_id, clamp);
   free (tmp);
   textureList.push_back(texture_id);
-  texture_map[texture_name] = next_id;
+  texture_map[section + texture_name] = next_id;
   return next_id++;
 }
 
@@ -361,7 +361,7 @@ int GL::requestTextureMask(const std::string &section, const std::string &textur
   texture_config->clean(texture_name);
   SDL_Surface *tmp = NULL;
   unsigned int texture_id = 0;
-  int id = texture_map[texture_name + "_mask"];
+  int id = texture_map[section + texture_name + "_mask"];
   if (id != 0) return id;
   glGenTextures(1, &texture_id);
   if (texture_id == 0) return -1;
@@ -375,7 +375,7 @@ int GL::requestTextureMask(const std::string &section, const std::string &textur
   createTextureMask(tmp, texture_id, clamp);
   free (tmp);
   textureList.push_back(texture_id);
-  texture_map[texture_name + "_mask"] = next_id;
+  texture_map[section + texture_name + "_mask"] = next_id;
   return next_id++;
 }
 

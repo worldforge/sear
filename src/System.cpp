@@ -293,7 +293,7 @@ void System::createWindow(bool fullscreen) {
   Log::writeLog(std::string("Setting video to ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height), Log::LOG_INFO);
 
   //Is this the correct way to free a window?
-  if (screen) free(screen);
+  if (screen) SDL_FreeSurface(screen);
   screen = SDL_SetVideoMode(_width, _height, 0, flags);
   if (screen == NULL ) {
     Log::writeLog(std::string("Unable to set ") + string_fmt(_width) + std::string(" x ") + string_fmt(_height) + std::string(" video: ") + string_fmt(SDL_GetError()), Log::LOG_ERROR);

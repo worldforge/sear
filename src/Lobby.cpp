@@ -16,9 +16,14 @@ void Lobby::init(Eris::Lobby *lobby) {
 }
 
 void Lobby::say(const std::string &speech) {
+  _lobby->say(speech);
 }
 
+void Lobby::emote(const std::string &speech) {
+  _lobby->emote(speech);
+}
 void Lobby::sayPrivate(const std::string &speech, const std::string &to) {
+  
 }
 
 void Lobby::shutdown() {
@@ -38,12 +43,12 @@ void Lobby::Entered(Eris::Room *room) {
   std::cout << "Entered room: " << room->getName() << std::endl;
 }
 
-void Lobby::Talk(Eris::Room *room, const std::string &str1, const std::string &str2) {
-  std::cout << "Talk: " << room->getName() << ": " << str1 << ": " << str2 << endl;
+void Lobby::Talk(Eris::Room *room, const std::string &who, const std::string &speech) {
+  std::cout << "Talk: " << room->getName() << ": " << who << ": " << speech << endl;
 }
 
-void Lobby::Emote(Eris::Room *room, const std::string&str1, const std::string&str2) {
-  std::cout << "Emote: " << room->getName() << ": " << str1 << ": " << str2 << endl;
+void Lobby::Emote(Eris::Room *room, const std::string&who, const std::string&emote) {
+  std::cout << "Emote: " << room->getName() << ": " << who << ": " << emote << endl;
 }
 
 void Lobby::Appearance(Eris::Room*room, const std::string&str) {
@@ -54,8 +59,11 @@ void Lobby::Disappearance(Eris::Room* room, const std::string&str) {
   std::cout << "Disappearance: " << room->getName() << ": " << str <<  endl;
 }
 
-void Lobby::Changed(const Eris::StringSet&) {
+void Lobby::Changed(const Eris::StringSet &ss) {
   std::cout << "Changed" << std::endl;
+  for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); I++) {
+    cout << *I << endl;
+  }
 }
 
 void Lobby::registerCommands(Console *console) {
@@ -64,7 +72,6 @@ void Lobby::registerCommands(Console *console) {
   console->registerCommand(LIST_ROOMS, this);
   console->registerCommand(TALK, this);
   console->registerCommand(EMOTE, this);
-
 }
 
 void Lobby::runCommand(const std::string &command, const std::string &args) {
@@ -80,9 +87,10 @@ void Lobby::runCommand(const std::string &command, const std::string &args) {
     }
   }
   else if (command == TALK) {
-    _lobby->say(args);	  
+    say(args);	  
   }
   else if (command == EMOTE) {
+    emote(args);
   }
 
 }

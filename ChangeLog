@@ -1,3 +1,7 @@
+23rd August 2002, Simon Goodall
+ * Added metaserver support. Currently displays active servers in stdout. use the command "/get_servers"
+ * Modified Impostor code so to optionally use two textures instead of one.
+
 21st August 2002, Simon Goodall
  * Added base code for using the Eris::Lobby chat interface
 

@@ -47,6 +47,7 @@ typedef struct {
   bool draw_members;
   bool outline;
   bool model_by_type;
+  bool multi_textures;
   float scale;
   float offset[3];
   char state[OBJECT_LOADER_MAX_SIZE];
