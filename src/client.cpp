@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.39 2003-01-31 12:17:36 alriddoch Exp $
+// $Id: client.cpp,v 1.40 2003-01-31 12:18:48 alriddoch Exp $
 
 #include "System.h"
 
@@ -51,11 +51,11 @@
   #define DEBUG_ERIS 1
   #define ERIS_LOG_LEVEL 1
 #elif defined(NDEBUG)
-  #define DEBUG_ERIS 1
-  #define ERIS_LOG_LEVEL 4
+  #define DEBUG_ERIS 0
+  #define ERIS_LOG_LEVEL 0
 #else
-  #define DEBUG_ERIS 1
-  #define ERIS_LOG_LEVEL 4
+  #define DEBUG_ERIS 0
+  #define ERIS_LOG_LEVEL 0
 #endif
 
 namespace Sear {
