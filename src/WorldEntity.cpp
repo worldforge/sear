@@ -197,18 +197,15 @@ std::string WorldEntity::parent() {
 
 void WorldEntity::checkActions() {
   ModelHandler *model_handler = System::instance()->getModelHandler();
-//  static std::string last_action;
-//  static std::string last_mode;
 
+  // TODO possibility to link into action handler
+  
   if (hasProperty("action")) {
     std::string action = getProperty("action").AsString();
     if (action != last_action) {
-      cout << getID() << " - action: " << action << endl;
       Model *model = NULL;
       if (model_handler) model = model_handler->getModel(NULL, this);
-      else cout << "NO MODEL_HANDLER" << endl;
       if (model) model->action(action);
-      else cout << "NO MODEL" << endl;
       last_action = action;
     }
   } else {
@@ -218,12 +215,9 @@ void WorldEntity::checkActions() {
   if (hasProperty("mode")) {
     std::string mode = getProperty("mode").AsString();
     if (mode != last_mode) {
-      cout << getID() << " - mode: " << mode << endl;
       Model *model = NULL;
       if (model_handler) model = model_handler->getModel(NULL, this);
-      else cout << "NO MODEL_HANDLER" << endl;
       if (model) model->action(mode);
-      else cout << "NO MODEL" << endl;
       last_mode = mode;
     }
   } else {
