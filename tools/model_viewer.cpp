@@ -53,7 +53,7 @@ Sear::ObjectProperties *op = NULL;
 WFMath::Quaternion q = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
 
 float camera_x = 0.0f;
-float camera_y = 0.0f;
+float camera_y = 5.0f;
 float camera_z = 0.0f;
 
 float model_x = 0.0f;
@@ -102,6 +102,10 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_DOWN) camera_y += 0.1f;
       else if (event.key.keysym.sym == SDLK_PAGEUP) camera_z -= 0.1f;
       else if (event.key.keysym.sym == SDLK_PAGEDOWN) camera_z += 0.1f;
+      else if (event.key.keysym.sym == SDLK_1) model->action("walk");
+      else if (event.key.keysym.sym == SDLK_2) model->action("run");
+      else if (event.key.keysym.sym == SDLK_3) model->action("wave");
+      else if (event.key.keysym.sym == SDLK_4) model->action("funky");
       break;
     }
     case SDL_MOUSEBUTTONDOWN: mouse_down = true; break;

@@ -200,7 +200,8 @@ int Client::createAccount(const std::string &username, const std::string &fullna
 
 int Client::login(const std::string &username, const std::string &password) {
   Log::writeLog("Client::login", Log::LOG_INFO);
-  if (_status != CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
+  if (_status < CLIENT_STATUS_CONNECTED) throw ClientException("Not Connected", ClientException::NOT_CONNECTED);
+  if (_status == CLIENT_STATUS_LOGGED_IN) throw Exception("Already Logged In");
   if (_connection == NULL) throw ClientException("No Connection Object", ClientException::NO_CONNECTION_OBJECT);
   if (!_connection->isConnected()) throw Exception("Not Connected");
   if (username.empty()) throw Exception("No Username");

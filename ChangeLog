@@ -1,3 +1,10 @@
+19th August 2002, Simon Goodall
+ * Fixed error message "Not connected" when trying to login when already logged in
+ * Model viewer now allows actions to be performed. Use number keys 1 through 4.  1 - Walk
+  2 - Run
+  3 - Some Model defined action - normally wave
+  4 - Some Model defined action
+
 18th August 2002, Simon Goodall
  * Model viewer now uses SDL instead of GLUT
 

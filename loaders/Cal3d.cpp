@@ -602,6 +602,8 @@ void Cal3d::action(const std::string &action) {
     setMotionBlend((float *)&_run_blend[0], 0);
   } else if (action == "wave") {
     executeAction(1);
+  } else if (action == "funky") {
+    executeAction(0);
   }
 }
 
