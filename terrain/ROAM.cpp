@@ -19,8 +19,16 @@
 
 #include <GL/gl.h>
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -32,7 +40,27 @@ namespace Sear {
 	
 float ROAM::_water_level = 0.0f;
 float ROAM::_water_level_base = 0.0f;
+ 
+  static const int DEFAULT_height = 128;
+  static const float DEFAULT_water_level = 127.0f;
+  static const float DEFAULT_terrain_scale = 0.01f;
+  static const float DEFAULT_texture_detail_scale = 1.0;
 
+  static const std::string KEY_water_level = "terrain_water_level";
+  static const std::string KEY_height = "terrain_height";
+  
+  static const std::string KEY_height_map = "height_map";
+  static const std::string KEY_terrain_scale = "terrain_scale";
+ 
+  static const std::string KEY_num_x_landscapes = "num_x_landscapes";
+  static const std::string KEY_num_y_landscapes = "num_y_landscapes";
+
+  static const std::string KEY_texture_detail_scale = "texture_detail_scale";
+  
+  static const std::string KEY_landscape = "landscape_";
+  
+  
+ 
 ROAM::ROAM(System *system, Render *renderer) :
   _height_maps(NULL),
   last_time(0.0f),
@@ -122,7 +150,7 @@ void ROAM::shutdown() {
 
 void ROAM::draw() {
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+  static float specular[] = { 0.0f, 0.0f, 0.0f, 0.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   _renderer->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
   render();
@@ -243,6 +271,9 @@ void ROAM::readConfig() {
   temp = general.getItem(TERRAIN, KEY_num_y_landscapes);
   _num_y_landscapes = (!temp.is_int()) ? (1) : ((int)(temp));
 
+  temp = general.getItem(TERRAIN, KEY_texture_detail_scale);
+  _detail_scale = (!temp.is_double()) ? (DEFAULT_texture_detail_scale) : ((double)(temp));
+
 }
 
 void ROAM::writeConfig() {
@@ -252,6 +283,7 @@ void ROAM::writeConfig() {
   general.setItem(TERRAIN, KEY_water_level, _water_level_base);
   general.setItem(TERRAIN, KEY_terrain_scale, _terrain_scale);
 //  general.setItem(TERRAIN, KEY_height_map, hmap);
+  general.setItem(TERRAIN, KEY_texture_detail_scale, (double)_detail_scale);
 }
 
 void ROAM::lowerDetail() { 
@@ -286,7 +318,10 @@ void ROAM::varconf_callback(const std::string &section, const std::string &key, 
     else if (key == KEY_terrain_scale) {
       temp = config.getItem(TERRAIN, KEY_terrain_scale);
       _terrain_scale = (!temp.is_double()) ? (DEFAULT_terrain_scale) : ((double)(temp));
-  _water_level = _water_level_base * _terrain_scale;
+      _water_level = _water_level_base * _terrain_scale;
+    } else if (key == KEY_texture_detail_scale) {
+      temp = config.getItem(TERRAIN, KEY_texture_detail_scale);
+      _detail_scale = (!temp.is_double()) ? (DEFAULT_texture_detail_scale) : ((double)(temp));
     }
   }
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.54 2003-02-22 19:11:48 simon Exp $
+// $Id: GL.cpp,v 1.55 2003-02-25 22:34:24 simon Exp $
 
 /*TODO
  * Allow texture unloading
@@ -13,18 +13,21 @@
 #include <SDL/SDL_image.h>
 
 #include <unistd.h>
-//#define GL_GLEXT_PROTOTYPES 1
+#ifndef __WIN32
+#define GL_GLEXT_PROTOTYPES 1
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
-
+//#ifndef __WIN32
 //typedef void (*PFNGLACTIVETEXTUREARBPROC) (GLenum texture);
 //typedef void (*PFNGLCLIENTACTIVETEXTUREARBPROC) (GLenum texture);
-
+//#endif
+#ifdef __WIN32
 PFNGLACTIVETEXTUREARBPROC glActiveTexture  = NULL;
 PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTexture = NULL;
 PFNGLLOCKARRAYSEXTPROC glLockArraysEXT = NULL;
 PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
-
+#endif
 #include <varconf/Config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
@@ -57,6 +60,9 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 #include "src/default_font.xpm"
 
 #include "GL.h"
+#define GL_GLEXT_PROTOTYPES 1
+#include "glext.h"
+
 // GL EXTENSIONS DEF
 #define GENERATE_MIPMAP_SGIS            0x8191
 #define GENERATE_MIPMAP_HINT_SGIS       0x8192
@@ -64,14 +70,119 @@ PFNGLUNLOCKARRAYSEXTPROC glUnlockArraysEXT = NULL;
 #define TEXTURE_MAX_ANISOTROPY_EXT          0x84FE
 #define MAX_TEXTURE_MAX_ANISOTROPY_EXT      0x84FF
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
 #endif
 namespace Sear {
+  // Consts
+  static const int sleep_time = 5000;
 
+  static const std::string font_texture = "ui_font";
+  static const std::string splash_texture = "ui_splash";
+  
+  // Config key strings
+  
+  static const std::string KEY_use_textures = "render_use_textures";
+  static const std::string KEY_use_lighting = "render_use_lighting";
+  static const std::string KEY_show_fps = "render_show_fps";
+  static const std::string KEY_use_stencil = "render_use_stencil";
+
+  static const std::string KEY_character_light_kc = "character_light_kc";
+  static const std::string KEY_character_light_kl = "character_light_kl";
+  static const std::string KEY_character_light_kq = "character_light_kq";
+  
+  static const std::string KEY_character_light_ambient_red = "character_light_ambient_red";
+  static const std::string KEY_character_light_ambient_blue = "character_light_ambient_blue";
+  static const std::string KEY_character_light_ambient_green = "character_light_ambient_green";
+  static const std::string KEY_character_light_ambient_alpha = "character_light_ambient_alpha";
+
+  static const std::string KEY_character_light_diffuse_red = "character_light_diffuse_red";
+  static const std::string KEY_character_light_diffuse_blue = "character_light_diffuse_blue";
+  static const std::string KEY_character_light_diffuse_green = "character_light_diffuse_green";
+  static const std::string KEY_character_light_diffuse_alpha = "character_light_diffuse_alpha";
+  
+  static const std::string KEY_character_light_specular_red = "character_light_specular_red";
+  static const std::string KEY_character_light_specular_blue = "character_light_specular_blue";
+  static const std::string KEY_character_light_specular_green = "character_light_specular_green";
+  static const std::string KEY_character_light_specular_alpha = "character_light_specular_alpha";
+  
+  static const std::string KEY_sun_light_kc = "sun_light_kc";
+  static const std::string KEY_sun_light_kl = "sun_light_kl";
+  static const std::string KEY_sun_light_kq = "sun_light_kq";
+  
+  static const std::string KEY_sun_light_specular_red = "sun_light_specular_red";
+  static const std::string KEY_sun_light_specular_blue = "sun_light_specular_blue";
+  static const std::string KEY_sun_light_specular_green = "sun_light_specular_green";
+  static const std::string KEY_sun_light_specular_alpha = "sun_light_specular_alpha";
+
+  static const std::string KEY_lower_frame_rate_bound = "lower_frame_rate_bound";
+  static const std::string KEY_upper_frame_rate_bound = "upper_frame_rate_bound";
+  
+  static const std::string KEY_speech_offset_x = "speech_offset_x";
+  static const std::string KEY_speech_offset_y = "speech_offset_y";
+  static const std::string KEY_speech_offset_z = "speech_offset_z";
+  
+  static const std::string KEY_fog_start = "fog_start";
+  static const std::string KEY_fog_end = "fog_end";
+	
+  static const std::string KEY_far_clip_dist = "far_clip_dist";
+  static const std::string KEY_texture_scale = "texture_scale";
+  
+  // Default config values
+  static const float DEFAULT_character_light_kc = 1.0f;
+  static const float DEFAULT_character_light_kl = 0.0f;
+  static const float DEFAULT_character_light_kq = 0.0f;
+
+  static const float DEFAULT_character_light_ambient_red = 0.0f;
+  static const float DEFAULT_character_light_ambient_green = 0.0f;
+  static const float DEFAULT_character_light_ambient_blue = 0.0f;
+  static const float DEFAULT_character_light_ambient_alpha = 0.0f;
+  
+  static const float DEFAULT_character_light_diffuse_red = 0.0f;
+  static const float DEFAULT_character_light_diffuse_green = 0.0f;
+  static const float DEFAULT_character_light_diffuse_blue = 0.0f;
+  static const float DEFAULT_character_light_diffuse_alpha = 0.0f;
+
+  static const float DEFAULT_character_light_specular_red = 0.0f;
+  static const float DEFAULT_character_light_specular_green = 0.0f;
+  static const float DEFAULT_character_light_specular_blue = 0.0f;
+  static const float DEFAULT_character_light_specular_alpha = 0.0f;
+  
+  static const float DEFAULT_sun_light_kc = 1.0f;
+  static const float DEFAULT_sun_light_kl = 0.0f;
+  static const float DEFAULT_sun_light_kq = 0.0f;
+
+  static const float DEFAULT_sun_light_specular_red = 0.0f;
+  static const float DEFAULT_sun_light_specular_green = 0.0f;
+  static const float DEFAULT_sun_light_specular_blue = 0.0f;
+  static const float DEFAULT_sun_light_specular_alpha = 0.0f;
+
+  static const float DEFAULT_use_textures = true;
+  static const float DEFAULT_use_lighting = true;
+  static const float DEFAULT_show_fps = true;
+  static const float DEFAULT_use_stencil = true;
+
+  static const float DEFAULT_lower_frame_rate_bound = 25.0f;
+  static const float DEFAULT_upper_frame_rate_bound = 30.0f;
+
+  static const float DEFAULT_speech_offset_x = 0.0f;
+  static const float DEFAULT_speech_offset_y = 0.0f;
+  static const float DEFAULT_speech_offset_z = 0.0f;
+
+  static const float DEFAULT_fog_start = 20.0f;
+  static const float DEFAULT_fog_end = 35.0f;
+  static const float DEFAULT_far_clip_dist = 100.0f;
+  static const float DEFAULT_texture_scale = 10.0f;
 
 //#ifndef GL_EXT_compiled_vertex_array
 //static const bool use_ext_compiled_vertex_array = false;
@@ -355,6 +466,8 @@ void GL::print3D(const char *string, int set) {
 
 inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
+//  float m[16];
+//  glLoadTransposeMatrixfARB(&m);
 }
 
 int GL::requestTexture(const std::string &section, const std::string &texture, bool clamp) {
@@ -966,7 +1079,7 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
 }
 
 void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, float *vertex_data, float *texture_data, float *normal_data, bool multitexture) {
-  if (!use_multitexturing) multitexture = false;;
+  if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
   bool textures = checkState(RENDER_TEXTURES);
   bool lighting = checkState(RENDER_LIGHTING);
@@ -979,12 +1092,12 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && texture_data) {
     if (multitexture) {
-      glClientActiveTexture(GL_TEXTURE1);
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
-      glClientActiveTexture(GL_TEXTURE0);
-      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
     } else {	    
       glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1011,9 +1124,9 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && texture_data) {
     if (multitexture)  {
-      glClientActiveTexture(GL_TEXTURE1);
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glClientActiveTexture(GL_TEXTURE0);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     } else {
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1032,12 +1145,12 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && texture_data) {
      if (multitexture) {
-      glClientActiveTexture(GL_TEXTURE1);
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
-      glClientActiveTexture(GL_TEXTURE0);
-      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
     } else {	    
       glTexCoordPointer(2, GL_FLOAT, 0, texture_data);
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1063,9 +1176,9 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && texture_data) {
-      glClientActiveTexture(GL_TEXTURE1);
+      glClientActiveTextureARB(GL_TEXTURE1_ARB);
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glClientActiveTexture(GL_TEXTURE0);
+      glClientActiveTextureARB(GL_TEXTURE0_ARB);
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     } else {
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1292,9 +1405,9 @@ inline void GL::switchTexture(int texture) {
 
 inline void GL::switchTextureID(unsigned int texture) {
   if (_multi_texture_mode) {
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTextureARB(GL_TEXTURE1_ARB);
     glDisable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTextureARB(GL_TEXTURE0_ARB);
     _multi_texture_mode = false;
     
   }
@@ -1453,6 +1566,8 @@ void GL::setupExtensions() {
   } else {
     use_ext_texture_filter_anisotropic = false;
   }
+  use_multitexturing = true;
+#ifdef __WIN32
   glActiveTexture = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTexture");
   glClientActiveTexture = (PFNGLCLIENTACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glClientActiveTexture");
   use_multitexturing = true;
@@ -1469,7 +1584,7 @@ void GL::setupExtensions() {
      use_ext_compiled_vertex_array = false;
      std::cerr << "No glUnlockArraysEXT" << std::endl;
    }
-  
+#endif
   /* Example use og getting a function
   
   typedef void (*GL_ActiveTextureARB_func)(unsigned int);
@@ -1631,17 +1746,29 @@ void GL::switchMultiTextureID(unsigned int texture_1, unsigned int texture_2) {
 //  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture_1);
 //  glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE1);
+  glActiveTextureARB(GL_TEXTURE1_ARB);
   glBindTexture(GL_TEXTURE_2D, texture_2);
-  glMatrixMode(GL_TEXTURE);
-  glLoadIdentity();
-  glScalef(_texture_scale, _texture_scale, 1.0f);
-  glMatrixMode(GL_MODELVIEW);
+//  glMatrixMode(GL_TEXTURE);
+//  glLoadIdentity();
+//  glScalef(_texture_scale, _texture_scale, 1.0f);
+//  glMatrixMode(GL_MODELVIEW);
   
   if (!_multi_texture_mode) glEnable(GL_TEXTURE_2D);
-  glActiveTexture(GL_TEXTURE0);
+  glActiveTextureARB(GL_TEXTURE0_ARB);
   _multi_texture_mode = true;
 }
 
+void GL::setTextureScale(unsigned int unit, float scale) {
+  switch(unit) {
+    case (0): glActiveTextureARB(GL_TEXTURE0_ARB); break;
+    case (1): glActiveTextureARB(GL_TEXTURE1_ARB); break;
+    default: glActiveTextureARB(GL_TEXTURE0_ARB); break;
+  }
+  glMatrixMode(GL_TEXTURE);
+  glLoadIdentity();
+  glScalef(scale, scale, 1.0f);
+  glMatrixMode(GL_MODELVIEW);
+  glActiveTextureARB(GL_TEXTURE0_ARB);
+}
 
 } /* namespace Sear */

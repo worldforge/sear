@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.24 2003-02-22 19:11:48 simon Exp $
+// $Id: Render.h,v 1.25 2003-02-25 22:34:24 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -99,6 +99,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void switchTextureID(unsigned int texture) =0;
   virtual void switchMultiTexture(int texture, int) =0;
   virtual void switchMultiTextureID(unsigned int texture, unsigned int) =0;
+  virtual void setTextureScale(unsigned int unit, float scale) = 0;
   virtual std::string getActiveID() =0;
 
   virtual int patchInFrustum(WFMath::AxisBox<3>) =0;

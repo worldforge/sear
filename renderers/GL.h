@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: GL.h,v 1.26 2003-02-22 19:11:48 simon Exp $
+// $Id: GL.h,v 1.27 2003-02-25 22:34:24 simon Exp $
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -126,7 +126,7 @@ public:
   void playList(unsigned int list) { glCallList(list); }
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { glDeleteLists(list, 1);};
-  
+  void setTextureScale(unsigned int unit, float scale);
 protected:
   System *_system;
   Graphics *_graphics;
@@ -210,109 +210,6 @@ protected:
   bool _multi_texture_mode;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
-private:
-  // Consts
-  static const int sleep_time = 5000;
-
-  static const char * const font_texture = "ui_font";
-  static const char * const splash_texture = "ui_splash";
-  
-  // Config key strings
-  
-  static const char * const KEY_use_textures = "render_use_textures";
-  static const char * const KEY_use_lighting = "render_use_lighting";
-  static const char * const KEY_show_fps = "render_show_fps";
-  static const char * const KEY_use_stencil = "render_use_stencil";
-
-  static const char * const KEY_character_light_kc = "character_light_kc";
-  static const char * const KEY_character_light_kl = "character_light_kl";
-  static const char * const KEY_character_light_kq = "character_light_kq";
-  
-  static const char * const KEY_character_light_ambient_red = "character_light_ambient_red";
-  static const char * const KEY_character_light_ambient_blue = "character_light_ambient_blue";
-  static const char * const KEY_character_light_ambient_green = "character_light_ambient_green";
-  static const char * const KEY_character_light_ambient_alpha = "character_light_ambient_alpha";
-
-  static const char * const KEY_character_light_diffuse_red = "character_light_diffuse_red";
-  static const char * const KEY_character_light_diffuse_blue = "character_light_diffuse_blue";
-  static const char * const KEY_character_light_diffuse_green = "character_light_diffuse_green";
-  static const char * const KEY_character_light_diffuse_alpha = "character_light_diffuse_alpha";
-  
-  static const char * const KEY_character_light_specular_red = "character_light_specular_red";
-  static const char * const KEY_character_light_specular_blue = "character_light_specular_blue";
-  static const char * const KEY_character_light_specular_green = "character_light_specular_green";
-  static const char * const KEY_character_light_specular_alpha = "character_light_specular_alpha";
-  
-  static const char * const KEY_sun_light_kc = "sun_light_kc";
-  static const char * const KEY_sun_light_kl = "sun_light_kl";
-  static const char * const KEY_sun_light_kq = "sun_light_kq";
-  
-  static const char * const KEY_sun_light_specular_red = "sun_light_specular_red";
-  static const char * const KEY_sun_light_specular_blue = "sun_light_specular_blue";
-  static const char * const KEY_sun_light_specular_green = "sun_light_specular_green";
-  static const char * const KEY_sun_light_specular_alpha = "sun_light_specular_alpha";
-
-  static const char * const KEY_lower_frame_rate_bound = "lower_frame_rate_bound";
-  static const char * const KEY_upper_frame_rate_bound = "upper_frame_rate_bound";
-  
-  static const char * const KEY_speech_offset_x = "speech_offset_x";
-  static const char * const KEY_speech_offset_y = "speech_offset_y";
-  static const char * const KEY_speech_offset_z = "speech_offset_z";
-  
-  static const char * const KEY_fog_start = "fog_start";
-  static const char * const KEY_fog_end = "fog_end";
-
-  static const char * const KEY_far_clip_dist = "far_clip_dist";
-  static const char * const KEY_texture_scale = "texture_scale";
-  
-  // Default config values
-  static const float DEFAULT_character_light_kc = 1.0f;
-  static const float DEFAULT_character_light_kl = 0.0f;
-  static const float DEFAULT_character_light_kq = 0.0f;
-
-  static const float DEFAULT_character_light_ambient_red = 0.0f;
-  static const float DEFAULT_character_light_ambient_green = 0.0f;
-  static const float DEFAULT_character_light_ambient_blue = 0.0f;
-  static const float DEFAULT_character_light_ambient_alpha = 0.0f;
-  
-  static const float DEFAULT_character_light_diffuse_red = 0.0f;
-  static const float DEFAULT_character_light_diffuse_green = 0.0f;
-  static const float DEFAULT_character_light_diffuse_blue = 0.0f;
-  static const float DEFAULT_character_light_diffuse_alpha = 0.0f;
-
-  static const float DEFAULT_character_light_specular_red = 0.0f;
-  static const float DEFAULT_character_light_specular_green = 0.0f;
-  static const float DEFAULT_character_light_specular_blue = 0.0f;
-  static const float DEFAULT_character_light_specular_alpha = 0.0f;
-  
-  static const float DEFAULT_sun_light_kc = 1.0f;
-  static const float DEFAULT_sun_light_kl = 0.0f;
-  static const float DEFAULT_sun_light_kq = 0.0f;
-
-  static const float DEFAULT_sun_light_specular_red = 0.0f;
-  static const float DEFAULT_sun_light_specular_green = 0.0f;
-  static const float DEFAULT_sun_light_specular_blue = 0.0f;
-  static const float DEFAULT_sun_light_specular_alpha = 0.0f;
-
-  static const float DEFAULT_use_textures = true;
-  static const float DEFAULT_use_lighting = true;
-  static const float DEFAULT_show_fps = true;
-  static const float DEFAULT_use_stencil = true;
-
-  static const float DEFAULT_lower_frame_rate_bound = 25.0f;
-  static const float DEFAULT_upper_frame_rate_bound = 30.0f;
-
-  static const float DEFAULT_speech_offset_x = 0.0f;
-  static const float DEFAULT_speech_offset_y = 0.0f;
-  static const float DEFAULT_speech_offset_z = 0.0f;
-
-  static const float DEFAULT_fog_start = 20.0f;
-  static const float DEFAULT_fog_end = 35.0f;
-  static const float DEFAULT_far_clip_dist = 100.0f;
-  static const float DEFAULT_texture_scale = 100.0f;
-
-
-  
 };
 
 } /* namespace Sear */

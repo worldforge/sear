@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: ROAM.h,v 1.13 2002-12-14 14:46:36 simon Exp $
+// $Id: ROAM.h,v 1.14 2003-02-25 22:34:25 simon Exp $
 
 #ifndef SEAR_ROAM_H
 #define SEAR_ROAM_H 1
@@ -56,23 +56,9 @@ public:
   void writeConfig();
 
   float _terrain_scale;
+  float _detail_scale;
   
 protected:
-  
-  static const int DEFAULT_height = 128;
-  static const float DEFAULT_water_level = 127.0f;
-  static const float DEFAULT_terrain_scale = 0.01f;
-
-  static const char * const KEY_water_level = "terrain_water_level";
-  static const char * const KEY_height = "terrain_height";
-  
-  static const char * const KEY_height_map = "height_map";
-  static const char * const KEY_terrain_scale = "terrain_scale";
- 
-  static const char * const KEY_num_x_landscapes = "num_x_landscapes";
-  static const char * const KEY_num_y_landscapes = "num_y_landscapes";
-  static const char * const KEY_landscape = "landscape_";
-  
   
   void render();
   int loadHeightMap(float **, const std::string&);

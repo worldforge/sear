@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: Landscape.cpp,v 1.17 2003-02-22 19:11:48 simon Exp $
+// $Id: Landscape.cpp,v 1.18 2003-02-25 22:34:25 simon Exp $
 
 // Code based upon ROAM Simplistic Implementation by Bryan Turner bryan.turner@pobox.com
 
@@ -18,8 +18,16 @@
 #include "Landscape.h"
 #include "ROAM.h"
 
-#ifdef DEBUG
+#ifdef HAVE_CONFIG
+  #include "config.h"
+#endif
+
+#ifdef USE_MMGR
   #include "common/mmgr.h"
+#endif
+
+
+#ifdef DEBUG
   static const bool debug = true;
 #else
   static const bool debug = false;
@@ -176,7 +184,7 @@ void Landscape::render() {
   _renderer->translateObject(offset_x, offset_y, 0.0f);
 
   waterlevel = ROAM::_water_level + sin(System::instance()->getTime() / 1000.0f) * _terrain->_terrain_scale;
-
+  _renderer->setTextureScale(1, _terrain->_detail_scale);
   _renderer->setColour(1.0f, 1.0f, 1.0f, 1.0f);	
   _renderer->stateChange(TERRAIN);
   if (_renderer->checkState(Render::RENDER_TEXTURES)) {
@@ -209,6 +217,7 @@ void Landscape::render() {
   //if ( GetNextTriNode() != gDesiredTris ) gFrameVariance += ((float)GetNextTriNode() - (float)gDesiredTris) / (float)gDesiredTris;
   // Bounds checking.
   if (gFrameVariance < 0 ) gFrameVariance = 0;
+  _renderer->setTextureScale(1, 1.0f);
 }
 //
 
