@@ -1273,7 +1273,7 @@ void GL_Render::drawBBox(BoundBox *bbox) {
 
 void GL_Render::CheckError() {
   GLenum err = glGetError();
-  string msg;
+  std::string msg;
   switch (err) {
     case GL_NO_ERROR: break;
     case GL_INVALID_ENUM: msg = "GL Error: Invalid enum!"; break;

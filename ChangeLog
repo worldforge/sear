@@ -1,3 +1,6 @@
+2nd July 2002, Al Riddoch
+ * ISO C++ compliance fixes.
+
 1st July 2002, Simon Goodall
  * Log applied to Bindings, Camerai, Character, Config, Console, Event, GL_Render, Model, Object Loader, SkyBox, System, Terrain and WorldEntity classes.
  * debug.h removed as will be encapsulated in Log class

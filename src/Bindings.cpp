@@ -9,6 +9,8 @@
 #include <SDL/SDL.h>
 #include "Log.h"
 
+#include <iostream>
+
 namespace Sear {
 
 std::map<int, std::string> Bindings::keymap = std::map<int, std::string>();
