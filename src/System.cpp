@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.112 2005-04-04 10:20:03 simon Exp $
+// $Id: System.cpp,v 1.113 2005-04-07 11:05:38 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -347,22 +347,22 @@ void System::shutdown() {
   // Save config
   writeConfig(m_general);
 
-  if (m_character) {
-    m_character->shutdown();
-    delete m_character;
-    m_character = NULL;
-  }
-  if (m_client) {
+//  if (m_client) {
     m_client->shutdown();
     delete m_client;
     m_client = NULL;
-  }
+//  }
   
-  if (m_action_handler) {
+//  if (m_character) {
+    m_character->shutdown();
+    delete m_character;
+    m_character = NULL;
+//  }
+//  if (m_action_handler) {
     m_action_handler->shutdown();
     delete m_action_handler;
     m_action_handler = NULL;
-  }
+//  }
 //  if (m_object_handler) {
 //    m_object_handler->shutdown();
 //    delete m_object_handler;
@@ -381,21 +381,21 @@ void System::shutdown() {
   RenderSystem::getInstance().shutdown();
 
 
-  if (m_editor) {
+//  if (m_editor) {
     delete m_editor;
     m_editor = NULL;
-  }
+//  }
 
-  if (m_workspace)  {
+//  if (m_workspace)  {
     delete m_workspace;
     m_workspace = NULL;
-  }
+//  }
 
-  if (m_calendar) {
+//  if (m_calendar) {
     m_calendar->shutdown();
     delete m_calendar;
     m_calendar = NULL;
-  }
+//  }
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileList shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
@@ -403,21 +403,21 @@ void System::shutdown() {
     m_script_engine->runScript(*I);
   }
   Bindings::shutdown();
-  if (m_script_engine) {
+//  if (m_script_engine) {
     m_script_engine->shutdown();
     delete m_script_engine;
     m_script_engine = NULL;
-  }  
-  if (m_file_handler) {
+//  }  
+//  if (m_file_handler) {
 //    m_file_handler->shutdown();
     delete m_file_handler;
     m_file_handler = NULL;
-  }
-  if (m_console) {
+//  }
+//  if (m_console) {
     m_console->shutdown();
     delete m_console;
     m_console = NULL;
-  }
+//  }
  
   if (m_sound) {
     m_sound->shutdown();

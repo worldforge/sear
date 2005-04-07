@@ -1,5 +1,12 @@
 2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/System.cpp: Re-order client and character destruction to avoid
+	  hitting an assert. Remove if (blah) delete as blah should exist at
+	  this point.
+
+2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+
 	* src/Calendar.cpp, src/Calendar.h: Change member variable prefix to m_.
 	  Intialise TimeStamp with epochStart().
 
