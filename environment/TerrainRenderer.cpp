@@ -13,6 +13,7 @@
 #include "renderers/Render.h"
 
 #include <sage/GLU.h>
+#include <sage/GL.h>
 
 #include "src/System.h"
 #include <Mercator/Segment.h>
@@ -96,13 +97,12 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
 
   glGenTextures (surfaces.size (), seg.m_alphaTextures);
   // FIXME These textures we have allocated are leaked.
-  for (int texNo = 0; I != surfaces.end (); ++I, ++texNo) {
-    if ((!(*I)->m_shader.checkIntersect (**I)) || (texNo == 0)) {
-      continue;
-    }
+  for (int texNo = 0; I != surfaces.end(); ++I, ++texNo) {
+    if (texNo == 0) continue; // shader 0 never has alpah
+    
     glBindTexture (GL_TEXTURE_2D, seg.m_alphaTextures[texNo]);
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, 65, 65, GL_ALPHA,
-                     GL_UNSIGNED_BYTE, (*I)->getData ());
+                     GL_UNSIGNED_BYTE, I->second->getData ());
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -136,15 +136,13 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map, DataSeg & seg) {
   }
 
   const Mercator::Segment::Surfacestore & surfaces = map->getSurfaces ();
+  
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
 
   for (int texNo = 0; I != surfaces.end (); ++I, ++texNo) {
-    // Do a rough check to see if this pass applies to this segment
-    if (!(*I)->m_shader.checkIntersect (**I)) {
-      continue;
-    }
+           
     // Set up the first texture unit with the ground texture
-    RenderSystem::getInstance ().switchTexture (0, m_textures[texNo]);
+    RenderSystem::getInstance ().switchTexture (0, m_textures[I->first]);
 
     // Set up the second texture unit with the alpha texture
     // This is not required for the first pass, as the first pass
@@ -235,7 +233,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
           s->populate ();
         }
         Mercator::Segment::Surfacestore & surfaces = s->getSurfaces ();
-        if (!surfaces.empty () && !surfaces.front ()->isValid ()) {
+        if (!surfaces.empty () && !surfaces.begin()->second->isValid ()) {
           s->populateSurfaces ();
         }
         // Generate the alpha textures for each shader for this surface
@@ -387,7 +385,7 @@ TerrainRenderer::TerrainRenderer ():
 
   // Add to mercator terrain
   for (unsigned int i = 0; i < m_shaders.size (); ++i) {
-    m_terrain.addShader (m_shaders[i]);
+    m_terrain.addShader (m_shaders[i], i);
   }
 }
 

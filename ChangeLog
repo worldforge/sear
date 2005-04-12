@@ -1,3 +1,8 @@
+2005-04-12 James Turner <james@worldforge.org>
+
+	* environment/TerrainRenderer.cpp: update to work with the modified
+	  Surfacestore API in Mercator.
+
 2005-04-06  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/System.cpp: Re-order client and character destruction to avoid
