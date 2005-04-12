@@ -1,3 +1,12 @@
+2005-04-12  Simon Goodall  <sear@simongoodall.co.uk>
+	
+	* loaders/NPlane.cpp: Free display lists in invalidate
+	* renderers/GL.cpp: Set pixelStore state on startup
+	* renderers/Graphics.cpp, renderers/Graphics.h: Merge James' changes to 
+	  make buildQueues more readable
+	* src/System.cpp: Remove some null pointer checks. Assert would be more
+	  suitable.
+
 2005-04-12 James Turner <james@worldforge.org>
 
 	* environment/TerrainRenderer.cpp: update to work with the modified

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.3 2005-03-04 17:58:24 simon Exp $
+// $Id: Graphics.h,v 1.4 2005-04-12 14:33:13 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -112,6 +112,14 @@ private:
   LightManager *m_lm;
 
   Light m_fire;
+
+    /**
+    Helper to qeueue the models for a single object record
+    */
+    void drawObject(ObjectRecord* obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list);
 };
 
 } /* namespace Sear */

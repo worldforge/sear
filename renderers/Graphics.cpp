@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.6 2005-04-05 21:56:09 simon Exp $
+// $Id: Graphics.cpp,v 1.7 2005-04-12 14:33:13 simon Exp $
 
 #include <sage/sage.h>
 
@@ -328,8 +328,8 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 //  we->checkActions(); // See if model animations need to be updated
   if (depth == 0 || we->isVisible()) {
     if (we->getType() != NULL) {
-      ObjectRecord *object_record = ModelSystem::getInstance().getObjectRecord(we);
-      assert (object_record);
+      ObjectRecord *obj = ModelSystem::getInstance().getObjectRecord(we);
+      assert (obj != NULL);
 
       // Setup lights as we go
       if (we->type() == "fire") {
@@ -347,36 +347,49 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         m_fire.enabled = false;
       }
 
-
       // Loop through all models in list
-      if (object_record->draw_self) {
+      if (obj->draw_self) {
         if ((cam->getType() == Camera::CAMERA_FIRST)
-         && (we->getId() == self->getId())) {
-           // Do nothing - We don't want to render ourself in first person mode
+         && (we->getId() == self->getId())) { 
+          /* first person, don't draw self */
         } else {
-          // Check if we're visible
-          // Change method here
-          if (Frustum::sphereInFrustum(m_frustum, object_record->bbox, object_record->position)) {
-          //if (Frustum::orientBBoxInFrustum(m_frustum, we->getOrientBBox(), object_record->position)) {
-            for (ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); ++I) {
-              if (!select_mode) {
-assert((int)ModelSystem::getInstance().getModelRecords().getItem(*I, "state_num") > 1.0);
-                 // Add to queue by state, then model record
-                 render_queue[ModelSystem::getInstance().getModelRecords().getItem(*I, "state_num")].push_back(Render::QueueItem(object_record, *I));
-                if (we->hasMessages()) message_list.push_back(we);
-              }
-              else render_queue[ModelSystem::getInstance().getModelRecords().getItem(*I, "select_state_num")].push_back(Render::QueueItem(object_record, *I));
-            }
-          }
+          drawObject(obj, select_mode, render_queue, message_list);
         }
       }
-      if (object_record->draw_members) {
+      // Draw any contained objects
+      if (obj->draw_members) {
         for (unsigned int i = 0; i < we->numContained(); ++i) {
-          buildQueues((WorldEntity*)we->getContained(i), depth + 1, select_mode, render_queue, message_list);
+          buildQueues(static_cast<WorldEntity*>(we->getContained(i)),
+                      depth + 1, select_mode, render_queue, message_list);
         }
       }
     }
   }
+}
+
+void Graphics::drawObject(ObjectRecord* obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list)
+{
+   
+  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
+
+  const char* nm = select_mode ? "select_state_num" : "state_num";
+    
+  ObjectRecord::ModelList::const_iterator I;
+  for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
+    int stateNum = ModelSystem::getInstance().getModelRecords().getItem(*I, nm);
+
+    if (stateNum <= 0) continue; // bad state
+
+    // Add to queue by state, then model record
+    render_queue[stateNum].push_back(Render::QueueItem(obj, *I));
+  }
+  // if rendering, add any messages
+  if (!select_mode && obj->entity->hasMessages()) {
+    message_list.push_back(obj->entity);
+  } // of object models loop
 }
 
 void Graphics::readConfig(varconf::Config &config) {

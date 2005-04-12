@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.113 2005-04-07 11:05:38 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+// $Id: System.cpp,v 1.114 2005-04-12 14:33:13 simon Exp $
 
 #include "sear_icon.xpm"
 
@@ -32,7 +28,6 @@
 #include "renderers/CameraSystem.h"
 #include "Character.h"
 #include "client.h"
-#include "conf.h"
 #include "Console.h"
 #include "Exception.h"
 #include "FileHandler.h"
@@ -177,7 +172,7 @@ System::~System() {
 
 bool System::init(int argc, char *argv[]) {
   assert (m_initialised == false);
-  if (m_initialised) shutdown();
+//  if (m_initialised) shutdown();
   if (!initVideo()) return false;
 
 
@@ -185,9 +180,11 @@ bool System::init(int argc, char *argv[]) {
   m_script_engine->init();
 //  m_model_handler = new ModelHandler();
 //  m_model_handler->init();
-  m_client = new Client(this, CLIENT_NAME);
+  m_client = new Client(this, "Sear");
   if(!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
+    #warning "possible mem-leak here"
+
     throw Exception("ERIS INIT");
   }
   
@@ -231,7 +228,6 @@ bool System::init(int argc, char *argv[]) {
   m_character->init();
   m_character->registerCommands(m_console);
 
-// TODO this is leaked
   m_editor = new Editor();
   m_editor->registerCommands(m_console);
 
@@ -328,6 +324,7 @@ bool System::init(int argc, char *argv[]) {
   if (!success) return false;
 
   // TODO:these are probably leaked, however freeing them often causes a segfault!
+  #warning "m_icon maybe leaked"
   if (!m_icon) m_icon = IMG_ReadXPMFromArray(sear_icon_xpm);
   SDL_WM_SetIcon(m_icon, NULL);
   // Hide cursor
@@ -468,7 +465,9 @@ void System::mainLoop() {
       }
       // Update Calendar
 //      m_calendar->update(time_elapsed);
-      if (m_client->getAvatar()) m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
+      if (m_client->getAvatar()) {
+        m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
+      }
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);
     } catch (ClientException ce) {
@@ -492,6 +491,10 @@ void System::mainLoop() {
 
 void System::handleEvents(const SDL_Event &event) {
   Render *renderer = RenderSystem::getInstance().getRenderer();
+
+  assert(m_character != NULL);
+  assert(renderer != NULL);
+
   m_workspace->handleEvent(event);
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
@@ -509,9 +512,9 @@ void System::handleEvents(const SDL_Event &event) {
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-          if (m_character != NULL) {
+//          if (m_character != NULL) {
             m_character->moveForward(1);
-          }
+  //        }
         }
         break;
       }
@@ -527,15 +530,15 @@ void System::handleEvents(const SDL_Event &event) {
                   ((event.button.x != m_click_x) ||
                    (event.button.y != m_click_y))) {
                   std::cout << "DRAG" << std::endl << std::flush;
-                  if (m_character) m_character->getEntity(m_click_id);
+                  m_character->getEntity(m_click_id);
               } else {
                   std::cout << "CLICK" << std::endl << std::flush;
-                  if (m_character) m_character->touchEntity(m_click_id);
+                  m_character->touchEntity(m_click_id);
               }
             }
             break;
-            case (ACTION_PICKUP):  if (m_character) m_character->getEntity(m_click_id); break;
-            case (ACTION_TOUCH): if (m_character) m_character->touchEntity(m_click_id); break;
+            case (ACTION_PICKUP): m_character->getEntity(m_click_id); break;
+            case (ACTION_TOUCH): m_character->touchEntity(m_click_id); break;
           }
           setAction(ACTION_DEFAULT);
           m_click_on = false;
@@ -543,9 +546,9 @@ void System::handleEvents(const SDL_Event &event) {
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-          if (m_character != NULL) {
+//          if (m_character != NULL) {
             m_character->moveForward(-1);
-          }
+  //        }
         }
         break;
       }
@@ -604,11 +607,11 @@ void System::handleEvents(const SDL_Event &event) {
     case SDL_JOYBUTTONDOWN: {
       if (event.jbutton.button == DEFAULT_joystick_touch_button) {
         renderer->procEvent(m_width / 2, m_height / 2);
-        if (m_character) m_character->touchEntity(renderer->getActiveID());
+        m_character->touchEntity(renderer->getActiveID());
       }
       if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
         renderer->procEvent(m_width / 2, m_height / 2);
-        if (m_character) m_character->getEntity(renderer->getActiveID());
+	m_character->getEntity(renderer->getActiveID());
       }
       break;
     }
@@ -634,9 +637,9 @@ void System::handleAnalogueControllers() {
     dy -= my;
     if (dx != 0) {
       float rotation = dx / 4.f;
-      if (m_character != NULL) {
+//      if (m_character != NULL) {
         m_character->rotateImmediate(rotation);
-      }
+//      }
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
@@ -676,8 +679,9 @@ void System::handleAnalogueControllers() {
 
 void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 {
+  assert (m_character != NULL);
     if (!m_axisBindings.count(axis)) return;
-    if (m_character == NULL) return;
+//    if (m_character == NULL) return;
     
     std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
     
@@ -915,7 +919,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == READ_CONFIG) {
     readConfig(m_general);
-    if (m_character)m_character->readConfig(m_general);
+    m_character->readConfig(m_general);
   }
   else if (command == BIND_KEY) {
     std::string key = tokeniser.nextToken();

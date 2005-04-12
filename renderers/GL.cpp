@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-#ifdef HAVE_CONFIG_H
- #include "config.h"
-#endif
+// $Id: GL.cpp,v 1.110 2005-04-12 14:33:13 simon Exp $
 
 #include <SDL/SDL.h>
 #include <sage/sage.h>
@@ -347,7 +345,8 @@ void GL::checkError() {
 
 void GL::setupExtensions() {
   sage_init();
-
+//  sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
+ 
   m_use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
   use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
 
@@ -460,6 +459,7 @@ void GL::init() {
 void GL::invalidate() {
   // Clear font display list
   shutdownFont();
+  setupStates();
   //
 }
 
@@ -834,6 +834,8 @@ void GL::setupStates() {
   glFogfv(GL_FOG_COLOR, fog_colour);
   glFogf(GL_FOG_START, m_fog_start);
   glFogf(GL_FOG_END, m_fog_end);
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 inline void GL::translateObject(float x, float y, float z) {
@@ -1157,7 +1159,7 @@ inline void GL::beginFrame() {
 }
 
 inline void GL::endFrame(bool select_mode) {
-  glFlush();
+//  glFlush();
   if (!select_mode) SDL_GL_SwapBuffers();
   if (debug) checkError();
 }
@@ -1532,6 +1534,7 @@ void GL::resize(int width, int height) {
 }
 
 void GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
+ // Taken from equator
   y = m_height - y;
   GLint viewport[4];
   GLdouble mvmatrix[16], projmatrix[16];

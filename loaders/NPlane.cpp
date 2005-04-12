@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.23 2005-03-15 17:33:58 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: NPlane.cpp,v 1.24 2005-04-12 14:33:13 simon Exp $
 
 #include "common/Utility.h"
 
@@ -127,6 +123,10 @@ int NPlane::shutdown() {
 
 void NPlane::invalidate() {
   assert(m_render);
+  m_render->freeList(m_disp);
+  m_render->freeList(m_select_disp);
+  m_disp = 0;
+  m_select_disp = 0;
 }
 
 void NPlane::render(bool select_mode) {
