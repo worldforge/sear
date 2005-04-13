@@ -1,7 +1,7 @@
 
 [Setup]
 AppName=Sear
-AppVerName=Sear @SEAR_VERSION@
+AppVerName=Sear @VERSION@
 AppPublisher=Simon Goodall
 AppPublisherURL=http://www.worldforge.org/dev/eng/clients/sear
 AppSupportURL=http://www.worldforge.org/dev/eng/clients/sear
@@ -13,7 +13,7 @@ Uninstallable=yes
 UninstallFilesDir={app}\uninst
 UninstallDisplayIcon={app}\Sear.bat
 UninstallDisplayName=Sear
-OutputBaseFilename=sear_win32_setup-@SEAR_VERSION@
+OutputBaseFilename=sear_win32_setup-@VERSION@
 [Tasks]
 Name: "desktopicon"; Description: "Create a &desktop icon"; GroupDescription: "Additional icons:"
 Name: "quicklaunchicon"; Description: "Create a &Quick Launch icon"; GroupDescription: "Additional icons:"; Flags: unchecked

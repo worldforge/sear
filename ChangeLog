@@ -1,5 +1,9 @@
 2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* Sear.iss.in: Use VERSION instead of removed SEAR_VERSION
+
+2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/client.cpp: Do not delete Factory as Eris handles this.
 	* environment/Environment.cpp: Add missing includes so it compiles. Add 
 	  some asserts to check for initialisation. Remove some "if (blah)"
