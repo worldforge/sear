@@ -1,5 +1,13 @@
 2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/conf.h: Remove file.
+	* renderers/Camera.cpp, src/main.cpp: Remove conf.h include
+	* loaders/Modelhandler.cpp:  Remove old comments
+	* renderers/RenderSystem.cpp: Remove call to shutdown in destrutor.
+	* src/Factory.cpp: Remove "Type: xxxx" output
+
+2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.in,configure.ac: Rename to configure.ac. Update Mercator and
 	  Eris version requirements. Change USE_MMGE to a cmd define.  Add call
 	  to AM_BINRELOC 

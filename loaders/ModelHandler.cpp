@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.8 2005-04-13 07:20:52 jmt Exp $
+// $Id: ModelHandler.cpp,v 1.9 2005-04-13 10:14:10 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -83,8 +83,7 @@ void ModelHandler::init() {
 
 void ModelHandler::shutdown() {
   assert (m_initialised == true);
-  //TODO Bug James to implement this
-  //m_timeout->cancel(); 
+
   delete m_timeout;
 
   // Clean up model loaders

@@ -1,8 +1,9 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.21 2005-02-18 16:39:06 simon Exp $
+// $Id: main.cpp,v 1.22 2005-04-13 10:14:09 simon Exp $
+
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -10,12 +11,6 @@
 #include <unistd.h>
 #include <iostream>
 #include <string>
-
-#ifdef HAVE_CONFIG_H
-    #include "config.h"
-#endif
-
-#include "conf.h"
 #include "System.h"
 #include "Exception.h"
 #include "common/operations.h"
@@ -99,7 +94,7 @@ under certain conditions; type `show c' for details.
   }
   try {
   //  sys->createWindow(false);
-    sys->setCaption(CLIENT_NAME, CLIENT_NAME);
+    sys->setCaption("Sear", "Sear");
     sys->mainLoop();
   } catch (Sear::Exception e) {
     std::cerr << "Exception: " << e.getMessage() << std::endl;

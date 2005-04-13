@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.6 2005-02-18 17:06:16 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: Factory.cpp,v 1.7 2005-04-13 10:14:09 simon Exp $
 
 #include "Factory.h"
 
@@ -26,7 +22,7 @@ namespace Sear {
 
    Eris::EntityPtr Factory::instantiate(const Atlas::Objects::Entity::GameEntity & ge, Eris::TypeInfo *type, Eris::View *view) {
 
-std::cout << "Type: " << type->getName() << std::endl;
+    //std::cout << "Type: " << type->getName() << std::endl;
     if (type->isA(terrainType)) {
       return new TerrainEntity(ge->getId(), type, view);
     } else {

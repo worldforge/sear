@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: RenderSystem.cpp,v 1.11 2005-04-13 10:14:10 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -36,7 +34,7 @@ RenderSystem RenderSystem::m_instance;
 
 void RenderSystem::init() {
   assert (m_initialised == false);
-  if (m_initialised) shutdown();
+  
   if (debug) std::cout << "RenderSystem: Initialise" << std::endl;
 
   m_renderer = new GL();
@@ -92,7 +90,7 @@ void RenderSystem::initContext() {
 
 void RenderSystem::shutdown() {
   assert (m_initialised);
-  if (!m_initialised) return;
+  
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
 
   m_cameraSystem->shutdown();
