@@ -4,6 +4,8 @@ noinst_LIBRARIES = libSear.a
 
 INCLUDES = -I$(top_srcdir)
 
+AM_CPPFLAGS = $(BINRELOC_CFLAGS)
+
 EXTRA_DIST = sear.rc
 
 if BUILD_STATIC
@@ -85,7 +87,6 @@ libSear_a_SOURCES = \
 	Character.h \
 	client.cpp \
 	client.h \
-	conf.h \
 	Console.cpp \
 	Console.h \
 	cursors.h \
@@ -110,7 +111,8 @@ libSear_a_SOURCES = \
 	Calendar.h \
 	Editor.cpp \
 	Editor.h \
-	TerrainEntity.cpp TerrainEntity.h
+	TerrainEntity.cpp TerrainEntity.h \
+	prefix.c prefix.h
 
 #	Lobby.cpp \
 #	Lobby.h \

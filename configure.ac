@@ -1,7 +1,8 @@
 dnl Initialise autoconf
 
-AC_INIT()
-AM_CONFIG_HEADER(config.h)
+AC_INIT([sear], [0.5.0])
+AC_CONFIG_SRCDIR([src/main.cpp])
+AC_CONFIG_HEADER([config.h])
 
 ###################################
 # TODO remove unrequired checks when eris is released as it pulls in most libs
@@ -12,18 +13,10 @@ dnl Detect the canonical host and target build environment
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-dnl Initialise automake
-SEAR_MAJOR_VERSION=0
-SEAR_MINOR_VERSION=5
-SEAR_MICRO_VERSION=0
-SEAR_VERSION=$SEAR_MAJOR_VERSION.$SEAR_MINOR_VERSION.$SEAR_MICRO_VERSION
-
-AC_SUBST(SEAR_VERSION)
-
-AM_INIT_AUTOMAKE(sear, $SEAR_VERSION)
+AM_INIT_AUTOMAKE([check-news])
 
 dnl Need libtool
-
+AM_BINRELOC
 AM_PROG_LIBTOOL
 dnl AC_PROG_LIBTOOL
 
@@ -69,7 +62,7 @@ AC_ARG_ENABLE(mmgr,
   [
     if test "$enableval" = "yes"; then
       use_mmgr="true"
-      AC_DEFINE(USE_MMGR, 1, [Compile in mmgr code])
+      CXXFLAGS="$CXXFLAGS -DUSE_MMGR=1"
     else
       use_mmgr="false"
     fi
@@ -174,9 +167,9 @@ UNSUSED=0
 UNSUSED=0
 ])
 
-MERCATOR_VERSION=0.2.0
+MERCATOR_VERSION=0.2.2
 VARCONF_VERSION=0.6.1
-ERIS_VERSION=1.3.0
+ERIS_VERSION=1.3.4
 SAGE_VERSION=0.1.1
 LIBMODELFILE=0.1.91
 PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 >= $ERIS_VERSION sage >= $SAGE_VERSION libmd3-0.2 >= $LIBMODELFILE,

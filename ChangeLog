@@ -1,3 +1,12 @@
+2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.in,configure.ac: Rename to configure.ac. Update Mercator and
+	  Eris version requirements. Change USE_MMGE to a cmd define.  Add call
+	  to AM_BINRELOC 
+	* acinclude.m4: Add binreloc m4 macro
+	* src/prefix.c, src/prefix.h, src/Makefile.am, src/FileHandler.cpp: Add
+	  autopackages binreloc code.
+
 2005-04-13 James Turner <james@worldforge.org>
 
 	* environment/Environment.cpp, environment/Environment.h: add in

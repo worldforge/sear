@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.15 2005-01-10 11:32:03 simon Exp $
+// $Id: FileHandler.cpp,v 1.16 2005-04-13 10:10:05 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,6 +15,8 @@
 
 #include "FileHandler.h"
 #include "Console.h"
+
+#include "prefix.h"
 
 #ifdef __WIN32__
     #include <io.h> // for _access, Win32 version of stat()
@@ -109,11 +111,15 @@ FileHandler::~FileHandler() {}
 std::string FileHandler::getInstallBasePath() const
 {
 #ifdef __APPLE__
-    return getBundleResourceDirPath();
+  return getBundleResourceDirPath();
 #elif __WIN32__
-    return std::string(".");
+  return std::string(".");
 #else
-    return std::string(INSTALLDIR) + std::string("/share/sear");
+  #ifdef ENABLE_BINRELOC
+  return std::string(DATADIR) + std::string("/sear");
+#else
+  return std::string(INSTALLDIR) + std::string("/share/sear");
+#endif
 #endif
 }
 
