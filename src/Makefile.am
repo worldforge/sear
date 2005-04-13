@@ -4,7 +4,7 @@ noinst_LIBRARIES = libSear.a
 
 INCLUDES = -I$(top_srcdir)
 
-AM_CPPFLAGS = $(BINRELOC_CFLAGS)
+#AM_CPPFLAGS = $(BINRELOC_CFLAGS)
 
 EXTRA_DIST = sear.rc
 
