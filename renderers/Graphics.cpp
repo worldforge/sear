@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.7 2005-04-12 14:33:13 simon Exp $
+// $Id: Graphics.cpp,v 1.8 2005-04-13 21:53:31 simon Exp $
 
 #include <sage/sage.h>
 
@@ -53,12 +53,12 @@ namespace Sear {
 
  extern void renderDome(float, int, int);
 static const std::string GRAPHICS = "graphics";
-	
+
 static const std::string DEFAULT = "default";
 static const std::string FONT = "font";
 static const std::string STATE = "state";
 static const std::string SELECT = "select_state";
-	  // Consts
+  // Consts
   static const int sleep_time = 5000;
   
   // Config key strings
@@ -238,45 +238,53 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
     assert(focus != NULL);
-//    if (focus) {
-      std::string id = focus->getId();
-      static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
-      m_orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      m_orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
-      pos = focus->getAbsPos();
-      float x = pos.x(),
-            y = pos.y(),
-            z = pos.z();
-      
-      // Apply camera rotations
-      m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
-      m_orient /= WFMath::Quaternion(z_vector, cam->getRotation());
-      
-//      if (m_character)
- m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
 
-      // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
-      if (!select_mode) {
-	m_renderer->store();
-        m_renderer->applyQuaternion(m_orient);
-        Environment::getInstance().renderSky();
-	m_renderer->restore();
-      }
 
-      if (cam->getType() == Camera::CAMERA_CHASE) {
-        // Translate camera getDist() units away from the character. Allows closups or large views
-        m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
-      }
-      m_renderer->applyCharacterLighting(0.5, 0, 0.5);
+    static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
+    m_orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+    m_orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
+    pos = focus->getAbsPos();
+    float x = pos.x(),
+          y = pos.y(),
+          z = pos.z();
+
+    // Apply camera rotations
+    m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
+    m_orient /= WFMath::Quaternion(z_vector, cam->getRotation());
+      
+    m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
+
+    // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
+    if (!select_mode) {
+      m_renderer->store();
       m_renderer->applyQuaternion(m_orient);
-      
-      float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
-      m_renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
-    
-      // m_renderer->applyCharacterLighting(x, y, z + height);
+      Environment::getInstance().renderSky();
+      m_renderer->restore();
+    }
 
-      m_renderer->getFrustum(m_frustum);
-//    }
+    if (cam->getType() == Camera::CAMERA_CHASE) {
+      // Translate camera getDist() units away from the character. Allows closups or large views
+      m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
+    }
+    m_renderer->applyCharacterLighting(0.5, 0, 0.5);
+    m_renderer->applyQuaternion(m_orient);
+      
+    // Calculate entity height so camera is always at the top
+    float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+
+    // Adjust height so camera doesn't go underneath the terrain
+    // Find terrain height at camera position, and adjust as if camera is at
+    // entity feet. (the - height part)
+    float terrain_z = Environment::getInstance().getHeight(x - cam->getXPos(),y + cam->getYPos()) + cam->getZPos() - height;
+    // If the calculated terrain height is larger than the current Z for the 
+    // camera, adjust to bound
+    if (terrain_z > z) {
+      z = terrain_z;
+    }
+
+    m_renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
+    
+    m_renderer->getFrustum(m_frustum);
     // Setup main light sources
     m_renderer->applyLighting();
 
@@ -293,17 +301,17 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     assert(view);
     WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
     assert(root);
-//    if (root != NULL) {
-      assert(System::instance()->getCharacter());
-      System::instance()->getCharacter()->updateLocals(false);
-      m_render_queue = Render::QueueMap();
-      m_message_list = Render::MessageList();
 
-      buildQueues(root, 0, select_mode, m_render_queue, m_message_list);
+    assert(System::instance()->getCharacter());
 
-      m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
-      if (!select_mode) m_renderer->drawMessageQueue(m_message_list);
-//    }
+    System::instance()->getCharacter()->updateLocals(false);
+    m_render_queue = Render::QueueMap();
+    m_message_list = Render::MessageList();
+
+    buildQueues(root, 0, select_mode, m_render_queue, m_message_list);
+
+    m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
+    if (!select_mode) m_renderer->drawMessageQueue(m_message_list);
 
     m_renderer->store();
     RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));

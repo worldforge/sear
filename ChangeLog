@@ -1,5 +1,10 @@
 2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Camera.cpp: Fix calculation of x/y/z pos.
+	* renderers/Graphics.cpp: Make sure camera doesn't go under terrain.
+
+2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Makefile.am: Remove BINRELOC CFLAGS as this information is also 
 	  added as a AC_DEFINE statement.
 

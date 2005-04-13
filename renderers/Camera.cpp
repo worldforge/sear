@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.3 2005-04-13 10:14:10 simon Exp $
+// $Id: Camera.cpp,v 1.4 2005-04-13 21:53:31 simon Exp $
 
 #include <string>
 
@@ -86,9 +86,8 @@ bool Camera::init() {
   //readConfig();
 
   // Store initial euclidean camera values
-  float dist_sqr = m_distance * m_distance;
-  m_x_pos = dist_sqr * cos(m_elevation) * cos(m_rotation);
-  m_y_pos = dist_sqr * cos(m_elevation) * sin(m_rotation);
+  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
+  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
   m_z_pos = m_distance * sin(m_elevation);
 
   // Connect callback to check for updates
@@ -126,26 +125,23 @@ void Camera::updateCameraPos(float time_elapsed) {
     changed = true;
   }
   if (changed) {
-    float dist_sqr = m_distance * m_distance;
-    m_x_pos = dist_sqr * cos(m_elevation) * cos(m_rotation);
-    m_y_pos = dist_sqr * cos(m_elevation) * sin(m_rotation);
+    m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
+    m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
     m_z_pos = m_distance * sin(m_elevation);
   }
 }
 
 void Camera::rotateImmediate(float rot) {
   m_rotation  += deg_to_rad(rot);
-  float dist_sqr = m_distance * m_distance;
-  m_x_pos = dist_sqr * cos(m_elevation) * cos(m_rotation);
-  m_y_pos = dist_sqr * cos(m_elevation) * sin(m_rotation);
+  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
+  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
   m_z_pos = m_distance * sin(m_elevation);
 }
 
 void Camera::elevateImmediate(float elev) {
   m_elevation += deg_to_rad(elev);
-  float dist_sqr = m_distance * m_distance;
-  m_x_pos = dist_sqr * cos(m_elevation) * cos(m_rotation);
-  m_y_pos = dist_sqr * cos(m_elevation) * sin(m_rotation);
+  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
+  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
   m_z_pos = m_distance * sin(m_elevation);
 }
 
