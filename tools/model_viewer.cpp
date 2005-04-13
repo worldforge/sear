@@ -44,10 +44,6 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
-#ifdef HAVE_CONFIG
-  #include "config.h"
-#endif
-
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif

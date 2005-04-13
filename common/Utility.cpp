@@ -1,12 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.10 2004-09-29 10:50:25 jmt Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: Utility.cpp,v 1.11 2005-04-13 12:16:03 simon Exp $
 
 #include "Utility.h"
 

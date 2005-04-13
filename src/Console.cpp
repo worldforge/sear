@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.34 2005-02-21 14:16:46 simon Exp $
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
-
+// $Id: Console.cpp,v 1.35 2005-04-13 12:16:05 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 

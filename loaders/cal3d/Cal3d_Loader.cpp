@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.14 2005-04-13 07:20:52 jmt Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: Cal3d_Loader.cpp,v 1.15 2005-04-13 12:16:04 simon Exp $
 
 #include <varconf/Config.h>
 

@@ -1,13 +1,8 @@
-#ifdef HAVE_CONFIG_H
-    #include "config.h"
-#endif
-
-#include "Stars.h"
-
-
 #include <sage/GL.h>
 #include <wfmath/vector.h>
 #include <wfmath/MersenneTwister.h>
+
+#include "Stars.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

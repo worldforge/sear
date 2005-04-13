@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.65 2005-04-06 13:24:15 simon Exp $
+// $Id: client.cpp,v 1.66 2005-04-13 12:16:05 simon Exp $
 
 #include "System.h"
 
@@ -125,10 +125,10 @@ void Client::shutdown() {
     m_connection = NULL;
   }
 
-  if (m_factory) {
-    delete m_factory;
-    m_factory = NULL;
-  }
+//  if (m_factory) {
+//    delete m_factory;
+//    m_factory = NULL;
+//  }
 
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
@@ -460,9 +460,10 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   }
   if (debug) printf("Client::createCharacter: Setting up callbacks\n");
 
-  if (m_factory) delete m_factory;
-  m_factory = new Factory(*m_connection->getTypeService());
-  Eris::Factory::registerFactory(m_factory);
+  if (!m_factory) {
+    m_factory = new Factory(*m_connection->getTypeService());
+    Eris::Factory::registerFactory(m_factory);
+  }
 
   return 0;
 }
@@ -500,12 +501,10 @@ int Client::takeCharacter(const std::string &id) {
     return 1;
   }
 
-  if (debug) printf("Client::takeCharacter: Setting up callbacks\n");
-
-  if (m_factory) delete m_factory;
-  m_factory = new Factory(*m_connection->getTypeService());
-  Eris::Factory::registerFactory(m_factory);
-
+  if (!m_factory) {
+    m_factory = new Factory(*m_connection->getTypeService());
+    Eris::Factory::registerFactory(m_factory);
+  }
   return 0;
 }
 
@@ -673,6 +672,7 @@ void Client::AvatarFailure(const std::string &msg) {
 void Client::GotCharacterEntity(Eris::Entity *e) {
   assert(e != NULL);
   assert(m_avatar != NULL);
+
   m_system->getCharacter()->setAvatar(m_avatar);
   setStatus(CLIENT_STATUS_IN_WORLD);
 }

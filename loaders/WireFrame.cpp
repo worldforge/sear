@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.15 2005-03-15 17:33:58 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: WireFrame.cpp,v 1.16 2005-04-13 12:16:04 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"

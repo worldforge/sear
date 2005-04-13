@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.9 2005-04-13 10:14:10 simon Exp $
+// $Id: ModelHandler.cpp,v 1.10 2005-04-13 12:16:04 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -73,12 +73,12 @@ void ModelHandler::init() {
 
   // TODO: this is not the place
   // create all the model loaders
-  new Cal3d_Loader(this);
-  new BoundBox_Loader(this);
-  new WireFrame_Loader(this);
-  new NPlane_Loader(this);
-  new ThreeDS_Loader(this);
-  new LibModelFile_Loader(this);
+//  new Cal3d_Loader(this);
+//  new BoundBox_Loader(this);
+//  new WireFrame_Loader(this);
+//  new NPlane_Loader(this);
+//  new ThreeDS_Loader(this);
+//  new LibModelFile_Loader(this);
 }
 
 void ModelHandler::shutdown() {

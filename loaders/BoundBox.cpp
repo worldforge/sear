@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.25 2005-03-15 17:33:58 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: BoundBox.cpp,v 1.26 2005-04-13 12:16:04 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"

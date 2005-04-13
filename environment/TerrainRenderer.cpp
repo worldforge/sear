@@ -2,10 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2003 Alistair Riddoch, Simon Goodall
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "TerrainRenderer.h"
 
 #include "renderers/RenderSystem.h"
@@ -89,9 +85,6 @@ void TerrainRenderer::disableRendererState() {
 }
 
 void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &seg) {
-  // Required otherwise alpha textures behave strangely
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-
   const Mercator::Segment::Surfacestore & surfaces = map->getSurfaces ();
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
 

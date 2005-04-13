@@ -1,6 +1,4 @@
-#ifdef HAVE_CONFIG_H
-    #include "config.h"
-#endif
+// $Id: Sprite.cpp,v 1.6 2005-04-13 12:16:04 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"

@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.34 2005-03-04 17:58:24 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+// $Id: TextureManager.cpp,v 1.35 2005-04-13 12:16:04 simon Exp $
 
 #include "TextureManager.h"
 
@@ -790,7 +786,7 @@ void TextureManager::invalidate()
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL);
   
-  // TODO unload textures first.
+  // unload textures first.
   for (unsigned int i = 0; i < m_textures.size(); i++) {
     // Unload texture if its still valid
     if (glIsTexture(m_textures[i])) {

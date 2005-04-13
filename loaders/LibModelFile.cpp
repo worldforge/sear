@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.3 2005-03-15 17:55:03 simon Exp $
+// $Id: LibModelFile.cpp,v 1.4 2005-04-13 12:16:04 simon Exp $
 
 /*
   Debug check list
@@ -11,10 +11,6 @@
   * Correct normal calculation
 
 */
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 
 extern "C" {
 #include <libmd3/structure.h>

@@ -79,6 +79,7 @@ void StaticObject::invalidate() {
       glDeleteBuffersARB(1, &m_vb_texture_data);
     }
   }
+
   // Clean up display lists 
   if (glIsList(m_select_disp_list)) glDeleteLists(1, m_select_disp_list);
   if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);

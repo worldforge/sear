@@ -2,12 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.9 2005-03-15 17:55:04 simon Exp $
-
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: CoreModelHandler.cpp,v 1.10 2005-04-13 12:16:04 simon Exp $
 
 #include "CoreModelHandler.h"
 #include "Cal3dCoreModel.h"

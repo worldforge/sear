@@ -2,16 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.18 2005-03-15 16:30:29 simon Exp $
+// $Id: StateManager.cpp,v 1.19 2005-04-13 12:16:04 simon Exp $
 
 /*
  * TODO
  * custom of default settings
  * */
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 
 #include <sage/sage.h>
 #include <sage/GL.h>

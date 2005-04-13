@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.2 2005-03-15 17:55:03 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: LibModelFile_Loader.cpp,v 1.3 2005-04-13 12:16:04 simon Exp $
 
 #include <varconf/Config.h>
 

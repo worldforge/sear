@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Log.cpp,v 1.8 2005-02-21 14:16:45 simon Exp $
+// $Id: Log.cpp,v 1.9 2005-04-13 12:16:03 simon Exp $
 
 #include "Log.h"
 #include <iostream>
@@ -12,10 +12,6 @@
  * FREQUENT LOG ACTIONS SHOULD BE IN A #if #endif BLOCK and
  * only included in debug mode
  */ 
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

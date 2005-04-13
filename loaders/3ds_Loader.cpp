@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.17 2005-03-15 17:55:03 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: 3ds_Loader.cpp,v 1.18 2005-04-13 12:16:04 simon Exp $
 
 #include <varconf/Config.h>
 

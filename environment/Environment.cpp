@@ -2,18 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+#include <Mercator/Area.h>
+#include <Atlas/Objects/Operation.h>
+
+#include "src/WorldEntity.h"
 
 #include "Environment.h"
-
 #include "TerrainRenderer.h"
 #include "SkyDome.h"
 #include "Stars.h"
-
-#include <Mercator/Area.h>
-#include "WorldEntity.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -24,7 +21,7 @@ namespace Sear {
 Environment  Environment::instance;
 
 void Environment::init() {
-  assert(!m_initialised);
+  assert(m_initialised == false);
   m_terrain = new TerrainRenderer();
   m_skyDome = new SkyDome(1.0f, 20, 20);
   m_stars = new Stars();
@@ -33,8 +30,7 @@ void Environment::init() {
 }
 
 void Environment::shutdown() {
-  assert(m_initialised);
-//  if (!m_initialised) return;
+  assert(m_initialised == true);
 
   delete m_terrain;
   m_terrain = NULL;
@@ -49,22 +45,20 @@ void Environment::shutdown() {
 }
 
 float Environment::getHeight(float x, float y) {
+  assert(m_initialised == true);
   WFMath::Vector<3> n;
   float z = 0.0f;
-  if (m_terrain) {  
-    m_terrain->m_terrain.getHeightAndNormal(x,y,z,n);
-  }
+  m_terrain->m_terrain.getHeightAndNormal(x,y,z,n);
   return z;
 }
 
 void Environment::setBasePoint(int x, int y, float z) {
-  if (m_terrain) {  
-    m_terrain->m_terrain.setBasePoint(x, y, z);
-  } 
+  assert(m_initialised == true);
+  m_terrain->m_terrain.setBasePoint(x, y, z);
 }
 
-void Environment::renderSky()
-{
+void Environment::renderSky() {
+  assert(m_initialised == true);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("stars"));
   m_stars->render();
   
@@ -73,15 +67,17 @@ void Environment::renderSky()
 }
 
 void Environment::renderTerrain(const WFMath::Point<3> &pos) {
+  assert(m_initialised == true);
   m_terrain->render(pos);
 }
 
 void Environment::renderSea() {
-return;
+  assert(m_initialised == true);
   m_terrain->renderSea();
 }
 
 void Environment::invalidate() {
+  assert(m_initialised == true);
   m_terrain->invalidate();
   m_skyDome->invalidate();
 }

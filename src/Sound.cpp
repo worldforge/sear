@@ -1,10 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
-
 
 #include "Sound.h"
 #include "Exception.h"
@@ -13,7 +9,7 @@
 #include <SDL/SDL.h>
 #include <unistd.h>
 
-// $Id: Sound.cpp,v 1.15 2004-05-23 13:32:29 jmt Exp $
+// $Id: Sound.cpp,v 1.16 2005-04-13 12:16:05 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 

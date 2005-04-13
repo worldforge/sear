@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: CameraSystem.cpp,v 1.3 2005-04-13 12:16:04 simon Exp $
 
 #include <varconf/Config.h>
 

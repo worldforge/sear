@@ -2,13 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.56 2005-04-06 13:24:15 simon Exp $
+// $Id: Character.cpp,v 1.57 2005-04-13 12:16:04 simon Exp $
 
 #include <math.h>
 #include <string>
 #include <SDL/SDL.h>
 
+#include <Atlas/Objects/Operation.h>
 #include <varconf/Config.h>
+
+#include <wfmath/atlasconv.h>
+
 #include <Eris/Connection.h>
 #include <Eris/TypeInfo.h>
 #include <Eris/Avatar.h>
@@ -21,8 +25,6 @@
 
 #include "ActionHandler.h"
 #include "WorldEntity.h"
-//#include "EventHandler.h"
-//#include "Event.h"
 #include "client.h"
 #include "System.h"
 #include "Character.h"
@@ -36,10 +38,6 @@
 
 #include "common/operations.h"
 
-#include <wfmath/atlasconv.h>
-
-#include <Atlas/Objects/Operation.h>
-//#include <Atlas/Message/Element.h>
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -53,7 +51,7 @@
 
 
 namespace Sear {
-  // Console commands	
+  // Console commands
   static const std::string CMD_MOVE_FORWARD = "+character_move_forward";
   static const std::string CMD_MOVE_BACKWARD = "+character_move_backward";
   static const std::string CMD_MOVE_STOP_FORWARD = "-character_move_forward";
@@ -126,7 +124,6 @@ Character::Character() :
   m_strafe_speed(0.0f),
   m_lastUpdate(SDL_GetTicks()),
   m_updateScheduled(false),
-  //m_orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f)),
   m_time(0),
   m_run_modifier(false),
   m_initialised(false),
@@ -137,14 +134,12 @@ Character::Character() :
 
 Character::~Character() {
   assert (m_initialised == false);
-  if (m_initialised) shutdown();
 }
 
 bool Character::init() {
   assert (m_initialised == false);
 
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
-
 
   m_timeout_rotate = new Eris::Timeout("sear_character_rotate", this, 0);
   m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
@@ -156,12 +151,11 @@ bool Character::init() {
 void Character::shutdown() {
   assert (m_initialised == true);
 
+  // Cleanup timeouts
   if (m_timeout_update) {
-    // m_timeout_update->cancel();
     delete m_timeout_update;
   }
   if (m_timeout_rotate) {
-    // m_timeout_rotate->cancel();
     delete m_timeout_rotate;
   }
 
@@ -177,7 +171,7 @@ void Character::moveForward(float speed) {
 }
 
 void Character::strafe(float speed) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
   m_strafe_speed += speed;
@@ -191,11 +185,10 @@ void Character::rotate(float rate) {
   if (debug) std::cout << "Character::rotate" << std::endl << std::flush;
   if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
   updateLocals(true);
-  // FIXME 0.0f is not safe to test for.
+
   if (m_rate > 0.000001f &&  m_timeout_rotate->isExpired()) {
     m_timeout_rotate->reset(server_update_interval);
   }
-//System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
 void Character::rotateImmediate(float rot)
@@ -212,7 +205,7 @@ void Character::rotateImmediate(float rot)
   if (!send && !m_updateScheduled) {
     m_timeout_update = new Eris::Timeout("sear_character_update", this, server_update_interval);
     m_timeout_update->Expired.connect(SigC::slot(*this, &Character::UpdateTimeoutExpired));
-//    System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_SEND, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
+
     m_updateScheduled = true;
   }
 }
@@ -226,7 +219,7 @@ void Character::sendUpdate()
 }
 
 void Character::setMovementSpeed(float speed) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
   m_speed = speed;
@@ -234,7 +227,7 @@ void Character::setMovementSpeed(float speed) {
 }
 
 void Character::setStrafeSpeed(float speed) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
   m_strafe_speed = speed;
@@ -249,8 +242,6 @@ void Character::setRotationRate(float rate) {
   if (m_rate > 0.000001f && m_timeout_rotate->isExpired()) {
     m_timeout_rotate->reset(server_update_interval);
   }
-//  // FIXME 0.0f is not safe to test for.
-//  if (m_rate != 0.0f) System::instance()->getEventHandler()->addEvent(Event(EF_UPDATE_CHAR_ROTATE, NULL, EC_TIME, server_update_interval + System::instance()->getTime()));
 }
 
 void Character::updateLocals(bool send_to_server) {
@@ -272,9 +263,6 @@ void Character::updateLocals(bool send_to_server) {
 //  divisor = sqrt(square(m_orient.vector().x()) + square(m_orient.vector().y()) + square(m_orient.vector().z()));
 //  zaxis = (divisor != 0.0f) ? (m_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
 //  m_angle = -2.0f * acos(m_self->getOrientation().scalar()) * zaxis;
-
-
-
 
   if (old_speed != m_speed || old_run != m_run_modifier) {
     if (m_speed ==  0.0f) {
@@ -360,15 +348,12 @@ void Character::wieldEntity(const std::string &name) {
     Eris::TypeInfo *type = we->getType();
     assert(type);
     if ((we->getName() == name) || (type->getName() == name)) {
-      //Atlas::Objects::Operation::Wield w;
       Wield w;
       w->setFrom(m_self->getId());
       Atlas::Message::MapType arg;
       arg["id"] = we->getId();
       arg["objtype"] = "obj";
       w->setArgsAsList(Atlas::Message::ListType(1, arg));
-//      Atlas::Message::Element::ListType & args = w->getArgs();
-//      args.push_back(arg);
       m_avatar->getConnection()->send(w);
       setAction("wield");
       return;
@@ -388,23 +373,21 @@ void Character::useToolOnEntity(const std::string & id) {
   arg["id"] = e->getId();
   arg["objtype"] = "obj";
   u->setArgsAsList(Atlas::Message::ListType(1, arg));
-//  Atlas::Message::Element::ListType & args = u->getArgs();
-//  args.push_back(arg);
   m_avatar->getConnection()->send(u);
   setAction("use");
 }
 
 void Character::displayInventory() {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
-//  if (!m_self) return;
   std::map<std::string, int> inventory;
-  for (unsigned int i = 0; i < m_self->numContained(); ++i)
+  for (unsigned int i = 0; i < m_self->numContained(); ++i) {
     inventory[m_self->getContained(i)->getName()]++;
-  for (std::map<std::string, int>::const_iterator I = inventory.begin(); I != inventory.end(); ++I) {
-//    std::cout << I->second << " - " << I->first << std::endl;
-  std::string quantity = string_fmt(I->second);
-  std::string name = I->first;
+  }
+  for (std::map<std::string, int>::const_iterator I = inventory.begin(); 
+                                                  I != inventory.end(); ++I) {
+    std::string quantity = string_fmt(I->second);
+    std::string name = I->first;
     System::instance()->pushMessage(std::string(name + std::string(" - ") + std::string(quantity)), 3);
   }
 
@@ -435,12 +418,8 @@ void Character::make(const std::string &type, const std::string &name) {
 }
 
 void Character::toggleRunModifier() {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
-//  if (!m_self) {
-//    Log::writeLog("Character: Error - Character object not created", Log::LOG_ERROR);
-//    return;
-//  }
   m_run_modifier = !m_run_modifier;
   updateLocals(true);
 }
@@ -466,7 +445,7 @@ void Character::writeConfig(varconf::Config &config) {
 }
 
 void Character::giveEntity(const std::string &name, int quantity, const std::string &target) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   if (quantity == 0) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
@@ -492,7 +471,6 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
 }
 
 void Character::registerCommands(Console *console) {
-  //assert ((m_initialised == true) && "Character not initialised");	
   console->registerCommand(CMD_MOVE_FORWARD, this);
   console->registerCommand(CMD_MOVE_BACKWARD, this);
   console->registerCommand(CMD_MOVE_STOP_FORWARD, this);
@@ -621,7 +599,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
 }
 
 void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
-  assert ((m_initialised == true) && "Character not initialised");	
+  assert ((m_initialised == true) && "Character not initialised");
   varconf::Variable temp;
   if (section == SECTION_character) {
     if (key == KEY_character_walk_speed) {
@@ -721,8 +699,6 @@ void Character::setAction(const std::string &action) {
 }
 
 void Character::RotateTimeoutExpired() {
-//  Eris::deleteLater(m_timeout_rotate);
-//  m_timeout_rotate = NULL;
   rotate(CMD_modifier);
 }
 void Character::UpdateTimeoutExpired() {

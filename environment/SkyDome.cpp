@@ -1,10 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -82,8 +78,6 @@ SkyDome::SkyDome(float radius, int levels, int segments) :
     m_radius(radius), m_levels(levels), m_segments(segments)
 {
     m_size = segments * (levels + 1); // extra level for the skirt
-    // disable for now
-//    sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
     domeInit(radius, levels, segments);
 }
 
@@ -189,6 +183,9 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   m_textures[1] = RenderSystem::getInstance().requestTexture("cloud_layer_1");
   m_textures[2] = RenderSystem::getInstance().requestTexture("cloud_layer_2");
 
+  if (m_verts) delete [] m_verts;
+  if (m_texCoords) delete [] m_texCoords;
+
   m_verts = genVerts(radius, levels, segments);  
   m_texCoords = genTexCoords(radius, levels, segments);  
 
@@ -213,13 +210,13 @@ void SkyDome::invalidate() {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (glIsBufferARB(m_vb_verts)) {
       glDeleteBuffersARB(1, &m_vb_verts);
-      m_vb_verts = 0;
     }
+    m_vb_verts = 0;
 
     if (glIsBufferARB(m_vb_texCoords)) {
       glDeleteBuffersARB(1, &m_vb_texCoords);
-      m_vb_texCoords = 0;
     }
+    m_vb_texCoords = 0;
   }
   domeInit(m_radius, m_levels, m_segments);
 }
@@ -235,7 +232,7 @@ void SkyDome::getHorizonColors()
     
     GLubyte* skyTexels = new GLubyte[width * height * 4];
 
-    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+//    glPixelStorei(GL_PACK_ALIGNMENT, 1);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, skyTexels);
     int glerr = glGetError();
     if (glerr != GL_NO_ERROR) {
@@ -259,6 +256,8 @@ void SkyDome::getHorizonColors()
 void SkyDome::updateFogColor(float t)
 {
     if (m_horizonColors.empty()) getHorizonColors();
+
+    assert(t >= 0.0f && t <= 1.0f);
        
     if (t == 1.0f) t = 0.0f; // ensure t is in the range [0.0 .. 1.0)
     t *= m_horizonColors.size(); // t is now in [0.0 ... num_colors)
@@ -290,10 +289,6 @@ void SkyDome::updateFogColor(float t)
 void SkyDome::render()
 {
   glColor3f(1.0f, 1.0f, 1.0f);
-//  ++counter;
-//  #define INCR 24000
-//  counter = counter % INCR;
-//  float val = (float)(counter) / (float)INCR;
   Calendar *cal = System::instance()->getCalendar();
   float val = cal->getHours();
   val *= (float)cal->getMinutesPerHour();

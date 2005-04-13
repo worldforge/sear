@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.37 2005-04-04 10:20:03 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: 3ds.cpp,v 1.38 2005-04-13 12:16:03 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -134,18 +130,21 @@ int ThreeDS::shutdown() {
 }
 
 void ThreeDS::invalidate() {
-  // Clean up display lists
   assert(m_render);
 
+  // Clean up display lists
   m_render->freeList(m_list);
-  m_render->freeList(m_list_select);
+  m_list = 0;
 
-  for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin();
-                                                I != m_render_objects.end();
-                                                ++I) {
-    RenderObject *ro = *I;
-    if (ro) {
-      if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+  m_render->freeList(m_list_select);
+  m_list_select = 0;
+
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin();
+                                                  I != m_render_objects.end();
+                                                  ++I) {
+      RenderObject *ro = *I;
+      if (ro) {
         if (glIsBufferARB(ro->vb_vertex_data)) {
           glDeleteBuffersARB(1, &ro->vb_vertex_data);
           ro->vb_vertex_data = 0;
@@ -161,9 +160,6 @@ void ThreeDS::invalidate() {
       }
     }
   }
-
-  m_list = 0;
-  m_list_select = 0;
 }
 
 void ThreeDS::render(bool select_mode) {

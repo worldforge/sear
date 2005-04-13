@@ -2,13 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.15 2005-02-21 14:16:46 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
-
-#include "ActionHandler.h"
+// $Id: ActionHandler.cpp,v 1.16 2005-04-13 12:16:04 simon Exp $
 
 #include <unistd.h>
 #include <varconf/varconf.h>
@@ -18,6 +12,8 @@
 #include "src/Console.h"
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"
+
+#include "ActionHandler.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -44,18 +40,19 @@ ActionHandler::ActionHandler(System *system) :
 }
 
 ActionHandler::~ActionHandler() {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
 }
 
 void ActionHandler::init() {
-  if (debug) Log::writeLog("Initialising Action Handler", Log::LOG_DEFAULT);
-  if (m_initialised) shutdown();
+  if (debug) Log::writeLog("Action Handler: Initialise", Log::LOG_DEFAULT);
+  assert(m_initialised == false);
+
   m_initialised = true;
 }
 
 void ActionHandler::shutdown() {
-  assert(m_initialised);
-  if (debug) Log::writeLog("Shutting down Action Handler", Log::LOG_DEFAULT);
+  assert(m_initialised == true);
+  if (debug) Log::writeLog("Action Handler: Shutdown", Log::LOG_DEFAULT);
   while(!action_map.empty()) {
     ActionStruct *as = action_map.begin()->second;
     if (as) delete (as);

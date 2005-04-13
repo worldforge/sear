@@ -2,11 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.20 2005-04-04 10:20:03 simon Exp $
-
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: Cal3dModel.cpp,v 1.21 2005-04-13 12:16:04 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"

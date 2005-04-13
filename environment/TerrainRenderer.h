@@ -51,7 +51,6 @@ public:
           if (glIsBufferARB(vb_harray)) {
             glDeleteBuffersARB(1, &vb_harray);
           }
-
           vb_harray = 0;
         }
         if (glIsList(disp)) {
@@ -68,6 +67,7 @@ public:
         if (glIsTexture(m_alphaTextures[0])) {
           glDeleteTextures(8, m_alphaTextures);
         }
+        for (int i = 0; i < 8; m_alphaTextures[i++] = 0);
       }
     };
     typedef std::map<int, DataSeg> DisplayListColumn;

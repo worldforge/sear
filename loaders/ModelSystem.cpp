@@ -2,10 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
-
 #include "src/Console.h"
 #include "src/WorldEntity.h"
 
@@ -13,6 +9,13 @@
 #include "ObjectHandler.h"
 #include "ModelHandler.h"
 #include "ObjectRecord.h"
+
+#include "3ds_Loader.h"
+#include "cal3d/Cal3d_Loader.h"
+#include "BoundBox_Loader.h"
+#include "NPlane_Loader.h"
+#include "WireFrame_Loader.h"
+#include "LibModelFile_Loader.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -36,6 +39,15 @@ int ModelSystem::init() {
 
   m_model_handler = new ModelHandler();
   m_model_handler->init();
+
+  // Register ModelLoaders
+  // The ModelHandler class cleans these up.
+  new BoundBox_Loader(m_model_handler); // This is the default loader
+  new WireFrame_Loader(m_model_handler);
+  new NPlane_Loader(m_model_handler);
+  new ThreeDS_Loader(m_model_handler);
+  new Cal3d_Loader(m_model_handler);
+  new LibModelFile_Loader(m_model_handler);
 
   m_object_handler = new ObjectHandler();
   m_object_handler->init();

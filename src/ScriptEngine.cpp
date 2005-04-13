@@ -2,10 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.10 2004-05-03 07:02:49 jmt Exp $
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
+// $Id: ScriptEngine.cpp,v 1.11 2005-04-13 12:16:05 simon Exp $
 
 #include "ScriptEngine.h"
 

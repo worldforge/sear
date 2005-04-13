@@ -2,11 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.17 2005-02-21 14:16:46 simon Exp $
+// $Id: Bindings.cpp,v 1.18 2005-04-13 12:16:04 simon Exp $
 
-#ifdef HAVE_CONFIG_H
-  #include "config.h"
-#endif
 
 #include <SDL/SDL.h>
 

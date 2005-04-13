@@ -13,16 +13,13 @@ namespace Sear
 {
 
 ObjectRecord::ObjectRecord() :
-name("object"),
-low_quality(ModelList()),
-medium_quality(ModelList()),
-high_quality(ModelList()),
-icon(0),
-draw_self(false),
-draw_members(false),
-bbox(WFMath::AxisBox<3>(WFMath::Point<3>(0.0f, 0.0f, 0.0f), WFMath::Point<3>(1.0f, 1.0f, 1.0f))),
-position(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
-orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f))
+  name("object"),
+  icon(0),
+  draw_self(false),
+  draw_members(false),
+  bbox(WFMath::AxisBox<3>(WFMath::Point<3>(0.0f, 0.0f, 0.0f), WFMath::Point<3>(1.0f, 1.0f, 1.0f))),
+  position(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
+  orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f))
 {}
 
 ObjectRecord::~ObjectRecord() {}
