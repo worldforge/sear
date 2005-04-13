@@ -1,3 +1,14 @@
+2005-04-13 James Turner <james@worldforge.org>
+
+	* environment/Environment.cpp, environment/Environment.h: add in
+	  initial code to define a Mercator Area based on entity data.
+	  The method is mostyle complete, but not used at present, and is
+	  un-tested.
+
+	* loaders/ObjectRecord.h, loaders/ObjectRecord.cpp: re-factor
+	  ObjectRecord into seperate decleration and implementation, because
+	  the inline methods were huge, and dragged in too many headers.
+
 2005-04-12  Simon Goodall  <sear@simongoodall.co.uk>
 	
 	* loaders/NPlane.cpp: Free display lists in invalidate

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.3 2005-03-15 17:55:04 simon Exp $
+// $Id: ObjectRecord.h,v 1.4 2005-04-13 07:20:52 jmt Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -13,11 +13,7 @@
 #include <wfmath/axisbox.h>
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
-
-#include "ModelSystem.h"
-#include "Model.h"
-#include "ModelHandler.h"
-#include "ModelRecord.h"
+#include <Atlas/Message/Element.h>
 
 namespace Sear {
 
@@ -27,68 +23,12 @@ class ObjectRecord {
 public:
   typedef std::list<std::string> ModelList;
   
-  ObjectRecord() :
-    name("object"),
-    low_quality(ModelList()),
-    medium_quality(ModelList()),
-    high_quality(ModelList()),
-    icon(0),
-    draw_self(false),
-    draw_members(false),
-    bbox(WFMath::AxisBox<3>(WFMath::Point<3>(0.0f, 0.0f, 0.0f), WFMath::Point<3>(1.0f, 1.0f, 1.0f))),
-    position(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
-    orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f))
-  {}
-    
-  ~ObjectRecord() {}
+  ObjectRecord();    
+  ~ObjectRecord();
 
-  void action(const std::string &action) {
-    for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->action(action);
-    }
-    for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->action(action);
-    }
-    for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->action(action);
-    }
-  }
- 
-  void setHeight(float height) {
-    std::cout << "Setting Appearance" << std::endl << std::flush;
-    for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-    }
-    for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-    }
-    for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-    }
-  }
-  void setAppearance(Atlas::Message::MapType &map) {
-    std::cout << "Setting Appearance" << std::endl << std::flush;
-    for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setAppearance(map);
-    }
-    for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setAppearance(map);
-    }
-    for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-      ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-      if (rec && rec->model) rec->model->setAppearance(map);
-    }
- 
-
-  }
+  void action(const std::string &action); 
+  void setHeight(float height);
+  void setAppearance(Atlas::Message::MapType &map);
  
   std::string name;
   std::string id;

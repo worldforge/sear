@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.7 2005-04-05 21:51:40 simon Exp $
+// $Id: ModelHandler.cpp,v 1.8 2005-04-13 07:20:52 jmt Exp $
 
 #include <set>
 #include <string.h>
@@ -21,6 +21,8 @@
 
 #include "ModelHandler.h"
 #include "ModelLoader.h"
+#include "Model.h"
+#include "ModelSystem.h"
 #include "3ds_Loader.h"
 #include "cal3d/Cal3d_Loader.h"
 #include "BoundBox_Loader.h"
@@ -266,7 +268,9 @@ void ModelHandler::varconf_callback(const std::string &section, const std::strin
   // Convert textual state name to the state number
   if (key == "state") {
 //    printf("Setting State Num: %d\n",  RenderSystem::getInstance().requestState(config.getItem(section, key)));
-    config.setItem(section, "state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
+    int stn = RenderSystem::getInstance().requestState(config.getItem(section, key));
+    assert(stn);
+    config.setItem(section, "state_num", stn);
   }
   else if (key == "select_state") {
     config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));

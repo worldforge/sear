@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.13 2005-03-15 17:55:04 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.14 2005-04-13 07:20:52 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -16,6 +16,7 @@
 #include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
+#include "ModelSystem.h"
 
 #include "Cal3d_Loader.h"
 #include "Cal3dModel.h"

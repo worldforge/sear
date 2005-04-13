@@ -6,15 +6,19 @@
 #define SEAR_EnVIRONMENT_H
 
 #include <stdlib.h>
+#include <map>
 
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
+
+namespace Mercator { class Area; }
 
 namespace Sear {
 
 class TerrainRenderer;
 class SkyDome;
 class Stars;
+class WorldEntity;
 
 class Environment {
   Environment() :
@@ -45,6 +49,8 @@ public:
 
   void invalidate();
 
+    void registerAreaEntity(WorldEntity* we);
+
 private:
   bool m_initialised;
 
@@ -52,6 +58,9 @@ private:
   TerrainRenderer *m_terrain;
   SkyDome *m_skyDome;
   Stars* m_stars;
+  
+    typedef std::map<std::string, Mercator::Area*> AreaDict;
+    AreaDict m_areaEntities;
 };
 
 } // namespace Sear

@@ -11,7 +11,10 @@
 #include "TerrainRenderer.h"
 #include "SkyDome.h"
 #include "Stars.h"
-                                                                                
+
+#include <Mercator/Area.h>
+#include "WorldEntity.h"
+
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif
@@ -81,6 +84,62 @@ return;
 void Environment::invalidate() {
   m_terrain->invalidate();
   m_skyDome->invalidate();
+}
+
+void Environment::registerAreaEntity(WorldEntity* we)
+{
+    assert(we);
+    
+    if (!we->hasAttr("area")) {
+        std::cerr << "registerAreaEntity called on entity with no area attribute" << std::endl;
+        return;
+    }
+    
+    const Atlas::Message::MapType& areaData(we->valueOfAttr("area").asMap());
+    Atlas::Message::MapType::const_iterator it = areaData.find("points");
+    if ((it == areaData.end()) || !it->second.isList()) {
+        std::cerr << "malformed area attribute on entity, no points data" << std::endl;
+        return;
+    }
+    
+    const Atlas::Message::ListType& pointsData(it->second.asList());
+    Mercator::Area* ar = m_areaEntities[we->getId()];
+    
+    if (ar == NULL) {
+        it = areaData.find("layer");
+        if ((it == areaData.end()) || !it->second.isInt()) {
+            std::cerr << "malformed area attribute on entity, no layer data" << std::endl;
+            return;
+        }
+
+        int layer = it->second.asInt();
+        ar = new Mercator::Area(layer, false);
+    } else {
+        // check layer + hole haven't changed?
+        #warning modifying Area shapes needs to be fixed
+        assert(false);
+    }
+    
+    WFMath::Polygon<2> poly;
+    for (unsigned int p=0; p<pointsData.size(); ++p) {
+        if (!pointsData[p].isList()) {
+            std::cerr << "skipped malformed point in area" << std::endl;
+            continue;
+        }
+        
+        const Atlas::Message::ListType& point(pointsData[p].asList());
+        if ((point.size() < 2) || !point[0].isFloat() || !point[1].isFloat()) {
+            std::cerr << "skipped malformed point in area" << std::endl;
+            continue;
+        }
+        
+        WFMath::Point<2> wpt(point[0].asFloat(), point[1].asFloat());
+        poly.addCorner(poly.numCorners(), wpt);
+    }
+    
+    ar->setShape(poly);
+    m_terrain->m_terrain.addArea(ar);
+    m_areaEntities[we->getId()] = ar;
 }
 
 } // namespace Sear

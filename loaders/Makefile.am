@@ -20,4 +20,5 @@ libModelLoader_a_SOURCES = \
 	ModelRecord.cpp ModelRecord.h \
 	ModelLoader.h \
 	Model.h \
-	ObjectRecord.h 
+	ObjectRecord.h ObjectRecord.cpp
+	
