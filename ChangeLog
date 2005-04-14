@@ -1,3 +1,8 @@
+2005-04-14  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/ModelHandler.cpp: Set model action went it is created to avoid
+	  models having the wrong animation.
+
 2005-04-13  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Camera.cpp: Fix calculation of x/y/z pos.
