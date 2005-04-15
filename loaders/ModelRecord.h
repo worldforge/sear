@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.2 2005-01-06 17:19:42 simon Exp $
+// $Id: ModelRecord.h,v 1.3 2005-04-15 16:21:01 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -17,6 +17,7 @@ class ModelRecord {
 public:
   ModelRecord() :
     scale(1.0),
+    scale_bbox(false),
     state_name("default"),
     select_state_name("select"),
     model_by_type(false),
@@ -31,6 +32,7 @@ public:
 //  float offset[3];
   std::string id;
   int state;
+  bool scale_bbox;
   std::string state_name;
   int select_state;
   std::string select_state_name;
@@ -46,6 +48,7 @@ public:
   bool scaleByHeight;
 
   static const std::string SCALE;
+  static const std::string SCALE_BBOX;
   static const std::string OFFSET_X;
   static const std::string OFFSET_Y;
   static const std::string OFFSET_Z;

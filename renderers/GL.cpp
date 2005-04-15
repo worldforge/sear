@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.110 2005-04-12 14:33:13 simon Exp $
+// $Id: GL.cpp,v 1.111 2005-04-15 16:21:01 simon Exp $
 
 #include <SDL/SDL.h>
 #include <sage/sage.h>
@@ -1060,6 +1060,14 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
       float scale = model_record->scale;
       // Do not perform scaling if it is to zero or has no effect
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+
+      if (model_record->scale_bbox && object_record->entity->hasBBox()) {
+        WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
+        float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+        float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+        float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+        glScalef(x_scale, y_scale, z_scale);
+      }
 
       // Update Model
       if (!select_mode) { // Only needs to be done once a frame

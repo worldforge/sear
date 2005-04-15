@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.2 2005-04-13 12:16:04 simon Exp $
+// $Id: ModelRecord.cpp,v 1.3 2005-04-15 16:21:01 simon Exp $
 
 #include "ModelRecord.h"
 #ifdef USE_MMGR
@@ -12,6 +12,7 @@
 
 namespace Sear {
   const std::string ModelRecord::SCALE = "scale";
+  const std::string ModelRecord::SCALE_BBOX = "scale_bbox";
   const std::string ModelRecord::OFFSET_X = "offset_x";
   const std::string ModelRecord::OFFSET_Y = "offset_y";
   const std::string ModelRecord::OFFSET_Z = "offset_z";

@@ -1,5 +1,12 @@
 2005-04-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelLoader.h, loaders/ModelRecord.cpp, loaders/ModelRecord.h:
+	  Add a scale by bbox field to  model records.
+	* renderers/GL.cpp: Scale model by bounding box if scale_bbox is
+	  defined in the model_record.
+
+2005-04-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* data/bindings.cfg: Add u as default binding to /use
 	* renderers/StateManager.cpp: Add a default state for the cursor in case
 	  of a missing states.cfg file

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.3 2005-03-15 17:55:03 simon Exp $
+// $Id: ModelLoader.h,v 1.4 2005-04-15 16:21:01 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1
@@ -38,6 +38,12 @@ public:
     } else {
       model_record->scale = 1.0;
     }
+    if (model_config.findItem(model_id, ModelRecord::SCALE_BBOX)) {
+      model_record->scale_bbox = (bool)model_config.getItem(model_id, ModelRecord::SCALE_BBOX);
+    } else {
+      model_record->scale_bbox = false;
+    }
+   // Get model offset (x)
    // Get model offset (x)
     if (model_config.findItem(model_id, ModelRecord::OFFSET_X)) {
       model_record->offset_x = (double)model_config.getItem(model_id, ModelRecord::OFFSET_X);
