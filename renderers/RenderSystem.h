@@ -38,6 +38,7 @@ public:
     CURSOR_DEFAULT = 0,
     CURSOR_TOUCH,
     CURSOR_PICKUP,
+    CURSOR_USE,
     CURSOR_LAST_STATE
   } CursorState;
 

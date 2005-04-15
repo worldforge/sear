@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.114 2005-04-12 14:33:13 simon Exp $
+// $Id: System.cpp,v 1.115 2005-04-15 15:47:19 simon Exp $
 
 #include "sear_icon.xpm"
 
@@ -539,6 +539,7 @@ void System::handleEvents(const SDL_Event &event) {
             break;
             case (ACTION_PICKUP): m_character->getEntity(m_click_id); break;
             case (ACTION_TOUCH): m_character->touchEntity(m_click_id); break;
+            case (ACTION_USE): m_character->useToolOnEntity(m_click_id); break;
           }
           setAction(ACTION_DEFAULT);
           m_click_on = false;
@@ -817,6 +818,7 @@ void System::setAction(int new_action) {
     case (ACTION_DEFAULT): switchCursor(RenderSystem::CURSOR_DEFAULT); break;
     case (ACTION_PICKUP): switchCursor(RenderSystem::CURSOR_PICKUP); break;
     case (ACTION_TOUCH): switchCursor(RenderSystem::CURSOR_TOUCH); break;
+    case (ACTION_USE): switchCursor(RenderSystem::CURSOR_USE); break;
   }
   m_action = new_action;
 }

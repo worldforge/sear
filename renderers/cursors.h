@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: cursors.h,v 1.1 2005-02-21 14:16:46 simon Exp $
+// $Id: cursors.h,v 1.2 2005-04-15 15:47:19 simon Exp $
 
 #ifndef SEAR_CURSORS_H
 #define SEAR_CURSORS_H 1
@@ -133,6 +133,50 @@ static const char *touch[] = {
   "                   XX           ",
   "                   XX           ",
   "                   XX           ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "0,0"
+};
+
+/* XPM */
+static const char *use[] = {
+  /* width height num_colors chars_per_pixel */
+  "    32    32        3            1",
+  /* colors */
+  ". c #000000",
+  "X c #ffffff",
+  "  c None",
+  /* pixels */
+  "X                               ",
+  "XX                              ",
+  "X.X                             ",
+  "X..X                            ",
+  "X...X                           ",
+  "X....X                          ",
+  "X.....X                         ",
+  "X......X                        ",
+  "X.......X                       ",
+  "X........X                      ",
+  "X.....XXXXX                     ",
+  "X..X..X                         ",
+  "X.X X..X                        ",
+  "XX  X..X                        ",
+  "X    X..X                       ",
+  "     X..X      XX    XX         ",
+  "      X..X     XX    XX         ",
+  "      X..X     XX    XX         ",
+  "       XX      XX    XX         ",
+  "               XX    XX         ",
+  "               XX    XX         ",
+  "                XXXXXX          ",
+  "                 XXXX           ",
   "                                ",
   "                                ",
   "                                ",

@@ -1,3 +1,20 @@
+2005-04-15  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* data/bindings.cfg: Add u as default binding to /use
+	* renderers/StateManager.cpp: Add a default state for the cursor in case
+	  of a missing states.cfg file
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h: Add a Use cursor
+	  to avaible cursors.
+	* renderers/TextureManager.cpp, renderers/TextureManager.h: Replace
+	  individual cursor loading functions with a generic function. Load a
+	  default use cursor.
+	* renderers/cursors.h: Added a default use cursor.
+	* src/Character.cpp: Change /use to call System::setAction instead of
+	  Character::useToolOnEntity directly.
+	* src/System,cpp, src/System.h: Add a use action which sets the use
+	  mouse cursor and calls Character::useToolOnEntity on the next 
+	  "clicked on" entity.
+
 2005-04-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* common/operations.cpp: Fix type of Use op to be "use" not "wield".

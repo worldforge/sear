@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.11 2005-04-13 10:14:10 simon Exp $
+// $Id: RenderSystem.cpp,v 1.12 2005-04-15 15:47:19 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -70,6 +70,7 @@ void RenderSystem::init() {
   m_mouseState[CURSOR_DEFAULT] = m_textureManager->requestTextureID("cursor_default",false);
   m_mouseState[CURSOR_TOUCH] = m_textureManager->requestTextureID("cursor_touch", false);
   m_mouseState[CURSOR_PICKUP] = m_textureManager->requestTextureID("cursor_pickup", false);
+  m_mouseState[CURSOR_USE] = m_textureManager->requestTextureID("cursor_use", false);
 
   m_initialised = true;
 }

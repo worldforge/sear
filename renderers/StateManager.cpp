@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.19 2005-04-13 12:16:04 simon Exp $
+// $Id: StateManager.cpp,v 1.20 2005-04-15 15:47:19 simon Exp $
 
 /*
  * TODO
@@ -105,6 +105,7 @@ int StateManager::init() {
   StateProperties *default_state = new StateProperties;
   StateProperties *font_state = new StateProperties;
   StateProperties *select_state = new StateProperties;
+  StateProperties *cursor_state = new StateProperties;
   // Create a default record
   default_state->state = "default";
   default_state->alpha_test = false;
@@ -180,6 +181,32 @@ int StateManager::init() {
   m_state_name_map[select_state->state] = m_state_counter;
   m_name_state_vector[m_state_counter] = select_state->state;
   ++m_state_counter;
+
+  // Create default state for mouse cursor
+  cursor_state->state = "cursor";
+  cursor_state->alpha_test = true;
+  cursor_state->blend = false;
+  cursor_state->lighting = false;
+  cursor_state->two_sided_lighting = false;
+  for (unsigned int  i = 1; i < MAX_UNITS; ++i)
+    cursor_state->textures[i] = false;
+  cursor_state->textures[0] = true;
+  cursor_state->colour_material = false;
+  cursor_state->depth_test = false;
+  cursor_state->cull_face = false;
+  cursor_state->cull_face_cw = false;
+  cursor_state->stencil = false;
+  cursor_state->fog = false;
+  cursor_state->rescale_normals = false;
+  cursor_state->alpha_function = GL_GREATER;
+  cursor_state->alpha_value = 0.1f;
+  cursor_state->blend_src_function = GL_SRC_ALPHA;
+  cursor_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
+  m_states[m_state_counter] = cursor_state;
+  m_state_name_map[cursor_state->state] = m_state_counter;
+  m_name_state_vector[m_state_counter] = cursor_state->state;
+  ++m_state_counter;
+
 
   m_initialised = true;
   return 0;

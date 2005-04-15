@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.57 2005-04-13 12:16:04 simon Exp $
+// $Id: Character.cpp,v 1.58 2005-04-15 15:47:19 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -555,7 +555,8 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     make(type, name);
   }
   else if (command == CMD_USE) {
-    useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
+    System::instance()->setAction(ACTION_USE);
+//    useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
   }
   else if (command == CMD_WIELD) {
     std::string name = tokeniser.nextToken();

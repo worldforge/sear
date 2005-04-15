@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.18 2005-02-21 14:16:46 simon Exp $
+// $Id: TextureManager.h,v 1.19 2005-04-15 15:47:19 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -187,9 +187,7 @@ private:
 
   TextureID createDefaultTexture();
   TextureID createDefaultFont();
-  TextureID createCursorDefault();
-  TextureID createCursorTouch();
-  TextureID createCursorPickup();
+  TextureID createCursor(const std::string &texture_name, const char **xpm);
   
   /**
    * Returns the OpenGL filter from the name
