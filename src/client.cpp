@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.66 2005-04-13 12:16:05 simon Exp $
+// $Id: client.cpp,v 1.67 2005-04-19 12:56:17 simon Exp $
 
 #include "System.h"
 
@@ -451,10 +451,12 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
     m_account->createCharacter(ch);
   } catch (Eris::InvalidOperation io) {
     setStatus(CLIENT_STATUS_LOGGED_IN);
+    m_system->pushMessage(io._msg, CONSOLE_MESSAGE);
     printf("Eris Exception: %s\n", io._msg.c_str());
     return 1;
   } catch (...){
     setStatus( CLIENT_STATUS_LOGGED_IN);
+    m_system->pushMessage("Error creating character", CONSOLE_MESSAGE);
     printf("Unkown Exception\n");
     return 1;
   }
@@ -657,14 +659,15 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 
 void Client::AvatarSuccess(Eris::Avatar *avatar) {
   assert(avatar != NULL);
-  std::cout << "Avatar sucessfully created" << std::endl;
+  printf("Avatar sucessfully created\n");
   m_avatar = avatar;
 
   m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &Client::GotCharacterEntity));
 }
 
 void Client::AvatarFailure(const std::string &msg) {
-  std::cerr << msg << std::endl;
+  std::cerr << "AvatarFailure: " << msg << std::endl;
+  m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   m_status = CLIENT_STATUS_LOGGED_IN;
   m_system->getCharacter()->setAvatar(NULL);
 }
