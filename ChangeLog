@@ -1,3 +1,9 @@
+2005-04-20 James Turner <james@worldforge.org>
+
+	* loaders/ModelLoader.h, loaders/ModelLoader.cpp, loaders/Makefile.am:
+	  give ModelLoader an implementation file, and move the large loadModel
+	  method into it, allowing ModelLoader.h to not pull in any headers.
+
 2005-04-19  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/client.cpp: Print AvatarFailure messages on screen so user knows 
