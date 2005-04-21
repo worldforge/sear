@@ -2,7 +2,7 @@ dnl Initialise autoconf
 
 AC_INIT([sear], [0.5.0])
 AC_CONFIG_SRCDIR([src/main.cpp])
-AC_CONFIG_HEADER([config.h])
+AM_CONFIG_HEADER([config.h])
 
 ###################################
 # TODO remove unrequired checks when eris is released as it pulls in most libs
@@ -17,11 +17,13 @@ AM_INIT_AUTOMAKE([check-news])
 
 dnl Need libtool
 AM_BINRELOC
-AM_PROG_LIBTOOL
 dnl AC_PROG_LIBTOOL
+AC_CHECK_TOOL(DLLTOOL, dlltool)
+AC_CHECK_TOOL(AS, as)
 
 AC_CHECK_TOOL(WINDRES, windres)
 AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
+AM_PROG_LIBTOOL
 
 SEAR_LIBS=
 

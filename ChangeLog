@@ -1,3 +1,9 @@
+2005-04-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Add AC_CHECK_TOOLS for dlltool and as and place all
+	  AC_CHECK_TOOLS calls before AM_PROG_LIBTOOL. This is to allow libtool
+	  to use the corrcet as when cross-compiling.
+
 2005-04-20 James Turner <james@worldforge.org>
 
 	* loaders/ModelLoader.h, loaders/ModelLoader.cpp, loaders/Makefile.am:
