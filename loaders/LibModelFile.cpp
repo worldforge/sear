@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.4 2005-04-13 12:16:04 simon Exp $
+// $Id: LibModelFile.cpp,v 1.5 2005-04-21 21:43:47 simon Exp $
 
 /*
   Debug check list
@@ -247,7 +247,6 @@ void LibModelFile::render(bool select_mode) {
   static float diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float shininess = 50.0f;
   
-  glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -323,7 +322,6 @@ void LibModelFile::render(bool select_mode) {
       glEndList();
     }
   }
-  glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }

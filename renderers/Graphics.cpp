@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.8 2005-04-13 21:53:31 simon Exp $
+// $Id: Graphics.cpp,v 1.9 2005-04-21 21:43:49 simon Exp $
 
 #include <sage/sage.h>
 
@@ -291,9 +291,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     if (!select_mode ) {
       m_renderer->store();
       RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-      glEnableClientState(GL_VERTEX_ARRAY);
       Environment::getInstance().renderTerrain(pos);
-      glDisableClientState(GL_VERTEX_ARRAY);
       m_renderer->restore();
     }
 
@@ -315,9 +313,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     m_renderer->store();
     RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-    glEnableClientState(GL_VERTEX_ARRAY);
     Environment::getInstance().renderSea();
-    glDisableClientState(GL_VERTEX_ARRAY);
     m_renderer->restore();
     
     m_compass->update(cam->getRotation());

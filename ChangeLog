@@ -1,5 +1,14 @@
 2005-04-21  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/SkyDome.cpp, environment/Stars.cpp, gui/Workspace.cpp, 
+	  loaders/3ds.cpp, renderers/GL.cpp, renderers/Graphics.cpp, 
+	  renderers/StaticObject.cpp,loaders/LibModelFile.cpp: Remove 
+	  unneccessary calls to glEnableClientState(GL_VERTEX_ARRAY) and 
+	  corrsponding disable. Instead call once when setting up GL context.
+	* renderers/Statemanger.cpp: Add some comments
+
+2005-04-21  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.ac: Add AC_CHECK_TOOLS for dlltool and as and place all
 	  AC_CHECK_TOOLS calls before AM_PROG_LIBTOOL. This is to allow libtool
 	  to use the corrcet as when cross-compiling.

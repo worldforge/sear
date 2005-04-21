@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.38 2005-04-13 12:16:03 simon Exp $
+// $Id: 3ds.cpp,v 1.39 2005-04-21 21:43:47 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -230,7 +230,6 @@ void ThreeDS::render(bool select_mode) {
         }
       }
 
-      glEnableClientState(GL_VERTEX_ARRAY);
       glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
       glVertexPointer(3, GL_FLOAT, 0, NULL);
 
@@ -248,7 +247,6 @@ void ThreeDS::render(bool select_mode) {
       // Draw object
       glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
       // Reset states
-      glDisableClientState(GL_VERTEX_ARRAY);
       if (ro->normal_data != NULL) {
         glDisableClientState(GL_NORMAL_ARRAY);
       }

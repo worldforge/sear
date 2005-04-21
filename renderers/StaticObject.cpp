@@ -93,7 +93,6 @@ void StaticObject::render(bool select_mode) {
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     // Setup client states
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
     // Set material properties
@@ -140,7 +139,6 @@ void StaticObject::render(bool select_mode) {
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
-    glDisableClientState(GL_VERTEX_ARRAY);
     glDisableClientState(GL_NORMAL_ARRAY);
   } else {
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
@@ -150,7 +148,6 @@ void StaticObject::render(bool select_mode) {
       disp = glGenLists(1);
       glNewList(disp, GL_COMPILE_AND_EXECUTE);
       // Setup client states
-      glEnableClientState(GL_VERTEX_ARRAY);
       glEnableClientState(GL_NORMAL_ARRAY);
 
       // Set material properties
@@ -201,7 +198,6 @@ void StaticObject::render(bool select_mode) {
         glActiveTextureARB(GL_TEXTURE0 + i);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       }
-      glDisableClientState(GL_VERTEX_ARRAY);
       glDisableClientState(GL_NORMAL_ARRAY);
       glEndList();
     }

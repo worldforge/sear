@@ -46,7 +46,6 @@ void Stars::render()
 
     
     glEnableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_VERTEX_ARRAY);
     
     glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colors);
     glVertexPointer(3, GL_FLOAT, 0, m_locations);
@@ -54,7 +53,6 @@ void Stars::render()
     glDrawArrays(GL_POINTS, 0, 1000);
 
     glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
     
     glDepthMask(GL_TRUE);
  

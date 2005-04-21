@@ -299,7 +299,6 @@ void SkyDome::render()
   val /= (float)(cal->getSecondsPerMinute() * cal->getMinutesPerHour() * cal->getHoursPerDay());
   updateFogColor(val);
   
-  glEnableClientState(GL_VERTEX_ARRAY);
  
   // Select atmosphere texture
   RenderSystem::getInstance().switchTexture(m_textures[0]);
@@ -369,7 +368,6 @@ glDisable(GL_BLEND);
 
   // Reset states
   glDisable(GL_BLEND);
-  glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
   // Disable vertex buffer objects

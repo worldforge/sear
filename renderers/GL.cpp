@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.111 2005-04-15 16:21:01 simon Exp $
+// $Id: GL.cpp,v 1.112 2005-04-21 21:43:49 simon Exp $
 
 #include <SDL/SDL.h>
 #include <sage/sage.h>
@@ -836,6 +836,7 @@ void GL::setupStates() {
   glFogf(GL_FOG_END, m_fog_end);
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glEnableClientState(GL_VERTEX_ARRAY);
 }
 
 inline void GL::translateObject(float x, float y, float z) {
@@ -926,7 +927,6 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
     return; //throw Exception(""); 
   }
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
-  glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && texture_data) {
     if (multitexture) {
       glClientActiveTextureARB(GL_TEXTURE1_ARB);
@@ -957,7 +957,6 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
-  glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && texture_data) {
     if (multitexture)  {
@@ -979,7 +978,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
  
   if (!vertex_data) return; //throw Exception(""); 
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
-  glEnableClientState(GL_VERTEX_ARRAY);
+
   if (textures && texture_data) {
      if (multitexture) {
       glClientActiveTextureARB(GL_TEXTURE1_ARB);
@@ -1010,7 +1009,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
   if (use_ext_compiled_vertex_array) glUnlockArraysEXT();
-  glDisableClientState(GL_VERTEX_ARRAY);
+
   if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && texture_data) {
     if (multitexture) {
@@ -1414,7 +1413,6 @@ void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
 
   if (mesh.vertex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);
   glVertexPointer(3, GL_FLOAT, 0, (float*)mesh.vertex_array);
-  glEnableClientState(GL_VERTEX_ARRAY);
   if (textures && mesh.tex_coord_array) {
     if (multitexture) {
       glClientActiveTextureARB(GL_TEXTURE1_ARB);
@@ -1449,7 +1447,6 @@ void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
-  glDisableClientState(GL_VERTEX_ARRAY);
   if (lighting && mesh.normal_array) glDisableClientState(GL_NORMAL_ARRAY);
   if (textures && mesh.tex_coord_array) {
     if (multitexture)  {

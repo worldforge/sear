@@ -43,13 +43,11 @@ void Workspace::draw()
   glTranslatef(0.f, renderer->getWindowHeight(), 0.f);
   glScalef(1.f, -1.f, 1.f);
 
-  glEnableClientState(GL_VERTEX_ARRAY);
   glLineWidth(1.0f);
 
   // Render the gui recursively
   m_rootWindow->render(renderer);
 
-  glDisableClientState(GL_VERTEX_ARRAY);
 
   glPopMatrix();
 

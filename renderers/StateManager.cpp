@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.20 2005-04-15 15:47:19 simon Exp $
+// $Id: StateManager.cpp,v 1.21 2005-04-21 21:43:49 simon Exp $
 
 /*
  * TODO
@@ -157,8 +157,7 @@ int StateManager::init() {
   m_name_state_vector[m_state_counter] = font_state->state;
   ++m_state_counter;
  
-  //Create a font state so we can still see text
-  //even if no files have been loaded into Sear
+  // Create default select mode state
   select_state->state = "select";
   select_state->alpha_test = false;
   select_state->blend = false;
