@@ -1,3 +1,17 @@
+2005-04-25 James Turner <james@worldforge.org>
+
+	* environment/Environment.cpp, environment/Environment.h: replace
+	  ::registerAreaEntity with ::registerArea and ::registerTerrainShader
+	  methods, in anticipation of doing the heavy lifting in a Model
+	  subclass.
+	  
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h:
+	  move the destructor and invalidate() methods into the .cpp file.
+	  
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h:
+	  replace the m_shaders / m_textures fixed arrays with a vector
+	  of structs holding the same information in an expandable way.
+
 2005-04-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/SkyDome.cpp, environment/Stars.cpp, gui/Workspace.cpp, 

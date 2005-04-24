@@ -75,31 +75,32 @@ public:
 
     Mercator::Terrain m_terrain;
 
-    void invalidate() {
-      DisplayListStore::iterator I = m_displayLists.begin();
-      while (I != m_displayLists.end()) {
-        DisplayListColumn &dcol = (I->second);
-        DisplayListColumn::iterator J = dcol.begin();
-        while (J != dcol.end()) {
-          (J->second).invalidate(); 
-          ++J;
-        }
-        ++I;
-      }
-     
-      m_displayLists.clear();
-    }
+    class ShaderEntry
+    {
+    public:
+        ShaderEntry(Mercator::Shader* s, const std::string& tnm) :
+            shader(s),
+            texId(0),
+            texName(tnm)
+        {}
+        
+        Mercator::Shader* shader;
+        GLint texId;
+        std::string texName; // for invalidation
+    };
 
+    std::vector<ShaderEntry> m_shaders;
+    
+    void invalidate();
   protected:
     DisplayListStore m_displayLists;
     int m_numLineIndeces;
     unsigned short * const m_lineIndeces;
-    int m_textures[8];
+   
     int m_seaTexture;
     int m_shadowTexture;
     GLuint m_landscapeList;
     bool m_haveTerrain;
-    std::vector<Mercator::Shader*> m_shaders;
 
     void enableRendererState();
     void disableRendererState();
@@ -112,17 +113,13 @@ public:
     void readTerrain();
   public:
     TerrainRenderer();
-    virtual ~TerrainRenderer() {
-      for (unsigned int i = 0; i < m_shaders.size();  ++i) {
-        delete m_shaders[i];
-      }
-      delete [] m_lineIndeces;
-      invalidate();
-    }
-
+    virtual ~TerrainRenderer();
+    
     virtual void render( const PosType & camPos);
     virtual void renderSea() { drawSea(m_terrain); }
     friend class Environment;
+    
+    void registerShader(Mercator::Shader*, const std::string& texId);
 };
 }
 #endif // APOGEE_TERRAIN_RENDERER_H

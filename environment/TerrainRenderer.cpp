@@ -17,6 +17,8 @@
 #include <Mercator/ThresholdShader.h>
 #include <Mercator/DepthShader.h>
 #include <Mercator/GrassShader.h>
+#include <Mercator/AreaShader.h>
+#include <Mercator/Area.h>
 #include <Mercator/Surface.h>
 
 #include <iostream>
@@ -90,7 +92,8 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
 
   glGenTextures (surfaces.size (), seg.m_alphaTextures);
   // FIXME These textures we have allocated are leaked.
-  for (int texNo = 0; I != surfaces.end(); ++I, ++texNo) {
+  for (int texNo=0; I != surfaces.end(); ++I, ++texNo) {
+    assert(texNo < 8); // FIXME - hard-coded limit
     if (texNo == 0) continue; // shader 0 never has alpah
     
     glBindTexture (GL_TEXTURE_2D, seg.m_alphaTextures[texNo]);
@@ -132,10 +135,9 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map, DataSeg & seg) {
   
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
 
-  for (int texNo = 0; I != surfaces.end (); ++I, ++texNo) {
-           
+  for (int texNo=0; I != surfaces.end (); ++I, ++texNo) {    
     // Set up the first texture unit with the ground texture
-    RenderSystem::getInstance ().switchTexture (0, m_textures[I->first]);
+    RenderSystem::getInstance ().switchTexture (0, m_shaders[I->first].texId);
 
     // Set up the second texture unit with the alpha texture
     // This is not required for the first pass, as the first pass
@@ -343,12 +345,6 @@ TerrainRenderer::TerrainRenderer ():
   m_landscapeList (0),
   m_haveTerrain (false)
 {
-  // Get texture id's
-  m_textures[0]   = RenderSystem::getInstance ().requestTexture ("granite.png");
-  m_textures[1]   = RenderSystem::getInstance ().requestTexture ("sand.png");
-  m_textures[2]   = RenderSystem::getInstance ().requestTexture ("rabbithill_grass_hh.png");
-  m_textures[3]   = RenderSystem::getInstance ().requestTexture ("dark.png");
-  m_textures[4]   = RenderSystem::getInstance ().requestTexture ("snow.png");
   m_seaTexture    = RenderSystem::getInstance ().requestTexture ("water");
   m_shadowTexture = RenderSystem::getInstance ().requestTexture ("shadow");
 
@@ -369,17 +365,19 @@ TerrainRenderer::TerrainRenderer ():
   }
   m_numLineIndeces = ++idx;
 
-  // Creat our shaders here so we can clean then up later
-  m_shaders.push_back (new Mercator::FillShader ());
-  m_shaders.push_back (new Mercator::BandShader (-2.f, 1.5f));  // Sandy beach
-  m_shaders.push_back (new Mercator::GrassShader (1.f, 80.f, .5f, 1.f));  // Grass
-  m_shaders.push_back (new Mercator::DepthShader (0.f, -10.f));  // Underwater
-  m_shaders.push_back (new Mercator::HighShader (110.f));  // Snow
+  registerShader(new Mercator::FillShader(), "granite.png");
+  registerShader(new Mercator::BandShader (-2.f, 1.5f), "sand.png");  // Sandy beach
+  registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
+  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
+  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
+}
 
-  // Add to mercator terrain
-  for (unsigned int i = 0; i < m_shaders.size (); ++i) {
-    m_terrain.addShader (m_shaders[i], i);
+TerrainRenderer::~TerrainRenderer() {
+  for (unsigned int i = 0; i < m_shaders.size();  ++i) {
+    delete m_shaders[i].shader;
   }
+  delete [] m_lineIndeces;
+  invalidate();
 }
 
 void TerrainRenderer::render (const PosType & camPos) {
@@ -388,6 +386,35 @@ void TerrainRenderer::render (const PosType & camPos) {
   }
   drawMap (m_terrain, camPos);
   drawShadow (WFMath::Point < 2 > (camPos.x (), camPos.y ()), .5f);
+}
+
+void TerrainRenderer::invalidate() {
+  DisplayListStore::iterator I = m_displayLists.begin();
+  while (I != m_displayLists.end()) {
+    DisplayListColumn &dcol = (I->second);
+    DisplayListColumn::iterator J = dcol.begin();
+    while (J != dcol.end()) {
+      (J->second).invalidate(); 
+      ++J;
+    }
+    ++I;
+  }
+ 
+  m_displayLists.clear();
+  
+  for (unsigned int i = 0; i < m_shaders.size();  ++i) {
+    // done by texture manager?
+  //  if (glIsTexture(m_shaders[i].texId)) glIsTexture(1, &m_shaders[i].texId);
+  }
+}
+
+void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& texName)
+{
+  int index = m_shaders.size();
+  m_shaders.push_back(ShaderEntry(s, texName));
+  m_terrain.addShader(s, index);
+  m_shaders[index].texId = RenderSystem::getInstance().requestTexture(texName);
+  // assert m_shaders[index].texId is non-zero?
 }
 
 void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) {

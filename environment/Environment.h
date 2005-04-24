@@ -11,7 +11,10 @@
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
 
-namespace Mercator { class Area; }
+namespace Mercator { 
+    class Area;
+    class Shader;
+}
 
 namespace Sear {
 
@@ -48,8 +51,9 @@ public:
 
   void invalidate();
 
-    void registerAreaEntity(WorldEntity* we);
-
+  void registerArea(Mercator::Area* we);
+  void registerTerrainShader(Mercator::Shader* s, const std::string& texId);
+  
 private:
   bool m_initialised;
 
@@ -57,9 +61,6 @@ private:
   TerrainRenderer *m_terrain;
   SkyDome *m_skyDome;
   Stars* m_stars;
-  
-    typedef std::map<std::string, Mercator::Area*> AreaDict;
-    AreaDict m_areaEntities;
 };
 
 } // namespace Sear
