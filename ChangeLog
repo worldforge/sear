@@ -1,4 +1,12 @@
 2005-04-25 James Turner <james@worldforge.org>
+	
+	* loaders/AreaModel.cpp, loaders/AreaModel.h, loaders/AreaModelLoader.h,
+	  loaders/AreaModelLoader.cpp, loaders/Makefile.am,
+	  loaders/ModelHandler.cpp, loaders/ModelHandler.h: add in initial code
+	  for Area models. Not currently used or tested, but should compile and
+	  not cause any regressions.
+
+2005-04-25 James Turner <james@worldforge.org>
 
 	* environment/Environment.cpp, environment/Environment.h: replace
 	  ::registerAreaEntity with ::registerArea and ::registerTerrainShader
