@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.113 2005-04-25 00:52:52 alriddoch Exp $
+// $Id: GL.cpp,v 1.114 2005-04-25 16:54:35 alriddoch Exp $
 
 #include <SDL/SDL.h>
 #include <sage/sage.h>
@@ -195,6 +195,9 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4 );
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 );
   // Only request stencil if specified
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
@@ -294,6 +297,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+  glEnable(GL_MULTISAMPLE_ARB);
  // glDisable(GL_DITHER);
                                                                                 
   setViewMode(PERSPECTIVE);
