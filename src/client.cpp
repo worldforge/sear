@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.67 2005-04-19 12:56:17 simon Exp $
+// $Id: client.cpp,v 1.68 2005-04-25 22:47:22 jmt Exp $
 
 #include "System.h"
 
@@ -24,6 +24,7 @@
 #include <Eris/Metaserver.h>
 #include <Eris/ServerInfo.h>
 #include <Eris/Exceptions.h>
+#include <Eris/View.h>
 
 #include "common/Utility.h"
 
@@ -462,11 +463,6 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   }
   if (debug) printf("Client::createCharacter: Setting up callbacks\n");
 
-  if (!m_factory) {
-    m_factory = new Factory(*m_connection->getTypeService());
-    Eris::Factory::registerFactory(m_factory);
-  }
-
   return 0;
 }
 
@@ -503,10 +499,6 @@ int Client::takeCharacter(const std::string &id) {
     return 1;
   }
 
-  if (!m_factory) {
-    m_factory = new Factory(*m_connection->getTypeService());
-    Eris::Factory::registerFactory(m_factory);
-  }
   return 0;
 }
 
@@ -661,6 +653,9 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
   assert(avatar != NULL);
   printf("Avatar sucessfully created\n");
   m_avatar = avatar;
+
+  Factory* f = new Factory(*m_connection->getTypeService());
+  m_avatar->getView()->registerFactory(f);
 
   m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &Client::GotCharacterEntity));
 }

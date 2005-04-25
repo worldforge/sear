@@ -1,3 +1,8 @@
+2005-04-25  James Turner  <james@worldforge.org>
+
+	* src/client.cpp: update Eris::Factory usage for revised Eris API -
+	  register Factory from AvatarSuccess slot.
+	  
 2005-04-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/Graphics.cpp: Clean up camera code a little.
