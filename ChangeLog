@@ -1,5 +1,13 @@
-2005-04-25 James Turner <james@worldforge.org>
-	
+2005-04-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/GL.cpp: Start fixing getWorldCoords().
+
+	* renderers/Graphics.cpp, renderers/Graphics.h: Start work on
+	  abstracting camera transform, as its required in other parts of
+	  the code.
+
+2005-04-25  James Turner  <james@worldforge.org>
+
 	* loaders/AreaModel.cpp, loaders/AreaModel.h, loaders/AreaModelLoader.h,
 	  loaders/AreaModelLoader.cpp, loaders/Makefile.am,
 	  loaders/ModelHandler.cpp, loaders/ModelHandler.h: add in initial code

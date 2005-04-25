@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.9 2005-04-21 21:43:49 simon Exp $
+// $Id: Graphics.cpp,v 1.10 2005-04-25 00:52:52 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -209,6 +209,9 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   m_renderer->endFrame(select_mode);
 }
 
+void Graphics::setCameraTransform() {
+}
+
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
@@ -229,9 +232,9 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
   // Reset enabled light sources
   m_lm->reset();
-  WFMath::Point<3> pos(0,0,0); // Initial camera positiona
   // Can we render the world yet?
   if (m_system->checkState(SYS_IN_WORLD)) {
+    WFMath::Point<3> pos(0,0,0); // Initial camera positiona
     Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
     //if (!m_character) m_character = m_system->getCharacter();

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.112 2005-04-21 21:43:49 simon Exp $
+// $Id: GL.cpp,v 1.113 2005-04-25 00:52:52 alriddoch Exp $
 
 #include <SDL/SDL.h>
 #include <sage/sage.h>
@@ -1544,17 +1544,20 @@ void GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   GLint viewport[4];
   GLdouble mvmatrix[16], projmatrix[16];
 
+  setViewMode(PERSPECTIVE);
+
   float z = 0.0f;
   glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
 
+  if (debug) printf("Screen Coord: %d %d %f\n", x, y, z);
   glGetIntegerv (GL_VIEWPORT, viewport);
   glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
   double tx, ty, tz;
-  gluProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
-  wx = ::lrint(tx);
-  wy = ::lrint(m_height - ty);
+  gluUnProject(x, y, z, mvmatrix, projmatrix, viewport, &tx, &ty, &tz);
+  wx = tx;
+  wy = ty;
   wz = tz;
 
   if (debug) printf("World Coord: %f %f %f\n", wx, wy, wz);
