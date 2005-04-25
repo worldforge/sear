@@ -6,7 +6,7 @@
 #include "ObjectRecord.h"
 #include "environment/Environment.h"
 #include <Mercator/Area.h>
-#include "WorldEntity.h"
+#include "src/WorldEntity.h"
 #include <iostream>
 
 namespace Sear
