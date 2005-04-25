@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.10 2005-04-25 00:52:52 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.11 2005-04-25 16:57:16 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -210,14 +210,14 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 }
 
 void Graphics::setCameraTransform() {
+  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  assert(cam != NULL);
 }
 
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
   static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
 
-  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
-  assert(cam != NULL);
   /*
     Camera coords
     //Should be stored in camera object an updated as required
@@ -237,6 +237,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     WFMath::Point<3> pos(0,0,0); // Initial camera positiona
     Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
+    Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+    assert(cam != NULL);
     //if (!m_character) m_character = m_system->getCharacter();
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
