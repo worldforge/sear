@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.11 2005-04-25 16:57:16 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.12 2005-04-26 00:47:18 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -209,14 +209,51 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   m_renderer->endFrame(select_mode);
 }
 
+static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
+static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
+
 void Graphics::setCameraTransform() {
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
+
+  // Get the current focus entity
+  Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+  assert(avatar != NULL);
+  WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
+  assert(focus != NULL);
+
+  // Calculate entity height so camera is always at the top
+  float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+
+  WFMath::Point<3> pos(0,0,0); // Initial camera positiona
+  pos = focus->getAbsPos();
+  float char_x = pos.x(),
+        char_y = pos.y(),
+        char_z = pos.z();
+
+  // Adjust height so camera doesn't go underneath the terrain
+  // Find terrain height at camera position, and adjust as if camera is at
+  // entity feet. (the - height part)
+  float terrain_z = Environment::getInstance().getHeight(char_x - cam->getXPos(), char_y + cam->getYPos()) + cam->getZPos() - height;
+  // If the calculated terrain height is larger than the current Z for the 
+  // camera, adjust to bound
+  if (terrain_z > char_z) {
+    char_z = terrain_z;
+  }
+
+  if (cam->getType() == Camera::CAMERA_CHASE) {
+    // Translate camera getDist() units away from the character. Allows closups or large views
+    m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
+  }
+  m_renderer->applyCharacterLighting(0.5, 0, 0.5);
+
+  m_renderer->applyQuaternion(m_orient);
+    
+  m_renderer->translateObject(-char_x, -char_y, -char_z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
+
 }
 
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
-  static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
-  static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
 
   /*
     Camera coords
@@ -234,24 +271,14 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   m_lm->reset();
   // Can we render the world yet?
   if (m_system->checkState(SYS_IN_WORLD)) {
-    WFMath::Point<3> pos(0,0,0); // Initial camera positiona
-    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
-    assert(avatar != NULL);
     Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
     assert(cam != NULL);
     //if (!m_character) m_character = m_system->getCharacter();
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
-    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
-    assert(focus != NULL);
-
 
     static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
     m_orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     m_orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
-    pos = focus->getAbsPos();
-    float x = pos.x(),
-          y = pos.y(),
-          z = pos.z();
 
     // Apply camera rotations
     m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
@@ -267,28 +294,16 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
       m_renderer->restore();
     }
 
-    if (cam->getType() == Camera::CAMERA_CHASE) {
-      // Translate camera getDist() units away from the character. Allows closups or large views
-      m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
-    }
-    m_renderer->applyCharacterLighting(0.5, 0, 0.5);
-    m_renderer->applyQuaternion(m_orient);
-      
-    // Calculate entity height so camera is always at the top
-    float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+    setCameraTransform();
 
-    // Adjust height so camera doesn't go underneath the terrain
-    // Find terrain height at camera position, and adjust as if camera is at
-    // entity feet. (the - height part)
-    float terrain_z = Environment::getInstance().getHeight(x - cam->getXPos(),y + cam->getYPos()) + cam->getZPos() - height;
-    // If the calculated terrain height is larger than the current Z for the 
-    // camera, adjust to bound
-    if (terrain_z > z) {
-      z = terrain_z;
-    }
+    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+    assert(avatar != NULL);
+    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
+    assert(focus != NULL);
 
-    m_renderer->translateObject(-x, -y, -z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
-    
+    WFMath::Point<3> pos(0,0,0); // Initial camera positiona
+    pos = focus->getAbsPos();
+
     m_renderer->getFrustum(m_frustum);
     // Setup main light sources
     m_renderer->applyLighting();

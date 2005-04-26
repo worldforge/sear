@@ -1,8 +1,16 @@
+2005-04-26  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/Graphics.cpp: Move the camera transform code into
+	  setCameraTransform(), and clean it up some more.
+
+	* renderers/GL.cpp: Use getCameraTransform() to make getWorldCoords()
+	  working.
+
 2005-04-25  James Turner  <james@worldforge.org>
 
 	* src/client.cpp: update Eris::Factory usage for revised Eris API -
 	  register Factory from AvatarSuccess slot.
-	  
+
 2005-04-25  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/Graphics.cpp: Clean up camera code a little.
