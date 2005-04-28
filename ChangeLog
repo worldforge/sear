@@ -1,5 +1,10 @@
 2005-04-28  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/Graphics.cpp: Prevent crash by doing nothing
+	  in setCameraTransform() if we are not yet in world.
+
+2005-04-28  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/main.cpp: Modify Atlas Factories usage to match modified
 	  Atlas-C++ API.
 

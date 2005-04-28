@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.12 2005-04-26 00:47:18 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.13 2005-04-28 16:47:22 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -213,6 +213,9 @@ static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
 static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
 
 void Graphics::setCameraTransform() {
+  if (!m_system->checkState(SYS_IN_WORLD)) {
+    return;
+  }
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
 
