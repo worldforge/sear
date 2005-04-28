@@ -1,7 +1,19 @@
 2005-04-28  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Calendar.cpp: Store result of epochStart. Add asserts to make 
+	  sure timestamps are valid.
+	* src/System.cpp: Remove old code. Fix clean up on client object init
+	  failure. Update getWorldTime checking flag to use SYS_IN_WORLD
+	* data/Makefile.am, data/sear-Icon.ico. configure.ac, 
+	  src/Makefile.am, src/sear.rc: Oops, we did need the windres bits
+	  afterall.
+	
+2005-04-28  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.ac: Remove checks for windres
-	* renderers/GL.cpp, src/System.cpp, src/System.h: Set window icon correctly before setVideoMode, instead of afterwards. This removes the need for the windows rc file which never worked properly.
+	* renderers/GL.cpp, src/System.cpp, src/System.h: Set window icon
+	  correctly before setVideoMode, instead of afterwards. This removes
+	  the need for the windows rc file which never worked properly.
 	* src/Makefile.am: Remove windres bits
 	* src/sear.rc: No longer required.
 	* data/sear_icon.bmp, data/sear_icon.ico: No longer required.

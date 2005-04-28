@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.16 2005-04-06 13:36:08 simon Exp $
+// $Id: Calendar.cpp,v 1.17 2005-04-28 20:31:37 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -111,7 +111,7 @@ void Calendar::init() {
   // Bind signal to config for further updates
   m_config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
   
-  m_ts.epochStart();
+  m_ts = WFMath::TimeStamp::epochStart();
   m_initialised = true;
 }
 
@@ -129,9 +129,14 @@ void Calendar::serverUpdate(double time) {
 }
 
 void Calendar::setWorldTime(const WFMath::TimeStamp &ts) {
+  assert ((m_initialised == true) && "Calender not initialised");
+  assert(ts.isValid());
+  assert(m_ts.isValid());
+
   WFMath::TimeDiff df = ts - m_ts;
   m_ts = ts;
   double time = (double)df.milliseconds() / 1000.0;
+
   update(time);
 }
 

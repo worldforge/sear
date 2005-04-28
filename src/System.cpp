@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.116 2005-04-28 17:17:05 simon Exp $
+// $Id: System.cpp,v 1.117 2005-04-28 20:31:38 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -131,9 +131,7 @@ System::System() :
   m_click_x(0),
   m_click_y(0),
   m_script_engine(NULL),
-//  m_model_handler(NULL),
   m_action_handler(NULL),
-//  m_object_handler(NULL),
   m_calendar(NULL),
   m_controller(NULL),
   m_console(NULL),
@@ -168,35 +166,34 @@ bool System::init(int argc, char *argv[]) {
 
   m_script_engine = new ScriptEngine();
   m_script_engine->init();
-//  m_model_handler = new ModelHandler();
-//  m_model_handler->init();
+
   m_client = new Client(this, "Sear");
   if(!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
-    #warning "possible mem-leak here"
 
-    throw Exception("ERIS INIT");
+    delete m_client;
+    m_client = NULL;
+
+    m_script_engine->shutdown();
+    delete m_script_engine;
+    m_script_engine = NULL;
+
+    return false;
+//    throw Exception("ERIS INIT");
   }
   
   // This should not be hardcoded!!
   m_action_handler = new ActionHandler(this);
   m_action_handler->init();
 
-//  m_object_handler = new ObjectHandler();
-//  m_object_handler->init();
- 
   m_calendar = new Calendar();
   m_calendar->init();
  
   // Connect signals for record processing 
   m_general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-//  m_models.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
-//  m_model_records.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
   
   // Connect signals for error messages
   m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-//  m_models.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
-//  m_model_records.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
   Bindings::bind("escape", "/" + QUIT);
@@ -211,7 +208,6 @@ bool System::init(int argc, char *argv[]) {
   m_script_engine->registerCommands(m_console);
   m_action_handler->registerCommands(m_console);
   m_file_handler->registerCommands(m_console);
-//  m_object_handler->registerCommands(m_console);
   m_calendar->registerCommands(m_console);
 
   m_character = new Character();
@@ -290,11 +286,6 @@ bool System::init(int argc, char *argv[]) {
     m_script_engine->runScript(*I);
   }
 
-//  if (debug) {
-//    for (int i = 0; i < argc; ++i) {
-//      std::cout << argv[i] << std::endl;
-//    }
-//  }
   // Pass command line into general varconf object for processing
   m_general.getCmdline(argc, argv);
   readConfig(m_general);
@@ -330,55 +321,33 @@ void System::shutdown() {
   // Save config
   writeConfig(m_general);
 
-//  if (m_client) {
-    m_client->shutdown();
-    delete m_client;
-    m_client = NULL;
-//  }
+  m_client->shutdown();
+  delete m_client;
+  m_client = NULL;
   
-//  if (m_character) {
-    m_character->shutdown();
-    delete m_character;
-    m_character = NULL;
-//  }
-//  if (m_action_handler) {
-    m_action_handler->shutdown();
-    delete m_action_handler;
-    m_action_handler = NULL;
-//  }
-//  if (m_object_handler) {
-//    m_object_handler->shutdown();
-//    delete m_object_handler;
-//    m_object_handler = NULL;
-///  }
- 
-//  if (m_model_handler) {
-//    m_model_handler->shutdown();
-//    delete m_model_handler;
-//    m_model_handler = NULL;
-//  }  
+  m_character->shutdown();
+  delete m_character;
+  m_character = NULL;
+
+  m_action_handler->shutdown();
+  delete m_action_handler;
+  m_action_handler = NULL;
+
   CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();
   ModelSystem::getInstance().shutdown(); 
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
 
+  delete m_editor;
+  m_editor = NULL;
 
-//  if (m_editor) {
-    delete m_editor;
-    m_editor = NULL;
-//  }
+  delete m_workspace;
+  m_workspace = NULL;
 
-//  if (m_workspace)  {
-    delete m_workspace;
-    m_workspace = NULL;
-//  }
-
-//  if (m_calendar) {
-    m_calendar->shutdown();
-    delete m_calendar;
-    m_calendar = NULL;
-//  }
+  m_calendar->shutdown();
+  delete m_calendar;
+  m_calendar = NULL;
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileList shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
@@ -386,28 +355,26 @@ void System::shutdown() {
     m_script_engine->runScript(*I);
   }
   Bindings::shutdown();
-//  if (m_script_engine) {
-    m_script_engine->shutdown();
-    delete m_script_engine;
-    m_script_engine = NULL;
-//  }  
-//  if (m_file_handler) {
-//    m_file_handler->shutdown();
-    delete m_file_handler;
-    m_file_handler = NULL;
-//  }
-//  if (m_console) {
-    m_console->shutdown();
-    delete m_console;
-    m_console = NULL;
-//  }
+
+  m_script_engine->shutdown();
+  delete m_script_engine;
+  m_script_engine = NULL;
+
+  delete m_file_handler;
+  m_file_handler = NULL;
+
+  m_console->shutdown();
+  delete m_console;
+  m_console = NULL;
  
   if (m_sound) {
     m_sound->shutdown();
     delete m_sound;
     m_sound = NULL;
   }
+
   SDL_Quit();
+
   m_initialised = false;
   std::cout << "System: Finished Shutdown" << std::endl;
 }
@@ -451,7 +418,7 @@ void System::mainLoop() {
       }
       // Update Calendar
 //      m_calendar->update(time_elapsed);
-      if (m_client->getAvatar()) {
+      if (checkState(SYS_IN_WORLD)) {
         m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
       }
       // draw scene
