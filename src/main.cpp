@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.22 2005-04-13 10:14:09 simon Exp $
+// $Id: main.cpp,v 1.23 2005-04-28 01:14:41 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -81,9 +81,9 @@ under certain conditions; type `show c' for details.
   sys = new Sear::System();
   sys->addSearchPaths(path_list);
 
-  WIELD_NO = Atlas::Objects::objectFactory.addFactory("wield",
+  WIELD_NO = Atlas::Objects::Factories::instance()->addFactory("wield",
                    (Atlas::Objects::FactoryMethod)&Wield::factory);
-  USE_NO = Atlas::Objects::objectFactory.addFactory("use",
+  USE_NO = Atlas::Objects::Factories::instance()->addFactory("use",
                    (Atlas::Objects::FactoryMethod)&Use::factory);
 
 
