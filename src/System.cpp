@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.115 2005-04-15 15:47:19 simon Exp $
-
-#include "sear_icon.xpm"
+// $Id: System.cpp,v 1.116 2005-04-28 17:17:05 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,12 +53,6 @@
   #include "common/mmgr.h"
 #endif
 
-#ifdef __APPLE__
-    #include <SDL_image/SDL_image.h>
-#else
-    #include <SDL/SDL_image.h>
-#endif
-
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -100,7 +92,6 @@ namespace Sear {
   static const std::string IDENTIFY_ENTITY = "identify";
 
   // Config key values  
-  static const std::string KEY_icon_file = "iconfile";
   static const std::string KEY_mouse_move_select = "mouse_move_select";
   static const std::string KEY_render_use_stencil = "render_use_stencil";
   static const std::string KEY_window_width = "width";
@@ -132,7 +123,6 @@ System::System() :
   m_mouseLook(0),
   m_screen(NULL),
   m_client(NULL),
-  m_icon(NULL),
   m_width(0),
   m_height(0),
   m_KeyRepeatDelay(DEFAULT_key_repeat_delay),
@@ -323,10 +313,6 @@ bool System::init(int argc, char *argv[]) {
   }
   if (!success) return false;
 
-  // TODO:these are probably leaked, however freeing them often causes a segfault!
-  #warning "m_icon maybe leaked"
-  if (!m_icon) m_icon = IMG_ReadXPMFromArray(sear_icon_xpm);
-  SDL_WM_SetIcon(m_icon, NULL);
   // Hide cursor
   SDL_ShowCursor(0);
 

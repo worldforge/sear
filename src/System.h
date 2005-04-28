@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.54 2005-04-15 15:47:19 simon Exp $
+// $Id: System.h,v 1.55 2005-04-28 17:17:08 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -210,8 +210,6 @@ protected:
   SDL_Surface *m_screen;
   Client *m_client;
   static System *m_instance;
-  std::string m_icon_file;
-  SDL_Surface *m_icon;
   
   int m_width;
   int m_height;

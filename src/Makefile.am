@@ -50,16 +50,6 @@ else
 SEAR_EXT_LIBS = $(SEAR_LIBS)
 endif
 
-if BUILD_RC_O
-SEAR_RC_O=sear.rc.o
-
-else
-SEAR_RC_O=
-endif
-
-$(SEAR_RC_O): sear.rc
-	$(WINDRES) -i sear.rc -o $(SEAR_RC_O)
-
 sear_bin_LDADD = \
 	libSear.a \
 	../common/libCommon.a \
@@ -68,7 +58,6 @@ sear_bin_LDADD = \
 	../loaders/libModelLoader.a \
 	../loaders/cal3d/libLoaderCal3d.a \
 	../gui/libGui.a \
-	$(SEAR_RC_O) \
 	$(SEAR_EXT_LIBS)
 
 sear_bin_SOURCES = \
@@ -113,7 +102,3 @@ libSear_a_SOURCES = \
 	Editor.h \
 	TerrainEntity.cpp TerrainEntity.h \
 	prefix.c prefix.h
-
-#	Lobby.cpp \
-#	Lobby.h \
-#

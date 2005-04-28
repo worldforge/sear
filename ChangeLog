@@ -1,3 +1,12 @@
+2005-04-28  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Remove checks for windres
+	* renderers/GL.cpp, src/System.cpp, src/System.h: Set window icon correctly before setVideoMode, instead of afterwards. This removes the need for the windows rc file which never worked properly.
+	* src/Makefile.am: Remove windres bits
+	* src/sear.rc: No longer required.
+	* data/sear_icon.bmp, data/sear_icon.ico: No longer required.
+	* data/Makefile.am, data/general.cfg: Remove sear_icon references
+
 2005-04-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/Graphics.cpp: Prevent crash by doing nothing

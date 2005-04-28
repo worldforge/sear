@@ -2,9 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.116 2005-04-26 00:47:18 alriddoch Exp $
+// $Id: GL.cpp,v 1.117 2005-04-28 17:17:05 simon Exp $
 
 #include <SDL/SDL.h>
+
+#ifdef __APPLE__
+    #include <SDL_image/SDL_image.h>
+#else
+    #include <SDL/SDL_image.h>
+#endif
+
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 #include <sage/GLU.h>
@@ -16,7 +24,6 @@
 #include <wfmath/vector.h>
 #include <Eris/Entity.h>
 
-//#include "sear_icon.xpm"
 #include "RenderSystem.h"
 
 #include "common/Log.h"
@@ -39,6 +46,9 @@
 #include "GL.h"
 
 #include "environment/Environment.h"
+
+
+#include "src/sear_icon.xpm"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -233,6 +243,12 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     return false;
   }
   if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
+
+   // TODO:these are probably leaked, however freeing them often causes a segfault!
+  SDL_Surface *icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+  SDL_WM_SetIcon(icon, NULL);
+  SDL_FreeSurface(icon);
+
 
   //Is this the correct way to free a window?
   m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
