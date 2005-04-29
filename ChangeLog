@@ -1,3 +1,13 @@
+2005-04-28  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/GL.h, renderers/GL.cpp: Change return type of
+	  getWorldCoord() to bool and return if getting a set of world
+	  coordinates worked.
+
+	* src/System.h, src/System.cpp: Check if getWorldCoords() worked,
+	  if so store the position of the click as well as the ID clicked
+	  on.
+
 2005-04-28  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp: Store result of epochStart. Add asserts to make 

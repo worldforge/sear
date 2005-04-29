@@ -125,7 +125,7 @@ public:
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void resize(int width, int height);
 
-  void getWorldCoords(int x, int y, float &wx, float &wy,float &wz);
+  bool getWorldCoords(int x, int y, float &wx, float &wy,float &wz);
 
 protected:
   System *m_system;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.117 2005-04-28 20:31:38 simon Exp $
+// $Id: System.cpp,v 1.118 2005-04-29 13:02:46 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -457,9 +457,11 @@ void System::handleEvents(const SDL_Event &event) {
           m_click_x = event.button.x;
           m_click_y = event.button.y;
           m_click_seconds = m_seconds;
-          renderer->procEvent(event.button.x, event.button.y);
           float x,y,z;
-          dynamic_cast<GL*>(renderer)->getWorldCoords(m_click_x, m_click_y, x,y,z);
+          if (dynamic_cast<GL*>(renderer)->getWorldCoords(m_click_x, m_click_y, x,y,z)) {
+              m_click_pos = WFMath::Point<3>(x,y,z);
+          }
+          renderer->procEvent(event.button.x, event.button.y);
           m_click_id = renderer->getActiveID();
           break;
         }

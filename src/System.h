@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.55 2005-04-28 17:17:08 simon Exp $
+// $Id: System.h,v 1.56 2005-04-29 13:02:46 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -15,6 +15,7 @@
 
 #include "interfaces/ConsoleObject.h"
 #include <varconf/Config.h>
+#include <wfmath/point.h>
 
 namespace Sear {
 	
@@ -221,6 +222,7 @@ protected:
   int m_click_y;
   std::string m_click_id;
   double m_click_seconds;
+  WFMath::Point<3> m_click_pos;
 
   ScriptEngine *m_script_engine; ///< Pointer to scripting engine object
   FileHandler *m_file_handler; ///< Pointer to file handler object
