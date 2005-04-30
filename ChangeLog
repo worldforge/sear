@@ -1,3 +1,7 @@
+2005-04-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Update names of some historic autoconf macros.
+
 2005-04-28  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/GL.h, renderers/GL.cpp: Change return type of

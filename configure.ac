@@ -2,14 +2,14 @@ dnl Initialise autoconf
 
 AC_INIT([sear], [0.5.0])
 AC_CONFIG_SRCDIR([src/main.cpp])
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 ###################################
 # TODO remove unrequired checks when eris is released as it pulls in most libs
 # We should check for eris and varconf within the same check
 ##################################
 
-dnl Detect the canonical host and target build environment
+dnl Detect the canonical host and target environment
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
@@ -23,7 +23,7 @@ AC_CHECK_TOOL(AS, as)
 
 AC_CHECK_TOOL(WINDRES, windres)
 AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 SEAR_LIBS=
 
@@ -39,7 +39,7 @@ dnl Test for C++ compiler
 
 AC_PROG_CXX
 
-AC_LANG_CPLUSPLUS
+AC_LANG(C++)
 AC_REQUIRE_CPP
 AC_PROG_INSTALL
 AC_HEADER_STDC
