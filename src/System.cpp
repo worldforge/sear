@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.118 2005-04-29 13:02:46 alriddoch Exp $
+// $Id: System.cpp,v 1.119 2005-05-01 17:26:01 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -494,7 +494,7 @@ void System::handleEvents(const SDL_Event &event) {
             break;
             case (ACTION_PICKUP): m_character->getEntity(m_click_id); break;
             case (ACTION_TOUCH): m_character->touchEntity(m_click_id); break;
-            case (ACTION_USE): m_character->useToolOnEntity(m_click_id); break;
+            case (ACTION_USE): m_character->useToolOnEntity(m_click_id, m_click_pos); break;
           }
           setAction(ACTION_DEFAULT);
           m_click_on = false;

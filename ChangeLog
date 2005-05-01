@@ -1,3 +1,9 @@
+2005-05-01  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/System.cpp, src/Character.h, src/Character.cpp:
+	  Add POS to tool use arguments. Default name to type
+	  if it is not specified when making entities.
+
 2005-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Update names of some historic autoconf macros.

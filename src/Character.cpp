@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.58 2005-04-15 15:47:19 simon Exp $
+// $Id: Character.cpp,v 1.59 2005-05-01 17:26:01 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -361,7 +361,8 @@ void Character::wieldEntity(const std::string &name) {
   }
 }
 
-void Character::useToolOnEntity(const std::string & id) {
+void Character::useToolOnEntity(const std::string & id,
+                                const WFMath::Point<3> & pos) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   if (id.empty()) return;
@@ -372,6 +373,7 @@ void Character::useToolOnEntity(const std::string & id) {
   Atlas::Message::MapType arg;
   arg["id"] = e->getId();
   arg["objtype"] = "obj";
+  arg["pos"] = pos.toAtlas();
   u->setArgsAsList(Atlas::Message::ListType(1, arg));
   m_avatar->getConnection()->send(u);
   setAction("use");
@@ -552,6 +554,9 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_MAKE) {
     std::string type = tokeniser.nextToken();
     std::string name = tokeniser.remainingTokens();
+    if (name.empty()) {
+        name = type;
+    }
     make(type, name);
   }
   else if (command == CMD_USE) {
