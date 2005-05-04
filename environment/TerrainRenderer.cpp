@@ -113,7 +113,8 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
   }
 }
 
-void TerrainRenderer::drawRegion (Mercator::Segment * map, DataSeg & seg) {
+void TerrainRenderer::drawRegion (Mercator::Segment * map,
+                                  DataSeg & seg, bool select_mode) {
   // Set pointer to normal buffer
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     glBindBufferARB (GL_ARRAY_BUFFER_ARB, seg.vb_narray);
@@ -134,8 +135,14 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map, DataSeg & seg) {
   const Mercator::Segment::Surfacestore & surfaces = map->getSurfaces ();
   
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
+  Mercator::Segment::Surfacestore::const_iterator Iend = surfaces.end ();
+  if (select_mode) {
+    // Only draw the first surface in select mode
+    Iend = I;
+    ++Iend;
+  }
 
-  for (int texNo=0; I != surfaces.end (); ++I, ++texNo) {    
+  for (int texNo=0; I != Iend; ++I, ++texNo) {    
     // Set up the first texture unit with the ground texture
     RenderSystem::getInstance ().switchTexture (0, m_shaders[I->first].texId);
 
@@ -174,13 +181,13 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map, DataSeg & seg) {
 using Mercator::Terrain;
 
 void TerrainRenderer::drawMap(Mercator::Terrain & t,
-                             const PosType & camPos) {
+                             const PosType & camPos, bool select_mode) {
   long lowXBound = lrintf (camPos[0] / segSize) - 2,
        upXBound = lrintf (camPos[0] / segSize) + 2,
        lowYBound = lrintf (camPos[1] / segSize) - 2,
        upYBound = lrintf (camPos[1] / segSize) + 2;
 
-  enableRendererState ();
+  if (!select_mode) enableRendererState ();
 
   Render *r = RenderSystem::getInstance ().getRenderer ();
   float frustum[6][4];
@@ -293,7 +300,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
       glPushMatrix ();
       glTranslatef (I->first * segSize, J->first * segSize, 0.0f);
-      drawRegion (s, seg);
+      drawRegion (s, seg, select_mode);
       glPopMatrix ();
 
       if (end) {
@@ -302,7 +309,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
     }
   }
 
-  disableRendererState ();
+  if (!select_mode) disableRendererState ();
 }
 
 void TerrainRenderer::drawSea (Mercator::Terrain & t) {
@@ -380,11 +387,11 @@ TerrainRenderer::~TerrainRenderer() {
   invalidate();
 }
 
-void TerrainRenderer::render (const PosType & camPos) {
+void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
   if (!m_haveTerrain) {
     m_haveTerrain = true;
   }
-  drawMap (m_terrain, camPos);
+  drawMap (m_terrain, camPos, select_mode);
   drawShadow (WFMath::Point < 2 > (camPos.x (), camPos.y ()), .5f);
 }
 

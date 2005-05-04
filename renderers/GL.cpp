@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.118 2005-04-29 13:02:46 alriddoch Exp $
+// $Id: GL.cpp,v 1.119 2005-05-04 21:58:12 alriddoch Exp $
 
 #include <SDL/SDL.h>
 
@@ -105,6 +105,7 @@
   static const std::string KEY_fog_start = "fog_start";
   static const std::string KEY_fog_end = "fog_end";
 	
+  static const std::string KEY_near_clip = "near_clip";
   static const std::string KEY_far_clip_dist = "far_clip_dist";
   static const std::string KEY_texture_scale = "texture_scale";
   
@@ -151,6 +152,7 @@
 
   static const float DEFAULT_fog_start = 100.0f;
   static const float DEFAULT_fog_end = 150.0f;
+  static const float DEFAULT_near_clip = 0.1f;
   static const float DEFAULT_far_clip_dist = 1000.0f;
   static const float DEFAULT_texture_scale = 10.0f;
 
@@ -386,6 +388,10 @@ void GL::nextColour(WorldEntity *we) {
   m_entityArray[m_colour_index] = we; // Store entity in array slot
   glColor3ubv(m_colourArray[m_colour_index]); // Set colour from appropriate index
   ++m_colour_index; // Increment counter for next pass
+}
+
+void GL::selectTerrainColour(WorldEntity * we) {
+  nextColour(we);
 }
 
 void GL::buildColourSet() {
@@ -790,6 +796,13 @@ void GL::readConfig(varconf::Config &config) {
     m_fog_end = DEFAULT_fog_end;
   }
 
+  if (config.findItem(RENDER, KEY_near_clip)) {
+    temp = config.getItem(RENDER, KEY_near_clip);
+    m_near_clip = (!temp.is_double()) ? (DEFAULT_near_clip) : ((double)(temp));
+  } else {
+    m_near_clip = DEFAULT_near_clip;
+  }
+
   if (config.findItem(RENDER, KEY_far_clip_dist)) {
     temp = config.getItem(RENDER, KEY_far_clip_dist);
     m_far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
@@ -837,6 +850,7 @@ void GL::writeConfig(varconf::Config &config) {
 
   config.setItem(RENDER, KEY_fog_start, m_fog_start);
   config.setItem(RENDER, KEY_fog_end, m_fog_end);
+  config.setItem(RENDER, KEY_near_clip, m_near_clip);
   config.setItem(RENDER, KEY_far_clip_dist, m_far_clip_dist);
 }  
 
@@ -1405,6 +1419,10 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
     else if (key == KEY_fog_end) {
       temp = config.getItem(RENDER, KEY_fog_end);
       m_fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
+    }
+    else if (key == KEY_near_clip) {
+      temp = config.getItem(RENDER, KEY_near_clip);
+      m_near_clip = (!temp.is_double()) ? (DEFAULT_near_clip) : ((double)(temp));
     }
     else if (key == KEY_far_clip_dist) {
       temp = config.getItem(RENDER, KEY_far_clip_dist);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.13 2005-04-28 16:47:22 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.14 2005-05-04 21:58:12 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -311,17 +311,22 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Setup main light sources
     m_renderer->applyLighting();
 
-    if (!select_mode ) {
-      m_renderer->store();
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-      Environment::getInstance().renderTerrain(pos);
-      m_renderer->restore();
-    }
-
     Eris::View *view = avatar->getView();
     assert(view);
     WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
     assert(root);
+
+    if (select_mode ) {
+      m_renderer->selectTerrainColour(root);
+    }
+    m_renderer->store();
+    if (select_mode) {
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("select"));
+    } else {
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+    }
+    Environment::getInstance().renderTerrain(pos, select_mode);
+    m_renderer->restore();
 
     assert(System::instance()->getCharacter());
 

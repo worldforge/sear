@@ -123,6 +123,7 @@ public:
   void playList(unsigned int list) { glCallList(list); }
   unsigned int getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
+  void selectTerrainColour(WorldEntity * we);
   void resize(int width, int height);
 
   bool getWorldCoords(int x, int y, float &wx, float &wy,float &wz);
@@ -132,7 +133,7 @@ protected:
   Graphics *m_graphics;
 
   const float m_fov;
-  const float m_near_clip;
+  float m_near_clip;
   float m_far_clip_dist;
 
   GLuint m_base;

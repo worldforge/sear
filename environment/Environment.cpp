@@ -63,9 +63,9 @@ void Environment::renderSky() {
   m_skyDome->render();
 }
 
-void Environment::renderTerrain(const WFMath::Point<3> &pos) {
+void Environment::renderTerrain(const WFMath::Point<3> &pos, bool select_mode) {
   assert(m_initialised == true);
-  m_terrain->render(pos);
+  m_terrain->render(pos, select_mode);
 }
 
 void Environment::renderSea() {

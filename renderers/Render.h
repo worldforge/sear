@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.3 2005-03-04 17:58:24 simon Exp $
+// $Id: Render.h,v 1.4 2005-05-04 21:58:12 alriddoch Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -109,6 +109,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual unsigned int getNewList() = 0;
   virtual void playList(unsigned int list) =0;
   virtual void freeList(unsigned int list) = 0;
+
+  virtual void selectTerrainColour(WorldEntity * we) = 0;
   
 protected:
 };

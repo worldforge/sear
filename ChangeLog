@@ -1,3 +1,15 @@
+2005-05-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/GL.cpp, renderers/GL.h: Make near_clip into a setting,
+	  so it can be tweaked.
+
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  renderers/GL.cpp, renderers/GL.h, renderers/Graphics.cpp,
+	  renderers/Render.h: Modify the select mode code so that terrain
+	  is included to correctly obscure entities behind the terrain
+	  and allow terrain to be selected.
+
 2005-05-01  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/System.cpp, src/Character.h, src/Character.cpp:

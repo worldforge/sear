@@ -106,8 +106,8 @@ public:
     void disableRendererState();
 
     void generateAlphaTextures(Mercator::Segment *, DataSeg &);
-    void drawRegion(Mercator::Segment *, DataSeg&);
-    void drawMap(Mercator::Terrain &, const PosType & camPos);
+    void drawRegion(Mercator::Segment *, DataSeg&, bool select_mode);
+    void drawMap(Mercator::Terrain &, const PosType & camPos, bool select_mode);
     void drawSea( Mercator::Terrain &);
     void drawShadow(const WFMath::Point<2> & pos, float radius = 1.f);
     void readTerrain();
@@ -115,7 +115,7 @@ public:
     TerrainRenderer();
     virtual ~TerrainRenderer();
     
-    virtual void render( const PosType & camPos);
+    virtual void render( const PosType & camPos, bool select_mode);
     virtual void renderSea() { drawSea(m_terrain); }
     friend class Environment;
     

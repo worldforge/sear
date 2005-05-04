@@ -46,7 +46,7 @@ public:
   void setBasePoint(int x, int y, float z);
 
   void renderSky();
-  void renderTerrain(const WFMath::Point<3> &pos);
+  void renderTerrain(const WFMath::Point<3> &pos, bool select_mode);
   void renderSea();
 
   void invalidate();
