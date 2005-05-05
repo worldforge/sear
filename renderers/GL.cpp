@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.119 2005-05-04 21:58:12 alriddoch Exp $
+// $Id: GL.cpp,v 1.120 2005-05-05 11:03:05 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -174,6 +174,7 @@ static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 //static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
 static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
+static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
 static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
 
@@ -1119,6 +1120,25 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
   }
 }
 
+void GL::drawNameQueue(MessageList &list) {
+  glColor4fv(blue);
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
+  for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
+    WorldEntity *we = (WorldEntity*)*I;
+    glPushMatrix();
+    WFMath::Point<3> pos = we->getAbsPos();
+    glTranslatef(pos.x(), pos.y(), pos.z());
+    WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+    orient2 /= m_graphics->getCameraOrientation(); 
+    applyQuaternion(orient2);
+    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
+    glScalef(0.025f, 0.025f, 0.025f);
+    glTranslatef(m_speech_offset_x, m_speech_offset_y, m_speech_offset_z);
+    print3D(we->getName().c_str(), 0);
+    we->renderMessages();
+    glPopMatrix();
+  }
+}
 void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));

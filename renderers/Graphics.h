@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.5 2005-04-25 00:52:52 alriddoch Exp $
+// $Id: Graphics.h,v 1.6 2005-05-05 11:03:05 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -68,7 +68,7 @@ typedef enum {
   void shutdown();
 
   float getLightLevel();
-  void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &list); 
+  void buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &queue, Render::MessageList &message_list, Render::MessageList &name_list); 
   void drawScene(bool, float);
   void setCameraTransform();
   void drawWorld(bool, float);
@@ -98,6 +98,7 @@ protected:
 
   Render::QueueMap m_render_queue;
   Render::MessageList m_message_list;
+  Render::MessageList m_name_list;
   
   int m_num_frames;
   float m_frame_time;
@@ -113,6 +114,7 @@ private:
   LightManager *m_lm;
 
   Light m_fire;
+  bool m_show_names;
 
     /**
     Helper to qeueue the models for a single object record
@@ -120,7 +122,8 @@ private:
     void drawObject(ObjectRecord* obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
-                        Render::MessageList &message_list);
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list);
 };
 
 } /* namespace Sear */

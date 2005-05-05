@@ -104,6 +104,7 @@ public:
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
   void drawMessageQueue(MessageList &list);
+  void drawNameQueue(MessageList &list);
   void drawOutline(ModelRecord *);
  
   inline void store();

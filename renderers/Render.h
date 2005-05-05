@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.4 2005-05-04 21:58:12 alriddoch Exp $
+// $Id: Render.h,v 1.5 2005-05-05 11:03:05 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -100,6 +100,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
   virtual void drawMessageQueue(MessageList &list) =0;
+  virtual void drawNameQueue(MessageList &list) =0;
 
   virtual void applyCharacterLighting(float x, float y, float z) =0;
   virtual void getFrustum(float [6][4]) =0;

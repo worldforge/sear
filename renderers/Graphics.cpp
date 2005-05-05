@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.14 2005-05-04 21:58:12 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.15 2005-05-05 11:03:05 simon Exp $
 
 #include <sage/sage.h>
 
@@ -113,7 +113,8 @@ Graphics::Graphics(System *system) :
   m_num_frames(0),
   m_frame_time(0),
   m_initialised(false),
-  m_compass(NULL)
+  m_compass(NULL),
+  m_show_names(false)
 {
 }
 
@@ -331,13 +332,19 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     assert(System::instance()->getCharacter());
 
     System::instance()->getCharacter()->updateLocals(false);
-    m_render_queue = Render::QueueMap();
-    m_message_list = Render::MessageList();
+    m_render_queue.clear();
+    m_message_list.clear();
+    m_name_list.clear();
 
-    buildQueues(root, 0, select_mode, m_render_queue, m_message_list);
+    buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list);
 
     m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
-    if (!select_mode) m_renderer->drawMessageQueue(m_message_list);
+    if (!select_mode) {
+      m_renderer->drawMessageQueue(m_message_list);
+      if (m_show_names) {
+        m_renderer->drawNameQueue(m_name_list);
+      }
+    }
 
     m_renderer->store();
     RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
@@ -352,7 +359,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 }
 
 
-void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list) {
+void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list, Render::MessageList &name_list) {
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
@@ -385,14 +392,14 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
          && (we->getId() == self->getId())) { 
           /* first person, don't draw self */
         } else {
-          drawObject(obj, select_mode, render_queue, message_list);
+          drawObject(obj, select_mode, render_queue, message_list, name_list);
         }
       }
       // Draw any contained objects
       if (obj->draw_members) {
         for (unsigned int i = 0; i < we->numContained(); ++i) {
           buildQueues(static_cast<WorldEntity*>(we->getContained(i)),
-                      depth + 1, select_mode, render_queue, message_list);
+                      depth + 1, select_mode, render_queue, message_list, name_list);
         }
       }
     }
@@ -402,7 +409,8 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
 void Graphics::drawObject(ObjectRecord* obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
-                        Render::MessageList &message_list)
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list)
 {
    
   if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
@@ -419,8 +427,11 @@ void Graphics::drawObject(ObjectRecord* obj,
     render_queue[stateNum].push_back(Render::QueueItem(obj, *I));
   }
   // if rendering, add any messages
-  if (!select_mode && obj->entity->hasMessages()) {
-    message_list.push_back(obj->entity);
+  if (!select_mode) {
+    name_list.push_back(obj->entity);
+    if (obj->entity->hasMessages()) {
+      message_list.push_back(obj->entity);
+    }
   } // of object models loop
 }
 
@@ -553,6 +564,8 @@ void Graphics::writeConfig(varconf::Config &config) {
 
 void Graphics::registerCommands(Console * console) {
   console->registerCommand("invalidate", this);
+  console->registerCommand("+show_names", this);
+  console->registerCommand("-show_names", this);
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
@@ -560,6 +573,10 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
     RenderSystem::getInstance().invalidate();
     Environment::getInstance().invalidate();
     ModelSystem::getInstance().invalidate();
+  } else if (command == "+show_names") {
+    m_show_names = true;
+  } else if (command == "-show_names") {
+    m_show_names = false;
   }
 }
 

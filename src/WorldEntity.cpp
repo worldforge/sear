@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.50 2005-04-13 12:16:05 simon Exp $
+// $Id: WorldEntity.cpp,v 1.51 2005-05-05 11:03:05 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -54,9 +54,6 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    m_lastMoveTime(0)
 {
   Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
-}
-
-WorldEntity::~WorldEntity() {
 }
 
 void WorldEntity::onMove() {

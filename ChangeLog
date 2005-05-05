@@ -1,3 +1,11 @@
+2005-05-05  Simon Goodall <sear@simongoodall.co.uk>
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: Move destructor to heeader.
+	* renderers/Graphics.cpp, renderers/Graphics.h, renderers/GL.cpp, 
+	  renderers/GL.h, renderers/Render.h: Add +show_names command to render
+	  the name of all visible objects on screen.
+	* data/bindings.cfg: Bind +show_names to both ctrl keys
+
 2005-05-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/GL.cpp, renderers/GL.h: Make near_clip into a setting,
