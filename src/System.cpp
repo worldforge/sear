@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.119 2005-05-01 17:26:01 alriddoch Exp $
+// $Id: System.cpp,v 1.120 2005-05-05 20:29:30 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -417,9 +417,9 @@ void System::mainLoop() {
         m_client->getAvatar()->getView()->update();
       }
       // Update Calendar
-//      m_calendar->update(time_elapsed);
       if (checkState(SYS_IN_WORLD)) {
-        m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
+        m_calendar->update(time_elapsed);
+//        m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
       }
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);

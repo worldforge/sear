@@ -1,5 +1,9 @@
 2005-05-05  Simon Goodall <sear@simongoodall.co.uk>
 
+	* src/System.cpp: Ignore any time info from Eris until James fixes it.
+
+2005-05-05  Simon Goodall <sear@simongoodall.co.uk>
+
 	* src/Character.cpp: Calculate character entity rotation so that we
 	  correctly restore character orientation we we login again. Previously
 	  characters did not always face the same way as the camera when first 
