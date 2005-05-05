@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.59 2005-05-01 17:26:01 alriddoch Exp $
+// $Id: Character.cpp,v 1.60 2005-05-05 20:26:31 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -49,6 +49,13 @@
   static const bool debug = false;
 #endif
 
+//  Wrap angle around it required.
+float limitAngle(float a) {
+  static float p2 = M_PI * 2.0;
+  while (a > M_PI) a -= p2;
+  while (a < -M_PI) a += p2;
+  return a;
+}
 
 namespace Sear {
   // Console commands
@@ -278,6 +285,9 @@ void Character::updateLocals(bool send_to_server) {
   ticks = SDL_GetTicks();
   angle = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
   m_angle += angle;
+
+  // m_angle = limitAngle(m_angle);
+
 //  if (_angle == WFMath::Pi) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
   mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
   z = 0.0f;
@@ -720,6 +730,31 @@ void Character::setAvatar(Eris::Avatar *avatar) {
   } else {
     m_self = dynamic_cast<WorldEntity*>(m_avatar->getEntity());
     assert(m_self != NULL);
+
+    WFMath::Vector<3> q = m_self->getAbsOrient().vector();
+    WFMath::CoordType w = m_self->getAbsOrient().scalar();
+
+    float v1,v2;
+    // Calculate attitude (which way we are facing)
+    v1  = 2.0f * q.x() * q.y() + 2.0f * q.z() * w;
+    float attitude = asin(v1);
+    // Attitude is now in the range -pi/2 -> pi/2
+
+    // Calculate bank so we can adjust attitude into the range
+    // -pi -> +pi
+    // Heading also exhibits the same behaviour, however should the angle of the
+    // z axis change, heading may be preferrable to bank. We shall have to see.
+    v1 = 2.0f * q.x() * w - 2.0f * q.y() * q.z();
+    v2 = 1.0f - 2.0f * q.x() * q.x()- 2.0f * q.z() * q.z();
+
+    float bank = atan2(v1, v2);
+
+    // Adjust attitude as neccessary
+    // bank actually flips to +=M_PI, but it is safer to test this way.
+    if  (bank > M_PI_2) attitude  = M_PI - attitude;
+    if  (bank < -M_PI_2) attitude  = -M_PI - attitude;
+
+    m_angle = attitude;
   }
 }
 } /* namespace Sear */
