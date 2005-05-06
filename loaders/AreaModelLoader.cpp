@@ -6,6 +6,9 @@
 #include "ModelHandler.h"
 #include "AreaModel.h"
 #include "ModelRecord.h"
+#include "environment/Environment.h"
+
+#include <Mercator/AreaShader.h>
 
 namespace Sear
 {
@@ -13,6 +16,7 @@ namespace Sear
 class AreaModel;
 
 const char* AREA_MODEL = "area";
+const char* KEY_shader_tex = "shader_texture";
 
 AreaModelLoader::AreaModelLoader(ModelHandler* mh)
 {
@@ -29,22 +33,21 @@ ModelRecord* AreaModelLoader::loadModel(Render *render,
     varconf::Config &model_config)
 {
     ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-
-  // Check that required fields exist
-/*
-  if (!model_config.findItem(model_id, KEY_width)
-    || !model_config.findItem(model_id, KEY_height)
-    || !model_config.findItem(model_id, KEY_num_planes)) {
-    std::cerr << "Error: Required fields missing for NPlane" << std::endl;
-    return NULL;
-  }
- */
-    
-    // Create model instance
     AreaModel* amodel = new AreaModel(render, record);
-  
-  
     model_record->model = amodel;
+    
+    amodel->init();
+    
+// create a shader if required
+    if (model_config.findItem(model_id, KEY_shader_tex) &&
+        !m_shaders.count(amodel->getLayer())) 
+    {
+        Mercator::AreaShader* ashade = new Mercator::AreaShader(amodel->getLayer()); 
+        std::string shaderTex(model_config.getItem(model_id, KEY_shader_tex));
+        Environment::getInstance().registerTerrainShader(ashade, shaderTex);
+        m_shaders[amodel->getLayer()] = ashade;
+    }
+
     return model_record;
 }
 

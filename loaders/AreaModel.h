@@ -7,6 +7,11 @@
 
 #include "Model.h"
 
+namespace Mercator
+{
+    class Area;
+}
+
 namespace Sear
 {
 
@@ -21,8 +26,11 @@ public:
     
     virtual int shutdown();
     virtual void invalidate();    
+    
+    int getLayer() const;
 private:
     ObjectRecord* m_object;
+    Mercator::Area* m_area;
 };
 
 }

@@ -1,3 +1,9 @@
+2005-05-06  James Turner  <james@worldforge.org>
+
+	* loaders/AreaModel.cpp, loaders/AreaModel.h, loaders/AreaModelLoader.h,
+	  loaders/AreaModelLoader.cpp: add support for defining Mercator
+	  AreaShaders based on data in model_records.cfg
+
 2005-05-05  Simon Goodall <sear@simongoodall.co.uk>
 
 	* src/System.cpp: Ignore any time info from Eris until James fixes it.

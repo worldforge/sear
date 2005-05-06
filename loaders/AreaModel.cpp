@@ -14,7 +14,8 @@ namespace Sear
 
 AreaModel::AreaModel(Render* r, ObjectRecord* orec) :
     Model(r),
-    m_object(orec)
+    m_object(orec),
+    m_area(NULL)
 {
 }
 
@@ -47,7 +48,7 @@ void AreaModel::init()
     }
 
     int layer = it->second.asInt();
-    Mercator::Area* ar = new Mercator::Area(layer, false);
+    m_area = new Mercator::Area(layer, false);
        
     WFMath::Polygon<2> poly;
     for (unsigned int p=0; p<pointsData.size(); ++p) {
@@ -66,8 +67,8 @@ void AreaModel::init()
         poly.addCorner(poly.numCorners(), wpt);
     }
     
-    ar->setShape(poly);
-    Environment::getInstance().registerArea(ar);
+    m_area->setShape(poly);
+    Environment::getInstance().registerArea(m_area);
 }
 
 void AreaModel::invalidate()
@@ -77,6 +78,11 @@ void AreaModel::invalidate()
 int AreaModel::shutdown()
 {
     return 0;
+}
+
+int AreaModel::getLayer() const
+{
+    return m_area->getLayer();
 }
 
 } // of namespace Sear
