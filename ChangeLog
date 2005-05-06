@@ -1,4 +1,21 @@
 2005-05-06  James Turner  <james@worldforge.org>
+	
+	* common/types.h, common/Mesh.h: move Mesh type into it's own header,
+	  change it to use GLuint as necessary, and include sage headers.
+
+	* renderers/Render.h: forward declare Mesh
+	
+	* renderers/GL.cpp: include Mesh.h as necessary
+	
+	* loaders/3ds.h, 3ds.cpp: move RenderObject to be file-local, with a
+	  forward declare in the header, and change it to use GLuint.
+
+	* environment/SkyDome.h: pull in sage/GL.h and switch to using GLuint
+
+	* loaders/LibModelFile.h, loaders/LibModelFile.cpp: strip out
+	  unecessary headers, pull in sage headers, and switch to using GLuint
+
+2005-05-06  James Turner  <james@worldforge.org>
 
 	* loaders/AreaModel.cpp, loaders/AreaModel.h, loaders/AreaModelLoader.h,
 	  loaders/AreaModelLoader.cpp: add support for defining Mercator

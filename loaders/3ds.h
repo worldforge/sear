@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.h,v 1.16 2005-03-15 17:33:58 simon Exp $
+// $Id: 3ds.h,v 1.17 2005-05-06 17:26:00 jmt Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -22,6 +22,7 @@
 namespace Sear {
 
 // Forward declarations	
+class RenderObject;
 
 class ThreeDS : public Model {
 public:
@@ -50,32 +51,7 @@ public:
   void setHeight(float height) { m_height = height; }
 
 protected:
-  class RenderObject {
-public:
-   RenderObject() : 
-     vertex_data(NULL),
-     normal_data(NULL),
-     texture_data(NULL),
-     num_points(0),
-     texture_id(0),
-     texture_mask_id(0),
-     vb_vertex_data(0),
-     vb_texCoords_data(0),
-     vb_normal_data(0)
- {}
-    Vertex_3 *vertex_data;
-    Normal *normal_data;
-    Texel *texture_data;
-    unsigned int num_points;
-    int texture_id;
-    int texture_mask_id;
-    std::string material_name;
-
-    unsigned int vb_vertex_data;
-    unsigned int vb_texCoords_data;
-    unsigned int vb_normal_data;
-  };
-
+  
   typedef struct {
     float ambient[4];
     float diffuse[4];

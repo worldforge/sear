@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.39 2005-04-21 21:43:47 simon Exp $
+// $Id: 3ds.cpp,v 1.40 2005-05-06 17:26:00 jmt Exp $
 
 #include <iostream>
 #include <list>
@@ -38,7 +38,35 @@
   static const bool debug = false;
 #endif
 namespace Sear {
-  
+
+class RenderObject {
+public:
+   RenderObject() : 
+     vertex_data(NULL),
+     normal_data(NULL),
+     texture_data(NULL),
+     num_points(0),
+     texture_id(0),
+     texture_mask_id(0),
+     vb_vertex_data(0),
+     vb_texCoords_data(0),
+     vb_normal_data(0)
+ {}
+
+    Vertex_3 *vertex_data;
+    Normal *normal_data;
+    Texel *texture_data;
+    unsigned int num_points;
+    int texture_id;
+    int texture_mask_id;
+    std::string material_name;
+
+    GLuint vb_vertex_data;
+    GLuint vb_texCoords_data;
+    GLuint vb_normal_data;
+};
+
+
 ThreeDS::ThreeDS(Render *render) : Model(render),
   m_initialised(false),
   m_list(0),

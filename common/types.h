@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: types.h,v 1.7 2004-09-29 10:50:25 jmt Exp $
+// $Id: types.h,v 1.8 2005-05-06 17:26:00 jmt Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1
@@ -63,20 +63,6 @@ typedef struct {
   float shininess;
   float emission[4];
 } Material;
-
-typedef struct {
-  Vertex_3 *vertex_array;
-  unsigned int vertex_vbo;
-  Normal *normal_array;
-  unsigned int normal_vbo;
-  Texel *tex_coord_array;
-  unsigned int tex_vbo;
-  unsigned int number_of_points;
-  DataType data_type;
-  Material material;
-  TextureObject texture_1;
-  unsigned int disp_list;
-} Mesh;
 
 class OrientBBox
 {

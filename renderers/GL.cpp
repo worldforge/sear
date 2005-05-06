@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.120 2005-05-05 11:03:05 simon Exp $
+// $Id: GL.cpp,v 1.121 2005-05-06 17:26:00 jmt Exp $
 
 #include <SDL/SDL.h>
 
@@ -46,7 +46,7 @@
 #include "GL.h"
 
 #include "environment/Environment.h"
-
+#include "common/Mesh.h"
 
 #include "src/sear_icon.xpm"
 

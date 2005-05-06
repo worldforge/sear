@@ -982,6 +982,20 @@
 			settings = {
 			};
 		};
+		C46F116E082BDA940028BFC5 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			path = Mesh.h;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		C46F116F082BDA940028BFC5 = {
+			fileRef = C46F116E082BDA940028BFC5;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		C471F3EC0690CB4A00FD9FE8 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -1718,6 +1732,7 @@
 				C4F53FC208009CDB007A2A4D,
 				C4DE7B0C08185BAD00AFB9C4,
 				C4DE7B0E08185BAD00AFB9C4,
+				C46F116F082BDA940028BFC5,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1928,6 +1943,7 @@
 				C4939AE2057BB10B000CAC07,
 				C4939AE3057BB10B000CAC07,
 				C4939AE4057BB10B000CAC07,
+				C46F116E082BDA940028BFC5,
 			);
 			isa = PBXGroup;
 			path = common;

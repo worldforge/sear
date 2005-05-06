@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.2 2005-03-15 17:55:03 simon Exp $
+// $Id: LibModelFile.h,v 1.3 2005-05-06 17:26:00 jmt Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -12,11 +12,10 @@
  *
  */ 
 
-#include <wfmath/axisbox.h>
+#include <sage/sage.h>
+#include <sage/GL.h>
 
 #include "Model.h"
-
-#include "common/types.h"
 
 namespace Sear {
 
@@ -57,10 +56,10 @@ private:
   unsigned int *m_faces;
 
   int m_num_triangles;
-  unsigned int m_vbos[4];
+  GLuint m_vbos[4];
 
-  unsigned int m_render_list;
-  unsigned int m_select_list;
+  GLuint m_render_list;
+  GLuint m_select_list;
 
   std::vector<int> m_boundaries;
   std::vector<int> m_textures;

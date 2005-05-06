@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.5 2005-04-21 21:43:47 simon Exp $
+// $Id: LibModelFile.cpp,v 1.6 2005-05-06 17:26:00 jmt Exp $
 
 /*
   Debug check list
@@ -288,7 +288,7 @@ void LibModelFile::render(bool select_mode) {
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
   } else { // Use Vertex Arrays
-    unsigned int &list = (select_mode) ? (m_select_list) : (m_render_list);
+    GLuint &list = (select_mode) ? (m_select_list) : (m_render_list);
     // Call display list if created
     if (glIsList(list)) {
       glCallList(list);

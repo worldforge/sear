@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.5 2005-05-05 11:03:05 simon Exp $
+// $Id: Render.h,v 1.6 2005-05-06 17:26:00 jmt Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -30,6 +30,7 @@ namespace Sear {
 class WorldEntity;
 class ModelRecord;
 class ObjectRecord;
+class Mesh;
 
 #define PERSPECTIVE (0)
 #define ORTHOGRAPHIC (1)
