@@ -42,7 +42,6 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 
 void ObjectRecord::setHeight(float height)
 {
-std::cout << "Setting Appearance" << std::endl << std::flush;
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
   ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
   if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
@@ -59,7 +58,6 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 
 void ObjectRecord::setAppearance(Atlas::Message::MapType &map)
 {
-std::cout << "Setting Appearance" << std::endl << std::flush;
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
   ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
   if (rec && rec->model) rec->model->setAppearance(map);

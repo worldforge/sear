@@ -1,3 +1,8 @@
+2005-05-07  James Turner  <james@worldforge.org>
+
+	* loaders/ObjectRecord.cpp: remove noisy debug output whenever
+	  height / appearance change.
+
 2005-05-06  James Turner  <james@worldforge.org>
 	
 	* common/types.h, common/Mesh.h: move Mesh type into it's own header,

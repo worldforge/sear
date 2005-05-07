@@ -1877,7 +1877,7 @@
 				PRODUCT_NAME = sear;
 				REZ_EXECUTABLE = NO;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost";
+				WARNING_CFLAGS = "-Wall";
 			};
 			dependencies = (
 			);
