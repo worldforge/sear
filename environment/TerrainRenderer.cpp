@@ -90,13 +90,33 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
   const Mercator::Segment::Surfacestore & surfaces = map->getSurfaces ();
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
 
-  glGenTextures (surfaces.size (), seg.m_alphaTextures);
-  // FIXME These textures we have allocated are leaked.
-  for (int texNo=0; I != surfaces.end(); ++I, ++texNo) {
-    assert(texNo < 8); // FIXME - hard-coded limit
-    if (texNo == 0) continue; // shader 0 never has alpah
+  for (; I != surfaces.end(); ++I) {
+    if (I == surfaces.begin()) continue; // shader 0 never has alpha
     
-    glBindTexture (GL_TEXTURE_2D, seg.m_alphaTextures[texNo]);
+    std::map<int, GLuint>::const_iterator J = seg.m_alphaTextures.find(I->first);
+    bool validTex = (J != seg.m_alphaTextures.end());
+    GLuint texNo = seg.m_alphaTextures[I->first];
+    
+    // if data was already good, and so is the texture, assume last state was
+    // fine, and hence we've nothing to do - this should be common case 99%
+    // of the time.
+    if (I->second->isValid() && validTex) continue;
+    
+    if (!validTex) {
+        // (re-)create the texture storage
+        std::cout << "Create new Texture" << std::endl;
+        glGenTextures(1, &texNo);
+        seg.m_alphaTextures[I->first] = texNo;
+    }
+    
+    // populate if the Surface data is stale
+    if (!I->second->isValid()) {
+        std::cout << "Populate surface" << std::endl;
+        I->second->populate();
+        assert(I->second->isValid());
+    }
+    
+    glBindTexture (GL_TEXTURE_2D, texNo);
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_ALPHA, 65, 65, GL_ALPHA,
                      GL_UNSIGNED_BYTE, I->second->getData ());
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -110,6 +130,8 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
       std::cerr << "Booya " << gluErrorString (er)
         << std::endl << std::flush;
     }
+    
+    assert( glIsTexture( texNo ));
   }
 }
 
@@ -142,23 +164,23 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map,
     ++Iend;
   }
 
-  for (int texNo=0; I != Iend; ++I, ++texNo) {    
+  for (; I != Iend; ++I) {    
     // Set up the first texture unit with the ground texture
     RenderSystem::getInstance ().switchTexture (0, m_shaders[I->first].texId);
 
     // Set up the second texture unit with the alpha texture
     // This is not required for the first pass, as the first pass
     // is always a fill
-    if (texNo != 0) {
+    if (I != surfaces.begin()) {
       glActiveTexture (GL_TEXTURE1);
-      glBindTexture (GL_TEXTURE_2D, seg.m_alphaTextures[texNo]);
+      glBindTexture (GL_TEXTURE_2D, seg.m_alphaTextures[I->first]);
     }
 
     // Draw this segment
     glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
                    GL_UNSIGNED_SHORT, m_lineIndeces);
 
-    if (texNo == 0) {
+    if (I == surfaces.begin()) {
       // After the first pass, which we assume is a fill, enable
       // blending, and enable the second texture unit
       // Disable the depth write as its redundant
@@ -227,20 +249,14 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
       DisplayListColumn & dcol = (M == m_displayLists.end ())? m_displayLists[I->first] : M->second;
       DisplayListColumn::iterator N = dcol.find (J->first);
 //            GLuint display_list;
-      DataSeg seg;
-      if (N != dcol.end ()) {
-        seg = N->second;
-      } else {
+      if (N == dcol.end ()) {
+
         if (!s->isValid ()) {
           s->populate ();
         }
-        Mercator::Segment::Surfacestore & surfaces = s->getSurfaces ();
-        if (!surfaces.empty () && !surfaces.begin()->second->isValid ()) {
-          s->populateSurfaces ();
-        }
-        // Generate the alpha textures for each shader for this surface
-        generateAlphaTextures (s, seg);
 
+        DataSeg seg;
+        
         // Generate normsl
         seg.narray = s->getNormals (); 
         if (seg.narray == 0) {
@@ -282,8 +298,14 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         }
 
         dcol[J->first] = seg;
+        N = dcol.find(J->first);
 //        s->invalidate (false);
       }
+      
+      DataSeg & seg = N->second;
+
+      generateAlphaTextures (s, seg);
+      
       // If we don't have VBO's fall back on display lists
       bool end = false;
       if (!sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -422,6 +444,7 @@ void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& tex
   m_terrain.addShader(s, index);
   m_shaders[index].texId = RenderSystem::getInstance().requestTexture(texName);
   // assert m_shaders[index].texId is non-zero?
+  std::cout << "shader with tex=" << texName << " got assigned ID " << index << std::endl;
 }
 
 void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) {

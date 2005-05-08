@@ -1,3 +1,10 @@
+2005-05-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h:
+	  Changes coded by James and fixed by me. Make alpha textures from
+	  a normal array into a sparse array to deal with more more dynamic
+	  surfaces.
+
 2005-05-07  James Turner  <james@worldforge.org>
 
 	* loaders/ObjectRecord.cpp: remove noisy debug output whenever

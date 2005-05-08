@@ -32,9 +32,13 @@ public:
         disp(0),
         harray(NULL),
         narray(NULL)
-      {}
+      {
+      }
+      
       ~DataSeg() {}
-      GLuint m_alphaTextures[8];
+      
+      std::map<int, GLuint> m_alphaTextures;
+      
       GLuint vb_narray;
       GLuint vb_harray;
       GLuint disp;
@@ -64,10 +68,13 @@ public:
         narray = NULL;
 
         // Clean up textures
-        if (glIsTexture(m_alphaTextures[0])) {
-          glDeleteTextures(8, m_alphaTextures);
+        std::map<int, GLuint>::iterator it = m_alphaTextures.begin();
+        for (; it != m_alphaTextures.end(); ++it) {
+            if (glIsTexture(it->second)) {
+                glDeleteTextures(1, &it->second);
+                it->second = 0;
+            }
         }
-        for (int i = 0; i < 8; m_alphaTextures[i++] = 0);
       }
     };
     typedef std::map<int, DataSeg> DisplayListColumn;
