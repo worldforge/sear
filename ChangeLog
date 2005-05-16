@@ -1,3 +1,8 @@
+2005-05-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/ModelHandler.cpp: Fix a bunch of misuses of operator[]
+	  which should fix a whole bunch of assert failures.
+
 2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
 
 	* src/Bindings.cpp: Fix typo in right_ctrl name.

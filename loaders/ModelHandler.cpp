@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.11 2005-04-14 10:37:13 simon Exp $
+// $Id: ModelHandler.cpp,v 1.12 2005-05-16 20:45:45 alriddoch Exp $
 
 #include <set>
 #include <string.h>
@@ -118,14 +118,17 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   assert (m_initialised == true);
   assert(record);
   // Model loaded for this object?
-  if (m_object_map[record->id + model_id]) {
-    return m_object_map[record->id + model_id];
+  std::string id = record->id + model_id;
+  ObjectRecordMap::const_iterator I = m_object_map.find(id);
+  if (I != m_object_map.end()) {
+    return I->second;
   }
 
 
-  if (m_model_records_map.find(model_id) != m_model_records_map.end()) {
-    m_object_map[record->id + model_id] = m_model_records_map[model_id];
-    return m_model_records_map[model_id];
+  ModelRecordMap::const_iterator J = m_model_records_map.find(model_id);
+  if (J != m_model_records_map.end()) {
+    m_object_map[record->id + model_id] = J->second;
+    return J->second;
   }
 //  assert(render);
   // No existing model found, load up a new one
@@ -142,13 +145,16 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     printf("Model Loader not defined. Using BoundBox.\n");
     model_loader = "boundbox";
   }
-  if (m_model_loaders.find(model_loader) == m_model_loaders.end()) {
+  ModelLoaderMap::const_iterator K = m_model_loaders.find(model_loader);
+  ModelLoaderMap::const_iterator Kend = m_model_loaders.end();
+  if (K == Kend) {
     printf("Unknown Model Loader. Using BoundBox.\n");
     model_loader = "boundbox";
+    K = m_model_loaders.find(model_loader);
   }
-  assert(m_model_loaders[model_loader] != NULL);
-  if (m_model_loaders[model_loader]) model = m_model_loaders[model_loader]->loadModel(render, record, model_id, m_model_records);
-  else {
+  if (K != Kend) {
+    model = K->second->loadModel(render, record, model_id, m_model_records);
+  } else {
     std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
   }
@@ -166,7 +172,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
       model->model->setAppearance(mt);
     }                                                                          
   }
-	  
+
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
   m_object_map[record->id + model_id] = model;
@@ -192,7 +198,10 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
 void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader) {
   assert (m_initialised == true);
   // Only unregister a model laoder if it is properly registered
-  if (m_model_loaders[model_type] == model_loader) m_model_loaders[model_type] = NULL;
+  ModelLoaderMap::iterator I = m_model_loaders.find(model_type);
+  if (I != m_model_loaders.end() && I->second == model_loader) {
+    m_model_loaders.erase(I);
+  }
 }
 
 void ModelHandler::checkModelTimeouts() {
