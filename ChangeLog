@@ -1,3 +1,7 @@
+2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
+
+	* src/Bindings.cpp: Fix typo in right_ctrl name.
+
 2005-05-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h:

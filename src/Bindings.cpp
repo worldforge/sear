@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.18 2005-04-13 12:16:04 simon Exp $
+// $Id: Bindings.cpp,v 1.19 2005-05-16 19:40:32 simon Exp $
 
 
 #include <SDL/SDL.h>
@@ -156,7 +156,7 @@ void Bindings::initKeyMap() {
   m_keymap[SDLK_SCROLLOCK] = "srcoll";
   m_keymap[SDLK_RSHIFT] = "right_shift";
   m_keymap[SDLK_LSHIFT] = "left_shift";
-  m_keymap[SDLK_RCTRL] = "right_crtl";
+  m_keymap[SDLK_RCTRL] = "right_ctrl";
   m_keymap[SDLK_LCTRL] = "left_ctrl";
   m_keymap[SDLK_RALT] = "right_alt";
   m_keymap[SDLK_LALT] = "left_alt";
