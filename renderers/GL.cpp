@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.122 2005-05-16 20:55:34 simon Exp $
+// $Id: GL.cpp,v 1.123 2005-05-16 21:15:55 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -400,6 +400,8 @@ void GL::buildColourSet() {
   glGetIntegerv (GL_RED_BITS, &m_redBits);
   glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
   glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
+
+  m_redBits = m_greenBits = m_blueBits = 3;
 
   // Create masks
   m_redMask = makeMask(m_redBits);

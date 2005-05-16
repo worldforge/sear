@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.15 2005-05-05 11:03:05 simon Exp $
+// $Id: Graphics.cpp,v 1.16 2005-05-16 21:15:55 simon Exp $
 
 #include <sage/sage.h>
 
@@ -50,6 +50,8 @@
 #endif
 
 namespace Sear {
+
+static bool c_select = false;
 
  extern void renderDome(float, int, int);
 static const std::string GRAPHICS = "graphics";
@@ -159,7 +161,8 @@ void Graphics::shutdown() {
 void Graphics::drawScene(bool select_mode, float time_elapsed) {
   assert(m_renderer != NULL);
 
-  if (select_mode) m_renderer->resetSelection();
+//  if (select_mode)
+ m_renderer->resetSelection();
 
   // Update camera position
   if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
@@ -258,7 +261,7 @@ void Graphics::setCameraTransform() {
 }
 
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
-
+if (c_select) select_mode = true;
   /*
     Camera coords
     //Should be stored in camera object an updated as required
@@ -346,13 +349,16 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
       }
     }
 
-    m_renderer->store();
-    RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-    Environment::getInstance().renderSea();
-    m_renderer->restore();
-    
-    m_compass->update(cam->getRotation());
-    m_compass->draw(m_renderer, select_mode);
+    if (!select_mode ) {
+      m_renderer->store();
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+      Environment::getInstance().renderSea();
+      m_renderer->restore();
+
+      m_compass->update(cam->getRotation());
+      m_compass->draw(m_renderer, select_mode);
+    } 
+
   } else {
     m_renderer->drawSplashScreen();
   }
@@ -566,6 +572,8 @@ void Graphics::registerCommands(Console * console) {
   console->registerCommand("invalidate", this);
   console->registerCommand("+show_names", this);
   console->registerCommand("-show_names", this);
+  console->registerCommand("+select_mode", this);
+  console->registerCommand("-select_mode", this);
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
@@ -577,6 +585,10 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
     m_show_names = true;
   } else if (command == "-show_names") {
     m_show_names = false;
+  } else if (command == "+select_mode") {
+    c_select = true;
+  } else if (command == "-select_mode") {
+    c_select = false;
   }
 }
 

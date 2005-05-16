@@ -1,5 +1,11 @@
 2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
 
+	* renderers/GL.cpp, renderers/Graphics.cpp: Add option to show select
+	  mode view for debugging. Reduce colour space for select mode to allow
+	  visual inspection.
+
+2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
+
 	* environment/TerrainRenderer.cpp: Do not draw shadow in select mode.
 
 2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
