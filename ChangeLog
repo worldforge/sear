@@ -1,5 +1,9 @@
 2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
 
+	* environment/TerrainRenderer.cpp: Do not draw shadow in select mode.
+
+2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Fix generation of colours for selection code.
 
 2005-05-16  Al Riddoch  <alriddoch@zepler.org>

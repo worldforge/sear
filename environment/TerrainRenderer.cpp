@@ -414,7 +414,9 @@ void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
     m_haveTerrain = true;
   }
   drawMap (m_terrain, camPos, select_mode);
-  drawShadow (WFMath::Point < 2 > (camPos.x (), camPos.y ()), .5f);
+  if (!select_mode) {
+    drawShadow (WFMath::Point < 2 > (camPos.x (), camPos.y ()), 0.5f);
+  }
 }
 
 void TerrainRenderer::invalidate() {
@@ -490,12 +492,11 @@ void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) 
       }
     }
   }
-//    GLuint shTexture = Texture::get("shadow.png", false);
+
   RenderSystem::getInstance ().switchTexture (0, m_shadowTexture);
 
   glEnable (GL_TEXTURE_2D);
   glEnable (GL_BLEND);
-//    glBindTexture(GL_TEXTURE_2D, shTexture);
 
   glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 
