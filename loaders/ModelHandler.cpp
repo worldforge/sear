@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.12 2005-05-16 20:45:45 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.13 2005-05-16 23:56:22 alriddoch Exp $
 
 #include <set>
 #include <string.h>
@@ -210,9 +210,11 @@ void ModelHandler::checkModelTimeouts() {
   // TODO what about records with no model?
   if (debug) std::cout << "Checking Timeouts" << std::endl;
 
+  std::set<std::string> expired_set;
+
   // Loop through and find all objects that have expired and add to set object
-  std::set<ModelRecord*> expired_set;
-  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
+  ModelRecordMap::iterator Iend = m_model_records_map.end();
+  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != Iend; ++I) {
     ModelRecord *record = I->second;
     assert(record);
     if (record) {
@@ -220,39 +222,57 @@ void ModelHandler::checkModelTimeouts() {
       if (model) {
         if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
           // Add to set object
-          expired_set.insert(record);
-          // Remove record from list
-          m_model_records_map[I->first] = NULL;
-        }
-      }
-    }
-  }
-  // Do the same again for the object map
-  for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
-    ModelRecord *record = I->second;
-    assert(record);
-    if (record) {
-      Model *model = record->model;
-      if (model) {
-        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-          expired_set.insert(record);
-          m_object_map[I->first] = NULL;
+          expired_set.insert(I->first);
         }
       }
     }
   }
 
-  // Unload old objects
-  while (!expired_set.empty()) {
-    ModelRecord *record = *expired_set.begin();
-    assert(record);
-    if (record) {
+  std::set<std::string>::const_iterator K = expired_set.begin();
+  std::set<std::string>::const_iterator Kend = expired_set.end();
+  for (; K != Kend; ++K) {
+    ModelRecordMap::iterator I = m_model_records_map.find(*K);
+    if (I != Iend) {
+      ModelRecord * record = I->second;
+      assert(record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
-      Model *model = record->model;
+      Model * model = record->model;
       if (model) delete model;
       delete record;
+      m_model_records_map.erase(I);
     }
-    expired_set.erase(expired_set.begin());
+  }
+
+  expired_set.clear();
+
+  // Do the same again for the object map
+  ModelRecordMap::iterator Jend = m_object_map.end();
+  for (ObjectRecordMap::iterator J = m_object_map.begin(); J != Jend; ++J) {
+    ModelRecord *record = J->second;
+    assert(record);
+    if (record) {
+      Model *model = record->model;
+      if (model) {
+        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+          expired_set.insert(J->first);
+        }
+      }
+    }
+  }
+
+  K = expired_set.begin();
+  Kend = expired_set.end();
+  for (; K != Kend; ++K) {
+    ModelRecordMap::iterator J = m_object_map.find(*K);
+    if (J != Jend) {
+      ModelRecord * record = J->second;
+      assert(record);
+      if (debug) std::cout << "Unloading: " << record->id << std::endl;
+      Model * model = record->model;
+      if (model) delete model;
+      delete record;
+      m_object_map.erase(J);
+    }
   }
 }
 

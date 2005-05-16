@@ -1,3 +1,8 @@
+2005-05-17  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/ModelHandler.cpp: Fix checkModelTimeouts() so it doesn't
+	  put NULLs into the maps.
+
 2005-05-16  Simon Goodall <sear@simongoodall.co.uk>
 
 	* renderers/GL.cpp, renderers/Graphics.cpp: Add option to show select
