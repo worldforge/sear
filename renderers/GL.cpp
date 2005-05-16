@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.121 2005-05-06 17:26:00 jmt Exp $
+// $Id: GL.cpp,v 1.122 2005-05-16 20:55:34 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -411,10 +411,27 @@ void GL::buildColourSet() {
   m_blueShift = 0;
   
   // Pre-Calculate each colour and store in array
+  unsigned int shift;
   for (unsigned int indx = 0; indx < NUM_COLOURS; ++indx) {
-    GLubyte red = (indx & (m_redMask << m_redShift)) << (8 - m_redBits);
-    GLubyte green = (indx & (m_greenMask << m_greenShift)) << (8 - m_greenBits);
-    GLubyte blue = (indx & (m_blueMask << m_blueShift)) << (8 - m_blueBits);
+    // Get value from 0 -> 2^num_bits
+    GLubyte red = (indx & (m_redMask << m_redShift)) >> (m_redShift);
+    GLubyte green = (indx & (m_greenMask << m_greenShift)) >> (m_greenShift);
+    GLubyte blue = (indx & (m_blueMask << m_blueShift)) >> (m_blueShift);
+    // Bit shift to MSB format
+    // Warning, there is an overflow here if shift is negative
+    //  Should only happen if num bits > num bits in glubyte
+    shift = 8 - m_redBits;
+    if (shift > 0) red <<= shift;
+    else if (shift < 0) red >>= shift;
+    shift = 8 - m_greenBits;
+    if (shift > 0) green <<= shift;
+    else if (shift < 0) green >>= shift;
+    shift = 8 - m_blueBits;
+    if (shift > 0) blue <<= shift;
+    else if (shift < 0) blue >>= shift;
+//    GLubyte red = (indx & (m_redMask << m_redShift)) << (8 - m_redShift - m_redBits);
+//    GLubyte green = (indx & (m_greenMask << m_greenShift)) << (8 - m_greenShift-m_greenBits);
+//    GLubyte blue = (indx & (m_blueMask << m_blueShift)) << (8 - m_blueShift - m_blueBits);
     m_colourArray[indx][0] = red;
     m_colourArray[indx][1] = green;
     m_colourArray[indx][2] = blue;
