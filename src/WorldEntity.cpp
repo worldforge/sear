@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.51 2005-05-05 11:03:05 simon Exp $
+// $Id: WorldEntity.cpp,v 1.52 2005-05-18 19:35:15 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -53,7 +53,6 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    messages(std::list<message>()),
    m_lastMoveTime(0)
 {
-  Changed.connect(SigC::slot(*this, &WorldEntity::sigChanged));
 }
 
 void WorldEntity::onMove() {
@@ -228,13 +227,11 @@ std::string WorldEntity::parent() {
   return "";
 }
 
-void WorldEntity::sigChanged(const Eris::StringSet &ss) {
+void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
   ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
-  for (Eris::StringSet::const_iterator I = ss.begin(); I != ss.end(); ++I) {
-    std::string str = *I;
-//    if (debug) std::cout << "Changed - " << str << std::endl;
+
     if (str == MODE) {
-      const std::string mode = valueOfAttr(MODE).asString();
+      const std::string mode = v.asString();
       static ActionHandler *ac = System::instance()->getActionHandler();
       ac->handleAction(mode + "_" + type(), NULL);
       if (debug) std::cout << "Mode: " << mode << std::endl;
@@ -245,7 +242,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
         last_mode = mode;
       }
     } else if (str == ACTION) {
-      const std::string action = valueOfAttr(ACTION).asString();
+      const std::string action = v.asString();
       static ActionHandler *ac = System::instance()->getActionHandler();
       ac->handleAction(action + "_" + type(), NULL);
       std::cout << "Action: " << action << std::endl;
@@ -256,7 +253,7 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
         last_action = action;
       }
     } else if (str == GUISE) {
-      Atlas::Message::MapType mt = valueOfAttr(GUISE).asMap();
+      const Atlas::Message::MapType& mt(v.asMap());
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setAppearance(mt);
@@ -266,8 +263,9 @@ void WorldEntity::sigChanged(const Eris::StringSet &ss) {
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setHeight(height);
+    } else if (str == "right_hand_wield") {
+        std::cout << "set right_hand_wield to " << v.asString() << std::endl;
     }
-  }
 }
 
 void WorldEntity::rotateBBox(const WFMath::Quaternion &q)

@@ -56,7 +56,7 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 }
 }
 
-void ObjectRecord::setAppearance(Atlas::Message::MapType &map)
+void ObjectRecord::setAppearance(const Atlas::Message::MapType &map)
 {
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
   ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);

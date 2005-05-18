@@ -1,3 +1,21 @@
+2005-05-18  James Turner  <james@worldforge.org>
+
+	* loaders/Model.h, loaders/ObjectRecord.cpp, loaders/ObjectRecord.h:
+	  pass appearance around as a const map
+	  
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h: take a
+	  copy of the apperance map to modify it.
+
+	* src/Character.cpp, src/Character.h: make setting appearance work in
+	  open-loop mode, i.e rely on the server to update the entity data.
+	  
+	* src/WorldEntity.cpp, src/WorldEntity.h: over-ride the new Eris::Entity
+	  method ::onAttrChange, instead of using the Changed signal. Print out
+	  a debug message when the interim 'right_hand_wield' attr is changed.
+
+	* environment/TerrainRenderer.h: make ::invalidate() clear the texture
+	  storage map out.
+
 2005-05-18  Simon Goodall <sear@simongoodall.co.uk>
 
 	* renderers/TextureManager.cpp, renderers/TextureManger.h: Linkup 

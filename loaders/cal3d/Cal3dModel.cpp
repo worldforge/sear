@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.21 2005-04-13 12:16:04 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.22 2005-05-18 19:35:15 jmt Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -245,9 +245,10 @@ void Cal3dModel::action(const std::string &action) {
   }
 }
 
-void Cal3dModel::setAppearance(Atlas::Message::MapType &map) {
+void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
   std::cout << "------" << std::endl;
-
+  Atlas::Message::MapType map(appearanceMap);
+  
   // Get mesh atrributes
   Atlas::Message::MapType::const_iterator I = map.find("mesh");
   if (I == map.end()) {

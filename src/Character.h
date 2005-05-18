@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.28 2005-05-01 17:26:01 alriddoch Exp $
+// $Id: Character.h,v 1.29 2005-05-18 19:35:15 jmt Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -100,7 +100,7 @@ public:
 	
   static const float CMD_modifier;
   void setAppearance(const std::string &, const std::string &, const std::string &);
-  void setApp();
+  void sendGuise(const Atlas::Message::Element& guise);
   void clearApp();
   void setHeight(float);
   void setAction(const std::string &action);

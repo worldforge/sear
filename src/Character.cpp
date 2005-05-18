@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.60 2005-05-05 20:26:31 simon Exp $
+// $Id: Character.cpp,v 1.61 2005-05-18 19:35:15 jmt Exp $
 
 #include <math.h>
 #include <string>
@@ -598,12 +598,8 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     if (m_self->hasAttr(GUISE)) { // Read existing values
       mt = m_self->valueOfAttr(GUISE).asMap();
       if (record) record->setAppearance(mt);
-    } else { // Set defaults and send to server
-      if (record) {
-        record->setAppearance(mt);
-        m_self->setAttr(GUISE, mt);
-        setApp();
-      }
+    } else { // Set defaults
+      if (record) record->setAppearance(mt); // mt is empty, i.e defaults
     }
   }
   else if (command == CMD_SET_ACTION) {
@@ -635,23 +631,23 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
 
 void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
   if (!m_avatar) return;
-  if (!name.empty()) {
-    Atlas::Message::MapType mt;
-    if (m_self->hasAttr(GUISE)) {
-      mt = m_self->valueOfAttr(GUISE).asMap();
-    }
-    Atlas::Message::MapType::iterator I = mt.find(map);
-    if (I != mt.end()) {
+  assert(!name.empty());
+      
+  Atlas::Message::MapType guiseMap;
+  if (m_self->hasAttr(GUISE)) guiseMap = m_self->valueOfAttr(GUISE).asMap();
+
+    Atlas::Message::MapType::iterator I = guiseMap.find(map);
+    if (I != guiseMap.end()) {
       I->second.asMap()[name] = value;
     } else {
       Atlas::Message::MapType m;
       m[name] = value;
-      mt[map] = m;
+      guiseMap[map] = m;
     }
-    m_self->setAttr(GUISE, mt);
-  }
-  setApp();
+  
+  sendGuise(guiseMap);
 }
+
 
 void Character::clearApp() {
   assert ((m_initialised == true) && "Character not initialised");
@@ -661,24 +657,21 @@ void Character::clearApp() {
   Atlas::Message::MapType msg;
   const Atlas::Message::MapType mt;
   msg["id"] = m_self->getId();
-  msg["objtype"] = "obj";
   msg[GUISE] = mt;
 
   set->setArgsAsList(Atlas::Message::ListType(1, msg));
   m_avatar->getConnection()->send(set);
 }
 
-void Character::setApp() {
+void Character::sendGuise(const Atlas::Message::Element& guise) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   Atlas::Objects::Operation::Set set;
   set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
   Atlas::Message::MapType msg;
-  const Atlas::Message::MapType mt = m_self->valueOfAttr(GUISE).asMap();
   msg["id"] = m_self->getId();
-  msg["objtype"] = "obj";
-  msg[GUISE] = mt;
+  msg[GUISE] = guise;
 
   set->setArgsAsList(Atlas::Message::ListType(1, msg));
   m_avatar->getConnection()->send(set);

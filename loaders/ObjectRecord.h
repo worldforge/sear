@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.4 2005-04-13 07:20:52 jmt Exp $
+// $Id: ObjectRecord.h,v 1.5 2005-05-18 19:35:15 jmt Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -28,7 +28,7 @@ public:
 
   void action(const std::string &action); 
   void setHeight(float height);
-  void setAppearance(Atlas::Message::MapType &map);
+  void setAppearance(const Atlas::Message::MapType &map);
  
   std::string name;
   std::string id;

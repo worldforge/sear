@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.22 2005-05-05 11:03:05 simon Exp $
+// $Id: WorldEntity.h,v 1.23 2005-05-18 19:35:15 jmt Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -61,7 +61,8 @@ protected:
   std::string last_action;
   std::string last_mode;
   
-  void sigChanged(const Eris::StringSet &ss);
+  void onAttrChanged(const std::string& attr, const Atlas::Message::Element& v);
+  
 friend class Character;
 
   OrientBBox m_orientBBox;

@@ -70,11 +70,10 @@ public:
         // Clean up textures
         std::map<int, GLuint>::iterator it = m_alphaTextures.begin();
         for (; it != m_alphaTextures.end(); ++it) {
-            if (glIsTexture(it->second)) {
-                glDeleteTextures(1, &it->second);
-                it->second = 0;
-            }
+            if (glIsTexture(it->second)) glDeleteTextures(1, &it->second);
         }
+        
+        m_alphaTextures.clear();
       }
     };
     typedef std::map<int, DataSeg> DisplayListColumn;
