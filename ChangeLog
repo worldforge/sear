@@ -1,5 +1,10 @@
 2005-05-18  Simon Goodall <sear@simongoodall.co.uk>
 
+	* renderers/TextureManager.cpp, renderers/TextureManger.h: Linkup 
+	  varconf error callback to report parse errors in texture config files.
+
+2005-05-18  Simon Goodall <sear@simongoodall.co.uk>
+
 	* src/sear.in: Store media channel name in a variable
 
 2005-05-17  Al Riddoch  <alriddoch@zepler.org>

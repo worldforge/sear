@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.36 2005-04-15 15:47:19 simon Exp $
+// $Id: TextureManager.cpp,v 1.37 2005-05-18 14:38:27 simon Exp $
 
 #include "TextureManager.h"
 
@@ -171,7 +171,9 @@ void TextureManager::init()
   m_names.resize(1); // ditto
 
   m_texture_map.clear();
-  
+ 
+  m_texture_config.sige.connect(SigC::slot(*this, &TextureManager::varconf_error_callback));
+ 
   m_initialised = true;
 }
 
@@ -824,5 +826,10 @@ void TextureManager::clearLastTexture(unsigned int index)
 {
     m_last_textures[index] = -1;
 }
+
+void TextureManager::varconf_error_callback(const char *error) {
+  printf("Varconf Error: %s\n ", error);
+}
+
 
 } /* namespace Sear */

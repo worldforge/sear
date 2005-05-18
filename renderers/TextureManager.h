@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.19 2005-04-15 15:47:19 simon Exp $
+// $Id: TextureManager.h,v 1.20 2005-05-18 14:38:27 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -195,6 +195,8 @@ private:
    * @return The filter, or 0 is a wrong name was specified
    */ 
   static int getFilter(const std::string &filter_name);
+
+void varconf_error_callback(const char *error);
     
     typedef std::map<std::string, SpriteData*> SpriteInstanceMap;
     SpriteInstanceMap m_sprites;
