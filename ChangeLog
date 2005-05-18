@@ -1,3 +1,7 @@
+2005-05-18  Simon Goodall <sear@simongoodall.co.uk>
+
+	* src/sear.in: Store media channel name in a variable
+
 2005-05-17  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/ModelHandler.cpp: Fix checkModelTimeouts() so it doesn't

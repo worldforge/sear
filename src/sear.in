@@ -8,6 +8,7 @@ datadir=@datadir@
 homedata=$HOME/.sear
 
 WFUT_JAR=WFUT.jar
+MEDIA_CHANNEL="sear-media"
 
 # Determine if java executable exists in path
 JAVA=`which java`
@@ -29,7 +30,7 @@ if [ -x $JAVA ] ; then
       cp $datadir/sear/$WFUT_JAR $homedata
 
       # Create startup.script
-      echo "/setvar SEAR_MEDIA $homedata/sear-media/" > $homedata/startup.script
+      echo "/setvar SEAR_MEDIA $homedata/$MEDIA_CHANNEL/" > $homedata/startup.script
       echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
     fi
   fi
@@ -41,7 +42,7 @@ if [ -x $JAVA ] ; then
     # We need to change here so updater knows where to find / store data
     cd $homedata
     # Update
-    $JAVA -jar $WFUT_JAR update sear-media
+    $JAVA -jar $WFUT_JAR update $MEDIA_CHANNEL
     # Restore dir
     cd $PWD
   fi
