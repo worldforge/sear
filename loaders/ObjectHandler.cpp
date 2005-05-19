@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.3 2005-04-13 12:16:04 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.4 2005-05-19 18:34:56 jmt Exp $
 
 #include <varconf/Config.h>
 
@@ -30,6 +30,7 @@ static const std::string CMD_LOAD_OBJECT_RECORDS = "load_object_records";
 
 static const std::string KEY_DRAW_SELF = "draw_self";
 static const std::string KEY_DRAW_MEMBERS = "draw_members";
+static const std::string KEY_DRAW_ATTACHED = "draw_attached";
 static const std::string KEY_LOW_QUALITY = "low_quality";
 static const std::string KEY_MEDIUM_QUALITY = "medium_quality";
 static const std::string KEY_HIGH_QUALITY = "high_quality";
@@ -90,6 +91,8 @@ void ObjectHandler::copyObjectRecord(const std::string &id, ObjectRecord *object
   ObjectRecord *record = new ObjectRecord();
   record->draw_self = object_record->draw_self;
   record->draw_members = object_record->draw_members;
+  record->draw_attached = object_record->draw_attached;
+  
   // hopefully this will copy the lists. Need to check tho
   record->low_quality = object_record->low_quality;
   record->medium_quality = object_record->medium_quality;
@@ -131,6 +134,9 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
   }
   else if (key == KEY_DRAW_MEMBERS) {
     record->draw_members = (bool)config.getItem(section, key);
+  }
+  else if (key == KEY_DRAW_ATTACHED) {
+    record->draw_attached = (bool)config.getItem(section, key);
   }
   else if (key == KEY_LOW_QUALITY) {
     record->low_quality.push_back((std::string)config.getItem(section, key));

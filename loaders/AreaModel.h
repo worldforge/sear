@@ -21,7 +21,10 @@ class AreaModel : public Model
 {
 public:
     AreaModel(Render*, ObjectRecord* orec);
-    void init();    
+    /**
+    initialise the model. Result indicates success (true) or failure
+    */
+    bool init();    
     virtual ~AreaModel();
     
     virtual int shutdown();

@@ -36,7 +36,11 @@ ModelRecord* AreaModelLoader::loadModel(Render *render,
     AreaModel* amodel = new AreaModel(render, record);
     model_record->model = amodel;
     
-    amodel->init();
+    if (!amodel->init()) {
+        delete model_record;
+        delete amodel;
+        return NULL;
+    }
     
 // create a shader if required
     if (model_config.findItem(model_id, KEY_shader_tex) &&

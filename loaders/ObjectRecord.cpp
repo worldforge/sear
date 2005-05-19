@@ -17,6 +17,7 @@ ObjectRecord::ObjectRecord() :
   icon(0),
   draw_self(false),
   draw_members(false),
+  draw_attached(false),
   bbox(WFMath::AxisBox<3>(WFMath::Point<3>(0.0f, 0.0f, 0.0f), WFMath::Point<3>(1.0f, 1.0f, 1.0f))),
   position(WFMath::Point<3>(0.0f, 0.0f, 0.0f)),
   orient(WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f))

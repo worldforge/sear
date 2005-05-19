@@ -12,6 +12,9 @@
 namespace Sear
 {
 
+typedef WFMath::Point<2> Point2;
+typedef WFMath::Vector<3> Vector3;
+
 AreaModel::AreaModel(Render* r, ObjectRecord* orec) :
     Model(r),
     m_object(orec),
@@ -24,27 +27,27 @@ AreaModel::~AreaModel()
 
 }
 
-void AreaModel::init()
+bool AreaModel::init()
 {
     WorldEntity* we = m_object->entity;
     
     if (!we->hasAttr("area")) {
         std::cerr << "AreaModel defined on entity with no area attribute" << std::endl;
-        return;
+        return false;
     }
     
     const Atlas::Message::MapType& areaData(we->valueOfAttr("area").asMap());
     Atlas::Message::MapType::const_iterator it = areaData.find("points");
     if ((it == areaData.end()) || !it->second.isList()) {
         std::cerr << "malformed area attribute on entity, no points data" << std::endl;
-        return;
+        return false;
     }
     
     const Atlas::Message::ListType& pointsData(it->second.asList());
     it = areaData.find("layer");
     if ((it == areaData.end()) || !it->second.isInt()) {
         std::cerr << "malformed area attribute on entity, no layer data" << std::endl;
-        return;
+        return false;
     }
 
     int layer = it->second.asInt();
@@ -63,12 +66,22 @@ void AreaModel::init()
             continue;
         }
         
-        WFMath::Point<2> wpt(point[0].asFloat(), point[1].asFloat());
+        Point2 wpt(point[0].asFloat(), point[1].asFloat());
         poly.addCorner(poly.numCorners(), wpt);
     }
     
+// transform polygon into terrain coords
+  /*
+      Vector3 xVec = Vector3(1.0, 0.0, 0.0).rotate(m_object->orient);
+    double theta = atan2(xVec.y(), xVec.x()); // rotation about Z
+    
+    WFMath::RotMatrix<2> rm;
+    poly.rotatePoint(rm.rotation(theta), Point2(0,0));
+    poly.shift(WFMath::Vector<2>(m_object->position.x(), m_object->position.y()));
+    */
     m_area->setShape(poly);
     Environment::getInstance().registerArea(m_area);
+    return true;
 }
 
 void AreaModel::invalidate()

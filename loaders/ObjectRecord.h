@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.5 2005-05-18 19:35:15 jmt Exp $
+// $Id: ObjectRecord.h,v 1.6 2005-05-19 18:34:56 jmt Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -39,6 +39,7 @@ public:
   int icon;
   bool draw_self;
   bool draw_members;
+  bool draw_attached;
   WFMath::AxisBox<3> bbox;
   WFMath::Point<3> position;
   WFMath::Quaternion orient;
