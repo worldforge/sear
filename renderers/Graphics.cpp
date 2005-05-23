@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.16 2005-05-16 21:15:55 simon Exp $
+// $Id: Graphics.cpp,v 1.17 2005-05-23 21:02:28 jmt Exp $
 
 #include <sage/sage.h>
 
@@ -339,9 +339,9 @@ if (c_select) select_mode = true;
     m_message_list.clear();
     m_name_list.clear();
 
-    buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list);
+    buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list, time_elapsed);
 
-    m_renderer->drawQueue(m_render_queue, select_mode, time_elapsed);
+    m_renderer->drawQueue(m_render_queue, select_mode);
     if (!select_mode) {
       m_renderer->drawMessageQueue(m_message_list);
       if (m_show_names) {
@@ -365,20 +365,91 @@ if (c_select) select_mode = true;
 }
 
 
-void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render::QueueMap &render_queue, Render::MessageList &message_list, Render::MessageList &name_list) {
+void Graphics::buildQueues(WorldEntity *we,
+    int depth,
+    bool select_mode,
+    Render::QueueMap &render_queue,
+    Render::MessageList &message_list,
+    Render::MessageList &name_list,
+    float time_elapsed) 
+{
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
 
 //  we->checkActions(); // See if model animations need to be updated
-  if (depth == 0 || we->isVisible()) {
-    if (we->getType() != NULL) {
-      ObjectRecord *obj = ModelSystem::getInstance().getObjectRecord(we);
-      assert (obj != NULL);
+  if (!we->isVisible()) return;
+  assert(we->getType());
+    
+  ObjectRecord *obj = ModelSystem::getInstance().getObjectRecord(we);
+  assert (obj);
 
-      // Setup lights as we go
-      if (we->type() == "fire") {
-        // Turn on light source
+// Setup lights as we go
+  if (we->type() == "fire") drawFire(we);
+      
+  // Loop through all models in list
+  if (obj->draw_self) {
+    if ((cam->getType() == Camera::CAMERA_FIRST) && (we == self)) { 
+      /* first person, don't draw self */
+    } else {
+      drawObject(obj, select_mode, render_queue, message_list, name_list, time_elapsed);
+    }
+  }
+  
+  // Draw any contained objects
+  if (obj->draw_members) {
+    for (unsigned int i = 0; i < we->numContained(); ++i) {
+          buildQueues(static_cast<WorldEntity*>(we->getContained(i)),
+                      depth + 1,
+                      select_mode,
+                      render_queue,
+                      message_list,
+                      name_list,
+                      time_elapsed);
+    }
+  } // of draw_members case
+}
+
+void Graphics::drawObject(ObjectRecord* obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list,
+                        float time_elapsed)
+{
+  // reject for drawing if object bbox is outside frustum   
+  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
+    
+  ObjectRecord::ModelList::const_iterator I;
+  for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
+    // retrive or create the model and modelRecord as necessary
+    ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj->entity);
+    
+    int state = select_mode ? modelRec->select_state : modelRec->state;
+    
+    if (state <= 0) continue; // bad state
+    // Add to queue by state, then model record
+    render_queue[state].push_back(Render::QueueItem(obj, modelRec));
+    
+    // Update Model
+    if (!select_mode) { // Only needs to be done once a frame
+        modelRec->model->update(time_elapsed);
+        modelRec->model->setLastTime(System::instance()->getTimef());
+    } 
+  }
+  
+  // if rendering, add any messages
+  if (!select_mode) {
+    name_list.push_back(obj->entity);
+    if (obj->entity->hasMessages()) {
+      message_list.push_back(obj->entity);
+    }
+  } // of object models loop
+}
+
+void Graphics::drawFire(WorldEntity* we)
+{
+// Turn on light source
         m_fire.enabled = true;
 
         // Set position to entity posotion
@@ -390,55 +461,7 @@ void Graphics::buildQueues(WorldEntity *we, int depth, bool select_mode, Render:
         
         // Disable as we don't need it again for now 
         m_fire.enabled = false;
-      }
 
-      // Loop through all models in list
-      if (obj->draw_self) {
-        if ((cam->getType() == Camera::CAMERA_FIRST)
-         && (we->getId() == self->getId())) { 
-          /* first person, don't draw self */
-        } else {
-          drawObject(obj, select_mode, render_queue, message_list, name_list);
-        }
-      }
-      // Draw any contained objects
-      if (obj->draw_members) {
-        for (unsigned int i = 0; i < we->numContained(); ++i) {
-          buildQueues(static_cast<WorldEntity*>(we->getContained(i)),
-                      depth + 1, select_mode, render_queue, message_list, name_list);
-        }
-      }
-    }
-  }
-}
-
-void Graphics::drawObject(ObjectRecord* obj, 
-                        bool select_mode,
-                        Render::QueueMap &render_queue,
-                        Render::MessageList &message_list,
-                        Render::MessageList &name_list)
-{
-   
-  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
-
-  const char* nm = select_mode ? "select_state_num" : "state_num";
-    
-  ObjectRecord::ModelList::const_iterator I;
-  for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
-    int stateNum = ModelSystem::getInstance().getModelRecords().getItem(*I, nm);
-
-    if (stateNum <= 0) continue; // bad state
-
-    // Add to queue by state, then model record
-    render_queue[stateNum].push_back(Render::QueueItem(obj, *I));
-  }
-  // if rendering, add any messages
-  if (!select_mode) {
-    name_list.push_back(obj->entity);
-    if (obj->entity->hasMessages()) {
-      message_list.push_back(obj->entity);
-    }
-  } // of object models loop
 }
 
 void Graphics::readConfig(varconf::Config &config) {

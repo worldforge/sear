@@ -1,3 +1,11 @@
+2005-05-23  James Turner  <james@worldforge.org>
+
+	* renderers/Graphics.cpp, renderers/Graphics.h, renderers/GL.h,
+	  renderers/GL.cpp, renderers/Render.h: create Models earliers in
+	  the rendering pipeline, store them directly in the render queues,
+	  and update them as the queues are built. As a result, drawQueues
+	  no longer has side-effects.
+
 2005-05-19  James Turner  <james@worldforge.org>
 
 	* loaders/ObjectHandler.cpp, loaders/ObjectRecord.cpp,

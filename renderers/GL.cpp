@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.123 2005-05-16 21:15:55 simon Exp $
+// $Id: GL.cpp,v 1.124 2005-05-23 21:02:28 jmt Exp $
 
 #include <SDL/SDL.h>
 
@@ -1073,7 +1073,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   }
 }
 
-void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
+void GL::drawQueue(QueueMap &queue, bool select_mode) {
 //  static MoelHandler *model_handler = m_system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
     // Change state for this queue
@@ -1081,17 +1081,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
       ObjectRecord *object_record = J->first;
-      ModelRecord *model_record = ModelSystem::getInstance().getModel(this, object_record, J->second, object_record->entity);
-      if (!model_record) {
-//        std::cerr << "No model record!" << std::endl;	      
-        continue;
-      }
+      ModelRecord *model_record = J->second;
       Model *model = model_record->model;
-      // Get model
-      if (!model) {  // ERROR GETTING MODEL
-	Log::writeLog("Trying to render NULL model", Log::LOG_ERROR);
-        continue;
-      }
+      assert(model);
+      
       glPushMatrix();
 
       // Translate Model
@@ -1117,12 +1110,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) {
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
         glScalef(x_scale, y_scale, z_scale);
       }
-
-      // Update Model
-      if (!select_mode) { // Only needs to be done once a frame
-        model->update(time_elapsed);
-        model->setLastTime(System::instance()->getTimef());
-      }      
+           
       // Draw Model
       if (select_mode) {
         nextColour(object_record->entity);

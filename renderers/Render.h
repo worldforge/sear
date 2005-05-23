@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.6 2005-05-06 17:26:00 jmt Exp $
+// $Id: Render.h,v 1.7 2005-05-23 21:02:28 jmt Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -40,7 +40,7 @@ class Render {
 
 public:
 
-typedef std::pair<ObjectRecord*, std::string> QueueItem;
+typedef std::pair<ObjectRecord*, ModelRecord*> QueueItem;
 typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
@@ -99,7 +99,7 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
-  virtual void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed) =0;
+  virtual void drawQueue(QueueMap &queue, bool select_mode) =0;
   virtual void drawMessageQueue(MessageList &list) =0;
   virtual void drawNameQueue(MessageList &list) =0;
 

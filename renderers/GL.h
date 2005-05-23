@@ -102,7 +102,7 @@ public:
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
-  void drawQueue(QueueMap &queue, bool select_mode, float time_elapsed);
+  void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
   void drawOutline(ModelRecord *);
