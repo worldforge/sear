@@ -1,4 +1,10 @@
 2005-05-24  James Turner  <james@worldforge.org>
+
+	* loaders/AreaModel.cpp: enable the code to transform area points
+	  from entity-local to terrain coordinates, now Mercator is fixed
+	  to deal with Areas that do not intersect segment boundaries.
+
+2005-05-24  James Turner  <james@worldforge.org>
 	
 	* src/WorldEntity.cpp, environment/TerrainRenderer.cpp: remove
 	  some excessively noisy debug output

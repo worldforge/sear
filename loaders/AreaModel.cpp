@@ -71,14 +71,13 @@ bool AreaModel::init()
     }
     
 // transform polygon into terrain coords
-  /*
-      Vector3 xVec = Vector3(1.0, 0.0, 0.0).rotate(m_object->orient);
+    Vector3 xVec = Vector3(1.0, 0.0, 0.0).rotate(m_object->orient);
     double theta = atan2(xVec.y(), xVec.x()); // rotation about Z
     
     WFMath::RotMatrix<2> rm;
     poly.rotatePoint(rm.rotation(theta), Point2(0,0));
     poly.shift(WFMath::Vector<2>(m_object->position.x(), m_object->position.y()));
-    */
+    
     m_area->setShape(poly);
     Environment::getInstance().registerArea(m_area);
     return true;
