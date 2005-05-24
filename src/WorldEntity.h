@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.23 2005-05-18 19:35:15 jmt Exp $
+// $Id: WorldEntity.h,v 1.24 2005-05-24 21:07:16 jmt Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -47,10 +47,6 @@ public:
 
   void rotateBBox(const WFMath::Quaternion &q);  
 protected:
-  /** Calculate the current position of this entity relative to it's
-  container (location). This is based on the last pos set by the server,
-  and a linear interpolation of the last set velocity. */
-  WFMath::Vector<3> getInterpolatedPos() const;
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
@@ -66,7 +62,6 @@ protected:
 friend class Character;
 
   OrientBBox m_orientBBox;
-  unsigned int m_lastMoveTime;
 };
 
 } /* namespace Sear */

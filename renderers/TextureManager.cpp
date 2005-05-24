@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.37 2005-05-18 14:38:27 simon Exp $
+// $Id: TextureManager.cpp,v 1.38 2005-05-24 21:07:16 jmt Exp $
 
 #include "TextureManager.h"
 
@@ -232,7 +232,6 @@ void TextureManager::readTextureConfig(const std::string &filename) {
 
 GLuint TextureManager::loadTexture(const std::string &texture_name) {
   assert((m_initialised == true) && "TextureManager not initialised");
-  std::cout << "Loading Texture: " << texture_name << std::endl;
   std::string clean_name = std::string(texture_name);
   
   bool mask = false;

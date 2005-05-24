@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.4 2005-05-18 19:35:15 jmt Exp $
+//$Id: Model.h,v 1.5 2005-05-24 21:07:16 jmt Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -16,6 +16,11 @@
 #include "renderers/Graphics.h"
 
 namespace Sear {
+
+typedef struct {
+    WFMath::Vector<3> pos;
+    WFMath::Quaternion orient;
+} PosAndOrient;
 
 class Model {
 public:
@@ -50,6 +55,8 @@ public:
 
   float getLastTime() const { return m_last_time; }
   void setLastTime(float t) { m_last_time = t; }
+  
+  virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
   
 protected: 
   Render *m_render;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.53 2005-05-24 19:14:44 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.54 2005-05-24 21:07:16 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -50,15 +50,11 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
-   messages(std::list<message>()),
-   m_lastMoveTime(0)
+   messages(std::list<message>())
 {
 }
 
 void WorldEntity::onMove() {
-  // record the time this data was updated, so we can interpolate pos
-  m_lastMoveTime = System::instance()->getTime();
-    
   rotateBBox(getOrientation());
 }
 
@@ -269,12 +265,6 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
 {
   m_orientBBox = OrientBBox(getBBox());
   m_orientBBox.rotate(q);
-}
-  
-WFMath::Vector<3> WorldEntity::getInterpolatedPos() const
-{
-    double dt = (System::instance()->getTime() - m_lastMoveTime) / 1000.0;
-    return (getPosition() + (getVelocity() * dt)) - WFMath::Point<3>(0,0,0);
 }
 
 } /* namespace Sear */

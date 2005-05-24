@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.13 2005-05-16 23:56:22 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.14 2005-05-24 21:07:16 jmt Exp $
 
 #include <set>
 #include <string.h>
@@ -329,6 +329,13 @@ void ModelHandler::invalidate() {
   }
 
 
+}
+
+PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName)
+{
+    PosAndOrient po;
+    std::cerr << "called getPositionForSubmodel on Model base class : undefined" << std::endl;
+    return po;
 }
 
 } /* namespace Sear */
