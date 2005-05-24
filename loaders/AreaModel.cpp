@@ -61,12 +61,12 @@ bool AreaModel::init()
         }
         
         const Atlas::Message::ListType& point(pointsData[p].asList());
-        if ((point.size() < 2) || !point[0].isFloat() || !point[1].isFloat()) {
+        if ((point.size() < 2) || !point[0].isNum() || !point[1].isNum()) {
             std::cerr << "skipped malformed point in area" << std::endl;
             continue;
         }
         
-        Point2 wpt(point[0].asFloat(), point[1].asFloat());
+        Point2 wpt(point[0].asNum(), point[1].asNum());
         poly.addCorner(poly.numCorners(), wpt);
     }
     

@@ -1,3 +1,8 @@
+2005-05-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/AreaModel.cpp: Use asNum() for getting numeric values
+	  from Atlas.
+
 2005-05-24  James Turner  <james@worldforge.org>
 
 	* loaders/AreaModel.cpp: enable the code to transform area points
