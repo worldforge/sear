@@ -104,14 +104,12 @@ void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &s
     
     if (!validTex) {
         // (re-)create the texture storage
-        std::cout << "Create new Texture" << std::endl;
         glGenTextures(1, &texNo);
         seg.m_alphaTextures[I->first] = texNo;
     }
     
     // populate if the Surface data is stale
     if (!I->second->isValid()) {
-        std::cout << "Populate surface" << std::endl;
         I->second->populate();
         assert(I->second->isValid());
     }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.52 2005-05-18 19:35:15 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.53 2005-05-24 19:14:44 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -234,7 +234,6 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       const std::string mode = v.asString();
       static ActionHandler *ac = System::instance()->getActionHandler();
       ac->handleAction(mode + "_" + type(), NULL);
-      if (debug) std::cout << "Mode: " << mode << std::endl;
       if (mode != last_mode) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getId());
@@ -245,7 +244,6 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       const std::string action = v.asString();
       static ActionHandler *ac = System::instance()->getActionHandler();
       ac->handleAction(action + "_" + type(), NULL);
-      std::cout << "Action: " << action << std::endl;
       if (action != last_action) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getId());
@@ -258,7 +256,6 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setAppearance(mt);
     } else if (str == "bbox") {
-      if (debug) std::cout << "Changing Height;" << std::endl;
       float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());
