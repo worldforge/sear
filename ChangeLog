@@ -1,5 +1,12 @@
 2005-05-25  James Turner  <james@worldforge.org>
 
+	* loaders/Makefile.am, loaders/NulModel.h, renderers/Graphics.cpp, 
+	  loader/ModelHandler.cpp: if loading the model fails, fall back to
+	  a NullModel. Hence, getModel should always return a valid result
+	  of some kind.
+
+2005-05-25  James Turner  <james@worldforge.org>
+
 	* loaders/Cal3dModel.cpp, loaders/Cal3dModel.h: override
 	  getPositionForSubmodel to return valid (but dummy) data for testing
 	  attachments.

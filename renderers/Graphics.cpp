@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.18 2005-05-25 12:42:51 jmt Exp $
+// $Id: Graphics.cpp,v 1.19 2005-05-25 22:51:38 jmt Exp $
 
 #include <sage/sage.h>
 
@@ -429,7 +429,7 @@ void Graphics::drawObject(ObjectRecord* obj,
   for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
     // retrive or create the model and modelRecord as necessary
     ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj->entity);
-    if (!modelRec) continue;
+    assert(modelRec);
     
     int state = select_mode ? modelRec->select_state : modelRec->state;
     

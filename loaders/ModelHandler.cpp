@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.14 2005-05-24 21:07:16 jmt Exp $
+// $Id: ModelHandler.cpp,v 1.15 2005-05-25 22:51:38 jmt Exp $
 
 #include <set>
 #include <string.h>
@@ -29,6 +29,7 @@
 #include "NPlane_Loader.h"
 #include "WireFrame_Loader.h"
 #include "LibModelFile_Loader.h"
+#include "NullModel.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -158,11 +159,14 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     std::cerr << "No loader found: " << model_loader << std::endl;
     return NULL;
   }
-  // Check model was loaded
+  
+  // Check model was loaded, and fall back to a NullModel
   if (!model) {
-    std::cerr << "Error loading model" << std::endl;	 
-    return NULL;
+    std::cerr << "Error loading model of type " << model_loader << std::endl;
+    model = new ModelRecord;
+    model->model = new NullModel(render);
   }
+  
   if (we != NULL) {
     if (we->hasAttr("mode")) {
       model->model->action(we->valueOfAttr("mode").asString());
