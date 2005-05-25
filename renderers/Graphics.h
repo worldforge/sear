@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.7 2005-05-23 21:02:28 jmt Exp $
+// $Id: Graphics.h,v 1.8 2005-05-25 12:42:51 jmt Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -135,6 +135,13 @@ private:
                         float time_elapsed);
                         
     void drawFire(WorldEntity*);
+    
+    void drawAttached(ObjectRecord* obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list,
+                        float time_elapsed);
 };
 
 } /* namespace Sear */

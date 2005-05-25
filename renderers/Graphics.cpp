@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.17 2005-05-23 21:02:28 jmt Exp $
+// $Id: Graphics.cpp,v 1.18 2005-05-25 12:42:51 jmt Exp $
 
 #include <sage/sage.h>
 
@@ -408,6 +408,11 @@ void Graphics::buildQueues(WorldEntity *we,
                       time_elapsed);
     }
   } // of draw_members case
+  
+  if (obj->draw_attached || !we->getAttachments().empty()) {
+    drawAttached(obj, select_mode, render_queue, message_list,
+                      name_list, time_elapsed);
+  }
 }
 
 void Graphics::drawObject(ObjectRecord* obj, 
@@ -424,6 +429,7 @@ void Graphics::drawObject(ObjectRecord* obj,
   for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
     // retrive or create the model and modelRecord as necessary
     ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj->entity);
+    if (!modelRec) continue;
     
     int state = select_mode ? modelRec->select_state : modelRec->state;
     
@@ -462,6 +468,42 @@ void Graphics::drawFire(WorldEntity* we)
         // Disable as we don't need it again for now 
         m_fire.enabled = false;
 
+}
+
+std::string mapAttachSlotToSubmodel(const std::string& s)
+{
+    // temporary .. should be done via a config file
+    if (s == "right_hand_wield") return "male_builder_right_hand";
+    
+    std::cerr << "no mapping from entity attachment slot '" << s << "'  to a submodel name" << std::endl;
+    return s;
+}
+
+void Graphics::drawAttached(ObjectRecord* obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list,
+                        float time_elapsed)
+{
+  ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, obj->low_quality.front(), obj->entity);
+
+  WorldEntity::AttachmentMap::const_iterator it,
+    end = obj->entity->getAttachments().end();
+    
+  for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
+    // retrieving the objectRecord also syncs it's pos with the WorldEntity
+    ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(it->second);
+    assert (attached);
+  
+    std::string submodel = mapAttachSlotToSubmodel(it->first);
+    PosAndOrient po = modelRec->model->getPositionForSubmodel(submodel);
+    
+    attached->orient = obj->orient * po.orient;
+    attached->position = obj->position + (po.pos.rotate(obj->orient.inverse()));
+        
+    drawObject(attached, select_mode, render_queue, message_list, name_list, time_elapsed);
+  }
 }
 
 void Graphics::readConfig(varconf::Config &config) {

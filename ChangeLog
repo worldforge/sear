@@ -1,3 +1,20 @@
+2005-05-25  James Turner  <james@worldforge.org>
+
+	* loaders/Cal3dModel.cpp, loaders/Cal3dModel.h: override
+	  getPositionForSubmodel to return valid (but dummy) data for testing
+	  attachments.
+	  
+	* src/WorldEntity.cpp, src/WorldEntity.h: track attached children via
+	  a new map, and make this available for rendering. Update the map
+	  based on changed to the 'right_hand_wield' attribute for the
+	  moment.
+	  
+	* renderers/Graphics.cpp, renderers/Graphics.h: add in a drawAttached
+	  method, and invoke for objects with a non-empty attachment map.
+	  Perform a dummy mapping of attachment slots to model names.
+	  and then modify the attached object's ObjectRecord with a pos
+	  relative to the parent.
+
 2005-05-24  James Turner  <james@worldforge.org>
 
 	* renderers/TextureManager.cpp: be less noisy

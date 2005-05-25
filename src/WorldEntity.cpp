@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.54 2005-05-24 21:07:16 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.55 2005-05-25 12:42:51 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -258,6 +258,17 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (record) record->setHeight(height);
     } else if (str == "right_hand_wield") {
         std::cout << "set right_hand_wield to " << v.asString() << std::endl;
+        std::string id = v.asString();
+        if (id.empty()) {
+            m_attached.erase("right_hand_wield");
+        } else {
+            WorldEntity* attach = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
+            if (attach) {
+                m_attached["right_hand_wield"] = attach;
+            } else {
+                // entity not retrieved yet ...
+            }
+        }
     }
 }
 

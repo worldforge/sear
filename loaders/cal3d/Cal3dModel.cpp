@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.22 2005-05-18 19:35:15 jmt Exp $
+// $Id: Cal3dModel.cpp,v 1.23 2005-05-25 12:42:51 jmt Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -351,4 +351,13 @@ void Cal3dModel::hideMesh(int meshId) {
   m_calModel.detachMesh(meshId);
 }
 */
+
+PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string&)
+{
+    PosAndOrient po;
+    po.orient.identity();
+    po.pos = WFMath::Vector<3>(2, 0, 0);
+    return po;
+}
+
 } /* namespace Sear */

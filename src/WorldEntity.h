@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.24 2005-05-24 21:07:16 jmt Exp $
+// $Id: WorldEntity.h,v 1.25 2005-05-25 12:42:51 jmt Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -46,6 +46,12 @@ public:
   std::string parent();
 
   void rotateBBox(const WFMath::Quaternion &q);  
+
+  // make this a map of vectors in the future
+  typedef std::map<std::string, WorldEntity*> AttachmentMap;
+  
+  const AttachmentMap& getAttachments() const
+  { return m_attached; }
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -59,9 +65,11 @@ protected:
   
   void onAttrChanged(const std::string& attr, const Atlas::Message::Element& v);
   
-friend class Character;
+  friend class Character;
 
   OrientBBox m_orientBBox;
+  
+  AttachmentMap m_attached;
 };
 
 } /* namespace Sear */
