@@ -1,3 +1,8 @@
+2005-05-26  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dCoreModel.cpp: Handle exceptions thrown when 
+	  skeleton is missing.
+
 2005-05-25  James Turner  <james@worldforge.org>
 
 	* loaders/Makefile.am, loaders/NulModel.h, renderers/Graphics.cpp, 

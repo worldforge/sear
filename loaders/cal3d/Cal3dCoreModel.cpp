@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.28 2005-04-13 12:16:04 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.29 2005-05-26 10:49:56 simon Exp $
 
 
 #include "Cal3dModel.h"
@@ -81,7 +81,17 @@ int Cal3dCoreModel::init(const std::string &filename) {
     return 1;
   }
 //  std::cerr << "reading config" << std::endl << std::flush;
-  readConfig(filename);
+  try {
+    readConfig(filename);
+  } catch (...) {
+    printf("Caught Exception while loading %s\n", filename.c_str());
+    delete m_core_model;
+    m_core_model = NULL;
+
+    #warning "Possible memleak here"
+
+    return 1;
+  }
  // std::cerr << "done reading config" << std::endl << std::flush;
 
   m_initialised = true;
