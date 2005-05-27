@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.23 2005-05-25 12:42:51 jmt Exp $
+// $Id: Cal3dModel.cpp,v 1.24 2005-05-27 23:44:33 alriddoch Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -356,7 +356,37 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string&)
 {
     PosAndOrient po;
     po.orient.identity();
-    po.pos = WFMath::Vector<3>(2, 0, 0);
+    po.pos = WFMath::Vector<3>(0, 0, 0);
+
+    // Get a pointer to the bone we need from cal3d
+    CalSkeleton * cs = m_calModel->getSkeleton();
+    if (cs == 0) {
+        return po;
+    }
+    CalCoreSkeleton * ccs = cs->getCoreSkeleton();
+    if (ccs == 0) {
+        return po;
+    }
+    int boneId = ccs->getCoreBoneId("Bip01 R Hand");
+    if (boneId == -1) {
+        return po;
+    }
+    CalBone * cb1 = cs->getBone(boneId);
+    if (cb1 == 0) {
+        return po;
+    }
+
+    // Get the position and orientation of the bone in cal3d coordinates
+    const CalQuaternion & cq2 = cb1->getRotationAbsolute();
+    const CalVector & cv1 = cb1->getTranslationAbsolute();
+
+    // Rotate the orienation into out coordinate system
+    po.orient = WFMath::Quaternion(0, 3.14) * WFMath::Quaternion(1, 3.14 / 2) * WFMath::Quaternion(cq2.w, -cq2.x, -cq2.y, -cq2.z);
+    
+    // Rotate the vector into our coordinate system
+    po.pos = WFMath::Vector<3>(cv1.x * 0.025, cv1.y * 0.025, cv1.z * 0.025);
+    po.pos = po.pos.rotate(WFMath::Quaternion(2, 3.1415927f / 2.f));
+
     return po;
 }
 

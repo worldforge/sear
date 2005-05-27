@@ -1,3 +1,9 @@
+2005-05-28  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/cal3d/Cal3dModel.cpp: Add rough implementation required to
+	  calculate transform used to render tools attached to wield points
+	  on the body.
+
 2005-05-27  James Turner  <james@worldforge.org>
 
 	* src/WorldEntity.cpp, src/WorldEntity.h: use the new Eris::View
