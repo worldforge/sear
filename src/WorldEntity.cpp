@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.55 2005-05-25 12:42:51 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.56 2005-05-27 08:11:56 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -30,7 +30,7 @@
 
 #include "environment/Environment.h"
 #include <set>
-
+#include <sigc++/bind.h>
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -257,7 +257,6 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setHeight(height);
     } else if (str == "right_hand_wield") {
-        std::cout << "set right_hand_wield to " << v.asString() << std::endl;
         std::string id = v.asString();
         if (id.empty()) {
             m_attached.erase("right_hand_wield");
@@ -266,10 +265,18 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
             if (attach) {
                 m_attached["right_hand_wield"] = attach;
             } else {
-                // entity not retrieved yet ...
+                Eris::View::EntitySightSlot ess(SigC::bind( 
+                    SigC::slot(*this, &WorldEntity::onSightAttached),
+                    str));
+                getView()->notifyWhenEntitySeen(id, ess);
             }
         }
     }
+}
+
+void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string& slot)
+{
+    m_attached[slot] =  dynamic_cast<WorldEntity*>(ent);
 }
 
 void WorldEntity::rotateBBox(const WFMath::Quaternion &q)

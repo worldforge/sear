@@ -1,3 +1,9 @@
+2005-05-27  James Turner  <james@worldforge.org>
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: use the new Eris::View
+	  notification feature to correctly setup attachments that exist
+	  when entering the world. (Requires bleeding-edge Eris)
+
 2005-05-26  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/cal3d/Cal3dCoreModel.cpp: Handle exceptions thrown when 
