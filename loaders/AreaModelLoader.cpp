@@ -7,7 +7,7 @@
 #include "AreaModel.h"
 #include "ModelRecord.h"
 #include "environment/Environment.h"
-
+#include "renderers/StateManager.h"
 #include <Mercator/AreaShader.h>
 
 namespace Sear
@@ -35,6 +35,8 @@ ModelRecord* AreaModelLoader::loadModel(Render *render,
     ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
     AreaModel* amodel = new AreaModel(render, record);
     model_record->model = amodel;
+    model_record->select_state = 0; // default
+    model_record->select_state = 2; // select
     
     if (!amodel->init()) {
         delete model_record;
