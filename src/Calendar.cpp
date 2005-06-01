@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.17 2005-04-28 20:31:37 simon Exp $
+// $Id: Calendar.cpp,v 1.18 2005-06-01 22:02:35 jmt Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -85,9 +85,7 @@ Calendar::Calendar() :
   m_days_per_week(DEFAULT_DAYS_PER_WEEK),
   m_weeks_per_month(DEFAULT_WEEKS_PER_MONTH),
   m_months_per_year(DEFAULT_MONTHS_PER_YEAR),
-  m_seconds(0.0f),
   m_server_seconds(0.0),
-  m_seconds_counter(0.0f),
   m_minutes(0),
   m_hours(0), // Default start time is midnight
   m_days(0),
@@ -99,7 +97,8 @@ Calendar::Calendar() :
   m_day_start(DEFAULT_DAY_START),
   m_dusk_start(DEFAULT_DUSK_START),
   m_night_start(DEFAULT_NIGHT_START),
-  m_time_in_area(0.0f)
+  m_time_in_area(0.0f),
+  m_firstUpdate(true)
 {}
 	
 Calendar::~Calendar() {
@@ -111,7 +110,6 @@ void Calendar::init() {
   // Bind signal to config for further updates
   m_config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
   
-  m_ts = WFMath::TimeStamp::epochStart();
   m_initialised = true;
 }
 
@@ -122,31 +120,24 @@ void Calendar::shutdown() {
   m_initialised = false;
 }
 
-void Calendar::serverUpdate(double time) {
-  double diff = time - m_server_seconds;
-  // Sync calendar values
-  update(diff);
-}
-
-void Calendar::setWorldTime(const WFMath::TimeStamp &ts) {
-  assert ((m_initialised == true) && "Calender not initialised");
-  assert(ts.isValid());
-  assert(m_ts.isValid());
-
-  WFMath::TimeDiff df = ts - m_ts;
-  m_ts = ts;
-  double time = (double)df.milliseconds() / 1000.0;
-
-  update(time);
-}
-
-void Calendar::update(double time_elapsed) {
+void Calendar::update(double server_time) {
   assert ((m_initialised == true) && "Calender not initialised");
 
-  m_server_seconds += time_elapsed;
+  double time_elapsed = server_time - m_server_seconds;
+  m_server_seconds = server_time;
 
-  m_seconds += time_elapsed;
-  m_seconds_counter += time_elapsed;
+  if (m_firstUpdate) {
+    // initial update
+    m_seconds = m_server_seconds;
+    m_seconds_counter = m_seconds;
+    time_elapsed = 0.0;
+    m_firstUpdate = false;
+  } else {
+    // incremental update
+    m_seconds += time_elapsed;
+    m_seconds_counter += time_elapsed;
+  }
+
   // Check for seconds overflow  
   while (m_seconds >= m_seconds_per_minute) {
     ++m_minutes;

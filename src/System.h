@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.56 2005-04-29 13:02:46 alriddoch Exp $
+// $Id: System.h,v 1.57 2005-06-01 22:02:35 jmt Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -130,8 +130,6 @@ public:
    */ 
   float getTimef() const { return (float)SDL_GetTicks() / 1000.0f; }
   double getTimeD() const { return (double)SDL_GetTicks() / 1000.0; }
-
-  void updateTime(double time);
 
   /**
    * Set a system state

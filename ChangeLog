@@ -1,3 +1,12 @@
+2005-06-01  James Turner  <james@worldforge.org>
+
+	* src/Calendar.cpp, src/Calendar.h: update to work with Eris time
+	  API, i.e passing in the absolute server seconds, instead of a delta.
+	  
+	* src/System.cpp, src/System.h: remove obsolete (and unused) time code,
+	  and update for the revised Eris and Calendar API.
+
+
 2005-06-01  Simon Goodall <sear@simongoodall.co.uk>
 
 	* configure.ac: Use pkgconfig to find cal3d. Add -lGL to check_lib 

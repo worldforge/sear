@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.120 2005-05-05 20:29:30 simon Exp $
+// $Id: System.cpp,v 1.121 2005-06-01 22:02:35 jmt Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -418,8 +418,7 @@ void System::mainLoop() {
       }
       // Update Calendar
       if (checkState(SYS_IN_WORLD)) {
-        m_calendar->update(time_elapsed);
-//        m_calendar->setWorldTime(m_client->getAvatar()->getWorldTime());
+        m_calendar->update(m_client->getAvatar()->getWorldTime());
       }
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);
@@ -969,9 +968,5 @@ void System::varconf_general_callback(const std::string &section, const std::str
     }
   }
 }
-
-void System::updateTime(double time) {
-  m_calendar->serverUpdate(time);
-}
-       
+    
 } /* namespace Sear */

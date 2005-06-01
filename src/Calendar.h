@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.h,v 1.7 2005-04-06 13:36:08 simon Exp $
+// $Id: Calendar.h,v 1.8 2005-06-01 22:02:35 jmt Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -59,17 +59,10 @@ public:
   void shutdown();
 
   /**
-   * Update calendar by time_elapsed seconds.
-   * @param time_elapsed Time elapsed in seconds
+   * Update calendar to server_time seconds.
+   * @param server_time The current time from the server
    */
-  void update(double time_elapsed);
-
-  /**
-   * Re-sync with server time
-   */
-  void serverUpdate(double time);
-
-  void setWorldTime(const WFMath::TimeStamp &ts);
+  void update(double server_time);
 
   /**
    * Read Calendar config data
@@ -240,7 +233,6 @@ private:
   unsigned int m_months_per_year;    //</ Number of months in a year
 
   // Current time and date values
-  WFMath::TimeStamp m_ts;
   double m_seconds; ///< Current seconds
   double m_server_seconds; ///< Predicted server seconds
   double m_seconds_counter; ///< Number of seconds passed in current day
@@ -271,6 +263,8 @@ private:
   std::string m_current_month_name; ///< Name of current month
 
   SigC::Connection m_config_connection; ///< Connection object for signal
+  
+  bool m_firstUpdate;
 };
 	
 } /* namespace Sear */
