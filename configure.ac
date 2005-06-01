@@ -171,7 +171,7 @@ UNSUSED=0
 
 MERCATOR_VERSION=0.2.2
 VARCONF_VERSION=0.6.1
-ERIS_VERSION=1.3.4
+ERIS_VERSION=1.3.5
 SAGE_VERSION=0.1.1
 LIBMODELFILE=0.1.91
 PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 >= $ERIS_VERSION sage >= $SAGE_VERSION libmd3-0.2 >= $LIBMODELFILE,
@@ -186,6 +186,17 @@ AC_SUBST(MERCATOR_VERSION)
 AC_SUBST(VARCONF_VERSION)
 AC_SUBST(ERIS_VERSION)
 AC_SUBST(SAGE_VERSION)
+
+CAL3D_VERSION=0.10.0
+PKG_CHECK_MODULES(PKGCHECKS2, cal3d >= $CAL3D_VERSION,
+      [
+              CPPFLAGS="$CPPFLAGS $PKGCHECKS2_CFLAGS"
+              SEAR_LIBS="$SEAR_LIBS $PKGCHECKS2_LIBS"
+      ],
+      AC_MSG_ERROR(Couldn't find the cal3d libs. Please goto http://cal3d.sourceforge.net)
+)
+AC_SUBST(CAL3D_VERSION)
+
 
 dnl Check Lib 3ds
 
@@ -213,24 +224,9 @@ if test $cross_compiling == no; then
     SEAR_LIBS="$SEAR_LIBS -lGLU"
   ],[
     AC_MSG_ERROR(Couldn't find GLU)
-])
-
-  AC_CHECK_LIB(cal3d,main, [
-    SEAR_LIBS="$SEAR_LIBS -lcal3d"
-  ], [
-    AC_MSG_ERROR(Couldn't find Cal3D. Please goto http://sourceforge.net/projects/cal3d/)
-])
+], "-lGL")
 
  else
-   AC_CHECK_HEADER(cal3d/cal3d.h,
-       [found_cal3d=yes break],
-       [found_cal3d=no])
-
-   if test $found_cal3d == yes; then
-       SEAR_LIBS="$SEAR_LIBS -lcal3d"
-   else
-       AC_MSG_ERROR(Error could not find Cal3D)
-   fi
    AC_CHECK_HEADER(GL/gl.h,
        [found_gl=yes break],
        [found_gl=no])

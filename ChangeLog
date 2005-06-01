@@ -1,5 +1,12 @@
-2005-06-01  Al Riddoch  <alriddoch@zepler.org>
+2005-06-01  Simon Goodall <sear@simongoodall.co.uk>
 
+	* configure.ac: Use pkgconfig to find cal3d. Add -lGL to check_lib 
+	  function for GLU for cases where GL is not linked explicitly. Update
+	  required eris version.
+	* src/WorldEntity.cpp: Fiddle with mode settings to support "swimming"
+	  and "floating" objects.
+
+2005-06-01  Al Riddoch  <alriddoch@zepler.org>
 	* loaders/3ds.cpp: Prevent segfaults when a .3ds file does not have materials.
 
 2005-05-29  James Turner  <james@worldforge.org>

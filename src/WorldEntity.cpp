@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.56 2005-05-27 08:11:56 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.57 2005-06-01 20:33:56 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -125,11 +125,7 @@ const WFMath::Quaternion WorldEntity::getAbsOrient()
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
-//return getPredictedPos();
-#if (1)
  // This function is still required to adjust the Z position of the entity
- // TODO Needs checking when terrain start working again
-
 
   WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
   if (!loc) return getPredictedPos(); // nothing below makes sense for the world.
@@ -139,39 +135,33 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
     loc->getPredictedPos().y() + getPredictedPos().y(),
     loc->getPredictedPos().z() + getPredictedPos().z());
 
-
+  float terrainOffset = 0.0f;
   if (loc->hasAttr("terrain")) {  
-    absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
-    //absPos.z() += Environment::getInstance().getHeight(absPos.x(), absPos.y());
+    terrainOffset = Environment::getInstance().getHeight(absPos.x(), absPos.y());
   }
-//    WFMath::Point<3> absPos(
-// getPredictedPos().x(),
-// getPredictedPos().y(),
-// getPredictedPos().z());
-//        getInterpolatedPos().rotate(loc->getAbsOrient().inverse());
     
   // Set Z coord to terrain height if required
   if (hasAttr(MODE)) {
     std::string mode = valueOfAttr(MODE).asString();
     if (mode == "floating") {
-      // Do nothing, use server Z
+      // Set to water level
+      absPos.z() = 0.0f;
     } else if (mode == "swimming") {
-      // Do nothing, use server Z
+      // Clamp between sea level and terrain height.
+      // If there is a dispute, then place object on top of terrain.
+      if (absPos.z() > 0.0f) absPos.z() = 0.0f;
+      if (absPos.z() < terrainOffset) absPos.z() = terrainOffset;
     } else {
-//    if (mode == "walking" || mode == "running" || mode == "standing" || mode == "birth") {
-//      z_mod = Environment::getInstance().getHeight(absPos.x(), absPos.y());
-       
-      if (loc->type() == "jetty") {
-        float jetty_z = loc->getAbsPos().z();
-        if (absPos.z() < jetty_z) absPos.z() = jetty_z;
-      }
+      // Assume clamped to terrain
+      absPos.z() = terrainOffset;
     }
-//  } else if (loc->hasAttr("terrain")) {  
-//    absPos.z() = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+  }  
+  if (loc->type() == "jetty") {
+    float jetty_z = loc->getAbsPos().z();
+    if (absPos.z() < jetty_z) absPos.z() = jetty_z;
   }
 
   return absPos;
-#endif
 }
 
 void WorldEntity::displayInfo() {
