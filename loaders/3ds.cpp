@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.40 2005-05-06 17:26:00 jmt Exp $
+// $Id: 3ds.cpp,v 1.41 2005-06-01 15:42:03 alriddoch Exp $
 
 #include <iostream>
 #include <list>
@@ -331,7 +331,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   ro->vertex_data = new Vertex_3[ro->num_points];
   ro->normal_data = new Normal[ro->num_points];
   ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-  int current_texture = 0;
+  int current_texture = -2;
   for (p=0; p<mesh->faces; ++p) {
     Lib3dsFace *f=&mesh->faceL[p];
     Lib3dsMaterial *mat = NULL;
@@ -340,38 +340,41 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     }
     if (mat) {
       ro->material_name = std::string(f->material);
+
+      MaterialMap::const_iterator I = m_material_map.find(std::string(f->material));
+      if (I == m_material_map.end()) {
+        Material *m = new Material;
+        m->ambient[0] = 0.0f;
+        m->ambient[1] = 0.0f;
+        m->ambient[2] = 0.0f;
+        m->ambient[3] = 1.0f;
+
+        m->diffuse[0] = mat->diffuse[0];
+        m->diffuse[1] = mat->diffuse[1];
+        m->diffuse[2] = mat->diffuse[2];
+        m->diffuse[3] = mat->diffuse[3];
+        m->specular[0] = mat->specular[0];
+        m->specular[1] = mat->specular[1];
+        m->specular[2] = mat->specular[2];
+        m->specular[3] = mat->specular[3];
+        m->shininess = pow(2, 10.0*mat->shininess);
+        if (m->shininess>128.0f) m->shininess = 128.0f;
+        m_material_map[std::string(f->material)] = m;
+      }
     } else {
       ro->material_name = "sear:default";
     }
 
-    MaterialMap::const_iterator I = m_material_map.find(std::string(f->material));
-    if (I == m_material_map.end()) {
-      Material *m = new Material;
-      m->ambient[0] = 0.0f;
-      m->ambient[1] = 0.0f;
-      m->ambient[2] = 0.0f;
-      m->ambient[3] = 1.0f;
-
-      m->diffuse[0] = mat->diffuse[0];
-      m->diffuse[1] = mat->diffuse[1];
-      m->diffuse[2] = mat->diffuse[2];
-      m->diffuse[3] = mat->diffuse[3];
-      m->specular[0] = mat->specular[0];
-      m->specular[1] = mat->specular[1];
-      m->specular[2] = mat->specular[2];
-      m->specular[3] = mat->specular[3];
-      m->shininess = pow(2, 10.0*mat->shininess);
-      if (m->shininess>128.0f) m->shininess = 128.0f;
-      m_material_map[std::string(f->material)] = m;
-    }
     int texture_id = -1;
     int texture_mask_id = -1;
-    if (mat->texture1_map.name[0]) {
+    if (mat && mat->texture1_map.name[0]) {
       texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
       texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
-    }  
+    } else {
+      texture_id = 0;
+    }
     if (texture_id != -1) {
-      if (current_texture == 0) {
+      if (current_texture == -2) {
         ro->texture_id = current_texture = texture_id;
         ro->texture_mask_id = texture_mask_id;
       }

@@ -1,10 +1,13 @@
+2005-06-01  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/3ds.cpp: Prevent segfaults when a .3ds file does not have materials.
+
 2005-05-29  James Turner  <james@worldforge.org>
 
 	* loaders/AreaModelLoader.cpp: initialise state values on the model
 	  record, to avoid crashes when selecting an object with an areas.
 	  This also removes the need to specify a state in the model_records
 	  entry for an area.
-
 
 2005-05-28  Al Riddoch  <alriddoch@zepler.org>
 
