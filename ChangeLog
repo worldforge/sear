@@ -1,4 +1,8 @@
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
+	
+	* renderers/Makefile.am: Add cursors.h to list of files.
+
+2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/BoundBox.cpp: Remove debugging output
 	* loaders/ModelRecord.cpp, loaders/ModelRecord.h: Move constructor to 

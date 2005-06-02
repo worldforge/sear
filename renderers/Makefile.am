@@ -3,6 +3,7 @@ noinst_LIBRARIES = libRendererGL.a
 INCLUDES = -I$(top_srcdir)
 
 libRendererGL_a_SOURCES = \
+	cursors.h \
 	Camera.cpp Camera.h \
 	CameraSystem.cpp CameraSystem.h \
 	Graphics.cpp Graphics.h \
