@@ -1,5 +1,9 @@
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
 
+	* data/general.cfg, src/System.h: Disable mouse_move_select by default.
+
+2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
+
 	* configure.ac: Fix some formatting issues
 
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>

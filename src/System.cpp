@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.121 2005-06-01 22:02:35 jmt Exp $
+// $Id: System.cpp,v 1.122 2005-06-02 15:16:16 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,7 +109,7 @@ namespace Sear {
   //Config default values
   static const int DEFAULT_window_width = 640;
   static const int DEFAULT_window_height = 480;  
-  static const bool DEFAULT_mouse_move_select = true;
+  static const bool DEFAULT_mouse_move_select = false;
   static const double DEFAULT_max_click_time = 0.3;
   static const int DEFAULT_joystick_touch_button = 1;
   static const int DEFAULT_joystick_pickup_button = 2;
