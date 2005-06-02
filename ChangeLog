@@ -1,4 +1,8 @@
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
+
+	* configure.ac: Fix some formatting issues
+
+2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
 	
 	* renderers/Makefile.am: Add cursors.h to list of files.
 

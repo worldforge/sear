@@ -218,13 +218,13 @@ if test $cross_compiling == no; then
     SEAR_LIBS="$SEAR_LIBS -lGL"
   ],[
     AC_MSG_ERROR(Couldn't find OpenGL)
-])
+  ])
 
   AC_CHECK_LIB(GLU,gluPerspective, [
     SEAR_LIBS="$SEAR_LIBS -lGLU"
   ],[
     AC_MSG_ERROR(Couldn't find GLU)
-], "-lGL")
+  ], "-lGL")
 
  else
    AC_CHECK_HEADER(GL/gl.h,
