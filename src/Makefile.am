@@ -89,7 +89,6 @@ libSear_a_SOURCES = \
 	client.h \
 	Console.cpp \
 	Console.h \
-	cursors.h \
 	Exception.h \
 	Factory.cpp \
 	Factory.h \
