@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.26 2005-04-13 12:16:04 simon Exp $
+// $Id: BoundBox.cpp,v 1.27 2005-06-02 11:18:14 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"
@@ -201,7 +201,6 @@ void BoundBox::render(bool select_mode) {
     if (m_list) {
       m_render->playList(m_list);
     } else {
-      printf("BoundBox: New Display list\n");
       m_list = m_render->getNewList();
       m_render->beginRecordList(m_list);
       m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);

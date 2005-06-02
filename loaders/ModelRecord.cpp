@@ -2,9 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.3 2005-04-15 16:21:01 simon Exp $
+// $Id: ModelRecord.cpp,v 1.4 2005-06-02 11:18:14 simon Exp $
 
 #include "ModelRecord.h"
+
+#include "renderers/RenderSystem.h"
+#include "renderers/StateManager.h"
+
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif
@@ -27,6 +31,22 @@ namespace Sear {
   const std::string ModelRecord::ROTATION_STYLE = "rotation_style";
   const std::string ModelRecord::DATA_FILE_ID = "data_file_id";
   const std::string ModelRecord::DEFAULT_SKIN = "default_skin";
+
+ModelRecord::ModelRecord() :
+    scale(1.0),
+    scale_bbox(false),
+    state_name("default"),
+    select_state_name("select"),
+    model_by_type(false),
+    rotation_style(Graphics::ROS_NONE),
+    offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
+    scaleByHeight(false)
+  {
+    // Initialise state numbers
+    state = RenderSystem::getInstance().getStateManager()->getState(state_name);
+    select_state = RenderSystem::getInstance().getStateManager()->getState(select_state_name);
+  }
+
 
 } /* namespace Sear */
 

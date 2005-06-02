@@ -1,3 +1,16 @@
+2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/BoundBox.cpp: Remove debugging output
+	* loaders/ModelRecord.cpp, loaders/ModelRecord.h: Move constructor to 
+	  code file and initialise state numbers to correct values.
+	* renderers/StateManager.cpp: Assert that requested state number is
+	  valid.
+	* src/FileHandler.cpp: Use $variable instead of installBase var to set 
+	  media paths. Keep substituting variables until there are none left. 
+	  This will break if there is a circular definition.
+	* src/WorldEntity.cpp, src/WorldEntity.h: Fix SigC::bind stuff to 
+	  compile under SigC 1.2
+
 2005-06-01  James Turner  <james@worldforge.org>
 
 	* src/Calendar.cpp, src/Calendar.h: update to work with Eris time

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.21 2005-04-21 21:43:49 simon Exp $
+// $Id: StateManager.cpp,v 1.22 2005-06-02 11:18:14 simon Exp $
 
 /*
  * TODO
@@ -343,6 +343,8 @@ int StateManager::getBlendFunction(const std::string &blend_function) {
 void StateManager::stateChange(StateID state) {
   assert(m_initialised == true);
   if (m_current_state == state) return; // No need to do anything
+
+  assert (state < m_states.size());
   StateProperties *sp = m_states[state];
   // If state doesn't exist, take first one
   assert(sp);

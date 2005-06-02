@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.57 2005-06-01 20:33:56 simon Exp $
+// $Id: WorldEntity.cpp,v 1.58 2005-06-02 11:18:15 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -264,7 +264,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
     }
 }
 
-void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string& slot)
+void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
     m_attached[slot] =  dynamic_cast<WorldEntity*>(ent);
 }

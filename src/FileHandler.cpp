@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.16 2005-04-13 10:10:05 simon Exp $
+// $Id: FileHandler.cpp,v 1.17 2005-06-02 11:18:14 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -96,8 +96,8 @@ FileHandler::FileHandler() {
     addSearchPath(installBase + "/scripts");
     
     setVariable("SEAR_INSTALL", installBase);
-    setVariable("SEAR_MEDIA", installBase + "/sear-media/");
-    setVariable("DEFAULT_SEAR_MEDIA", installBase + "/sear-media/");
+    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media/");
+    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media/");
     setVariable("SEAR_HOME", getUserDataPath());
     
     if (!exists(getUserDataPath())) {
@@ -198,17 +198,22 @@ void FileHandler::runCommand(const std::string &command, const std::string &args
 }
 
 void FileHandler::expandString(std::string &str) {
-  for (VarMap::const_iterator I = varMap.begin(); I != varMap.end(); ++I) {
-    std::string var = I->first;
-    std::string value = I->second;
-    var = "${" + var + "}";
-    for (std::string::size_type p=str.find(var); p != str.npos; p=str.find(var, p))
-   {
-      str.replace(p, var.length(), value);
-      p += value.length();
-   }
-
-//    replace(str.begin(), str.end(), "${" + var + "}", value);
+  bool changed = true;
+  while (changed) {
+    changed = false;
+    for (VarMap::const_iterator I = varMap.begin(); I != varMap.end(); ++I) {
+      std::string var = I->first;
+      std::string value = I->second;
+      var = "${" + var + "}";
+      for (std::string::size_type p=str.find(var); p != str.npos; p=str.find(var, p))
+     {
+        str.replace(p, var.length(), value);
+        p += value.length();
+        changed = true;
+     }
+  
+  //    replace(str.begin(), str.end(), "${" + var + "}", value);
+    }
   }
 }
 
