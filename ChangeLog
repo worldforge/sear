@@ -1,5 +1,11 @@
 2005-06-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/Makefile.am: Update the static libs.
+
+	* loaders/3ds_Loader.cpp: Report failures to load 3ds models.
+
+2005-06-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/Makefile.am: Remove old cursors.h from list of files.
 
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>

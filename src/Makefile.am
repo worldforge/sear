@@ -25,21 +25,20 @@ SEAR_EXT_LIBS = \
 	/usr/lib/libasound.a \
 	/usr/X11R6/lib/libX11.a \
 	/usr/X11R6/lib/libXext.a \
-	/usr/lib/libmercator-0.2.a \
+	/usr/local/lib/libmercator-0.2.a \
 	/usr/lib/libvarconf-1.0.a \
-	/usr/local/lib/liberis-1.2.a \
+	/usr/local/lib/liberis-1.3.a \
 	/usr/lib/libsigc-2.0.a \
 	/usr/lib/libskstream-0.3.a \
-	/usr/lib/libAtlasObjectsOperation-0.5.a \
-	/usr/lib/libAtlasObjectsEntity-0.5.a \
-	/usr/lib/libAtlasObjects-0.5.a \
-	/usr/lib/libAtlasNet-0.5.a \
-	/usr/lib/libAtlasCodecs-0.5.a \
-	/usr/lib/libAtlasMessage-0.5.a \
-	/usr/lib/libAtlas-0.5.a \
+	/usr/lib/libAtlasObjects-0.6.a \
+	/usr/lib/libAtlasNet-0.6.a \
+	/usr/lib/libAtlasCodecs-0.6.a \
+	/usr/lib/libAtlasMessage-0.6.a \
+	/usr/lib/libAtlas-0.6.a \
 	/usr/lib/libwfmath-0.3.a \
 	/usr/local/lib/libsage.a \
 	/usr/local/lib/lib3ds.a \
+	/usr/local/lib/libmd3-0.2.a \
 	/usr/local/lib/libcal3d.a \
 	/usr/X11R6/lib/libGLU.a \
 	$(STATIC_LIBSTDCPP) \

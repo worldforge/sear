@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.18 2005-04-13 12:16:04 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.19 2005-06-02 23:58:14 alriddoch Exp $
 
 #include <varconf/Config.h>
 
@@ -57,6 +57,7 @@ ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, con
   // Load 3ds model
   if (model->init(file_name)) {
 //    model->shutdown();
+    std::cerr << "Error: Failed to load \"" << file_name << "\"" << std::endl;
     delete model;
     return NULL;
   }
