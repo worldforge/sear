@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.58 2005-06-02 11:18:15 simon Exp $
+// $Id: WorldEntity.cpp,v 1.59 2005-06-02 16:33:56 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -125,19 +125,28 @@ const WFMath::Quaternion WorldEntity::getAbsOrient()
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
- // This function is still required to adjust the Z position of the entity
-
+  // Get parent entity for additional positional information
   WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
-  if (!loc) return getPredictedPos(); // nothing below makes sense for the world.
-//    
-  WFMath::Point<3> absPos(
-    loc->getPredictedPos().x() + getPredictedPos().x(),
-    loc->getPredictedPos().y() + getPredictedPos().y(),
-    loc->getPredictedPos().z() + getPredictedPos().z());
+  if (!loc) return getPredictedPos(); // nothing below makes sense for the world
 
-  float terrainOffset = 0.0f;
+  // Cache predicted pos of entity
+  WFMath::Point<3> pred = getPredictedPos();
+  // Cache abs position of parent
+  WFMath::Point<3> lpos = loc->getAbsPos();
+  //WFMath::Point<3> lpos = loc->getPredictedPos();
+  // Work out predicted abs pos.
+  WFMath::Point<3> absPos(
+    lpos.x() + pred.x(),
+    lpos.y() + pred.y(),
+    lpos.z() + pred.z());
+
+  // Apply modifiers to height.
+
+  float terrainHeight = 0.0f;
+  bool hasHeight = false;
   if (loc->hasAttr("terrain")) {  
-    terrainOffset = Environment::getInstance().getHeight(absPos.x(), absPos.y());
+    terrainHeight = Environment::getInstance().getHeight(absPos.x(), absPos.y()); 
+    hasHeight = true;
   }
     
   // Set Z coord to terrain height if required
@@ -150,11 +159,14 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
       // Clamp between sea level and terrain height.
       // If there is a dispute, then place object on top of terrain.
       if (absPos.z() > 0.0f) absPos.z() = 0.0f;
-      if (absPos.z() < terrainOffset) absPos.z() = terrainOffset;
+      if (absPos.z() < terrainHeight) absPos.z() = terrainHeight;
     } else {
       // Assume clamped to terrain
-      absPos.z() = terrainOffset;
+      if (hasHeight) absPos.z() = terrainHeight;
     }
+  } else {
+    // Assume clamped to terrain
+    if (hasHeight) absPos.z() = terrainHeight;
   }  
   if (loc->type() == "jetty") {
     float jetty_z = loc->getAbsPos().z();
@@ -173,10 +185,17 @@ void WorldEntity::displayInfo() {
 //  WFMath::Vector<3> pos = getInterpolatedPos();
 //  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   
-//  WFMath::Point<3> abspos = getAbsPos();
-//  Log::writeLog(std::string("ABS - X: ") + string_fmt(abspos.x()) + std::string(" Y: ") + string_fmt(abspos.y()) + std::string(" Z: ") + string_fmt(abspos.z()), Log::LOG_DEFAULT);
+  WFMath::Point<3> abspos = getAbsPos();
+  Log::writeLog(std::string("ABS - X: ") + string_fmt(abspos.x()) + std::string(" Y: ") + string_fmt(abspos.y()) + std::string(" Z: ") + string_fmt(abspos.z()), Log::LOG_DEFAULT);
   Eris::Entity *e = getLocation();
   Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getId())), Log::LOG_DEFAULT);
+
+    WorldEntity *loc =  dynamic_cast<WorldEntity*>(getLocation());
+if (loc) {
+  WFMath::Point<3> labspos = loc->getAbsPos();
+  Log::writeLog(std::string("LABS - X: ") + string_fmt(labspos.x()) + std::string(" Y: ") + string_fmt(labspos.y()) + std::string(" Z: ") + string_fmt(labspos.z()), Log::LOG_DEFAULT);
+}
+
   Log::writeLog(std::string("Num Children: ") + string_fmt(numContained()), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Has Bounding Box: ") + string_fmt(hasBBox()), Log::LOG_DEFAULT);
   WFMath::AxisBox<3> bbox = getBBox();

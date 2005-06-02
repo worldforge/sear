@@ -1,5 +1,10 @@
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
 
+	* src/WorldEntity.cpp: Fix setting of height when in a container. Add
+	  more output to /identify.
+
+2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
+
 	* data/general.cfg, src/System.h: Disable mouse_move_select by default.
 
 2005-06-02  Simon Goodall <sear@simongoodall.co.uk>
