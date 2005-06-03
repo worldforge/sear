@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.24 2005-05-27 23:44:33 alriddoch Exp $
+// $Id: Cal3dModel.cpp,v 1.25 2005-06-03 15:35:34 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -119,15 +119,24 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 	static float shininess;
 	if (!select_mode) {
           pCalRenderer->getAmbientColor(&meshColor[0]);
-          ambient[0] = meshColor[0] / 255.0f;  ambient[1] = meshColor[1] / 255.0f; ambient[2] = meshColor[2] / 255.0f; ambient[3] = meshColor[3] / 255.0f;
+          ambient[0] = meshColor[0] / 255.0f;
+          ambient[1] = meshColor[1] / 255.0f;
+          ambient[2] = meshColor[2] / 255.0f;
+          ambient[3] = meshColor[3] / 255.0f;
 
           // set the material diffuse color
           pCalRenderer->getDiffuseColor(&meshColor[0]);
-          diffuse[0] = meshColor[0] / 255.0f;  diffuse[1] = meshColor[1] / 255.0f; diffuse[2] = meshColor[2] / 255.0f; diffuse[3] = 255.0f;//meshColor[3] / 255.0f;
+          diffuse[0] = meshColor[0] / 255.0f;
+          diffuse[1] = meshColor[1] / 255.0f;
+          diffuse[2] = meshColor[2] / 255.0f;
+          diffuse[3] = 1.0f;//meshColor[3] / 255.0f;
 
           // set the material specular color
           pCalRenderer->getSpecularColor(&meshColor[0]);
-          specular[0] = meshColor[0] / 255.0f;  specular[1] = meshColor[1] / 255.0f; specular[2] = meshColor[2] / 255.0f; specular[3] = meshColor[3] / 255.0f;
+          specular[0] = meshColor[0] / 255.0f;
+          specular[1] = meshColor[1] / 255.0f;
+          specular[2] = meshColor[2] / 255.0f;
+          specular[3] = meshColor[3] / 255.0f;
 
 	  shininess = pCalRenderer->getShininess();
 
@@ -164,6 +173,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             }
 	  } else {
 	    multitexture = true;
+            // Set texture unit 0
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
             if (md) {
@@ -171,12 +181,12 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             } else {
               RenderSystem::getInstance().switchTexture(0);
             }
-
+            // Set texture unit 1
             md = reinterpret_cast<MapData*>(pCalRenderer->getMapUserData(1));
             if (md) {
-              RenderSystem::getInstance().switchTexture(md->textureID);
+              RenderSystem::getInstance().switchTexture(1, md->textureID);
             } else {
-              RenderSystem::getInstance().switchTexture(0);
+              RenderSystem::getInstance().switchTexture(1, 0);
             }
 	  }
           m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
@@ -246,7 +256,7 @@ void Cal3dModel::action(const std::string &action) {
 }
 
 void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
-  std::cout << "------" << std::endl;
+  if (debug) std::cout << "------" << std::endl;
   Atlas::Message::MapType map(appearanceMap);
   
   // Get mesh atrributes
@@ -284,7 +294,7 @@ void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
   for (I = meshes.begin(); I != meshes.end(); ++I) {
     std::string name = I->first;
     std::string value = I->second.asString();
-    std::cout << "Name: " << name << " - Value: " << value << std::endl;
+    if (debug) std::cout << "Name: " << name << " - Value: " << value << std::endl;
     // Attach mesh
     if (m_core_model->m_meshes.find(name + "_" + value) 
       != m_core_model->m_meshes.end()) {
@@ -313,7 +323,7 @@ void Cal3dModel::setMaterialSet(unsigned int set) {
 }
 
 void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
- std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
+  if (debug) std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
   //TODO make this do the correct thing!
 //  m_calModel.setMaterialSet(set);
   // Get mesh name

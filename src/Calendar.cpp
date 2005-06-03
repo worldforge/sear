@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.18 2005-06-01 22:02:35 jmt Exp $
+// $Id: Calendar.cpp,v 1.19 2005-06-03 15:35:34 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -47,17 +47,17 @@ static const std::string KEY_DAY_NAME = "day_name_";
 static const std::string KEY_MONTH_NAME = "month_name_";
 
 // Default config values
-static const unsigned int DEFAULT_SECONDS_PER_MINUTE = 20;
-static const unsigned int DEFAULT_MINUTES_PER_HOUR = 60;
-static const unsigned int DEFAULT_HOURS_PER_DAY = 24;
-static const unsigned int DEFAULT_DAYS_PER_WEEK = 7;
-static const unsigned int DEFAULT_WEEKS_PER_MONTH = 4;
-static const unsigned int DEFAULT_MONTHS_PER_YEAR = 12;
+static const int DEFAULT_SECONDS_PER_MINUTE = 20;
+static const int DEFAULT_MINUTES_PER_HOUR = 60;
+static const int DEFAULT_HOURS_PER_DAY = 24;
+static const int DEFAULT_DAYS_PER_WEEK = 7;
+static const int DEFAULT_WEEKS_PER_MONTH = 4;
+static const int DEFAULT_MONTHS_PER_YEAR = 12;
 
-static const unsigned int DEFAULT_DAWN_START = 6;
-static const unsigned int DEFAULT_DAY_START = 9;
-static const unsigned int DEFAULT_DUSK_START = 18;
-static const unsigned int DEFAULT_NIGHT_START = 21;
+static const int DEFAULT_DAWN_START = 6;
+static const int DEFAULT_DAY_START = 9;
+static const int DEFAULT_DUSK_START = 18;
+static const int DEFAULT_NIGHT_START = 21;
 
 // Console Commands
 static const std::string GET_TIME = "get_time";
@@ -188,7 +188,7 @@ void Calendar::update(double server_time) {
   else if (m_hours < m_hours_per_day) m_time_area = NIGHT;
 
   if (ta != m_time_area) {
-    unsigned int time_1 = 0;
+    int time_1 = 0;
     switch(m_time_area) {
       case INVALID:
       case NIGHT: break;
@@ -197,6 +197,8 @@ void Calendar::update(double server_time) {
       case DUSK: time_1 = m_dusk_start; break;
     }
     m_time_in_area = m_seconds_counter - (time_1 * m_seconds_per_minute * m_minutes_per_hour);
+printf("IME: %f %f %u %u %u\n", m_time_in_area, m_seconds_counter, time_1, m_seconds_per_minute, m_minutes_per_hour);
+
     // Emit an action event
     ActionHandler *action_handler = System::instance()->getActionHandler();
     switch(m_time_area) {
@@ -215,7 +217,6 @@ void Calendar::update(double server_time) {
 }
 
 void Calendar::readConfig(varconf::Config &config) {
-
   varconf::Variable temp;
 
   if (config.findItem(CALENDER, KEY_SECONDS_PER_MINUTE)) {
@@ -280,7 +281,7 @@ void Calendar::readConfig(varconf::Config &config) {
     m_night_start = DEFAULT_NIGHT_START;
   }
   
-  for (unsigned int i = 0; i < m_days_per_week; ++i) {
+  for (int i = 0; i < m_days_per_week; ++i) {
     std::string key = KEY_DAY_NAME + string_fmt(i);
     if (config.findItem(CALENDER, key)) {
       temp = config.getItem(CALENDER, key);
@@ -290,7 +291,7 @@ void Calendar::readConfig(varconf::Config &config) {
     }
   }
   
-  for (unsigned int i = 0; i < m_months_per_year; ++i) {
+  for (int i = 0; i < m_months_per_year; ++i) {
     std::string key = KEY_MONTH_NAME + string_fmt(i);
     if (config.findItem(CALENDER, key)) {
       temp = config.getItem(CALENDER, key);
@@ -318,12 +319,12 @@ void Calendar::writeConfig(varconf::Config &config) {
   config.setItem(CALENDER, KEY_DUSK_START, (int)m_dusk_start);
   config.setItem(CALENDER, KEY_NIGHT_START, (int)m_night_start);
   
-  for (unsigned int i = 0; i < m_days_per_week; ++i) {
+  for (int i = 0; i < m_days_per_week; ++i) {
     std::string key = KEY_DAY_NAME + string_fmt(i);
     config.setItem(CALENDER, key, m_day_names[i]);
   }
   
-  for (unsigned int i = 0; i < m_months_per_year; ++i) {
+  for (int i = 0; i < m_months_per_year; ++i) {
     std::string key = KEY_MONTH_NAME + string_fmt(i);
     config.setItem(CALENDER, key, m_month_names[i]);
   }
@@ -377,13 +378,13 @@ void Calendar::config_update(const std::string &section, const std::string &key,
 
     else if (key.substr(0, KEY_DAY_NAME.length()) == KEY_DAY_NAME) {
       temp = config.getItem(CALENDER, key);
-      unsigned int index;
+      int index;
       cast_stream(key.substr(KEY_DAY_NAME.length()), index);
       if (temp.is_string()) m_day_names[index] = ((std::string)temp);
     }
      else if (key.substr(0, KEY_MONTH_NAME.length()) == KEY_MONTH_NAME) {
       temp = config.getItem(CALENDER, key);
-      unsigned int index;
+      int index;
       cast_stream(key.substr(KEY_MONTH_NAME.length()), index);
       if (temp.is_string()) m_month_names[index] = ((std::string)temp);
     }

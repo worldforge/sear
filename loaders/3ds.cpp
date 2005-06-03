@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.41 2005-06-01 15:42:03 alriddoch Exp $
+// $Id: 3ds.cpp,v 1.42 2005-06-03 15:35:34 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -193,7 +193,7 @@ void ThreeDS::invalidate() {
 void ThreeDS::render(bool select_mode) {
   assert(m_render);
 
-  std::string current_material = "";
+  std::string current_material = "sear:blank";
 
   m_render->scaleObject(m_height);
   bool end_list = false;

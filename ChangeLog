@@ -1,3 +1,12 @@
+2005-06-03  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp: Set initial material name in case there happens to 
+	  be a blank name.
+	* loaders/cal3d/Cal3dModel.cpp: Properly set texture unit 1 textures.
+	  Move some output to debug messages only.
+	* src/Calendar.cpp, src/Calendar.h: Change unsigned int to int's as 
+	  there are some casting problems.
+
 2005-06-03  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/GL.cpp: Disable FSAA by default.
