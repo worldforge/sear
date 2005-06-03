@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.125 2005-06-03 00:06:34 alriddoch Exp $
+// $Id: GL.cpp,v 1.126 2005-06-03 11:54:02 alriddoch Exp $
 
 #include <SDL/SDL.h>
 
@@ -143,7 +143,7 @@
   static const bool DEFAULT_use_lighting = true;
   static const bool DEFAULT_show_fps = true;
   static const bool DEFAULT_use_stencil = true;
-  static const bool DEFAULT_use_fsaa = true;
+  static const bool DEFAULT_use_fsaa = false;
 
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;

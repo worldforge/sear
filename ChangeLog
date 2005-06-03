@@ -1,5 +1,9 @@
 2005-06-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/GL.cpp: Disable FSAA by default.
+
+2005-06-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* renderers/GL.cpp, renderers/GL.h: Add option to enable full screen
 	  anti-aliasing.
 
