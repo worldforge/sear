@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.124 2005-05-23 21:02:28 jmt Exp $
+// $Id: GL.cpp,v 1.125 2005-06-03 00:06:34 alriddoch Exp $
 
 #include <SDL/SDL.h>
 
@@ -66,6 +66,7 @@
   static const std::string KEY_use_lighting = "render_use_lighting";
   static const std::string KEY_show_fps = "render_show_fps";
   static const std::string KEY_use_stencil = "render_use_stencil";
+  static const std::string KEY_use_fsaa = "render_use_fsaa";
 
   static const std::string KEY_character_light_kc = "character_light_kc";
   static const std::string KEY_character_light_kl = "character_light_kl";
@@ -138,10 +139,11 @@
   static const float DEFAULT_sun_light_specular_blue = 0.0f;
   static const float DEFAULT_sun_light_specular_alpha = 0.0f;
 
-  static const float DEFAULT_use_textures = true;
-  static const float DEFAULT_use_lighting = true;
-  static const float DEFAULT_show_fps = true;
-  static const float DEFAULT_use_stencil = true;
+  static const bool DEFAULT_use_textures = true;
+  static const bool DEFAULT_use_lighting = true;
+  static const bool DEFAULT_show_fps = true;
+  static const bool DEFAULT_use_stencil = true;
+  static const bool DEFAULT_use_fsaa = true;
 
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;
@@ -208,6 +210,10 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+  if (m_use_fsaa) {
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4 );
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 );
+  }
   // Only request stencil if specified
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
@@ -313,6 +319,9 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+  if (m_use_fsaa) {
+    glEnable(GL_MULTISAMPLE_ARB);
+  }
  // glDisable(GL_DITHER);
                                                                                 
   setViewMode(PERSPECTIVE);
@@ -466,6 +475,7 @@ GL::GL() :
   m_redMask(0), m_greenMask(0), m_blueMask(0),
   m_redShift(0), m_greenShift(0), m_blueShift(0),
   m_use_sgis_generate_mipmap(false),
+  m_use_fsaa(DEFAULT_use_fsaa),
   m_multi_texture_mode(false),
   m_initialised(false)
 {
@@ -781,6 +791,12 @@ void GL::readConfig(varconf::Config &config) {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
   } else {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, DEFAULT_use_stencil);
+  }
+  if (config.findItem(RENDER, KEY_use_fsaa)) {
+    temp = config.getItem(RENDER, KEY_use_stencil);
+    m_use_fsaa = temp.is_bool() ? ((bool)(temp)) : DEFAULT_use_fsaa;
+  } else {
+    m_use_fsaa = DEFAULT_use_fsaa;
   }
 
   // Setup the speech offsets

@@ -1,5 +1,9 @@
 2005-06-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/GL.cpp: Add option to enable full screen anti-aliasing.
+
+2005-06-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/Makefile.am: Update the static libs.
 
 	* loaders/3ds_Loader.cpp: Report failures to load 3ds models.
