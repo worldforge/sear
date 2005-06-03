@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.126 2005-06-03 11:54:02 alriddoch Exp $
+// $Id: GL.cpp,v 1.127 2005-06-03 23:20:23 alriddoch Exp $
 
 #include <SDL/SDL.h>
 
@@ -793,7 +793,7 @@ void GL::readConfig(varconf::Config &config) {
     RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, DEFAULT_use_stencil);
   }
   if (config.findItem(RENDER, KEY_use_fsaa)) {
-    temp = config.getItem(RENDER, KEY_use_stencil);
+    temp = config.getItem(RENDER, KEY_use_fsaa);
     m_use_fsaa = temp.is_bool() ? ((bool)(temp)) : DEFAULT_use_fsaa;
   } else {
     m_use_fsaa = DEFAULT_use_fsaa;

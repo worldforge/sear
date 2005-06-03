@@ -1,3 +1,8 @@
+2005-06-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/GL.cpp: Fix the key used to check the fsaa option
+	  setting.
+
 2005-06-03  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/3ds.cpp: Set initial material name in case there happens to 
