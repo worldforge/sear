@@ -1,5 +1,10 @@
 2005-06-04  Al Riddoch  <alriddoch@zepler.org>
 
+	* configure.ac, renderers/GL.cpp: Check whether SDL is recent enough
+	  to support multisample buffers.
+
+2005-06-04  Al Riddoch  <alriddoch@zepler.org>
+
 	* renderers/GL.cpp: Fix the key used to check the fsaa option
 	  setting.
 

@@ -102,6 +102,13 @@ SDL_VERSION=1.2.2
 AM_PATH_SDL($SDL_VERSION, [
   CPPFLAGS="$CPPFLAGS $SDL_CFLAGS"
   SEAR_LIBS="$SEAR_LIBS $SDL_LIBS"
+  AC_TRY_COMPILE([#include <SDL.h>],
+  [
+    SDL_GL_MULTISAMPLEBUFFERS;
+  ],
+  [
+    AC_DEFINE(HAVE_SDL_GL_MULTISAMPLE, 1, [Define to 1 if you have SDL that supports multisample GL buffers.])
+  ])
 ],
 [
   AC_MSG_ERROR(Couldn't find SDL or insufficent version found. Please goto http://www.libsdl.org/ and get at least version $SDL_VERSION)

@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.127 2005-06-03 23:20:23 alriddoch Exp $
+// $Id: GL.cpp,v 1.128 2005-06-04 12:34:14 alriddoch Exp $
+
+#ifdef HAVE_CONFIG_H
+  #include "config.h"
+#endif
 
 #include <SDL/SDL.h>
 
@@ -210,10 +214,12 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+#ifdef HAVE_SDL_GL_MULTISAMPLE
   if (m_use_fsaa) {
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4 );
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 );
   }
+#endif
   // Only request stencil if specified
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
