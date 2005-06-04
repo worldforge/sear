@@ -1,0 +1,55 @@
+# -*-shell-script-*-
+# autopackage specfile for sear
+
+[Meta]
+RootName: @worldforge.org/clients/sear:$SOFTWAREVERSION
+DisplayName: Sear - a client for Worldforge
+ShortName: sear
+AutopackageTarget: 1.0.0
+URL: http://www.worldforge.org/dev/eng/clients/sear
+Maintainer: Simon Goodall <sear@simongoodall.co.uk>
+Packager: Simon Goodall <sear@simongoodall.co.uk>
+Summary: Sear is a client for MMORPGs using the Worldforge system.
+SoftwareVersion: @VERSION@
+
+[Global]
+export bindir=@bindir@
+export datadir=@datadir@
+
+[Description]
+Sear desc
+
+[BuildPrepare]
+#prepareBuild --enable-binreloc --enable-static-build
+
+[BuildUnprepare]
+#unprepareBuild
+
+[Imports]
+import <<EOF
+$source_dir/src/sear
+$source_dir/src/sear-bin
+$source_dir/src/sear_icon.xpm
+$source_dir/sear.desktop
+$source_dir/data/states.cfg
+$source_dir/data/bindings.cfg
+$source_dir/data/general.cfg
+EOF
+
+[Prepare]
+#require @libsdl.org/sdl 1.2
+#require @gnu.org/libstdc++ 3
+
+
+[Install]
+installExe sear
+installExe sear-bin
+#installConfig states.cfg general.cfg bindings.cfg
+installIcon sear_icon.xpm
+installDesktop "Applications" sear.desktop
+#$source_dir/*
+
+[Uninstall]
+uninstallFromLog
+
+

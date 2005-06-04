@@ -9,3 +9,7 @@ EXTRA_DIST =  \
 
 # Rule to build tar-gzipped distribution package
 $(PACKAGE)-$(VERSION).tar.gz: dist
+
+
+appdir = $(datadir)/applications/
+app_DATA = sear.desktop

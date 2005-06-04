@@ -115,3 +115,5 @@ libSear_a_SOURCES = \
 #	Lobby.cpp \
 #	Lobby.h \
 #
+icondir = $(datadir)/icons/worldforge
+icon_DATA = sear_icon.xpm

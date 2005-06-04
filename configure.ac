@@ -117,7 +117,7 @@ AC_SUBST(SDL_VERSION)
 
 if test $cross_compiling == no; then
   AC_CHECK_LIB(SDL_image,IMG_ReadXPMFromArray, [
-    SEAR_LIBS="$SEAR_LIBS -lSDL_image"
+    SEAR_LIBS="$SEAR_LIBS -lSDL_image -ltiff -ljpeg -lpng -lz"
   ], [
     AC_MSG_ERROR(Couldn't find SDL_image or wrong version found. Please goto http://www.libsdl.org/projects/SDL_image and get at least version 1.2.1)
 ])
@@ -203,7 +203,6 @@ PKG_CHECK_MODULES(PKGCHECKS2, cal3d >= $CAL3D_VERSION,
       AC_MSG_ERROR(Couldn't find the cal3d libs. Please goto http://cal3d.sourceforge.net)
 )
 AC_SUBST(CAL3D_VERSION)
-
 
 dnl Check Lib 3ds
 
@@ -295,4 +294,6 @@ AC_OUTPUT([
 	sear-updater.spec
 	Sear.iss
 	src/sear
+	sear.desktop
+	autopackage/default.apspec
 ],[chmod +x src/sear])

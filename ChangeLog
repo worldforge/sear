@@ -1,5 +1,13 @@
 2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
 
+	* configure.ac: Explicitly add tiff,jpeg, png and z libs. Make sear 
+	  desktop entry and autopackage file.
+	* sear.desktop.in: Add desktop entry file.
+	* autopackage/default.apsec.in: Add autopackage builder file
+	* src/Makefile.am: Install Icon for desktop entry
+
+2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
+
 	* src/System.cpp, src/System.h: Add option to start fullscreen. Default
 	  to disabled.
 
