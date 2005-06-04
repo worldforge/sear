@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.57 2005-06-01 22:02:35 jmt Exp $
+// $Id: System.h,v 1.58 2005-06-04 14:09:05 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -279,6 +279,7 @@ private:
 
   Editor *m_editor;
   bool m_initialised; ///< Initialisation state of System
+  bool m_startFullscreen;
 };
 
 } /* namespace Sear */

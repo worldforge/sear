@@ -1,3 +1,8 @@
+2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
+
+	* src/System.cpp, src/System.h: Add option to start fullscreen. Default
+	  to disabled.
+
 2005-06-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac, renderers/GL.cpp: Check whether SDL is recent enough

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.122 2005-06-02 15:16:16 simon Exp $
+// $Id: System.cpp,v 1.123 2005-06-04 14:09:05 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,6 +105,8 @@ namespace Sear {
   static const std::string KEY_ELEVATION_AXIS = "elevation_axis";
   static const std::string KEY_key_repeat_delay = "key_repeat_delay";
   static const std::string KEY_key_repeat_rate = "key_repeat_rate";
+ 
+  static const std::string KEY_fullscreen = "start_fullscreen";
   
   //Config default values
   static const int DEFAULT_window_width = 640;
@@ -115,7 +117,9 @@ namespace Sear {
   static const int DEFAULT_joystick_pickup_button = 2;
   static const int DEFAULT_key_repeat_delay = 1000;
   static const int DEFAULT_key_repeat_rate = 500;
-  
+ 
+  static const bool DEFAULT_fullscreen = false;
+ 
 System *System::m_instance = NULL;
 
 System::System() :
@@ -142,7 +146,8 @@ System::System() :
   m_sound(NULL),
   m_system_running(false),
   m_editor(NULL),
-  m_initialised(false)
+  m_initialised(false),
+  m_startFullscreen(DEFAULT_fullscreen)
 {
   m_instance = this;
   // Initialise system states
@@ -294,12 +299,12 @@ bool System::init(int argc, char *argv[]) {
 
   // Try and create the window
   bool success;
-  if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, false))) {
+  if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen))) {
     // Only try again if stencil buffer was enabled first time round
     if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
       // Disable stencil buffer and try again
       RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, false);
-      success = RenderSystem::getInstance().createWindow(m_width, m_height, false);
+      success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen);
     }
   }
   if (!success) return false;
@@ -736,6 +741,13 @@ void System::readConfig(varconf::Config &config) {
   if(config.findItem(SECTION_INPUT, KEY_key_repeat_rate)) {
     temp = config.getItem(SECTION_INPUT, KEY_key_repeat_rate);
     m_KeyRepeatRate = (temp.is_int() == true) ? ((int)(temp)) : (DEFAULT_key_repeat_rate);
+  }
+ 
+  if (config.findItem(SYSTEM, KEY_fullscreen)) {
+    temp = config.getItem(SYSTEM, KEY_fullscreen);
+    m_startFullscreen = (!temp.is_bool()) ? (DEFAULT_fullscreen) : ((bool)(temp));
+  } else {
+    m_startFullscreen = DEFAULT_fullscreen;
   }
 
 
