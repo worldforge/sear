@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.25 2005-06-03 15:35:34 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.26 2005-06-04 21:23:53 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -27,17 +27,11 @@
 #endif
 
 namespace Sear {
-const int STATE_IDLE = 0;
-const int STATE_FANCY = 1;
-const int STATE_MOTION = 2;
 
-float strut_blend[] = {0.5, 0.0, 0.0, 0.5};
-float walk_blend[] = {0.0, 0.5, 0.0, 0.5};
-float run_blend[] = {0.0, 0.0, 0.5, 0.5};
-
+static const std::string IDLE     = "idle";
 static const std::string STANDING = "standing";
-static const std::string WALKING = "walking";
-static const std::string RUNNING = "running";
+static const std::string WALKING  = "walking";
+static const std::string RUNNING  = "running";
 
 static const std::string ANIM_default = "default";
 
@@ -233,23 +227,33 @@ void Cal3dModel::setLodLevel(float lodLevel) {
 
 void Cal3dModel::action(const std::string &action) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
-  if (action == "standing") {
+  // Check default 
+  if (action == IDLE) {
+    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
+    m_calModel->getMixer()->blendCycle(animations[IDLE], 1.0f, 0.2f);
+  } else if (action == STANDING) {
+    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+  } else if (action == WALKING) {
+    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
     m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-  } else if (action == "walking") {
+    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
-  } else if (action == "running") {
-    m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
+  } else if (action == RUNNING) {
+    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
     m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
     m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
+    m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
   } else {
-//    std::string act = *(animations.find(action)->);
+    // Search map for animation with matching name
     if (animations.find(action) != animations.end()) {
       m_calModel->getMixer()->executeAction(animations[action], 0.0f, 0.0f);
     } else {
+      // Play default animation if none others found
       m_calModel->getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
     }
   }

@@ -1,5 +1,13 @@
 2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h: Use
+	  return code rather than exceptions. Remove some debugging output.
+	* loaders/cal3d/Cal3dModel.cpp: Add IDLE as a specific animation case.
+	* loaders/cal3d/CoreModelHandler.cpp: Check return value of init.
+	* renderers/TextureManager.h: Use find instead of [] on texture map.
+
+2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
+
 	* configure.ac: Explicitly add tiff,jpeg, png and z libs. Make sear 
 	  desktop entry and autopackage file.
 	* sear.desktop.in: Add desktop entry file.

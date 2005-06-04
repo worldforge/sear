@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.20 2005-05-18 14:38:27 simon Exp $
+// $Id: TextureManager.h,v 1.21 2005-06-04 21:23:53 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -89,14 +89,20 @@ public:
   TextureID requestTextureID(const std::string &texture_name, bool mask)
   {
     assert(m_initialised);
+    // Convert to internal name
     std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
-    TextureID texId = m_texture_map[name];
-    
-    if (texId == 0) {
-        texId = m_names.size(); // we already made m_texture_map bigger
-        m_texture_map[name] = texId;
-        m_names.push_back(name);
-        m_textures.push_back(0);
+    // Find existing ID if any
+    TextureMap::const_iterator I = m_texture_map.find(name);
+    TextureID texId; 
+    if (I == m_texture_map.end()) {
+      // Assign new texture ID
+      texId = m_names.size();
+      m_texture_map[name] = texId;
+      m_names.push_back(name);
+      m_textures.push_back(0);
+    } else {
+      // Return existing id
+      texId = I->second;
     }
     
     return texId;

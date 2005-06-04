@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.29 2005-05-26 10:49:56 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.30 2005-06-04 21:23:53 simon Exp $
 
 
 #include "Cal3dModel.h"
@@ -81,10 +81,8 @@ int Cal3dCoreModel::init(const std::string &filename) {
     return 1;
   }
 //  std::cerr << "reading config" << std::endl << std::flush;
-  try {
-    readConfig(filename);
-  } catch (...) {
-    printf("Caught Exception while loading %s\n", filename.c_str());
+  if (readConfig(filename)) {
+    printf("Error while loading %s\n", filename.c_str());
     delete m_core_model;
     m_core_model = NULL;
 
@@ -119,7 +117,7 @@ int Cal3dCoreModel::shutdown() {
   return 0;
 }
 
-void Cal3dCoreModel::readConfig(const std::string &filename) {
+int Cal3dCoreModel::readConfig(const std::string &filename) {
   varconf::Config config;
   config.sigsv.connect(SigC::slot(*this, &Cal3dCoreModel::varconf_callback));
   config.sige.connect(SigC::slot(*this, &Cal3dCoreModel::varconf_error_callback));
@@ -139,10 +137,9 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
     System::instance()->getFileHandler()->expandString(path);
   }
   // Load skeleton
-  if (!m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)))  {
+  if (m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)) == 0)  {
     CalError::printLastError();
-    throw Exception();
-    return;
+    return 1;
   }
   // Get scale
   if (config.findItem(SECTION_model, KEY_scale)) {
@@ -152,7 +149,7 @@ void Cal3dCoreModel::readConfig(const std::string &filename) {
   }
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
-printf("Rotate %f\n", m_rotate);
+    if (debug) printf("Rotate %f\n", m_rotate);
   }
   // Load all meshes 
   for (MeshMap::const_iterator I = m_meshes.begin(); I != m_meshes.end(); ++I) {
@@ -183,7 +180,7 @@ printf("Rotate %f\n", m_rotate);
     int length =  material_name.find_first_of("_");
     std::string set = material_name.substr(0,length);
     std::string part = material_name.substr(length + 1);
-   std::cout << "Set: " << set << " - Part: " << part << std::endl;
+//    if (debug) std::cout << "Set: " << set << " - Part: " << part << std::endl;
     int material = m_core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
     if (material == -1) {
       std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
@@ -194,13 +191,11 @@ printf("Rotate %f\n", m_rotate);
     // Create material thread and assign material to a set;
     if (m_sets[set] == 0) {
       m_sets[set] = set_counter++;
-//      if (debug)
- std::cout << "Creating set " << set << " with id  " << m_sets[set] << std::endl;
+//      if (debug) std::cout << "Creating set " << set << " with id  " << m_sets[set] << std::endl;
     }
     if (m_parts[part] == 0) {
       m_parts[part] = part_counter++;
-//      if (debug)
- std::cout << "Creating part " << part << " with id  " << m_parts[part] << std::endl;
+//      if (debug) std::cout << "Creating part " << part << " with id  " << m_parts[part] << std::endl;
     }
     m_core_model->createCoreMaterialThread(m_parts[part] - 1);
 //     _core_model->createCoreMaterialThread(material);
@@ -292,6 +287,8 @@ printf("Rotate %f\n", m_rotate);
       }
     }
   }
+
+  return 0;
 }
 
 void Cal3dCoreModel::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {

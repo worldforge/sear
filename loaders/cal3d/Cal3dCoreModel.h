@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.8 2005-04-04 10:20:03 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.9 2005-06-04 21:23:53 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -90,7 +90,7 @@ private:
    * This function processes a cal3d config file
    * @param filename cal3d config file
    */ 
-  void readConfig(const std::string &filename);
+  int readConfig(const std::string &filename);
 
   /**
    * This function is the varconf callback called everytime a line is read
