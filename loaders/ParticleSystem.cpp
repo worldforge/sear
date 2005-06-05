@@ -6,6 +6,7 @@
 #include "common/types.h"
 #include "renderers/Render.h"
 #include <wfmath/MersenneTwister.h>
+#include <iostream>
 
 namespace Sear
 {
@@ -134,8 +135,9 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::init()
 {
-    // read config form model_record
-    int numParticles = 0;
+    // arbitrary low starting number; we re-allocate storage if required
+    // during update()
+    int numParticles = 100;
     
     m_particles.resize(numParticles);
     for (unsigned int p=0; p < m_particles.size(); ++p) {
@@ -166,19 +168,33 @@ void ParticleSystem::update(float elapsed)
         if (m_particles[p]->isActive()) {
             m_particles[p]->update(elapsed);
         } else if (numToCreate > 0) {
-            // activate a particle
-            
-            double ttl = randomInRange(m_minTTL, m_maxTTL);
-            Vector3 acc = m_accelVector * randomInRange(m_minAccelMag, m_maxAccelMag);
-            
-            m_particles[p]->init(ttl, 
-                initialPos(), initialVelocity(), acc);
-                
+            activate(m_particles[p]);
             // randomise the position / color slightly, so it's less obvious
             // when many particles are created at once.
             m_particles[p]->update(twister.rand(elapsed));
         }
     }  
+    
+    if (numToCreate > 0) {
+        // need to re-allocate things a bit ... bigger
+        unsigned int firstNew = m_particles.size(),
+            newSize = m_particles.size() + numToCreate;
+        m_particles.resize(newSize);
+        
+        std::cout << "re-allocating particle storage with size=" << 
+            newSize << std::endl;
+    // re-alloc storage
+        delete[] m_vertexBuffer;
+        delete[] m_texCoordBuffer;
+        m_vertexBuffer = new Vertex_3[newSize * 4];
+        m_texCoordBuffer = new Texel[newSize * 4];
+        
+        for (unsigned int p=firstNew; p < m_particles.size(); ++p) {
+            m_particles[p] = new Particle(this);
+            activate(m_particles[p]);
+            m_particles[p]->update(twister.rand(elapsed));
+        }
+    } // of spilled particles case
 }
 
 void ParticleSystem::render(bool select_mode)
@@ -217,6 +233,14 @@ void ParticleSystem::render(bool select_mode)
 void ParticleSystem::invalidate()
 {
     // invalidate the texture
+}
+
+void ParticleSystem::activate(Particle* p)
+{            
+    double ttl = randomInRange(m_minTTL, m_maxTTL);
+    Vector3 acc = m_accelVector * randomInRange(m_minAccelMag, m_maxAccelMag);
+    
+    p->init(ttl, initialPos(), initialVelocity(), acc);
 }
 
 Vector3 ParticleSystem::initialVelocity() const

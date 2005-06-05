@@ -32,6 +32,8 @@ public:
     virtual void render(bool select_mode);
 
 private:
+    void activate(Particle*);
+    
     Vector3 initialVelocity() const;
     Point3 initialPos() const;
     
@@ -42,6 +44,7 @@ private:
     Texel* m_texCoordBuffer;
     
 // config data
+    double m_minCreatePerSec, m_maxCreatePerSec;
     double m_minTTL, m_maxTTL;
     Vector3 m_basicVel, m_velocityDeviation;
     Point3 m_origin;
