@@ -1,3 +1,7 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+
 #include "loaders/ParticleSystem.h"
 #include "common/types.h"
 #include "renderers/Render.h"
