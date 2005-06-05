@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.19 2005-06-03 15:35:34 simon Exp $
+// $Id: Calendar.cpp,v 1.20 2005-06-05 17:23:08 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -156,11 +156,15 @@ void Calendar::update(double server_time) {
     m_current_day_name = m_day_names[m_days];
     m_hours -= m_hours_per_day;
   }
+  // Check our seconds in day counter is ok
+  int sec_per_day = m_seconds_per_minute * m_minutes_per_hour * m_hours_per_day;
+  while (m_seconds_counter >= sec_per_day) {
+    m_seconds_counter -= sec_per_day;
+  }
   // Check for days overflow
   while (m_days >= m_days_per_week) {
     ++m_weeks;
     m_days -= m_days_per_week;
-    m_seconds_counter -= m_seconds_per_minute * m_minutes_per_hour * m_hours_per_day;
     // Update day name
     m_current_day_name = m_day_names[m_days];
   }
@@ -197,7 +201,6 @@ void Calendar::update(double server_time) {
       case DUSK: time_1 = m_dusk_start; break;
     }
     m_time_in_area = m_seconds_counter - (time_1 * m_seconds_per_minute * m_minutes_per_hour);
-printf("IME: %f %f %u %u %u\n", m_time_in_area, m_seconds_counter, time_1, m_seconds_per_minute, m_minutes_per_hour);
 
     // Emit an action event
     ActionHandler *action_handler = System::instance()->getActionHandler();
@@ -212,8 +215,6 @@ printf("IME: %f %f %u %u %u\n", m_time_in_area, m_seconds_counter, time_1, m_sec
     // Update m_time_in_area
     m_time_in_area += time_elapsed;
   }
-
-
 }
 
 void Calendar::readConfig(varconf::Config &config) {

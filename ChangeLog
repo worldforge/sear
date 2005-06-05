@@ -1,3 +1,7 @@
+2005-06-05  Simon Goodall <sear@simongoodall.co.uk>
+
+	* src/Calendar.cpp: Make suce m_seconds_counter is correctly wrapped.
+
 2005-06-04  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Bindings.cpp: Make getting bindings a little more efficient
