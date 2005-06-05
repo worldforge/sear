@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.7 2005-05-23 21:02:28 jmt Exp $
+// $Id: Render.h,v 1.8 2005-06-05 21:31:07 jmt Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -105,7 +105,8 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void applyCharacterLighting(float x, float y, float z) =0;
   virtual void getFrustum(float [6][4]) =0;
-
+  virtual void getModelviewMatrix(float m[4][4]) = 0;
+  
   virtual void beginRecordList(unsigned int list) = 0;
   virtual void endRecordList() = 0;
   virtual unsigned int getNewList() = 0;

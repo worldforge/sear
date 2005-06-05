@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.128 2005-06-04 12:34:14 alriddoch Exp $
+// $Id: GL.cpp,v 1.129 2005-06-05 21:31:07 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1136,14 +1136,16 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       // Draw Model
       if (select_mode) {
         nextColour(object_record->entity);
-	model->render(true);
+        model->render(true);
       } else {
         if (object_record->entity == m_activeEntity) {
           m_active_name = object_record->name;
-	  drawOutline(model_record);
-	}
-	else model->render(false);
+          drawOutline(model_record);
+	    } else {
+          model->render(false);
+        }
       }
+      
       glPopMatrix();
     }
   }
@@ -1357,6 +1359,11 @@ inline void GL::getFrustum(float frust[6][4]) {
       m_frustum[i][j] = frust[i][j];
     }
   }
+}
+
+void GL::getModelviewMatrix(float m[4][4])
+{
+    glGetFloatv(GL_MODELVIEW_MATRIX, (float*) m);
 }
 
 void GL::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {

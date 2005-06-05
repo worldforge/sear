@@ -118,6 +118,7 @@ public:
   inline void renderActiveName();
   inline void applyCharacterLighting(float x, float y, float z);
   inline void getFrustum(float [6][4]);
+  virtual void getModelviewMatrix(float m[4][4]);
  
   void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
   void endRecordList() { glEndList(); }

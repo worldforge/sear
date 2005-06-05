@@ -1,3 +1,13 @@
+2005-06-05  James Turner  <james@worldforge.org>
+
+	* renderers/Render.h, renderers/GL.h, renderers/GL.cpp: add another
+	  accessor to the Render interface, 'getModelviewMatrix', so a Model
+	  can generate view-dependant billboards easily.
+
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/Makfile.am: initial work on a simple particle system. Not yet
+	  used, but should compile successfully.
+
 2005-06-05  Simon Goodall <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp: Make suce m_seconds_counter is correctly wrapped.

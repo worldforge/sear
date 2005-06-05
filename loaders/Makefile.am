@@ -23,6 +23,7 @@ libModelLoader_a_SOURCES = \
 	ObjectRecord.h ObjectRecord.cpp \
 	AreaModel.cpp AreaModel.h \
 	AreaModelLoader.cpp AreaModelLoader.h \
-	NullModel.h
+	NullModel.h \
+	ParticleSystem.cpp ParticleSystem.h
 	
 	
