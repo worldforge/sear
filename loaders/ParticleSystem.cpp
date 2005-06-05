@@ -5,20 +5,23 @@
 #include "loaders/ParticleSystem.h"
 #include "common/types.h"
 #include "renderers/Render.h"
+#include <wfmath/MersenneTwister.h>
 
 namespace Sear
 {
 
+WFMath::MTRand twister;
+
 Vector3 randomVector()
 {
-    return Vector3(drand48() * 2.0 - 1.0,
-        drand48() * 2.0 - 1.0,
-        drand48() * 2.0 - 1.0);
+    return Vector3(twister.rand(2.0) - 1.0,
+        twister.rand(2.0) - 1.0,
+        twister.rand(2.0) - 1.0);
 }
 
 double randomInRange(double min, double max)
 {
-    return min + (drand48() * (max - min));
+    return min + twister.rand(max - min);
 }
 
 Vector3 memberMult(const Vector3& a, const Vector3& b)
@@ -156,7 +159,8 @@ int ParticleSystem::shutdown()
 
 void ParticleSystem::update(float elapsed)
 {
-    int numToCreate = 0; // based on re-spawn rate
+    int numToCreate = 
+        lrintf(randomInRange(m_minCreatePerSec, m_maxCreatePerSec) * elapsed);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {
         if (m_particles[p]->isActive()) {
@@ -172,7 +176,7 @@ void ParticleSystem::update(float elapsed)
                 
             // randomise the position / color slightly, so it's less obvious
             // when many particles are created at once.
-            m_particles[p]->update(elapsed * drand48());
+            m_particles[p]->update(twister.rand(elapsed));
         }
     }  
 }
@@ -182,22 +186,15 @@ void ParticleSystem::render(bool select_mode)
     if (select_mode) return; // particles can't be selected, for now
     
     // figure out the up and left vectors for the billboard, based on the
-    // modelview matrix
+    // modelview matrix. The following code was 'borrowed' from a snippet
+    // on the web; apologies for it's obscurity.
     
-  /*
-  
-    //Retrieve the up and right vector from the modelview matrix:
-				float fModelviewMatrix[16];
-				glGetFloatv(GL_MODELVIEW_MATRIX, fModelviewMatrix);
+    float modelview[4][4];
+    m_render->getModelviewMatrix(modelview);
+    
+    Vector3 billboardX(modelview[0][0], modelview[1][0], modelview[2][0]),
+        billboardY(modelview[0][1], modelview[1][1], modelview[2][1]);
 
-				//Assign the x-Vector for billboarding:
-				m_BillboardedX = F3dVector(fModelviewMatrix[0], fModelviewMatrix[4], fModelviewMatrix[8]);
-
-				//Assign the y-Vector for billboarding:
-				m_BillboardedY = F3dVector(fModelviewMatrix[1], fModelviewMatrix[5], fModelviewMatrix[9]);
-
-      */
-        
     Vertex_3* vptr = m_vertexBuffer;
     Texel* texptr = m_texCoordBuffer;
     int activeCount = 0;

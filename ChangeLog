@@ -1,5 +1,10 @@
 2005-06-05  James Turner  <james@worldforge.org>
 
+	* loaders/ParticleSystem.cpp: replace all use of drand48() with
+	  portable, and considerably more sexy use of WFMath's Mersenne Twister
+
+2005-06-05  James Turner  <james@worldforge.org>
+
 	* renderers/Render.h, renderers/GL.h, renderers/GL.cpp: add another
 	  accessor to the Render interface, 'getModelviewMatrix', so a Model
 	  can generate view-dependant billboards easily.
