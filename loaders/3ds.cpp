@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.42 2005-06-03 15:35:34 simon Exp $
+// $Id: 3ds.cpp,v 1.43 2005-06-05 14:52:41 alriddoch Exp $
 
 #include <iostream>
 #include <list>
@@ -226,9 +226,12 @@ void ThreeDS::render(bool select_mode) {
     assert(ro);
 
     if (ro->material_name != current_material) {
-      Material *m = m_material_map[ro->material_name];
-      assert(m);
-      m_render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+      MaterialMap::const_iterator I = m_material_map.find(ro->material_name);
+      if (I != m_material_map.end()) {
+        Material *m = I->second;
+        assert(m);
+        m_render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
+      }
       current_material = ro->material_name;
     }
     if (ro->texture_data) {

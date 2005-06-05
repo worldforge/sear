@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.19 2005-05-16 19:40:32 simon Exp $
+// $Id: Bindings.cpp,v 1.20 2005-06-05 14:52:41 alriddoch Exp $
 
 
 #include <SDL/SDL.h>
@@ -227,9 +227,10 @@ std::string Bindings::getBinding(const std::string &key) {
 std::string Bindings::getBindingForKeysym(const SDL_keysym& key) {
   assert(m_bindings);
   
-  if (!m_keymap.count(key.sym)) return ""; // un-mapped basic keysym
-  std::string plainName = m_keymap[key.sym],
-    decoratedName = plainName;
+  std::map<int, std::string>::const_iterator I = m_keymap.find(key.sym);
+  if (I == m_keymap.end()) return ""; // un-mapped basic keysym
+  const std::string & plainName = I->second;
+  std::string decoratedName = plainName;
     
   if (key.mod & KMOD_SHIFT)
     decoratedName = "shift_" + decoratedName;    

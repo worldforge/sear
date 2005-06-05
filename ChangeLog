@@ -1,3 +1,11 @@
+2005-06-04  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Bindings.cpp: Make getting bindings a little more efficient
+	  and robust.
+
+	* loaders/3ds.cpp: Don't use [] to get materials, as it seems to
+	  cause a crash under some circumstances.
+
 2005-06-04  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h: Use
