@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.44 2005-06-06 12:20:07 simon Exp $
+// $Id: 3ds.cpp,v 1.45 2005-06-06 19:29:14 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -21,6 +21,7 @@
 #include "common/Utility.h"
 
 #include "src/System.h"
+#include "src/FileHandler.h"
 #include "renderers/Graphics.h"
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
@@ -80,14 +81,29 @@ ThreeDS::~ThreeDS() {
 
 int ThreeDS::init(const std::string &file_name) {
   assert(m_initialised == false);
-  
-  // Load 3ds file
-  if (debug) printf("3ds: Loading: %s\n", file_name.c_str());
+ 
+  std::string object;
+  if (m_config.readFromFile(file_name)) {
+    if (m_config.findItem("model", "filename")) {
+      object = (std::string)m_config.getItem("model", "filename");
+    } else {
+      fprintf(stderr, "Error: No 3ds filename specified.\n");
+      return 1;
+    }
+  } else {
+    fprintf(stderr, "Error reading %s as varconf file. Trying as .3ds file.\n", file_name.c_str());
+    object = file_name;
+  }
 
-  Lib3dsFile *model = lib3ds_file_load(file_name.c_str());
+  System::instance()->getFileHandler()->expandString(object);
+
+  // Load 3ds file
+  if (debug) printf("3ds: Loading: %s\n", object.c_str());
+
+  Lib3dsFile *model = lib3ds_file_load(object.c_str());
 
   if (!model) {
-    fprintf(stderr, "3ds: Unable to load %s\n", file_name.c_str());
+    fprintf(stderr, "3ds: Unable to load %s\n", object.c_str());
     return 1;
   }
 
@@ -380,8 +396,17 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     int texture_mask_id = -1;
     // If a material is set get texture map names.
     if (mat && mat->texture1_map.name[0]) {
-      texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
-      texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
+      if (m_config.findItem(material_name,"texture_map_0")) {
+        texture_id = RenderSystem::getInstance().requestTexture(
+                               m_config.getItem(material_name,"texture_map_0"));
+        texture_mask_id = RenderSystem::getInstance().requestTexture(
+                         m_config.getItem(material_name,"texture_map_0"), true);
+      } else  {
+        texture_id = RenderSystem::getInstance().requestTexture(
+                                                        mat->texture1_map.name);
+        texture_mask_id = RenderSystem::getInstance().requestTexture(
+                                                  mat->texture1_map.name, true);
+      }
     } else {
       texture_id = 0;
       texture_mask_id = 0;

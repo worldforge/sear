@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.h,v 1.17 2005-05-06 17:26:00 jmt Exp $
+// $Id: 3ds.h,v 1.18 2005-06-06 19:29:14 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -14,6 +14,8 @@
 
 #include <lib3ds/file.h>
 #include <lib3ds/node.h>
+
+#include <varconf/Config.h>
 
 #include "common/types.h"
 
@@ -63,6 +65,10 @@ protected:
   void render_file(Lib3dsFile *file);
   void render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *d);
   
+  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+  void varconf_error_callback(const char *message);
+
+
   std::list<RenderObject*> m_render_objects;
   typedef std::map<std::string, Material*> MaterialMap;
   MaterialMap m_material_map;
@@ -70,6 +76,7 @@ protected:
   unsigned int m_list;
   unsigned int m_list_select;
   float m_height;
+  varconf::Config m_config;  
 };
 
 } /* namespace Sear */
