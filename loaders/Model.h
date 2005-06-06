@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.5 2005-05-24 21:07:16 jmt Exp $
+//$Id: Model.h,v 1.6 2005-06-06 21:27:48 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -39,7 +39,6 @@ public:
   virtual void setDetailLevel(float f) {}
 
   virtual void action(const std::string &action) {}
-  virtual void setHeight(float height) {} 
   virtual void setAppearance(const Atlas::Message::MapType &mt) {}
 
   virtual void setFlag(const std::string &flag, bool state) { m_flag_map[flag] = state; }

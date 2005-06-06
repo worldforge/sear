@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.26 2005-06-04 21:23:53 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.27 2005-06-06 21:27:49 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -48,7 +48,6 @@ Cal3dModel::Cal3dModel(Render *render) :
 {
   m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
-  m_height = 1.0f;
 }
 
 Cal3dModel::~Cal3dModel() {
@@ -196,7 +195,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
   assert(m_render);
 //  if (m_render) {
-    float scale = m_height * getScale();
+    float scale = getScale();
     m_render->scaleObject(scale);
     m_render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
     renderMesh(useTextures, useLighting, select_mode);

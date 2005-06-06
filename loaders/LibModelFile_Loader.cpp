@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.3 2005-04-13 12:16:04 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.4 2005-06-06 21:27:48 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -58,11 +58,6 @@ ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record
 //    model->shutdown();
     delete model;
     return NULL;
-  }
-  if (model_record->scaleByHeight) {
-    float height = 1.0f;
-    height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
-    model->setHeight(height);
   }
  
   model->setInUse(true);

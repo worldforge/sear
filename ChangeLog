@@ -1,5 +1,13 @@
 2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
 
+	* loaders/LibModelFile_Loader.cpp, loaders/Model.h, 
+	  loaders/ObjectRecords.cpp, loaders/ObjectRecord.h,
+	  loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h, 
+	  loaders/cal3d/Cal3d_Loader.cpp: Remove extra scaling as this is now in
+	  in the general render function.
+
+2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
+
 	* loaders/Modelhandler.cpp: call shutdown on unloading models to avoid
 	  assert.
 

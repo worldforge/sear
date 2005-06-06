@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.15 2005-04-13 12:16:04 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.16 2005-06-06 21:27:49 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -66,12 +66,6 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
     if (!model) {
       std::cerr << "Unable to load model" << std::endl;	  
       return NULL;
-    }
-    // Set model height
-    if (model_record->scaleByHeight) {
-      float height = 1.0f;
-      height = fabs(record->bbox.highCorner().z() - record->bbox.lowCorner().z());
-      model->setHeight(height);
     }
 
     // Set model default texture set

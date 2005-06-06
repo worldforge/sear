@@ -41,22 +41,6 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 }
 }
 
-void ObjectRecord::setHeight(float height)
-{
-for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-  if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-}
-for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-  if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-}
-for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I);
-  if (rec && rec->model && rec->scaleByHeight) rec->model->setHeight(height);
-}
-}
-
 void ObjectRecord::setAppearance(const Atlas::Message::MapType &map)
 {
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
