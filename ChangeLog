@@ -1,5 +1,10 @@
 2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
 
+	* src/System.cpp: Add config item to disable joysticks. 
+	  input:disable_joystick default is false.
+
+2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp, src/WorldEntity.cpp:  Scale any object by bbox 
 	  height, not just models cal3d models.
 

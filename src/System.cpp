@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.124 2005-06-06 12:20:08 simon Exp $
+// $Id: System.cpp,v 1.125 2005-06-06 18:04:33 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,6 +97,7 @@ namespace Sear {
   static const std::string KEY_STRAFE_AXIS = "strafe_axis";
   static const std::string KEY_MOVE_AXIS = "move_axis";
   static const std::string KEY_PAN_AXIS = "pan_axis";
+  static const std::string KEY_DISABLE_JOYSTICK = "disable_joystick";
   static const std::string KEY_ELEVATION_AXIS = "elevation_axis";
   static const std::string KEY_key_repeat_delay = "key_repeat_delay";
   static const std::string KEY_key_repeat_rate = "key_repeat_rate";
@@ -222,6 +223,13 @@ bool System::init(int argc, char *argv[]) {
   // m_workspace->registerCommands(m_console);
 
   int sticks = SDL_NumJoysticks();
+
+  if (m_general.findItem(SECTION_INPUT, KEY_MOVE_AXIS))  {
+    if ((bool)m_general.getItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK)) {
+      sticks = 0;
+    }
+  }
+
   if (sticks > 0) {
     SDL_JoystickEventState(SDL_ENABLE);
     m_controller = SDL_JoystickOpen(0);
@@ -255,13 +263,13 @@ bool System::init(int argc, char *argv[]) {
   }
 
 /*
-  try { 
     sound = new Sound();
-    sound->init();
-    sound->registerCommands(m_console);
-  } catch (Exception &e) {
-    Log::writeLog(e.getMessage(), Log::LOG_ERROR);
-  }
+    if (sound->init()) {
+      delete sound;
+      sound = NULL;
+    } else { 
+      sound->registerCommands(m_console);
+    }
 */
   RenderSystem::getInstance().init();
   RenderSystem::getInstance().registerCommands(m_console);
