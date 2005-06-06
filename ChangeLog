@@ -1,3 +1,7 @@
+2005-06-06  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/ParticleSystem.h: Add missing newline to end of file.
+
 2005-06-05  James Turner  <james@worldforge.org>
 
 	* loaders/ParticleSystem.cpp: replace all use of drand48() with
