@@ -1,3 +1,11 @@
+2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp: Change RenderObject creation so we don't create an
+	  empty object.
+	* src/System.cpp: Remove old code.
+	* src/WorldEntity.cpp: Add a case for mode == fixed where we take the
+	  entity coords as the absolute position.
+
 2005-06-06  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/ParticleSystem.h: Add missing newline to end of file.

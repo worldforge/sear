@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.123 2005-06-04 14:09:05 simon Exp $
+// $Id: System.cpp,v 1.124 2005-06-06 12:20:08 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,8 +31,6 @@
 #include "FileHandler.h"
 #include "renderers/Graphics.h"
 #include "loaders/ModelSystem.h"
-//#include "loaders/ModelHandler.h"
-//#include "loaders/ObjectHandler.h"
 #include "renderers/Render.h"
 #include "renderers/GL.h"
 #include "Sound.h"
@@ -76,11 +74,8 @@ namespace Sear {
   static const std::string GET_ATTRIBUTE = "getat";
   static const std::string SET_ATTRIBUTE = "setat";
 
-//  static const std::string LOAD_MODEL_RECORDS = "load_model_records";
-//  static const std::string LOAD_OBJECT_RECORDS = "load_object_records";
   static const std::string LOAD_GENERAL_CONFIG = "load_general";
   static const std::string LOAD_KEY_BINDINGS = "load_bindings";
-//  static const std::string LOAD_MODEL_CONFIG = "load_models";
   static const std::string SAVE_GENERAL_CONFIG = "save_general";
   static const std::string SAVE_KEY_BINDINGS = "save_bindings";
   static const std::string READ_CONFIG = "read_config";
@@ -165,9 +160,8 @@ System::~System() {
 
 bool System::init(int argc, char *argv[]) {
   assert (m_initialised == false);
-//  if (m_initialised) shutdown();
-  if (!initVideo()) return false;
 
+  if (!initVideo()) return false;
 
   m_script_engine = new ScriptEngine();
   m_script_engine->init();
@@ -184,10 +178,8 @@ bool System::init(int argc, char *argv[]) {
     m_script_engine = NULL;
 
     return false;
-//    throw Exception("ERIS INIT");
   }
   
-  // This should not be hardcoded!!
   m_action_handler = new ActionHandler(this);
   m_action_handler->init();
 
@@ -597,9 +589,7 @@ void System::handleAnalogueControllers() {
     dy -= my;
     if (dx != 0) {
       float rotation = dx / 4.f;
-//      if (m_character != NULL) {
-        m_character->rotateImmediate(rotation);
-//      }
+      m_character->rotateImmediate(rotation);
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
@@ -640,8 +630,7 @@ void System::handleAnalogueControllers() {
 void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 {
   assert (m_character != NULL);
-    if (!m_axisBindings.count(axis)) return;
-//    if (m_character == NULL) return;
+  if (!m_axisBindings.count(axis)) return;
     
     std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
     
@@ -696,14 +685,12 @@ void System::setCaption(const std::string &title, const std::string &icon) {
 }
 
 void System::toggleMouselook() {
-  std::cout << "System::toggleMouselook()" << std::endl << std::flush;
+  if (debug) std::cout << "System::toggleMouselook()" << std::endl << std::flush;
   m_mouseLook = ! m_mouseLook;
   if (m_mouseLook) {
     RenderSystem::getInstance().setMouseVisible(false);
-//    SDL_ShowCursor(SDL_DISABLE);
     SDL_WarpMouse(m_width / 2, m_height / 2);
   } else {
-  //  SDL_ShowCursor(SDL_ENABLE);
     RenderSystem::getInstance().setMouseVisible(true);
   }
 }
@@ -798,11 +785,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(EXIT, this);
   console->registerCommand(GET_ATTRIBUTE, this);
   console->registerCommand(SET_ATTRIBUTE, this);
-//  console->registerCommand(LOAD_MODEL_RECORDS, this);
-//  console->registerCommand(LOAD_STATE_FILE, this);
   console->registerCommand(LOAD_GENERAL_CONFIG, this);
   console->registerCommand(LOAD_KEY_BINDINGS, this);
-//  console->registerCommand(LOAD_MODEL_CONFIG, this);
   console->registerCommand(SAVE_GENERAL_CONFIG, this);
   console->registerCommand(SAVE_KEY_BINDINGS, this);
   console->registerCommand(READ_CONFIG, this);
@@ -824,9 +808,7 @@ void System::runCommand(const std::string &command) {
     m_console->runCommand(command);
   } catch (Exception e) {
     Log::writeLog(e.getMessage(), Log::LOG_ERROR);
-  }// catch (...) {
-//    Log::writeLog("Caught Console Command Exception", Log::LOG_ERROR);
-//  }
+  }
 }
 
 void System::runCommand(const std::string &command, const std::string &args_t) {
@@ -855,25 +837,6 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
       processRecords();
     }
   }
-//  else if (command == LOAD_MODEL_RECORDS) {
-///    m_process_records = m_script_engine->prefixEnabled();
-//  System::instance()->getFileHandler()->expandString(args);
-//    m_model_records.readFromFile(args);
-//    if (m_process_records) {
-//      m_process_records = false;
-//      processRecords();
-//    }
-//  }
-// else if (command == LOAD_MODEL_CONFIG) {
-//    m_process_records = m_script_engine->prefixEnabled();
-//  System::instance()->getFileHandler()->expandString(args);
-//    m_models.readFromFile(args);
-//    if (m_process_records) {
-//      m_process_records = false;
-//      processRecords();
-//    }
-//  System::instance()->getFileHandler()->expandString(args);
-//  }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(args);
   }
@@ -937,7 +900,7 @@ void System::varconf_callback(const std::string &section, const std::string &key
   if (m_process_records && m_script_engine->prefixEnabled()) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {
-      VarconfRecord *r = new VarconfRecord();//*)malloc(sizeof(VarconfRecord));
+      VarconfRecord *r = new VarconfRecord();
       r->section = section;
       r->key = key; 
       r->config = &config;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.59 2005-06-02 16:33:56 simon Exp $
+// $Id: WorldEntity.cpp,v 1.60 2005-06-06 12:20:08 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -160,6 +160,11 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
       // If there is a dispute, then place object on top of terrain.
       if (absPos.z() > 0.0f) absPos.z() = 0.0f;
       if (absPos.z() < terrainHeight) absPos.z() = terrainHeight;
+    } else if (mode == "fixed") {
+      // Do predited entity pos as absolute position
+      absPos.x() = pred.x();
+      absPos.y() = pred.y();
+      absPos.z() = pred.z();
     } else {
       // Assume clamped to terrain
       if (hasHeight) absPos.z() = terrainHeight;

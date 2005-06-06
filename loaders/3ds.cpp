@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.43 2005-06-05 14:52:41 alriddoch Exp $
+// $Id: 3ds.cpp,v 1.44 2005-06-06 12:20:07 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -328,13 +328,16 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   unsigned int v_counter = 0;
   unsigned int n_counter = 0;
   unsigned int t_counter = 0;
-  RenderObject *ro = new RenderObject();
-  m_render_objects.push_back(ro);
-  ro->num_points = 3 * mesh->faces;
-  ro->vertex_data = new Vertex_3[ro->num_points];
-  ro->normal_data = new Normal[ro->num_points];
-  ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
+
+  RenderObject *ro = NULL;//new RenderObject();
+//  m_render_objects.push_back(ro);
+//  ro->num_points = 3 * mesh->faces;
+//  ro->vertex_data = new Vertex_3[ro->num_points];
+//  ro->normal_data = new Normal[ro->num_points];
+//  ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
   int current_texture = -2;
+  std::string material_name = "sear:noname";
+
   for (p=0; p<mesh->faces; ++p) {
     Lib3dsFace *f=&mesh->faceL[p];
     Lib3dsMaterial *mat = NULL;
@@ -342,9 +345,10 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       mat = lib3ds_file_material_by_name(file, f->material);
     }
     if (mat) {
-      ro->material_name = std::string(f->material);
+      material_name = std::string(f->material);
 
-      MaterialMap::const_iterator I = m_material_map.find(std::string(f->material));
+      MaterialMap::const_iterator I = m_material_map.find(material_name);
+      // If material obj does not exist, create it
       if (I == m_material_map.end()) {
         Material *m = new Material;
         m->ambient[0] = 0.0f;
@@ -361,41 +365,46 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         m->specular[2] = mat->specular[2];
         m->specular[3] = mat->specular[3];
         m->shininess = pow(2, 10.0*mat->shininess);
+        // Clamp shininess
         if (m->shininess>128.0f) m->shininess = 128.0f;
-        m_material_map[std::string(f->material)] = m;
+        
+        // Store in material map for later use
+        m_material_map[material_name] = m;
       }
     } else {
-      ro->material_name = "sear:default";
+      // No material? Use default
+      material_name = "sear:default";
     }
 
     int texture_id = -1;
     int texture_mask_id = -1;
+    // If a material is set get texture map names.
     if (mat && mat->texture1_map.name[0]) {
       texture_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name);
       texture_mask_id = RenderSystem::getInstance().requestTexture(mat->texture1_map.name, true);
     } else {
       texture_id = 0;
+      texture_mask_id = 0;
     }
-    if (texture_id != -1) {
-      if (current_texture == -2) {
-        ro->texture_id = current_texture = texture_id;
-        ro->texture_mask_id = texture_mask_id;
-      }
-      if (texture_id != current_texture) {
-        current_texture = texture_id;
-        ro->num_points = v_counter;
-        
-        v_counter = n_counter = t_counter = 0;
-        
-        ro = new RenderObject();
-        ro->texture_id = texture_id;
-        ro->texture_mask_id = texture_mask_id;
-        ro->num_points = 3 * mesh->faces;
-        ro->vertex_data = new Vertex_3[ro->num_points];
-        ro->normal_data = new Normal[ro->num_points];
-        ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-        m_render_objects.push_back(ro);
-      }
+    // Create new render object for change in texture
+    if (texture_id != current_texture) {
+      current_texture = texture_id;
+      // Set correct num of points in old render object
+      if (ro) ro->num_points = v_counter;
+
+      // Reset counters
+      v_counter = n_counter = t_counter = 0;
+      // Create a new render object and create data structures        
+      ro = new RenderObject();
+      ro->texture_id = texture_id;
+      ro->texture_mask_id = texture_mask_id;
+      ro->num_points = 3 * mesh->faces;
+      ro->vertex_data = new Vertex_3[ro->num_points];
+      ro->normal_data = new Normal[ro->num_points];
+      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
+      ro->material_name = material_name;
+
+      m_render_objects.push_back(ro);
     }
 
     int i;
