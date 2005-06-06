@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.15 2005-05-25 22:51:38 jmt Exp $
+// $Id: ModelHandler.cpp,v 1.16 2005-06-06 21:13:42 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -188,10 +188,6 @@ void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoade
   assert(model_type.empty() == false);
   assert(model_loader != NULL);
 
-  // Check for bad values	
-  if (model_type.empty()) throw Exception("No type specified");
-  if (!model_loader) throw Exception("No model loader given");
-
   // Throw error if we already have a loader for this type
   assert(m_model_loaders[model_type] ==  NULL);
 
@@ -240,8 +236,11 @@ void ModelHandler::checkModelTimeouts() {
       ModelRecord * record = I->second;
       assert(record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
-      Model * model = record->model;
-      if (model) delete model;
+      Model *model = record->model;
+      if (model) {
+        model->shutdown();
+        delete model;
+      }
       delete record;
       m_model_records_map.erase(I);
     }
@@ -273,7 +272,10 @@ void ModelHandler::checkModelTimeouts() {
       assert(record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
       Model * model = record->model;
-      if (model) delete model;
+      if (model) {
+        model->shutdown();
+        delete model;
+      }
       delete record;
       m_object_map.erase(J);
     }

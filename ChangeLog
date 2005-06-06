@@ -1,5 +1,10 @@
 2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
 
+	* loaders/Modelhandler.cpp: call shutdown on unloading models to avoid
+	  assert.
+
+2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/3ds.h: Use varconf to store 3ds filename and
 	  allow texture_map names to be overridden. If the filename specified by
 	  models.cfg is not a varconf file, then try and load it as a 3ds file.
