@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.38 2005-05-24 21:07:16 jmt Exp $
+// $Id: TextureManager.cpp,v 1.39 2005-06-06 12:58:23 simon Exp $
 
 #include "TextureManager.h"
 
@@ -288,10 +288,10 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
         ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
       }
     } else {
-      for (int i = 0; i < surface->w * surface->h * 3; i += 3) {
-        ((unsigned char *)surface->pixels)[i + 0] = (unsigned char)0xff;
-        ((unsigned char *)surface->pixels)[i + 1] = (unsigned char)0xff;
-        ((unsigned char *)surface->pixels)[i + 2] = (unsigned char)0xff;
+      for (int i = 0; i < surface->w * surface->h * surface->format->BytesPerPixel; i += surface->format->BytesPerPixel) {
+        for (int j = 0; j < surface->format->BytesPerPixel; ++j) {
+          ((unsigned char *)surface->pixels)[i + j] = (unsigned char)0xff;
+        }
       }
     }
   }
