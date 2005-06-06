@@ -1,5 +1,10 @@
 2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
 
+	* renderers/GL.cpp, src/WorldEntity.cpp:  Scale any object by bbox 
+	  height, not just models cal3d models.
+
+2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
+
 	* renderers/TextureManager.cpp: Fix bug where texture used to create 
 	  mask was assumed to have either 3 or 4 bytes per pixel.
 

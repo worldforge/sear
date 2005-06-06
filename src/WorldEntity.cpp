@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.60 2005-06-06 12:20:08 simon Exp $
+// $Id: WorldEntity.cpp,v 1.61 2005-06-06 14:01:37 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -265,11 +265,11 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       ObjectRecord *record = NULL;
       if (object_handler) record = object_handler->getObjectRecord(getId());
       if (record) record->setAppearance(mt);
-    } else if (str == "bbox") {
-      float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
-      ObjectRecord *record = NULL;
-      if (object_handler) record = object_handler->getObjectRecord(getId());
-      if (record) record->setHeight(height);
+//    } else if (str == "--bbox") {
+//      float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
+//      ObjectRecord *record = NULL;
+//      if (object_handler) record = object_handler->getObjectRecord(getId());
+//      if (record) record->setHeight(height);
     } else if (str == "right_hand_wield") {
         std::string id = v.asString();
         if (id.empty()) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.129 2005-06-05 21:31:07 jmt Exp $
+// $Id: GL.cpp,v 1.130 2005-06-06 14:01:37 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1132,7 +1132,15 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
         glScalef(x_scale, y_scale, z_scale);
       }
-           
+
+      if (model_record->scaleByHeight && object_record->entity->hasBBox()) {
+        WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
+//        float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+//        float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+        float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+        glScalef(z_scale, z_scale, z_scale);
+      }
+ 
       // Draw Model
       if (select_mode) {
         nextColour(object_record->entity);
