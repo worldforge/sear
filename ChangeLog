@@ -1,3 +1,8 @@
+2005-06-07  Hagen Moebius  <hagen.moebius@starschiffchen.de>
+
+	* renderers/StaticObject.cpp: Added #include <cassert>. Line 40 uses
+	  the assert() function which caused a compiler error for me.
+
 2005-06-06  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/LibModelFile_Loader.cpp, loaders/Model.h, 

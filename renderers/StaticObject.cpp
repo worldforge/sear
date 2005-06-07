@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
+#include <cassert>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 
