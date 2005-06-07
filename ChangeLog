@@ -1,3 +1,9 @@
+2005-06-07  Simon Goodall <sear@simongoodall.co.uk>
+
+	* configure.ac: Require Eris 1.3.6
+	* src/client.cpp: Update account and character code to use new Eris
+	  interface.
+
 2005-06-07  Hagen Moebius  <hagen.moebius@starschiffchen.de>
 
 	* renderers/StaticObject.cpp: Added #include <cassert>. Line 40 uses

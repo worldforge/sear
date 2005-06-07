@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.68 2005-04-25 22:47:22 jmt Exp $
+// $Id: client.cpp,v 1.69 2005-06-07 11:27:20 simon Exp $
 
 #include "System.h"
 
@@ -25,6 +25,7 @@
 #include <Eris/ServerInfo.h>
 #include <Eris/Exceptions.h>
 #include <Eris/View.h>
+#include <Eris/Types.h>
 
 #include "common/Utility.h"
 
@@ -173,7 +174,7 @@ int Client::connect(const std::string &host, int port) {
 
   setStatus(CLIENT_STATUS_CONNECTING);
   if (m_connection->connect()  != 0) {
-    printf("Error: Connection Error\n");
+    fprintf(stderr, "Error: Connection Error\n");
     m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
     setStatus( CLIENT_STATUS_DISCONNECTED);
     delete m_connection;
@@ -202,7 +203,7 @@ int Client::disconnect() {
   setStatus(CLIENT_STATUS_DISCONNECTING);
   if (m_connection->disconnect() != 0) {
     setStatus(CLIENT_STATUS_CONNECTED);
-    printf("Error: Disconnect Error\n");
+    fprintf(stderr, "Error: Disconnect Error\n");
     m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
     delete m_connection;
     m_connection = NULL;
@@ -257,23 +258,27 @@ int Client::createAccount(const std::string &username, const std::string &fullna
     m_account->AvatarSuccess.connect(SigC::slot(*this, &Client::AvatarSuccess));
     m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
   }
-  try {
-    setStatus(CLIENT_STATUS_LOGGING_IN);
-    m_account->createAccount(username, fullname, password);
-  } catch (Eris::InvalidOperation io) {
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    setStatus(CLIENT_STATUS_CONNECTED);
-    // Clean up object just to be safe
-    delete m_account;
-    m_account = NULL;
-    return 1;
-  } catch (...) {
-    printf("Unknown Exception\n");
-    setStatus(CLIENT_STATUS_CONNECTED);
-    // Clean up object just to be safe
-    delete m_account;
-    m_account = NULL;
-    return 1;
+
+  setStatus(CLIENT_STATUS_LOGGING_IN);
+  Eris::Result res = m_account->createAccount(username, fullname, password);
+
+  switch (res) {
+    case Eris::NO_ERR: break;
+    case Eris::ALREADY_LOGGED_IN:
+    case Eris::NOT_CONNECTED:
+    case Eris::NOT_LOGGED_IN:
+    case Eris::DUPLICATE_CHAR_ACTIVE:
+    case Eris::BAD_CHARACTER_ID:
+      assert(false);
+      fprintf(stderr, "We've hit an unexpected return code\n");
+      m_system->pushMessage("An Unknown error occured", 
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_CONNECTED);
+      // Clean up object just to be safe
+      delete m_account;
+      m_account = NULL;
+      return 1;
+      break;
   }
   return 0;
 }
@@ -319,23 +324,27 @@ int Client::login(const std::string &username, const std::string &password) {
     m_account->AvatarSuccess.connect(SigC::slot(*this, &Client::AvatarSuccess));
     m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
   }
-  try {
-    setStatus(CLIENT_STATUS_LOGGING_IN);
-    m_account->login(username, password);
-  } catch (Eris::InvalidOperation io) {
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    setStatus(CLIENT_STATUS_CONNECTED);
-    // Clean up object just to be safe
-    delete m_account;
-    m_account = NULL;
-    return 1;
-  } catch(...) {
-    printf("Unknown Exception\n");
-    setStatus(CLIENT_STATUS_CONNECTED);
-    // Clean up object just to be safe
-    delete m_account;
-    m_account = NULL;
-    return 1;
+
+  setStatus(CLIENT_STATUS_LOGGING_IN);
+  Eris::Result res = m_account->login(username, password);
+
+  switch (res) {
+    case Eris::NO_ERR: break;
+    case Eris::ALREADY_LOGGED_IN:
+    case Eris::NOT_CONNECTED:
+    case Eris::NOT_LOGGED_IN:
+    case Eris::DUPLICATE_CHAR_ACTIVE:
+    case Eris::BAD_CHARACTER_ID:
+      assert(false);
+      fprintf(stderr, "We've hit an unexpected return code\n");
+      m_system->pushMessage("An Unknown error occured", 
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_CONNECTED);
+      // Clean up object just to be safe
+      delete m_account;
+      m_account = NULL;
+      return 1;
+      break;
   }
   return 0;
 }
@@ -345,13 +354,13 @@ void Client::poll() {
   try {
     Eris::PollDefault::poll();   
   } catch (Eris::InvalidOperation io) {
-    printf("Eris Exception: %s\n", io._msg.c_str());
+    fprintf(stderr,"Eris Exception: %s\n", io._msg.c_str());
   } catch (Eris::BaseException be) {
-    printf("Eris Exception: %s\n", be._msg.c_str());
+    fprintf(stderr, "Eris Exception: %s\n", be._msg.c_str());
   } catch (std::runtime_error re) {
-    printf("STD::RUNTIME ERROR\n");
+    fprintf(stderr, "STD::RUNTIME ERROR\n");
   } catch (...) {
-    printf("Caught some error - ignoring\n");
+    fprintf(stderr,"Caught some error - ignoring\n");
   }
 }
 
@@ -447,22 +456,30 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   ch->setAttr("sex", sex);
   ch->setAttr("description", description);
 
-  try {
-    setStatus(CLIENT_STATUS_GOING_IN_WORLD);
-    m_account->createCharacter(ch);
-  } catch (Eris::InvalidOperation io) {
-    setStatus(CLIENT_STATUS_LOGGED_IN);
-    m_system->pushMessage(io._msg, CONSOLE_MESSAGE);
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    return 1;
-  } catch (...){
-    setStatus( CLIENT_STATUS_LOGGED_IN);
-    m_system->pushMessage("Error creating character", CONSOLE_MESSAGE);
-    printf("Unkown Exception\n");
-    return 1;
-  }
-  if (debug) printf("Client::createCharacter: Setting up callbacks\n");
+  setStatus(CLIENT_STATUS_GOING_IN_WORLD);
+  Eris::Result res = m_account->createCharacter(ch);
 
+  switch (res) {
+    case Eris::NO_ERR: break;
+    case Eris::DUPLICATE_CHAR_ACTIVE:
+      fprintf(stderr, "Character is already in use.\n");
+      m_system->pushMessage("Character is already in use.",
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_LOGGED_IN);
+      return 1;
+      break;
+    case Eris::BAD_CHARACTER_ID:
+    case Eris::ALREADY_LOGGED_IN:
+    case Eris::NOT_CONNECTED:
+    case Eris::NOT_LOGGED_IN:
+      assert(false);
+      fprintf(stderr, "We've hit an unexpected return code %d\n", res);
+      m_system->pushMessage("An Unknown error occured", 
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_LOGGED_IN);
+      return 1;
+      break;
+  }
   return 0;
 }
 
@@ -486,19 +503,36 @@ int Client::takeCharacter(const std::string &id) {
   if (debug) printf("Client::takeCharacter: Taking character - %s\n", id.c_str());
   m_system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
   
-  try {
-    setStatus(CLIENT_STATUS_GOING_IN_WORLD);
-    m_account->takeCharacter(id);
-  } catch (Eris::InvalidOperation io) {
-    setStatus(CLIENT_STATUS_LOGGED_IN);
-    printf("Eris Exception: %s\n", io._msg.c_str());
-    return 1;
-  } catch (...) {
-    setStatus(CLIENT_STATUS_LOGGED_IN);
-    printf("Unkown Exception\n");
-    return 1;
-  }
+  setStatus(CLIENT_STATUS_GOING_IN_WORLD);
+  Eris::Result res = m_account->takeCharacter(id);
 
+  switch (res) {
+    case Eris::NO_ERR: break;
+    case Eris::BAD_CHARACTER_ID:
+      break;
+      fprintf(stderr, "Bad character ID\n");
+      m_system->pushMessage("Bad character ID",
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_LOGGED_IN);
+      return 1;
+    case Eris::DUPLICATE_CHAR_ACTIVE:
+      fprintf(stderr, "Character is already in use.\n");
+      m_system->pushMessage("Character is already in use.",
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_LOGGED_IN);
+      return 1;
+      break;
+    case Eris::ALREADY_LOGGED_IN:
+    case Eris::NOT_CONNECTED:
+    case Eris::NOT_LOGGED_IN:
+      assert(false);
+      fprintf(stderr, "We've hit an unexpected return code\n");
+      m_system->pushMessage("An Unknown error occured", 
+                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+      setStatus(CLIENT_STATUS_LOGGED_IN);
+      return 1;
+      break;
+  }
   return 0;
 }
 
@@ -534,7 +568,7 @@ std::string Client::getStatus() {
   assert ((m_initialised == true) && "Client not initialised");
   printf("Client::getStatus\n");
   if (m_connection == NULL) return "No Connection object";
-  switch(m_connection->getStatus()) {
+  switch (m_connection->getStatus()) {
     case 0: return "INVALID_STATUS";
     case 1: return "NEGOTIATE";
     case 2: return "CONNECTING";
@@ -550,7 +584,7 @@ void Client::StatusChanged(Eris::Connection::Status s) {
 }
 
 void Client::LoginFailure(const std::string& msg) {
-  printf("Login Failure: %s\n", msg.c_str());
+  fprintf(stderr, "Login Failure: %s\n", msg.c_str());
   m_system->pushMessage("Login Failure" + msg, CONSOLE_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
 }
@@ -561,7 +595,7 @@ void Client::LogoutComplete(bool clean_logout) {
     printf("Clean Logout\n");
   }  else {
     // Emitted due to timeout or other error
-    printf("Error during Logout\n");
+    fprintf(stderr, "Error during Logout\n");
   }
   m_system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
