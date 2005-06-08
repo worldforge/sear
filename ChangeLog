@@ -1,3 +1,9 @@
+2005-06-08  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/LibModelFile.cpp, loaders/LibModelFile.h: Fix bug where the 
+	  number of triangles * 3 was used instead of number of vertices. Fix 
+	  indexing problem for normal_counter calculation.
+
 2005-06-08  James Turner  <james@worldforge.org>
 
 	* loaders/AreaModelLoader.cpp remove some lingering debug output

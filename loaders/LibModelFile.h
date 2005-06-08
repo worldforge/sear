@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.3 2005-05-06 17:26:00 jmt Exp $
+// $Id: LibModelFile.h,v 1.4 2005-06-08 14:07:25 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -56,6 +56,7 @@ private:
   unsigned int *m_faces;
 
   int m_num_triangles;
+  int m_num_vertices;
   GLuint m_vbos[4];
 
   GLuint m_render_list;

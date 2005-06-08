@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.6 2005-05-06 17:26:00 jmt Exp $
+// $Id: LibModelFile.cpp,v 1.7 2005-06-08 14:07:25 simon Exp $
 
 /*
   Debug check list
@@ -48,6 +48,7 @@ LibModelFile::LibModelFile(Render *render) : Model(render),
   m_normal_data(NULL),
   m_texel_data(NULL),
   m_num_triangles(0),
+  m_num_vertices(0),
   m_render_list(0),
   m_select_list(0)
 {}
@@ -80,6 +81,7 @@ int LibModelFile::init(const std::string &filename) {
 
   // Get number of triangles
   m_num_triangles = 0;
+  m_num_vertices = 0;
   libmd3_mesh *meshp = modelFile->meshes;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
     m_num_triangles += meshp->mesh_header->triangle_count;
@@ -93,7 +95,7 @@ int LibModelFile::init(const std::string &filename) {
   m_faces       = new unsigned int[m_num_triangles * 3];
   m_normal_data = new float[m_num_triangles * 3 * 3];
   int *normal_counter = new int[m_num_triangles * 3];
-
+  int vertex_counter = 0;
   // Initialise normal data
   for (int i = 0; i < m_num_triangles * 3 * 3; m_normal_data[i++] = 0.0f);
   for (int i = 0; i < m_num_triangles * 3; normal_counter[i++] = 0);
@@ -110,14 +112,14 @@ int LibModelFile::init(const std::string &filename) {
       m_textures[i] = 0;
       m_mask_textures[i] = 0;
     }
-    
+   
+    vertex_counter += meshp->mesh_header->vertex_count;
     // Copy data into array.
-    memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->triangle_count * 3 * 3 * sizeof(short));
+    memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->vertex_count  * 3 * sizeof(short));
 
-    memcpy(&m_texel_data[m_boundaries[i] * 3 * 2], meshp->texcoords, meshp->mesh_header->triangle_count * 3 * 2 * sizeof(float));
+    memcpy(&m_texel_data[m_boundaries[i] * 3 * 2], meshp->texcoords, meshp->mesh_header->vertex_count * 3 * 2 * sizeof(float));
 
     memcpy(&m_faces[m_boundaries[i] * 3], meshp->triangles, meshp->mesh_header->triangle_count * 3 * sizeof(unsigned int));
-
     // We are using one buffer for all objects, so adjust face vertex numbers accordingly
     for (int j = 0; j < meshp->mesh_header->triangle_count * 3; ++j) {
       m_faces[m_boundaries[i] *  3 + j] += m_boundaries[i] * 3;
@@ -150,20 +152,21 @@ int LibModelFile::init(const std::string &filename) {
       m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 1] += out[1];
       m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 2] += out[2];
       // Increment counters
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3] + 0]++;
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3] + 1]++;
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3] + 2]++;
+      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 0]]++;
+      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 1]]++;
+      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 2]]++;
     }
   }
 
   // Average out normal
   // TODO whats wrong with this method?
-  for (int i = 0; i < m_num_triangles * 3; ++i) {
+  for (int i = 0; i < vertex_counter; ++i) {
     assert(normal_counter[i] != 0);
     m_normal_data[i * 3 + 0] /= (float)normal_counter[i];
     m_normal_data[i * 3 + 1] /= (float)normal_counter[i];
     m_normal_data[i * 3 + 2] /= (float)normal_counter[i];
   }
+  m_num_vertices = vertex_counter;
 
   // Clean up 
   delete [] normal_counter;
@@ -218,15 +221,15 @@ void LibModelFile::genVBOs() {
 
     // Generate Vertex Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[0]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_triangles * 3 * 3 * sizeof(short), m_vertex_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 3 * sizeof(short), m_vertex_data, GL_STATIC_DRAW_ARB);
     
     // Generate Normal Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[1]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_triangles * 3 * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
 
     // Generate Texel Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[2]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_triangles * 3 * 2 * sizeof(float), m_texel_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 2 * sizeof(float), m_texel_data, GL_STATIC_DRAW_ARB);
 
     // Generate faces vbo
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vbos[3]);
