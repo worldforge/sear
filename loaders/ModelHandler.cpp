@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.16 2005-06-06 21:13:42 simon Exp $
+// $Id: ModelHandler.cpp,v 1.17 2005-06-08 00:12:30 jmt Exp $
 
 #include <set>
 #include <string.h>
@@ -23,12 +23,6 @@
 #include "ModelLoader.h"
 #include "Model.h"
 #include "ModelSystem.h"
-#include "3ds_Loader.h"
-#include "cal3d/Cal3d_Loader.h"
-#include "BoundBox_Loader.h"
-#include "NPlane_Loader.h"
-#include "WireFrame_Loader.h"
-#include "LibModelFile_Loader.h"
 #include "NullModel.h"
 
 #ifdef USE_MMGR

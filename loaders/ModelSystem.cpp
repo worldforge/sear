@@ -17,6 +17,7 @@
 #include "WireFrame_Loader.h"
 #include "LibModelFile_Loader.h"
 #include "AreaModelLoader.h"
+#include "ParticleSystemLoader.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -50,6 +51,7 @@ int ModelSystem::init() {
   new Cal3d_Loader(m_model_handler);
   new LibModelFile_Loader(m_model_handler);
   new AreaModelLoader(m_model_handler);
+  new ParticleSystemLoader(m_model_handler);
   
   m_object_handler = new ObjectHandler();
   m_object_handler->init();

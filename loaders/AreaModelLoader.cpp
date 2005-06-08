@@ -15,8 +15,8 @@ namespace Sear
 
 class AreaModel;
 
-const char* AREA_MODEL = "area";
-const char* KEY_shader_tex = "shader_texture";
+static const char* AREA_MODEL = "area";
+static const char* KEY_shader_tex = "shader_texture";
 
 AreaModelLoader::AreaModelLoader(ModelHandler* mh)
 {

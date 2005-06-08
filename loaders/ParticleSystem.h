@@ -31,7 +31,13 @@ public:
 
     virtual void render(bool select_mode);
 
+    void setTextureName(const std::string& nm);
 private:
+    friend class Particle;
+    friend class ParticleSystemLoader;
+    
+    void submit(const Point3& pos, double size);
+
     void activate(Particle*);
     
     Vector3 initialVelocity() const;
@@ -42,17 +48,23 @@ private:
     
     Vertex_3* m_vertexBuffer;
     Texel* m_texCoordBuffer;
+    Vector3 m_billboardX, m_billboardY;
+    unsigned int m_activeCount;
     
 // config data
     double m_minCreatePerSec, m_maxCreatePerSec;
     double m_minTTL, m_maxTTL;
     Vector3 m_basicVel, m_velocityDeviation;
+    double m_minInitialVelMag, m_maxInitialVelMag;
+    
     Point3 m_origin;
     Vector3 m_posDeviation;
     Vector3 m_accelVector;
     double m_minAccelMag, m_maxAccelMag;
+    double m_minInitialSize, m_maxInitialSize,
+        m_minFinalSize, m_maxFinalSize;
 };
 
-}
+} // of namespace Sear
 
 #endif // of SEAR_PARTICLE_SYSTEM_H
