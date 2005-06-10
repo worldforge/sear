@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.58 2005-06-04 14:09:05 simon Exp $
+// $Id: System.h,v 1.59 2005-06-10 16:54:11 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -28,7 +28,7 @@ class FileHandler;
 //class ObjectHandler;
 class ScriptEngine;
 class Console;
-class Workspace;
+class Workarea;
 class Character;
 class Sound;
 class Editor;
@@ -182,7 +182,7 @@ public:
   Calendar *getCalendar() const { return m_calendar; }
   
   Console *getConsole() { return m_console; }
-  Workspace *getWorkspace() { return m_workspace; }
+  Workarea *getWorkarea() { return m_workarea; }
   Character *getCharacter() { return m_character; }
   
   static System *instance() { return m_instance; }
@@ -237,7 +237,7 @@ protected:
   
   SDL_Joystick *m_controller;
   Console *m_console;
-  Workspace *m_workspace;
+  Workarea *m_workarea;
   Character *m_character;
  
   void readConfig(varconf::Config &config);

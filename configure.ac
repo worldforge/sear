@@ -148,6 +148,8 @@ else
    fi
 fi
 
+AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan -lguichan_sdl -lguichan_opengl",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.]))
+
 AC_LANG_RESTORE
 
 AC_CHECK_HEADER(sstream, , AC_MSG_ERROR(Couldn't find sstream header))
@@ -289,6 +291,7 @@ AC_OUTPUT([
 	data/Makefile
 	scripts/Makefile
 	gui/Makefile
+	guichan/Makefile
 	sear.spec
 	sear-media.spec
 	sear-updater.spec

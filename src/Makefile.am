@@ -67,6 +67,7 @@ sear_bin_LDADD = \
 	../loaders/libModelLoader.a \
 	../loaders/cal3d/libLoaderCal3d.a \
 	../gui/libGui.a \
+	../guichan/libGuichan.a \
 	$(SEAR_RC_O) \
 	$(SEAR_EXT_LIBS)
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.125 2005-06-06 18:04:33 simon Exp $
+// $Id: System.cpp,v 1.126 2005-06-10 16:54:11 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,8 +41,7 @@
 #include "environment/Environment.h"
 #include "Editor.h"
 
-#include "gui/Workspace.h"
-#include "gui/Toplevel.h"
+#include "guichan/Workarea.h"
 
 #include "CacheManager.h"
 #include "renderers/StaticObject.h"
@@ -215,13 +214,6 @@ bool System::init(int argc, char *argv[]) {
   m_editor = new Editor();
   m_editor->registerCommands(m_console);
 
-  m_workspace = new Workspace(this);
-  // Toplevel * t = new Toplevel("Panel");
-  // t->setPos(50, 50);
-  // m_workspace->addToplevel(t);
-  m_workspace->show();
-  // m_workspace->registerCommands(m_console);
-
   int sticks = SDL_NumJoysticks();
 
   if (m_general.findItem(SECTION_INPUT, KEY_MOVE_AXIS))  {
@@ -314,6 +306,8 @@ bool System::init(int argc, char *argv[]) {
 
   RenderSystem::getInstance().initContext();
 
+  m_workarea = new Workarea(this);
+
   m_system_running = true;
   m_initialised = true;
   return true;
@@ -347,8 +341,8 @@ void System::shutdown() {
   delete m_editor;
   m_editor = NULL;
 
-  delete m_workspace;
-  m_workspace = NULL;
+  delete m_workarea;
+  m_workarea = NULL;
 
   m_calendar->shutdown();
   delete m_calendar;
@@ -452,7 +446,10 @@ void System::handleEvents(const SDL_Event &event) {
   assert(m_character != NULL);
   assert(renderer != NULL);
 
-  m_workspace->handleEvent(event);
+  if (m_workarea->handleEvent(event)) {
+    return;
+  }
+
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
@@ -577,6 +574,7 @@ void System::handleEvents(const SDL_Event &event) {
     }
     case SDL_VIDEORESIZE: {
       RenderSystem::getInstance().resize(event.resize.w, event.resize.h);
+      m_workarea->resize(event.resize.w, event.resize.h);
       break;
     }
     case SDL_QUIT: {

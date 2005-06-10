@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.19 2005-05-25 22:51:38 jmt Exp $
+// $Id: Graphics.cpp,v 1.20 2005-06-10 16:54:11 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -37,7 +37,7 @@
 #include "renderers/RenderSystem.h"
 #include "CameraSystem.h"
 #include "gui/Compass.h"
-#include "gui/Workspace.h"
+#include "guichan/Workarea.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -174,12 +174,11 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   drawWorld(select_mode, time_elapsed);
 
   if (!select_mode) {
-/* Removed for release
  
-    Workspace *ws = m_system->getWorkspace();
-    if (ws) ws->draw();
-    else throw Exception("Error no Workspace object");
-*/
+    Workarea * wa = m_system->getWorkarea();
+    if (wa) wa->draw();
+    else throw Exception("Error no Workarea object");
+
     Console *con = m_system->getConsole();
     assert(con);
     con->draw();

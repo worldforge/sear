@@ -1,3 +1,9 @@
+2005-06-10  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan: New UI code using the guichan library. This is not yet
+	  used by the application, but is commited to get it under revision
+	  control.
+
 2005-06-08  Simon Goodall <sear@simongoodall.co.uk>
 
 	* loaders/LibModelFile.cpp, loaders/LibModelFile.h: Fix bug where the 
