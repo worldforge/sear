@@ -1,5 +1,17 @@
 2005-06-10  Al Riddoch  <alriddoch@zepler.org>
 
+	* Makefile.am, configure.ac, src/Makefile.am: Add guichan subdirectory
+	  to the build, and add test to configure.ac.
+
+	* src/System.cpp, src/System.h, renderers/Graphics.cpp: Remove old
+	  gui hooks, and add in new code.
+
+	* NEWS: Remove some testing stuff.
+
+	* guichan/Workarea.cpp: Disable the test gui for now.
+
+2005-06-10  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan: New UI code using the guichan library. This is not yet
 	  used by the application, but is commited to get it under revision
 	  control.

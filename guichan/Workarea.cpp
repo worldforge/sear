@@ -67,12 +67,12 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   gcn::Image * image = new gcn::Image("/tmp/gui-chan.bmp");
   gcn::Icon * icon = new gcn::Icon(image);
 
-  m_top->add(icon, 10, 30);
+  // m_top->add(icon, 10, 30);
 
   LoginWindow * lw = new LoginWindow();
-  m_top->add(lw, width / 2 - lw->getWidth() / 2, height / 2 - lw->getHeight () / 2);
+  // m_top->add(lw, width / 2 - lw->getWidth() / 2, height / 2 - lw->getHeight () / 2);
   ConsoleWindow * cw = new ConsoleWindow();
-  m_top->add(cw, 4, height - cw->getHeight() - 4);
+  // m_top->add(cw, 4, height - cw->getHeight() - 4);
 }
 
 Workarea::~Workarea()
