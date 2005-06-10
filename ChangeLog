@@ -1,5 +1,9 @@
 2005-06-10  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/box.hpp: Add missing file.
+
+2005-06-10  Al Riddoch  <alriddoch@zepler.org>
+
 	* Makefile.am, configure.ac, src/Makefile.am: Add guichan subdirectory
 	  to the build, and add test to configure.ac.
 
