@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.61 2005-05-18 19:35:15 jmt Exp $
+// $Id: Character.cpp,v 1.62 2005-06-11 21:55:23 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -36,12 +36,12 @@
 
 #include "loaders/ModelSystem.h"
 
-#include "common/operations.h"
-
-
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif
+
+using Atlas::Objects::Operation::Use;
+using Atlas::Objects::Operation::Wield;
 
 #ifdef DEBUG
   static const bool debug = true;

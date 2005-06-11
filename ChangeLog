@@ -1,5 +1,11 @@
 2005-06-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* common/Makefile.am, src/Character.cpp, src/main.cpp:
+	  Use Use and Wield ops from the Atlas-C++ library rather than
+	  the locally defined versions, as they are now standard operations.
+
+2005-06-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* renderers/StateManager.cpp: Fix typos in initialisation of
 	  built-in states.
 
