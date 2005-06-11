@@ -1,3 +1,11 @@
+2005-06-11  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Panel.cpp, guichan/Panel.h: Starting point for a main panel
+	  for the gui.
+
+	* guichan/LoginWindow.cpp, guichan/ConsoleWindow.cpp: Make windows
+	  a bit more transparent.
+
 2005-06-11  James Turner  <james@worldforge.org>
 
 	* data/states.cfg: add state for rendering particles

@@ -21,7 +21,7 @@ namespace Sear {
 LoginWindow::LoginWindow() : gcn::Window("Login")
 {
   gcn::Color base = getBaseColor();
-  base.a = 192;
+  base.a = 128;
   setBaseColor(base);
 
   gcn::Box * vbox = new gcn::VBox(6);

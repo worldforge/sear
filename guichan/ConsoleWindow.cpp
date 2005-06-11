@@ -14,7 +14,7 @@ namespace Sear {
 ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 {
   gcn::Color base = getBaseColor();
-  base.a = 192;
+  base.a = 128;
   setBaseColor(base);
 
   gcn::Box * vbox = new gcn::VBox(6);
