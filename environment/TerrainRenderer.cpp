@@ -444,7 +444,6 @@ void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& tex
   m_terrain.addShader(s, index);
   m_shaders[index].texId = RenderSystem::getInstance().requestTexture(texName);
   // assert m_shaders[index].texId is non-zero?
-  std::cout << "shader with tex=" << texName << " got assigned ID " << index << std::endl;
 }
 
 void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) {

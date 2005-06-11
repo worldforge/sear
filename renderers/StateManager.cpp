@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.22 2005-06-02 11:18:14 simon Exp $
+// $Id: StateManager.cpp,v 1.23 2005-06-11 15:07:43 jmt Exp $
 
 /*
  * TODO
@@ -45,6 +45,7 @@ static const std::string TWO_SIDED_LIGHTING = "two_sided_lighting";
 static const std::string TEXTURE = "texture_";
 static const std::string COLOUR_MATERIAL = "colour_material";
 static const std::string DEPTH_TEST = "depth_test";
+static const std::string DEPTH_WRITE = "depth_write";
 static const std::string CULL_FACE = "cull_face";
 static const std::string CULL_FACE_CW = "cull_face_cw";
 static const std::string STENCIL = "stencil";
@@ -117,6 +118,7 @@ int StateManager::init() {
     default_state->textures[i] = false;
   default_state->colour_material = false;
   default_state->depth_test = false;
+  default_state->depth_write = true;
   default_state->cull_face = false;
   default_state->cull_face_cw = false;
   default_state->stencil = false;
@@ -143,6 +145,7 @@ int StateManager::init() {
     font_state->textures[i] = false;
   font_state->colour_material = false;
   font_state->depth_test = false;
+  font_state->depth_write = true;
   font_state->cull_face = false;
   font_state->cull_face_cw = false;
   font_state->stencil = false;
@@ -167,6 +170,7 @@ int StateManager::init() {
     select_state->textures[i] = false;
   select_state->colour_material = false;
   select_state->depth_test = true;
+  font_state->depth_write = true;
   select_state->cull_face = false;
   select_state->cull_face_cw = false;
   select_state->stencil = false;
@@ -192,6 +196,7 @@ int StateManager::init() {
   cursor_state->textures[0] = true;
   cursor_state->colour_material = false;
   cursor_state->depth_test = false;
+  font_state->depth_write = true;
   cursor_state->cull_face = false;
   cursor_state->cull_face_cw = false;
   cursor_state->stencil = false;
@@ -251,6 +256,7 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
         record->textures[i] = false;
       record->colour_material = false;
       record->depth_test = false;
+      record->depth_write = true;
       record->cull_face = false;
       record->cull_face_cw = false;
       record->stencil = false;
@@ -274,6 +280,7 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
   else if (key == TWO_SIDED_LIGHTING) record->two_sided_lighting = (bool)config.getItem(section, key);
   else if (key == COLOUR_MATERIAL) record->colour_material = (bool)config.getItem(section, key);
   else if (key == DEPTH_TEST) record->depth_test = (bool)config.getItem(section, key);
+  else if (key == DEPTH_WRITE) record->depth_write = (bool)config.getItem(section, key);
   else if (key == CULL_FACE) record->cull_face = (bool)config.getItem(section, key);
   else if (key == CULL_FACE_CW) record->cull_face_cw = (bool)config.getItem(section, key);
   else if (key == STENCIL) record->stencil = (bool)config.getItem(section, key);
@@ -384,8 +391,11 @@ void StateManager::stateChange(StateID state) {
     }
     if (sp->colour_material) glEnable(GL_COLOR_MATERIAL);
     else glDisable(GL_COLOR_MATERIAL);
+    
     if (sp->depth_test) glEnable(GL_DEPTH_TEST);
     else glDisable(GL_DEPTH_TEST);
+    glDepthMask(sp->depth_write);
+        
     if (sp->cull_face) glEnable(GL_CULL_FACE);
     else glDisable(GL_CULL_FACE);
     if (sp->cull_face_cw) glFrontFace(GL_CW);
@@ -447,6 +457,11 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
     if (next_state->depth_test) glEnable(GL_DEPTH_TEST);
     else glDisable(GL_DEPTH_TEST);
   }
+  
+  if (previous_state->depth_write != next_state->depth_write) {
+    glDepthMask(next_state->depth_write);
+  }
+  
   if (previous_state->cull_face != next_state->cull_face) {
     if (next_state->cull_face) glEnable(GL_CULL_FACE);
     else glDisable(GL_CULL_FACE);

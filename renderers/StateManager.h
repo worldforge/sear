@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: StateManager.h,v 1.7 2005-03-15 16:30:29 simon Exp $
+// $Id: StateManager.h,v 1.8 2005-06-11 15:07:43 jmt Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -37,6 +37,7 @@ typedef struct {
   bool textures[MAX_UNITS];
   bool colour_material;
   bool depth_test;
+  bool depth_write;
   bool cull_face;
   bool cull_face_cw;
   bool stencil;

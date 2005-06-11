@@ -15,6 +15,22 @@ class Particle;
 
 typedef WFMath::Point<3> Point3;
 typedef WFMath::Vector<3> Vector3;
+class Color_4d;
+
+class DRange
+{
+public:
+    DRange() : min(0.0), max(1.0)
+    { }
+    
+    DRange(double lower, double upper) : 
+        min(lower), max(upper)
+    { }
+    
+    double random() const;
+    
+    double min, max;
+};
 
 class ParticleSystem : public Model
 {
@@ -36,7 +52,7 @@ private:
     friend class Particle;
     friend class ParticleSystemLoader;
     
-    void submit(const Point3& pos, double size);
+    void submit(const Point3& pos, double size, const Color_4d&);
 
     void activate(Particle*);
     
@@ -48,21 +64,25 @@ private:
     
     Vertex_3* m_vertexBuffer;
     Texel* m_texCoordBuffer;
+    Color_4* m_colorBuffer;
+    
     Vector3 m_billboardX, m_billboardY;
     unsigned int m_activeCount;
     
 // config data
-    double m_minCreatePerSec, m_maxCreatePerSec;
-    double m_minTTL, m_maxTTL;
+    DRange m_createPerSec;
+    DRange m_ttl;
     Vector3 m_basicVel, m_velocityDeviation;
-    double m_minInitialVelMag, m_maxInitialVelMag;
+    DRange m_initialVelMag;
     
     Point3 m_origin;
     Vector3 m_posDeviation;
     Vector3 m_accelVector;
-    double m_minAccelMag, m_maxAccelMag;
-    double m_minInitialSize, m_maxInitialSize,
-        m_minFinalSize, m_maxFinalSize;
+    DRange m_accelMag;
+    DRange m_initialSize;
+    DRange m_finalSize;
+        
+    DRange m_initialAlpha, m_finalAlpha;
 };
 
 } // of namespace Sear

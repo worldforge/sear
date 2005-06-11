@@ -2,6 +2,8 @@
 #include "ParticleSystem.h"
 #include "ModelHandler.h"
 #include "ModelRecord.h"
+#include "renderers/StateManager.h"
+#include "renderers/RenderSystem.h"
 
 #include <iostream>
 
@@ -45,11 +47,11 @@ ModelRecord* ParticleSystemLoader::loadModel(Render *render,
     ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, cfg);
     ParticleSystem* ps = new ParticleSystem(render);
     model_record->model = ps;
-    model_record->select_state = 0; // default
+    model_record->state = RenderSystem::getInstance().getStateManager()->getState("particles");
     model_record->select_state = 2; // select
     
-    ps->m_minTTL = getItemWithDefault(cfg, model_id, KEY_min_lifetime, 0.0);
-    ps->m_maxTTL = getItemWithDefault(cfg, model_id, KEY_max_lifetime, 10.0);
+    ps->m_ttl = DRange(getItemWithDefault(cfg, model_id, KEY_min_lifetime, 0.0),
+                    getItemWithDefault(cfg, model_id, KEY_max_lifetime, 10.0));
     
     ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
     ps->init();

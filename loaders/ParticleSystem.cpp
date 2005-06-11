@@ -5,8 +5,11 @@
 #include "loaders/ParticleSystem.h"
 #include "common/types.h"
 #include "renderers/Render.h"
+
 #include <wfmath/MersenneTwister.h>
 #include <iostream>
+#include <sage/sage.h>
+#include <sage/GL.h>
 
 namespace Sear
 {
@@ -20,9 +23,9 @@ Vector3 randomVector()
         twister.rand(2.0) - 1.0);
 }
 
-double randomInRange(double min, double max)
+double DRange::random() const
 {
-    return min + twister.rand(max - min);
+    return min + twister.rand(max - min); 
 }
 
 Vector3 memberMult(const Vector3& a, const Vector3& b)
@@ -57,11 +60,22 @@ public:
     a += x.a;
     return *this;
   }
+    
+  Color_4 asColor_4() const
+  {
+    Color_4 c = { lrintf(r * 255.0), lrintf(g * 255.0), lrintf(b * 255.0), lrintf(a * 255.0) };
+    return c;
+  }
 };
 
 const Color_4d operator*(const Color_4d& c, const double scalar)
 {
     return Color_4d(c.r * scalar, c.g * scalar, c.b * scalar, c.a * scalar);
+}
+
+const Color_4d operator-(const Color_4d& c, const Color_4d& d)
+{
+    return Color_4d(c.r - d.r, c.g -d.g, c.b - d.b, c.a - d.a);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -78,7 +92,9 @@ public:
             const Point3& pos,
             const Vector3& vel,
             const Vector3& acc,
-            double sz, double dsz)
+            double sz, double dsz,
+            const Color_4d& col,
+            const Color_4d& dc)
     {
         assert(!isActive()); // don't try to re-init active particle!
         m_active = true;
@@ -90,11 +106,14 @@ public:
         
         m_size = sz;
         m_sizeDelta = dsz;
+        
+        m_color = col;
+        m_colorDelta = dc;
     }
     
     void render() const
     {
-        m_system->submit(m_pos, m_size);
+        m_system->submit(m_pos, m_size, m_color);
     }
     
     void update(double dt)
@@ -109,7 +128,6 @@ public:
         m_velocity = m_velocity + (m_accel * dt);
         
         m_color += m_colorDelta * dt;
-        
         m_size += m_sizeDelta * dt;
     }
     
@@ -155,67 +173,60 @@ void ParticleSystem::init()
     
     m_vertexBuffer = new Vertex_3[numParticles * 4];
     m_texCoordBuffer = new Texel[numParticles * 4];
+    m_colorBuffer = new Color_4[numParticles * 4];
     
 // default data for fire - this will gradually all become dynamic data
     /*
-    	g_ParticleSystem1.Initialize(300);
-
-	g_ParticleSystem1.m_bRecreateWhenDied = false;
-	g_ParticleSystem1.m_fMinDieAge = 0.5f;
 
 	g_ParticleSystem1.SetCreationColor(1.0f,0.0f,0.0f,
 									1.0f,0.5f,0.0f);
 	g_ParticleSystem1.SetDieColor(1.0f,1.0f,1.0f,
 							      1.0f,0.5f,0.0f);
 
-	g_ParticleSystem1.SetAlphaValues(1.0f,1.0f,0.0f,0.0f);
-
-	g_ParticleSystem1.m_bParticlesLeaveSystem = true;
 	g_ParticleSystem1.SetSpinSpeed(-0.82*PI,0.82*PI);
-	g_ParticleSystem1.LoadTextureFromFile("particle1.tga");
     */
     
     m_origin = Point3(0, 0, 0);
-    m_posDeviation = Vector3(0.5, 0, 0.5);
+    m_posDeviation = Vector3(0.5, 0.5, 0.0);
     
-    m_minCreatePerSec = m_maxCreatePerSec = 300;
-    m_minTTL = 0.5;
-    m_maxTTL = 1.5;
-    m_basicVel = Vector3(0.0, 1.0, 0.0);
+    m_createPerSec = DRange(300, 300);
+    m_ttl = DRange(0.5, 1.5);
+  
+    m_basicVel = Vector3(0.0, 0.0, 1.0);
     m_velocityDeviation = Vector3(0.8, 0.8, 0.8);
-    m_minInitialVelMag = 0.3;
-    m_maxInitialVelMag = 0.2; // max < min : is this intentional?
-    
-    m_accelVector = Vector3(0.0, 1.0, 0.0);
-    m_minAccelMag = 0.3;
-    m_maxAccelMag = 0.4;
-    
-    m_minInitialSize = 0.04;
-    m_maxInitialSize = 0.08;
-    m_minFinalSize = 0.06;
-    m_maxFinalSize = 0.12;
+    m_initialVelMag = DRange(0.3, 0.2); // max < min : is this intentional?
+   
+    m_accelVector = Vector3(0.0, 0.0, 1.0);
+    m_accelMag = DRange(0.3, 0.4);
+    m_initialSize = DRange(0.04, 0.08);
+    m_finalSize = DRange(0.06, 0.12);
+        
+    m_initialAlpha = DRange(1.0, 1.0);
+    m_finalAlpha = DRange(0.0, 0.0);
 }
 
 int ParticleSystem::shutdown()
 {
     // get rid of everything
     for (unsigned int p=0; p < m_particles.size(); ++p) delete m_particles[p];
-
+    m_particles.clear();
+    
     delete[] m_vertexBuffer;
     delete[] m_texCoordBuffer;
-
+    delete[] m_colorBuffer;
+    
     return 0; // what does this indicate?
 }
 
 void ParticleSystem::update(float elapsed)
 {
-    int numToCreate = 
-        lrintf(randomInRange(m_minCreatePerSec, m_maxCreatePerSec) * elapsed);
+    int numToCreate = lrintf(m_createPerSec.random() * elapsed);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {
         if (m_particles[p]->isActive()) {
             m_particles[p]->update(elapsed);
         } else if (numToCreate > 0) {
+            --numToCreate;
             activate(m_particles[p]);
             // randomise the position / color slightly, so it's less obvious
             // when many particles are created at once.
@@ -229,13 +240,14 @@ void ParticleSystem::update(float elapsed)
             newSize = m_particles.size() + numToCreate;
         m_particles.resize(newSize);
         
-        std::cout << "re-allocating particle storage with size=" << 
-            newSize << std::endl;
     // re-alloc storage
         delete[] m_vertexBuffer;
         delete[] m_texCoordBuffer;
+        delete[] m_colorBuffer;
+        
         m_vertexBuffer = new Vertex_3[newSize * 4];
         m_texCoordBuffer = new Texel[newSize * 4];
+        m_colorBuffer = new Color_4[newSize * 4];
         
         for (unsigned int p=firstNew; p < m_particles.size(); ++p) {
             m_particles[p] = new Particle(this);
@@ -264,11 +276,20 @@ void ParticleSystem::render(bool select_mode)
     for (unsigned int p=0; p < m_particles.size(); ++p) {
         if (m_particles[p]->isActive()) m_particles[p]->render();
     }
-    
-    m_render->renderArrays( Graphics::RES_QUADS, 0, m_activeCount, 
-        m_vertexBuffer, m_texCoordBuffer, 
-        NULL /* no normal data */,
-        false /* no multi-texture */);
+
+    RenderSystem::getInstance().switchTexture(m_texture);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    glVertexPointer(3, GL_FLOAT, 0, (float*) m_vertexBuffer);
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, (GLubyte*) m_colorBuffer);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, 0, (float*)m_texCoordBuffer);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      
+    glDrawArrays(GL_QUADS, 0, m_activeCount * 4);
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 static Vertex_3 vertexFromPoint(const Point3& p)
@@ -283,10 +304,11 @@ static Texel makeTexel(double u, double v)
     return t;
 }
 
-void ParticleSystem::submit(const Point3& pos, double sz)
+void ParticleSystem::submit(const Point3& pos, double sz, const Color_4d& c)
 {
     Vertex_3* vptr = &(m_vertexBuffer[m_activeCount * 4]);
     Texel* texptr = &(m_texCoordBuffer[m_activeCount * 4]);
+    Color_4* colorptr = &(m_colorBuffer[m_activeCount * 4]);
     
     *vptr++ = vertexFromPoint(pos - (m_billboardX * 0.5 * sz) - (m_billboardY * 0.5 * sz));
     *vptr++ = vertexFromPoint(pos - (m_billboardX * 0.5 * sz) + (m_billboardY * 0.5 * sz));
@@ -298,6 +320,12 @@ void ParticleSystem::submit(const Point3& pos, double sz)
     *texptr++ = makeTexel(1.0, 1.0);
     *texptr++ = makeTexel(1.0, 0.0);
     
+    Color_4 uc(c.asColor_4());
+    *colorptr++ = uc;
+    *colorptr++ = uc;
+    *colorptr++ = uc;
+    *colorptr++ = uc;
+    
     ++m_activeCount;
 }
 
@@ -308,19 +336,26 @@ void ParticleSystem::invalidate()
 
 void ParticleSystem::activate(Particle* p)
 {            
-    double ttl = randomInRange(m_minTTL, m_maxTTL);
-    Vector3 acc = m_accelVector * randomInRange(m_minAccelMag, m_maxAccelMag);
+    double ttl = m_ttl.random();;
+    Vector3 acc = m_accelVector * m_accelMag.random();
         
+    Color_4d initialColor(1.0, 1.0, 1.0, m_initialAlpha.random()),
+        finalColor(1.0, 1.0, 1.0, m_finalAlpha.random());
+        
+    double initialSize = m_initialSize.random();
+    
     p->init(ttl, initialPos(), initialVelocity(), acc, 
-        randomInRange(m_minInitialSize, m_maxInitialSize),
-        randomInRange(m_minFinalSize, m_maxFinalSize) / ttl
+        initialSize,
+        (m_finalSize.random() - initialSize) / ttl,
+        initialColor,
+        (finalColor - initialColor) * (1.0 / ttl)
     );
 }
 
 Vector3 ParticleSystem::initialVelocity() const
 {
     Vector3 vd = memberMult(randomVector(), m_velocityDeviation);
-    return (m_basicVel + vd) * randomInRange(m_minInitialVelMag, m_maxInitialVelMag);
+    return (m_basicVel + vd) * m_initialVelMag.random();
 }
 
 Point3 ParticleSystem::initialPos() const

@@ -1,3 +1,19 @@
+2005-06-11  James Turner  <james@worldforge.org>
+
+	* data/states.cfg: add state for rendering particles
+	
+	* renderers/StateManger.cpp, renderers/StateManager.h: add support for
+	  a new state variable, 'depth_write', which is useful for particle
+	  rendering.
+	  
+	* loaders/ParticleSystemLoder.cpp, loaders/ParticleSystemLoader.h,
+	  loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: more code
+	  changes, support specifying color / alpha per particle, and fix
+	  bugs in setting the texture and creating new particles. Also add
+	  a double-range helper since the particle code has so many.
+	  
+	* environment/TerrainRenderer.cpp: remove more debug output
+
 2005-06-10  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/LoginWindow.cpp, guichan/Workarea.cpp: Make sure exceptions
