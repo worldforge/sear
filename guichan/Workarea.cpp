@@ -60,12 +60,16 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   m_gui->setInput(m_input);
   m_gui->setTop(m_top);
 
-  // gcn::ImageFont * font = new gcn::ImageFont("/tmp/fixedfont.bmp", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-  gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
-  gcn::Widget::setGlobalFont(font);
+  try {
+    gcn::ImageFont * font = new gcn::ImageFont("/tmp/fixedfont.bmp", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
+    gcn::Widget::setGlobalFont(font);
+  } catch (...) {
+    std::cout << "Failed to load font" << std::endl << std::flush;
+  }
 
-  gcn::Image * image = new gcn::Image("/tmp/gui-chan.bmp");
-  gcn::Icon * icon = new gcn::Icon(image);
+  // gcn::Image * image = new gcn::Image("/tmp/gui-chan.bmp");
+  // gcn::Icon * icon = new gcn::Icon(image);
 
   // m_top->add(icon, 10, 30);
 

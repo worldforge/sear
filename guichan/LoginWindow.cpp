@@ -120,10 +120,6 @@ void LoginWindow::actionPressed(action a)
     return;
   }
   parent->remove(this);
-
-  gcn::ImageFont * font = new gcn::ImageFont("/tmp/fixedfont.bmp", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-  gcn::Widget::setGlobalFont(font);
-
 }
 
 } // namespace Sear
