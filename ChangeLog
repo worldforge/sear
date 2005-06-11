@@ -1,5 +1,10 @@
 2005-06-11  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/StateManager.cpp: Fix typos in initialisation of
+	  built-in states.
+
+2005-06-11  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Panel.cpp, guichan/Panel.h: Starting point for a main panel
 	  for the gui.
 

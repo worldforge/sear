@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.23 2005-06-11 15:07:43 jmt Exp $
+// $Id: StateManager.cpp,v 1.24 2005-06-11 16:15:33 alriddoch Exp $
 
 /*
  * TODO
@@ -170,7 +170,7 @@ int StateManager::init() {
     select_state->textures[i] = false;
   select_state->colour_material = false;
   select_state->depth_test = true;
-  font_state->depth_write = true;
+  select_state->depth_write = true;
   select_state->cull_face = false;
   select_state->cull_face_cw = false;
   select_state->stencil = false;
@@ -196,7 +196,7 @@ int StateManager::init() {
   cursor_state->textures[0] = true;
   cursor_state->colour_material = false;
   cursor_state->depth_test = false;
-  font_state->depth_write = true;
+  cursor_state->depth_write = true;
   cursor_state->cull_face = false;
   cursor_state->cull_face_cw = false;
   cursor_state->stencil = false;
