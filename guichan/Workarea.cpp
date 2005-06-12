@@ -7,6 +7,7 @@
 #include "guichan/RootWidget.h"
 #include "guichan/LoginWindow.h"
 #include "guichan/ConsoleWindow.h"
+#include "guichan/Panel.h"
 #include "guichan/ActionListenerSigC.h"
 
 #include "guichan/box.hpp"
@@ -45,14 +46,14 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
 
   // Tell it the size of our screen.
   Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-  m_graphics->setTargetPlane(width, height);
+  m_width = render->getWindowWidth();
+  m_height = render->getWindowHeight();
+  m_graphics->setTargetPlane(m_width, m_height);
 
   m_input = new gcn::SDLInput();
 
   m_top = new RootWidget();
-  m_top->setDimension(gcn::Rectangle(0, 0, width, height));
+  m_top->setDimension(gcn::Rectangle(0, 0, m_width, m_height));
   m_top->setOpaque(false);
 
   m_gui = new Gui();
@@ -73,10 +74,13 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
 
   // m_top->add(icon, 10, 30);
 
-  LoginWindow * lw = new LoginWindow();
-  // m_top->add(lw, width / 2 - lw->getWidth() / 2, height / 2 - lw->getHeight () / 2);
-  ConsoleWindow * cw = new ConsoleWindow();
-  // m_top->add(cw, 4, height - cw->getHeight() - 4);
+  // LoginWindow * lw = new LoginWindow;
+  // m_top->add(lw, m_width / 2 - lw->getWidth() / 2, m_height / 2 - lw->getHeight () / 2);
+  // ConsoleWindow * cw = new ConsoleWindow;
+  // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
+
+  // Panel * p = new Panel;
+  // m_top->add(p, 0, 0);
 }
 
 Workarea::~Workarea()
@@ -92,7 +96,10 @@ void Workarea::resize(int x, int y)
   int width = render->getWindowWidth(),
       height = render->getWindowHeight();
   m_graphics->setTargetPlane(width, height);
-  m_top->setDimension(gcn::Rectangle(0, 0, width, height));
+  m_top->resize(width, height, m_width, m_height);
+  // m_top->setDimension(gcn::Rectangle(0, 0, width, height));
+  m_width = width;
+  m_height = height;
 }
 
 bool Workarea::handleEvent(const SDL_Event & event)

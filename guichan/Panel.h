@@ -19,18 +19,17 @@ namespace Sear {
 
 class ActionListenerSigC;
 
-typedef enum { PANEL_INVENTORY } panel_button;
-
 class Panel : virtual public SigC::Object, public gcn::Window {
 protected:
   gcn::Button * m_inventoryButton;
+  gcn::Button * m_optionsButton;
 
   ActionListenerSigC * m_buttonListener;
 public:
   Panel();
   virtual ~Panel();
 
-  void actionPressed(panel_button a);
+  void actionPressed(std::string);
 };
 
 } // namespace Sear

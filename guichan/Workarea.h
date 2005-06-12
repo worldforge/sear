@@ -34,6 +34,7 @@ public:
 class Workarea {
 protected:
   System * m_system;
+  int m_width, m_height;
 
   gcn::SDLInput * m_input;                 // Input driver
   gcn::OpenGLGraphics * m_graphics;        // Graphics driver

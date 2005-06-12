@@ -13,6 +13,7 @@ class RootWidget : public gcn::Container
 {
   public:
     bool childHasMouse();
+    void resize(int width, int height, int old_width, int old_height);
 };
 
 } // namespace Sear

@@ -25,15 +25,30 @@ Panel::Panel() : gcn::Window()
   base.a = 128;
   setBaseColor(base);
 
+  setTitleBarHeight(0);
+  setMovable(false);
+
+  // setOpaque(true);
+
   gcn::Box * hbox = new gcn::HBox(6);
 
-  m_inventoryButton = new gcn::Button("Login");
   m_buttonListener = new ActionListenerSigC;
-  SigC::Slot0<void> s1 = SigC::bind<panel_button>(SigC::slot(*this, &Panel::actionPressed), PANEL_INVENTORY);
-  SigC::Slot1<void, std::string> s2 = SigC::hide<std::string>(s1);
-  m_buttonListener->Action.connect(s2);
+  m_buttonListener->Action.connect(SigC::slot(*this, &Panel::actionPressed));
+
+  m_optionsButton = new gcn::Button("Options");
+  m_optionsButton->setEventId("options");
+  m_optionsButton->addActionListener(m_buttonListener);
+  hbox->pack(m_optionsButton);
+
+  m_inventoryButton = new gcn::Button("Inventory");
+  m_inventoryButton->setEventId("inventory");
   m_inventoryButton->addActionListener(m_buttonListener);
   hbox->pack(m_inventoryButton);
+
+  hbox->pack(new gcn::Button("Test"));
+  hbox->pack(new gcn::Button("Test"));
+  hbox->pack(new gcn::Button("Test"));
+  hbox->pack(new gcn::Button("Test"));
 
   setContent(hbox);
 
@@ -44,9 +59,15 @@ Panel::~Panel()
 {
 }
 
-void Panel::actionPressed(panel_button a)
+void Panel::actionPressed(std::string event)
 {
-
+  if (event == "options") {
+    std::cout << "Open options window" << std::endl << std::flush;
+  } else if (event == "inventory") {
+    std::cout << "Open inventory window" << std::endl << std::flush;
+  } else {
+    std::cout << "Say what?" << std::endl << std::flush;
+  }
 }
 
 } // namespace Sear
