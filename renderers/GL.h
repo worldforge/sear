@@ -188,10 +188,8 @@ protected:
   inline WorldEntity *getSelectedID(unsigned int i);
   void nextColour(WorldEntity*);
 
-  void setupExtensions();
-  bool m_use_sgis_generate_mipmap;
+  int setupExtensions();
   bool m_use_fsaa;
-  bool m_multi_texture_mode;
   bool m_initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.130 2005-06-06 14:01:37 simon Exp $
+// $Id: GL.cpp,v 1.131 2005-06-13 15:15:36 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -163,7 +163,6 @@
   static const float DEFAULT_texture_scale = 10.0f;
 
 static bool use_ext_compiled_vertex_array = false;
-static bool use_multitexturing = false;
 static std::string FONT = "font";
 static std::string UI = "ui";
 static std::string SPLASH = "splash";
@@ -331,7 +330,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
  // glDisable(GL_DITHER);
                                                                                 
   setViewMode(PERSPECTIVE);
-  setupExtensions();
+  if (setupExtensions()) return false;
 
 //  initFont();
 
@@ -377,20 +376,20 @@ void GL::checkError() {
 }   
 
 
-void GL::setupExtensions() {
+int GL::setupExtensions() {
   sage_init();
-//  sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
- 
-  m_use_sgis_generate_mipmap = sage_ext[GL_SGIS_GENERATE_MIPMAP];
-  use_multitexturing = sage_ext[GL_ARB_MULTITEXTURE];
 
-  if (use_multitexturing) {
-    if (debug) std::cout << "Using arb_multitexture" << std::endl;
+  if (sage_ext[GL_ARB_MULTITEXTURE]) {
+    if (debug) std::cout << "Found arb_multitexture" << std::endl;
+  } else {
+    fprintf(stderr, "Error, no GL_ARB_multitexture. Sear cannot run\n");
+    return 1;
   }
 
   if (use_ext_compiled_vertex_array) {
     if (debug) std::cout << "Using use_ext_compiled_vertex_array" << std::endl;
   }
+  return 0;
 }
                                                                                 
 
@@ -480,9 +479,7 @@ GL::GL() :
   m_redBits(0), m_greenBits(0), m_blueBits(0),
   m_redMask(0), m_greenMask(0), m_blueMask(0),
   m_redShift(0), m_greenShift(0), m_blueShift(0),
-  m_use_sgis_generate_mipmap(false),
   m_use_fsaa(DEFAULT_use_fsaa),
-  m_multi_texture_mode(false),
   m_initialised(false)
 {
   memset(m_entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
@@ -989,14 +986,13 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
 }
 
 void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
-  if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
   bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
   bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!vertex_data) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);
-    return; //throw Exception(""); 
+    return;
   }
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
   if (textures && texture_data) {
@@ -1043,12 +1039,11 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
 }
 
 void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
-  if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
   bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
   bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
-  if (!vertex_data) return; //throw Exception(""); 
+  if (!vertex_data) return; 
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
 
   if (textures && texture_data) {
@@ -1137,7 +1132,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
 //        float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
 //        float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
-        float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+        float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
         glScalef(z_scale, z_scale, z_scale);
       }
  
@@ -1499,14 +1494,13 @@ std::string GL::getActiveID() {
   return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
 } 
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
-  if (!use_multitexturing) multitexture = false;
   // TODO: Reduce ClientState switches
   bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
   bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!mesh.vertex_array) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);
-    return; //throw Exception(""); 
+    return; 
   }
 
   if (mesh.vertex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);

@@ -1,5 +1,10 @@
 2005-06-13  Simon Goodall <sear@simongoodall.co.uk>
 
+	* renderers/GL.cpp, renderers/GL.h: Be more strict on checking for 
+	  available and required extensions.
+
+2005-06-13  Simon Goodall <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/3ds.h: Connect varconf error signal. Use
 	  varconf clean function to get material names from config object.
 	* loaders/LibModelFile.cpp, loaders/LibModelFile.h: Add varconf object
