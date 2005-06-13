@@ -1,4 +1,4 @@
-2005-06-11  Al Riddoch  <alriddoch@zepler.org>
+2005-06-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Workarea.h, guichan/Workarea.cpp, guichan/RootWidget.h,
 	  guichan/RootWidget.cpp: Handle window resizing by moving gui
