@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.39 2005-06-06 12:58:23 simon Exp $
+// $Id: TextureManager.cpp,v 1.40 2005-06-13 15:10:46 simon Exp $
 
 #include "TextureManager.h"
 
@@ -377,7 +377,11 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
 #else // SDL_BYTEORDER == SDL_LIL_ENDIAN
     if (surface->format->Rshift < surface->format->Bshift) {
 #endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
+      if (sage_ext[GL_EXT_bgra]) {
         format = (bpp == 24) ? GL_BGR_EXT : GL_BGRA_EXT;
+      } else {
+        fprintf(stderr, "Unsupported sprite format bgr. No GL_EXT_bgra extension\n");
+      }
     } else {
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }
@@ -568,7 +572,7 @@ void TextureManager::setupGLExtensions()
   if (debug && use_sgis_generate_mipmap) std::cout << "Using GL_SGIS_GENERATE_MIPMAP" << std::endl;
   
   use_ext_texture_filter_anisotropic = sage_ext[GL_EXT_TEXTURE_FILTER_ANISOTROPIC];
-  use_arb_texture_border_clamp = true;//sage_ext[GL_ARB_TEXTURE_BORDER_CLAMP];
+  use_arb_texture_border_clamp = sage_ext[GL_ARB_TEXTURE_BORDER_CLAMP];
 
 }
 

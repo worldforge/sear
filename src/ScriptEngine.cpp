@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.11 2005-04-13 12:16:05 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.12 2005-06-13 15:10:46 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -101,6 +101,7 @@ printf("Exec: %s\n", string_data.c_str());
       System::instance()->getConsole()->runCommand(std::string(string_data));
     }
   } catch (...) {
+    fprintf(stderr, "ScriptEngine: Caught Unknown Exception.\n");
     //Arg, caught something, lets clean up before re-throwing the error
   //  _prefix_enabled = pre_cwd;
     //_file_dir = old_file_dir;

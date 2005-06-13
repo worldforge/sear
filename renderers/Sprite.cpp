@@ -1,4 +1,4 @@
-// $Id: Sprite.cpp,v 1.6 2005-04-13 12:16:04 simon Exp $
+// $Id: Sprite.cpp,v 1.7 2005-06-13 15:10:46 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"
@@ -146,7 +146,14 @@ void SpriteData::load()
 #else // SDL_BYTEORDER == SDL_LIL_ENDIAN
     if (texImage->format->Rshift < texImage->format->Bshift) {
 #endif // SDL_BYTEORDER == SDL_LIL_ENDIAN
+      if (sage_ext[GL_EXT_bgra]) {
         format = (bpp == 24) ? GL_BGR_EXT : GL_BGRA_EXT;
+      } else {
+        fprintf(stderr, "Unsupported sprite format bgr. No GL_EXT_bgra extension\n");
+        SDL_FreeSurface(texImage);
+        loadFail();
+        return;
+      }
     } else {
         format = (bpp == 24) ? GL_RGB : GL_RGBA;
     }

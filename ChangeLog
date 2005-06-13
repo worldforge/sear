@@ -1,3 +1,15 @@
+2005-06-13  Simon Goodall <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp, loaders/3ds.h: Connect varconf error signal. Use
+	  varconf clean function to get material names from config object.
+	* loaders/LibModelFile.cpp, loaders/LibModelFile.h: Add varconf object
+	  reading like 3ds files for future support of extra options.
+	* renderers/Sprite.cpp, renderers/TextureManager.cpp: Check for
+	  existence of GL_EXT_bgra before attempting to use it. Check
+	  border_clamp extension exists before using it.
+	* src/ScriptEngine.cpp: Print err msg when unknown exception is caught.
+	* src/Sound.cpp, src/Sound.h: Use return code rather than exception.
+
 2005-06-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Workarea.h, guichan/Workarea.cpp, guichan/RootWidget.h,

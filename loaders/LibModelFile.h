@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.4 2005-06-08 14:07:25 simon Exp $
+// $Id: LibModelFile.h,v 1.5 2005-06-13 15:10:46 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -11,6 +11,9 @@
  * This reprents a model based upon its bounding box.
  *
  */ 
+#include <sigc++/object_slot.h>
+
+#include <varconf/Config.h>
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -19,7 +22,7 @@
 
 namespace Sear {
 
-class LibModelFile : public Model {
+class LibModelFile : public Model, public SigC::Object {
 public:
   /*
    * Constructor stores the bounding box for the basis of this model.
@@ -45,9 +48,12 @@ public:
 
   void invalidate();
 
-
   void genVBOs(); 
+
 private:
+//  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+  void varconf_error_callback(const char *message);
+
   bool m_initialised;
 
   short *m_vertex_data; // Vertex data
@@ -66,6 +72,7 @@ private:
   std::vector<int> m_textures;
   std::vector<int> m_mask_textures;
 
+  varconf::Config m_config;
 };
 
 } /* namespace Sear */

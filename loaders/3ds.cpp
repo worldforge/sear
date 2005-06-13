@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.45 2005-06-06 19:29:14 simon Exp $
+// $Id: 3ds.cpp,v 1.46 2005-06-13 15:10:46 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -73,7 +73,10 @@ ThreeDS::ThreeDS(Render *render) : Model(render),
   m_list(0),
   m_list_select(0),
   m_height(1.0f)
-{}
+{
+  m_config.sige.connect(SigC::slot(*this, &ThreeDS::varconf_error_callback));
+
+}
 
 ThreeDS::~ThreeDS() {
   assert(m_initialised == false);
@@ -125,8 +128,9 @@ int ThreeDS::init(const std::string &file_name) {
   m->specular[3] = 0.0f;
 
   m->shininess = 0.0f;
-
-  m_material_map["sear:default"] = m;
+  std::string mat_name = "sear:default";
+  m_config.clean(mat_name);
+  m_material_map[mat_name] = m;
 
   // Calculate initial positions
   lib3ds_file_eval(model,1);
@@ -210,6 +214,7 @@ void ThreeDS::render(bool select_mode) {
   assert(m_render);
 
   std::string current_material = "sear:blank";
+  m_config.clean(current_material);
 
   m_render->scaleObject(m_height);
   bool end_list = false;
@@ -362,6 +367,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     }
     if (mat) {
       material_name = std::string(f->material);
+      m_config.clean(material_name);
 
       MaterialMap::const_iterator I = m_material_map.find(material_name);
       // If material obj does not exist, create it
@@ -390,17 +396,17 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     } else {
       // No material? Use default
       material_name = "sear:default";
+      m_config.clean(material_name);
     }
-
     int texture_id = -1;
     int texture_mask_id = -1;
     // If a material is set get texture map names.
     if (mat && mat->texture1_map.name[0]) {
+
       if (m_config.findItem(material_name,"texture_map_0")) {
-        texture_id = RenderSystem::getInstance().requestTexture(
-                               m_config.getItem(material_name,"texture_map_0"));
-        texture_mask_id = RenderSystem::getInstance().requestTexture(
-                         m_config.getItem(material_name,"texture_map_0"), true);
+        std::string name = (std::string)m_config.getItem(material_name,"texture_map_0");
+        texture_id = RenderSystem::getInstance().requestTexture(name);
+        texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
       } else  {
         texture_id = RenderSystem::getInstance().requestTexture(
                                                         mat->texture1_map.name);
@@ -462,6 +468,10 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
  
   ro->num_points = v_counter;
   free(normalL);
+}
+
+void ThreeDS::varconf_error_callback(const char *message) {
+  fprintf(stderr, "3DS: %s\n", message);
 }
 
 } /* namespace Sear */

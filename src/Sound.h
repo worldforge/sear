@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall
 
-// $Id: Sound.h,v 1.8 2004-05-23 13:32:29 jmt Exp $
+// $Id: Sound.h,v 1.9 2005-06-13 15:10:46 simon Exp $
 
 #ifndef SEAR_SOUND_H
 #define SEAR_SOUND_H 1
@@ -26,7 +26,7 @@ class Sound : public ConsoleObject {
 public:
   Sound();
   ~Sound();
-  void init();
+  int init();
   void shutdown();
   Mix_Chunk *getSample(const std::string &file_name);
   Mix_Music *getMusic(const std::string &file_name);

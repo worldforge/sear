@@ -9,7 +9,7 @@
 #include <SDL/SDL.h>
 #include <unistd.h>
 
-// $Id: Sound.cpp,v 1.16 2005-04-13 12:16:05 simon Exp $
+// $Id: Sound.cpp,v 1.17 2005-06-13 15:10:46 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 
@@ -41,17 +41,18 @@ Sound::~Sound() {
   if (_initialised) shutdown();
 }
 	
-void Sound::init() {
+int Sound::init() {
   if (_initialised) shutdown();
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
     Log::writeLog(std::string("Error init SDL_AUDIO: ") + SDL_GetError(), Log::LOG_ERROR);
-    throw Exception("Error initialising SDL Sound Subsystem!");
+    return 1;
   }
   if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
     Log::writeLog(std::string("Error init SDL_mixer: ") + Mix_GetError(), Log::LOG_ERROR);
-    throw Exception("Error initialising SDL_mixer!");
+    return 1;
   }
   _initialised = true;
+  return 0;
 }
 
 void Sound::shutdown() {
