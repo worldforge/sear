@@ -74,7 +74,8 @@ public:
             const Vector3& acc,
             double sz, double dsz,
             const Color_4d& col,
-            const Color_4d& dc)
+            const Color_4d& dc,
+            double spinSpeed, double spinAcc)
     {
         assert(!isActive()); // don't try to re-init active particle!
         m_active = true;
@@ -89,11 +90,15 @@ public:
         
         m_color = col;
         m_colorDelta = dc;
+        
+        m_spinAngle = 0.0;
+        m_spinSpeed = spinSpeed;
+        m_spinAcc = spinAcc;
     }
     
     void render() const
     {
-        m_system->submit(m_pos, m_size, m_color);
+        m_system->submit(m_pos, m_size, m_color, m_spinAngle);
     }
     
     void update(double dt)
@@ -106,6 +111,9 @@ public:
         
         m_pos = m_pos + (m_velocity * dt) + (0.5 * m_accel * dt * dt);
         m_velocity = m_velocity + (m_accel * dt);
+        
+        m_spinAngle = m_spinAngle + (m_spinSpeed * dt) + (0.5 * m_spinAcc * dt * dt);
+        m_spinSpeed = m_spinSpeed + (m_spinAcc * dt);
         
         m_color += m_colorDelta * dt;
         m_size += m_sizeDelta * dt;
@@ -124,14 +132,18 @@ private:
     Color_4d m_color;
     Color_4d m_colorDelta;
     double m_size, m_sizeDelta;
+    
+    double m_spinSpeed, m_spinAngle, m_spinAcc;
 };
 
 //////////////////////////////////////
 
 ParticleSystem::ParticleSystem(Render *render) : 
     Model(render)
-{
-
+{   
+    m_origin = Point3(0, 0, 0);
+    m_posDeviation = Vector3(0.5, 0.5, 0.0);
+    m_createPerSec = DRange(100, 100);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -156,21 +168,7 @@ void ParticleSystem::init()
     m_colorBuffer = new Color_4[numParticles * 4];
     
 // default data for fire - this will gradually all become dynamic data
-    /*
-
-	g_ParticleSystem1.SetCreationColor(1.0f,0.0f,0.0f,
-									1.0f,0.5f,0.0f);
-	g_ParticleSystem1.SetDieColor(1.0f,1.0f,1.0f,
-							      1.0f,0.5f,0.0f);
-
-	g_ParticleSystem1.SetSpinSpeed(-0.82*PI,0.82*PI);
-    */
-    
-    m_origin = Point3(0, 0, 0);
-    m_posDeviation = Vector3(0.5, 0.5, 0.0);
-    
-    m_createPerSec = DRange(300, 300);
-    m_ttl = DRange(0.5, 1.5);
+    m_ttl = DRange(0.5, 1.6);
   
     m_basicVel = Vector3(0.0, 0.0, 1.0);
     m_velocityDeviation = Vector3(0.8, 0.8, 0.8);
@@ -178,11 +176,13 @@ void ParticleSystem::init()
    
     m_accelVector = Vector3(0.0, 0.0, 1.0);
     m_accelMag = DRange(0.3, 0.4);
-    m_initialSize = DRange(0.04, 0.08);
-    m_finalSize = DRange(0.06, 0.12);
+    m_initialSize = DRange(0.1, 0.2);
+    m_finalSize = DRange(0.15, 0.3);
         
     m_initialAlpha = DRange(1.0, 1.0);
     m_finalAlpha = DRange(0.0, 0.0);
+    
+    m_emitSpinSpeed = DRange(-0.82 * M_PI, 0.82 * M_PI);
     
     m_initialColors[0] = Color_4d(1.0, 0.0, 0.0, 1.0);
     m_initialColors[1] = Color_4d(1.0, 0.5, 0.0, 1.0);
@@ -290,16 +290,19 @@ static Texel makeTexel(double u, double v)
     return t;
 }
 
-void ParticleSystem::submit(const Point3& pos, double sz, const Color_4d& c)
+void ParticleSystem::submit(const Point3& pos, double sz, const Color_4d& c, double spin)
 {
     Vertex_3* vptr = &(m_vertexBuffer[m_activeCount * 4]);
     Texel* texptr = &(m_texCoordBuffer[m_activeCount * 4]);
     Color_4* colorptr = &(m_colorBuffer[m_activeCount * 4]);
     
-    *vptr++ = vertexFromPoint(pos - (m_billboardX * 0.5 * sz) - (m_billboardY * 0.5 * sz));
-    *vptr++ = vertexFromPoint(pos - (m_billboardX * 0.5 * sz) + (m_billboardY * 0.5 * sz));
-    *vptr++ = vertexFromPoint(pos + (m_billboardX * 0.5 * sz) + (m_billboardY * 0.5 * sz));
-    *vptr++ = vertexFromPoint(pos + (m_billboardX * 0.5 * sz) - (m_billboardY * 0.5 * sz));
+    Vector3 bx = m_billboardX * cos(spin) + m_billboardY * sin(spin);
+    Vector3 by = m_billboardY * cos(spin) - m_billboardX * sin(spin);
+    
+    *vptr++ = vertexFromPoint(pos - (bx * 0.5 * sz) - (by * 0.5 * sz));
+    *vptr++ = vertexFromPoint(pos - (bx * 0.5 * sz) + (by * 0.5 * sz));
+    *vptr++ = vertexFromPoint(pos + (bx * 0.5 * sz) + (by * 0.5 * sz));
+    *vptr++ = vertexFromPoint(pos + (bx * 0.5 * sz) - (by * 0.5 * sz));
     
     *texptr++ = makeTexel(0.0, 0.0);
     *texptr++ = makeTexel(0.0, 1.0);
@@ -337,7 +340,8 @@ void ParticleSystem::activate(Particle* p)
         initialSize,
         (m_finalSize.random() - initialSize) / ttl,
         initialColor,
-        (finalColor - initialColor) * (1.0 / ttl)
+        (finalColor - initialColor) * (1.0 / ttl),
+        m_emitSpinSpeed.random(), 0.0
     );
 }
 
@@ -355,6 +359,16 @@ Point3 ParticleSystem::initialPos() const
 void ParticleSystem::setTextureName(const std::string& nm)
 {
     m_texture = RenderSystem::getInstance().requestTexture(nm);
+}
+
+void ParticleSystem::setBBox(const WFMath::AxisBox<3>& bb)
+{
+    m_origin = Point3(0, 0, 0);
+    m_posDeviation = Vector3(bb.highCorner().x(), bb.highCorner().y(), 0.0);
+    
+    double diameter = sqrt((bb.highCorner().x() - bb.lowCorner().x()) * 
+        (bb.highCorner().y() - bb.lowCorner().y()));
+    m_createPerSec = DRange(300 * diameter, 300 * diameter);
 }
 
 } // of namespace Sear

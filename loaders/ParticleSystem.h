@@ -80,11 +80,12 @@ public:
     virtual void render(bool select_mode);
 
     void setTextureName(const std::string& nm);
+    void setBBox(const WFMath::AxisBox<3>& bb);
 private:
     friend class Particle;
     friend class ParticleSystemLoader;
     
-    void submit(const Point3& pos, double size, const Color_4d&);
+    void submit(const Point3& pos, double size, const Color_4d&, double spin);
 
     void activate(Particle*);
     
@@ -113,6 +114,8 @@ private:
     DRange m_accelMag;
     DRange m_initialSize;
     DRange m_finalSize;
+        
+    DRange m_emitSpinSpeed;
         
     DRange m_initialAlpha, m_finalAlpha;
     Color_4d m_initialColors[2];

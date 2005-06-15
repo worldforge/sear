@@ -4,6 +4,7 @@
 #include "ModelRecord.h"
 #include "renderers/StateManager.h"
 #include "renderers/RenderSystem.h"
+#include "ObjectRecord.h"
 
 #include <iostream>
 
@@ -54,6 +55,8 @@ ModelRecord* ParticleSystemLoader::loadModel(Render *render,
                     getItemWithDefault(cfg, model_id, KEY_max_lifetime, 10.0));
     
     ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
+    
+    ps->setBBox(record->bbox);
     ps->init();
     
     return model_record;

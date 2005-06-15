@@ -1,5 +1,15 @@
 2005-06-15  James Turner  <james@worldforge.org>
 
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/ParticleSystemLoader.cpp: add support for spin, and scale
+	  the particle box by the entity bbox size. Tune the numbers to look
+	  more firey.
+	  
+	* data/states.cfg: add blend information for particles state - looks
+	  infinitely better. Thanks to simon for the fix.
+
+2005-06-15  James Turner  <james@worldforge.org>
+
 	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: add support for
 	  color interpolation, so all the pieces required for fire are in place.
 	  Haven't done spin yet, but that's less critical
