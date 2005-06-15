@@ -18,9 +18,13 @@
 #include <guichan/sdl.hpp>
 #include <guichan/opengl.hpp>
 
+#include <sage/GL.h>
+
 #include <iostream>
 
 namespace Sear {
+
+static const std::string WORKSPACE = "workspace";
 
 Gui::Gui()
 {
@@ -152,8 +156,13 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
 void Workarea::draw()
 {
+  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(WORKSPACE));
+  glLineWidth(1.f);
+
   m_gui->logic();
   m_gui->draw();
+
+  glLineWidth(4.f);
 }
 
 } // namespace Sear

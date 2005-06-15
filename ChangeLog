@@ -1,3 +1,8 @@
+2005-06-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Workarea.cpp: Set the right rendering state when
+	  drawing gui, and set the line width to one.
+
 2005-06-15  James Turner  <james@worldforge.org>
 
 	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
