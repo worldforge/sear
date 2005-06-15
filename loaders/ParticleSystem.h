@@ -15,7 +15,39 @@ class Particle;
 
 typedef WFMath::Point<3> Point3;
 typedef WFMath::Vector<3> Vector3;
-class Color_4d;
+
+class Color_4d
+{
+public:
+  Color_4d() :
+    r(1.0), g(1.0), b(1.0), a(1.0)
+  {}
+
+
+  Color_4d(double rx, double gx, double bx, double ax) :
+    r(rx), g(gx), b(bx), a(ax)
+  {}
+  
+  double r;
+  double g;
+  double b;
+  double a;
+  
+  Color_4d& operator+=(const Color_4d& x)
+  {
+    r += x.r;
+    g += x.g;
+    b += x.b;
+    a += x.a;
+    return *this;
+  }
+    
+  Color_4 asColor_4() const
+  {
+    Color_4 c = { lrintf(r * 255.0), lrintf(g * 255.0), lrintf(b * 255.0), lrintf(a * 255.0) };
+    return c;
+  }
+};
 
 class DRange
 {
@@ -83,6 +115,8 @@ private:
     DRange m_finalSize;
         
     DRange m_initialAlpha, m_finalAlpha;
+    Color_4d m_initialColors[2];
+    Color_4d m_finalColors[2];
 };
 
 } // of namespace Sear

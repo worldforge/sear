@@ -35,38 +35,6 @@ Vector3 memberMult(const Vector3& a, const Vector3& b)
 
 //////////////////////////////////////////////////////////////////////////
 
-class Color_4d
-{
-public:
-  Color_4d() :
-    r(1.0), g(1.0), b(1.0), a(1.0)
-  {}
-
-
-  Color_4d(double rx, double gx, double bx, double ax) :
-    r(rx), g(gx), b(bx), a(ax)
-  {}
-  
-  double r;
-  double g;
-  double b;
-  double a;
-  
-  Color_4d& operator+=(const Color_4d& x)
-  {
-    r += x.r;
-    g += x.g;
-    b += x.b;
-    a += x.a;
-    return *this;
-  }
-    
-  Color_4 asColor_4() const
-  {
-    Color_4 c = { lrintf(r * 255.0), lrintf(g * 255.0), lrintf(b * 255.0), lrintf(a * 255.0) };
-    return c;
-  }
-};
 
 const Color_4d operator*(const Color_4d& c, const double scalar)
 {
@@ -76,6 +44,18 @@ const Color_4d operator*(const Color_4d& c, const double scalar)
 const Color_4d operator-(const Color_4d& c, const Color_4d& d)
 {
     return Color_4d(c.r - d.r, c.g -d.g, c.b - d.b, c.a - d.a);
+}
+
+Color_4d interpolate(double frac, const Color_4d& c, const Color_4d& d)
+{
+    assert(frac >= 0.0);
+    assert(frac <= 1.0);
+    double mf = 1.0 - frac;
+    
+    return Color_4d(frac * c.r + mf * d.r,
+        frac * c.g + mf * d.g,
+        frac * c.b + mf * d.b,
+        frac * c.a + mf * d.a);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,6 +183,12 @@ void ParticleSystem::init()
         
     m_initialAlpha = DRange(1.0, 1.0);
     m_finalAlpha = DRange(0.0, 0.0);
+    
+    m_initialColors[0] = Color_4d(1.0, 0.0, 0.0, 1.0);
+    m_initialColors[1] = Color_4d(1.0, 0.5, 0.0, 1.0);
+    
+    m_finalColors[0] = Color_4d(1.0, 1.0, 1.0, 1.0);
+    m_finalColors[1] = Color_4d(1.0, 0.5, 0.0, 1.0);
 }
 
 int ParticleSystem::shutdown()
@@ -336,12 +322,15 @@ void ParticleSystem::invalidate()
 
 void ParticleSystem::activate(Particle* p)
 {            
-    double ttl = m_ttl.random();;
+    double ttl = m_ttl.random();
     Vector3 acc = m_accelVector * m_accelMag.random();
         
-    Color_4d initialColor(1.0, 1.0, 1.0, m_initialAlpha.random()),
-        finalColor(1.0, 1.0, 1.0, m_finalAlpha.random());
-        
+    Color_4d initialColor = interpolate(twister.rand(), m_initialColors[0], m_initialColors[1]);
+    Color_4d finalColor = interpolate(twister.rand(), m_finalColors[0], m_finalColors[1]);
+    
+    initialColor.a = m_initialAlpha.random();
+    finalColor.a = m_finalAlpha.random();
+    
     double initialSize = m_initialSize.random();
     
     p->init(ttl, initialPos(), initialVelocity(), acc, 

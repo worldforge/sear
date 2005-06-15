@@ -1,3 +1,9 @@
+2005-06-15  James Turner  <james@worldforge.org>
+
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: add support for
+	  color interpolation, so all the pieces required for fire are in place.
+	  Haven't done spin yet, but that's less critical
+
 2005-06-13  Simon Goodall <sear@simongoodall.co.uk>
 
 	* renderers/GL.cpp, renderers/GL.h: Be more strict on checking for 
