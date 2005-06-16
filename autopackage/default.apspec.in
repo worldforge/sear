@@ -5,25 +5,15 @@
 RootName: @worldforge.org/clients/sear:$SOFTWAREVERSION
 DisplayName: Sear - a client for Worldforge
 ShortName: sear
-AutopackageTarget: 1.0.0
+AutopackageTarget: 1.0
 URL: http://www.worldforge.org/dev/eng/clients/sear
 Maintainer: Simon Goodall <sear@simongoodall.co.uk>
 Packager: Simon Goodall <sear@simongoodall.co.uk>
 Summary: Sear is a client for MMORPGs using the Worldforge system.
 SoftwareVersion: @VERSION@
 
-[Global]
-export bindir=@bindir@
-export datadir=@datadir@
-
 [Description]
-Sear desc
-
-[BuildPrepare]
-#prepareBuild --enable-binreloc --enable-static-build
-
-[BuildUnprepare]
-#unprepareBuild
+Sear is a 3D client for use with WorldForge project servers.
 
 [Imports]
 import <<EOF
@@ -31,25 +21,28 @@ $source_dir/README
 $source_dir/COPYING
 $source_dir/AUTHORS
 $source_dir/NEWS
-$source_dir/bin/Sear
-$source_dir/bin/Sear-bin
 $source_dir/sear_icon.xpm
 $source_dir/sear.desktop
+EOF
+import bin/ <<EOF
+$source_dir/bin/sear
+$source_dir/bin/sear-bin
+EOF
+import share/ <<EOF
 $source_dir/share/*
 EOF
 
-[Prepare]
+#[Prepare]
 #require @libsdl.org/sdl 1.2
 #require @gnu.org/libstdc++ 3
 
 
 [Install]
-installExe Sear
-installExe Sear-bin
+installExe bin/sear bin/sear-bin
 installIcon sear_icon.xpm
-installDesktop "Applications" sear.desktop
+installDesktop "Games" sear.desktop
 copyFiles README NEWS COPYING AUTHORS "$PREFIX/share/doc/sear"
-installData sear
+installData share/sear
 
 [Uninstall]
 uninstallFromLog
