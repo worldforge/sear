@@ -46,7 +46,7 @@ ModelRecord* ParticleSystemLoader::loadModel(Render *render,
     }
 
     ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, cfg);
-    ParticleSystem* ps = new ParticleSystem(render);
+    ParticleSystem* ps = new ParticleSystem(render, record);
     model_record->model = ps;
     model_record->state = RenderSystem::getInstance().getStateManager()->getState("particles");
     model_record->select_state = 2; // select

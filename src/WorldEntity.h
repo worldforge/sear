@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.27 2005-06-02 11:18:15 simon Exp $
+// $Id: WorldEntity.h,v 1.28 2005-06-16 20:12:49 jmt Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -52,6 +52,10 @@ public:
   
   const AttachmentMap& getAttachments() const
   { return m_attached; }
+  
+  double getStatus() const
+  { return m_status; }
+  
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -70,8 +74,8 @@ protected:
   friend class Character;
 
   OrientBBox m_orientBBox;
-  
   AttachmentMap m_attached;
+  double m_status;
 };
 
 } /* namespace Sear */

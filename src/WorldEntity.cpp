@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.61 2005-06-06 14:01:37 simon Exp $
+// $Id: WorldEntity.cpp,v 1.62 2005-06-16 20:12:49 jmt Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -50,7 +50,8 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
-   messages(std::list<message>())
+   messages(std::list<message>()),
+   m_status(1.0)
 {
 }
 
@@ -285,6 +286,8 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
                 getView()->notifyWhenEntitySeen(id, ess);
             }
         }
+    } else if (str == "status") {
+        m_status = v.asFloat();
     }
 }
 

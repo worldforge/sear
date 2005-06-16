@@ -5,6 +5,8 @@
 #include "loaders/ParticleSystem.h"
 #include "common/types.h"
 #include "renderers/Render.h"
+#include "ObjectRecord.h"
+#include "WorldEntity.h"
 
 #include <wfmath/MersenneTwister.h>
 #include <iostream>
@@ -138,8 +140,9 @@ private:
 
 //////////////////////////////////////
 
-ParticleSystem::ParticleSystem(Render *render) : 
-    Model(render)
+ParticleSystem::ParticleSystem(Render *render, ObjectRecord* e) : 
+    Model(render),
+    m_entity(e)
 {   
     m_origin = Point3(0, 0, 0);
     m_posDeviation = Vector3(0.5, 0.5, 0.0);
@@ -176,8 +179,8 @@ void ParticleSystem::init()
    
     m_accelVector = Vector3(0.0, 0.0, 1.0);
     m_accelMag = DRange(0.3, 0.4);
-    m_initialSize = DRange(0.1, 0.2);
-    m_finalSize = DRange(0.15, 0.3);
+    m_initialSize = DRange(0.16, 0.30);
+    m_finalSize = DRange(0.06, 0.16);
         
     m_initialAlpha = DRange(1.0, 1.0);
     m_finalAlpha = DRange(0.0, 0.0);
@@ -206,7 +209,8 @@ int ParticleSystem::shutdown()
 
 void ParticleSystem::update(float elapsed)
 {
-    int numToCreate = lrintf(m_createPerSec.random() * elapsed);
+    double status = m_entity->entity->getStatus();
+    int numToCreate = lrintf(m_createPerSec.random() * elapsed * status);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {
         if (m_particles[p]->isActive()) {

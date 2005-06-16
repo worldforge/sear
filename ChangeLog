@@ -1,3 +1,14 @@
+2005-06-16  James Turner  <james@worldforge.org>
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: record the entity status,
+	  and provdide an accessor for it.
+	  
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/ParticleSystemLoader.cpp: use the entity's status to scale
+	  the particle creation rate. As a result, fires now burn more or less
+	  fiercely based on status.
+
+
 2005-06-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Workarea.cpp: Remove some very verbose debug output.

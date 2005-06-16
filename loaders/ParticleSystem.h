@@ -67,7 +67,7 @@ public:
 class ParticleSystem : public Model
 {
 public:
-    ParticleSystem(Render *render);
+    ParticleSystem(Render *render, ObjectRecord* rec);
     virtual ~ParticleSystem();
     
     virtual void init();
@@ -81,6 +81,7 @@ public:
 
     void setTextureName(const std::string& nm);
     void setBBox(const WFMath::AxisBox<3>& bb);
+    
 private:
     friend class Particle;
     friend class ParticleSystemLoader;
@@ -94,6 +95,7 @@ private:
     
     std::vector<Particle*> m_particles;
     TextureID m_texture;
+    ObjectRecord* m_entity;
     
     Vertex_3* m_vertexBuffer;
     Texel* m_texCoordBuffer;
@@ -101,7 +103,6 @@ private:
     
     Vector3 m_billboardX, m_billboardY;
     unsigned int m_activeCount;
-    
 // config data
     DRange m_createPerSec;
     DRange m_ttl;
