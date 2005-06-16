@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.20 2005-06-10 16:54:11 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.21 2005-06-16 14:06:14 simon Exp $
 
 #include <sage/sage.h>
 
@@ -137,6 +137,7 @@ void Graphics::init() {
 
   // Create the LightManager    
   m_lm = new LightManager();
+  m_lm->init();
 
   m_initialised = true;
 }
@@ -319,17 +320,8 @@ if (c_select) select_mode = true;
     WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
     assert(root);
 
-    if (select_mode ) {
-      m_renderer->selectTerrainColour(root);
-    }
-    m_renderer->store();
-    if (select_mode) {
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("select"));
-    } else {
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
-    }
-    Environment::getInstance().renderTerrain(pos, select_mode);
-    m_renderer->restore();
+
+//>> Build queues here ??
 
     assert(System::instance()->getCharacter());
 
@@ -340,6 +332,22 @@ if (c_select) select_mode = true;
 
     buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list, time_elapsed);
 
+
+    if (select_mode ) {
+      m_renderer->selectTerrainColour(root);
+    }
+
+    m_renderer->store();
+
+    if (select_mode) {
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("select"));
+    } else {
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+    }
+
+    Environment::getInstance().renderTerrain(pos, select_mode);
+
+    m_renderer->restore();
     m_renderer->drawQueue(m_render_queue, select_mode);
     if (!select_mode) {
       m_renderer->drawMessageQueue(m_message_list);

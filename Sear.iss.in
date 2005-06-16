@@ -11,7 +11,7 @@ DefaultGroupName=Sear
 AllowNoIcons=yes
 Uninstallable=yes
 UninstallFilesDir={app}\uninst
-UninstallDisplayIcon={app}\Sear.bat
+UninstallDisplayIcon={app}\sear-bin.exe
 UninstallDisplayName=Sear
 OutputBaseFilename=sear_win32_setup-@VERSION@
 [Tasks]
@@ -30,14 +30,13 @@ Source: "sdl.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "sdl_image.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "sdl_mixer.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "sear.bat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "sear.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "sear-bin.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "shutdown.script"; DestDir: "{app}"; Flags: ignoreversion
 Source: "startup.script"; DestDir: "{app}"; Flags: ignoreversion
 Source: "states.cfg"; DestDir: "{app}"; Flags: ignoreversion
 Source: "WFUT.jar"; DestDir: "{app}"; Flags: ignoreversion
 Source: "zlib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "channels\sear-media.xml"; DestDir: "{app}\channels"; Flags: ignoreversion
-Source: "data\*.png"; DestDir: "{app}\data"; Flags: ignoreversion
 Source: "sear-media\*.*"; DestDir: "{app}\sear-media"; Flags: ignoreversion recursesubdirs;
 
 [INI]
@@ -45,11 +44,11 @@ Source: "sear-media\*.*"; DestDir: "{app}\sear-media"; Flags: ignoreversion recu
 Filename: "{app}\sear.url"; Section: "InternetShortcut"; Key: "URL"; String: "http://www.worldforge.org/dev/eng/clients/sear"
 
 [Icons]
-Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; IconFilename: "{app}\sear.exe"
-Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\sear.exe"
+Name: "{group}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; IconFilename: "{app}\sear-bin.exe"
+Name: "{group}\Sear on the Web"; Filename: "{app}\sear.url";IconFilename: "{app}\sear-bin.exe"
 Name: "{group}\Uninstall Sear"; Filename: "{app}\uninst"
-Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: desktopicon; IconFilename: "{app}\sear.exe"
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: quicklaunchicon; IconFilename:"{app}\sear.exe"
+Name: "{userdesktop}\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: desktopicon; IconFilename: "{app}\sear-bin.exe"
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Sear"; WorkingDir: "{app}"; Filename: "{app}\sear.bat"; Tasks: quicklaunchicon; IconFilename:"{app}\sear-bin.exe"
 
 [UninstallDelete]
 Type: files; Name: "{app}\sear.url"

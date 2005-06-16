@@ -1,18 +1,18 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: LightManager.h,v 1.1 2005-01-06 12:46:54 simon Exp $
+// $Id: LightManager.h,v 1.2 2005-06-16 14:06:14 simon Exp $
 
 #ifndef SEAR_LIGHTMANAGER_H
 #define SEAR_LIGHTMANAGER_H 1
 
-#include <sigc++/object_slot.h>
-#include <varconf/Config.h>
+//#include <sigc++/object_slot.h>
+//#include <varconf/Config.h>
 
-#include <vector>
-#include <stack>
-#include <queue>
+//#include <vector>
+//#include <stack>
+//#include <queue>
 
 #include "Light.h"
 
@@ -24,7 +24,7 @@ public:
   LightManager();
   ~LightManager();
 
-  void init();
+  int init();
   void shutdown();
 
   void reset();

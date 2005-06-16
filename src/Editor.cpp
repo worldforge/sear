@@ -100,6 +100,7 @@ void Editor::translate(const std::string& target, WFMath::Vector<3> delta, bool 
     WFMath::Point<3> pos = te->getPosition() + delta;
     msg["pos"] = pos.toAtlas();
     msg["id"] = te->getId();
+#warning "This statement can segfault"
     msg["loc"] = te->getLocation()->getId();
     move->setArgsAsList(Atlas::Message::ListType(1, msg));
       

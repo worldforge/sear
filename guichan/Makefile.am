@@ -9,4 +9,6 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        Panel.cpp Panel.h \
                        LoginWindow.cpp LoginWindow.h \
                        ConsoleWindow.cpp ConsoleWindow.h \
-                       Workarea.cpp Workarea.h
+                       Workarea.cpp Workarea.h \
+                       ActionListenerCommand.h ActionListenerSigC.h
+

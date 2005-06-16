@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.2 2005-04-13 12:16:04 simon Exp $
+// $Id: LightManager.cpp,v 1.3 2005-06-16 14:06:14 simon Exp $
 
 #include <sage/GL.h>
 
@@ -25,15 +25,19 @@ LightManager::LightManager() :
 {}
 
 LightManager::~LightManager() {
-  if (m_initialised) shutdown();
+  assert (m_initialised == false);
 }
   
-void LightManager::init() {
-  if (m_initialised) shutdown();
+int LightManager::init() {
+  assert (m_initialised == false);
+
   m_initialised = true;
+  return 0;
 }
 
 void LightManager::shutdown() {
+  assert (m_initialised == true);
+
   m_initialised = false;
 }
 
@@ -54,7 +58,7 @@ void LightManager::applyLight(const Light &light) {
   if (!light.enabled) return;
 
   // Increment counter so we know how many lights we have used this frame
-  m_lightCounter++;
+  ++m_lightCounter;
 
   // Select light number
   GLenum lightNum = GL_LIGHT2;

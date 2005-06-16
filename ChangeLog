@@ -1,5 +1,22 @@
 2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
 
+	* Sear.iss.in: Update to current file set
+	* sear.desktop.in: Fix Categories string
+	* autopackage/default.apspec.in: Update to nearly work from a WFUT
+	  download. Requires sear and sear-bin to be renamed to Sear and 
+	  Sear-bin otherwise there is a conflict with a dir called sear.
+	* guichan/Makefile.am: Add missing files.
+	  of calculating them manually. Free md3 after use. Scale model to 1/64.
+	* src/Editor.cpp: Add warning about possible segfault. Need to check 
+	  this file in future.
+	* renderers/LightManager.cpp, renderers/LightManager.h: Remove call to
+	  shutdown from destructor and init and use asserts.
+	* renderers/Graphics.cpp: Shutdown lightmanager. Move buildqueues call 
+	  to before terrain is rendered so entity based lighting is applied to
+	  when rendering.
+
+2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
+
 	* configure.ac: Fix guichan checks for cross-compiling and static builds
 	* renderers.GL.cpp: More verbose output on missing extensions.
 

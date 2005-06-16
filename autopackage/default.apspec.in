@@ -27,13 +27,15 @@ Sear desc
 
 [Imports]
 import <<EOF
-$source_dir/src/sear
-$source_dir/src/sear-bin
-$source_dir/src/sear_icon.xpm
+$source_dir/README
+$source_dir/COPYING
+$source_dir/AUTHORS
+$source_dir/NEWS
+$source_dir/bin/Sear
+$source_dir/bin/Sear-bin
+$source_dir/sear_icon.xpm
 $source_dir/sear.desktop
-$source_dir/data/states.cfg
-$source_dir/data/bindings.cfg
-$source_dir/data/general.cfg
+$source_dir/share/*
 EOF
 
 [Prepare]
@@ -42,12 +44,12 @@ EOF
 
 
 [Install]
-installExe sear
-installExe sear-bin
-#installConfig states.cfg general.cfg bindings.cfg
+installExe Sear
+installExe Sear-bin
 installIcon sear_icon.xpm
 installDesktop "Applications" sear.desktop
-#$source_dir/*
+copyFiles README NEWS COPYING AUTHORS "$PREFIX/share/doc/sear"
+installData sear
 
 [Uninstall]
 uninstallFromLog
