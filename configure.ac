@@ -148,7 +148,6 @@ else
    fi
 fi
 
-AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan -lguichan_sdl -lguichan_opengl",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.]))
 
 AC_LANG_RESTORE
 
@@ -222,6 +221,7 @@ AM_PATH_LIB3DS($LIB3DS_VERSION, [
 dnl Check other libs
 
 if test $cross_compiling == no; then
+
   AC_CHECK_LIB(GL,glViewport, [
     SEAR_LIBS="$SEAR_LIBS -lGL"
   ],[
@@ -234,7 +234,22 @@ if test $cross_compiling == no; then
     AC_MSG_ERROR(Couldn't find GLU)
   ], "-lGL")
 
+  AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.]))
  else
+
+
+   AC_CHECK_HEADER(guichan.hpp, 
+     [found_guichan=yes break],
+     [found_guichan=no])
+
+   if test $found_guichan == yes; then
+     SEAR_LIBS="-lguichan_sdl -lguichan_opengl -lguichan $SEAR_LIBS"
+   else
+     AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.])
+   fi
+
+
+
    AC_CHECK_HEADER(GL/gl.h,
        [found_gl=yes break],
        [found_gl=no])

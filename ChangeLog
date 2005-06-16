@@ -1,3 +1,8 @@
+2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
+
+	* configure.ac: Fix guichan checks for cross-compiling and static builds
+	* renderers.GL.cpp: More verbose output on missing extensions.
+
 2005-06-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/ConnectWindow.cpp, guichan/ConnectWindow.h: New

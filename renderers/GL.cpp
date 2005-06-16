@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.131 2005-06-13 15:15:36 simon Exp $
+// $Id: GL.cpp,v 1.132 2005-06-16 11:04:56 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -330,7 +330,10 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
  // glDisable(GL_DITHER);
                                                                                 
   setViewMode(PERSPECTIVE);
-  if (setupExtensions()) return false;
+  if (setupExtensions()) {
+    fprintf(stderr, "Error finding required extensions\n");
+    return false;
+  }
 
 //  initFont();
 
