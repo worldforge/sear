@@ -1,5 +1,10 @@
 2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
 
+	* loaders/LibModelFile.cpp: Updates to pull normals from libmd3 instead
+	  of calculating them manually. Free md3 after use. Scale model to 1/64.
+
+2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
+
 	* Sear.iss.in: Update to current file set
 	* sear.desktop.in: Fix Categories string
 	* autopackage/default.apspec.in: Update to nearly work from a WFUT

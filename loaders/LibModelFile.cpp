@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.8 2005-06-13 15:10:46 simon Exp $
+// $Id: LibModelFile.cpp,v 1.9 2005-06-16 14:34:20 simon Exp $
 
 /*
   Debug check list
@@ -42,6 +42,8 @@ extern "C" {
   static const bool debug = false;
 #endif
 namespace Sear {
+
+static const float default_scale = 1.0f / 64.0f;
 
 LibModelFile::LibModelFile(Render *render) : Model(render), 
   m_initialised(false),
@@ -89,7 +91,8 @@ int LibModelFile::init(const std::string &filename) {
   }
 
   for (int i = 0; i < modelFile->header->mesh_count; ++i) {
-    libmd3_strip_env_texcoords(&modelFile->meshes[i]);
+    libmd3_unpack_normals(&modelFile->meshes[i]);
+//    libmd3_strip_env_texcoords(&modelFile->meshes[i]);
   }
 
   // Create one big array to store all data, then just swap the textures when rendering.
@@ -116,11 +119,8 @@ int LibModelFile::init(const std::string &filename) {
   m_texel_data  = new float[m_num_triangles * 3 * 2];
   m_faces       = new unsigned int[m_num_triangles * 3];
   m_normal_data = new float[m_num_triangles * 3 * 3];
-  int *normal_counter = new int[m_num_triangles * 3];
+
   int vertex_counter = 0;
-  // Initialise normal data
-  for (int i = 0; i < m_num_triangles * 3 * 3; m_normal_data[i++] = 0.0f);
-  for (int i = 0; i < m_num_triangles * 3; normal_counter[i++] = 0);
 
   // Get mesh data
   meshp = modelFile->meshes;
@@ -137,62 +137,21 @@ int LibModelFile::init(const std::string &filename) {
    
     vertex_counter += meshp->mesh_header->vertex_count;
     // Copy data into array.
-    memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->vertex_count  * 3 * sizeof(short));
+    memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->vertex_count * 3 * sizeof(short));
 
-    memcpy(&m_texel_data[m_boundaries[i] * 3 * 2], meshp->texcoords, meshp->mesh_header->vertex_count * 3 * 2 * sizeof(float));
+    memcpy(&m_texel_data[m_boundaries[i] * 3 * 2], meshp->texcoords, meshp->mesh_header->vertex_count * 2 * sizeof(float));
+
+    memcpy(&m_normal_data[m_boundaries[i] * 3 * 3], meshp->normals, meshp->mesh_header->vertex_count * 3 * sizeof(float));
 
     memcpy(&m_faces[m_boundaries[i] * 3], meshp->triangles, meshp->mesh_header->triangle_count * 3 * sizeof(unsigned int));
+
     // We are using one buffer for all objects, so adjust face vertex numbers accordingly
     for (int j = 0; j < meshp->mesh_header->triangle_count * 3; ++j) {
       m_faces[m_boundaries[i] *  3 + j] += m_boundaries[i] * 3;
     }
-
-    // Calculate normals data
-    for (int j = 0; j < meshp->mesh_header->triangle_count; ++j) {
-      float in[3][3];
-      float out[3];
-      // Calculate the surface normal for each face. We can then later work out the average normal for each vertex.
-      in[0][0] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 0];
-      in[0][1] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 1];
-      in[0][2] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 2];
-      in[1][0] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 0];
-      in[1][1] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 1];
-      in[1][2] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 2];
-      in[2][0] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 0];
-      in[2][1] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 1];
-      in[2][2] = m_vertex_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 2];
-
-      calcNormal(in, out);
-      // Add surface normal to current sum
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 0] += out[0];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 1] += out[1];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 0] * 3 + 2] += out[2];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 0] += out[0];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 1] += out[1];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 1] * 3 + 2] += out[2];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 0] += out[0];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 1] += out[1];
-      m_normal_data[m_faces[m_boundaries[i] * 3 + j * 3 + 2] * 3 + 2] += out[2];
-      // Increment counters
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 0]]++;
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 1]]++;
-      normal_counter[m_faces[m_boundaries[i] * 3 + j * 3 + 2]]++;
-    }
-  }
-
-  // Average out normal
-  // TODO whats wrong with this method?
-  for (int i = 0; i < vertex_counter; ++i) {
-    assert(normal_counter[i] != 0);
-    m_normal_data[i * 3 + 0] /= (float)normal_counter[i];
-    m_normal_data[i * 3 + 1] /= (float)normal_counter[i];
-    m_normal_data[i * 3 + 2] /= (float)normal_counter[i];
   }
   m_num_vertices = vertex_counter;
-
-  // Clean up 
-  delete [] normal_counter;
-//  free (modelFile);
+  libmd3_file_free(modelFile);
 
   m_initialised = true;
   return 0;
@@ -271,7 +230,10 @@ void LibModelFile::render(bool select_mode) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float shininess = 50.0f;
-  
+
+  // Scale to 1/64 
+  glScalef(default_scale, default_scale, default_scale);
+ 
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
