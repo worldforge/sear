@@ -115,11 +115,6 @@ bool Workarea::handleEvent(const SDL_Event & event)
   assert(fh != 0);
 
   gcn::Widget * focus = fh->getFocused();
-  if (focus == 0) {
-    std::cout << "Nothing is focused" << std::endl << std::flush;
-  } else {
-    std::cout << "A Widget is focused" << std::endl << std::flush;
-  }
 
   bool gui_has_mouse = m_top->childHasMouse();
 
@@ -149,11 +144,6 @@ bool Workarea::handleEvent(const SDL_Event & event)
     fh->focusNone();
   }
 
-  if (!event_eaten) {
-      std::cout << "But not eaten" << std::endl << std::flush;
-  } else {
-      std::cout << "Eaten" << std::endl << std::flush;
-  }
   return event_eaten;
 }
 

@@ -1,3 +1,7 @@
+2005-06-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Workarea.cpp: Remove some very verbose debug output.
+
 2005-06-16  Simon Goodall <sear@simongoodall.co.uk>
 
 	* autopackage/default.apspec.in: Various fixes so it works properly.
