@@ -1,5 +1,16 @@
 2005-06-16  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/ConnectWindow.cpp, guichan/ConnectWindow.h: New
+	  dialogue for specifying server to connect to.
+
+	* guichan/OptionsWindow.cpp, guichan/OptionsWindow.h: Placeholder
+	  for options window.
+
+	* guichan/Panel.cpp, guichan/Panel.h: Manage a set of windows
+	  available at any time.
+
+2005-06-16  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Workarea.cpp: Set the right rendering state when
 	  drawing gui, and set the line width to one.
 

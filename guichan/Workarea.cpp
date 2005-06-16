@@ -5,7 +5,7 @@
 #include "guichan/Workarea.h"
 
 #include "guichan/RootWidget.h"
-#include "guichan/LoginWindow.h"
+#include "guichan/ConnectWindow.h"
 #include "guichan/ConsoleWindow.h"
 #include "guichan/Panel.h"
 #include "guichan/ActionListenerSigC.h"
@@ -83,7 +83,10 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   // ConsoleWindow * cw = new ConsoleWindow;
   // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
 
-  // Panel * p = new Panel;
+  // ConnectWindow * con_w = new ConnectWindow;
+  // m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
+
+  // Panel * p = new Panel(m_top);
   // m_top->add(p, 0, 0);
 }
 

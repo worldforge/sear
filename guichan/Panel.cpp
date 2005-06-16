@@ -5,7 +5,12 @@
 #include "guichan/Panel.h"
 
 #include "guichan/ActionListenerSigC.h"
+#include "guichan/OptionsWindow.h"
+#include "guichan/RootWidget.h"
 #include "guichan/box.hpp"
+
+#include "renderers/Render.h"
+#include "renderers/RenderSystem.h"
 
 #include "src/System.h"
 
@@ -19,7 +24,7 @@
 
 namespace Sear {
 
-Panel::Panel() : gcn::Window()
+Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -27,6 +32,8 @@ Panel::Panel() : gcn::Window()
 
   setTitleBarHeight(0);
   setMovable(false);
+
+  m_optionsWindow = new OptionsWindow;
 
   // setOpaque(true);
 
@@ -45,11 +52,6 @@ Panel::Panel() : gcn::Window()
   m_inventoryButton->addActionListener(m_buttonListener);
   hbox->pack(m_inventoryButton);
 
-  hbox->pack(new gcn::Button("Test"));
-  hbox->pack(new gcn::Button("Test"));
-  hbox->pack(new gcn::Button("Test"));
-  hbox->pack(new gcn::Button("Test"));
-
   setContent(hbox);
 
   resizeToContent();
@@ -61,8 +63,18 @@ Panel::~Panel()
 
 void Panel::actionPressed(std::string event)
 {
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int width = render->getWindowWidth(),
+      height = render->getWindowHeight();
+
   if (event == "options") {
     std::cout << "Open options window" << std::endl << std::flush;
+    if (m_optionsWindow->getParent() == 0) {
+      m_top->add(m_optionsWindow, width / 2 - m_optionsWindow->getWidth() / 2,
+                                  height / 2 - m_optionsWindow->getHeight() / 2);
+    } else {
+      m_top->remove(m_optionsWindow);
+    }
   } else if (event == "inventory") {
     std::cout << "Open inventory window" << std::endl << std::flush;
   } else {
