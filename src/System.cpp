@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.126 2005-06-10 16:54:11 alriddoch Exp $
+// $Id: System.cpp,v 1.127 2005-06-16 23:34:30 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -307,6 +307,8 @@ bool System::init(int argc, char *argv[]) {
   RenderSystem::getInstance().initContext();
 
   m_workarea = new Workarea(this);
+
+  m_workarea->registerCommands(m_console);
 
   m_system_running = true;
   m_initialised = true;

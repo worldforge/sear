@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.16 2005-04-13 12:16:04 simon Exp $
+// $Id: ActionHandler.cpp,v 1.17 2005-06-16 23:34:30 alriddoch Exp $
 
 #include <unistd.h>
 #include <varconf/varconf.h>
@@ -75,22 +75,30 @@ void ActionHandler::loadConfiguration(const std::string &file_name) {
 void ActionHandler::handleAction(const std::string &action, WorldEntity *entity) {
   assert ((m_initialised == true) && "ActionHandler not initialised");
   // Get requested action
-  ActionStruct *as = action_map[action];
+  std::map<std::string, ActionStruct*>::const_iterator I = action_map.find(action);
+  if (I == action_map.end()) {
+    return;
+  }
+  ActionStruct *as = I->second;
+  assert(as);
   // Execute action if it exists
-  if (as) m_system->getScriptEngine()->runScript(as->script);
+  m_system->getScriptEngine()->runScript(as->script);
 }
 
 void ActionHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   // Get record if it exists
-  ActionStruct *record = action_map[section];
+  std::map<std::string, ActionStruct*>::const_iterator I = action_map.find(section);
+  ActionStruct * record;
   // If record does not exist, create it.
-  if (!record) {
+  if (I == action_map.end()) {
     // Create record and set defaults
     record = new ActionStruct();
     record->action = section;
     record->entity_based = false;
     action_map[section] = record;
     if (debug) Log::writeLog(std::string("Adding Action: ") + section, Log::LOG_INFO);
+  } else {
+    record = I->second;
   }
   // Set script file
   if (key == SCRIPT) {

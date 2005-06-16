@@ -15,6 +15,8 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
+#include "src/Console.h"
+
 #include <guichan/sdl.hpp>
 #include <guichan/opengl.hpp>
 
@@ -25,6 +27,8 @@
 namespace Sear {
 
 static const std::string WORKSPACE = "workspace";
+
+static const std::string WORKAREA_FOO = "workarea_foo";
 
 Gui::Gui()
 {
@@ -83,11 +87,13 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   // ConsoleWindow * cw = new ConsoleWindow;
   // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
 
-  // ConnectWindow * con_w = new ConnectWindow;
-  // m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
+  ConnectWindow * con_w = new ConnectWindow;
+  m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
 
-  // Panel * p = new Panel(m_top);
-  // m_top->add(p, 0, 0);
+  m_panel = 0;
+
+  // m_panel = new Panel(m_top);
+  // m_top->add(m_panel, 0, 0);
 }
 
 Workarea::~Workarea()
@@ -95,6 +101,22 @@ Workarea::~Workarea()
   delete m_input;
   delete m_graphics;
   delete m_imageLoader;
+}
+
+void Workarea::registerCommands(Console * console)
+{
+  if (m_panel != 0) {
+    m_panel->registerCommands(console);
+  }
+
+  console->registerCommand(WORKAREA_FOO, this);
+}
+
+void Workarea::runCommand(const std::string & command, const std::string & args)
+{
+  if (command == WORKAREA_FOO) {
+    std::cout << "Go the workarea foo command" << std::endl << std::flush;
+  }
 }
 
 void Workarea::resize(int x, int y)

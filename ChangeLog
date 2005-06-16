@@ -1,3 +1,11 @@
+2005-06-17  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Panel.cpp, guichan/Panel.h, guichan/Workarea.cpp,
+	  guichan/Workarea.h, src/System.cpp: Make Workarea and Panel
+	  into console objects, and add some commands.
+
+	* src/ActionHandler.cpp: Fix misuse of operator[].
+
 2005-06-16  James Turner  <james@worldforge.org>
 
 	* src/WorldEntity.cpp, src/WorldEntity.h: record the entity status,
@@ -7,7 +15,6 @@
 	  loaders/ParticleSystemLoader.cpp: use the entity's status to scale
 	  the particle creation rate. As a result, fires now burn more or less
 	  fiercely based on status.
-
 
 2005-06-16  Al Riddoch  <alriddoch@zepler.org>
 

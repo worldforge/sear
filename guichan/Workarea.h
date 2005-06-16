@@ -5,6 +5,8 @@
 #ifndef SEAR_GUICHAN_WORKAREA_H
 #define SEAR_GUICHAN_WORKAREA_H
 
+#include "src/ConsoleObject.h"
+
 #include <guichan.hpp>
 
 #include <SDL/SDL.h>
@@ -19,7 +21,10 @@ namespace gcn {
 namespace Sear {
 
 class System;
+class Console;
+
 class RootWidget;
+class Panel;
 
 class Gui : public gcn::Gui {
 public:
@@ -31,7 +36,7 @@ public:
   }
 };
 
-class Workarea {
+class Workarea : public ConsoleObject {
 protected:
   System * m_system;
   int m_width, m_height;
@@ -42,10 +47,15 @@ protected:
   gcn::SDLImageLoader * m_hostImageLoader; // For loading images
   Gui * m_gui;                             // A Gui object - binds it together
 
+  Panel * m_panel;
+
   RootWidget * m_top;                  // Top level container widget
 public:
   Workarea(System *);
   virtual ~Workarea();
+
+  void registerCommands(Console *);
+  virtual void runCommand(const std::string &, const std::string &);
 
   void resize(int width, int height);
   bool handleEvent(const SDL_Event &);

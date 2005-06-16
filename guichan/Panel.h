@@ -5,6 +5,8 @@
 #ifndef SEAR_GUICHAN_PANEL_H
 #define SEAR_GUICHAN_PANEL_H
 
+#include "src/ConsoleObject.h"
+
 #include <guichan/widgets/window.hpp>
 
 #include <sigc++/object.h>
@@ -17,10 +19,14 @@ class Button;
 
 namespace Sear {
 
+class Console;
+
 class ActionListenerSigC;
 class RootWidget;
 
-class Panel : virtual public SigC::Object, public gcn::Window {
+class Panel : virtual public SigC::Object,
+              public ConsoleObject,
+              public gcn::Window {
 protected:
   gcn::Button * m_inventoryButton;
   gcn::Button * m_optionsButton;
@@ -33,6 +39,9 @@ protected:
 public:
   explicit Panel(RootWidget * top);
   virtual ~Panel();
+
+  void registerCommands(Console *);
+  virtual void runCommand(const std::string &, const std::string &);
 
   void actionPressed(std::string);
 };

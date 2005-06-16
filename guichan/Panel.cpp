@@ -13,6 +13,7 @@
 #include "renderers/RenderSystem.h"
 
 #include "src/System.h"
+#include "src/Console.h"
 
 #include <guichan.hpp>
 
@@ -23,6 +24,9 @@
 #include <iostream>
 
 namespace Sear {
+
+static std::string PANEL_OPEN_OPTIONS = "panel_open_options";
+static std::string PANEL_CLOSE_OPTIONS = "panel_close_options";
 
 Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 {
@@ -59,6 +63,32 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 
 Panel::~Panel()
 {
+}
+
+void Panel::registerCommands(Console * console)
+{
+  console->registerCommand(PANEL_OPEN_OPTIONS, this);
+  console->registerCommand(PANEL_CLOSE_OPTIONS, this);
+}
+
+void Panel::runCommand(const std::string & command, const std::string & args)
+{
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int width = render->getWindowWidth(),
+      height = render->getWindowHeight();
+
+  if (command == PANEL_CLOSE_OPTIONS) {
+    std::cout << "Got the panel close options command" << std::endl << std::flush;
+    if (m_optionsWindow->getParent() != 0) {
+      m_top->remove(m_optionsWindow);
+    }
+  }
+  else if (command == PANEL_OPEN_OPTIONS) {
+    if (m_optionsWindow->getParent() == 0) {
+      m_top->add(m_optionsWindow, width / 2 - m_optionsWindow->getWidth() / 2,
+                                  height / 2 - m_optionsWindow->getHeight() / 2);
+    }
+  }
 }
 
 void Panel::actionPressed(std::string event)
