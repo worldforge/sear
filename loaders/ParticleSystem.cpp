@@ -6,7 +6,7 @@
 #include "common/types.h"
 #include "renderers/Render.h"
 #include "ObjectRecord.h"
-#include "WorldEntity.h"
+#include "src/WorldEntity.h"
 
 #include <wfmath/MersenneTwister.h>
 #include <iostream>
