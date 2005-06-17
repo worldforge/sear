@@ -34,17 +34,22 @@ class Panel : virtual public SigC::Object,
 public:
   typedef std::map<std::string, gcn::Button *> ButtonDict;
   typedef std::map<std::string, gcn::Window *> WindowDict;
+  typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
   gcn::Box * m_hbox;
 
   ButtonDict m_buttons;
   WindowDict m_windows;
+  CoordDict m_coords;
 
   RootWidget * m_top;
 
   ActionListenerSigC * m_buttonListener;
 
   void actionPressed(std::string);
+
+  void openWindow(const std::string &, gcn::Window *);
+  void closeWindow(const std::string &, gcn::Window *);
 public:
   explicit Panel(RootWidget * top);
   virtual ~Panel();

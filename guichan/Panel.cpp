@@ -5,6 +5,7 @@
 #include "guichan/Panel.h"
 
 #include "guichan/ActionListenerSigC.h"
+#include "guichan/ConsoleWindow.h"
 #include "guichan/OptionsWindow.h"
 #include "guichan/RootWidget.h"
 #include "guichan/box.hpp"
@@ -48,6 +49,13 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 
   addWindow("options", new OptionsWindow);
   addWindow("inventory", new OptionsWindow);
+
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int height = render->getWindowHeight();
+
+  gcn::Window * con = new ConsoleWindow;
+  addWindow("chat", con);
+  m_coords["chat"] = std::make_pair(4, height - con->getHeight() / 2 - 4);
 }
 
 Panel::~Panel()
@@ -62,10 +70,6 @@ void Panel::registerCommands(Console * console)
 
 void Panel::runCommand(const std::string & command, const std::string & args)
 {
-  Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-
   if (command == PANEL_CLOSE) {
     std::cout << "Got the panel close command" << std::endl << std::flush;
     WindowDict::const_iterator I = m_windows.find(args);
@@ -73,7 +77,7 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        m_top->remove(win);
+        closeWindow(args, win);
       }
     }
   }
@@ -83,8 +87,7 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        m_top->add(win, width / 2 - win->getWidth() / 2,
-                        height / 2 - win->getHeight() / 2);
+        openWindow(args, win);
       }
     }
   }
@@ -92,23 +95,44 @@ void Panel::runCommand(const std::string & command, const std::string & args)
 
 void Panel::actionPressed(std::string event)
 {
-  Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-
   WindowDict::const_iterator I = m_windows.find(event);
   if (I != m_windows.end()) {
     gcn::Window * win = I->second;
     assert(win != 0);
     if (win->getParent() == 0) {
-      m_top->add(win, width / 2 - win->getWidth() / 2,
-                      height / 2 - win->getHeight() / 2);
+      openWindow(event, win);
     } else {
-      m_top->remove(win);
+      closeWindow(event, win);
     }
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
+}
+
+void Panel::openWindow(const std::string & name, gcn::Window * win)
+{
+  int x, y;
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int width = render->getWindowWidth(),
+      height = render->getWindowHeight();
+
+  CoordDict::const_iterator I = m_coords.find(name);
+
+  if (I != m_coords.end()) {
+    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
+    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
+  } else {
+    x = width / 2 - win->getWidth() / 2;
+    y = height / 2 - win->getHeight() / 2;
+  }
+
+  m_top->add(win, x, y);
+}
+
+void Panel::closeWindow(const std::string & name, gcn::Window * win)
+{
+  m_coords[name] = std::make_pair(win->getX(), win->getY());
+  m_top->remove(win);
 }
 
 void Panel::addWindow(const std::string & name, gcn::Window * window)

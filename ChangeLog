@@ -1,3 +1,9 @@
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Panel.h, guichan/Panel.cpp: Generalise opening and
+	  closing window code. Store coordinates of windows when they
+	  are not viewed.
+
 2005-06-17  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Workarea.cpp: Disable the server window for a short while.
