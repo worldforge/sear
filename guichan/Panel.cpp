@@ -25,8 +25,8 @@
 
 namespace Sear {
 
-static std::string PANEL_OPEN_OPTIONS = "panel_open_options";
-static std::string PANEL_CLOSE_OPTIONS = "panel_close_options";
+static std::string PANEL_OPEN = "panel_open";
+static std::string PANEL_CLOSE = "panel_close";
 
 Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 {
@@ -37,28 +37,17 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
   setTitleBarHeight(0);
   setMovable(false);
 
-  m_optionsWindow = new OptionsWindow;
-
   // setOpaque(true);
 
-  gcn::Box * hbox = new gcn::HBox(6);
+  m_hbox = new gcn::HBox(6);
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &Panel::actionPressed));
 
-  m_optionsButton = new gcn::Button("Options");
-  m_optionsButton->setEventId("options");
-  m_optionsButton->addActionListener(m_buttonListener);
-  hbox->pack(m_optionsButton);
+  setContent(m_hbox);
 
-  m_inventoryButton = new gcn::Button("Inventory");
-  m_inventoryButton->setEventId("inventory");
-  m_inventoryButton->addActionListener(m_buttonListener);
-  hbox->pack(m_inventoryButton);
-
-  setContent(hbox);
-
-  resizeToContent();
+  addWindow("options", new OptionsWindow);
+  addWindow("inventory", new OptionsWindow);
 }
 
 Panel::~Panel()
@@ -67,8 +56,8 @@ Panel::~Panel()
 
 void Panel::registerCommands(Console * console)
 {
-  console->registerCommand(PANEL_OPEN_OPTIONS, this);
-  console->registerCommand(PANEL_CLOSE_OPTIONS, this);
+  console->registerCommand(PANEL_OPEN, this);
+  console->registerCommand(PANEL_CLOSE, this);
 }
 
 void Panel::runCommand(const std::string & command, const std::string & args)
@@ -77,16 +66,26 @@ void Panel::runCommand(const std::string & command, const std::string & args)
   int width = render->getWindowWidth(),
       height = render->getWindowHeight();
 
-  if (command == PANEL_CLOSE_OPTIONS) {
-    std::cout << "Got the panel close options command" << std::endl << std::flush;
-    if (m_optionsWindow->getParent() != 0) {
-      m_top->remove(m_optionsWindow);
+  if (command == PANEL_CLOSE) {
+    std::cout << "Got the panel close command" << std::endl << std::flush;
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      gcn::Window * win = I->second;
+      assert(win != 0);
+      if (win->getParent() != 0) {
+        m_top->remove(win);
+      }
     }
   }
-  else if (command == PANEL_OPEN_OPTIONS) {
-    if (m_optionsWindow->getParent() == 0) {
-      m_top->add(m_optionsWindow, width / 2 - m_optionsWindow->getWidth() / 2,
-                                  height / 2 - m_optionsWindow->getHeight() / 2);
+  else if (command == PANEL_OPEN) {
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      gcn::Window * win = I->second;
+      assert(win != 0);
+      if (win->getParent() == 0) {
+        m_top->add(win, width / 2 - win->getWidth() / 2,
+                        height / 2 - win->getHeight() / 2);
+      }
     }
   }
 }
@@ -97,19 +96,32 @@ void Panel::actionPressed(std::string event)
   int width = render->getWindowWidth(),
       height = render->getWindowHeight();
 
-  if (event == "options") {
-    std::cout << "Open options window" << std::endl << std::flush;
-    if (m_optionsWindow->getParent() == 0) {
-      m_top->add(m_optionsWindow, width / 2 - m_optionsWindow->getWidth() / 2,
-                                  height / 2 - m_optionsWindow->getHeight() / 2);
+  WindowDict::const_iterator I = m_windows.find(event);
+  if (I != m_windows.end()) {
+    gcn::Window * win = I->second;
+    assert(win != 0);
+    if (win->getParent() == 0) {
+      m_top->add(win, width / 2 - win->getWidth() / 2,
+                      height / 2 - win->getHeight() / 2);
     } else {
-      m_top->remove(m_optionsWindow);
+      m_top->remove(win);
     }
-  } else if (event == "inventory") {
-    std::cout << "Open inventory window" << std::endl << std::flush;
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
+}
+
+void Panel::addWindow(const std::string & name, gcn::Window * window)
+{
+  gcn::Button * button = new gcn::Button(name);
+  button->setEventId(name);
+  button->addActionListener(m_buttonListener);
+  m_hbox->pack(button);
+
+  m_buttons[name] = button;
+  m_windows[name] = window;
+
+  resizeToContent();
 }
 
 } // namespace Sear

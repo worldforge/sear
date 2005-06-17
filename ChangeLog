@@ -1,5 +1,13 @@
 2005-06-17  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/Workarea.cpp: Disable the server window for a short while.
+
+	* guichan/Panel.cpp, guichan/Panel.h: Make the panel completely
+	  generic, allowing new buttons with associated windows to be
+	  added at will.
+
+2005-06-17  Al Riddoch  <alriddoch@zepler.org>
+
 	* loaders/ParticleSystem.cpp: Fix header filename.
 
 2005-06-17  Al Riddoch  <alriddoch@zepler.org>

@@ -11,8 +11,12 @@
 
 #include <sigc++/object.h>
 
+#include <map>
+#include <string>
+
 namespace gcn {
 
+class Box;
 class Button;
 
 } // namespace gcn
@@ -27,15 +31,20 @@ class RootWidget;
 class Panel : virtual public SigC::Object,
               public ConsoleObject,
               public gcn::Window {
+public:
+  typedef std::map<std::string, gcn::Button *> ButtonDict;
+  typedef std::map<std::string, gcn::Window *> WindowDict;
 protected:
-  gcn::Button * m_inventoryButton;
-  gcn::Button * m_optionsButton;
+  gcn::Box * m_hbox;
+
+  ButtonDict m_buttons;
+  WindowDict m_windows;
 
   RootWidget * m_top;
 
-  gcn::Window * m_optionsWindow;
-
   ActionListenerSigC * m_buttonListener;
+
+  void actionPressed(std::string);
 public:
   explicit Panel(RootWidget * top);
   virtual ~Panel();
@@ -43,7 +52,7 @@ public:
   void registerCommands(Console *);
   virtual void runCommand(const std::string &, const std::string &);
 
-  void actionPressed(std::string);
+  void addWindow(const std::string & name, gcn::Window * window);
 };
 
 } // namespace Sear
