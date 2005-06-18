@@ -1,4 +1,9 @@
-2005-06-18  Simon Goodall <sear@simongoodall.co.uk>
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConnectWindow.cpp: Fix off by one bug that meant the first
+	  server was not selectable. Thanks Simon.
+
+2005-06-18  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* README: Update dependancies.
 

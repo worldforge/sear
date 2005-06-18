@@ -112,11 +112,10 @@ ConnectWindow::~ConnectWindow()
 
 void ConnectWindow::logic()
 {
-  std::cout << "SELECTED " << m_servers->getSelected() << std::endl << std::flush;
   int new_selected = m_servers->getSelected();
   if (new_selected != m_selected) {
     m_selected = new_selected;
-    if (m_selected > 0 &&
+    if (m_selected >= 0 &&
         m_selected < m_serverListModel->m_metaQuery->getGameServerCount()) {
       const Eris::ServerInfo & si = m_serverListModel->m_metaQuery->getInfoForServer(m_selected);
       if ((si.getStatus() == Eris::ServerInfo::QUERYING) ||
