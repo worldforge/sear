@@ -86,6 +86,8 @@ void Editor::translate(const std::string& target, WFMath::Vector<3> delta, bool 
 
     Eris::EntityPtr te = getAvatar()->getView()->getEntity(target);
     if (!te) return; // odd
+    Eris::EntityPtr loc = te->getLocation();
+    if (!loc) return;
     
     Atlas::Objects::Operation::Move move;
     move->setFrom(getAvatar()->getId());
@@ -100,8 +102,7 @@ void Editor::translate(const std::string& target, WFMath::Vector<3> delta, bool 
     WFMath::Point<3> pos = te->getPosition() + delta;
     msg["pos"] = pos.toAtlas();
     msg["id"] = te->getId();
-#warning "This statement can segfault"
-    msg["loc"] = te->getLocation()->getId();
+    msg["loc"] = loc->getId();
     move->setArgsAsList(Atlas::Message::ListType(1, msg));
       
     getAvatar()->getConnection()->send(move);
@@ -111,6 +112,8 @@ void Editor::rotateZ(const std::string& target, double delta)
 {
     Eris::EntityPtr te = getAvatar()->getView()->getEntity(target);
     if (!te) return; // odd
+    Eris::EntityPtr loc = te->getLocation();
+    if (!loc) return;
     
     Atlas::Objects::Operation::Move move;
     move->setFrom(getAvatar()->getId());
@@ -121,7 +124,7 @@ void Editor::rotateZ(const std::string& target, double delta)
     
     msg["orientation"] = q.toAtlas();
     msg["pos"] = te->getPosition().toAtlas();    
-    msg["loc"] = te->getLocation()->getId();
+    msg["loc"] = loc->getId();
     msg["id"] = te->getId();
     move->setArgsAsList(Atlas::Message::ListType(1, msg));
       
