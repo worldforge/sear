@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.21 2005-06-16 14:06:14 simon Exp $
+// $Id: Graphics.cpp,v 1.22 2005-06-18 21:08:33 simon Exp $
 
 #include <sage/sage.h>
 
@@ -321,7 +321,9 @@ if (c_select) select_mode = true;
     assert(root);
 
 
-//>> Build queues here ??
+    // Build entity queues before rendering so entity lighting will be enabled.
+    // Need to be careful we don't change our view matrices because of frustum
+    //  culling
 
     assert(System::instance()->getCharacter());
 
@@ -348,6 +350,7 @@ if (c_select) select_mode = true;
     Environment::getInstance().renderTerrain(pos, select_mode);
 
     m_renderer->restore();
+
     m_renderer->drawQueue(m_render_queue, select_mode);
     if (!select_mode) {
       m_renderer->drawMessageQueue(m_message_list);

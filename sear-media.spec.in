@@ -8,7 +8,7 @@ Version: %{version}
 Release: %{release}
 URL: http://www.worldforge.org/dev/eng/clients/sear/
 # TODO make sure this is correct
-Copyright: GPL / GFDL
+License: GPL / GFDL
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/build-%{name}
 BuildArchitectures: noarch
@@ -26,7 +26,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %build
 # Requires java in path and WFUT.jar in the BUILD dir
 # There is problably a much better way of doing this
-# uing the Requires: tag
+# using the Requires: tag
 java -jar WFUT.jar update sear-media
 
 %install

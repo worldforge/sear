@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.17 2005-06-16 23:34:30 alriddoch Exp $
+// $Id: ActionHandler.cpp,v 1.18 2005-06-18 21:08:33 simon Exp $
 
 #include <unistd.h>
 #include <varconf/varconf.h>
@@ -45,6 +45,7 @@ ActionHandler::~ActionHandler() {
 
 void ActionHandler::init() {
   if (debug) Log::writeLog("Action Handler: Initialise", Log::LOG_DEFAULT);
+
   assert(m_initialised == false);
 
   m_initialised = true;
@@ -53,11 +54,13 @@ void ActionHandler::init() {
 void ActionHandler::shutdown() {
   assert(m_initialised == true);
   if (debug) Log::writeLog("Action Handler: Shutdown", Log::LOG_DEFAULT);
+  // Free all actions
   while(!action_map.empty()) {
     ActionStruct *as = action_map.begin()->second;
     if (as) delete (as);
     action_map.erase(action_map.begin());
   }
+
   m_initialised = false;
 }
 
@@ -74,21 +77,25 @@ void ActionHandler::loadConfiguration(const std::string &file_name) {
   
 void ActionHandler::handleAction(const std::string &action, WorldEntity *entity) {
   assert ((m_initialised == true) && "ActionHandler not initialised");
-  // Get requested action
-  std::map<std::string, ActionStruct*>::const_iterator I = action_map.find(action);
+
+  // Find requested action
+  ActionMap::const_iterator I = action_map.find(action); 
+
   if (I == action_map.end()) {
     return;
   }
+
   ActionStruct *as = I->second;
   assert(as);
   // Execute action if it exists
   m_system->getScriptEngine()->runScript(as->script);
+
 }
 
 void ActionHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  ActionStruct *record = NULL;
   // Get record if it exists
-  std::map<std::string, ActionStruct*>::const_iterator I = action_map.find(section);
-  ActionStruct * record;
+  ActionMap::const_iterator I = action_map.find(section);
   // If record does not exist, create it.
   if (I == action_map.end()) {
     // Create record and set defaults
@@ -100,6 +107,7 @@ void ActionHandler::varconf_callback(const std::string &section, const std::stri
   } else {
     record = I->second;
   }
+  assert(record != NULL);
   // Set script file
   if (key == SCRIPT) {
     record->script = (std::string)config.getItem(section, key);
@@ -115,9 +123,11 @@ void ActionHandler::varconf_error_callback(const char *message) {
 
 void ActionHandler::registerCommands(Console *console) {
   assert ((m_initialised == true) && "ActionHandler not initialised");
+  assert(console != NULL);
   console->registerCommand(LOAD_CONFIG, this);
   console->registerCommand(DO_ACTION, this);
 }
+
 void ActionHandler::runCommand(const std::string &command, const std::string &args) {
   assert ((m_initialised == true) && "ActionHandler not initialised");
   if (command == LOAD_CONFIG) loadConfiguration(args);

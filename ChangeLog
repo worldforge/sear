@@ -1,5 +1,13 @@
 2005-06-18  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* README, configure.ac: Update deps.
+	* sear-media.spec.in, sear-updater.spec.in: Change Copyright to License.
+	* renderers/Graphics.cpp: Update some comments
+	* src/ActionHandler.h: Add typdef for actionmap type.
+	* src/ActionHandler.cpp: Use actionmap typedef.
+
+2005-06-18  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Editor.cpp: Do not allow move or rotate when loc = 0.
 
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
