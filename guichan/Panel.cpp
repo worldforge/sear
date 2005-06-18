@@ -7,6 +7,7 @@
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/ConsoleWindow.h"
 #include "guichan/OptionsWindow.h"
+#include "guichan/Inventory.h"
 #include "guichan/RootWidget.h"
 #include "guichan/box.hpp"
 
@@ -47,15 +48,15 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 
   setContent(m_hbox);
 
-  addWindow("options", new OptionsWindow);
-  addWindow("inventory", new OptionsWindow);
-
   Render * render = RenderSystem::getInstance().getRenderer();
   int height = render->getWindowHeight();
 
   gcn::Window * con = new ConsoleWindow;
   addWindow("chat", con);
   m_coords["chat"] = std::make_pair(4, height - con->getHeight() / 2 - 4);
+
+  addWindow("inventory", new Inventory);
+  addWindow("options", new OptionsWindow);
 }
 
 Panel::~Panel()
@@ -138,6 +139,7 @@ void Panel::closeWindow(const std::string & name, gcn::Window * win)
 void Panel::addWindow(const std::string & name, gcn::Window * window)
 {
   gcn::Button * button = new gcn::Button(name);
+  button->setFocusable(false);
   button->setEventId(name);
   button->addActionListener(m_buttonListener);
   m_hbox->pack(button);

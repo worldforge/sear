@@ -22,6 +22,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   gcn::TextBox * textBox = new gcn::TextBox("Multiline\nText box");
   textBox->setEditable(false);
   textBox->setOpaque(false);
+  textBox->setFocusable(false);
   textBox->setBackgroundColor(gcn::Color(0,0,0,0));
   gcn::ScrollArea * textBoxScrollArea = new gcn::ScrollArea(textBox,
                                             gcn::ScrollArea::SHOW_NEVER,

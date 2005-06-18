@@ -34,11 +34,13 @@ OptionsWindow::OptionsWindow() : gcn::Window()
 
   m_applyButton = new gcn::Button("Apply");
   m_applyButton->setEventId("apply");
+  m_applyButton->setFocusable(false);
   m_applyButton->addActionListener(m_buttonListener);
   hbox->pack(m_applyButton);
 
   m_closeButton = new gcn::Button("Close");
   m_closeButton->setEventId("close");
+  m_closeButton->setFocusable(false);
   m_closeButton->addActionListener(m_buttonListener);
   hbox->pack(m_closeButton);
 

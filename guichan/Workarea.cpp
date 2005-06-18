@@ -63,6 +63,7 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   m_top = new RootWidget();
   m_top->setDimension(gcn::Rectangle(0, 0, m_width, m_height));
   m_top->setOpaque(false);
+  m_top->setFocusable(true);
 
   m_gui = new Gui();
   m_gui->setGraphics(m_graphics);
@@ -153,7 +154,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
     case SDL_KEYDOWN:
     case SDL_KEYUP:
       clear_focus = (event.key.keysym.sym == SDLK_RETURN);
-      event_eaten = (focus != 0);
+      event_eaten = ((focus != 0) && (focus != m_top));
       break;
     default:
       event_eaten = false;

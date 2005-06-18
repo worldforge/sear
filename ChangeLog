@@ -1,5 +1,14 @@
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/ConsoleWindow.cpp, guichan/LoginWindow.cpp,
+	  guichan/OptionsWindow.cpp, guichan/Workarea.cpp: Manage gui
+	  focus more carefully so it does not obstruct gameplay.
+
+	* guichan/Panel.cpp, guichan/Inventory.cpp, guichan/Inventory.h:
+	  Work in progress on an inventory window.
+
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Panel.h, guichan/Panel.cpp: Generalise opening and
 	  closing window code. Store coordinates of windows when they
 	  are not viewed.

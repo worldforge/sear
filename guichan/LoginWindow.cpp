@@ -46,6 +46,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login")
 
   hbox = new gcn::HBox(6);
   m_loginButton = new gcn::Button("Login");
+  m_loginButton->setFocusable(false);
   m_loginListener = new ActionListenerSigC;
   SigC::Slot0<void> s1 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), LOGIN);
   SigC::Slot1<void, std::string> s2 = SigC::hide<std::string>(s1);
@@ -54,6 +55,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login")
   hbox->pack(m_loginButton);
 
   m_createButton = new gcn::Button("Create");
+  m_createButton->setFocusable(false);
   m_createListener = new ActionListenerSigC;
   SigC::Slot0<void> s3 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), CREATE);
   SigC::Slot1<void, std::string> s4 = SigC::hide<std::string>(s3);
