@@ -11,23 +11,32 @@
 
 namespace gcn {
 
-class Button;
+class ListBox;
 class TextField;
+class Button;
 
 } // namespace gcn
 
 namespace Sear {
 
 class ActionListenerSigC;
+class ServerListModel;
 
 class ConnectWindow : virtual public SigC::Object, public gcn::Window {
 protected:
+  gcn::ListBox * m_servers;
+
   gcn::TextField * m_serverField;
 
   gcn::Button * m_connectButton;
   gcn::Button * m_closeButton;
 
+  ServerListModel * m_serverListModel;
   ActionListenerSigC * m_buttonListener;
+
+  int m_selected;
+
+  virtual void logic();
 public:
   ConnectWindow();
   virtual ~ConnectWindow();

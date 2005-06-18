@@ -1,5 +1,12 @@
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/ConnectWindow.cpp, guichan/ConnectWindow.h: Implement
+	  server list.
+
+	* guichan/Workarea.cpp: Add the Panel and ConnectWindow by default.
+
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Workarea.h, guichan/Workarea.cpp: Add code from panel
 	  to handle commands to open and close windows.
 

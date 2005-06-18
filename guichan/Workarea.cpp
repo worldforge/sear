@@ -89,13 +89,13 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   // ConsoleWindow * cw = new ConsoleWindow;
   // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
 
-  // ConnectWindow * con_w = new ConnectWindow;
-  // m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
+  ConnectWindow * con_w = new ConnectWindow;
+  m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
 
   m_panel = 0;
 
-  // m_panel = new Panel(m_top);
-  // m_top->add(m_panel, 0, 0);
+  m_panel = new Panel(m_top);
+  m_top->add(m_panel, 0, 0);
 }
 
 Workarea::~Workarea()

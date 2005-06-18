@@ -9,6 +9,8 @@
 
 #include "src/System.h"
 
+#include <Eris/Metaserver.h>
+
 #include <guichan.hpp>
 
 #include <sigc++/bind.h>
@@ -22,23 +24,42 @@ namespace Sear {
 class ServerListModel : public gcn::ListModel
 {
 public:
+  Eris::Meta * m_metaQuery;
+
+  ServerListModel()
+  {
+    m_metaQuery = new Eris::Meta("metaserver.worldforge.org", 16);
+    m_metaQuery->refresh();
+  }
+
   virtual int getNumberOfElements()
   {
-    return 0;
+    return m_metaQuery->getGameServerCount();
   }
 
   virtual std::string getElementAt(int i)
   {
-    switch(i)
-    {
-      default: // Just to keep warnings away
-        return std::string("");
+    const Eris::ServerInfo & si = m_metaQuery->getInfoForServer(i);
+    switch (si.getStatus()) {
+      case Eris::ServerInfo::QUERYING:
+        return si.getHostname();
+        break;
+      case Eris::ServerInfo::VALID:
+        return si.getServername();
+        break;
+      case Eris::ServerInfo::TIMEOUT:
+        return "<timeout>";
+        break;
+      case Eris::ServerInfo::INVALID:
+      default:
+        return "...";
+        break;
     }
   }
 };
 
 
-ConnectWindow::ConnectWindow() : gcn::Window()
+ConnectWindow::ConnectWindow() : gcn::Window(), m_selected(-1)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -48,8 +69,10 @@ ConnectWindow::ConnectWindow() : gcn::Window()
 
   gcn::Box * vbox = new gcn::VBox(6);
 
-  gcn::ListBox * servers = new gcn::ListBox(new ServerListModel);
-  gcn::ScrollArea * scroll_area = new gcn::ScrollArea(servers,
+  m_serverListModel = new ServerListModel;
+
+  m_servers = new gcn::ListBox(m_serverListModel);
+  gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_servers,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
   scroll_area->setWidth(300);
@@ -85,6 +108,26 @@ ConnectWindow::ConnectWindow() : gcn::Window()
 
 ConnectWindow::~ConnectWindow()
 {
+}
+
+void ConnectWindow::logic()
+{
+  std::cout << "SELECTED " << m_servers->getSelected() << std::endl << std::flush;
+  int new_selected = m_servers->getSelected();
+  if (new_selected != m_selected) {
+    m_selected = new_selected;
+    if (m_selected > 0 &&
+        m_selected < m_serverListModel->m_metaQuery->getGameServerCount()) {
+      const Eris::ServerInfo & si = m_serverListModel->m_metaQuery->getInfoForServer(m_selected);
+      if ((si.getStatus() == Eris::ServerInfo::QUERYING) ||
+          (si.getStatus() == Eris::ServerInfo::VALID)) {
+        m_serverField->setText(si.getHostname());
+      } else {
+        m_serverField->setText("");
+      }
+    }
+  }
+  gcn::Window::logic();
 }
 
 void ConnectWindow::actionPressed(std::string event)
