@@ -23,8 +23,9 @@ namespace Sear {
 class System;
 class Console;
 
-class RootWidget;
 class Panel;
+class ConnectWindow;
+class RootWidget;
 
 class Gui : public gcn::Gui {
 public:
@@ -37,6 +38,10 @@ public:
 };
 
 class Workarea : public ConsoleObject {
+public:
+  typedef std::map<std::string, gcn::Button *> ButtonDict;
+  typedef std::map<std::string, gcn::Window *> WindowDict;
+  typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
   System * m_system;
   int m_width, m_height;
@@ -47,9 +52,17 @@ protected:
   gcn::SDLImageLoader * m_hostImageLoader; // For loading images
   Gui * m_gui;                             // A Gui object - binds it together
 
+  ButtonDict m_buttons;
+  WindowDict m_windows;
+  CoordDict m_coords;
+
   Panel * m_panel;
+  ConnectWindow * m_connectWindow;
 
   RootWidget * m_top;                  // Top level container widget
+
+  void openWindow(const std::string &, gcn::Window *);
+  void closeWindow(const std::string &, gcn::Window *);
 public:
   Workarea(System *);
   virtual ~Workarea();

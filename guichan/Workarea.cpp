@@ -28,7 +28,8 @@ namespace Sear {
 
 static const std::string WORKSPACE = "workspace";
 
-static const std::string WORKAREA_FOO = "workarea_foo";
+static const std::string WORKAREA_OPEN = "workarea_open";
+static const std::string WORKAREA_CLOSE = "workarea_close";
 
 Gui::Gui()
 {
@@ -104,19 +105,64 @@ Workarea::~Workarea()
   delete m_imageLoader;
 }
 
+void Workarea::openWindow(const std::string & name, gcn::Window * win)
+{
+  int x, y;
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int width = render->getWindowWidth(),
+      height = render->getWindowHeight();
+
+  CoordDict::const_iterator I = m_coords.find(name);
+
+  if (I != m_coords.end()) {
+    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
+    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
+  } else {
+    x = width / 2 - win->getWidth() / 2;
+    y = height / 2 - win->getHeight() / 2;
+  }
+
+  m_top->add(win, x, y);
+}
+
+void Workarea::closeWindow(const std::string & name, gcn::Window * win)
+{
+  m_coords[name] = std::make_pair(win->getX(), win->getY());
+  m_top->remove(win);
+}
+
 void Workarea::registerCommands(Console * console)
 {
   if (m_panel != 0) {
     m_panel->registerCommands(console);
   }
 
-  console->registerCommand(WORKAREA_FOO, this);
+  console->registerCommand(WORKAREA_OPEN, this);
+  console->registerCommand(WORKAREA_CLOSE, this);
 }
 
 void Workarea::runCommand(const std::string & command, const std::string & args)
 {
-  if (command == WORKAREA_FOO) {
-    std::cout << "Go the workarea foo command" << std::endl << std::flush;
+  if (command == WORKAREA_CLOSE) {
+    std::cout << "Got the workarea close command" << std::endl << std::flush;
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      gcn::Window * win = I->second;
+      assert(win != 0);
+      if (win->getParent() != 0) {
+        closeWindow(args, win);
+      }
+    }
+  }
+  else if (command == WORKAREA_OPEN) {
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      gcn::Window * win = I->second;
+      assert(win != 0);
+      if (win->getParent() == 0) {
+        openWindow(args, win);
+      }
+    }
   }
 }
 

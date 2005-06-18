@@ -1,5 +1,10 @@
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/Workarea.h, guichan/Workarea.cpp: Add code from panel
+	  to handle commands to open and close windows.
+
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/ConsoleWindow.cpp, guichan/LoginWindow.cpp,
 	  guichan/OptionsWindow.cpp, guichan/Workarea.cpp: Manage gui
 	  focus more carefully so it does not obstruct gameplay.
