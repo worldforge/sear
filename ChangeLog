@@ -1,3 +1,7 @@
+2005-06-18  Simon Goodall <sear@simongoodall.co.uk>
+
+	* README: Update dependancies.
+
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/ConnectWindow.cpp, guichan/ConnectWindow.h: Implement
