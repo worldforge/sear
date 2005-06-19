@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.127 2005-06-16 23:34:30 alriddoch Exp $
+// $Id: System.cpp,v 1.128 2005-06-19 22:52:22 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -214,6 +214,9 @@ bool System::init(int argc, char *argv[]) {
   m_editor = new Editor();
   m_editor->registerCommands(m_console);
 
+  m_workarea = new Workarea(this);
+  m_workarea->registerCommands(m_console);
+
   int sticks = SDL_NumJoysticks();
 
   if (m_general.findItem(SECTION_INPUT, KEY_MOVE_AXIS))  {
@@ -306,9 +309,7 @@ bool System::init(int argc, char *argv[]) {
 
   RenderSystem::getInstance().initContext();
 
-  m_workarea = new Workarea(this);
-
-  m_workarea->registerCommands(m_console);
+  m_workarea->init();
 
   m_system_running = true;
   m_initialised = true;
@@ -750,6 +751,7 @@ void System::readConfig(varconf::Config &config) {
   ModelSystem::getInstance().readConfig(config);
   m_character->readConfig(config);
   m_calendar->readConfig(config);
+  m_workarea->readConfig(m_general);
 }
 
 void System::writeConfig(varconf::Config &config) {
@@ -764,6 +766,7 @@ void System::writeConfig(varconf::Config &config) {
   ModelSystem::getInstance().writeConfig(config);
   m_character->writeConfig(config);
   m_calendar->writeConfig(config);
+  m_workarea->writeConfig(m_general);
 }
 
 void System::vEnableKeyRepeat(bool bEnable) {

@@ -11,6 +11,10 @@
 
 #include <SDL/SDL.h>
 
+namespace varconf {
+  class Config;
+}
+
 namespace gcn {
   class SDLInput;
   class OpenGLGraphics;
@@ -45,6 +49,8 @@ public:
 protected:
   System * m_system;
   int m_width, m_height;
+  std::string m_fixed_font;
+  std::string m_fixed_font_characters;
 
   gcn::SDLInput * m_input;                 // Input driver
   gcn::OpenGLGraphics * m_graphics;        // Graphics driver
@@ -67,8 +73,12 @@ public:
   Workarea(System *);
   virtual ~Workarea();
 
+  void init();
+
   void registerCommands(Console *);
   virtual void runCommand(const std::string &, const std::string &);
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config);
 
   void resize(int width, int height);
   bool handleEvent(const SDL_Event &);

@@ -1,5 +1,14 @@
 2005-06-18  Al Riddoch  <alriddoch@zepler.org>
 
+	* data/Makefile.am, data/fixedfont.bmp: Add a font for the gui.
+
+	* guichan/Workarea.cpp, guichan/Workarea.h: Add code to read and
+	  write config, and settings for font path and characters.
+
+	* src/System.cpp: Add hooks to read and write gui config.
+
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/ConnectWindow.cpp: Make sure most widgets can't get focus.
 	  Sort out issue with ListBox entries getting cropped.
 

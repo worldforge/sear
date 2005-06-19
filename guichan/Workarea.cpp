@@ -15,7 +15,9 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
+#include "src/FileHandler.h"
 #include "src/Console.h"
+#include "src/System.h"
 
 #include <guichan/sdl.hpp>
 #include <guichan/opengl.hpp>
@@ -31,6 +33,14 @@ static const std::string WORKSPACE = "workspace";
 static const std::string WORKAREA_OPEN = "workarea_open";
 static const std::string WORKAREA_CLOSE = "workarea_close";
 
+static const std::string WORKAREA = "workarea";
+
+static const std::string KEY_fixed_font = "fixed_font";
+static const std::string KEY_fixed_font_characters = "fixed_font_characters";
+
+static const std::string DEFAULT_fixed_font = "${SEAR_INSTALL}/data/fixedfont.bmp";
+static const std::string DEFAULT_fixed_font_characters = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
 Gui::Gui()
 {
 }
@@ -40,6 +50,10 @@ Gui::~Gui()
 }
 
 Workarea::Workarea(System * s) : m_system(s), m_input(0)
+{
+}
+
+void Workarea::init()
 {
   m_imageLoader = new gcn::OpenGLImageLoader();
   m_hostImageLoader = new gcn::SDLImageLoader();
@@ -72,11 +86,13 @@ Workarea::Workarea(System * s) : m_system(s), m_input(0)
   m_gui->setTop(m_top);
 
   try {
-    gcn::ImageFont * font = new gcn::ImageFont("/tmp/fixedfont.bmp", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+    std::string font_path = m_fixed_font;
+    m_system->getFileHandler()->expandString(font_path);
+    gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
     gcn::Widget::setGlobalFont(font);
   } catch (...) {
-    std::cout << "Failed to load font" << std::endl << std::flush;
+    std::cerr << "Failed to load font " << m_fixed_font << std::endl << std::flush;
   }
 
   // gcn::Image * image = new gcn::Image("/tmp/gui-chan.bmp");
@@ -164,6 +180,30 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       }
     }
   }
+}
+
+void Workarea::readConfig(varconf::Config & config)
+{
+  varconf::Variable temp;
+
+  if (config.findItem(WORKAREA, KEY_fixed_font)) {
+    temp = config.getItem(WORKAREA, KEY_fixed_font);
+    m_fixed_font = (!temp.is_string()) ? (DEFAULT_fixed_font) : temp.as_string();
+  } else {
+    m_fixed_font = DEFAULT_fixed_font;
+  }
+  if (config.findItem(WORKAREA, KEY_fixed_font_characters)) {
+    temp = config.getItem(WORKAREA, KEY_fixed_font_characters);
+    m_fixed_font_characters = (!temp.is_string()) ? (DEFAULT_fixed_font_characters) : temp.as_string();
+  } else {
+    m_fixed_font_characters = DEFAULT_fixed_font_characters;
+  }
+}
+
+void Workarea::writeConfig(varconf::Config & config)
+{
+  config.setItem(WORKAREA, KEY_fixed_font, m_fixed_font);
+  config.setItem(WORKAREA, KEY_fixed_font_characters, m_fixed_font_characters);
 }
 
 void Workarea::resize(int x, int y)
