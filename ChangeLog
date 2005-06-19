@@ -1,3 +1,8 @@
+2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConnectWindow.cpp: Make sure most widgets can't get focus.
+	  Sort out issue with ListBox entries getting cropped.
+
 2005-06-18  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* README, configure.ac: Update deps.

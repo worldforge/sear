@@ -72,10 +72,12 @@ ConnectWindow::ConnectWindow() : gcn::Window(), m_selected(-1)
   m_serverListModel = new ServerListModel;
 
   m_servers = new gcn::ListBox(m_serverListModel);
+  m_servers->setWidth(200);
+  m_servers->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_servers,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
-  scroll_area->setWidth(300);
+  scroll_area->setWidth(200);
   scroll_area->setHeight(200);
   scroll_area->setBorderSize(1);
   vbox->pack(scroll_area);
@@ -90,11 +92,13 @@ ConnectWindow::ConnectWindow() : gcn::Window(), m_selected(-1)
   m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
 
   m_connectButton = new gcn::Button("Connect");
+  m_connectButton->setFocusable(false);
   m_connectButton->setEventId("connect");
   m_connectButton->addActionListener(m_buttonListener);
   hbox->pack(m_connectButton);
 
   m_closeButton = new gcn::Button("Close");
+  m_closeButton->setFocusable(false);
   m_closeButton->setEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
   hbox->pack(m_closeButton);
