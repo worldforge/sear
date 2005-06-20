@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.18 2005-06-18 21:08:33 simon Exp $
+// $Id: ActionHandler.cpp,v 1.19 2005-06-20 09:22:07 simon Exp $
 
 #include <unistd.h>
 #include <varconf/varconf.h>
@@ -30,6 +30,7 @@ namespace Sear {
 static const std::string LOAD_CONFIG = "load_action_config";
 static const std::string DO_ACTION = "do_action";
 static const std::string SCRIPT = "script";
+static const std::string COMMAND = "command";
 static const std::string ENTITY = "entity_based";
 
 ActionHandler::ActionHandler(System *system) :
@@ -88,7 +89,9 @@ void ActionHandler::handleAction(const std::string &action, WorldEntity *entity)
   ActionStruct *as = I->second;
   assert(as);
   // Execute action if it exists
-  m_system->getScriptEngine()->runScript(as->script);
+  // Execute command if present, else fall back to external script.
+  if (!as->command.empty()) m_system->runCommand(as->command);
+  else m_system->getScriptEngine()->runScript(as->script);
 
 }
 
@@ -112,6 +115,9 @@ void ActionHandler::varconf_callback(const std::string &section, const std::stri
   if (key == SCRIPT) {
     record->script = (std::string)config.getItem(section, key);
   }
+  else if (key == COMMAND) {
+    record->command = (std::string)config.getItem(section, key);
+  }
   // Set entity based flag
   else if (key == ENTITY) record->entity_based = (bool)config.getItem(section, key);
 }
@@ -132,6 +138,23 @@ void ActionHandler::runCommand(const std::string &command, const std::string &ar
   assert ((m_initialised == true) && "ActionHandler not initialised");
   if (command == LOAD_CONFIG) loadConfiguration(args);
   else if (command == DO_ACTION) handleAction(args, NULL);
+}
+
+void ActionHandler::addHandler(const std::string &action, const std::string &command) {
+  // Get record if it exists
+  ActionMap::const_iterator I = action_map.find(action);
+
+  if (I != action_map.end()) {
+    fprintf(stderr, "Action %s already exists. Ignoring.\n", action.c_str());
+    return;
+  }
+  
+  // Create action 
+  ActionStruct *record = new ActionStruct();
+  record->action = action;
+  record->entity_based = false;
+  record->command = command;
+  action_map[action] = record;
 }
 
 } /* namespace Sear */

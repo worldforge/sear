@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.7 2005-06-18 21:08:33 simon Exp $
+// $Id: ActionHandler.h,v 1.8 2005-06-20 09:22:07 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -41,7 +41,7 @@ public:
 
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
-
+  void addHandler(const std::string &action, const std::string &command);
 private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
@@ -49,6 +49,7 @@ private:
   typedef struct {
     std::string action;
     std::string script;
+    std::string command;
     bool entity_based;
   } ActionStruct;
  
