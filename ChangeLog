@@ -1,4 +1,16 @@
-2005-06-18  Al Riddoch  <alriddoch@zepler.org>
+2005-06-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConnectWindow.cpp: Open the LoginWindow when this window
+	  closes.
+
+	* guichan/CharacterWindow.h, guichan/CharacterWindow.cpp: Add new
+	  window for selecting or creating a character.
+
+	* guichan/LoginWindow.h, guichan/LoginWindow.cpp: Add support for
+	  creating a new account more cleanly. Add password confirmation
+	  field. Open the CharacterWindow when this window closes.
+
+2005-06-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* data/Makefile.am, data/fixedfont.bmp: Add a font for the gui.
 

@@ -4,6 +4,7 @@
 
 #include "guichan/ConnectWindow.h"
 
+#include "guichan/LoginWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -157,6 +158,10 @@ void ConnectWindow::actionPressed(std::string event)
   }
   parent->remove(this);
 
+
+  LoginWindow * lw = new LoginWindow;
+  parent->add(lw, parent->getWidth() / 2 - lw->getWidth() / 2,
+                  parent->getHeight() / 2 - lw->getHeight() / 2);
 }
 
 } // namespace Sear

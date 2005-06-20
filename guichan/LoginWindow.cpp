@@ -3,6 +3,8 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "guichan/LoginWindow.h"
+
+#include "guichan/CharacterWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -45,6 +47,19 @@ LoginWindow::LoginWindow() : gcn::Window("Login")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  gcn::Label * l3 = new gcn::Label("        ");
+  m_pswdConfirmField = new gcn::TextField("                ");
+  m_pswdConfirmField->setText("");
+  m_pswdConfirmField->setEnabled(false);
+  hbox->pack(l3);
+  hbox->pack(m_pswdConfirmField);
+
+  vbox->pack(hbox);
+
+  m_createCheck = new gcn::CheckBox("New Account");
+  vbox->pack(m_createCheck);
+
+  hbox = new gcn::HBox(6);
   m_loginButton = new gcn::Button("Login");
   m_loginButton->setFocusable(false);
   m_loginListener = new ActionListenerSigC;
@@ -54,14 +69,14 @@ LoginWindow::LoginWindow() : gcn::Window("Login")
   m_loginButton->addActionListener(m_loginListener);
   hbox->pack(m_loginButton);
 
-  m_createButton = new gcn::Button("Create");
-  m_createButton->setFocusable(false);
-  m_createListener = new ActionListenerSigC;
-  SigC::Slot0<void> s3 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), CREATE);
+  m_cancelButton = new gcn::Button("Cancel");
+  m_cancelButton->setFocusable(false);
+  m_cancelListener = new ActionListenerSigC;
+  SigC::Slot0<void> s3 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), CANCEL);
   SigC::Slot1<void, std::string> s4 = SigC::hide<std::string>(s3);
-  m_createListener->Action.connect(s4);
-  m_createButton->addActionListener(m_createListener);
-  hbox->pack(m_createButton);
+  m_cancelListener->Action.connect(s4);
+  m_cancelButton->addActionListener(m_cancelListener);
+  hbox->pack(m_cancelButton);
 
   vbox->pack(hbox);
 
@@ -80,6 +95,12 @@ LoginWindow::~LoginWindow()
 {
 }
 
+void LoginWindow::logic()
+{
+  m_pswdConfirmField->setEnabled(m_createCheck->isMarked());
+  gcn::Window::logic();
+}
+
 void LoginWindow::actionPressed(action a)
 {
   const std::string & username = m_userField->getText();
@@ -90,23 +111,21 @@ void LoginWindow::actionPressed(action a)
   std::string cmd;
   switch (a) {
     case LOGIN:
-      std::cout << "LOGIN " << username << " " << password << std::endl << std::flush;
-      cmd = "/login ";
-      cmd += username;
-      cmd += " ";
-      cmd += password;
+      if (m_createCheck->isMarked()) {
+        cmd = "/create ";
+        cmd += username;
+        cmd += " ";
+        cmd += password;
+        cmd += " Sear_User";
+      } else {
+        cmd = "/login ";
+        cmd += username;
+        cmd += " ";
+        cmd += password;
+      }
       System::instance()->runCommand(cmd);
       break;
-    case CREATE:
-      std::cout << "CREATE " << username << " " << password << std::endl << std::flush;
-      cmd = "/create ";
-      cmd += username;
-      cmd += " ";
-      cmd += password;
-      cmd += " Sear Player";
-      // FIXME Actually this really needs another dialogue with password
-      // confirmation.
-      System::instance()->runCommand(cmd);
+    case CANCEL:
       break;
     default:
       break;
@@ -122,6 +141,11 @@ void LoginWindow::actionPressed(action a)
     return;
   }
   parent->remove(this);
+
+  CharacterWindow * cw = new CharacterWindow;
+  parent->add(cw, parent->getWidth() / 2 - cw->getWidth() / 2,
+                  parent->getHeight() / 2 - cw->getHeight() / 2);
+
 }
 
 } // namespace Sear
