@@ -1,5 +1,11 @@
 2005-06-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h: Filled out
+	  more character related functionality, including making character
+	  creation now work.
+
+2005-06-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/ConnectWindow.cpp: Open the LoginWindow when this window
 	  closes.
 

@@ -6,6 +6,8 @@
 
 #include "guichan/LoginWindow.h"
 #include "guichan/ActionListenerSigC.h"
+#include "guichan/widgets/label.hpp"
+
 #include "guichan/box.hpp"
 
 #include "src/System.h"
@@ -66,6 +68,8 @@ CharacterWindow::CharacterWindow() : gcn::Window(), m_selected(-1)
 
   gcn::Box * vbox = new gcn::VBox(6);
 
+  vbox->pack(new gcn::Label("Characters"));
+
   m_characterListModel = new CharacterListModel;
 
   m_characters = new gcn::ListBox(m_characterListModel);
@@ -79,14 +83,34 @@ CharacterWindow::CharacterWindow() : gcn::Window(), m_selected(-1)
   scroll_area->setBorderSize(1);
   vbox->pack(scroll_area);
 
-  m_characterField = new gcn::TextField("                ");
-  m_characterField->setText("");
-  vbox->pack(m_characterField);
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
+
+  m_refreshButton = new gcn::Button("Refresh");
+  m_refreshButton->setFocusable(false);
+  m_refreshButton->setEventId("refresh");
+  m_refreshButton->addActionListener(m_buttonListener);
+  vbox->pack(m_refreshButton);
 
   gcn::Box * hbox = new gcn::HBox(6);
 
-  m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
+  hbox->pack(new gcn::Label("Name"));
+  m_nameField = new gcn::TextField("                ");
+  m_nameField->setText("");
+  hbox->pack(m_nameField);
+
+  vbox->pack(hbox);
+
+  hbox = new gcn::HBox(6);
+
+  hbox->pack(new gcn::Label("Type"));
+  m_typeField = new gcn::TextField("                ");
+  m_typeField->setText("");
+  hbox->pack(m_typeField);
+
+  vbox->pack(hbox);
+
+  hbox = new gcn::HBox(6);
 
   m_takeButton = new gcn::Button("Take character");
   m_takeButton->setFocusable(false);
@@ -116,14 +140,14 @@ void CharacterWindow::logic()
   int new_selected = m_characters->getSelected();
   if (new_selected != m_selected) {
     m_selected = new_selected;
-    m_characterField->setText("");
+    m_nameField->setText("");
     const Eris::CharacterMap & ci = m_characterListModel->m_account->getCharacters();
     if (m_selected >= 0 && m_selected < ci.size()) {
       Eris::CharacterMap::const_iterator I = ci.begin();
       Eris::CharacterMap::const_iterator Iend = ci.end();
       for (int j = 0; I != Iend; ++I, ++j) {
         if (m_selected == j) {
-          m_characterField->setText(I->second->getName());
+          m_nameField->setText(I->second->getName());
         }
       }
     }
@@ -134,11 +158,19 @@ void CharacterWindow::logic()
 void CharacterWindow::actionPressed(std::string event)
 {
   if (event == "take") {
-    std::cout << "Character " << m_characterField->getText() << std::endl << std::flush;
+    std::cout << "Character " << m_nameField->getText() << std::endl << std::flush;
     std::string cmd("/connect ");
-    cmd += m_characterField->getText();
+    cmd += m_nameField->getText();
     System::instance()->runCommand(cmd);
   } else if (event == "create") {
+    std::string cmd("/add ");
+    cmd += m_nameField->getText();
+    cmd += " ";
+    cmd += m_typeField->getText();
+    cmd += " ";
+    cmd += "male"; // FIXME add a widget for this
+    cmd += " A settler"; // FIXME Could add a widget for this too.
+    System::instance()->runCommand(cmd);
     std::cout << "Close window" << std::endl << std::flush;
   } else if (event == "refresh") {
   } else {
@@ -155,11 +187,6 @@ void CharacterWindow::actionPressed(std::string event)
     return;
   }
   parent->remove(this);
-
-
-  LoginWindow * lw = new LoginWindow;
-  parent->add(lw, parent->getWidth() / 2 - lw->getWidth() / 2,
-                  parent->getHeight() / 2 - lw->getHeight() / 2);
 }
 
 } // namespace Sear

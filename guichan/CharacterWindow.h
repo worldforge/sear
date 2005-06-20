@@ -26,8 +26,10 @@ class CharacterWindow : virtual public SigC::Object, public gcn::Window {
 protected:
   gcn::ListBox * m_characters;
 
-  gcn::TextField * m_characterField;
+  gcn::TextField * m_nameField;
+  gcn::TextField * m_typeField;
 
+  gcn::Button * m_refreshButton;
   gcn::Button * m_takeButton;
   gcn::Button * m_createButton;
 
