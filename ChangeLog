@@ -1,3 +1,15 @@
+2005-06-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/CharacterWindow.cpp: Fix headers.
+
+	* guichan/ConnectWindow.cpp: Handle closing the window more sanely.
+
+	* guichan/Alert.cpp, guichan/Alert.h: New window class for alert
+	  messages.
+
+	* guichan/LoginWindow.cpp: Flag an alert when account creation
+	  passwords don't match.
+
 2005-06-20  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Camera.cpp: Remove debugging output.

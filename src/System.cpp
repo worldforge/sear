@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.128 2005-06-19 22:52:22 alriddoch Exp $
+// $Id: System.cpp,v 1.129 2005-06-20 16:55:39 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -608,6 +608,7 @@ void System::handleAnalogueControllers() {
         c = g->getCurrentCamera();
         if (c != NULL) {
           c->elevateImmediate(elevation);
+          // m_character->setPitch(c->getElevation());
         }
       }
     }

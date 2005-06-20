@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.29 2005-05-18 19:35:15 jmt Exp $
+// $Id: Character.h,v 1.30 2005-06-20 16:55:39 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -115,6 +115,7 @@ private:
   float m_rotate_speed;
 
   float m_angle;
+  float m_pitch;
   float m_rate;
   float m_speed;
   float m_strafe_speed;

@@ -4,6 +4,7 @@
 
 #include "guichan/LoginWindow.h"
 
+#include "guichan/Alert.h"
 #include "guichan/CharacterWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
@@ -103,6 +104,10 @@ void LoginWindow::logic()
 
 void LoginWindow::actionPressed(action a)
 {
+  bool close = false;
+  bool next = false;
+  bool password_error = false;
+
   const std::string & username = m_userField->getText();
   const std::string & password = m_pswdField->getText();
   if (username.empty() || password.empty()) {
@@ -112,6 +117,10 @@ void LoginWindow::actionPressed(action a)
   switch (a) {
     case LOGIN:
       if (m_createCheck->isMarked()) {
+        if (password != m_pswdConfirmField->getText()) {
+          password_error = true;
+          break;
+        }
         cmd = "/create ";
         cmd += username;
         cmd += " ";
@@ -124,12 +133,16 @@ void LoginWindow::actionPressed(action a)
         cmd += password;
       }
       System::instance()->runCommand(cmd);
+      close = true;
+      next = true;
       break;
     case CANCEL:
+      close = true;
       break;
     default:
       break;
   };
+
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
@@ -140,7 +153,17 @@ void LoginWindow::actionPressed(action a)
     std::cout << "WEIRD PARENT" << std::endl << std::flush;
     return;
   }
+
+  if (password_error) {
+    new Alert(parent, "Passwords do not match");
+    return;
+  }
+
+  if (!close) { return; }
+
   parent->remove(this);
+
+  if (!next) { return; }
 
   CharacterWindow * cw = new CharacterWindow;
   parent->add(cw, parent->getWidth() / 2 - cw->getWidth() / 2,

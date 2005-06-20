@@ -6,9 +6,10 @@
 
 #include "guichan/LoginWindow.h"
 #include "guichan/ActionListenerSigC.h"
-#include "guichan/widgets/label.hpp"
 
 #include "guichan/box.hpp"
+
+#include <guichan/widgets/label.hpp>
 
 #include "src/System.h"
 #include "src/client.h"

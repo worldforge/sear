@@ -136,16 +136,24 @@ void ConnectWindow::logic()
 
 void ConnectWindow::actionPressed(std::string event)
 {
+  bool close = false;
+  bool next = false;
   if (event == "connect") {
     std::cout << "Connect " << m_serverField->getText() << std::endl << std::flush;
     std::string cmd("/connect ");
     cmd += m_serverField->getText();
     System::instance()->runCommand(cmd);
+    close = true;
+    next = true;
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
+    close = true;
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
+
+  if (!close) { return; }
+
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
@@ -158,6 +166,7 @@ void ConnectWindow::actionPressed(std::string event)
   }
   parent->remove(this);
 
+  if (!next) { return; }
 
   LoginWindow * lw = new LoginWindow;
   parent->add(lw, parent->getWidth() / 2 - lw->getWidth() / 2,

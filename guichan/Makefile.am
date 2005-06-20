@@ -4,6 +4,7 @@ INCLUDES = -I$(top_srcdir)
 
 libGuichan_a_SOURCES = box.cpp box.hpp \
                        RootWidget.cpp RootWidget.h \
+                       Alert.cpp Alert.h \
                        ConnectWindow.cpp ConnectWindow.h \
                        OptionsWindow.cpp OptionsWindow.h \
                        Inventory.cpp Inventory.h \

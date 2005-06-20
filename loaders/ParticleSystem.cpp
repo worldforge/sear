@@ -210,7 +210,7 @@ int ParticleSystem::shutdown()
 void ParticleSystem::update(float elapsed)
 {
     double status = m_entity->entity->getStatus();
-    int numToCreate = lrintf(m_createPerSec.random() * elapsed * status);
+    int numToCreate = lrintf(m_createPerSec.random() * elapsed * status * 2.f);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {
         if (m_particles[p]->isActive()) {

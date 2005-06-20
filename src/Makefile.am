@@ -25,9 +25,9 @@ SEAR_EXT_LIBS = \
 	/usr/lib/libasound.a \
 	/usr/X11R6/lib/libX11.a \
 	/usr/X11R6/lib/libXext.a \
-	/usr/local/lib/libmercator-0.2.a \
+	/usr/lib/libmercator-0.2.a \
 	/usr/lib/libvarconf-1.0.a \
-	/usr/local/lib/liberis-1.3.a \
+	/usr/lib/liberis-1.3.a \
 	/usr/lib/libsigc-2.0.a \
 	/usr/lib/libskstream-0.3.a \
 	/usr/lib/libAtlasObjects-0.6.a \
@@ -36,6 +36,9 @@ SEAR_EXT_LIBS = \
 	/usr/lib/libAtlasMessage-0.6.a \
 	/usr/lib/libAtlas-0.6.a \
 	/usr/lib/libwfmath-0.3.a \
+	/usr/local/lib/libguichan_sdl.a \
+	/usr/local/lib/libguichan_opengl.a \
+	/usr/local/lib/libguichan.a \
 	/usr/local/lib/libsage.a \
 	/usr/local/lib/lib3ds.a \
 	/usr/local/lib/libmd3-0.2.a \
