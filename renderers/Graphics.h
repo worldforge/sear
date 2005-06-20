@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.8 2005-05-25 12:42:51 jmt Exp $
+// $Id: Graphics.h,v 1.9 2005-06-20 16:22:24 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -123,6 +123,8 @@ private:
 
   Light m_fire;
   bool m_show_names;
+  float m_modelview_matrix[4][4];
+  float m_medium_dist, m_high_dist;
 
     /**
     Helper to qeueue the models for a single object record

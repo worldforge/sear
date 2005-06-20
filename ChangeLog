@@ -1,5 +1,13 @@
 2005-06-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp, renderers/Graphics.h: Finally implement
+	  rendering which queue (low/medium/high) based in distance from camera.
+	  Distances will need tweaking. A media update will be required.
+	* renderers/Camera.cpp: Fix bug where the wrong values were being
+	  checked to determine whether to update camera position.
+
+2005-06-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/ActionHandler.cpp, src/ActionHandler.h: Add ability to run a
 	  command instead of just external script files. Add addHandler method
 	  so other system components can add their own commands to events.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.4 2005-04-13 21:53:31 simon Exp $
+// $Id: Camera.cpp,v 1.5 2005-06-20 16:22:24 simon Exp $
 
 #include <string>
 
@@ -109,18 +109,19 @@ void Camera::updateCameraPos(float time_elapsed) {
   assert ((m_initialised == true) && "Camera not initialised");	
   bool changed = false;
   //Only perform calculations if required
-  if (m_zoom_speed != 0.0f) {
+//printf("%f %f %f\n", m_zoom_dir, m_rotation_dir, m_elevation_dir);
+  if (m_zoom_dir != 0.0f) {
     m_distance += m_zoom_speed * m_zoom_dir * time_elapsed;
     // Don't let us move the camera past the focus point
     if (m_distance < m_min_distance) m_distance = m_min_distance; 
     if (m_distance > m_max_distance) m_distance = m_max_distance; 
     changed = true;
   }
-  if (m_rotation_speed != 0.0f) {
+  if (m_rotation_dir != 0.0f) {
     m_rotation  += deg_to_rad(m_rotation_speed * (float)m_rotation_dir * time_elapsed);
     changed = true;
   }
-  if (m_elevation_speed != 0.0f) {
+  if (m_elevation_dir != 0.0f) {
     m_elevation += deg_to_rad(m_elevation_speed * (float)m_elevation_dir * time_elapsed);
     changed = true;
   }
@@ -128,6 +129,7 @@ void Camera::updateCameraPos(float time_elapsed) {
     m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
     m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
     m_z_pos = m_distance * sin(m_elevation);
+    printf("New Pos %f %f %f\n", m_x_pos, m_y_pos, m_z_pos);
   }
 }
 

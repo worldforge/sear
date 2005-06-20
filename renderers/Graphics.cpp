@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.22 2005-06-18 21:08:33 simon Exp $
+// $Id: Graphics.cpp,v 1.23 2005-06-20 16:22:24 simon Exp $
 
 #include <sage/sage.h>
 
@@ -85,6 +85,10 @@ static const std::string SELECT = "select_state";
   static const std::string KEY_fire_spec_green = "fire_specular_green";
   static const std::string KEY_fire_spec_blue = "fire_specular_blue";
   static const std::string KEY_fire_spec_alpha = "fire_specular_alpha";
+
+//  static const std::string KEY_low_dist = "low_dist";
+  static const std::string KEY_medium_dist = "medium_dist";
+  static const std::string KEY_high_dist = "high_dist";
  
   // Default config values
   static const float DEFAULT_use_textures = true;
@@ -108,7 +112,12 @@ static const std::string SELECT = "select_state";
   static const float DEFAULT_fire_spec_green = 0.0f;
   static const float DEFAULT_fire_spec_blue = 0.0f;
   static const float DEFAULT_fire_spec_alpha = 0.0f;
- 
+
+
+//  static const float DEFAULT_low_dist    = 1000.0f;
+  static const float DEFAULT_medium_dist = 800.0f;
+  static const float DEFAULT_high_dist   = 400.0f; 
+
 Graphics::Graphics(System *system) :
   m_system(system),
   m_renderer(NULL),
@@ -116,7 +125,9 @@ Graphics::Graphics(System *system) :
   m_frame_time(0),
   m_initialised(false),
   m_compass(NULL),
-  m_show_names(false)
+  m_show_names(false),
+  m_medium_dist(DEFAULT_medium_dist),
+  m_high_dist(DEFAULT_high_dist)
 {
 }
 
@@ -255,8 +266,9 @@ void Graphics::setCameraTransform() {
   m_renderer->applyCharacterLighting(0.5, 0, 0.5);
 
   m_renderer->applyQuaternion(m_orient);
-    
+
   m_renderer->translateObject(-char_x, -char_y, -char_z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
+  glGetFloatv(GL_MODELVIEW_MATRIX,&m_modelview_matrix[0][0]);
 
 }
 
@@ -381,7 +393,7 @@ void Graphics::buildQueues(WorldEntity *we,
     Render::QueueMap &render_queue,
     Render::MessageList &message_list,
     Render::MessageList &name_list,
-    float time_elapsed) 
+    float time_elapsed)
 {
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
@@ -430,13 +442,51 @@ void Graphics::drawObject(ObjectRecord* obj,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
                         Render::MessageList &name_list,
-                        float time_elapsed)
-{
+                        float time_elapsed) {
+  assert(obj != NULL);
+
   // reject for drawing if object bbox is outside frustum   
   if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
     
+
+  // Get world coord of object
+  WFMath::Point<3> p = obj->entity->getAbsPos();
+
+  // Transform world coord into camera coord
+  WFMath::Vector<3> cam_pos(
+    p.x() * m_modelview_matrix[0][0] 
+     + p.y() * m_modelview_matrix[1][0] 
+     + p.z() * m_modelview_matrix[2][0]
+     + m_modelview_matrix[3][0],
+    p.x() * m_modelview_matrix[0][1]
+     + p.y() * m_modelview_matrix[1][1]
+     + p.z() * m_modelview_matrix[2][1]
+     + m_modelview_matrix[3][1],
+    p.x() * m_modelview_matrix[0][2]
+     + p.y() * m_modelview_matrix[1][2]
+     + p.z() * m_modelview_matrix[2][2]
+     + m_modelview_matrix[3][2]
+  );
+
+  // Calculate distance squared from camera
+  float dist = cam_pos.sqrMag();
+
   ObjectRecord::ModelList::const_iterator I;
-  for (I = obj->low_quality.begin(); I != obj->low_quality.end(); ++I) {
+  ObjectRecord::ModelList::const_iterator Ibegin;
+  ObjectRecord::ModelList::const_iterator Iend;
+  // Choose low/medium/high quality queue based on distance from camera
+  if (dist < m_high_dist) {
+    Ibegin = obj->high_quality.begin();
+    Iend = obj->high_quality.end();
+  } else if (dist < m_medium_dist) {
+    Ibegin = obj->medium_quality.begin();
+    Iend = obj->medium_quality.end();
+  } else {
+    Ibegin = obj->low_quality.begin();
+    Iend = obj->low_quality.end();
+  }
+
+  for (I = Ibegin; I != Iend; ++I) {
     // retrive or create the model and modelRecord as necessary
     ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj->entity);
     assert(modelRec);
@@ -444,6 +494,7 @@ void Graphics::drawObject(ObjectRecord* obj,
     int state = select_mode ? modelRec->select_state : modelRec->state;
     
     if (state <= 0) continue; // bad state
+
     // Add to queue by state, then model record
     render_queue[state].push_back(Render::QueueItem(obj, modelRec));
     
@@ -465,19 +516,18 @@ void Graphics::drawObject(ObjectRecord* obj,
 
 void Graphics::drawFire(WorldEntity* we)
 {
-// Turn on light source
-        m_fire.enabled = true;
+  // Turn on light source
+  m_fire.enabled = true;
 
-        // Set position to entity posotion
-        m_fire.position = we->getAbsPos();
-        m_fire.position.z() += 0.5f; // Raise position off the ground a bit
+  // Set position to entity posotion
+  m_fire.position = we->getAbsPos();
+  m_fire.position.z() += 0.5f; // Raise position off the ground a bit
 
-        // Add light to gl system
-        m_lm->applyLight(m_fire);
+  // Add light to gl system
+  m_lm->applyLight(m_fire);
         
-        // Disable as we don't need it again for now 
-        m_fire.enabled = false;
-
+  // Disable as we don't need it again for now 
+  m_fire.enabled = false;
 }
 
 std::string mapAttachSlotToSubmodel(const std::string& s)
@@ -518,7 +568,26 @@ void Graphics::drawAttached(ObjectRecord* obj,
 
 void Graphics::readConfig(varconf::Config &config) {
   varconf::Variable temp;
- 
+
+  // Read Distances for quality queues
+//  if (config.findItem(GRAPHICS, KEY_low_dist)) {
+//    temp =  config.getItem(GRAPHICS, KEY_low_dist);
+//    m_low_dist = (!temp.is_double()) ? (DEFAULT_low_dist) : ((double)(temp));
+//  } else {
+//    m_low_dist = DEFAULT_low_dist;
+//  } 
+  if (config.findItem(GRAPHICS, KEY_medium_dist)) {
+    temp =  config.getItem(GRAPHICS, KEY_medium_dist);
+    m_medium_dist = (!temp.is_double()) ? (DEFAULT_medium_dist) : ((double)(temp));
+  } else {
+    m_medium_dist = DEFAULT_medium_dist;
+  } 
+  if (config.findItem(GRAPHICS, KEY_high_dist)) {
+    temp =  config.getItem(GRAPHICS, KEY_high_dist);
+    m_high_dist = (!temp.is_double()) ? (DEFAULT_high_dist) : ((double)(temp));
+  } else {
+    m_high_dist = DEFAULT_high_dist;
+  } 
   // Read Fire properties 
   if (config.findItem(GRAPHICS, KEY_fire_ac)) {
     temp = config.getItem(GRAPHICS, KEY_fire_ac);
@@ -620,7 +689,10 @@ void Graphics::readConfig(varconf::Config &config) {
 }  
 
 void Graphics::writeConfig(varconf::Config &config) {
-  
+  // Save queue quality settings 
+//  config.setItem(GRAPHICS, KEY_low_dist, m_low_dist);
+  config.setItem(GRAPHICS, KEY_medium_dist, m_medium_dist);
+  config.setItem(GRAPHICS, KEY_high_dist, m_high_dist);
   // Save frame rate detail boundaries
   config.setItem(GRAPHICS, KEY_fire_ac, m_fire.attenuation_constant);
   config.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
@@ -669,6 +741,23 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
 
 void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   varconf::Variable temp;
+  if (section != GRAPHICS) return;
+
+//  if (key == KEY_low_dist) {
+//    temp =  config.getItem(GRAPHICS, KEY_low_dist);
+//    m_low_dist = ((double)(temp));
+//  } 
+
+//  else
+ if (key == KEY_medium_dist) {
+    temp =  config.getItem(GRAPHICS, KEY_medium_dist);
+    m_medium_dist = ((double)(temp));
+  } 
+
+  else if (key == KEY_high_dist) {
+    temp =  config.getItem(GRAPHICS, KEY_high_dist);
+    m_high_dist = ((double)(temp));
+  } 
 }
 
 } /* namespace Sear */
