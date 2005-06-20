@@ -1,5 +1,14 @@
 2005-06-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* data/rpgfont.png: Add a new font from the guichan archive.
+
+	* guichan/Workarea.cpp: Switch to using the new font by default.
+
+	* guichan/ConnectWindow.cpp: Avoid a couple of characters missing
+	  from the new font.
+
+2005-06-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/CharacterWindow.cpp: Fix headers.
 
 	* guichan/ConnectWindow.cpp: Handle closing the window more sanely.

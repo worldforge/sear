@@ -49,7 +49,7 @@ public:
         return si.getServername();
         break;
       case Eris::ServerInfo::TIMEOUT:
-        return "<timeout>";
+        return "*timeout*";
         break;
       case Eris::ServerInfo::INVALID:
       default:
