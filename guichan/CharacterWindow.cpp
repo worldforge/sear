@@ -31,22 +31,25 @@ namespace Sear {
 class CharacterListModel : public gcn::ListModel
 {
 public:
-  Eris::Account * m_account;
-
   CharacterListModel()
   {
-    m_account = System::instance()->getClient()->getAccount();
-    m_account->refreshCharacterInfo();
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account == 0) { return; }
+    account->refreshCharacterInfo();
   }
 
   virtual int getNumberOfElements()
   {
-    return m_account->getCharacters().size();
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account == 0) { return 0; }
+    return account->getCharacters().size();
   }
 
   virtual std::string getElementAt(int i)
   {
-    const Eris::CharacterMap & ci = m_account->getCharacters();
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account == 0) { return ""; }
+    const Eris::CharacterMap & ci = account->getCharacters();
     Eris::CharacterMap::const_iterator I = ci.begin();
     Eris::CharacterMap::const_iterator Iend = ci.end();
     for (int j = 0; I != Iend; ++I, ++j) {
@@ -59,7 +62,8 @@ public:
 };
 
 
-CharacterWindow::CharacterWindow() : gcn::Window(), m_selected(-1)
+CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
+                                     m_selected(-1)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -127,6 +131,13 @@ CharacterWindow::CharacterWindow() : gcn::Window(), m_selected(-1)
 
   vbox->pack(hbox);
 
+  m_closeButton = new gcn::Button("Close");
+  m_closeButton->setFocusable(false);
+  m_closeButton->setEventId("close");
+  m_closeButton->addActionListener(m_buttonListener);
+
+  vbox->pack(m_closeButton);
+
   setContent(vbox);
 
   resizeToContent();
@@ -142,13 +153,17 @@ void CharacterWindow::logic()
   if (new_selected != m_selected) {
     m_selected = new_selected;
     m_nameField->setText("");
-    const Eris::CharacterMap & ci = m_characterListModel->m_account->getCharacters();
-    if (m_selected >= 0 && m_selected < ci.size()) {
-      Eris::CharacterMap::const_iterator I = ci.begin();
-      Eris::CharacterMap::const_iterator Iend = ci.end();
-      for (int j = 0; I != Iend; ++I, ++j) {
-        if (m_selected == j) {
-          m_nameField->setText(I->second->getName());
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account != 0) {
+      const Eris::CharacterMap & ci = account->getCharacters();
+      if (m_selected >= 0 && (unsigned int)m_selected < ci.size()) {
+        Eris::CharacterMap::const_iterator I = ci.begin();
+        Eris::CharacterMap::const_iterator Iend = ci.end();
+        for (int j = 0; I != Iend; ++I, ++j) {
+          if (m_selected == j) {
+            m_nameField->setText(I->second->getName());
+            m_typeField->setText(I->second->getParents().front());
+          }
         }
       }
     }
@@ -158,11 +173,26 @@ void CharacterWindow::logic()
 
 void CharacterWindow::actionPressed(std::string event)
 {
+  bool close = false;
+
   if (event == "take") {
     std::cout << "Character " << m_nameField->getText() << std::endl << std::flush;
-    std::string cmd("/connect ");
-    cmd += m_nameField->getText();
-    System::instance()->runCommand(cmd);
+    std::string cmd("/take ");
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account != 0) {
+      const Eris::CharacterMap & ci = account->getCharacters();
+      if (m_selected >= 0 && (unsigned int)m_selected < ci.size()) {
+        Eris::CharacterMap::const_iterator I = ci.begin();
+        Eris::CharacterMap::const_iterator Iend = ci.end();
+        for (int j = 0; I != Iend; ++I, ++j) {
+          if (m_selected == j) {
+            cmd += I->second->getId();
+            System::instance()->runCommand(cmd);
+            close = true;
+          }
+        }
+      }
+    }
   } else if (event == "create") {
     std::string cmd("/add ");
     cmd += m_nameField->getText();
@@ -172,11 +202,20 @@ void CharacterWindow::actionPressed(std::string event)
     cmd += "male"; // FIXME add a widget for this
     cmd += " A settler"; // FIXME Could add a widget for this too.
     System::instance()->runCommand(cmd);
-    std::cout << "Close window" << std::endl << std::flush;
+    close = true;
+  } else if (event == "close") {
+    close = true;
   } else if (event == "refresh") {
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account != 0) {
+      account->refreshCharacterInfo();
+    }
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
+
+  if (!close) { return; }
+
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;

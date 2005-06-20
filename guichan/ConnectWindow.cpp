@@ -4,7 +4,6 @@
 
 #include "guichan/ConnectWindow.h"
 
-#include "guichan/LoginWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -60,7 +59,8 @@ public:
 };
 
 
-ConnectWindow::ConnectWindow() : gcn::Window(), m_selected(-1)
+ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
+                                 m_selected(-1)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -137,14 +137,12 @@ void ConnectWindow::logic()
 void ConnectWindow::actionPressed(std::string event)
 {
   bool close = false;
-  bool next = false;
   if (event == "connect") {
     std::cout << "Connect " << m_serverField->getText() << std::endl << std::flush;
     std::string cmd("/connect ");
     cmd += m_serverField->getText();
     System::instance()->runCommand(cmd);
     close = true;
-    next = true;
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
     close = true;
@@ -165,12 +163,6 @@ void ConnectWindow::actionPressed(std::string event)
     return;
   }
   parent->remove(this);
-
-  if (!next) { return; }
-
-  LoginWindow * lw = new LoginWindow;
-  parent->add(lw, parent->getWidth() / 2 - lw->getWidth() / 2,
-                  parent->getHeight() / 2 - lw->getHeight() / 2);
 }
 
 } // namespace Sear

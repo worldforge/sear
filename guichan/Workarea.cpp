@@ -6,7 +6,8 @@
 
 #include "guichan/RootWidget.h"
 #include "guichan/ConnectWindow.h"
-#include "guichan/ConsoleWindow.h"
+#include "guichan/LoginWindow.h"
+#include "guichan/CharacterWindow.h"
 #include "guichan/Panel.h"
 #include "guichan/ActionListenerSigC.h"
 
@@ -15,6 +16,7 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
+#include "src/ActionHandler.h"
 #include "src/FileHandler.h"
 #include "src/Console.h"
 #include "src/System.h"
@@ -110,10 +112,18 @@ void Workarea::init()
   ConnectWindow * con_w = new ConnectWindow;
   m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
 
-  m_panel = 0;
-
   m_panel = new Panel(m_top);
-  m_top->add(m_panel, 0, 0);
+  // m_top->add(m_panel, 0, 0);
+
+  m_windows["panel"] = m_panel;
+  m_coords["panel"] = std::make_pair(0,0);
+  m_windows["connect"] = con_w;
+  m_windows["login"] = new LoginWindow;
+  m_windows["character"] = new CharacterWindow;
+
+  m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
+  m_system->getActionHandler()->addHandler("logged_in", "/workarea_open character");
+  m_system->getActionHandler()->addHandler("world_entered", "/workarea_open panel");
 }
 
 Workarea::~Workarea()

@@ -5,7 +5,6 @@
 #include "guichan/LoginWindow.h"
 
 #include "guichan/Alert.h"
-#include "guichan/CharacterWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -21,7 +20,7 @@
 
 namespace Sear {
 
-LoginWindow::LoginWindow() : gcn::Window("Login")
+LoginWindow::LoginWindow() : gcn::Window("Login to server")
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -52,31 +51,41 @@ LoginWindow::LoginWindow() : gcn::Window("Login")
   m_pswdConfirmField = new gcn::TextField("                ");
   m_pswdConfirmField->setText("");
   m_pswdConfirmField->setEnabled(false);
+  m_pswdConfirmField->setVisible(false);
   hbox->pack(l3);
   hbox->pack(m_pswdConfirmField);
+
+  vbox->pack(hbox);
+
+  hbox = new gcn::HBox(6);
+  m_nameLabel = new gcn::Label("Name    ");
+  m_nameLabel->setVisible(false);
+  m_nameField = new gcn::TextField("                ");
+  m_nameField->setText("");
+  m_nameField->setEnabled(false);
+  m_nameField->setVisible(false);
+  hbox->pack(m_nameLabel);
+  hbox->pack(m_nameField);
 
   vbox->pack(hbox);
 
   m_createCheck = new gcn::CheckBox("New Account");
   vbox->pack(m_createCheck);
 
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &LoginWindow::actionPressed));
+
   hbox = new gcn::HBox(6);
   m_loginButton = new gcn::Button("Login");
   m_loginButton->setFocusable(false);
-  m_loginListener = new ActionListenerSigC;
-  SigC::Slot0<void> s1 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), LOGIN);
-  SigC::Slot1<void, std::string> s2 = SigC::hide<std::string>(s1);
-  m_loginListener->Action.connect(s2);
-  m_loginButton->addActionListener(m_loginListener);
+  m_loginButton->setEventId("login");
+  m_loginButton->addActionListener(m_buttonListener);
   hbox->pack(m_loginButton);
 
-  m_cancelButton = new gcn::Button("Cancel");
+  m_cancelButton = new gcn::Button("Close");
   m_cancelButton->setFocusable(false);
-  m_cancelListener = new ActionListenerSigC;
-  SigC::Slot0<void> s3 = SigC::bind<action>(SigC::slot(*this, &LoginWindow::actionPressed), CANCEL);
-  SigC::Slot1<void, std::string> s4 = SigC::hide<std::string>(s3);
-  m_cancelListener->Action.connect(s4);
-  m_cancelButton->addActionListener(m_cancelListener);
+  m_cancelButton->setEventId("close");
+  m_cancelButton->addActionListener(m_buttonListener);
   hbox->pack(m_cancelButton);
 
   vbox->pack(hbox);
@@ -98,15 +107,21 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::logic()
 {
-  m_pswdConfirmField->setEnabled(m_createCheck->isMarked());
+  bool show_create = m_createCheck->isMarked();
+  m_pswdConfirmField->setEnabled(show_create);
+  m_pswdConfirmField->setVisible(show_create);
+  m_nameField->setEnabled(show_create);
+  m_nameField->setVisible(show_create);
+  m_nameLabel->setVisible(show_create);
   gcn::Window::logic();
 }
 
-void LoginWindow::actionPressed(action a)
+void LoginWindow::actionPressed(std::string event)
 {
   bool close = false;
-  bool next = false;
   bool password_error = false;
+
+  std::cout << "EVENT" << std::endl << std::flush;
 
   const std::string & username = m_userField->getText();
   const std::string & password = m_pswdField->getText();
@@ -114,34 +129,32 @@ void LoginWindow::actionPressed(action a)
     return;
   }
   std::string cmd;
-  switch (a) {
-    case LOGIN:
-      if (m_createCheck->isMarked()) {
-        if (password != m_pswdConfirmField->getText()) {
-          password_error = true;
-          break;
-        }
+  if (event == "login") {
+    if (m_createCheck->isMarked()) {
+      if (password == m_pswdConfirmField->getText()) {
         cmd = "/create ";
         cmd += username;
         cmd += " ";
         cmd += password;
-        cmd += " Sear_User";
-      } else {
-        cmd = "/login ";
-        cmd += username;
         cmd += " ";
-        cmd += password;
+        cmd += m_nameField->getText();
+      } else {
+        password_error = true;
       }
-      System::instance()->runCommand(cmd);
-      close = true;
-      next = true;
-      break;
-    case CANCEL:
-      close = true;
-      break;
-    default:
-      break;
-  };
+    } else {
+      cmd = "/login ";
+      cmd += username;
+      cmd += " ";
+      cmd += password;
+    }
+    System::instance()->runCommand(cmd);
+    close = true;
+  } else if (event == "close") {
+  std::cout << "CLOSE" << std::endl << std::flush;
+    close = true;
+  } else {
+  std::cout << "OTHER" << std::endl << std::flush;
+  }
 
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {
@@ -162,13 +175,6 @@ void LoginWindow::actionPressed(action a)
   if (!close) { return; }
 
   parent->remove(this);
-
-  if (!next) { return; }
-
-  CharacterWindow * cw = new CharacterWindow;
-  parent->add(cw, parent->getWidth() / 2 - cw->getWidth() / 2,
-                  parent->getHeight() / 2 - cw->getHeight() / 2);
-
 }
 
 } // namespace Sear

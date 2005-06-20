@@ -32,6 +32,7 @@ protected:
   gcn::Button * m_refreshButton;
   gcn::Button * m_takeButton;
   gcn::Button * m_createButton;
+  gcn::Button * m_closeButton;
 
   CharacterListModel * m_characterListModel;
   ActionListenerSigC * m_buttonListener;

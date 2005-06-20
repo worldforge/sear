@@ -1,6 +1,6 @@
 dnl Initialise autoconf
 
-AC_INIT([sear], [0.5.0])
+AC_INIT([sear], [0.5.1])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 

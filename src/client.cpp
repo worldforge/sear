@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.69 2005-06-07 11:27:20 simon Exp $
+// $Id: client.cpp,v 1.70 2005-06-20 23:24:54 alriddoch Exp $
 
 #include "System.h"
 
@@ -408,6 +408,7 @@ void Client::LoginSuccess() {
   if (debug) printf("Client::LoginSuccess\n");
   m_system->pushMessage("Login Success", CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_LOGGED_IN);
+  m_account->refreshCharacterInfo();
 }
 
 int Client::createCharacter(const std::string &name, const std::string &type, const std::string &sex, const std::string &description) {
@@ -728,6 +729,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_LOGGED_IN, false);
       m_system->setState(SYS_IN_WORLD, false);
       m_system->getCharacter()->setAvatar(NULL);
+      m_system->getActionHandler()->handleAction("connected", 0);
       break;
     case CLIENT_STATUS_LOGGED_IN:
     case CLIENT_STATUS_GOING_IN_WORLD:
@@ -736,11 +738,13 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_LOGGED_IN, true);
       m_system->setState(SYS_IN_WORLD, false);
       m_system->getCharacter()->setAvatar(NULL);
+      m_system->getActionHandler()->handleAction("logged_in", 0);
       break;
     case CLIENT_STATUS_IN_WORLD:
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, true);
       m_system->setState(SYS_IN_WORLD, true);
+      m_system->getActionHandler()->handleAction("world_entered", 0);
       break;
   }
   m_status = status;

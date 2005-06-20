@@ -1,3 +1,29 @@
+2005-06-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Increment version to suggested release.
+
+	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h: Get
+	  character window working correctly. Stops crashes if
+	  the client is not yet logged in.
+
+	* guichan/ConnectWindow.cpp, guichan/ConnectWindow.h: Remove hook
+	  that opens login window.
+
+	* guichan/Inventory.cpp, guichan/Inventory.h: Implement inventory
+	  action buttons.
+
+	* guichan/LoginWindow.cpp, guichan/LoginWindow.h: Remove hook
+	  that opens character window. Add name field, and correctly
+	  implement password verification on new accounts.
+
+	* guichan/Workarea.cpp: Install action handlers to open
+	  various windows at the right time. Store all the top
+	  windows in the window index, so they can be opened with
+	  console commands.
+
+	* src/client.cpp: Emit action handler actions when events like
+	  connecting, logging in, and entering the world occur.
+
 2005-06-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* data/rpgfont.png: Add a new font from the guichan archive.

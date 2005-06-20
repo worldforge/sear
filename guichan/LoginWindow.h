@@ -11,6 +11,7 @@
 
 namespace gcn {
 
+class Label;
 class Button;
 class TextField;
 class CheckBox;
@@ -28,19 +29,18 @@ protected:
   gcn::TextField * m_userField;
   gcn::TextField * m_pswdField;
   gcn::TextField * m_pswdConfirmField;
+  gcn::TextField * m_nameField;
+  gcn::Label * m_nameLabel;
   gcn::CheckBox * m_createCheck;
 
-  ActionListenerSigC * m_loginListener;
-  ActionListenerSigC * m_cancelListener;
+  ActionListenerSigC * m_buttonListener;
 
   virtual void logic();
 public:
-  enum action { LOGIN, CANCEL };
-
   LoginWindow();
   virtual ~LoginWindow();
 
-  void actionPressed(action a);
+  void actionPressed(std::string);
 };
 
 } // namespace Sear

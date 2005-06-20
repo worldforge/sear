@@ -46,7 +46,7 @@ public:
 };
 
 
-Inventory::Inventory() : gcn::Window()
+Inventory::Inventory() : gcn::Window("Inventory")
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -56,8 +56,9 @@ Inventory::Inventory() : gcn::Window()
 
   gcn::Box * vbox = new gcn::VBox(6);
 
-  gcn::ListBox * servers = new gcn::ListBox(new InventoryListAdaptor);
-  gcn::ScrollArea * scroll_area = new gcn::ScrollArea(servers,
+  m_inventory = new InventoryListAdaptor;
+  m_items = new gcn::ListBox(m_inventory);
+  gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_items,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
   scroll_area->setWidth(120);
@@ -72,16 +73,19 @@ Inventory::Inventory() : gcn::Window()
 
   m_wieldButton = new gcn::Button("Wield");
   m_wieldButton->setEventId("wield");
+  m_wieldButton->setFocusable(false);
   m_wieldButton->addActionListener(m_buttonListener);
   hbox->pack(m_wieldButton);
 
   m_giveButton = new gcn::Button("Give");
   m_giveButton->setEventId("give");
+  m_giveButton->setFocusable(false);
   m_giveButton->addActionListener(m_buttonListener);
   hbox->pack(m_giveButton);
 
   m_dropButton = new gcn::Button("Drop");
   m_dropButton->setEventId("drop");
+  m_dropButton->setFocusable(false);
   m_dropButton->addActionListener(m_buttonListener);
   hbox->pack(m_dropButton);
 
@@ -98,15 +102,30 @@ Inventory::~Inventory()
 
 void Inventory::actionPressed(std::string event)
 {
+  int selected = m_items->getSelected();
+
+  Character * chr = System::instance()->getCharacter();
+  if (chr == 0) { return; }
+  Eris::Avatar * av = chr->getAvatar();
+  if (av == 0) { return; }
+  if ((selected < 0) ||
+      ((unsigned int)selected >= av->getEntity()->numContained())) {
+    return;
+  }
+  std::string name = av->getEntity()->getContained(selected)->getName();
+
   if (event == "wield") {
     std::string cmd("/wield ");
-    // cmd += m_serverField->getText();
-    // System::instance()->runCommand(cmd);
+    cmd += name;
+    System::instance()->runCommand(cmd);
   } else if (event == "give") {
-    std::string cmd("/give ");
-    // std::cout << "Close window" << std::endl << std::flush;
+    std::string cmd("/give 1 ");
+    cmd += name;
+    System::instance()->runCommand(cmd);
   } else if (event == "drop") {
-    std::string cmd("/drop ");
+    std::string cmd("/drop 1 ");
+    cmd += name;
+    System::instance()->runCommand(cmd);
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
