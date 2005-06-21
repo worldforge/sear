@@ -251,7 +251,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
       break;
     case SDL_KEYDOWN:
     case SDL_KEYUP:
-      clear_focus = (event.key.keysym.sym == SDLK_RETURN);
+      // clear_focus = (event.key.keysym.sym == SDLK_RETURN);
       event_eaten = ((focus != 0) && (focus != m_top));
       break;
     default:

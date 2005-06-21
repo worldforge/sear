@@ -4,6 +4,7 @@
 
 #include "guichan/CharacterWindow.h"
 
+#include "guichan/Alert.h"
 #include "guichan/LoginWindow.h"
 #include "guichan/ActionListenerSigC.h"
 
@@ -175,6 +176,17 @@ void CharacterWindow::actionPressed(std::string event)
 {
   bool close = false;
 
+  gcn::BasicContainer * parent_widget = getParent();
+  if (parent_widget == 0) {
+    std::cout << "NO PARENT" << std::endl << std::flush;
+    return;
+  }
+  gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
+  if (parent == 0) {
+    std::cout << "WEIRD PARENT" << std::endl << std::flush;
+    return;
+  }
+
   if (event == "take") {
     std::cout << "Character " << m_nameField->getText() << std::endl << std::flush;
     std::string cmd("/take ");
@@ -191,18 +203,26 @@ void CharacterWindow::actionPressed(std::string event)
             close = true;
           }
         }
+      } else {
+        new Alert(parent, "Please select a character to take.");
       }
+    } else {
+      new Alert(parent, "Not currently logged in.");
     }
   } else if (event == "create") {
-    std::string cmd("/add ");
-    cmd += m_nameField->getText();
-    cmd += " ";
-    cmd += m_typeField->getText();
-    cmd += " ";
-    cmd += "male"; // FIXME add a widget for this
-    cmd += " A settler"; // FIXME Could add a widget for this too.
-    System::instance()->runCommand(cmd);
-    close = true;
+    if (m_nameField->getText().empty() || m_typeField->getText().empty()) {
+      new Alert(parent, "Please specify a name and type for the character to be created.");
+    } else {
+      std::string cmd("/add ");
+      cmd += m_nameField->getText();
+      cmd += " ";
+      cmd += m_typeField->getText();
+      cmd += " ";
+      cmd += "male"; // FIXME add a widget for this
+      cmd += " A settler"; // FIXME Could add a widget for this too.
+      System::instance()->runCommand(cmd);
+      close = true;
+    }
   } else if (event == "close") {
     close = true;
   } else if (event == "refresh") {
@@ -216,16 +236,6 @@ void CharacterWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  gcn::BasicContainer * parent_widget = getParent();
-  if (parent_widget == 0) {
-    std::cout << "NO PARENT" << std::endl << std::flush;
-    return;
-  }
-  gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
-  if (parent == 0) {
-    std::cout << "WEIRD PARENT" << std::endl << std::flush;
-    return;
-  }
   parent->remove(this);
 }
 

@@ -1,5 +1,24 @@
 2005-06-21  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/CharacterWindow.cpp, guichan/ConnectWindow.cpp,
+	  guichan/LoginWindow.cpp: Add alerts to notify user about error
+	  conditions.
+
+	* guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h: Add code to
+	  detect EOL from user, handler focus better, and execute the
+	  contents of the text field as a standard sear command.
+
+	* guichan/Workarea.cpp: Disable clearing focus when return is pressed
+	  as this is now handled by the chat window.
+
+	* src/Console.cpp: Don't open the console at startup any more as its
+	  no longer required to log in.
+
+	* src/System.cpp: Call gui registerCommands after initialisation so
+	  the panel commands get registered.
+
+2005-06-21  Al Riddoch  <alriddoch@zepler.org>
+
 	* configure.ac: Increment version to suggested release.
 
 	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h: Get

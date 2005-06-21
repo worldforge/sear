@@ -5,6 +5,7 @@
 #include "guichan/ConnectWindow.h"
 
 #include "guichan/ActionListenerSigC.h"
+#include "guichan/Alert.h"
 #include "guichan/box.hpp"
 
 #include "src/System.h"
@@ -137,12 +138,29 @@ void ConnectWindow::logic()
 void ConnectWindow::actionPressed(std::string event)
 {
   bool close = false;
+
+  gcn::BasicContainer * parent_widget = getParent();
+  if (parent_widget == 0) {
+    std::cerr << "NO PARENT" << std::endl << std::flush;
+    return;
+  }
+  gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
+  if (parent == 0) {
+    std::cerr << "WEIRD PARENT" << std::endl << std::flush;
+    return;
+  }
+
   if (event == "connect") {
     std::cout << "Connect " << m_serverField->getText() << std::endl << std::flush;
     std::string cmd("/connect ");
-    cmd += m_serverField->getText();
-    System::instance()->runCommand(cmd);
-    close = true;
+    const std::string & server = m_serverField->getText();
+    if (server.empty()) {
+      new Alert(parent, "No server specified");
+    } else {
+      cmd += m_serverField->getText();
+      System::instance()->runCommand(cmd);
+      close = true;
+    }
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
     close = true;
@@ -152,16 +170,6 @@ void ConnectWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  gcn::BasicContainer * parent_widget = getParent();
-  if (parent_widget == 0) {
-    std::cout << "NO PARENT" << std::endl << std::flush;
-    return;
-  }
-  gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
-  if (parent == 0) {
-    std::cout << "WEIRD PARENT" << std::endl << std::flush;
-    return;
-  }
   parent->remove(this);
 }
 

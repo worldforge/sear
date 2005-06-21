@@ -7,12 +7,20 @@
 
 #include <guichan/widgets/window.hpp>
 
+#include <sigc++/object.h>
+
 namespace Sear {
 
-class ConsoleWindow : public gcn::Window {
+class CommandLine;
+
+class ConsoleWindow : public gcn::Window, virtual public SigC::Object {
+protected:
+  CommandLine * m_entry;
 public:
   ConsoleWindow();
   virtual ~ConsoleWindow();
+
+  void lineEntered();
 };
 
 } // namespace Sear

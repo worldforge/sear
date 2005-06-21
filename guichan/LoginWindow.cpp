@@ -121,41 +121,6 @@ void LoginWindow::actionPressed(std::string event)
   bool close = false;
   bool password_error = false;
 
-  std::cout << "EVENT" << std::endl << std::flush;
-
-  const std::string & username = m_userField->getText();
-  const std::string & password = m_pswdField->getText();
-  if (username.empty() || password.empty()) {
-    return;
-  }
-  std::string cmd;
-  if (event == "login") {
-    if (m_createCheck->isMarked()) {
-      if (password == m_pswdConfirmField->getText()) {
-        cmd = "/create ";
-        cmd += username;
-        cmd += " ";
-        cmd += password;
-        cmd += " ";
-        cmd += m_nameField->getText();
-      } else {
-        password_error = true;
-      }
-    } else {
-      cmd = "/login ";
-      cmd += username;
-      cmd += " ";
-      cmd += password;
-    }
-    System::instance()->runCommand(cmd);
-    close = true;
-  } else if (event == "close") {
-  std::cout << "CLOSE" << std::endl << std::flush;
-    close = true;
-  } else {
-  std::cout << "OTHER" << std::endl << std::flush;
-  }
-
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
@@ -167,9 +132,38 @@ void LoginWindow::actionPressed(std::string event)
     return;
   }
 
-  if (password_error) {
-    new Alert(parent, "Passwords do not match");
-    return;
+  const std::string & username = m_userField->getText();
+  const std::string & password = m_pswdField->getText();
+  std::string cmd;
+  if (event == "login") {
+    if (username.empty()) {
+        new Alert(parent, "No username specified");
+    } else {
+      if (m_createCheck->isMarked()) {
+        if (password == m_pswdConfirmField->getText()) {
+          cmd = "/create ";
+          cmd += username;
+          cmd += " ";
+          cmd += password;
+          cmd += " ";
+          cmd += m_nameField->getText();
+          System::instance()->runCommand(cmd);
+          close = true;
+        } else {
+          new Alert(parent, "Passwords do not match");
+        }
+      } else {
+        cmd = "/login ";
+        cmd += username;
+        cmd += " ";
+        cmd += password;
+        System::instance()->runCommand(cmd);
+        close = true;
+      }
+    }
+  } else if (event == "close") {
+    close = true;
+  } else {
   }
 
   if (!close) { return; }

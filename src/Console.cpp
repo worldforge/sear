@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.35 2005-04-13 12:16:05 simon Exp $
+// $Id: Console.cpp,v 1.36 2005-06-21 17:04:36 alriddoch Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -84,8 +84,8 @@ std::istream &operator>>(std::istream &IStream, std::list< std::string > &List) 
 }
 
 Console::Console(System *system) :
-  animateConsole(true),
-  showConsole(true),
+  animateConsole(false),
+  showConsole(false),
   consoleHeight(0),
   console_messages(std::list<std::string>()),
   screen_messages(std::list<screenMessage>()),

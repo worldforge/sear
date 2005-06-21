@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.129 2005-06-20 16:55:39 alriddoch Exp $
+// $Id: System.cpp,v 1.130 2005-06-21 17:04:36 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -215,7 +215,6 @@ bool System::init(int argc, char *argv[]) {
   m_editor->registerCommands(m_console);
 
   m_workarea = new Workarea(this);
-  m_workarea->registerCommands(m_console);
 
   int sticks = SDL_NumJoysticks();
 
@@ -310,6 +309,8 @@ bool System::init(int argc, char *argv[]) {
   RenderSystem::getInstance().initContext();
 
   m_workarea->init();
+
+  m_workarea->registerCommands(m_console);
 
   m_system_running = true;
   m_initialised = true;
