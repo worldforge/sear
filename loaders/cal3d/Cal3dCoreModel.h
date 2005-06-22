@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.9 2005-06-04 21:23:53 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.10 2005-06-22 07:16:56 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -43,7 +43,10 @@ public:
   typedef std::map<std::string, MaterialMap> MaterialsMap;
   typedef std::map<std::string, unsigned int> PartMap;
   typedef std::map<std::string, unsigned int> SetMap;
- 
+
+  typedef std::pair<std::string, float> AnimWeight;
+  typedef std::list<AnimWeight> WeightList;
+  typedef std::map<std::string, WeightList> Animations;
   /**
    * Default constructor
    */ 
@@ -128,6 +131,7 @@ private:
   PartMap m_parts; ///< Mapping between part name and id
   SetMap m_sets; ///< mapping between set name and id  
   float m_rotate;
+  Animations m_anims;
 };
 
 } /* namespace Sear */

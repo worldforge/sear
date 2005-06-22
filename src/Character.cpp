@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.62 2005-06-11 21:55:23 alriddoch Exp $
+// $Id: Character.cpp,v 1.63 2005-06-22 07:16:55 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -63,6 +63,11 @@ namespace Sear {
   static const std::string CMD_MOVE_BACKWARD = "+character_move_backward";
   static const std::string CMD_MOVE_STOP_FORWARD = "-character_move_forward";
   static const std::string CMD_MOVE_STOP_BACKWARD = "-character_move_backward";
+
+  static const std::string CMD_MOVE_UPWARD = "+character_move_upwards";
+  static const std::string CMD_MOVE_DOWNWARD = "+character_move_downwards";
+  static const std::string CMD_MOVE_STOP_UPWARD = "-character_move_upwards";
+  static const std::string CMD_MOVE_STOP_DOWNWARD = "-character_move_downwards";
 
   static const std::string CMD_ROTATE_LEFT = "+character_rotate_left";
   static const std::string CMD_ROTATE_RIGHT = "+character_rotate_right";
@@ -128,6 +133,7 @@ Character::Character() :
   m_angle(0.0f),
   m_rate(0.0f),
   m_speed(0.0f),
+  m_up_speed(0.0f),
   m_strafe_speed(0.0f),
   m_lastUpdate(SDL_GetTicks()),
   m_updateScheduled(false),
@@ -167,6 +173,14 @@ void Character::shutdown() {
   }
 
   m_initialised = false;
+}
+
+void Character::moveUpward(float speed) {
+  assert ((m_initialised == true) && "Character not initialised");
+  if (!m_avatar) return;
+
+  m_up_speed += speed;
+  updateLocals(true);
 }
 
 void Character::moveForward(float speed) {
@@ -233,6 +247,14 @@ void Character::setMovementSpeed(float speed) {
   updateLocals(true);
 }
 
+void Character::setUpwardSpeed(float speed) {
+  assert ((m_initialised == true) && "Character not initialised");
+  if (!m_avatar) return;
+
+  m_up_speed = speed;
+  updateLocals(true);
+}
+
 void Character::setStrafeSpeed(float speed) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
@@ -290,11 +312,14 @@ void Character::updateLocals(bool send_to_server) {
 
 //  if (_angle == WFMath::Pi) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
   mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
-  z = 0.0f;
+  // TODO - Perhaps add the walk/run modifier
+  z = m_up_speed;
   y = mod_speed * -sin(m_angle);
   x = mod_speed * cos(m_angle);
   mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
-  z += 0.0f;
+
+//  z += 0.0f;
+
   static const float PI_BY_2 = WFMath::Pi / 2.0f;
   y += mod_speed * -sin(m_angle + PI_BY_2);
   x += mod_speed * cos(m_angle + PI_BY_2);
@@ -402,7 +427,6 @@ void Character::displayInventory() {
     std::string name = I->first;
     System::instance()->pushMessage(std::string(name + std::string(" - ") + std::string(quantity)), 3);
   }
-
 }
 
 void Character::say(const std::string &msg) {
@@ -488,6 +512,11 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_MOVE_STOP_FORWARD, this);
   console->registerCommand(CMD_MOVE_STOP_BACKWARD, this);
 
+  console->registerCommand(CMD_MOVE_UPWARD, this);
+  console->registerCommand(CMD_MOVE_DOWNWARD, this);
+  console->registerCommand(CMD_MOVE_STOP_UPWARD, this);
+  console->registerCommand(CMD_MOVE_STOP_DOWNWARD, this);
+
   console->registerCommand(CMD_ROTATE_LEFT, this);
   console->registerCommand(CMD_ROTATE_RIGHT, this);
   console->registerCommand(CMD_ROTATE_STOP_LEFT, this);
@@ -530,6 +559,11 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_MOVE_BACKWARD) moveForward(-1);
   else if (command == CMD_MOVE_STOP_FORWARD) moveForward(-1);
   else if (command == CMD_MOVE_STOP_BACKWARD) moveForward( 1);
+
+  else if (command == CMD_MOVE_UPWARD) moveUpward(1);
+  else if (command == CMD_MOVE_DOWNWARD) moveUpward(-1);
+  else if (command == CMD_MOVE_STOP_UPWARD) moveUpward(-1);
+  else if (command == CMD_MOVE_STOP_DOWNWARD) moveUpward( 1);
 
   else if (command == CMD_ROTATE_LEFT) rotate(-1);
   else if (command == CMD_ROTATE_RIGHT) rotate( 1);

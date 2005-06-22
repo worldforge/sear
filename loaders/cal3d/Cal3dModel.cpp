@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.27 2005-06-06 21:27:49 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.28 2005-06-22 07:16:56 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -52,7 +52,7 @@ Cal3dModel::Cal3dModel(Render *render) :
 
 Cal3dModel::~Cal3dModel() {
   assert(m_initialised == false);
-  if (m_initialised) shutdown();
+//  if (m_initialised) shutdown();
 }
 
 int Cal3dModel::init(Cal3dCoreModel *core_model) {
@@ -226,26 +226,50 @@ void Cal3dModel::setLodLevel(float lodLevel) {
 
 void Cal3dModel::action(const std::string &action) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
-  // Check default 
-  if (action == IDLE) {
+  Cal3dCoreModel::Animations anims = m_core_model->m_anims;
+
+  Cal3dCoreModel::Animations::const_iterator anim_cur = anims.find(m_cur_anim);
+  // First clear previous animations.
+  if (anim_cur != anims.end()) {
+    // Clear previous combined anim
+    removeAnimation(anim_cur->second);
+  } else {
+    // Clear previous single anim
     m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
     m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
     m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
+    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+  }
+ 
+  // See if there is a combined animation defined.
+  Cal3dCoreModel::Animations::const_iterator anim_next = anims.find(action);
+  if (anim_next != anims.end()) {
+   addAnimation(anim_next->second);
+    m_cur_anim = action;
+    return;
+  }
+  // Else play named anim directly
+  m_cur_anim = "";
+  // Check default 
+  if (action == IDLE) {
+//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
     m_calModel->getMixer()->blendCycle(animations[IDLE], 1.0f, 0.2f);
   } else if (action == STANDING) {
-    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
   } else if (action == WALKING) {
-    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
   } else if (action == RUNNING) {
-    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
+//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
   } else {
     // Search map for animation with matching name
@@ -403,4 +427,26 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string&)
     return po;
 }
 
+void Cal3dModel::addAnimation(const Cal3dCoreModel::WeightList &list) {
+printf("Adding anum\n");
+  Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
+  Cal3dCoreModel::WeightList::const_iterator I = list.begin();
+  while (I != list.end()) {
+    std::string name = (*I).first;
+    double weight = (*I).second;
+    m_calModel->getMixer()->blendCycle(animations[name], weight, 0.2f);
+    ++I;
+  }
+}
+
+void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
+printf("Removinng anum\n");
+  Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
+  Cal3dCoreModel::WeightList::const_iterator I = list.begin();
+  while (I != list.end()) {
+    std::string name = (*I).first;
+    m_calModel->getMixer()->clearCycle(animations[name], 0.2f);
+    ++I;
+  }
+}
 } /* namespace Sear */

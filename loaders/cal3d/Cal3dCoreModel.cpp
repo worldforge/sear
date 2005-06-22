@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.30 2005-06-04 21:23:53 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.31 2005-06-22 07:16:56 simon Exp $
 
 
 #include "Cal3dModel.h"
@@ -136,11 +136,13 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     path = (std::string)config.getItem(SECTION_model, KEY_path);
     System::instance()->getFileHandler()->expandString(path);
   }
+
   // Load skeleton
   if (m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)) == 0)  {
     CalError::printLastError();
     return 1;
   }
+
   // Get scale
   if (config.findItem(SECTION_model, KEY_scale)) {
     m_scale = (double)config.getItem(SECTION_model, KEY_scale);
@@ -151,6 +153,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
     if (debug) printf("Rotate %f\n", m_rotate);
   }
+
   // Load all meshes 
   for (MeshMap::const_iterator I = m_meshes.begin(); I != m_meshes.end(); ++I) {
     std::string mesh_name = I->first;
@@ -162,6 +165,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
       m_meshes[mesh_name] = mesh;
     }
   }
+
   // Load all animations
   for (AnimationMap::const_iterator I = m_animations.begin(); I != m_animations.end(); ++I) {
     std::string animation_name = I->first;
@@ -173,6 +177,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
       m_animations[animation_name] = animation;
     }
   }
+
   // Load all materials
   for (MaterialList::const_iterator I = m_material_list.begin();
                                     I != m_material_list.end(); ++I) {
@@ -304,6 +309,21 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
     if (key == KEY_material) {}
     else if (key.substr(0, KEY_material.size()) == KEY_material) {
       m_material_list.push_back(key.substr(KEY_material.size() + 1));;
+    }
+  } else {
+    
+    // Add animations weights to map
+    // Get weight value
+    varconf::Variable temp = config.getItem(section, key);
+    std::string sec = section.substr(KEY_animation.size() + 1);
+    if (section.substr(0, KEY_animation.size()) == KEY_animation) {
+      if (temp.is_double()) {
+        // Get animation name
+        std::string k = key.substr(KEY_animation.size() + 1);
+        // Add pair to map.
+         printf("Adding animation: %s %s %f\n", section.c_str() , k.c_str(), (double)temp);
+        m_anims[sec].push_back(AnimWeight(k, (double)temp));
+      }
     }
   }
 }

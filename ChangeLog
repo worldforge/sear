@@ -1,5 +1,19 @@
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* Makefile.am: Add tools subdir.
+	* configure.ac: Add tools/Makefile to generated files list.
+	* tools/Makefile.am: Update build deps
+	* loaders/LibModelFile.cpp: Add texture name overrides.
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h, 
+	  loaders/cal3d/Cal3dModel.cpp: Allow multiple animations to be blended
+	  together.
+	* src/Character.cpp: Allow movement in Z axis.
+	* tools/model_viewer.cpp: Fix it so that it mostly works with latest
+	  sear.
+
+
+2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/LibModelFile.cpp: Calculate actual number of vertices.
 
 2005-06-21  Al Riddoch  <alriddoch@zepler.org>

@@ -314,4 +314,5 @@ AC_OUTPUT([
 	src/sear
 	sear.desktop
 	autopackage/default.apspec
+	tools/Makefile
 ],[chmod +x src/sear])

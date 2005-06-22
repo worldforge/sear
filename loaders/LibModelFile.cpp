@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.10 2005-06-22 07:08:27 simon Exp $
+// $Id: LibModelFile.cpp,v 1.11 2005-06-22 07:16:55 simon Exp $
 
 /*
   Debug check list
@@ -82,11 +82,11 @@ return 1;
   System::instance()->getFileHandler()->expandString(object);
 
   // Load 3ds file
-  if (debug) printf("MD3: Loading: %s\n", object.c_str());
+  if (debug) printf("LibModelFile: Loading: %s\n", object.c_str());
 
   libmd3_file *modelFile = libmd3_file_load(object.c_str());
   if (!modelFile) {
-    std::cerr << "Error loading .md3 file" << std::endl;
+    fprintf(stderr, "LibModelFile: Error loading %s file\n", object.c_str());
     return 1;
   }
 
@@ -127,9 +127,14 @@ return 1;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
     // Get Texture data from Mesh
     if (meshp->mesh_header->skin_count != 0) {
+      std::string name = (const char*)(meshp->skins[0].name);
+      // Check for texture name overrides in vconf file
+      if (m_config.findItem(name, "filename")) {
+        name = (std::string)m_config.getItem(name, "filename");
+      }
       // Request Texture ID
-      m_textures[i] = RenderSystem::getInstance().requestTexture((const char *)(meshp->skins[0].name));
-      m_mask_textures[i] = RenderSystem::getInstance().requestTexture((const char *)(meshp->skins[0].name), true);
+      m_textures[i] = RenderSystem::getInstance().requestTexture(name);
+      m_mask_textures[i] = RenderSystem::getInstance().requestTexture(name, true);
     } else {
       m_textures[i] = 0;
       m_mask_textures[i] = 0;
