@@ -1,3 +1,11 @@
+2005-06-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Panel.cpp: Add panel_toggle command to toggle the open/closed
+	  state of a window.
+
+	* guichan/Workarea.cpp, src/Character.cpp: Use action handler to
+	  toggle the inventory when the inventory command is issued.
+
 2005-06-22  James Turner  <james@worldforge.org>
 
 	* loaders/ParticleSystem.cpp: tune parameters for fire.

@@ -124,6 +124,7 @@ void Workarea::init()
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
   m_system->getActionHandler()->addHandler("logged_in", "/workarea_open character");
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_open panel");
+  m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle inventory");
 }
 
 Workarea::~Workarea()

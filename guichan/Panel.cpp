@@ -29,6 +29,7 @@ namespace Sear {
 
 static std::string PANEL_OPEN = "panel_open";
 static std::string PANEL_CLOSE = "panel_close";
+static std::string PANEL_TOGGLE = "panel_toggle";
 
 Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
 {
@@ -67,6 +68,7 @@ void Panel::registerCommands(Console * console)
 {
   console->registerCommand(PANEL_OPEN, this);
   console->registerCommand(PANEL_CLOSE, this);
+  console->registerCommand(PANEL_TOGGLE, this);
 }
 
 void Panel::runCommand(const std::string & command, const std::string & args)
@@ -89,6 +91,18 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       assert(win != 0);
       if (win->getParent() == 0) {
         openWindow(args, win);
+      }
+    }
+  }
+  else if (command == PANEL_TOGGLE) {
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      gcn::Window * win = I->second;
+      assert(win != 0);
+      if (win->getParent() == 0) {
+        openWindow(args, win);
+      } else {
+        closeWindow(args, win);
       }
     }
   }
