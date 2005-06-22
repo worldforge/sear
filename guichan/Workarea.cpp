@@ -242,6 +242,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
   bool clear_focus = false;
   bool event_eaten = false;
+  bool suppress = false;
 
   switch (event.type) {
     case SDL_MOUSEMOTION:
@@ -251,16 +252,22 @@ bool Workarea::handleEvent(const SDL_Event & event)
       event_eaten = gui_has_mouse;
       break;
     case SDL_KEYDOWN:
+      if (event.key.keysym.sym == SDLK_RETURN) {
+        if (m_panel != 0) {
+          suppress = m_panel->requestConsoleFocus();
+        }
+        event_eaten = true;
+      } else {
+        event_eaten = ((focus != 0) && (focus != m_top));
+      }
     case SDL_KEYUP:
-      // clear_focus = (event.key.keysym.sym == SDLK_RETURN);
-      event_eaten = ((focus != 0) && (focus != m_top));
       break;
     default:
       event_eaten = false;
       break;
   }
 
-  m_input->pushInput(event);
+  if (!suppress) { m_input->pushInput(event); }
 
   if (clear_focus) {
     fh->focusNone();

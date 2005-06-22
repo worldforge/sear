@@ -52,9 +52,9 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
   Render * render = RenderSystem::getInstance().getRenderer();
   int height = render->getWindowHeight();
 
-  gcn::Window * con = new ConsoleWindow;
-  addWindow("chat", con);
-  m_coords["chat"] = std::make_pair(4, height - con->getHeight() / 2 - 4);
+  m_console = new ConsoleWindow;
+  addWindow("chat", m_console);
+  m_coords["chat"] = std::make_pair(4, height - m_console->getHeight() / 2 - 4);
 
   addWindow("inventory", new Inventory);
   addWindow("options", new OptionsWindow);
@@ -162,6 +162,11 @@ void Panel::addWindow(const std::string & name, gcn::Window * window)
   m_windows[name] = window;
 
   resizeToContent();
+}
+
+bool Panel::requestConsoleFocus()
+{
+   return m_console->requestConsoleFocus();
 }
 
 } // namespace Sear

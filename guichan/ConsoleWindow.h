@@ -21,6 +21,7 @@ public:
   virtual ~ConsoleWindow();
 
   void lineEntered();
+  bool requestConsoleFocus();
 };
 
 } // namespace Sear

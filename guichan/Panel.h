@@ -27,6 +27,7 @@ class Console;
 
 class ActionListenerSigC;
 class RootWidget;
+class ConsoleWindow;
 
 class Panel : virtual public SigC::Object,
               public ConsoleObject,
@@ -43,6 +44,7 @@ protected:
   CoordDict m_coords;
 
   RootWidget * m_top;
+  ConsoleWindow * m_console;
 
   ActionListenerSigC * m_buttonListener;
 
@@ -58,6 +60,7 @@ public:
   virtual void runCommand(const std::string &, const std::string &);
 
   void addWindow(const std::string & name, gcn::Window * window);
+  bool requestConsoleFocus();
 };
 
 } // namespace Sear

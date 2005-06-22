@@ -77,4 +77,14 @@ void ConsoleWindow::lineEntered()
   }
 }
 
+bool ConsoleWindow::requestConsoleFocus()
+{
+  if (!m_entry->hasFocus()) {
+    std::cout << "Request Focus" << std::endl << std::flush;
+    m_entry->requestFocus();
+    return true;
+  }
+  return false;
+}
+
 } // namespace Sear

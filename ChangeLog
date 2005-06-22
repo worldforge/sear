@@ -1,3 +1,10 @@
+2005-06-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Workarea.cpp, guichan/Panel.h, guichan/Panel.cpp,
+	  guichan/ConsoleWindow.h, guichan/ConsoleWindow.cpp: Grab focus
+	  into the chat window when return is pressed, to allow the user
+	  to switch quickly to chat mode.
+
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/WorldEntity.cpp: Fixed mode now takes account of parent position.
