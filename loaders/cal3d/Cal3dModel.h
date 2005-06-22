@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.14 2005-06-06 21:27:49 simon Exp $
+// $Id: Cal3dModel.h,v 1.15 2005-06-22 07:21:51 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -63,6 +63,9 @@ public:
   void setRotate(float r) { m_rotate = r; }
   
   virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
+
+  void addAnimation(const Cal3dCoreModel::WeightList &list);
+  void removeAnimation(const Cal3dCoreModel::WeightList &list);
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
 
@@ -73,7 +76,8 @@ private:
   float m_lodLevel;
   float m_renderScale;
   float m_rotate;
-  std::string current_head;
+  //std::string current_head;
+  std::string m_cur_anim;
 };
 
 

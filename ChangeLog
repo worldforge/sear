@@ -1,5 +1,9 @@
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dModel.h:  Add function declars
+
+2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* Makefile.am: Add tools subdir.
 	* configure.ac: Add tools/Makefile to generated files list.
 	* tools/Makefile.am: Update build deps
@@ -10,7 +14,6 @@
 	* src/Character.cpp: Allow movement in Z axis.
 	* tools/model_viewer.cpp: Fix it so that it mostly works with latest
 	  sear.
-
 
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
