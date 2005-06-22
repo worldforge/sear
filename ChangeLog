@@ -1,3 +1,7 @@
+2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/LibModelFile.cpp: Calculate actual number of vertices.
+
 2005-06-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/CharacterWindow.cpp, guichan/ConnectWindow.cpp,

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.9 2005-06-16 14:34:20 simon Exp $
+// $Id: LibModelFile.cpp,v 1.10 2005-06-22 07:08:27 simon Exp $
 
 /*
   Debug check list
@@ -64,7 +64,7 @@ LibModelFile::~LibModelFile() {
   
 int LibModelFile::init(const std::string &filename) {
   assert(m_initialised == false);
-
+return 1;
   std::string object;
   if (m_config.readFromFile(filename)) {
     if (m_config.findItem("model", "filename")) {
@@ -108,19 +108,19 @@ int LibModelFile::init(const std::string &filename) {
   m_num_triangles = 0;
   m_num_vertices = 0;
   libmd3_mesh *meshp = modelFile->meshes;
+
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
     m_num_triangles += meshp->mesh_header->triangle_count;
+    m_num_vertices += meshp->mesh_header->vertex_count;
     // Record where the different meshes end
     m_boundaries[i+1] = m_num_triangles;
   }
 
   // Create data arrays
-  m_vertex_data = new short[m_num_triangles * 3 * 3];
-  m_texel_data  = new float[m_num_triangles * 3 * 2];
+  m_vertex_data = new short[m_num_vertices * 3];
+  m_texel_data  = new float[m_num_vertices * 2];
+  m_normal_data = new float[m_num_vertices * 3];
   m_faces       = new unsigned int[m_num_triangles * 3];
-  m_normal_data = new float[m_num_triangles * 3 * 3];
-
-  int vertex_counter = 0;
 
   // Get mesh data
   meshp = modelFile->meshes;
@@ -135,7 +135,6 @@ int LibModelFile::init(const std::string &filename) {
       m_mask_textures[i] = 0;
     }
    
-    vertex_counter += meshp->mesh_header->vertex_count;
     // Copy data into array.
     memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->vertex_count * 3 * sizeof(short));
 
@@ -145,12 +144,13 @@ int LibModelFile::init(const std::string &filename) {
 
     memcpy(&m_faces[m_boundaries[i] * 3], meshp->triangles, meshp->mesh_header->triangle_count * 3 * sizeof(unsigned int));
 
-    // We are using one buffer for all objects, so adjust face vertex numbers accordingly
+    // We are using one buffer for all objects, so adjust face vertex 
+    // numbers accordingly
     for (int j = 0; j < meshp->mesh_header->triangle_count * 3; ++j) {
       m_faces[m_boundaries[i] *  3 + j] += m_boundaries[i] * 3;
     }
   }
-  m_num_vertices = vertex_counter;
+
   libmd3_file_free(modelFile);
 
   m_initialised = true;
