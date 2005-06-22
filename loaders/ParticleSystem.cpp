@@ -179,8 +179,8 @@ void ParticleSystem::init()
    
     m_accelVector = Vector3(0.0, 0.0, 1.0);
     m_accelMag = DRange(0.3, 0.4);
-    m_initialSize = DRange(0.16, 0.30);
-    m_finalSize = DRange(0.06, 0.16);
+    m_initialSize = DRange(0.08, 0.15);
+    m_finalSize = DRange(0.04, 0.08);
         
     m_initialAlpha = DRange(1.0, 1.0);
     m_finalAlpha = DRange(0.0, 0.0);
@@ -372,7 +372,7 @@ void ParticleSystem::setBBox(const WFMath::AxisBox<3>& bb)
     
     double diameter = sqrt((bb.highCorner().x() - bb.lowCorner().x()) * 
         (bb.highCorner().y() - bb.lowCorner().y()));
-    m_createPerSec = DRange(300 * diameter, 300 * diameter);
+    m_createPerSec = DRange(1200 * diameter, 1200 * diameter);
 }
 
 } // of namespace Sear

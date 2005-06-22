@@ -1,3 +1,7 @@
+2005-06-22  James Turner  <james@worldforge.org>
+
+	* loaders/ParticleSystem.cpp: tune parameters for fire.
+
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Character.h:  Add function declars
