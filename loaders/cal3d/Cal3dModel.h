@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.15 2005-06-22 07:21:51 simon Exp $
+// $Id: Cal3dModel.h,v 1.16 2005-06-22 15:51:56 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -40,6 +40,7 @@ public:
   void setLodLevel(float lodLevel);
 
   void action(const std::string &action);
+  void animate(const std::string &action);
   void setAppearance(const Atlas::Message::MapType &map);
   Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
  

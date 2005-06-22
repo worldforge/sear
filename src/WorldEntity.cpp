@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.63 2005-06-22 14:05:30 simon Exp $
+// $Id: WorldEntity.cpp,v 1.64 2005-06-22 15:51:56 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -248,7 +248,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (mode != last_mode) {
         ObjectRecord *record = NULL;
         if (object_handler) record = object_handler->getObjectRecord(getId());
-        if (record) record->action(mode);
+        if (record) record->animate(mode);
         last_mode = mode;
       }
     } else if (str == ACTION) {
