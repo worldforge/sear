@@ -1,5 +1,9 @@
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* data/bindings.cfg: Add defaults for up/down movement
+
+2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/WorldEntity.cpp, loaders/Model.h, loaders/ObjectRecord.h, 
 	  loaders/ObjectRecord.cpp, loaders/cal3d/Cal3dModel.cpp,
 	  loaders/cal3d/Cal3dModel.h: Separate single and continuous actions
