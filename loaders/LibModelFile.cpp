@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.11 2005-06-22 07:16:55 simon Exp $
+// $Id: LibModelFile.cpp,v 1.12 2005-06-22 08:34:42 simon Exp $
 
 /*
   Debug check list
@@ -64,7 +64,7 @@ LibModelFile::~LibModelFile() {
   
 int LibModelFile::init(const std::string &filename) {
   assert(m_initialised == false);
-return 1;
+
   std::string object;
   if (m_config.readFromFile(filename)) {
     if (m_config.findItem("model", "filename")) {

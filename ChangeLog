@@ -1,3 +1,7 @@
+2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/LibModelFile.cpp: Remove stray return statement.
+
 2005-06-22  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Panel.cpp: Add panel_toggle command to toggle the open/closed
