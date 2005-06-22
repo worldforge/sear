@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2003 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.30 2005-06-20 16:55:39 alriddoch Exp $
+// $Id: Character.h,v 1.31 2005-06-22 07:22:47 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -57,8 +57,8 @@ public:
    */
   void shutdown();
 
-
   void moveForward(float);
+  void moveUpward(float);
   void strafe(float);
   void rotate(float);
 
@@ -70,6 +70,7 @@ public:
   void sendUpdate();
 
   void setMovementSpeed(float);
+  void setUpwardSpeed(float);
   void setStrafeSpeed(float);
   void setRotationRate(float);
 
@@ -86,7 +87,7 @@ public:
   void say(const std::string&);
   void make(const std::string&type, const std::string &name);
 
-  float getAngle() { return m_angle; }
+  float getAngle() const { return m_angle; }
 //  WFMath::Quaternion getOrientation() { return m_orient; }
   Eris::Avatar *getAvatar() const { return m_avatar; }
 //  WorldEntity *getSelf() { return m_self; }
@@ -118,6 +119,7 @@ private:
   float m_pitch;
   float m_rate;
   float m_speed;
+  float m_up_speed;
   float m_strafe_speed;
 
   unsigned int m_lastUpdate;
