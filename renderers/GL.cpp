@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.132 2005-06-16 11:04:56 simon Exp $
+// $Id: GL.cpp,v 1.133 2005-06-23 08:13:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -211,6 +211,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
+  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 5 );
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
 #ifdef HAVE_SDL_GL_MULTISAMPLE
@@ -1104,7 +1105,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       ModelRecord *model_record = J->second;
       Model *model = model_record->model;
       assert(model);
-      
+
       glPushMatrix();
 
       // Translate Model
@@ -1128,6 +1129,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
         float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+
         glScalef(x_scale, y_scale, z_scale);
       }
 
@@ -1147,7 +1149,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         if (object_record->entity == m_activeEntity) {
           m_active_name = object_record->name;
           drawOutline(model_record);
-	    } else {
+        } else {
           model->render(false);
         }
       }
