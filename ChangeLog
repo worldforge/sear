@@ -1,3 +1,7 @@
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/ParticleSystem.cpp: Fix selectmode on particle system.
+
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>#
 
 	* src/WorldEntity.cpp: Fix asFloat/asNum usage.

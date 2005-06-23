@@ -249,7 +249,7 @@ void ParticleSystem::update(float elapsed)
 
 void ParticleSystem::render(bool select_mode)
 {
-    if (select_mode) return; // particles can't be selected, for now
+//    if (select_mode) return; // particles can't be selected, for now
     
     // figure out the up and left vectors for the billboard, based on the
     // modelview matrix. The following code was 'borrowed' from a snippet
