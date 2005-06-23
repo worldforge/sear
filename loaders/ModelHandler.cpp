@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.20 2005-06-23 09:48:39 simon Exp $
+// $Id: ModelHandler.cpp,v 1.21 2005-06-23 13:40:09 alriddoch Exp $
 
 #include <set>
 #include <string.h>
@@ -98,7 +98,7 @@ void ModelHandler::shutdown() {
     ModelRecord *mr = m_model_records_map.begin()->second;
     if (mr) {
       if (mr->model) {
-	mr->model->shutdown();
+        mr->model->shutdown();
         delete mr->model;
         mr->model = NULL;
       }
@@ -128,7 +128,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
 //  assert(render);
   // No existing model found, load up a new one
   if (!render) {
-    std::cerr << "renderer is null" << std::endl;
+//    std::cerr << "renderer is null" << std::endl;	  
     if (debug) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
     return NULL;
   }

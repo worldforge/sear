@@ -1,5 +1,11 @@
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelHandler.cpp: Remove "render is null" output.
+	* renderers/Graphics.cpp: Change fire attenuation based on status 
+	  attribute
+
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/ModelHandler.cpp: Remove extra debugging output.
 
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
