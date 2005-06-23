@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.19 2005-06-23 09:46:21 simon Exp $
+// $Id: ModelHandler.cpp,v 1.20 2005-06-23 09:48:39 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -239,7 +239,6 @@ void ModelHandler::checkModelTimeouts() {
       ModelRecord *record = I->second;
 
       assert(record);
-printf("Aptr %i\n",record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
 
       Model *model = record->model;

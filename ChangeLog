@@ -1,5 +1,9 @@
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/ModelHandler.cpp: Remove extra debugging output.
+
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/WorldEntity.cpp: Use ModelSystem::getObjectRecord instead of the
 	  one in ObjectHandler directly as it does some extra setting up of 
 	  data.
