@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.18 2005-06-23 08:10:35 simon Exp $
+// $Id: ModelHandler.cpp,v 1.19 2005-06-23 09:46:21 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -112,13 +112,13 @@ void ModelHandler::shutdown() {
 ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
   assert (m_initialised == true);
   assert(record);
+  assert(we);
   // Model loaded for this object?
   std::string id = record->id + model_id;
   ObjectRecordMap::const_iterator I = m_object_map.find(id);
   if (I != m_object_map.end()) {
     return I->second;
   }
-
 
   ModelRecordMap::const_iterator J = m_model_records_map.find(model_id);
   if (J != m_model_records_map.end()) {
@@ -128,7 +128,8 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
 //  assert(render);
   // No existing model found, load up a new one
   if (!render) {
-    std::cerr << "renderer is null" << std::endl;	  
+    std::cerr << "renderer is null" << std::endl;
+    if (debug) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
     return NULL;
   }
 
@@ -160,7 +161,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     model = new ModelRecord;
     model->model = new NullModel(render);
   }
-  
+
   if (we != NULL) {
     if (we->hasAttr("mode")) {
       model->model->action(we->valueOfAttr("mode").asString());
@@ -201,6 +202,14 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
 void ModelHandler::checkModelTimeouts() {
   assert (m_initialised == true);
 
+  // This function checks to see when the last time a model record was rendered.
+  // If the time has been longer than a threshold, we unload the model record 
+  // and associated models.
+
+  // NOTE: Perhaps we could just unload the model and not the record?
+
+  // Only look thorugh unique records list. 
+
   // TODO what about records with no model?
   if (debug) std::cout << "Checking Timeouts" << std::endl;
 
@@ -210,14 +219,14 @@ void ModelHandler::checkModelTimeouts() {
   ModelRecordMap::iterator Iend = m_model_records_map.end();
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != Iend; ++I) {
     ModelRecord *record = I->second;
+
     assert(record);
-    if (record) {
-      Model *model = record->model;
-      if (model) {
-        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-          // Add to set object
-          expired_set.insert(I->first);
-        }
+
+    Model *model = record->model;
+    if (model) {
+      if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+        // Add to set object
+        expired_set.insert(I->first);
       }
     }
   }
@@ -227,32 +236,38 @@ void ModelHandler::checkModelTimeouts() {
   for (; K != Kend; ++K) {
     ModelRecordMap::iterator I = m_model_records_map.find(*K);
     if (I != Iend) {
-      ModelRecord * record = I->second;
+      ModelRecord *record = I->second;
+
       assert(record);
+printf("Aptr %i\n",record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
+
       Model *model = record->model;
       if (model) {
         model->shutdown();
         delete model;
       }
+
       delete record;
       m_model_records_map.erase(I);
     }
   }
 
   expired_set.clear();
+#if(0)
+  // Do not do this as it leads to a double free!
 
   // Do the same again for the object map
   ModelRecordMap::iterator Jend = m_object_map.end();
   for (ObjectRecordMap::iterator J = m_object_map.begin(); J != Jend; ++J) {
     ModelRecord *record = J->second;
+
     assert(record);
-    if (record) {
-      Model *model = record->model;
-      if (model) {
-        if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-          expired_set.insert(J->first);
-        }
+
+    Model *model = record->model;
+    if (model) {
+      if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+        expired_set.insert(J->first);
       }
     }
   }
@@ -265,6 +280,7 @@ void ModelHandler::checkModelTimeouts() {
       ModelRecord * record = J->second;
       assert(record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
+printf("Bptr %i\n",record);
       Model * model = record->model;
       if (model) {
         model->shutdown();
@@ -274,6 +290,7 @@ void ModelHandler::checkModelTimeouts() {
       m_object_map.erase(J);
     }
   }
+#endif
 }
 
 void ModelHandler::TimeoutExpired() {

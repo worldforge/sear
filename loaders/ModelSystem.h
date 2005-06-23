@@ -52,7 +52,7 @@ public:
 //  varconf::Config &getObjectRecords();
 //  varconf::Config &getObjectRecords() { return m_object_records; }
  
-  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &mode_id, WorldEntity *we = NULL); 
+  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &mode_id, WorldEntity *we); 
 
   ObjectRecord *getObjectRecord(WorldEntity *we);
 private:

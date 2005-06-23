@@ -116,6 +116,7 @@ ModelRecord *ModelSystem::getModel(Render *render, ObjectRecord *record, const s
 }
 
 ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
+  assert (we != NULL);
   // Find object record from entity id
   ObjectRecord *object_record = m_object_handler->getObjectRecord(we->getId());
 
@@ -124,10 +125,10 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 //    object_record->type = we->getId();
 //  }
 
+  std::string type = we->type();
   if (!object_record) {
     // No record for this ID yet, so lets see if there is a record for 
     // the object type
-    std::string type = we->type();
     varconf::Config::inst()->clean(type);
     object_record = m_object_handler->getObjectRecord(type);
 
@@ -155,12 +156,12 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 
     assert(object_record);
 
+  }
     // Set the values for the object record
     object_record->type = type;
     object_record->name = we->getName();
     object_record->id = we->getId();
     object_record->entity = we;
-  }
 
   // Copy bounding box value
   if (we->hasBBox()) {

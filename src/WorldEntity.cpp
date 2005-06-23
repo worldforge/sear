@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.64 2005-06-22 15:51:56 simon Exp $
+// $Id: WorldEntity.cpp,v 1.65 2005-06-23 09:46:21 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -239,7 +239,7 @@ std::string WorldEntity::parent() {
 }
 
 void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
-  ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
+  //ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
 
     if (str == MODE) {
       const std::string mode = v.asString();
@@ -247,7 +247,8 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       ac->handleAction(mode + "_" + type(), NULL);
       if (mode != last_mode) {
         ObjectRecord *record = NULL;
-        if (object_handler) record = object_handler->getObjectRecord(getId());
+        //if (object_handler) record = object_handler->getObjectRecord(getId());
+        record = ModelSystem::getInstance().getObjectRecord(this);
         if (record) record->animate(mode);
         last_mode = mode;
       }
@@ -257,14 +258,16 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       ac->handleAction(action + "_" + type(), NULL);
       if (action != last_action) {
         ObjectRecord *record = NULL;
-        if (object_handler) record = object_handler->getObjectRecord(getId());
+        //if (object_handler) record = object_handler->getObjectRecord(getId());
+        record = ModelSystem::getInstance().getObjectRecord(this);
         if (record) record->action(action);
         last_action = action;
       }
     } else if (str == GUISE) {
       const Atlas::Message::MapType& mt(v.asMap());
       ObjectRecord *record = NULL;
-      if (object_handler) record = object_handler->getObjectRecord(getId());
+//      if (object_handler) record = object_handler->getObjectRecord(getId());
+      record = ModelSystem::getInstance().getObjectRecord(this);
       if (record) record->setAppearance(mt);
 //    } else if (str == "--bbox") {
 //      float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());

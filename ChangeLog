@@ -1,5 +1,16 @@
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/WorldEntity.cpp: Use ModelSystem::getObjectRecord instead of the
+	  one in ObjectHandler directly as it does some extra setting up of 
+	  data.
+	* loaders/ModelSystem.h: Do not allow getModel() to default to we=NULL.
+	* loaders/ObjectRecord.cpp: Pass entity to getModel
+	* loaders/ModelSystem.cpp: Add assert system.
+	* loaders/ModelHandler.cpp: Add some debugging info. Remove second check
+	  in unloadModels as it double deletes modelrecords.
+
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/Camera.h:  Fix typo
 
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
