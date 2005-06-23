@@ -272,8 +272,8 @@ void ParticleSystem::render(bool select_mode)
 
     if (!select_mode) glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glVertexPointer(3, GL_FLOAT, 0, (float*) m_vertexBuffer);
-    if (!select_mode) glColorPointer(4, GL_UNSIGNED_BYTE, 0, (GLubyte*) m_colorBuffer);
-    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, (GLubyte*) m_colorBuffer);
+    if (!select_mode) glEnableClientState(GL_COLOR_ARRAY);
     glTexCoordPointer(2, GL_FLOAT, 0, (float*)m_texCoordBuffer);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
       
