@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.21 2005-06-23 13:40:09 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.22 2005-06-23 16:03:27 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -200,6 +200,7 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
 }
 
 void ModelHandler::checkModelTimeouts() {
+return;
   assert (m_initialised == true);
 
   // This function checks to see when the last time a model record was rendered.

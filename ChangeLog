@@ -1,5 +1,10 @@
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelHandler.cpp: Currently disable unloading as it is still
+	  buggy.
+
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ModelHandler.cpp: Remove "render is null" output.
 	* renderers/Graphics.cpp: Change fire attenuation based on status 
 	  attribute
