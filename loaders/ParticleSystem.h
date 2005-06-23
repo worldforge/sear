@@ -94,7 +94,7 @@ private:
     Point3 initialPos() const;
     
     std::vector<Particle*> m_particles;
-    TextureID m_texture;
+    TextureID m_texture, m_texture_mask;
     ObjectRecord* m_entity;
     
     Vertex_3* m_vertexBuffer;

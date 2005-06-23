@@ -1,5 +1,12 @@
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: Allow rendering
+	  in select mode.
+	* renderers/Graphics.cpp: Use asNum instead of asFloat to avoid an 
+	  exception.
+
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ModelHandler.cpp: Currently disable unloading as it is still
 	  buggy.
 
