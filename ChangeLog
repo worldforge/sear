@@ -1,3 +1,11 @@
+2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Graphics.cpp: Move drawAttached code into drawObject loop 
+	  so objects are attached using the correct model.
+	* loaders/ModelHandler.cpp: Return a valid position and oreintation to
+	  avoid wierd transformations on attached objects. Be quiet about
+	   missing model position information.
+
 2005-06-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/ConsoleWindow.cpp: Clear the enabled flag on the textbox

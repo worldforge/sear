@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.23 2005-06-20 16:22:24 simon Exp $
+// $Id: Graphics.cpp,v 1.24 2005-06-23 08:10:35 simon Exp $
 
 #include <sage/sage.h>
 
@@ -117,6 +117,13 @@ static const std::string SELECT = "select_state";
 //  static const float DEFAULT_low_dist    = 1000.0f;
   static const float DEFAULT_medium_dist = 800.0f;
   static const float DEFAULT_high_dist   = 400.0f; 
+
+std::string mapAttachSlotToSubmodel(const std::string& s);
+typedef enum {
+  DIST_LOW = 0,
+  DIST_MEDIUM,
+  DIST_HIGH
+} Dist;
 
 Graphics::Graphics(System *system) :
   m_system(system),
@@ -431,10 +438,10 @@ void Graphics::buildQueues(WorldEntity *we,
     }
   } // of draw_members case
   
-  if (obj->draw_attached || !we->getAttachments().empty()) {
-    drawAttached(obj, select_mode, render_queue, message_list,
-                      name_list, time_elapsed);
-  }
+//  if (obj->draw_attached || !we->getAttachments().empty()) {
+//    drawAttached(obj, select_mode, render_queue, message_list,
+//                      name_list, time_elapsed);
+//  }
 }
 
 void Graphics::drawObject(ObjectRecord* obj, 
@@ -503,6 +510,28 @@ void Graphics::drawObject(ObjectRecord* obj,
         modelRec->model->update(time_elapsed);
         modelRec->model->setLastTime(System::instance()->getTimef());
     } 
+    // Add attached objects to the render queues.
+    if (obj->draw_attached || !obj->entity->getAttachments().empty()) {
+      WorldEntity::AttachmentMap::const_iterator it,
+                                      end = obj->entity->getAttachments().end();
+
+      for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
+        // retrieving the objectRecord also syncs it's pos with the WorldEntity
+        ObjectRecord *attached = 
+                         ModelSystem::getInstance().getObjectRecord(it->second);
+        assert (attached);
+
+        std::string submodel = mapAttachSlotToSubmodel(it->first);
+        PosAndOrient po = modelRec->model->getPositionForSubmodel(submodel);
+
+        attached->orient = obj->orient * po.orient;
+        attached->position = obj->position +
+                                         (po.pos.rotate(obj->orient.inverse()));
+
+        drawObject(attached, select_mode, render_queue, message_list, name_list,
+                   time_elapsed);
+      }
+    }
   }
   
   // if rendering, add any messages

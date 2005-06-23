@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.17 2005-06-08 00:12:30 jmt Exp $
+// $Id: ModelHandler.cpp,v 1.18 2005-06-23 08:10:35 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -333,8 +333,10 @@ void ModelHandler::invalidate() {
 
 PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName)
 {
-    PosAndOrient po;
-    std::cerr << "called getPositionForSubmodel on Model base class : undefined" << std::endl;
+  PosAndOrient po;
+  po.pos = WFMath::Vector<3>(0.0f,0.0f,0.0f);
+  po.orient = WFMath::Quaternion(1.0f, 0.0f,0.0f,0.0f);
+//    std::cerr << "called getPositionForSubmodel on Model base class : undefined" << std::endl;
     return po;
 }
 
