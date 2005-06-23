@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Camera.h,v 1.3 2005-06-23 08:17:41 simon Exp $
+// $Id: Camera.h,v 1.4 2005-06-23 08:45:12 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -157,7 +157,7 @@ public:
   void setMaxDistance(float m) { m_max_distance = m; }
 
   float getMinDistance() const { return m_min_distance; }
-  float getMaxDistance() const { retuen m_max_distance; }
+  float getMaxDistance() const { return m_max_distance; }
  
 protected:
   /**
