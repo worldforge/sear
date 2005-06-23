@@ -261,6 +261,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
         event_eaten = ((focus != 0) && (focus != m_top));
       }
     case SDL_KEYUP:
+      event_eaten = ((focus != 0) && (focus != m_top));
       break;
     default:
       event_eaten = false;

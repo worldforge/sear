@@ -1,3 +1,17 @@
+2005-06-23  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConsoleWindow.cpp: Clear the enabled flag on the textbox
+	  so mouse clicks don't cause a segfault.
+
+	* guichan/Panel.cpp: Only attempt to focus the console if it is
+	  on screen.
+
+	* guichan/Workarea.cpp: Filter key release the same way as key
+	  press.
+
+	* src/System.cpp: Only pass events to the gui if the console is
+	  not open.
+
 2005-06-22  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* data/bindings.cfg: Add defaults for up/down movement

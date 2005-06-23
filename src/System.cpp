@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.130 2005-06-21 17:04:36 alriddoch Exp $
+// $Id: System.cpp,v 1.131 2005-06-23 07:19:13 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -450,8 +450,10 @@ void System::handleEvents(const SDL_Event &event) {
   assert(m_character != NULL);
   assert(renderer != NULL);
 
-  if (m_workarea->handleEvent(event)) {
-    return;
+  if (!m_console->consoleStatus()) {
+    if (m_workarea->handleEvent(event)) {
+      return;
+    }
   }
 
   switch (event.type) {

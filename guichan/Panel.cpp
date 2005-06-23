@@ -166,7 +166,10 @@ void Panel::addWindow(const std::string & name, gcn::Window * window)
 
 bool Panel::requestConsoleFocus()
 {
-   return m_console->requestConsoleFocus();
+   if (m_console->getParent() != 0) {
+     return m_console->requestConsoleFocus();
+   }
+   return false;
 }
 
 } // namespace Sear

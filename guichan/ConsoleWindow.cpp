@@ -41,6 +41,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   textBox->setEditable(false);
   textBox->setOpaque(false);
   textBox->setFocusable(false);
+  textBox->setEnabled(false);
   textBox->setBackgroundColor(gcn::Color(0,0,0,0));
   gcn::ScrollArea * textBoxScrollArea = new gcn::ScrollArea(textBox,
                                             gcn::ScrollArea::SHOW_AUTO,
