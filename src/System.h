@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.59 2005-06-10 16:54:11 alriddoch Exp $
+// $Id: System.h,v 1.60 2005-06-23 08:17:41 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -196,6 +196,8 @@ public:
   void runCommand(const std::string &command, const std::string &args);
   Client *getClient() const { return m_client; }
 
+  int getWidth() const { return m_width; }
+  int getHeight() const { return m_height; }
 protected:
   bool initVideo();
   

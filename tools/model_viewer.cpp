@@ -21,6 +21,8 @@
 #include <iostream>
 #include <string>
 
+#include <png.h>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 #include <sage/GLU.h>
@@ -68,15 +70,74 @@ float y_angle = 0.0f;
 Sear::ObjectRecord *object_record = NULL;
 std::string the_state = "";
 std::string type = "";
-
+void display();
 float model_x = 0.0f;
 float model_y = 0.0f;
 float model_z = 0.0f;
 int move_dir = 0;
-
+int width, height;
 bool black = true;
+void dump(const std::string &filename);
 
-void reshape(int width, int height) {
+
+int save_png(const std::string &filename, unsigned char* buffer,
+             int width, int height) {
+  FILE *fp = fopen(filename.c_str(),"wb");
+	
+  if (!fp) {
+    fprintf(stderr, "Error opening %s for writing\n", filename.c_str());
+    return 1;
+  }
+	
+  png_structp write_png = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+        NULL, NULL, NULL);
+
+  png_infop info_ptr = png_create_info_struct(write_png);
+
+  png_init_io(write_png, fp);
+
+  info_ptr->width = width;
+  info_ptr->height = height;
+  info_ptr->rowbytes = width * 4;
+  info_ptr->bit_depth = 8;
+  info_ptr->interlace_type = 0;
+  info_ptr->num_palette = 0;
+  info_ptr->palette = NULL;
+  info_ptr->valid = 0;
+	
+  info_ptr->sig_bit.red = 8;
+  info_ptr->sig_bit.green = 8;
+  info_ptr->sig_bit.blue = 8;
+  info_ptr->sig_bit.alpha = 8;
+  info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+
+  png_write_info(write_png, info_ptr);
+
+  unsigned char **row_pointers =
+    (unsigned char**) malloc( info_ptr->height*sizeof(unsigned char*));	
+
+  row_pointers[0]=buffer;
+
+  for(int i=1; i<info_ptr->height; i++ )
+    row_pointers[i] = row_pointers[i-1] + info_ptr->rowbytes;
+
+  png_write_image(write_png, row_pointers);
+
+  png_write_end(write_png, info_ptr);
+
+  if ( info_ptr ) free( info_ptr->palette );
+  free( row_pointers );
+
+  png_destroy_write_struct(&write_png, &info_ptr);
+fclose(fp);
+  return 0;
+}
+
+
+
+void reshape(int w, int h) {
+  width = w;
+  height = h;
   //Check for divide by 0
   if (height == 0) height = 1;
   glViewport(0, 0, width, height);
@@ -101,7 +162,7 @@ void updateMove(float time) {
 void idle() {
   static unsigned int last_time = 0;
   float time = (((float)(sys->getTime() - last_time)) / 1000.0f);
-  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->high_quality.begin(); I != object_record->high_quality.end(); I++) {
     Sear::ModelRecord *model_record = Sear::ModelSystem::getInstance().getModelHandler()->getModel(render, object_record, *I);
     if (model_record) {
       Sear::Model *model = model_record->model;   
@@ -157,6 +218,18 @@ void handleEvents(const SDL_Event &event) {
 
       else if (event.key.keysym.sym == SDLK_g) show_axis = !show_axis;
       else if (event.key.keysym.sym == SDLK_c) black = !black;
+      else if (event.key.keysym.sym == SDLK_b) {
+        bool c = show_axis;
+        show_axis = false;
+        float y = x_angle;
+        display();
+        dump(type + ".png");
+        x_angle += 90.0f;
+        display();
+        
+        dump(type + ".90.png");
+        show_axis = c; x_angle = y;
+      }
       break;
     }
     case SDL_KEYUP: {
@@ -194,9 +267,11 @@ void display() {
 //  glLightfv(GL_LIGHT0, GL_SPECULAR, lights[LIGHT_CHARACTER].specular);
 
   render->beginFrame();
-  if (black) glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Colour used to clear window
+glEnable(GL_ALPHA_TEST);
+  if (black) glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
   else glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
   orient /= WFMath::Quaternion(WFMath::Vector<3>(1.0f, 0.0f, 0.0f), _camera->getElevation());
   orient /= WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), _camera->getRotation());
@@ -232,7 +307,7 @@ void display() {
 
 //  std::cout << object_record->low_quality.size() << std::endl;
 //  std::cout << object_record->name << std::endl;
-  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->low_quality.begin(); I != object_record->low_quality.end(); I++) {
+  for (Sear::ObjectRecord::ModelList::const_iterator I = object_record->high_quality.begin(); I != object_record->high_quality.end(); I++) {
     Sear::ModelRecord *model_record = Sear::ModelSystem::getInstance().getModelHandler()->getModel(render, object_record, *I);
 //    if (model_record) {
 //      _system_running = false;
@@ -281,10 +356,13 @@ int main(int argc, char** argv) {
   }
   sys = new Sear::System();
   sys->init(argc, argv);
+width = sys->getWidth();
+height = sys->getHeight();
 //  sys->
 //  sys->createWindow(false);
   render = Sear::RenderSystem::getInstance().getRenderer();
   _camera = Sear::RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  _camera->setMinDistance(0.0f);
 
   object_record = Sear::ModelSystem::getInstance().getObjectHandler()->getObjectRecord(type);
 //            SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -302,4 +380,16 @@ int main(int argc, char** argv) {
     sys = NULL;
   }
   
+}
+
+void dump (const std::string &filename) {
+glEnable(GL_ALPHA_TEST);
+  unsigned char *buf = new unsigned char[width * height * 4];
+  glReadPixels(0,0,width, height, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+printf("%d %d %d %d\n",buf[400*4], buf[400*4+1], buf[400*4+2], buf[400 * 4+3]);
+//  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(buf, width, height, 32, width * 4, 0x000000ff, 0x0000ff00, 0x00ff0000,0x000000ff );
+//  SDL_SaveBMP(surface, filename.c_str());
+  save_png(filename, buf, width, height);
+//  SDL_FreeSurface(surface);
+delete [] buf;
 }
