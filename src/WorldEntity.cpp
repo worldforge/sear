@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.65 2005-06-23 09:46:21 simon Exp $
+// $Id: WorldEntity.cpp,v 1.66 2005-06-23 16:42:23 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -290,7 +290,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
             }
         }
     } else if (str == "status") {
-        m_status = v.asFloat();
+        m_status = v.asNum();
     }
 }
 
