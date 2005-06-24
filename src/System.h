@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.60 2005-06-23 08:17:41 simon Exp $
+// $Id: System.h,v 1.61 2005-06-24 14:29:49 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -93,6 +93,11 @@ public:
    * This toggles the mlook flag
    */
   void toggleMouselook();
+
+  /**
+   * Return if mouselook is currently set
+   */
+  bool isMouselookEnabled() const;
 
   /**
    * This passes a command string to the console to run. The first word encountered

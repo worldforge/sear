@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.131 2005-06-23 07:19:13 alriddoch Exp $
+// $Id: System.cpp,v 1.132 2005-06-24 14:29:49 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -706,6 +706,10 @@ void System::toggleMouselook() {
   } else {
     RenderSystem::getInstance().setMouseVisible(true);
   }
+}
+
+bool System::isMouselookEnabled() const {
+  return m_mouseLook;
 }
 
 void System::pushMessage(const std::string &msg, int type, int duration) {

@@ -1,3 +1,8 @@
+2005-06-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/System.cpp, src/System.h: Add method to determine if mouse look
+	  is currently enabled.
+
 2005-06-24  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/LibModelFile.cpp: Fix bug were VBO creation accessed too much
