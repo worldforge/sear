@@ -1,3 +1,8 @@
+2005-06-24  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/LibModelFile.cpp: Fix bug were VBO creation accessed too much
+	  memory and caused wierd rendering effects and segfaults.
+
 2005-06-23  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/ParticleSystem.cpp: Fix more typos

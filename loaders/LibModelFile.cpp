@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.12 2005-06-22 08:34:42 simon Exp $
+// $Id: LibModelFile.cpp,v 1.13 2005-06-24 08:42:34 simon Exp $
 
 /*
   Debug check list
@@ -102,13 +102,12 @@ int LibModelFile::init(const std::string &filename) {
   m_textures.resize(modelFile->header->mesh_count);
   m_mask_textures.resize(modelFile->header->mesh_count);
 
-  m_boundaries[0] = 0;
-
   // Get number of triangles
   m_num_triangles = 0;
   m_num_vertices = 0;
   libmd3_mesh *meshp = modelFile->meshes;
 
+  m_boundaries[0] = 0;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
     m_num_triangles += meshp->mesh_header->triangle_count;
     m_num_vertices += meshp->mesh_header->vertex_count;
@@ -201,21 +200,22 @@ void LibModelFile::invalidate() {
 
 void LibModelFile::genVBOs() {
   // Create VBO's if required.
+  assert (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] == true);
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     // Create VBOS
     glGenBuffersARB(4, &m_vbos[0]);
 
     // Generate Vertex Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[0]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 3 * sizeof(short), m_vertex_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * sizeof(short), m_vertex_data, GL_STATIC_DRAW_ARB);
     
     // Generate Normal Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[1]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
 
     // Generate Texel Array VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[2]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * 2 * sizeof(float), m_texel_data, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 2 * sizeof(float), m_texel_data, GL_STATIC_DRAW_ARB);
 
     // Generate faces vbo
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vbos[3]);
