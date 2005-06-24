@@ -1,5 +1,17 @@
 2005-06-24  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/Workarea.cpp: Prevent certain widgets from being
+	  focusable using tab. Make sure mouse look is disabled when
+	  the gui has focus.
+
+	* guichan/Inventory.cpp: Make sure nothing in this window
+	  is focusable.
+
+	* guichan/ConsoleWindow.cpp: Prevent tab in and out working on
+	  this window, so tab can be used for completion.
+
+2005-06-24  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/System.cpp, src/System.h: Add method to determine if mouse look
 	  is currently enabled.
 

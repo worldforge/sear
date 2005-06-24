@@ -83,6 +83,7 @@ void Workarea::init()
   m_top->setDimension(gcn::Rectangle(0, 0, m_width, m_height));
   m_top->setOpaque(false);
   m_top->setFocusable(true);
+  m_top->setTabInEnabled(false);
 
   m_gui = new Gui();
   m_gui->setGraphics(m_graphics);
@@ -272,6 +273,14 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
   if (clear_focus) {
     fh->focusNone();
+  }
+
+  focus = fh->getFocused();
+
+  if ((focus != 0) && (focus != m_top)) {
+    if (m_system->isMouselookEnabled()) {
+      m_system->toggleMouselook();
+    }
   }
 
   return event_eaten;

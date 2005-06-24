@@ -54,6 +54,8 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 
   m_entry = new CommandLine;
   m_entry->setWidth(400);
+  m_entry->setTabInEnabled(false);
+  m_entry->setTabOutEnabled(false);
   m_entry->ReturnPressed.connect(SigC::slot(*this, &ConsoleWindow::lineEntered));
 
   vbox->pack(m_entry);

@@ -58,12 +58,14 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   m_inventory = new InventoryListAdaptor;
   m_items = new gcn::ListBox(m_inventory);
+  m_items->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_items,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
   scroll_area->setWidth(120);
   scroll_area->setHeight(100);
   scroll_area->setBorderSize(1);
+  scroll_area->setFocusable(false);
   vbox->pack(scroll_area);
 
   gcn::Box * hbox = new gcn::HBox(6);
