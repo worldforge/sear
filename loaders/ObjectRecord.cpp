@@ -44,7 +44,6 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 
 void ObjectRecord::animate(const std::string &action)
 {
-assert(this->entity);
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
   ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, entity);
   if (rec && rec->model) rec->model->animate(action);
