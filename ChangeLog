@@ -1,3 +1,7 @@
+2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/LibModelFile.cpp: Clean skin name for use with varconf.
+
 2005-06-24  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Workarea.cpp: Prevent certain widgets from being

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.13 2005-06-24 08:42:34 simon Exp $
+// $Id: LibModelFile.cpp,v 1.14 2005-06-25 11:23:00 simon Exp $
 
 /*
   Debug check list
@@ -127,6 +127,7 @@ int LibModelFile::init(const std::string &filename) {
     // Get Texture data from Mesh
     if (meshp->mesh_header->skin_count != 0) {
       std::string name = (const char*)(meshp->skins[0].name);
+      m_config.clean(name);
       // Check for texture name overrides in vconf file
       if (m_config.findItem(name, "filename")) {
         name = (std::string)m_config.getItem(name, "filename");
@@ -151,7 +152,7 @@ int LibModelFile::init(const std::string &filename) {
     // We are using one buffer for all objects, so adjust face vertex 
     // numbers accordingly
     for (int j = 0; j < meshp->mesh_header->triangle_count * 3; ++j) {
-      m_faces[m_boundaries[i] *  3 + j] += m_boundaries[i] * 3;
+      m_faces[m_boundaries[i] * 3 + j] += m_boundaries[i] * 3;
     }
   }
 
