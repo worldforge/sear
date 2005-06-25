@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.26 2005-06-23 16:23:56 simon Exp $
+// $Id: Graphics.cpp,v 1.27 2005-06-25 15:47:40 simon Exp $
 
 #include <sage/sage.h>
 
@@ -553,6 +553,10 @@ void Graphics::drawFire(WorldEntity* we)
   m_fire.position.z() += 0.5f; // Raise position off the ground a bit
 
   float status = we->valueOfAttr("status").asNum();
+  if (status > 1.0f) {
+    printf("Error status (%f) is greater than 1.0f!\n", status);
+    status = 1.0f;
+  }
   // Add light to gl system
   m_fire.attenuation_constant =  1.0f;// - status;
   m_fire.attenuation_linear =  1.0f - status;

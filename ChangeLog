@@ -1,5 +1,11 @@
 2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp: Check fire status is <= 1.0.
+
+	* tools/model_viewer.cpp: Change animations and add caption to window.
+
+2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp: Change some formatting.
 
 	* loaders/ModelHandler.cpp: Check for null pointer on worldentity.

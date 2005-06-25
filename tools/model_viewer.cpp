@@ -194,15 +194,15 @@ void handleEvents(const SDL_Event &event) {
       else if (event.key.keysym.sym == SDLK_UP) _camera->zoom(-1);
       else if (event.key.keysym.sym == SDLK_DOWN) _camera->zoom(1);
 
-      else if (event.key.keysym.sym == SDLK_1) model->action("standing");
-      else if (event.key.keysym.sym == SDLK_2) model->action("walking");
-      else if (event.key.keysym.sym == SDLK_3) model->action("running");
-      else if (event.key.keysym.sym == SDLK_4) model->action("animation_grip_axe");
-      else if (event.key.keysym.sym == SDLK_5) model->action("animation_wave");
-      else if (event.key.keysym.sym == SDLK_6) model->action("animation_shoot_arrow");
-      else if (event.key.keysym.sym == SDLK_7) model->action("animation_take_axe");
-      else if (event.key.keysym.sym == SDLK_8) model->action("blend_grip_axe");
-      else if (event.key.keysym.sym == SDLK_9) model->action("animation_stow_axe");
+      else if (event.key.keysym.sym == SDLK_1) model->animate("standing");
+      else if (event.key.keysym.sym == SDLK_2) model->animate("walking");
+      else if (event.key.keysym.sym == SDLK_3) model->animate("running");
+      else if (event.key.keysym.sym == SDLK_4) model->animate("idle");
+      else if (event.key.keysym.sym == SDLK_5) model->action("dead");
+      else if (event.key.keysym.sym == SDLK_6) model->action("sit");
+      else if (event.key.keysym.sym == SDLK_7) model->action("look");
+      else if (event.key.keysym.sym == SDLK_8) model->action("birth");
+      else if (event.key.keysym.sym == SDLK_9) model->action("pickup");
       else if (event.key.keysym.sym == SDLK_0) model->action("blend_limp");
       else if (event.key.keysym.sym == SDLK_w) model->action("animation_funky");
       else if (event.key.keysym.sym == SDLK_e) model->action("change_set_default");
@@ -356,6 +356,7 @@ int main(int argc, char** argv) {
   }
   sys = new Sear::System();
   sys->init(argc, argv);
+sys->setCaption("Sear: Model Viewer", "Sear: Model Viewer");
 width = sys->getWidth();
 height = sys->getHeight();
 //  sys->
