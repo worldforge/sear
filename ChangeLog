@@ -1,5 +1,13 @@
 2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp: Change some formatting.
+
+	* loaders/ModelHandler.cpp: Check for null pointer on worldentity.
+
+	* loaders/ObjectRecord.cpp: Remove assert statement.
+
+2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/NPlane.cpp: Remove debugging output.
 
 	* loaders/ModelHander.cpp: Properly set mode and action anims when 

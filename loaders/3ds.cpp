@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.46 2005-06-13 15:10:46 simon Exp $
+// $Id: 3ds.cpp,v 1.47 2005-06-25 15:42:23 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -404,7 +404,8 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     if (mat && mat->texture1_map.name[0]) {
 
       if (m_config.findItem(material_name,"texture_map_0")) {
-        std::string name = (std::string)m_config.getItem(material_name,"texture_map_0");
+        std::string name = (std::string)m_config.getItem(material_name,
+                                                         "texture_map_0");
         texture_id = RenderSystem::getInstance().requestTexture(name);
         texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
       } else  {

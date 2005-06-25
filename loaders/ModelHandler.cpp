@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.23 2005-06-25 14:43:01 simon Exp $
+// $Id: ModelHandler.cpp,v 1.24 2005-06-25 15:42:23 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -112,7 +112,7 @@ void ModelHandler::shutdown() {
 ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
   assert (m_initialised == true);
   assert(record);
-  assert(we);
+//  assert(we);
   // Model loaded for this object?
   std::string id = record->id + model_id;
   ObjectRecordMap::const_iterator I = m_object_map.find(id);
@@ -129,7 +129,7 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   // No existing model found, load up a new one
   if (!render) {
 //    std::cerr << "renderer is null" << std::endl;	  
-    if (debug) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
+    if (debug && we) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
     return NULL;
   }
 
