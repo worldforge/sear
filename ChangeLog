@@ -1,5 +1,12 @@
 2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/NPlane.cpp: Remove debugging output.
+
+	* loaders/ModelHander.cpp: Properly set mode and action anims when 
+	  creating the model.
+
+2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/LibModelFile.cpp: Clean skin name for use with varconf.
 
 2005-06-24  Al Riddoch  <alriddoch@zepler.org>

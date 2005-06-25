@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.24 2005-04-12 14:33:13 simon Exp $
+// $Id: NPlane.cpp,v 1.25 2005-06-25 14:43:01 simon Exp $
 
 #include "common/Utility.h"
 
@@ -55,7 +55,7 @@ int NPlane::init(const std::string &type, unsigned int num_planes, float width, 
 
   float in[3][3];
   float out[3];
-  std::cout << num_planes << std::endl;
+
   for (unsigned int i = 0; i < num_planes; i++) {
     float x = width * cos ((float)i * rads_per_segment) / 2.0f;
     float y = width * sin ((float)i * rads_per_segment) / 2.0f;

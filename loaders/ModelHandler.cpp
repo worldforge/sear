@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.22 2005-06-23 16:03:27 simon Exp $
+// $Id: ModelHandler.cpp,v 1.23 2005-06-25 14:43:01 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -163,8 +163,11 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
   }
 
   if (we != NULL) {
+    if (we->hasAttr("action")) {
+      model->model->action(we->valueOfAttr("action").asString());
+    }
     if (we->hasAttr("mode")) {
-      model->model->action(we->valueOfAttr("mode").asString());
+      model->model->animate(we->valueOfAttr("mode").asString());
     }
     if (we->hasAttr("guise")) {
       Atlas::Message::MapType mt = we->valueOfAttr("guise").asMap();
