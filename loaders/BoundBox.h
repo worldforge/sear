@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.11 2005-03-15 17:33:58 simon Exp $
+// $Id: BoundBox.h,v 1.12 2005-06-29 21:19:41 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -17,6 +17,8 @@
 #include "Model.h"
 
 #include "common/types.h"
+
+#include "renderers/RenderSystem.h"
 
 namespace Sear {
 
@@ -46,22 +48,18 @@ public:
 
   void invalidate();
 
-  bool useTextures() { return m_use_textures; }
-  
 private:
   static const int m_num_points = 24; // NUmber of points in model
 
   bool m_initialised;
-  bool m_use_textures;
-  std::string m_type;
+  std::string m_texture_name;
+  TextureID m_texture_id;
 
   Vertex_3 m_vertex_data[m_num_points]; // Vertex data
   Texel m_texture_data[m_num_points]; // Texture Co-oridinates data
   Normal m_normal_data[m_num_points]; // Normal data
   unsigned int m_list;
   unsigned int m_list_select;
-
-  int m_texture;
 };
 
 } /* namespace Sear */

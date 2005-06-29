@@ -2,12 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.26 2005-04-13 12:16:04 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.27 2005-06-29 21:19:41 simon Exp $
 
 #include <varconf/Config.h>
 
 #include "src/System.h"
-
 
 #include <string>
 
@@ -36,13 +35,13 @@ const std::string BoundBox_Loader::BOUNDBOX = "boundbox";
 
 // Config keys
 const std::string KEY_wrap_texture = "wrap_texture";
+const std::string KEY_texture = "texture";
 	
 BoundBox_Loader::BoundBox_Loader(ModelHandler *mh) {
   mh->registerModelLoader(BOUNDBOX, this);
 }
 
 BoundBox_Loader::~BoundBox_Loader() {
-//  mh->unregisterModelLoader("boundbox", this);
   // TODO: Add ability to unregister loader.
 }
 
@@ -51,38 +50,29 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
   BoundBox *model = new BoundBox(render);
 
   WFMath::AxisBox<3> bbox = record->bbox;
-//  if (!ms.hasBBox) {
-//    WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-//    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
-//    bbox = WFMath::AxisBox<3>(lc, hc);
-//  }
-  // BUG: FIXME boundbox has a slash and no slash?
-  // 
-//  int id = render->requestTexture("boundbox", type);
-//  if (id == -1 && ms.parent) {
-//    type = ms.parent;
-//    id = render->requestTexture("boundbox_", type);
-//  }
-//  if (id == -1) {
-//    // TODO: what happens if we still cannot find a texture?
-//
-//  }
  
-  std::string type = record->type;
+  std::string texture = record->type;
   bool wrap = false; //default to false
+
   // Check whether we specify texture wrapping
+  if (model_config.findItem(model_id, KEY_texture)) {
+    texture = (std::string)model_config.getItem(model_id, KEY_texture);
+  }
+  // Get texture name
   if (model_config.findItem(model_id, KEY_wrap_texture)) {
     wrap = (bool)model_config.getItem(model_id, KEY_wrap_texture);
   }
+
   // Initialise model
-  if (model->init(bbox, type, wrap)) {
+  if (model->init(bbox, texture, wrap)) {
     std::cerr<< "BoundBoxLoader: Error initialising model" << std::endl;
-//    model->shutdown();
     delete model;
     return NULL;
   }
+
   model->setInUse(true);
   model_record->model = model;
+
   return model_record;
 }
 

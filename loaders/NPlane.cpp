@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.25 2005-06-25 14:43:01 simon Exp $
+// $Id: NPlane.cpp,v 1.26 2005-06-29 21:19:41 simon Exp $
 
 #include "common/Utility.h"
 
@@ -38,14 +38,19 @@ NPlane::NPlane(Render *render) : Model(render),
 
 NPlane::~NPlane() {
   assert(m_initialised == false);
-///  if (_initialised) shutdown();
 }
   
-int NPlane::init(const std::string &type, unsigned int num_planes, float width, float height) {
+int NPlane::init(const std::string &texture, unsigned int num_planes, float width, float height) {
   assert(m_initialised == false);
-//  if (_initialised) shutdown();
-  m_type = type;
+ 
+  // Store texture name and get ID numbers
+  m_texture_name = texture;
+  m_texture_id = RenderSystem::getInstance().requestTexture(texture);
+  m_texture_mask_id = RenderSystem::getInstance().requestTexture(texture, true);
+
   m_num_planes = num_planes;
+
+  // Allocate mem
   float rads_per_segment = WFMath::Pi / (float)num_planes;
   m_vertex_data = new Vertex_3[8 * num_planes];
   m_normal_data = new Normal[8 * num_planes];
@@ -55,7 +60,7 @@ int NPlane::init(const std::string &type, unsigned int num_planes, float width, 
 
   float in[3][3];
   float out[3];
-
+  // Compute normals
   for (unsigned int i = 0; i < num_planes; i++) {
     float x = width * cos ((float)i * rads_per_segment) / 2.0f;
     float y = width * sin ((float)i * rads_per_segment) / 2.0f;
@@ -118,7 +123,7 @@ int NPlane::shutdown() {
   invalidate();
 
   m_initialised = false;
- return 0;
+  return 0;
 }
 
 void NPlane::invalidate() {
@@ -143,7 +148,7 @@ void NPlane::render(bool select_mode) {
       m_select_disp = m_render->getNewList();
       m_render->beginRecordList(m_select_disp);
       m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(m_type, true));
+      RenderSystem::getInstance().switchTexture(m_texture_mask_id);
       m_render->renderArrays(Graphics::RES_QUADS, 0, m_num_planes * 8, m_vertex_data, m_texture_data, m_normal_data,false);
       m_render->endRecordList();
     }
@@ -154,7 +159,7 @@ void NPlane::render(bool select_mode) {
       m_disp = m_render->getNewList();
       m_render->beginRecordList(m_disp);
       m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-      RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(m_type));
+      RenderSystem::getInstance().switchTexture(m_texture_id);
       m_render->renderArrays(Graphics::RES_QUADS, 0, m_num_planes * 8, m_vertex_data, m_texture_data, m_normal_data,false);
       m_render->endRecordList();
     }

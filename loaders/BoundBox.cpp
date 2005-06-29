@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.27 2005-06-02 11:18:14 simon Exp $
+// $Id: BoundBox.cpp,v 1.28 2005-06-29 21:19:41 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"
@@ -25,20 +25,18 @@ namespace Sear {
 
 BoundBox::BoundBox(Render *render) : Model(render), 
   m_initialised(false),
-  m_use_textures(true),
-  m_type("default"),
   m_list(0),
   m_list_select(0)
 {}
 
 BoundBox::~BoundBox() {
   assert(m_initialised == false);
-  if (m_initialised) shutdown();
 }
   
-int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &type, bool _wrap) {
+int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wrap) {
   assert(m_initialised == false);
-  m_type = type;
+  m_texture_name = texture;
+  m_texture_id = RenderSystem::getInstance().requestTexture(m_texture_name);
 
   m_vertex_data[0].x = bbox.lowCorner().x(); m_vertex_data[0].y = bbox.highCorner().y(); m_vertex_data[0].z = bbox.lowCorner().z();
   m_vertex_data[1].x = bbox.lowCorner().x(); m_vertex_data[1].y = bbox.lowCorner().y(); m_vertex_data[1].z = bbox.lowCorner().z();
@@ -69,7 +67,7 @@ int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &type, bool _wrap)
   m_vertex_data[21].x = bbox.lowCorner().x(); m_vertex_data[21].y = bbox.lowCorner().y(); m_vertex_data[21].z = bbox.highCorner().z();
   m_vertex_data[22].x = bbox.highCorner().x(); m_vertex_data[22].y = bbox.lowCorner().y(); m_vertex_data[22].z = bbox.highCorner().z();
   m_vertex_data[23].x = bbox.highCorner().x(); m_vertex_data[23].y = bbox.lowCorner().y(); m_vertex_data[23].z = bbox.lowCorner().z();
-  if (!_wrap) {
+  if (!wrap) {
     m_texture_data[0].s = 0.0f; m_texture_data[0].t = 0.0f;
     m_texture_data[1].s = 0.0f; m_texture_data[1].t = 1.0f;
     m_texture_data[2].s = 1.0f; m_texture_data[2].t = 1.0f;
@@ -197,7 +195,7 @@ void BoundBox::render(bool select_mode) {
       m_render->endRecordList();
     } 
   } else {
-    RenderSystem::getInstance().switchTexture(RenderSystem::getInstance().requestTexture(m_type));
+    RenderSystem::getInstance().switchTexture(m_texture_id);
     if (m_list) {
       m_render->playList(m_list);
     } else {

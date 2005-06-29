@@ -1,3 +1,10 @@
+2005-06-29  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/BoundBox_Loader.cpp,
+	  loaders/NPlane.cpp, loaders/NPlane.h, loader/NPlane_Loader.cpp: Allow
+	  texture name to be specified in model_records, otherwise use type as
+	  texture name.
+
 2005-06-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Check fire status is <= 1.0.
