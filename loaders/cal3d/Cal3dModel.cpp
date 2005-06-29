@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.29 2005-06-22 15:51:56 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.30 2005-06-29 21:32:48 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -489,7 +489,6 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string&)
 }
 
 void Cal3dModel::addAnimation(const Cal3dCoreModel::WeightList &list) {
-printf("Adding anum\n");
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
@@ -501,7 +500,6 @@ printf("Adding anum\n");
 }
 
 void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
-printf("Removinng anum\n");
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
