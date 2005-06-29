@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.27 2005-06-25 15:47:40 simon Exp $
+// $Id: Graphics.cpp,v 1.28 2005-06-29 21:25:29 simon Exp $
 
 #include <sage/sage.h>
 
@@ -115,15 +115,10 @@ static const std::string SELECT = "select_state";
 
 
 //  static const float DEFAULT_low_dist    = 1000.0f;
-  static const float DEFAULT_medium_dist = 800.0f;
-  static const float DEFAULT_high_dist   = 400.0f; 
+  static const float DEFAULT_medium_dist = 1600.0f;
+  static const float DEFAULT_high_dist   = 1000.0f; 
 
 std::string mapAttachSlotToSubmodel(const std::string& s);
-typedef enum {
-  DIST_LOW = 0,
-  DIST_MEDIUM,
-  DIST_HIGH
-} Dist;
 
 Graphics::Graphics(System *system) :
   m_system(system),
@@ -180,11 +175,10 @@ void Graphics::shutdown() {
 void Graphics::drawScene(bool select_mode, float time_elapsed) {
   assert(m_renderer != NULL);
 
-//  if (select_mode)
- m_renderer->resetSelection();
+  m_renderer->resetSelection();
 
   // Update camera position
-  if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
+//  if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
   RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
   // Do necessary GL initialisation for the frame
   m_renderer->beginFrame();
@@ -192,8 +186,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   // Draw the world!
   drawWorld(select_mode, time_elapsed);
 
-  if (!select_mode) {
- 
+  if (!select_mode) { 
     Workarea * wa = m_system->getWorkarea();
     if (wa) wa->draw();
     else throw Exception("Error no Workarea object");
@@ -215,6 +208,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
       m_frame_time = 0.0f;
     }
   }
+
   // Render the entity name if available
   if (!select_mode) m_renderer->renderActiveName();
 
@@ -408,12 +402,14 @@ void Graphics::buildQueues(WorldEntity *we,
 
 //  we->checkActions(); // See if model animations need to be updated
   if (!we->isVisible()) return;
+
   assert(we->getType());
     
   ObjectRecord *obj = ModelSystem::getInstance().getObjectRecord(we);
   assert (obj);
 
-// Setup lights as we go
+  // Setup lights as we go
+  // TODO: This should be changed so that only the closest objects have light.
   if (we->type() == "fire") drawFire(we);
       
   // Loop through all models in list
@@ -553,10 +549,14 @@ void Graphics::drawFire(WorldEntity* we)
   m_fire.position.z() += 0.5f; // Raise position off the ground a bit
 
   float status = we->valueOfAttr("status").asNum();
-  if (status > 1.0f) {
-    printf("Error status (%f) is greater than 1.0f!\n", status);
-    status = 1.0f;
-  }
+  // Clamp status range in case of bad values from server.
+  if (status > 1.0f) status = 1.0f;
+  else if (status < 0.0f) status = 0.0f;
+ 
+  // TODO We need to use status to affect attenuation
+  // But we need a good way to affect each component.
+  // One component on its own gives too little, or too much light.
+
   // Add light to gl system
   m_fire.attenuation_constant =  1.0f;// - status;
   m_fire.attenuation_linear =  1.0f - status;

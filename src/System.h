@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.61 2005-06-24 14:29:49 alriddoch Exp $
+// $Id: System.h,v 1.62 2005-06-29 21:25:29 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -186,9 +186,9 @@ public:
 //  ObjectHandler *getObjectHandler() const { return m_object_handler; }
   Calendar *getCalendar() const { return m_calendar; }
   
-  Console *getConsole() { return m_console; }
-  Workarea *getWorkarea() { return m_workarea; }
-  Character *getCharacter() { return m_character; }
+  Console *getConsole() const { return m_console; }
+  Workarea *getWorkarea() const { return m_workarea; }
+  Character *getCharacter() const { return m_character; }
   
   static System *instance() { return m_instance; }
 

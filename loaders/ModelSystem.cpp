@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Simon Goodall
 
+#include <Eris/TypeInfo.h>
+
 #include "src/Console.h"
 #include "src/WorldEntity.h"
 
@@ -124,7 +126,31 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 //  if (object_record && object_record->type.empty()) {
 //    object_record->type = we->getId();
 //  }
+#if(1)
+  std::string type = DEFAULT;
+  if (!object_record) {
+    Eris::TypeInfo *ti = we->getType();
 
+    while (ti != NULL) {
+      std::string t = ti->getName();
+      varconf::Config::inst()->clean(t);
+      object_record = m_object_handler->getObjectRecord(t);
+      if (object_record) {
+        type = ti->getName();
+        break;
+      } else {
+        // TODO, Check this output
+        // I.e, will there be more than one?
+        // And if so, will it be the same as getParent on each type too?
+        if (ti->getParents().size() > 0) {
+          ti = *(ti->getParents().begin());
+        } else {
+          ti = NULL;
+        }
+      }
+    }
+
+#else
   std::string type = we->type();
   if (!object_record) {
     // No record for this ID yet, so lets see if there is a record for 
@@ -146,7 +172,7 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
       object_record = m_object_handler->getObjectRecord(type);
       if (debug) printf("Object ID: %s Type: %s using default record.\n", we->getId().c_str(), we->type().c_str());
     }
- 
+#endif 
     assert(object_record);
     // Copy existing record to the entity ID so we can make entity
     // Specific changes
@@ -156,12 +182,14 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 
     assert(object_record);
 
-  }
     // Set the values for the object record
     object_record->type = type;
     object_record->name = we->getName();
     object_record->id = we->getId();
     object_record->entity = we;
+  }
+
+  assert(object_record->entity != NULL);
 
   // Copy bounding box value
   if (we->hasBBox()) {
@@ -179,9 +207,5 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 varconf::Config &ModelSystem::getModelRecords() {
   return m_model_handler->getModelRecords();
 }
-
-//varconf::Config &ModelSystem::getObjectRecords() {
-//  return m_object_handler->getObjectRecords();
-//}
 
 } // namespace Sear

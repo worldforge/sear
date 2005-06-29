@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CacheManager.cpp,v 1.4 2005-03-15 17:55:05 simon Exp $
+// $Id: CacheManager.cpp,v 1.5 2005-06-29 21:25:29 simon Exp $
 
 #include <stdlib.h>
 #include <cassert>
@@ -148,12 +148,15 @@ int CacheManager::add(CacheObject *obj, const std::string &filename) {
   char cache_name[name.size()];
   memcpy(cache_name, name.c_str(), name.size());
 
+#if(0)
+  // TODO Re-think this method so it is safe
+  // Currently disable as it is not used and generated warnings.
   // Generate unique unused filename
   if (!mktemp(cache_name)) {
     fprintf(stderr, "Error generating cache name.\n");
     return 1;
   }
-
+#endif
   // Save object
   if (obj->save(cache_name)) {
     fprintf(stderr, "Error saving cache object.\n");

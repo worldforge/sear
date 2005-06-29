@@ -1,5 +1,16 @@
 2005-06-29  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelSystem.cpp: Work up the TypeInfo parents list until we
+	  get a match against an object record. Use default record if none
+	  found. Previous behaviour only checked the first parent.
+	* renderers/Graphics.cpp: Clamp status value from server to 0.0:1.0
+	* src/CacheManager.cpp: Disable compiling mktemp call to avoid warning
+	  for now as this code is not used.
+	* src/System.cpp: Remove calls to cachemanger.
+	* src/System.h: Make some functions const.
+
+2005-06-29  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/BoundBox_Loader.cpp,
 	  loaders/NPlane.cpp, loaders/NPlane.h, loader/NPlane_Loader.cpp: Allow
 	  texture name to be specified in model_records, otherwise use type as

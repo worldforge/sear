@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.132 2005-06-24 14:29:49 alriddoch Exp $
+// $Id: System.cpp,v 1.133 2005-06-29 21:25:29 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -269,7 +269,7 @@ bool System::init(int argc, char *argv[]) {
   RenderSystem::getInstance().registerCommands(m_console);
   ModelSystem::getInstance().init();
   ModelSystem::getInstance().registerCommands(m_console);
-  CacheManager::getInstance().init();
+//  CacheManager::getInstance().init();
 
   // Register StaticObject with CacheManager
 //  StaticObject *so = new StaticObject();
@@ -336,7 +336,7 @@ void System::shutdown() {
   delete m_action_handler;
   m_action_handler = NULL;
 
-  CacheManager::getInstance().shutdown();
+//  CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();
   ModelSystem::getInstance().shutdown(); 
   RenderSystem::getInstance().destroyWindow();
