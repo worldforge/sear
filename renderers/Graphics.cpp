@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.28 2005-06-29 21:25:29 simon Exp $
+// $Id: Graphics.cpp,v 1.29 2005-07-02 12:31:02 simon Exp $
 
 #include <sage/sage.h>
 
@@ -115,8 +115,8 @@ static const std::string SELECT = "select_state";
 
 
 //  static const float DEFAULT_low_dist    = 1000.0f;
-  static const float DEFAULT_medium_dist = 1600.0f;
-  static const float DEFAULT_high_dist   = 1000.0f; 
+  static const float DEFAULT_medium_dist = 9000.0f;
+  static const float DEFAULT_high_dist   = 4500.0f; 
 
 std::string mapAttachSlotToSubmodel(const std::string& s);
 

@@ -1,3 +1,11 @@
+2005-07-02  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Graphics.cpp: Make medium/high dist values larger
+
+	* loaders/ModelRecord.h, loaders/ModelRecord.cpp,
+	  loaders/ModelLoader.cpp: Add "scale_height" as a const var of
+	  model_record.
+
 2005-06-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/cal3d/Cal3dModel.cpp: Remove some debugging output.

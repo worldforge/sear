@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.4 2005-06-02 11:18:14 simon Exp $
+// $Id: ModelRecord.h,v 1.5 2005-07-02 12:31:02 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -39,6 +39,7 @@ public:
 
   static const std::string SCALE;
   static const std::string SCALE_BBOX;
+  static const std::string SCALE_HEIGHT;
   static const std::string OFFSET_X;
   static const std::string OFFSET_Y;
   static const std::string OFFSET_Z;

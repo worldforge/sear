@@ -126,8 +126,8 @@ ModelRecord* ModelLoader::loadModel(Render *,
     if (model_config.findItem(model_id, ModelRecord::DATA_FILE_ID)) {
       model_record->data_file_id = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
     }
-    if (model_config.findItem(model_id, "scale_height")) {
-      model_record->scaleByHeight = (bool)model_config.getItem(model_id, "scale_height");
+    if (model_config.findItem(model_id, ModelRecord::SCALE_HEIGHT)) {
+      model_record->scaleByHeight = (bool)model_config.getItem(model_id, ModelRecord::SCALE_HEIGHT);
     }
     return model_record;
   }
