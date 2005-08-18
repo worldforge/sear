@@ -37,14 +37,12 @@ if [ -x $JAVA ] ; then
 
   # Run Updater if it exists
   if [ -e $homedata/$WFUT_JAR ] ; then
-    # Store Current dir
-    CUR_DIR=`pwd`
     # We need to change here so updater knows where to find / store data
-    cd $homedata
+    pushd $homedata
     # Update
     $JAVA -jar $WFUT_JAR update $MEDIA_CHANNEL
     # Restore dir
-    cd $PWD
+    popd
   fi
 else
   echo "Java not found in path. Updater cannot be run."

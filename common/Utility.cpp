@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.11 2005-04-13 12:16:03 simon Exp $
+// $Id: Utility.cpp,v 1.12 2005-08-18 10:56:36 simon Exp $
 
 #include "Utility.h"
 
@@ -85,25 +85,25 @@ void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]) {
   wy = quat.scalar() * y2;
   wz = quat.scalar() * z2;
 
-  m[0][0] = 1.0 - (yy + zz);
+  m[0][0] = 1.0f - (yy + zz);
   m[0][1] = xy - wz;
   m[0][2] = xz + wy;
-  m[0][3] = 0.0;
+  m[0][3] = 0.0f;
              
   m[1][0] = xy + wz;
-  m[1][1] = 1.0 - (xx + zz);
+  m[1][1] = 1.0f - (xx + zz);
   m[1][2] = yz - wx;
-  m[1][3] = 0.0;
+  m[1][3] = 0.0f;
   
   m[2][0] = xz - wy;
   m[2][1] = yz + wx;  
-  m[2][2] = 1.0 - (xx + yy);
-  m[2][3] = 0.0;
+  m[2][2] = 1.0f - (xx + yy);
+  m[2][3] = 0.0f;
     
-  m[3][0] = 0;
-  m[3][1] = 0;
-  m[3][2] = 0;
-  m[3][3] = 1;  
+  m[3][0] = 0.0f;
+  m[3][1] = 0.0f;
+  m[3][2] = 0.0f;
+  m[3][3] = 1.0f;  
 }
 
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {

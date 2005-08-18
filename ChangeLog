@@ -1,3 +1,17 @@
+2005-08-18  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Use AC_PATH_X to get X11 paths. Remove /usr/lib and 
+	  /usr/local/lib from SEAR_LIBS path due to 64 bit machine problems.
+	  This may cause problems with opengl linking but appears to work ok 
+	  so far. Move libmd3 check to a separate block to report the proper 
+	  library name. Change ftp url to sourceforge site.
+
+	* gui/TextEntry.h: Use size_t for m_size for 64 bit machines.
+
+	* src/sear.in: Use pushd/popd instead of storing the value of pwd.
+
+	* common/Utility.cpp: Use f on float values.
+
 2005-07-02  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Make medium/high dist values larger

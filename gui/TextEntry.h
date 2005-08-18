@@ -32,7 +32,7 @@ protected:
   Caret * m_caret;
   std::string m_input;
   unsigned int m_textOffset;
-  unsigned int m_size;
+  size_t m_size;
   unsigned int m_border;
   unsigned int m_caretPos;
   bool m_obscure;

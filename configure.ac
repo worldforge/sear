@@ -28,9 +28,10 @@ AC_PROG_LIBTOOL
 SEAR_LIBS=
 
 if test $cross_compiling == no; then
-  CPPFLAGS="$CPPFLAGS -I/usr/X11R6/include"
+  AC_PATH_X
+  CPPFLAGS="$CPPFLAGS -I $x_includes"
   CXXFLAGS="$CXXFLAGS -Wall"
-  SEAR_LIBS="$SEAR_LIBS -L/usr/lib -L/usr/X11R6/lib -L/usr/local/lib"
+  SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
 fi
 
 #CXXFLAGS="$CXXFLAGS -pedantic -ansi"
@@ -181,13 +182,13 @@ MERCATOR_VERSION=0.2.3
 VARCONF_VERSION=0.6.3
 ERIS_VERSION=1.3.6
 SAGE_VERSION=0.1.1
-LIBMODELFILE=0.1.92
-PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 >= $ERIS_VERSION sage >= $SAGE_VERSION libmd3-0.2 >= $LIBMODELFILE,
+
+PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 >= $ERIS_VERSION sage >= $SAGE_VERSION,
 	[
 		CPPFLAGS="$CPPFLAGS $PKGCHECKS_CFLAGS"
 		SEAR_LIBS="$SEAR_LIBS $PKGCHECKS_LIBS"
 	],
-	AC_MSG_ERROR(Couldn't find some WorldForge libs. Please goto ftp://ftp.worldforge.org/pub/worldforge/libs/)
+	AC_MSG_ERROR(Couldn't find some WorldForge libs  ($PKGCHECKS_PKG_ERRORS). Please goto http://sourceforge.net/projects/worldforge)
 )
 
 AC_SUBST(MERCATOR_VERSION)
@@ -195,11 +196,21 @@ AC_SUBST(VARCONF_VERSION)
 AC_SUBST(ERIS_VERSION)
 AC_SUBST(SAGE_VERSION)
 
+LIBMODELFILE_VERSION=0.1.92
+PKG_CHECK_MODULES(PKGCHECKS2, libmd3-0.2 >= $LIBMODELFILE_VERSION,
+	[
+		CPPFLAGS="$CPPFLAGS $PKGCHECKS2_CFLAGS"
+		SEAR_LIBS="$SEAR_LIBS $PKGCHECKS2_LIBS"
+	],
+	AC_MSG_ERROR(Couldn't find libModelFile  ($PKGCHECKS_PKG_ERRORS). Please goto http://sourceforge.net/projects/worldforge)
+)
+AC_SUBST(LIBMODELFILE_VERSION)
+
 CAL3D_VERSION=0.10.0
-PKG_CHECK_MODULES(PKGCHECKS2, cal3d >= $CAL3D_VERSION,
+PKG_CHECK_MODULES(PKGCHECKS3, cal3d >= $CAL3D_VERSION,
       [
-              CPPFLAGS="$CPPFLAGS $PKGCHECKS2_CFLAGS"
-              SEAR_LIBS="$SEAR_LIBS $PKGCHECKS2_LIBS"
+              CPPFLAGS="$CPPFLAGS $PKGCHECKS3_CFLAGS"
+              SEAR_LIBS="$SEAR_LIBS $PKGCHECKS3_LIBS"
       ],
       AC_MSG_ERROR(Couldn't find the cal3d libs. Please goto http://cal3d.sourceforge.net)
 )
