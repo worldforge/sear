@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.66 2005-06-23 16:42:23 simon Exp $
+// $Id: WorldEntity.cpp,v 1.67 2005-08-23 10:12:31 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -53,6 +53,7 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    messages(std::list<message>()),
    m_status(1.0)
 {
+  Acted.connect(SigC::slot(*this, &WorldEntity::onAction));
 }
 
 void WorldEntity::onMove() {
@@ -304,5 +305,16 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
   m_orientBBox = OrientBBox(getBBox());
   m_orientBBox.rotate(q);
 }
+
+void WorldEntity::onAction(const Atlas::Objects::Operation::Action &action) {
+  printf("Entity %s (%s) received action\n", getName().c_str(), getId().c_str());
+  const std::list<std::string> &p = action->getParents();
+  std::list<std::string>::const_iterator I = p.begin();
+  while (I != p.end()) {
+    printf("Parent: %s\n", (*I).c_str());
+    ++I;
+  }
+}
+
 
 } /* namespace Sear */
