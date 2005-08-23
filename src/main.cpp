@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.25 2005-08-23 10:14:31 simon Exp $
+// $Id: main.cpp,v 1.26 2005-08-23 10:21:11 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -27,13 +27,14 @@
 #if defined(_WIN32)
 int SDL_main(int argc, char** argv) {
 #else
-
 int main(int argc, char** argv) {
 #endif
 
+#ifndef _WIN32 
   if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
     fprintf(stderr, "Warning: Attempt to ignore SIGPIPE failed.\n");
   }
+#endif
 
   bool exit_program = false;
   Sear::System *sys = NULL;

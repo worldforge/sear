@@ -1,5 +1,9 @@
 2005-08-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/main.cpp: Add check as sigpipe does not exist on win32.
+
+2005-08-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/main.cpp: Ignore sigpipe to aid eris debugging.
 
 2005-08-23  Simon Goodall  <sear@simongoodall.co.uk>
