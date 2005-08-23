@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.24 2005-06-11 21:55:23 alriddoch Exp $
+// $Id: main.cpp,v 1.25 2005-08-23 10:14:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -13,6 +13,7 @@
 #include <string>
 #include "System.h"
 #include "Exception.h"
+#include <signal.h>
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -29,6 +30,11 @@ int SDL_main(int argc, char** argv) {
 
 int main(int argc, char** argv) {
 #endif
+
+  if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+    fprintf(stderr, "Warning: Attempt to ignore SIGPIPE failed.\n");
+  }
+
   bool exit_program = false;
   Sear::System *sys = NULL;
   std::list<std::string> path_list;

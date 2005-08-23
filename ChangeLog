@@ -1,5 +1,9 @@
 2005-08-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/main.cpp: Ignore sigpipe to aid eris debugging.
+
+2005-08-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/WorldEntity.cpp, src/WorldEntity.h: Add handler for Acted signal
 	  and print out debugging info about parameters.
 
