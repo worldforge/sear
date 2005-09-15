@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.24 2005-06-11 16:15:33 alriddoch Exp $
+// $Id: StateManager.cpp,v 1.25 2005-09-15 08:31:31 simon Exp $
 
 /*
  * TODO
@@ -87,7 +87,8 @@ StateManager::StateManager() :
 {}
 
 StateManager::~StateManager() {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
+//  if (m_initialised) shutdown();
 }
 
 int StateManager::init() {
@@ -217,7 +218,7 @@ int StateManager::init() {
 }
 
 int StateManager::shutdown() {
-  assert(m_initialised);
+  assert(m_initialised == true);
   if (debug) std::cout << "State Loader: Shutdown" << std::endl;
   while (!m_states.empty()) {
 //    if (*m_states.begin()) {

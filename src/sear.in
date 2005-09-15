@@ -9,43 +9,94 @@ homedata=$HOME/.sear
 
 WFUT_JAR=WFUT.jar
 MEDIA_CHANNEL="sear-media"
+UPDATED=0
 
-# Determine if java executable exists in path
-JAVA=`which java`
-if [ -x $JAVA ] ; then
+# Create dir if required 
+if [ ! -d $homedata ] ; then
+  echo "Creating sear configuration directory..."
+  mkdir $homedata
 
-  # See if Updater exists in home dir
-  if [ ! -e $homedata/$WFUT_JAR ] ; then
-    # Check to see if its in the install dir
-    if [ -e $datadir/sear/$WFUT_JAR ] ; then
-      # Install into home dir 
-      echo "Installing Updater"
+  # Create startup.script
+  echo "/setvar SEAR_MEDIA $homedata/$MEDIA_CHANNEL/" > $homedata/startup.script
+  echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
+fi
 
-      # Create dir if required 
-      if [ ! -d $homedata ] ; then
-        mkdir $homedata
-      fi
 
-      # Copy WFUT to home dir
-      cp $datadir/sear/$WFUT_JAR $homedata
+## First check to see if a native compile of wfut exists
+if [ "$UPDATED" -eq "0" ] ; then
+  # Find the wfut binary found in path first
+  WFUT_BIN="`which wfut 2>/dev/null`"
 
-      # Create startup.script
-      echo "/setvar SEAR_MEDIA $homedata/$MEDIA_CHANNEL/" > $homedata/startup.script
-      echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
+  if test -z "$WFUT_BIN"; then
+    # wfut might be installed with the same prefix as sear...
+    if test -x $bindir/wfut; then
+      WFUT_BIN="$bindir/wfut"
+#    else
+#      echo "Could not find the 'wfut' binary, did you install this package? Updater cannot be run."
     fi
   fi
 
-  # Run Updater if it exists
-  if [ -e $homedata/$WFUT_JAR ] ; then
+  if test -n "$WFUT_BIN"; then
     # We need to change here so updater knows where to find / store data
     pushd $homedata
     # Update
-    $JAVA -jar $WFUT_JAR update $MEDIA_CHANNEL
+    $WFUT_BIN update $MEDIA_CHANNEL
     # Restore dir
     popd
+    UPDATED=1
   fi
-else
-  echo "Java not found in path. Updater cannot be run."
+fi
+
+## Next check for a .JAR file and an installed java implementation
+if [ "$UPDATED" -eq "0" ] ; then
+  # Check to see if WFUT.jar is in the install dir
+  if [ -e $datadir/sear/$WFUT_JAR ] ; then
+  WFUT_JAR_CP=$datadir/sear/$WFUT_JAR;
+  fi
+
+  # See if Updater exists in home dir
+  if [ ! -e $homedata/$WFUT_JAR ] ; then
+  WFUT_JAR_CP=$homedata/$WFUT_JAR;
+  fi
+
+  # Determine if java executable exists in path
+  JAVA=`which java`
+  GIJ=`which gij`
+
+  if [ -x $JAVA ] ; then
+    # Run Updater if it exists
+    if [ -e $WFUT_JAR_CP ] ; then
+      # We need to change here so updater knows where to find / store data
+      pushd $homedata
+      # Update
+      $JAVA -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
+      # Restore dir
+      popd
+    else
+      echo "Could not find WFUT.jar"
+    fi
+  elif [-x $GIJ ] ; then
+    ## TODO Check GIJ Version
+    ## Version 1.4.2 Works for cmd line wfut.
+
+    # Run Updater if it exists
+    if [ -e $WFUT_JAR_CP ] ; then
+      # We need to change here so updater knows where to find / store data
+      pushd $homedata
+      # Update
+      $GIJ -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
+      # Restore dir
+      popd
+    else
+      echo "Could not find WFUT.jar"
+    fi
+  else
+    echo "No Java or GIJ binary found on path";
+  fi
+fi
+
+if [ "$UPDATED" -eq "0" ] ; then
+   echo "Error running WFUT. No native 'wfut' found on path or no Java found on path or missing WFUT.jar "
 fi
 
 # Execute real sear binary
