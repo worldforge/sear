@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.19 2005-06-20 09:22:07 simon Exp $
+// $Id: ActionHandler.cpp,v 1.20 2005-09-19 20:34:21 alriddoch Exp $
 
 #include <unistd.h>
 #include <varconf/varconf.h>
@@ -80,46 +80,49 @@ void ActionHandler::handleAction(const std::string &action, WorldEntity *entity)
   assert ((m_initialised == true) && "ActionHandler not initialised");
 
   // Find requested action
-  ActionMap::const_iterator I = action_map.find(action); 
+  ActionMap::const_iterator I = action_map.lower_bound(action); 
+  ActionMap::const_iterator Iend = action_map.upper_bound(action); 
 
   if (I == action_map.end()) {
     return;
   }
 
-  ActionStruct *as = I->second;
-  assert(as);
-  // Execute action if it exists
-  // Execute command if present, else fall back to external script.
-  if (!as->command.empty()) m_system->runCommand(as->command);
-  else m_system->getScriptEngine()->runScript(as->script);
-
+  for (; I != Iend; ++I) {
+    ActionStruct *as = I->second;
+    assert(as);
+    // Execute action if it exists
+    // Execute command if present, else fall back to external script.
+    if (!as->command.empty()) m_system->runCommand(as->command);
+    else m_system->getScriptEngine()->runScript(as->script);
+  }
 }
 
 void ActionHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  ActionStruct *record = NULL;
-  // Get record if it exists
-  ActionMap::const_iterator I = action_map.find(section);
-  // If record does not exist, create it.
-  if (I == action_map.end()) {
-    // Create record and set defaults
-    record = new ActionStruct();
-    record->action = section;
-    record->entity_based = false;
-    action_map[section] = record;
-    if (debug) Log::writeLog(std::string("Adding Action: ") + section, Log::LOG_INFO);
-  } else {
-    record = I->second;
-  }
+  // FIXME I am not sure what I have done is right. It is possible differnet
+  // varconf records are intended to incrementally set up a single record,
+  // so the original code which checked for an existing record, and modified
+  // it was probably right.
+
+  // Create record and set defaults
+  ActionStruct * record = new ActionStruct();
+  record->action = section;
+  record->entity_based = false;
+
   assert(record != NULL);
+
   // Set script file
   if (key == SCRIPT) {
     record->script = (std::string)config.getItem(section, key);
   }
+  // Set command string
   else if (key == COMMAND) {
     record->command = (std::string)config.getItem(section, key);
   }
   // Set entity based flag
   else if (key == ENTITY) record->entity_based = (bool)config.getItem(section, key);
+
+  action_map.insert(make_pair(section, record));
+  if (debug) Log::writeLog(std::string("Adding Action: ") + section, Log::LOG_INFO);
 }
 
 void ActionHandler::varconf_error_callback(const char *message) {
@@ -142,19 +145,22 @@ void ActionHandler::runCommand(const std::string &command, const std::string &ar
 
 void ActionHandler::addHandler(const std::string &action, const std::string &command) {
   // Get record if it exists
+#if 0
   ActionMap::const_iterator I = action_map.find(action);
 
   if (I != action_map.end()) {
     fprintf(stderr, "Action %s already exists. Ignoring.\n", action.c_str());
     return;
   }
+#endif
   
   // Create action 
   ActionStruct *record = new ActionStruct();
   record->action = action;
   record->entity_based = false;
   record->command = command;
-  action_map[action] = record;
+  // action_map[action] = record;
+  action_map.insert(make_pair(action, record));
 }
 
 } /* namespace Sear */

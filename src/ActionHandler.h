@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.8 2005-06-20 09:22:07 simon Exp $
+// $Id: ActionHandler.h,v 1.9 2005-09-19 20:34:21 alriddoch Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -53,7 +53,7 @@ private:
     bool entity_based;
   } ActionStruct;
  
-  typedef std::map<std::string, ActionStruct*> ActionMap; 
+  typedef std::multimap<std::string, ActionStruct*> ActionMap; 
   ActionMap action_map;
 
   System *m_system;

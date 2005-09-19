@@ -1,3 +1,11 @@
+2005-09-19  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/ActionHandler.cpp, src/ActionHandler.h: Make the action store
+	  a multimap, so a given action can have many handlers.
+
+	* guichan/Workarea.cpp: Install more handlers so that dialogues
+	  get closed automatically at the right time.
+
 2005-09-15  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/sear.in: Merge patch by J. Phenix to check for a natively compiled
