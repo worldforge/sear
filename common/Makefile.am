@@ -11,6 +11,7 @@ endif
 libCommon_a_SOURCES = \
 	Log.cpp Log.h \
 	Utility.cpp Utility.h \
+	operations.cpp operations.h \
 	types.h \
 	Mesh.h \
 	$(MMGR_FILES)

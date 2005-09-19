@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.31 2005-06-22 07:22:47 simon Exp $
+// $Id: Character.h,v 1.32 2005-09-19 21:27:51 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -83,6 +83,7 @@ public:
   void touchEntity(const std::string&);
   void wieldEntity(const std::string&);
   void useToolOnEntity(const std::string&, const WFMath::Point<3>&);
+  void attackEntity(const std::string&);
   void displayInventory();
   void say(const std::string&);
   void make(const std::string&type, const std::string &name);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.40 2005-06-13 15:10:46 simon Exp $
+// $Id: TextureManager.cpp,v 1.41 2005-09-19 21:27:51 alriddoch Exp $
 
 #include "TextureManager.h"
 
@@ -200,6 +200,7 @@ void TextureManager::initGL()
   createCursor("cursor_pickup", pickup);
   createCursor("cursor_touch", touch);
   createCursor("cursor_use", use);
+  createCursor("cursor_attack", attack);
 
   m_initGL = true;
 }

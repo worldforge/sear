@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.62 2005-06-29 21:25:29 simon Exp $
+// $Id: System.h,v 1.63 2005-09-19 21:27:51 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -46,6 +46,7 @@ typedef enum {
 #define ACTION_PICKUP (1)
 #define ACTION_TOUCH (2)
 #define ACTION_USE (3)
+#define ACTION_ATTACK (4)
 
 /**
  * This class is the root object for Sear. All the higher level classes will be created by

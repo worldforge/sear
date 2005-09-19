@@ -1,5 +1,17 @@
 2005-09-19  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/main.cpp, common/operations.h, common/operations.cpp:
+	  Add custom op definition for Attack.
+
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h,
+	  renderers/TextureManager.cpp, renderers/cursors.h:
+	  Add a trivial cursor sprite to represent the attack action.
+
+	* src/Character.cpp, src/Character.h, src/System.cpp, src/System.h:
+	  Add command for Attack action.
+
+2005-09-19  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/ActionHandler.cpp, src/ActionHandler.h: Make the action store
 	  a multimap, so a given action can have many handlers.
 

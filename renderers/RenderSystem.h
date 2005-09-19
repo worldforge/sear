@@ -39,6 +39,7 @@ public:
     CURSOR_TOUCH,
     CURSOR_PICKUP,
     CURSOR_USE,
+    CURSOR_ATTACK,
     CURSOR_LAST_STATE
   } CursorState;
 

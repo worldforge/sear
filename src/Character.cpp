@@ -2,13 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.64 2005-06-22 08:18:35 alriddoch Exp $
+// $Id: Character.cpp,v 1.65 2005-09-19 21:27:51 alriddoch Exp $
 
 #include <math.h>
 #include <string>
 #include <SDL/SDL.h>
 
 #include <Atlas/Objects/Operation.h>
+#include <Atlas/Objects/Anonymous.h>
 #include <varconf/Config.h>
 
 #include <wfmath/atlasconv.h>
@@ -22,6 +23,7 @@
 
 #include "common/Log.h"
 #include "common/Utility.h"
+#include "common/operations.h"
 
 #include "ActionHandler.h"
 #include "WorldEntity.h"
@@ -42,6 +44,8 @@
 
 using Atlas::Objects::Operation::Use;
 using Atlas::Objects::Operation::Wield;
+using Atlas::Objects::Operation::Attack;
+using Atlas::Objects::Entity::Anonymous;
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -92,6 +96,7 @@ namespace Sear {
   static const std::string CMD_MAKE = "make";
   static const std::string CMD_USE = "use";
   static const std::string CMD_WIELD = "wield";
+  static const std::string CMD_ATTACK = "attack";
 
   static const std::string CMD_SET_APPEARANCE = "set_app";
   static const std::string CMD_RESET_APPEARANCE = "clear_app";
@@ -405,13 +410,29 @@ void Character::useToolOnEntity(const std::string & id,
   if (!e) return;
   Use u;
   u->setFrom(m_self->getId());
-  Atlas::Message::MapType arg;
-  arg["id"] = e->getId();
-  arg["objtype"] = "obj";
-  arg["pos"] = pos.toAtlas();
-  u->setArgsAsList(Atlas::Message::ListType(1, arg));
+  Anonymous arg;
+  arg->setId(e->getId());
+  arg->setObjtype("obj");
+  arg->setAttr("pos", pos.toAtlas());
+  u->setArgs1(arg);
   m_avatar->getConnection()->send(u);
   setAction("use");
+}
+
+void Character::attackEntity(const std::string& id) {
+  assert ((m_initialised == true) && "Character not initialised");
+  if (!m_avatar) return;
+  if (id.empty()) return;
+  Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
+  if (!e) return;
+  Attack a;
+  a->setFrom(m_self->getId());
+  Anonymous arg;
+  arg->setId(e->getId());
+  arg->setObjtype("obj");
+  a->setArgs1(arg);
+  m_avatar->getConnection()->send(a);
+  setAction("attack");
 }
 
 void Character::displayInventory() {
@@ -540,6 +561,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_SAY, this);
   console->registerCommand(CMD_USE, this);
   console->registerCommand(CMD_WIELD, this);
+  console->registerCommand(CMD_ATTACK, this);
   console->registerCommand(CMD_SET_APPEARANCE, this);
   console->registerCommand(CMD_RESET_APPEARANCE, this);
   console->registerCommand(CMD_READ_APPEARANCE, this);
@@ -613,6 +635,9 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_WIELD) {
     std::string name = tokeniser.nextToken();
     wieldEntity(name);
+  }
+  else if (command == CMD_ATTACK) {
+    System::instance()->setAction(ACTION_ATTACK);
   }
   else if (command == CMD_RESET_APPEARANCE) clearApp();
   else if (command == CMD_SET_HEIGHT) {

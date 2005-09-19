@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.133 2005-06-29 21:25:29 simon Exp $
+// $Id: System.cpp,v 1.134 2005-09-19 21:27:51 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -502,6 +502,7 @@ void System::handleEvents(const SDL_Event &event) {
             case (ACTION_PICKUP): m_character->getEntity(m_click_id); break;
             case (ACTION_TOUCH): m_character->touchEntity(m_click_id); break;
             case (ACTION_USE): m_character->useToolOnEntity(m_click_id, m_click_pos); break;
+            case (ACTION_ATTACK): m_character->attackEntity(m_click_id); break;
           }
           setAction(ACTION_DEFAULT);
           m_click_on = false;
@@ -791,6 +792,7 @@ void System::setAction(int new_action) {
     case (ACTION_PICKUP): switchCursor(RenderSystem::CURSOR_PICKUP); break;
     case (ACTION_TOUCH): switchCursor(RenderSystem::CURSOR_TOUCH); break;
     case (ACTION_USE): switchCursor(RenderSystem::CURSOR_USE); break;
+    case (ACTION_ATTACK): switchCursor(RenderSystem::CURSOR_ATTACK); break;
   }
   m_action = new_action;
 }

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: cursors.h,v 1.2 2005-04-15 15:47:19 simon Exp $
+// $Id: cursors.h,v 1.3 2005-09-19 21:27:51 alriddoch Exp $
 
 #ifndef SEAR_CURSORS_H
 #define SEAR_CURSORS_H 1
@@ -177,6 +177,51 @@ static const char *use[] = {
   "               XX    XX         ",
   "                XXXXXX          ",
   "                 XXXX           ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "                                ",
+  "0,0"
+};
+
+
+/* XPM */
+static const char *attack[] = {
+  /* width height num_colors chars_per_pixel */
+  "    32    32        3            1",
+  /* colors */
+  ". c #000000",
+  "X c #ffffff",
+  "  c None",
+  /* pixels */
+  "X                               ",
+  "XX                              ",
+  "X.X                             ",
+  "X..X                            ",
+  "X...X                           ",
+  "X....X                          ",
+  "X.....X                         ",
+  "X......X                        ",
+  "X.......X                       ",
+  "X........X                      ",
+  "X.....XXXXX                     ",
+  "X..X..X                         ",
+  "X.X X..X                        ",
+  "XX  X..X                        ",
+  "X    X..X                       ",
+  "     X..X        XXXX           ",
+  "      X..X      XXXXXX          ",
+  "      X..X     XX    XX         ",
+  "       XX      XX    XX         ",
+  "               XXXXXXXX         ",
+  "               XXXXXXXX         ",
+  "               XX    XX         ",
+  "               XX    XX         ",
   "                                ",
   "                                ",
   "                                ",
