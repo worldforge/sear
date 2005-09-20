@@ -10,6 +10,7 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        OptionsWindow.cpp OptionsWindow.h \
                        Inventory.cpp Inventory.h \
                        Panel.cpp Panel.h \
+                       StatusWindow.cpp StatusWindow.h \
                        LoginWindow.cpp LoginWindow.h \
                        CharacterWindow.cpp CharacterWindow.h \
                        ConsoleWindow.cpp ConsoleWindow.h \

@@ -9,6 +9,7 @@
 #include "guichan/LoginWindow.h"
 #include "guichan/CharacterWindow.h"
 #include "guichan/Panel.h"
+#include "guichan/StatusWindow.h"
 #include "guichan/ActionListenerSigC.h"
 
 #include "guichan/box.hpp"
@@ -122,6 +123,10 @@ void Workarea::init()
   m_windows["login"] = new LoginWindow;
   m_windows["character"] = new CharacterWindow;
 
+  StatusWindow * sw = new StatusWindow;
+  m_windows["status"] = sw;
+  m_coords["status"] = std::make_pair(m_width - sw->getWidth(), 0);
+
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
 
@@ -130,6 +135,7 @@ void Workarea::init()
 
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_close character");
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_open panel");
+  m_system->getActionHandler()->addHandler("world_entered", "/workarea_open status");
 
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle inventory");
 }
@@ -188,6 +194,9 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       if (win->getParent() != 0) {
         closeWindow(args, win);
       }
+    } else {
+      std::cerr << "Asked to close unknown window " << args
+                << std::endl << std::flush;
     }
   }
   else if (command == WORKAREA_OPEN) {
@@ -198,6 +207,9 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       if (win->getParent() == 0) {
         openWindow(args, win);
       }
+    } else {
+      std::cerr << "Asked to open unknown window " << args
+                << std::endl << std::flush;
     }
   }
 }

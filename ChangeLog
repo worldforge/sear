@@ -1,5 +1,16 @@
 2005-09-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/StatusWindow.cpp, guichan/StatusWindow.h: Window to display
+	  character status.
+
+	* guichan/Workarea.cpp: Add StatusWindow to the set opened when
+	  we go in-game.
+
+	* guichan/bar.cpp, guichan/bar.hpp: Remove lostFocus() method, as
+	  bar is not focusable. Use forground color for the bar itself.
+
+2005-09-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/client.cpp, src/Character.cpp: Use Anonymous for arguments to
 	  ops rather than using the *ArgsAsList() methods.
 

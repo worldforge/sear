@@ -65,7 +65,6 @@ namespace gcn
         mScaleStart = 0;
         mScaleEnd = scaleEnd;
         
-        setFocusable(true);
         setBorderSize(1);
         setOrientation(HORIZONTAL);
         setValue(0);
@@ -76,7 +75,6 @@ namespace gcn
         mScaleStart = scaleStart;
         mScaleEnd = scaleEnd;
         
-        setFocusable(true);
         setBorderSize(1);
         setOrientation(HORIZONTAL);
         setValue(scaleStart);
@@ -146,9 +144,9 @@ namespace gcn
     
     void Bar::drawMarker(gcn::Graphics* graphics)
     {
-        gcn::Color faceColor = getBaseColor();
+        gcn::Color faceColor = getForegroundColor();
         Color highlightColor, shadowColor;
-        int alpha = getBaseColor().a;
+        int alpha = getForegroundColor().a;
         highlightColor = faceColor + 0x303030;
         highlightColor.a = alpha;
         shadowColor = faceColor - 0x303030;

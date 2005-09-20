@@ -169,8 +169,6 @@ namespace gcn
         
         virtual void drawBorder(gcn::Graphics* graphics);
         
-        virtual void lostFocus();
-
         /**
          * Draw orientations for the slider. It can be drawn verticaly or
          * horizontaly.
