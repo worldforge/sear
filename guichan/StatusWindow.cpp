@@ -88,6 +88,18 @@ void StatusWindow::logic()
               m_healthBar->setValue(status_attr.asNum());
             }
           }
+          if (ent->hasAttr("stamina")) {
+            Atlas::Message::Element stamina_attr = ent->valueOfAttr("stamina");
+            if (stamina_attr.isNum()) {
+              m_staminaBar->setValue(stamina_attr.asNum());
+            }
+          }
+          if (ent->hasAttr("mana")) {
+            Atlas::Message::Element mana_attr = ent->valueOfAttr("mana");
+            if (mana_attr.isNum()) {
+              m_manaBar->setValue(mana_attr.asNum());
+            }
+          }
         }
       }
     }

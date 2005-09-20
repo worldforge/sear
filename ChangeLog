@@ -1,5 +1,9 @@
 2005-09-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/StatusWindow.cpp: Add stamina and mana bars too.
+
+2005-09-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/StatusWindow.cpp, guichan/StatusWindow.h: Add logic
 	  function which implements tracking character health.
 
