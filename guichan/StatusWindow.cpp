@@ -8,6 +8,10 @@
 #include "guichan/bar.hpp"
 
 #include "src/System.h"
+#include "src/Character.h"
+
+#include <Eris/Avatar.h>
+#include <Eris/Entity.h>
 
 #include <guichan.hpp>
 
@@ -66,6 +70,29 @@ StatusWindow::StatusWindow()
 
 StatusWindow::~StatusWindow()
 {
+}
+
+void StatusWindow::logic()
+{
+  System * s = System::instance();
+  if (s != 0) {
+    Character * c = s->getCharacter();
+    if (c != 0) {
+      Eris::Avatar * av = c->getAvatar();
+      if (av != 0) {
+        Eris::Entity * ent = av->getEntity();
+        if (ent != 0) {
+          if (ent->hasAttr("status")) {
+            Atlas::Message::Element status_attr = ent->valueOfAttr("status");
+            if (status_attr.isNum()) {
+              m_healthBar->setValue(status_attr.asNum());
+            }
+          }
+        }
+      }
+    }
+  }
+  gcn::Window::logic();
 }
 
 } // namespace Sear

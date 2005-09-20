@@ -32,7 +32,7 @@ public:
   StatusWindow();
   virtual ~StatusWindow();
 
-  // virtual void logic();
+  virtual void logic();
 };
 
 } // namespace Sear
