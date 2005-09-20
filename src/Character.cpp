@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.65 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: Character.cpp,v 1.66 2005-09-20 18:26:03 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -390,10 +390,10 @@ void Character::wieldEntity(const std::string &name) {
     if ((we->getName() == name) || (type->getName() == name)) {
       Wield w;
       w->setFrom(m_self->getId());
-      Atlas::Message::MapType arg;
-      arg["id"] = we->getId();
-      arg["objtype"] = "obj";
-      w->setArgsAsList(Atlas::Message::ListType(1, arg));
+      Anonymous arg;
+      arg->setId(we->getId());
+      arg->setObjtype("obj");
+      w->setArgs1(arg);
       m_avatar->getConnection()->send(w);
       setAction("wield");
       return;
@@ -461,16 +461,16 @@ void Character::make(const std::string &type, const std::string &name) {
   if (!m_avatar) return;
   Atlas::Objects::Operation::Create c;
   c->setFrom(m_self->getId());
-  Atlas::Message::MapType msg;
+  Anonymous msg;
   
   Eris::Entity *e = m_self->getLocation();
   assert(e);
-  msg["loc"] = e->getId();
+  msg->setLoc(e->getId());
   WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
-  msg["pos"] = pos.toAtlas();
-  msg["name"] = name;
-  msg["parents"] = Atlas::Message::ListType(1, type);
-  c->setArgsAsList(Atlas::Message::ListType(1, msg));
+  msg->setAttr("pos", pos.toAtlas());
+  msg->setName(name);
+  msg->setParents(std::list<std::string>(1, type));
+  c->setArgs1(msg);
   m_avatar->getConnection()->send(c);
 }
 
@@ -716,12 +716,12 @@ void Character::clearApp() {
   Atlas::Objects::Operation::Set set;
   set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
-  Atlas::Message::MapType msg;
+  Anonymous msg;
+  msg->setId(m_self->getId());
   const Atlas::Message::MapType mt;
-  msg["id"] = m_self->getId();
-  msg[GUISE] = mt;
+  msg->setAttr(GUISE, mt);
 
-  set->setArgsAsList(Atlas::Message::ListType(1, msg));
+  set->setArgs1(msg);
   m_avatar->getConnection()->send(set);
 }
 
@@ -731,11 +731,11 @@ void Character::sendGuise(const Atlas::Message::Element& guise) {
   Atlas::Objects::Operation::Set set;
   set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
-  Atlas::Message::MapType msg;
-  msg["id"] = m_self->getId();
-  msg[GUISE] = guise;
+  Anonymous msg;
+  msg->setId(m_self->getId());
+  msg->setAttr(GUISE, guise);
 
-  set->setArgsAsList(Atlas::Message::ListType(1, msg));
+  set->setArgs1(msg);
   m_avatar->getConnection()->send(set);
 }
 
@@ -745,12 +745,12 @@ void Character::setHeight(float height) {
   Atlas::Objects::Operation::Set set;
   set->setFrom(System::instance()->getClient()->getAccount()->getId());
 
-  Atlas::Message::MapType msg;
-  msg["id"] = m_self->getId();
-  msg["objtype"] = "obj";
-  msg[HEIGHT] = height;
+  Anonymous msg;
+  msg->setId(m_self->getId());
+  msg->setObjtype("obj");
+  msg->setAttr(HEIGHT, height);
 
-  set->setArgsAsList(Atlas::Message::ListType(1, msg));
+  set->setArgs1(msg);
   m_avatar->getConnection()->send(set);
 }
 
@@ -760,12 +760,12 @@ void Character::setAction(const std::string &action) {
   Atlas::Objects::Operation::Set set;
   set->setFrom(m_self->getId());
 
-  Atlas::Message::MapType msg;
-  msg["id"] = m_self->getId();
-  msg["objtype"] = "obj";
-  msg["action"] = action;
+  Anonymous msg;
+  msg->setId(m_self->getId());
+  msg->setObjtype("obj");
+  msg->setAttr("action", action);
 
-  set->setArgsAsList(Atlas::Message::ListType(1, msg));
+  set->setArgs1(msg);
   m_avatar->getConnection()->send(set);
 }
 

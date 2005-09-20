@@ -3,6 +3,7 @@ noinst_LIBRARIES = libGuichan.a
 INCLUDES = -I$(top_srcdir)
 
 libGuichan_a_SOURCES = box.cpp box.hpp \
+                       bar.cpp bar.hpp \
                        RootWidget.cpp RootWidget.h \
                        Alert.cpp Alert.h \
                        ConnectWindow.cpp ConnectWindow.h \

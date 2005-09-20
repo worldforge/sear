@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.70 2005-06-20 23:24:54 alriddoch Exp $
+// $Id: client.cpp,v 1.71 2005-09-20 18:26:03 alriddoch Exp $
 
 #include "System.h"
 
@@ -451,8 +451,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
 
   // Create atlas character object
   Atlas::Objects::Entity::GameEntity ch;
-  Atlas::Message::ListType prs(1, Atlas::Message::Element(type));
-  ch->setParentsAsList(prs);
+  ch->setParents(std::list<std::string>(1, type));
   ch->setName(name);
   ch->setAttr("sex", sex);
   ch->setAttr("description", description);

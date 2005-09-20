@@ -1,3 +1,10 @@
+2005-09-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/client.cpp, src/Character.cpp: Use Anonymous for arguments to
+	  ops rather than using the *ArgsAsList() methods.
+
+	* guichan/bar.cpp, guichan/bar.hpp: New widget for status bars.
+
 2005-09-19  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/main.cpp, common/operations.h, common/operations.cpp:
