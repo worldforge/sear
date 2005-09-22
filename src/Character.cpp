@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.66 2005-09-20 18:26:03 alriddoch Exp $
+// $Id: Character.cpp,v 1.67 2005-09-22 17:17:23 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -792,6 +792,12 @@ void Character::setAvatar(Eris::Avatar *avatar) {
     float v1,v2;
     // Calculate attitude (which way we are facing)
     v1  = 2.0f * q.x() * q.y() + 2.0f * q.z() * w;
+
+    // asin is very sensitive to numbers which it thinks are
+    // outside its numeric range.
+    if (v1 > 1.f) v1 = 1.f;
+    if (v1 < -1.f) v1 = -1.f;
+
     float attitude = asin(v1);
     // Attitude is now in the range -pi/2 -> pi/2
 

@@ -1,3 +1,9 @@
+2005-09-22  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Check values of calculation to determine
+	  character angle, as asin() sometimes rejects values that
+	  seem like they should be ok.
+
 2005-09-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/StatusWindow.cpp: Add stamina and mana bars too.
