@@ -1,3 +1,7 @@
+2005-10-19  James Turner  <james@worldforge.org>
+
+	* src/WorldEntity.h, src/WorldEntity.cpp: update for tweaked Eris API
+
 2005-10-11  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Makefile.am: Add missing header to files list.
