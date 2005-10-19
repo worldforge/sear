@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.134 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: System.cpp,v 1.135 2005-10-19 21:46:55 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -755,7 +755,7 @@ void System::readConfig(varconf::Config &config) {
     m_startFullscreen = DEFAULT_fullscreen;
   }
 
-
+  m_client->readConfig(config);
   RenderSystem::getInstance().readConfig(config);
   ModelSystem::getInstance().readConfig(config);
   m_character->readConfig(config);
@@ -771,6 +771,7 @@ void System::writeConfig(varconf::Config &config) {
   config.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
 
   // Write Other config objects
+  m_client->writeConfig(config);
   RenderSystem::getInstance().writeConfig(config);
   ModelSystem::getInstance().writeConfig(config);
   m_character->writeConfig(config);

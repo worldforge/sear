@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.71 2005-09-20 18:26:03 alriddoch Exp $
+// $Id: client.cpp,v 1.72 2005-10-19 21:46:55 simon Exp $
 
 #include "System.h"
 
@@ -53,13 +53,10 @@
 #endif
 #ifdef DEBUG
   #define DEBUG_ERIS 0
-  #define ERIS_LOG_LEVEL 0
 #elif defined(NDEBUG)
   #define DEBUG_ERIS 0
-  #define ERIS_LOG_LEVEL 0
 #else
   #define DEBUG_ERIS 0
-  #define ERIS_LOG_LEVEL 0
 #endif
 
 namespace Sear {
@@ -79,6 +76,10 @@ static const std::string GET_SERVERS = "get_servers";
 static const std::string STOP_SERVERS = "stop_servers";
 
 
+// Config items
+static const std::string SECTION_CONNECTION = "connection";
+static const std::string KEY_LOGLEVEL = "loglevel";
+
 /*
  * The Constructor. Creates the initial Eris Connection object and
  * 
@@ -93,7 +94,8 @@ Client::Client(System *system, const std::string &client_name) :
   m_status(CLIENT_STATUS_DISCONNECTED),
   m_client_name(client_name),
   m_initialised(false),
-  m_takeFirst(false)
+  m_takeFirst(false),
+  m_loglevel(Eris::LOG_WARNING)
 {
   assert((system != NULL) && "System is NULL");
 }
@@ -106,7 +108,7 @@ bool Client::init() {
   assert(m_initialised == false);
 
   // Setup logging
-  Eris::setLogLevel((Eris::LogLevel) ERIS_LOG_LEVEL);
+  Eris::setLogLevel(m_loglevel);
   Eris::Logged.connect(SigC::slot(*this, &Client::Log));
 
   m_initialised = true;
@@ -695,7 +697,7 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
 }
 
 void Client::AvatarFailure(const std::string &msg) {
-  std::cerr << "AvatarFailure: " << msg << std::endl;
+  fprintf(stderr, "AvatarFailure: %s\n", msg.c_str());
   m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   m_status = CLIENT_STATUS_LOGGED_IN;
   m_system->getCharacter()->setAvatar(NULL);
@@ -747,6 +749,29 @@ void Client::setStatus(int status) {
       break;
   }
   m_status = status;
+}
+
+void Client::readConfig(varconf::Config &config) {
+  if (config.findItem(SECTION_CONNECTION, KEY_LOGLEVEL)) {
+    std::string lvl = (std::string)config.getItem(SECTION_CONNECTION, KEY_LOGLEVEL);
+    setErisLogLevel(lvl);
+  }
+}
+
+void Client::writeConfig(varconf::Config &config) const {
+
+}
+
+void Client::setErisLogLevel(const std::string &level) {
+  if (level == "error")         m_loglevel = Eris::LOG_ERROR;
+  else if (level == "warning")  m_loglevel = Eris::LOG_WARNING;
+  else if (level == "notice")   m_loglevel = Eris::LOG_NOTICE;
+  else if (level == "verbose")  m_loglevel = Eris::LOG_VERBOSE;
+  else if (level == "debug")    m_loglevel = Eris::LOG_DEBUG;
+  else {
+    fprintf(stderr, "Unknown eris log level %s\n", level.c_str());
+  }
+  Eris::setLogLevel(m_loglevel);
 }
 
 } /* namespace Sear */

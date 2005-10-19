@@ -1,3 +1,9 @@
+2005-10-19  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/System.cpp, src/client.cpp, src/client.h: Add a read/write config
+	  section to client class. Allow manually setting of eris log level in
+	  config file.
+
 2005-10-19  James Turner  <james@worldforge.org>
 
 	* src/WorldEntity.h, src/WorldEntity.cpp: update for tweaked Eris API

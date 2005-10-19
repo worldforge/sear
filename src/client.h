@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.20 2005-04-06 13:24:15 simon Exp $
+// $Id: client.h,v 1.21 2005-10-19 21:46:55 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -14,6 +14,10 @@
 #include <Eris/Account.h>
 #include <Atlas/Message/DecoderBase.h>
 #include "interfaces/ConsoleObject.h"
+
+namespace varconf {
+class Config;
+}
 
 //Client Messages
 #define CLIENT_CONNECTING       "Connecting"
@@ -91,10 +95,12 @@ public:
   Eris::Avatar     *getAvatar() const { return m_avatar; }
   Eris::Connection *getConnection() const { return m_connection;  }
 
-
+  void readConfig(varconf::Config &config);
+  void writeConfig(varconf::Config &config) const;
  
 protected:
   void setStatus(int status);
+  void setErisLogLevel(const std::string &level);
   //Callbacks
 
   //Connection
@@ -129,6 +135,8 @@ protected:
   std::string m_client_name;
   bool m_initialised;
   bool m_takeFirst;
+
+  Eris::LogLevel m_loglevel;
 };
 
 } /* namespace Sear */
