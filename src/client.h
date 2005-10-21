@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.21 2005-10-19 21:46:55 simon Exp $
+// $Id: client.h,v 1.22 2005-10-21 01:58:33 alriddoch Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -115,7 +115,7 @@ protected:
   void LoginSuccess();
   void LoginFailure(const std::string&);
   void LogoutComplete(bool);
-  void GotCharacterInfo(const Atlas::Objects::Entity::GameEntity&);
+  void GotCharacterInfo(const Atlas::Objects::Entity::RootEntity&);
   void GotAllCharacters();
   void AvatarSuccess(Eris::Avatar *);
   void AvatarFailure(const std::string &msg);

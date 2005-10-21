@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.72 2005-10-19 21:46:55 simon Exp $
+// $Id: client.cpp,v 1.73 2005-10-21 01:58:33 alriddoch Exp $
 
 #include "System.h"
 
@@ -606,7 +606,7 @@ void Client::LogoutComplete(bool clean_logout) {
   m_account = NULL;
 }
 
-void Client::GotCharacterInfo(const Atlas::Objects::Entity::GameEntity& ge) {
+void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
   if (debug) printf("Got Char - Name: %s ID: %s\n ", ge->getName().c_str(), ge->getId().c_str());
 }
 

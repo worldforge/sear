@@ -1,3 +1,9 @@
+2005-20-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/client.h, src/client.cpp, src/Factory.h, src/Factory.cpp:
+	  Fix function arguments to match the signals in the modified
+	  Eris API.
+
 2005-10-19  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/System.cpp, src/client.cpp, src/client.h: Add a read/write config
