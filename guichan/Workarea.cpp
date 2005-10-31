@@ -31,6 +31,8 @@
 
 namespace Sear {
 
+static const bool debug = false;
+
 static const std::string WORKSPACE = "workspace";
 
 static const std::string WORKAREA_OPEN = "workarea_open";
@@ -186,7 +188,7 @@ void Workarea::registerCommands(Console * console)
 void Workarea::runCommand(const std::string & command, const std::string & args)
 {
   if (command == WORKAREA_CLOSE) {
-    std::cout << "Got the workarea close command" << std::endl << std::flush;
+    if (debug) std::cout << "Got the workarea close command" << std::endl << std::flush;
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
       gcn::Window * win = I->second;

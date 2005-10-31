@@ -29,6 +29,8 @@
 
 namespace Sear {
 
+static const bool debug = false;
+
 class CharacterListModel : public gcn::ListModel
 {
 public:
@@ -188,7 +190,7 @@ void CharacterWindow::actionPressed(std::string event)
   }
 
   if (event == "take") {
-    std::cout << "Character " << m_nameField->getText() << std::endl << std::flush;
+    if (debug) std::cout << "Character " << m_nameField->getText() << std::endl << std::flush;
     std::string cmd("/take ");
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {

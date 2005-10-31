@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.68 2005-10-19 12:45:22 jmt Exp $
+// $Id: WorldEntity.cpp,v 1.69 2005-10-31 15:58:41 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -132,10 +132,69 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
   if (!loc) return getPredictedPos(); // nothing below makes sense for the world
 
   // Cache predicted pos of entity
-  WFMath::Point<3> pred = getPredictedPos();
+  WFMath::Point<3> predicted = getPredictedPos();
   // Cache abs position of parent
-  WFMath::Point<3> lpos = loc->getAbsPos();
-  //WFMath::Point<3> lpos = loc->getPredictedPos();
+  WFMath::Point<3> location = loc->getAbsPos();
+
+  // Get rotation
+  WFMath::Quaternion orient =  WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
+  orient *= loc->getOrientation();
+  float rot_matrix[4][4];
+  // Calculate rotation matrix
+  QuatToMatrix(orient, rot_matrix);
+
+  WFMath::Point<3> pred = predicted;
+  WFMath::Point<3> lpos = location;
+//predicted = location;
+
+#if (1)
+  // Calculate rotated components
+  float w;
+  pred.x() = rot_matrix[0][0] * predicted.x()
+           + rot_matrix[0][1] * predicted.y()
+           + rot_matrix[0][2] * predicted.z()
+           + rot_matrix[0][3];
+  pred.y() = rot_matrix[1][0] * predicted.x()
+           + rot_matrix[1][1] * predicted.y()
+           + rot_matrix[1][2] * predicted.z()
+           + rot_matrix[1][3];
+  pred.z() = rot_matrix[2][0] * predicted.x()
+           + rot_matrix[2][1] * predicted.y()
+           + rot_matrix[2][2] * predicted.z()
+           + rot_matrix[2][3];
+  w        = rot_matrix[3][0] * predicted.x()
+           + rot_matrix[3][1] * predicted.y()
+           + rot_matrix[3][2] * predicted.z()
+           + rot_matrix[3][3];
+
+#else
+
+  // Calculate rotated components
+  float w;
+  pred.x() = rot_matrix[0][0] * predicted.x()
+           + rot_matrix[1][0] * predicted.y()
+           + rot_matrix[2][0] * predicted.z()
+           + rot_matrix[3][0];
+  pred.y() = rot_matrix[0][1] * predicted.x()
+           + rot_matrix[1][1] * predicted.y()
+           + rot_matrix[2][1] * predicted.z()
+           + rot_matrix[3][1];
+  pred.z() = rot_matrix[0][2] * predicted.x()
+           + rot_matrix[1][2] * predicted.y()
+           + rot_matrix[2][2] * predicted.z()
+           + rot_matrix[3][2];
+  w        = rot_matrix[0][3] * predicted.x()
+           + rot_matrix[1][3] * predicted.y()
+           + rot_matrix[2][3] * predicted.z()
+           + rot_matrix[3][3];
+#endif
+  // Apply normalisation factor
+  pred.x() /= w;
+  pred.y() /= w;
+  pred.z() /= w;
+
+
+
   // Work out predicted abs pos.
   WFMath::Point<3> absPos(
     lpos.x() + pred.x(),
@@ -213,13 +272,13 @@ if (loc) {
   if (hasAttr("mass")) {
 
     double mass = valueOfAttr("mass").asNum();
-  Log::writeLog(std::string("Mass: ") + string_fmt(mass), Log::LOG_DEFAULT);
-  System::instance()->pushMessage(std::string(getName()) + std::string(" - Mass: ") + std::string(string_fmt(mass)), CONSOLE_MESSAGE | SCREEN_MESSAGE);
+    Log::writeLog(std::string("Mass: ") + string_fmt(mass), Log::LOG_DEFAULT);
+    System::instance()->pushMessage(std::string(getName()) + std::string(" - Mass: ") + std::string(string_fmt(mass)), CONSOLE_MESSAGE | SCREEN_MESSAGE);
   }
   if (hasAttr(MODE)) {
     std::string mode = valueOfAttr(MODE).asString();
-    Log::writeLog(std::string("Mode: ") + mode, Log::LOG_DEFAULT);
-}
+    if (debug) Log::writeLog(std::string("Mode: ") + mode, Log::LOG_DEFAULT);
+  }
 }
 
 std::string WorldEntity::type() {
@@ -240,59 +299,53 @@ std::string WorldEntity::parent() {
 }
 
 void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
-  //ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
-
-    if (str == MODE) {
-      const std::string mode = v.asString();
-      static ActionHandler *ac = System::instance()->getActionHandler();
-      ac->handleAction(mode + "_" + type(), NULL);
-      if (mode != last_mode) {
-        ObjectRecord *record = NULL;
-        //if (object_handler) record = object_handler->getObjectRecord(getId());
-        record = ModelSystem::getInstance().getObjectRecord(this);
-        if (record) record->animate(mode);
-        last_mode = mode;
-      }
-    } else if (str == ACTION) {
-      const std::string action = v.asString();
-      static ActionHandler *ac = System::instance()->getActionHandler();
-      ac->handleAction(action + "_" + type(), NULL);
-      if (action != last_action) {
-        ObjectRecord *record = NULL;
-        //if (object_handler) record = object_handler->getObjectRecord(getId());
-        record = ModelSystem::getInstance().getObjectRecord(this);
-        if (record) record->action(action);
-        last_action = action;
-      }
-    } else if (str == GUISE) {
-      const Atlas::Message::MapType& mt(v.asMap());
+  if (str == MODE) {
+    const std::string mode = v.asString();
+    static ActionHandler *ac = System::instance()->getActionHandler();
+    ac->handleAction(mode + "_" + type(), NULL);
+    if (mode != last_mode) {
       ObjectRecord *record = NULL;
-//      if (object_handler) record = object_handler->getObjectRecord(getId());
       record = ModelSystem::getInstance().getObjectRecord(this);
-      if (record) record->setAppearance(mt);
-//    } else if (str == "--bbox") {
-//      float height = fabs(getBBox().highCorner().z() - getBBox().lowCorner().z());
-//      ObjectRecord *record = NULL;
-//      if (object_handler) record = object_handler->getObjectRecord(getId());
-//      if (record) record->setHeight(height);
-    } else if (str == "right_hand_wield") {
-        std::string id = v.asString();
-        if (id.empty()) {
-            m_attached.erase("right_hand_wield");
-        } else {
-            WorldEntity* attach = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
-            if (attach) {
-                m_attached["right_hand_wield"] = attach;
-            } else {
-                Eris::View::EntitySightSlot ess(SigC::bind( 
-                    SigC::slot(*this, &WorldEntity::onSightAttached),
-                    str));
-                getView()->notifyWhenEntitySeen(id, ess);
-            }
-        }
-    } else if (str == "status") {
-        m_status = v.asNum();
+      if (record) record->animate(mode);
+      last_mode = mode;
     }
+  } else if (str == ACTION) {
+    const std::string action = v.asString();
+    if (debug) {
+      printf("Entity %s (%s) action prop changed\n", getName().c_str(), getId().c_str());
+      printf("Action is %s\n", action.c_str());
+    }
+    static ActionHandler *ac = System::instance()->getActionHandler();
+    ac->handleAction(action + "_" + type(), NULL);
+    if (action != last_action) {
+      ObjectRecord *record = NULL;
+      record = ModelSystem::getInstance().getObjectRecord(this);
+      if (record) record->action(action);
+      last_action = action;
+    }
+  } else if (str == GUISE) {
+    const Atlas::Message::MapType& mt(v.asMap());
+    ObjectRecord *record = NULL;
+    record = ModelSystem::getInstance().getObjectRecord(this);
+    if (record) record->setAppearance(mt);
+  } else if (str == "right_hand_wield") {
+    std::string id = v.asString();
+    if (id.empty()) {
+     m_attached.erase("right_hand_wield");
+    } else {
+      WorldEntity* attach = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
+      if (attach) {
+        m_attached["right_hand_wield"] = attach;
+      } else {
+        Eris::View::EntitySightSlot ess(SigC::bind( 
+          SigC::slot(*this, &WorldEntity::onSightAttached),
+          str));
+        getView()->notifyWhenEntitySeen(id, ess);
+      }
+    }
+  } else if (str == "status") {
+    m_status = v.asNum();
+  }
 }
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
@@ -307,12 +360,14 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
 }
 
 void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &action) {
-  printf("Entity %s (%s) received action\n", getName().c_str(), getId().c_str());
-  const std::list<std::string> &p = action->getParents();
-  std::list<std::string>::const_iterator I = p.begin();
-  while (I != p.end()) {
-    printf("Parent: %s\n", (*I).c_str());
-    ++I;
+  if (debug) {
+    printf("Entity %s (%s) received action\n", getName().c_str(), getId().c_str());
+    const std::list<std::string> &p = action->getParents();
+    std::list<std::string>::const_iterator I = p.begin();
+    while (I != p.end()) {
+      printf("Parent: %s\n", (*I).c_str());
+      ++I;
+    }
   }
 }
 

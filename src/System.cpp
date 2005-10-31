@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.135 2005-10-19 21:46:55 simon Exp $
+// $Id: System.cpp,v 1.136 2005-10-31 15:58:41 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -491,10 +491,10 @@ void System::handleEvents(const SDL_Event &event) {
               if ((period > DEFAULT_max_click_time) &&
                   ((event.button.x != m_click_x) ||
                    (event.button.y != m_click_y))) {
-                  std::cout << "DRAG" << std::endl << std::flush;
+                  if (debug) std::cout << "DRAG" << std::endl << std::flush;
                   m_character->getEntity(m_click_id);
               } else {
-                  std::cout << "CLICK" << std::endl << std::flush;
+                  if (debug) std::cout << "CLICK" << std::endl << std::flush;
                   m_character->touchEntity(m_click_id);
               }
             }

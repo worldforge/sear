@@ -1,3 +1,13 @@
+2005-10-31  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Bump required eris version
+
+	* guichan/Workarea.cpp, guichan/CharacterWindow.cpp, src/System.cpp:
+	  Make some output debugging only
+
+	* src/WorldEntity.cpp: Modify getAbsPosition to incorporate parent 
+	  object rotations into final position. Move some output to debug only.
+
 2005-20-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/client.h, src/client.cpp, src/Factory.h, src/Factory.cpp:
