@@ -1,3 +1,8 @@
+2005-11-23  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp: Commit a speech
+	  bubble widget, as yet unused.
+
 2005-10-31  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac: Bump required eris version
@@ -8,7 +13,7 @@
 	* src/WorldEntity.cpp: Modify getAbsPosition to incorporate parent 
 	  object rotations into final position. Move some output to debug only.
 
-2005-20-21  Al Riddoch  <alriddoch@zepler.org>
+2005-10-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/client.h, src/client.cpp, src/Factory.h, src/Factory.cpp:
 	  Fix function arguments to match the signals in the modified
