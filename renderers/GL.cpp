@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.133 2005-06-23 08:13:31 simon Exp $
+// $Id: GL.cpp,v 1.134 2005-11-26 16:08:28 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1108,16 +1108,14 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       glPushMatrix();
 
-      // Translate Model
+      // Apply Object transforms
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
       translateObject(pos.x(), pos.y(), pos.z() );
-      // Correct model position
-      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
-
-      // Correct model rotation
-      glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
-      // Rotate Model
       rotateObject(object_record, model_record);
+
+      // Apply model transforms
+      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
+      glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
 
       // Scale Object
       float scale = model_record->scale;

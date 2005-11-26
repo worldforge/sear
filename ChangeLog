@@ -1,3 +1,7 @@
+2005-11-26  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/GL.cpp: Fix order of model and object transforms.
+
 2005-11-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp: Commit a speech
