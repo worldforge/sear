@@ -1,3 +1,8 @@
+2005-11-26  Al Riddoch  <alriddoch@zepler.org>
+
+	* data/rpgfont.png: Replace font with a simpler smaller version
+	  which looks cleaner, and allows more compact text to be displayed.
+
 2005-11-26  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* data/bindings.cpp: Bind 'c' to /attack and bind r,f to move up and 
