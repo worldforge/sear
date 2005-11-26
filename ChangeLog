@@ -1,5 +1,10 @@
 2005-11-26  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* data/bindings.cpp: Bind 'c' to /attack and bind r,f to move up and 
+	  down.
+
+2005-11-26  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Fix order of model and object transforms.
 
 2005-11-23  Al Riddoch  <alriddoch@zepler.org>
