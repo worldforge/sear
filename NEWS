@@ -1,3 +1,7 @@
+29th November 2005
+Sear 0.6.0 uses the lastest mercator updates for procedurally added area and paths. A particle system has also been implemented. This version of sear also uses the latest Eris version providing greater stability than before. There has also been many internal changes and overall stability improvements.
+Other improvements include a GUI system based on Guichan.
+
 16th August 2002
 First working ModelViewer code has been completed and uploaded to cvs.
 

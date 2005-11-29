@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.17 2005-06-02 11:18:14 simon Exp $
+// $Id: FileHandler.cpp,v 1.18 2005-11-29 21:01:52 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -96,8 +96,8 @@ FileHandler::FileHandler() {
     addSearchPath(installBase + "/scripts");
     
     setVariable("SEAR_INSTALL", installBase);
-    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media/");
-    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media/");
+    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
     setVariable("SEAR_HOME", getUserDataPath());
     
     if (!exists(getUserDataPath())) {
