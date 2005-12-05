@@ -1,3 +1,11 @@
+2005-12-05  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/passwordfield.cpp, guichan/passwordfield.h: Add a new
+	  textfield for passwords which obscures the contents with *s.
+
+	* guichan/LoginWindow.cpp, guichan/LoginWindow.h: Use
+	  PasswordField for passwords at login.
+
 2005-11-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac: Bump version number to 0.6.0 for release.

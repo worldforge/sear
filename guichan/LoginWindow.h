@@ -20,6 +20,8 @@ class CheckBox;
 
 namespace Sear {
 
+class PasswordField;
+
 class ActionListenerSigC;
 
 class LoginWindow : virtual public SigC::Object, public gcn::Window {
@@ -27,8 +29,8 @@ protected:
   gcn::Button * m_loginButton;
   gcn::Button * m_cancelButton;
   gcn::TextField * m_userField;
-  gcn::TextField * m_pswdField;
-  gcn::TextField * m_pswdConfirmField;
+  PasswordField * m_pswdField;
+  PasswordField * m_pswdConfirmField;
   gcn::TextField * m_nameField;
   gcn::Label * m_nameLabel;
   gcn::CheckBox * m_createCheck;

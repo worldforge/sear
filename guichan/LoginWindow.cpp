@@ -7,6 +7,7 @@
 #include "guichan/Alert.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
+#include "guichan/passwordfield.h"
 
 #include "src/System.h"
 
@@ -39,7 +40,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
 
   hbox = new gcn::HBox(6);
   gcn::Label * l2 = new gcn::Label("Password");
-  m_pswdField = new gcn::TextField("                ");
+  m_pswdField = new PasswordField("                ");
   m_pswdField->setText("");
   hbox->pack(l2);
   hbox->pack(m_pswdField);
@@ -48,7 +49,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
 
   hbox = new gcn::HBox(6);
   gcn::Label * l3 = new gcn::Label("        ");
-  m_pswdConfirmField = new gcn::TextField("                ");
+  m_pswdConfirmField = new PasswordField("                ");
   m_pswdConfirmField->setText("");
   m_pswdConfirmField->setEnabled(false);
   m_pswdConfirmField->setVisible(false);
