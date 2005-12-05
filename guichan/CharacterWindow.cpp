@@ -64,9 +64,33 @@ public:
   }
 };
 
+class TypeListModel : public gcn::ListModel
+{
+public:
+  virtual int getNumberOfElements()
+  {
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account == 0) { return 1; }
+    std::cout << "Types: " << account->getCharacterTypes().size() << std::endl << std::flush;
+    return account->getCharacterTypes().size();
+  }
+
+  virtual std::string getElementAt(int i)
+  {
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account == 0) { return ""; }
+    const std::vector<std::string> & types = account->getCharacterTypes();
+    if (i < types.size()) {
+    std::cout << "Type[" << i << "]: " << types[i] << std::endl << std::flush;
+      return types[i];
+    } else {
+      return "UNKNOWN";
+    }
+  }
+};
 
 CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
-                                     m_selected(-1)
+                                     m_charSelected(-1), m_typeSelected(-1)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -115,6 +139,9 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_typeField = new gcn::TextField("                ");
   m_typeField->setText("");
   hbox->pack(m_typeField);
+  TypeListModel * type_list_model = new TypeListModel;
+  m_types = new gcn::DropDown(type_list_model);
+  hbox->pack(m_types);
 
   vbox->pack(hbox);
 
@@ -152,22 +179,34 @@ CharacterWindow::~CharacterWindow()
 
 void CharacterWindow::logic()
 {
-  int new_selected = m_characters->getSelected();
-  if (new_selected != m_selected) {
-    m_selected = new_selected;
+  int new_char_sel = m_characters->getSelected();
+  if (new_char_sel != m_charSelected) {
+    m_charSelected = new_char_sel;
     m_nameField->setText("");
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const Eris::CharacterMap & ci = account->getCharacters();
-      if (m_selected >= 0 && (unsigned int)m_selected < ci.size()) {
+      if (m_charSelected >= 0 && (unsigned int)m_charSelected < ci.size()) {
         Eris::CharacterMap::const_iterator I = ci.begin();
         Eris::CharacterMap::const_iterator Iend = ci.end();
         for (int j = 0; I != Iend; ++I, ++j) {
-          if (m_selected == j) {
+          if (m_charSelected == j) {
             m_nameField->setText(I->second->getName());
             m_typeField->setText(I->second->getParents().front());
           }
         }
+      }
+    }
+  }
+  int new_type_sel = m_types->getSelected();
+  if (new_type_sel != m_typeSelected) {
+    m_typeSelected = new_type_sel;
+    m_typeField->setText("");
+    Eris::Account * account = System::instance()->getClient()->getAccount();
+    if (account != 0) {
+      const std::vector<std::string> & types = account->getCharacterTypes();
+      if (m_typeSelected >= 0 && m_typeSelected < types.size()) {
+        m_typeField->setText(types[m_typeSelected]);
       }
     }
   }
@@ -195,11 +234,11 @@ void CharacterWindow::actionPressed(std::string event)
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const Eris::CharacterMap & ci = account->getCharacters();
-      if (m_selected >= 0 && (unsigned int)m_selected < ci.size()) {
+      if (m_charSelected >= 0 && (unsigned int)m_charSelected < ci.size()) {
         Eris::CharacterMap::const_iterator I = ci.begin();
         Eris::CharacterMap::const_iterator Iend = ci.end();
         for (int j = 0; I != Iend; ++I, ++j) {
-          if (m_selected == j) {
+          if (m_charSelected == j) {
             cmd += I->second->getId();
             System::instance()->runCommand(cmd);
             close = true;

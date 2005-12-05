@@ -12,6 +12,7 @@
 namespace gcn {
 
 class ListBox;
+class DropDown;
 class TextField;
 class Button;
 
@@ -25,6 +26,7 @@ class CharacterListModel;
 class CharacterWindow : virtual public SigC::Object, public gcn::Window {
 protected:
   gcn::ListBox * m_characters;
+  gcn::DropDown * m_types;
 
   gcn::TextField * m_nameField;
   gcn::TextField * m_typeField;
@@ -37,7 +39,8 @@ protected:
   CharacterListModel * m_characterListModel;
   ActionListenerSigC * m_buttonListener;
 
-  int m_selected;
+  int m_charSelected;
+  int m_typeSelected;
 
   virtual void logic();
 public:

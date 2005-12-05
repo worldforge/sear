@@ -1,5 +1,11 @@
 2005-12-05  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/CharacterWindow.h, guichan/CharacterWindow.cpp:
+	  Add a dropdown selection for picking playable character types
+	  from the server.
+
+2005-12-05  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/passwordfield.cpp, guichan/passwordfield.h: Add a new
 	  textfield for passwords which obscures the contents with *s.
 
