@@ -1,3 +1,11 @@
+2005-12-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/ScriptEngine.cpp, src/ScriptEngine.h: Clean up code files. Remove
+	  old code and prefix member vars with m_. Remove prefixEnabled() as it
+	  returns true always.
+
+	* src/System.cpp: Remove call to prefixEnabled().
+
 2005-12-05  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp:

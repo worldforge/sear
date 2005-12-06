@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.136 2005-10-31 15:58:41 simon Exp $
+// $Id: System.cpp,v 1.137 2005-12-06 20:59:06 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -851,8 +851,8 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     m_general.setItem(section, key, value);
   }
   else if (command == LOAD_GENERAL_CONFIG) {
-    m_process_records = m_script_engine->prefixEnabled();
-  System::instance()->getFileHandler()->expandString(args);
+    m_process_records = true;
+    System::instance()->getFileHandler()->expandString(args);
     m_general.readFromFile(args);
     if (m_process_records) {
       m_process_records = false;
@@ -919,7 +919,7 @@ void System::varconf_callback(const std::string &section, const std::string &key
   if (key == "select_state") {
     config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
   }
-  if (m_process_records && m_script_engine->prefixEnabled()) {
+  if (m_process_records) {
     varconf::Variable v = config.getItem(section, key);
     if (v.is_string()) {
       VarconfRecord *r = new VarconfRecord();
