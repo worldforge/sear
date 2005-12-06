@@ -14,6 +14,8 @@ class SpeechBubble: public gcn::Widget
 public:
     SpeechBubble();
 
+    virtual void logic();
+
     virtual void draw(gcn::Graphics * graphics);
 
     virtual void drawBorder(gcn::Graphics * graphics);
@@ -29,6 +31,11 @@ private:
     gcn::Image * m_sw;
     gcn::Image * m_nw;
     gcn::Image * m_mid;
+
+    std::list<std::string> m_lines;
+
+    bool m_overflow;
+    float m_offset;
 };
 
 #endif // SEAR_GUICHAN_SPEECH_BUBBLE_H

@@ -1,5 +1,11 @@
 2005-12-05  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp:
+	  Add store for speech lines, and handle scrolling lines up
+	  and popping old lines off as new ones are added.
+
+2005-12-05  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/CharacterWindow.h, guichan/CharacterWindow.cpp:
 	  Add a dropdown selection for picking playable character types
 	  from the server.
