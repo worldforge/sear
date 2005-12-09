@@ -60,7 +60,8 @@ public:
   virtual void runCommand(const std::string &, const std::string &);
 
   void addWindow(const std::string & name, gcn::Window * window);
-  bool requestConsoleFocus();
+  bool requestConsole();
+  bool dismissConsole();
 };
 
 } // namespace Sear

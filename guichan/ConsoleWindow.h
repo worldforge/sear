@@ -22,6 +22,7 @@ public:
 
   void lineEntered();
   bool requestConsoleFocus();
+  bool dismissConsoleFocus();
 };
 
 } // namespace Sear

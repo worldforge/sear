@@ -11,6 +11,7 @@
 #include "guichan/Panel.h"
 #include "guichan/StatusWindow.h"
 #include "guichan/ActionListenerSigC.h"
+#include "guichan/SpeechBubble.h"
 
 #include "guichan/box.hpp"
 
@@ -112,6 +113,10 @@ void Workarea::init()
   // m_top->add(lw, m_width / 2 - lw->getWidth() / 2, m_height / 2 - lw->getHeight () / 2);
   // ConsoleWindow * cw = new ConsoleWindow;
   // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
+
+  // SpeechBubble * sp = new SpeechBubble;
+  // sp->loadImages(std::vector<std::string>());
+  // m_top->add(sp, 50, 50);
 
   ConnectWindow * con_w = new ConnectWindow;
   m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
@@ -275,7 +280,12 @@ bool Workarea::handleEvent(const SDL_Event & event)
     case SDL_KEYDOWN:
       if (event.key.keysym.sym == SDLK_RETURN) {
         if (m_panel != 0) {
-          suppress = m_panel->requestConsoleFocus();
+          suppress = m_panel->requestConsole();
+        }
+        event_eaten = true;
+      } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+        if (m_panel != 0) {
+          suppress = m_panel->dismissConsole();
         }
         event_eaten = true;
       } else {

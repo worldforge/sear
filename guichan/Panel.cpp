@@ -164,12 +164,27 @@ void Panel::addWindow(const std::string & name, gcn::Window * window)
   resizeToContent();
 }
 
-bool Panel::requestConsoleFocus()
+bool Panel::requestConsole()
 {
-   if (m_console->getParent() != 0) {
-     return m_console->requestConsoleFocus();
-   }
-   return false;
+  if (m_console->getParent() != 0) {
+    std::cout << "Goo" << std::endl << std::flush;
+    return m_console->requestConsoleFocus();
+  } else {
+    openWindow("chat", m_console);
+    return m_console->requestConsoleFocus();
+  }
+  return false;
+}
+
+bool Panel::dismissConsole()
+{
+  if (m_console->getParent() != 0) {
+    if (!m_console->dismissConsoleFocus()) {
+      closeWindow("chat", m_console);
+    }
+    return true;
+  }
+  return false;
 }
 
 } // namespace Sear

@@ -1,3 +1,10 @@
+2005-12-09  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h,
+	  guichan/Panel.cpp, guichan/Panel.h, guichan/Workarea.cpp:
+	  Use return to summon the chat window, and escape to dismiss
+	  it.
+
 2005-12-06  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/ScriptEngine.cpp, src/ScriptEngine.h: Clean up code files. Remove

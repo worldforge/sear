@@ -90,4 +90,13 @@ bool ConsoleWindow::requestConsoleFocus()
   return false;
 }
 
+bool ConsoleWindow::dismissConsoleFocus()
+{
+  if (m_entry->hasFocus()) {
+    _getFocusHandler()->focusNone();
+    return true;
+  }
+  return false;
+}
+
 } // namespace Sear
