@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.32 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: Character.h,v 1.33 2005-12-13 23:32:35 jmt Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -87,6 +87,7 @@ public:
   void displayInventory();
   void say(const std::string&);
   void make(const std::string&type, const std::string &name);
+  void displayUseOperations();
 
   float getAngle() const { return m_angle; }
 //  WFMath::Quaternion getOrientation() { return m_orient; }
@@ -110,6 +111,14 @@ public:
   void setAvatar(Eris::Avatar *avatar);
 
 private:
+  /**
+  @brief Locate an item in the inventory by instance or type name
+  @param name The instance or type name to search for
+  Return NULL if no such item can be found, and the first match if multiple
+  items are present.
+  */
+  WorldEntity* findInInventory(const std::string& name);
+ 
   Eris::Avatar *m_avatar;
   WorldEntity *m_self;
   float m_walk_speed;

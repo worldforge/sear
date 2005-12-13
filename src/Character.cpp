@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.67 2005-09-22 17:17:23 alriddoch Exp $
+// $Id: Character.cpp,v 1.68 2005-12-13 23:32:35 jmt Exp $
 
 #include <math.h>
 #include <string>
@@ -97,7 +97,8 @@ namespace Sear {
   static const std::string CMD_USE = "use";
   static const std::string CMD_WIELD = "wield";
   static const std::string CMD_ATTACK = "attack";
-
+  static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
+  
   static const std::string CMD_SET_APPEARANCE = "set_app";
   static const std::string CMD_RESET_APPEARANCE = "clear_app";
   static const std::string CMD_READ_APPEARANCE = "read_app";
@@ -347,9 +348,9 @@ void Character::getEntity(const std::string &id) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
-  Eris::EntityPtr e = System::instance()->getClient()->getAvatar()->getView()->getEntity(id);
+  Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
   if (!e) return;
-  m_avatar->place(e, m_avatar->getEntity());
+  m_avatar->take(e);
   setAction("pickup");
 }
 
@@ -383,22 +384,26 @@ void Character::touchEntity(const std::string &id) {
 
 void Character::wieldEntity(const std::string &name) {
   if (!m_avatar) return;
-  for (unsigned int i = 0; i < m_self->numContained(); ++i) {
-    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getContained(i));
-    Eris::TypeInfo *type = we->getType();
-    assert(type);
-    if ((we->getName() == name) || (type->getName() == name)) {
-      Wield w;
-      w->setFrom(m_self->getId());
-      Anonymous arg;
-      arg->setId(we->getId());
-      arg->setObjtype("obj");
-      w->setArgs1(arg);
-      m_avatar->getConnection()->send(w);
-      setAction("wield");
-      return;
-    }
+  WorldEntity* toWield = findInInventory(name);
+  if (!toWield) {
+    Log::writeLog("no " + name + " in inventory to wield", Log::LOG_DEFAULT);
+    return;
   }
+  
+  m_avatar->wield(toWield);
+}
+
+WorldEntity* Character::findInInventory(const std::string& name) {
+    assert(m_avatar);
+    
+    for (unsigned int i = 0; i < m_self->numContained(); ++i) {
+        Eris::Entity* e = m_self->getContained(i);
+        if ((e->getName() == name) || (e->getType()->getName() == name)) {
+            return static_cast<WorldEntity*>(e);
+        }
+    } // of inventory iteration
+    
+    return NULL;
 }
 
 void Character::useToolOnEntity(const std::string & id,
@@ -408,14 +413,8 @@ void Character::useToolOnEntity(const std::string & id,
   if (id.empty()) return;
   Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
   if (!e) return;
-  Use u;
-  u->setFrom(m_self->getId());
-  Anonymous arg;
-  arg->setId(e->getId());
-  arg->setObjtype("obj");
-  arg->setAttr("pos", pos.toAtlas());
-  u->setArgs1(arg);
-  m_avatar->getConnection()->send(u);
+
+  m_avatar->useOn(e, pos, std::string());
   setAction("use");
 }
 
@@ -425,14 +424,18 @@ void Character::attackEntity(const std::string& id) {
   if (id.empty()) return;
   Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
   if (!e) return;
-  Attack a;
-  a->setFrom(m_self->getId());
-  Anonymous arg;
-  arg->setId(e->getId());
-  arg->setObjtype("obj");
-  a->setArgs1(arg);
-  m_avatar->getConnection()->send(a);
+
+  m_avatar->attack(e);
   setAction("attack");
+}
+
+void Character::displayUseOperations() {
+  if (!m_avatar) return;
+  
+  const Eris::TypeInfoArray& ops = m_avatar->getUseOperationsForWielded();
+  for (unsigned int i=0; i<ops.size(); ++i) {
+    System::instance()->pushMessage(ops[i]->getName(), 1);
+  }
 }
 
 void Character::displayInventory() {
@@ -568,6 +571,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_SET_HEIGHT, this);
   console->registerCommand(CMD_SET_ACTION, this);
   console->registerCommand(CMD_WAVE, this);
+  console->registerCommand(CMD_DISPLAY_USE_OPS, this);
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
@@ -631,6 +635,9 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_USE) {
     System::instance()->setAction(ACTION_USE);
 //    useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
+  }
+  else if (command == CMD_DISPLAY_USE_OPS) {
+    displayUseOperations();
   }
   else if (command == CMD_WIELD) {
     std::string name = tokeniser.nextToken();

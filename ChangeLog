@@ -1,3 +1,11 @@
+2005-12-13  James Turner  <james@worldforge.org>
+
+	* src/Character.cpp, src/Character.h: update to use the Eris::Avatar
+	  functions instead of built-in code for many Character actions. Add
+	  a command to query the operations supported by the currently
+	  wielded entity (tool). Enter '/use_ops' in the console to see
+	  the list. Note these changes require the latest CVS Eris.
+
 2005-12-09  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h,
