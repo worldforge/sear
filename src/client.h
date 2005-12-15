@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.22 2005-10-21 01:58:33 alriddoch Exp $
+// $Id: client.h,v 1.23 2005-12-15 00:17:14 alriddoch Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -14,6 +14,8 @@
 #include <Eris/Account.h>
 #include <Atlas/Message/DecoderBase.h>
 #include "interfaces/ConsoleObject.h"
+
+#include <sigc++/object.h>
 
 namespace varconf {
 class Config;
@@ -65,7 +67,7 @@ class Factory;
 class Console;
 class System;
 
-class Client :public SigC::Object, public ConsoleObject {
+class Client : public SigC::Object, public ConsoleObject {
 
 public:
   Client(System *system, const std::string &client_name);

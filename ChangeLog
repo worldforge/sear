@@ -1,3 +1,11 @@
+2005-12-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* data/bindings.cfg: Fix typo that broke up and down movement
+	  keys.
+
+	* src/client.h: Add a sigc++ header which is required due to Eris
+	  changes.
+
 2005-12-13  James Turner  <james@worldforge.org>
 
 	* src/Character.cpp, src/Character.h: update to use the Eris::Avatar
