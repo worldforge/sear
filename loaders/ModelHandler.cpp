@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.24 2005-06-25 15:42:23 simon Exp $
+// $Id: ModelHandler.cpp,v 1.25 2005-12-16 13:37:01 alriddoch Exp $
 
 #include <set>
 #include <string.h>
@@ -54,7 +54,7 @@ ModelHandler::~ModelHandler() {
 void ModelHandler::init() {
   assert (m_initialised == false);
 
-  m_timeout = new Eris::Timeout("sear_free_models", this, 60000);
+  m_timeout = new Eris::Timeout(60000);
   m_timeout->Expired.connect(SigC::slot(*this, &ModelHandler::TimeoutExpired));
 
   // Add default record

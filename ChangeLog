@@ -1,3 +1,8 @@
+2005-12-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/ModelHandler.cpp, src/Character.cpp: The Eris Timeout
+	  API has changed, so constructors now need different parameters.
+
 2005-12-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* data/bindings.cfg: Fix typo that broke up and down movement

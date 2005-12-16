@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.68 2005-12-13 23:32:35 jmt Exp $
+// $Id: Character.cpp,v 1.69 2005-12-16 13:37:01 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -160,7 +160,7 @@ bool Character::init() {
 
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
 
-  m_timeout_rotate = new Eris::Timeout("sear_character_rotate", this, 0);
+  m_timeout_rotate = new Eris::Timeout(0);
   m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
 
   m_initialised = true;
@@ -230,7 +230,7 @@ void Character::rotateImmediate(float rot)
   updateLocals(send);
   // If we don't send, we need to schedule an update.
   if (!send && !m_updateScheduled) {
-    m_timeout_update = new Eris::Timeout("sear_character_update", this, server_update_interval);
+    m_timeout_update = new Eris::Timeout(server_update_interval);
     m_timeout_update->Expired.connect(SigC::slot(*this, &Character::UpdateTimeoutExpired));
 
     m_updateScheduled = true;
