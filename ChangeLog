@@ -1,3 +1,12 @@
+2005-12-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* configure.ac: Handle include and library directories cleanly if
+	  X11 is in the standard system directories. Do the GL tests in C
+	  as they don't seem to work in C++ with some versions of autoconf.
+
+	* src/WorldEntity.h: Remove class qualifier from constructor
+	  declaration as its not legal there.
+
 2005-12-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/ModelHandler.cpp, src/Character.cpp: The Eris Timeout

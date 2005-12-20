@@ -29,9 +29,13 @@ SEAR_LIBS=
 
 if test $cross_compiling == no; then
   AC_PATH_X
-  CPPFLAGS="$CPPFLAGS -I $x_includes"
+  if test x"$x_includes" != x; then
+    CPPFLAGS="$CPPFLAGS -I $x_includes"
+  fi
   CXXFLAGS="$CXXFLAGS -Wall"
-  SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
+  if test x"$x_libraries" != x; then
+    SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
+  fi
 fi
 
 #CXXFLAGS="$CXXFLAGS -pedantic -ansi"
@@ -233,6 +237,9 @@ dnl Check other libs
 
 if test $cross_compiling == no; then
 
+  AC_LANG_SAVE
+  AC_LANG_C
+
   AC_CHECK_LIB(GL,glViewport, [
     SEAR_LIBS="$SEAR_LIBS -lGL"
   ],[
@@ -246,6 +253,8 @@ if test $cross_compiling == no; then
   ], "-lGL")
 
   AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.]))
+
+  AC_LANG_RESTORE
  else
 
 

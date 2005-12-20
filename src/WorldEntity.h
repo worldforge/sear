@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.30 2005-10-19 12:45:22 jmt Exp $
+// $Id: WorldEntity.h,v 1.31 2005-12-20 03:20:53 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -28,7 +28,7 @@ typedef std::pair<std::string, unsigned int> message;
 
 class WorldEntity : public Eris::Entity {
 public:
-  WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view);
+  WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view);
   virtual ~WorldEntity() {}
   
   void onMove();
