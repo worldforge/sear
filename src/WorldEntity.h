@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.31 2005-12-20 03:20:53 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.32 2005-12-20 22:39:33 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -14,6 +14,7 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
 #include <Eris/Entity.h>
+#include <Eris/EntityRef.h>
 #include <Eris/Types.h>
 #include "common/types.h"
 
@@ -48,7 +49,7 @@ public:
   void rotateBBox(const WFMath::Quaternion &q);  
 
   // make this a map of vectors in the future
-  typedef std::map<std::string, WorldEntity*> AttachmentMap;
+  typedef std::map<std::string, Eris::EntityRef> AttachmentMap;
   
   const AttachmentMap& getAttachments() const
   { return m_attached; }

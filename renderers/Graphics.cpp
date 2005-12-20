@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.29 2005-07-02 12:31:02 simon Exp $
+// $Id: Graphics.cpp,v 1.30 2005-12-20 22:39:33 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -513,8 +513,11 @@ void Graphics::drawObject(ObjectRecord* obj,
 
       for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
         // retrieving the objectRecord also syncs it's pos with the WorldEntity
-        ObjectRecord *attached = 
-                         ModelSystem::getInstance().getObjectRecord(it->second);
+        if (!it->second) { continue; }
+        Eris::Entity * ee = it->second.ptr();
+        WorldEntity * we = dynamic_cast<WorldEntity*>(ee);
+        assert(we!=0);
+        ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(we);
         assert (attached);
 
         std::string submodel = mapAttachSlotToSubmodel(it->first);
@@ -590,7 +593,10 @@ void Graphics::drawAttached(ObjectRecord* obj,
     
   for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
     // retrieving the objectRecord also syncs it's pos with the WorldEntity
-    ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(it->second);
+    if (!it->second) { continue; }
+    Eris::Entity * ee = it->second.ptr();
+    WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
+    ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(we);
     assert (attached);
   
     std::string submodel = mapAttachSlotToSubmodel(it->first);

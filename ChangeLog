@@ -1,5 +1,13 @@
 2005-12-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/WorldEntity.h, renderers/Graphics.cpp: Change attachments
+	  on an entity to use Eris::EntityRef, so that a crash does not
+	  occur sometimes when the attached entity is deleted.
+
+	* guichan/Workarea.cpp: Add some missing characters to the gui font.
+
+2005-12-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* configure.ac: Handle include and library directories cleanly if
 	  X11 is in the standard system directories. Do the GL tests in C
 	  as they don't seem to work in C++ with some versions of autoconf.
