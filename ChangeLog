@@ -1,5 +1,10 @@
 2005-12-20  Al Riddoch  <alriddoch@zepler.org>
 
+	* renderers/Graphics.cpp: Update for changes in the Eris::EntityRef
+	  API.
+
+2005-12-20  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/WorldEntity.h, renderers/Graphics.cpp: Change attachments
 	  on an entity to use Eris::EntityRef, so that a crash does not
 	  occur sometimes when the attached entity is deleted.
