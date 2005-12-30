@@ -1,5 +1,10 @@
 2005-12-30  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/WorldEntity.cpp, src/WorldEntity.h: Fix onTalk override
+	  as the fingerprint in the Eris::Entity base class has changed.
+
+2005-12-30  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/WorldEntity.h, src/WorldEntity.cpp: Add handler for Imaginary
 	  ops for emotes, and push them to the system message function.
 

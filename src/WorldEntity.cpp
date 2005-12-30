@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.70 2005-12-30 18:11:44 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.71 2005-12-30 19:20:39 alriddoch Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -59,12 +59,19 @@ void WorldEntity::onMove() {
   rotateBBox(getOrientation());
 }
 
-void WorldEntity::onTalk(const Atlas::Objects::Root &talkArgs) {
-  if (!talkArgs->hasAttr("say")) {
+void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
+{
+  const std::vector<Atlas::Objects::Root> & talkArgs = talk->getArgs();
+  if (talkArgs.empty())
+  {
+    return;
+  }
+  const Atlas::Objects::Root & talkArg = talkArgs.front();
+  if (!talkArg->hasAttr("say")) {
     printf("Error: Talk but no 'say'\n");
     return;
   }
-  std::string msg = talkArgs->getAttr("say").asString();
+  std::string msg = talkArg->getAttr("say").asString();
 
   Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);	
   System::instance()->pushMessage(getName()+ ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);

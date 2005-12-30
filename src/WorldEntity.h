@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.33 2005-12-30 18:11:44 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.34 2005-12-30 19:20:39 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -33,7 +33,7 @@ public:
   virtual ~WorldEntity() {}
   
   void onMove();
-  void onTalk(const Atlas::Objects::Root &talkArgs);
+  void onTalk(const Atlas::Objects::Operation::RootOperation &talk);
   void onImaginary(const Atlas::Objects::Root &imaginaryArg);
 
   const WFMath::Quaternion getAbsOrient();
