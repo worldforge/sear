@@ -283,6 +283,11 @@ bool Workarea::handleEvent(const SDL_Event & event)
           suppress = m_panel->requestConsole();
         }
         event_eaten = true;
+      } else if (event.key.keysym.sym == SDLK_SLASH) {
+        if (m_panel != 0) {
+          m_panel->requestConsole();
+        }
+        event_eaten = true;
       } else if (event.key.keysym.sym == SDLK_ESCAPE) {
         if (m_panel != 0) {
           suppress = m_panel->dismissConsole();

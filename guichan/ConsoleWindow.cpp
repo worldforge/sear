@@ -29,6 +29,14 @@ public:
   SigC::Signal0<void> ReturnPressed;
 };
 
+void ConsoleWindow::pushMessage(const std::string & msg, int, int)
+{
+  std::cout << "Got console message " << msg << std::endl << std::flush;
+  m_textBox->addRow(msg);
+  m_textBox->setCaretRow(m_textBox->getNumberOfRows() -1);
+  m_textBox->scrollToCaret();
+}
+
 ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 {
   gcn::Color base = getBaseColor();
@@ -37,13 +45,13 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 
   gcn::Box * vbox = new gcn::VBox(6);
 
-  gcn::TextBox * textBox = new gcn::TextBox;
-  textBox->setEditable(false);
-  textBox->setOpaque(false);
-  textBox->setFocusable(false);
-  textBox->setEnabled(false);
-  textBox->setBackgroundColor(gcn::Color(0,0,0,0));
-  gcn::ScrollArea * textBoxScrollArea = new gcn::ScrollArea(textBox,
+  m_textBox = new gcn::TextBox;
+  m_textBox->setEditable(false);
+  m_textBox->setOpaque(false);
+  m_textBox->setFocusable(false);
+  m_textBox->setEnabled(false);
+  m_textBox->setBackgroundColor(gcn::Color(0,0,0,0));
+  gcn::ScrollArea * textBoxScrollArea = new gcn::ScrollArea(m_textBox,
                                             gcn::ScrollArea::SHOW_AUTO,
                                             gcn::ScrollArea::SHOW_ALWAYS);
   textBoxScrollArea->setWidth(400);
@@ -63,6 +71,8 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   setContent(vbox);
 
   resizeToContent();
+
+  System::instance()->pushedMessage.connect(SigC::slot(*this, &ConsoleWindow::pushMessage));
 }
 
 ConsoleWindow::~ConsoleWindow()

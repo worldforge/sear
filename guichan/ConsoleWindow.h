@@ -9,13 +9,20 @@
 
 #include <sigc++/object.h>
 
+namespace gcn {
+class TextBox;
+}
+
 namespace Sear {
 
 class CommandLine;
 
 class ConsoleWindow : public gcn::Window, virtual public SigC::Object {
 protected:
+  gcn::TextBox * m_textBox;
   CommandLine * m_entry;
+
+  void pushMessage(const std::string &, int, int);
 public:
   ConsoleWindow();
   virtual ~ConsoleWindow();

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.69 2005-10-31 15:58:41 simon Exp $
+// $Id: WorldEntity.cpp,v 1.70 2005-12-30 18:11:44 alriddoch Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -50,7 +50,6 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
-   messages(std::list<message>()),
    m_status(1.0)
 {
   Acted.connect(SigC::slot(*this, &WorldEntity::onAction));
@@ -74,6 +73,14 @@ void WorldEntity::onTalk(const Atlas::Objects::Root &talkArgs) {
   messages.push_back(message(msg, System::instance()->getTime() + message_life));  
 }
 
+void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)
+{
+    Atlas::Message::Element attr;
+    if (imaginaryArg->copyAttr("description", attr) != 0 || !attr.isString()) {
+        return;
+    }
+    System::instance()->pushMessage(getName()+" " + attr.String(), CONSOLE_MESSAGE | SCREEN_MESSAGE);
+}
 
 void WorldEntity::renderMessages() {
   if (messages.empty()) return;

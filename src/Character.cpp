@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.69 2005-12-16 13:37:01 alriddoch Exp $
+// $Id: Character.cpp,v 1.70 2005-12-30 18:11:44 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -88,6 +88,7 @@ namespace Sear {
   static const std::string CMD_TOGGLE_RUN = "toggle_run";
 
   static const std::string CMD_SAY = "say";
+  static const std::string CMD_ME = "me";
   static const std::string CMD_PICKUP = "pickup";
   static const std::string CMD_TOUCH = "touch";
   static const std::string CMD_DROP = "drop";
@@ -459,6 +460,12 @@ void Character::say(const std::string &msg) {
   m_avatar->say(msg);
 }
 
+void Character::emote(const std::string &msg) {
+  assert ((m_initialised == true) && "Character not initialised");
+  if (!m_avatar) return;
+  m_avatar->emote(msg);
+}
+
 void Character::make(const std::string &type, const std::string &name) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
@@ -560,6 +567,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_GIVE, this);
   console->registerCommand(CMD_DISPLAY_INVENTORY, this);
   console->registerCommand(CMD_MAKE, this);
+  console->registerCommand(CMD_ME, this);
   console->registerCommand(CMD_TOUCH, this);
   console->registerCommand(CMD_SAY, this);
   console->registerCommand(CMD_USE, this);
@@ -604,6 +612,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_RUN || command == CMD_STOP_RUN || command == CMD_TOGGLE_RUN) toggleRunModifier();
 
   else if (command == CMD_SAY) say(args);
+  else if (command == CMD_ME) emote(args);
   else if (command == CMD_GIVE) {
     std::string quantity_str = tokeniser.nextToken();
     std::string item = tokeniser.remainingTokens();

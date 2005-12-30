@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.137 2005-12-06 20:59:06 simon Exp $
+// $Id: System.cpp,v 1.138 2005-12-30 18:11:44 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -716,6 +716,7 @@ bool System::isMouselookEnabled() const {
 void System::pushMessage(const std::string &msg, int type, int duration) {
   assert(m_console);
   m_console->pushMessage(msg, type, duration);
+  pushedMessage.emit(msg, type, duration);
 }
 
 void System::readConfig(varconf::Config &config) {

@@ -1,3 +1,21 @@
+2005-12-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/WorldEntity.h, src/WorldEntity.cpp: Add handler for Imaginary
+	  ops for emotes, and push them to the system message function.
+
+	* src/System.h, src/System.cpp: Add a signal emitted each time a
+	  message is pushed, so other components can use the messages.
+
+	* src/Character.h, src/Character.cpp: Add new /me command for sending
+	  emotes.
+
+	* guichan/Workarea.cpp: Switch focus to console when the / key is
+	  pressed.
+
+	* guichan/ConsoleWindow.h, guichan/ConsoleWindow.cpp: Add a method
+	  to get messages from system, and connect it to the signal on
+	  system. Push the messages into the console text area as they arrive.
+
 2005-12-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/Graphics.cpp: Update for changes in the Eris::EntityRef
