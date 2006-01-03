@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.70 2005-12-30 18:11:44 alriddoch Exp $
+// $Id: Character.cpp,v 1.71 2006-01-03 20:04:09 jmt Exp $
 
 #include <math.h>
 #include <string>
@@ -23,7 +23,6 @@
 
 #include "common/Log.h"
 #include "common/Utility.h"
-#include "common/operations.h"
 
 #include "ActionHandler.h"
 #include "WorldEntity.h"
@@ -44,7 +43,6 @@
 
 using Atlas::Objects::Operation::Use;
 using Atlas::Objects::Operation::Wield;
-using Atlas::Objects::Operation::Attack;
 using Atlas::Objects::Entity::Anonymous;
 
 #ifdef DEBUG

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.27 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: main.cpp,v 1.28 2006-01-03 20:04:09 jmt Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -13,7 +13,6 @@
 #include <string>
 #include "System.h"
 #include "Exception.h"
-#include "common/operations.h"
 
 #include <signal.h>
 
@@ -53,7 +52,7 @@ int main(int argc, char** argv) {
       argv++;
       argc--;
       if (arg == "-v" || arg == "--version") {
-        std::cout << "Sear version: " << VERSION << std::endl;
+      //  std::cout << "Sear version: " << VERSION << std::endl;
 	exit_program = true;
       }
       else if (arg == "-a" || arg == "--add-search-path") {
@@ -88,8 +87,6 @@ under certain conditions; type `show c' for details.
   
   sys = new Sear::System();
   sys->addSearchPaths(path_list);
-
-  Atlas::Objects::Operation::ATTACK_NO = Atlas::Objects::Factories::instance()->addFactory("attack", &Atlas::Objects::generic_factory);
 
   if (!sys->init(p_argc, p_argv)) {
     std::cerr << "Error initialising Sear!" << std::endl;

@@ -1,3 +1,9 @@
+2006-01-03  James Turner  <james@worldforge.org>
+
+	* src/main.cpp, common/operations.h, common/operations.cpp, 
+	  src/character.cpp: remove sear definition of Atlas op, since Eris
+	  supplies one in 1.3.10.
+
 2005-12-31  Al Riddoch  <alriddoch@zepler.org>
 
 	* configure.ac: Require Eris 1.3.10 as the API has changed in a way
