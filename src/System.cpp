@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.138 2005-12-30 18:11:44 alriddoch Exp $
+// $Id: System.cpp,v 1.139 2006-01-07 18:55:52 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,9 +73,12 @@ namespace Sear {
   static const std::string GET_ATTRIBUTE = "getat";
   static const std::string SET_ATTRIBUTE = "setat";
 
-  static const std::string LOAD_GENERAL_CONFIG = "load_general";
-  static const std::string LOAD_KEY_BINDINGS = "load_bindings";
-  static const std::string SAVE_GENERAL_CONFIG = "save_general";
+  static const std::string LOAD_GENERAL_CONFIG_USER = "load_general";
+  static const std::string LOAD_GENERAL_CONFIG_GLOBAL = "load_general_global";
+  static const std::string LOAD_KEY_BINDINGS_USER = "load_bindings";
+  static const std::string LOAD_KEY_BINDINGS_GLOBAL = "load_bindings_global";
+  static const std::string SAVE_GENERAL_CONFIG_USER = "save_general";
+  static const std::string SAVE_GENERAL_CONFIG_ALL = "save_general_all";
   static const std::string SAVE_KEY_BINDINGS = "save_bindings";
   static const std::string READ_CONFIG = "read_config";
   static const std::string BIND_KEY = "bind";
@@ -765,11 +768,12 @@ void System::readConfig(varconf::Config &config) {
 }
 
 void System::writeConfig(varconf::Config &config) {
-  config.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select);
-  config.setItem(SYSTEM, KEY_window_width, m_width);
-  config.setItem(SYSTEM, KEY_window_height, m_height);
-  config.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay);
-  config.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
+  varconf::Scope scope = varconf::USER;
+  config.setItem(SYSTEM, KEY_mouse_move_select,  m_mouse_move_select, scope);
+  config.setItem(SYSTEM, KEY_window_width, m_width, scope);
+  config.setItem(SYSTEM, KEY_window_height, m_height, scope);
+  config.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay, scope);
+  config.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate, scope);
 
   // Write Other config objects
   m_client->writeConfig(config);
@@ -808,9 +812,12 @@ void System::registerCommands(Console *console) {
   console->registerCommand(EXIT, this);
   console->registerCommand(GET_ATTRIBUTE, this);
   console->registerCommand(SET_ATTRIBUTE, this);
-  console->registerCommand(LOAD_GENERAL_CONFIG, this);
-  console->registerCommand(LOAD_KEY_BINDINGS, this);
-  console->registerCommand(SAVE_GENERAL_CONFIG, this);
+  console->registerCommand(LOAD_GENERAL_CONFIG_GLOBAL, this);
+  console->registerCommand(LOAD_GENERAL_CONFIG_USER, this);
+  console->registerCommand(LOAD_KEY_BINDINGS_GLOBAL, this);
+  console->registerCommand(LOAD_KEY_BINDINGS_USER, this);
+  console->registerCommand(SAVE_GENERAL_CONFIG_ALL, this);
+  console->registerCommand(SAVE_GENERAL_CONFIG_USER, this);
   console->registerCommand(SAVE_KEY_BINDINGS, this);
   console->registerCommand(READ_CONFIG, this);
   console->registerCommand(BIND_KEY, this);
@@ -851,20 +858,36 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     std::string value = tokeniser.remainingTokens();
     m_general.setItem(section, key, value);
   }
-  else if (command == LOAD_GENERAL_CONFIG) {
+  else if (command == LOAD_GENERAL_CONFIG_USER) {
     m_process_records = true;
     System::instance()->getFileHandler()->expandString(args);
-    m_general.readFromFile(args);
+    m_general.readFromFile(args, varconf::USER);
     if (m_process_records) {
       m_process_records = false;
       processRecords();
     }
   }
-  else if (command == LOAD_KEY_BINDINGS) {
-    Bindings::loadBindings(args);
+  else if (command == LOAD_GENERAL_CONFIG_GLOBAL) {
+    m_process_records = true;
+    System::instance()->getFileHandler()->expandString(args);
+    m_general.readFromFile(args, varconf::GLOBAL);
+    if (m_process_records) {
+      m_process_records = false;
+      processRecords();
+    }
   }
-  else if (command == SAVE_GENERAL_CONFIG) {
-  System::instance()->getFileHandler()->expandString(args);
+  else if (command == LOAD_KEY_BINDINGS_USER) {
+    Bindings::loadBindings(args, true);
+  }
+  else if (command == LOAD_KEY_BINDINGS_GLOBAL) {
+    Bindings::loadBindings(args, false);
+  }
+  else if (command == SAVE_GENERAL_CONFIG_USER) {
+    System::instance()->getFileHandler()->expandString(args);
+    m_general.writeToFile(args, varconf::USER);
+  }
+  else if (command == SAVE_GENERAL_CONFIG_ALL) {
+    System::instance()->getFileHandler()->expandString(args);
     m_general.writeToFile(args);
   }
   else if (command == SAVE_KEY_BINDINGS) {

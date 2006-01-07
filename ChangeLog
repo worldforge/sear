@@ -1,3 +1,18 @@
+2006-01-07  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Increment required varconf version to 0.6.4. Make Eris
+	  require = instead of >= while using development version.
+
+	* src/Bindings.cpp, src/Bindings.h, src/System.cpp: Use new 
+	  varconf::Scope variable in read/write functions. Create a new 
+	  load_bindings_global and load_eneral_global to read in GLOBAL scope
+	  variables. load_bindings and load_general commands read in as USER 
+	  scope. /bind commands will create USER scope bindings. In game config
+	  variable changes currently have INSTANCE scope and will not be saved.
+	  Open to suggestion on this behaviour.
+
+	* scripts/startup.script: Use new load_XXX_global commands.
+
 2006-01-03  James Turner  <james@worldforge.org>
 
 	* src/main.cpp, common/operations.h, common/operations.cpp, 

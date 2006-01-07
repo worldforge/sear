@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Bindings.h,v 1.10 2005-02-21 14:16:46 simon Exp $
+// $Id: Bindings.h,v 1.11 2006-01-07 18:55:52 simon Exp $
 
 #ifndef SEAR_BINDINGS_H
 #define SEAR_BINDINGS_H 1
@@ -46,8 +46,9 @@ public:
   /**
    * Merges current bindings with those in file_name
    * @param file_name Name of a key bindings file
+   * @param user Flag indicating user bindings or global bindings
    */
-  static void loadBindings(const std::string &file_name);
+  static void loadBindings(const std::string &file_name, bool user);
   
   /**
    * Saves current bindings to file_name

@@ -1,5 +1,5 @@
-/load_general ${SEAR_INSTALL}/data/general.cfg
-/load_bindings ${SEAR_INSTALL}/data/bindings.cfg
+/load_general_global ${SEAR_INSTALL}/data/general.cfg
+/load_bindings_global ${SEAR_INSTALL}/data/bindings.cfg
 /load_state_file ${SEAR_INSTALL}/data/states.cfg
 /load_general ${SEAR_HOME}/general.cfg
 /load_bindings ${SEAR_HOME}/bindings.cfg
