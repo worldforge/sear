@@ -1,3 +1,9 @@
+2006-01-09  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac src/Bindings.cpp, src/Bindings.h, src/System.cpp,
+	  scripts/startup.script: Rollback varconf changes for a re-think of
+	  handling variable scope.
+
 2006-01-07  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac: Increment required varconf version to 0.6.4. Make Eris
