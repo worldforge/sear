@@ -28,8 +28,20 @@ void RootWidget::resize(int width, int height, int old_width, int old_height)
     if ((x + child->getWidth() / 2) > (old_width * 2 / 3)) {
       x += width - old_width;
     }
+    if (x > (width - 20)) {
+      x = width - 20;
+    }
+    if (x < 0) {
+      x = 0;
+    }
     if ((y + child->getHeight()) > (old_height * 2 / 3)) {
       y += height - old_height;
+    }
+    if (y > (height - 20)) {
+      y = height - 20;
+    }
+    if (y < 0) {
+      y = 0;
     }
     child->setX(x);
     child->setY(y);

@@ -1,5 +1,21 @@
 2005-01-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/System.cpp, src/System.h: Make code to resize screen into a
+	  public method so the gui can get to it.
+
+	* guichan/VideoOptions.cpp, guichan/VideoOptions.h: Add widgets to
+	  allow control of screen resolution and fullscreen.
+
+	* guichan/Workarea.cpp, guichan/Workarea.h: Remove redundant args
+	  from resize notification function.
+
+	* renderers/GL.h: Add a boolean to check if screen is fullscreen.
+
+	* guichan/RootWidget.cpp: Ensure windows don't get lost off the sise
+	  in a resolution change.
+
+2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Panel.cpp: Clean up console widget placement.
 
 	* guichan/OptionsWindow.cpp: Rename from Options to System, and

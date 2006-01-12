@@ -219,7 +219,7 @@ void Workarea::writeConfig(varconf::Config & config)
   config.setItem(WORKAREA, KEY_fixed_font_characters, m_fixed_font_characters);
 }
 
-void Workarea::resize(int x, int y)
+void Workarea::resize()
 {
   Render * render = RenderSystem::getInstance().getRenderer();
   int width = render->getWindowWidth(),

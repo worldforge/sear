@@ -82,6 +82,7 @@ public:
   void procEvent(int, int);
   int getWindowWidth() const { return m_width; }
   int getWindowHeight() const { return m_height; }
+  bool isFullScreen() const { return m_fullscreen; }
 
   std::string getActiveID();// { return activeID; }
   void checkModelStatus(const std::string &) {}

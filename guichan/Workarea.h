@@ -77,7 +77,7 @@ public:
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
 
-  void resize(int width, int height);
+  void resize();
   bool handleEvent(const SDL_Event &);
   void draw();
 

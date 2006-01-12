@@ -6,22 +6,39 @@
 #define SEAR_GUICHAN_VIDEO_OPTIONS_H
 
 #include <guichan/widgets/window.hpp>
+#include <guichan/actionlistener.hpp>
 
 #include <sigc++/object.h>
+
+namespace gcn {
+class CheckBox;
+class ListBox;
+}
 
 namespace Sear {
 
 class ActionListenerSigC;
 class RootWidget;
+class ResolutionListModel;
 
-class VideoOptions : virtual public SigC::Object, public gcn::Window {
+class VideoOptions : virtual public SigC::Object, public gcn::Window, virtual public gcn::ActionListener {
 protected:
   RootWidget * m_top;
+
+  gcn::CheckBox * m_fullCheck;
+  gcn::ListBox * m_resolutions;
+
+  ResolutionListModel * m_resolutionList;
+
+  bool m_checkFullChanged;
 public:
   explicit VideoOptions(RootWidget * top);
   virtual ~VideoOptions();
 
   void actionPressed(std::string);
+
+  virtual void logic();
+  virtual void action(const std::string &);
 };
 
 } // namespace Sear

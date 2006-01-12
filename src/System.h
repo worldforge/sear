@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.64 2005-12-30 18:11:44 alriddoch Exp $
+// $Id: System.h,v 1.65 2006-01-12 03:43:44 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -89,6 +89,13 @@ public:
    * @param icon Icon title
    */
   void setCaption(const std::string &title, const std::string &icon); 
+
+  /**
+   * Sets the Window size
+   * @param w Window width
+   * @param h Window height
+   */
+  void resizeScreen(int w, int h);
 
   /**
    * This toggles the mlook flag

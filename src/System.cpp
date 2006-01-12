@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.140 2006-01-09 18:00:24 simon Exp $
+// $Id: System.cpp,v 1.141 2006-01-12 03:43:44 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -580,8 +580,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_VIDEORESIZE: {
-      RenderSystem::getInstance().resize(event.resize.w, event.resize.h);
-      m_workarea->resize(event.resize.w, event.resize.h);
+      resizeScreen(event.resize.w, event.resize.h);
       break;
     }
     case SDL_QUIT: {
@@ -696,6 +695,12 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 void System::setCaption(const std::string &title, const std::string &icon) {
   // Set window and icon title
   SDL_WM_SetCaption(title.c_str(), icon.c_str());
+}
+
+void System::resizeScreen(int w, int h)
+{
+  RenderSystem::getInstance().resize(w, h);
+  m_workarea->resize();
 }
 
 void System::toggleMouselook() {
