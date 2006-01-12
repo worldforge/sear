@@ -12,6 +12,8 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
+#include "src/System.h"
+
 #include <guichan.hpp>
 
 #include <sigc++/bind.h>
@@ -22,7 +24,7 @@
 
 namespace Sear {
 
-OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("Options"),
+OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
                                                  m_top(top)
 {
   gcn::Color base = getBaseColor();
@@ -60,7 +62,7 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("Options"),
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
-  b = new gcn::Button("Close");
+  b = new gcn::Button("Return to game");
   b->setEventId("close");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
@@ -79,8 +81,9 @@ OptionsWindow::~OptionsWindow()
 
 void OptionsWindow::actionPressed(std::string event)
 {
-  if (event == "apply") {
-    std::cout << "Apply changes" << std::endl << std::flush;
+  if (event == "quit") {
+    std::cout << "Quit game" << std::endl << std::flush;
+    System::instance()->runCommand("/quit");
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
     m_top->closeWindow(this);

@@ -1,5 +1,12 @@
 2005-01-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/Panel.cpp: Clean up console widget placement.
+
+	* guichan/OptionsWindow.cpp: Rename from Options to System, and
+	  implement the Quit button.
+
+2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/OptionsWindow.cpp, guichan/OptionsWindow.h: Remove obsolete
 	  members that are just widget pointers. Clean up constructor, and
 	  removed commented out code.

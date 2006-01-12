@@ -54,8 +54,7 @@ Panel::Panel(RootWidget * top) : gcn::Window("Panel"), m_top(top)
 
   m_console = new ConsoleWindow;
   addWindow(m_console);
-  m_top->setWindowCoords(m_console, std::make_pair(4, height - m_console->getHeight() / 2 - 4));
-  // m_coords["chat"] = std::make_pair(4, height - m_console->getHeight() / 2 - 4);
+  m_top->setWindowCoords(m_console, std::make_pair(2, height - m_console->getHeight() - 2));
 
   addWindow(new Inventory);
   addWindow(new OptionsWindow(m_top));
