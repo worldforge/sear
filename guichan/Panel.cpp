@@ -31,7 +31,7 @@ static std::string PANEL_OPEN = "panel_open";
 static std::string PANEL_CLOSE = "panel_close";
 static std::string PANEL_TOGGLE = "panel_toggle";
 
-Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
+Panel::Panel(RootWidget * top) : gcn::Window("Panel"), m_top(top)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -53,11 +53,12 @@ Panel::Panel(RootWidget * top) : gcn::Window(), m_top(top)
   int height = render->getWindowHeight();
 
   m_console = new ConsoleWindow;
-  addWindow("chat", m_console);
-  m_coords["chat"] = std::make_pair(4, height - m_console->getHeight() / 2 - 4);
+  addWindow(m_console);
+  m_top->setWindowCoords(m_console, std::make_pair(4, height - m_console->getHeight() / 2 - 4));
+  // m_coords["chat"] = std::make_pair(4, height - m_console->getHeight() / 2 - 4);
 
-  addWindow("inventory", new Inventory);
-  addWindow("options", new OptionsWindow);
+  addWindow(new Inventory);
+  addWindow(new OptionsWindow(m_top));
 }
 
 Panel::~Panel()
@@ -80,7 +81,7 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        closeWindow(args, win);
+        m_top->closeWindow(win);
       }
     }
   }
@@ -90,7 +91,7 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        openWindow(args, win);
+        m_top->openWindow(win);
       }
     }
   }
@@ -100,9 +101,9 @@ void Panel::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        openWindow(args, win);
+        m_top->openWindow(win);
       } else {
-        closeWindow(args, win);
+        m_top->closeWindow(win);
       }
     }
   }
@@ -115,15 +116,16 @@ void Panel::actionPressed(std::string event)
     gcn::Window * win = I->second;
     assert(win != 0);
     if (win->getParent() == 0) {
-      openWindow(event, win);
+      m_top->openWindow(win);
     } else {
-      closeWindow(event, win);
+      m_top->closeWindow(win);
     }
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }
 }
 
+#if 0
 void Panel::openWindow(const std::string & name, gcn::Window * win)
 {
   int x, y;
@@ -149,17 +151,18 @@ void Panel::closeWindow(const std::string & name, gcn::Window * win)
   m_coords[name] = std::make_pair(win->getX(), win->getY());
   m_top->remove(win);
 }
+#endif
 
-void Panel::addWindow(const std::string & name, gcn::Window * window)
+void Panel::addWindow(gcn::Window * window)
 {
-  gcn::Button * button = new gcn::Button(name);
+  gcn::Button * button = new gcn::Button(window->getCaption());
   button->setFocusable(false);
-  button->setEventId(name);
+  button->setEventId(window->getCaption());
   button->addActionListener(m_buttonListener);
   m_hbox->pack(button);
 
-  m_buttons[name] = button;
-  m_windows[name] = window;
+  m_buttons[window->getCaption()] = button;
+  m_windows[window->getCaption()] = window;
 
   resizeToContent();
 }
@@ -170,7 +173,7 @@ bool Panel::requestConsole()
     std::cout << "Goo" << std::endl << std::flush;
     return m_console->requestConsoleFocus();
   } else {
-    openWindow("chat", m_console);
+    m_top->openWindow(m_console);
     return m_console->requestConsoleFocus();
   }
   return false;
@@ -180,7 +183,7 @@ bool Panel::dismissConsole()
 {
   if (m_console->getParent() != 0) {
     if (!m_console->dismissConsoleFocus()) {
-      closeWindow("chat", m_console);
+      m_top->closeWindow(m_console);
     }
     return true;
   }

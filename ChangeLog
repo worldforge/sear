@@ -1,3 +1,17 @@
+2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Panel.cpp, guichan/Panel.h,
+	  guichan/RootWidget.cpp, guichan/RootWidget.h:
+	  Move functionality for opening and closing windows, and remembering
+	  their coordinates into RootWidget, ensuring that all windows have
+	  have caption, and using window caption as the windows's name.
+
+	* guichan/OptionsWindow.cpp, guichan/OptionsWindow.h: Add buttons
+	  to open a number of sub option windows.
+
+	* guichan/VideoOptions.cpp, guichan/VideoOptions.h: New option
+	  window for controlling video options.
+
 2006-01-09  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac src/Bindings.cpp, src/Bindings.h, src/System.cpp,

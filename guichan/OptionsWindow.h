@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include <map>
+
 namespace gcn {
 
 class Button;
@@ -18,15 +20,23 @@ class Button;
 namespace Sear {
 
 class ActionListenerSigC;
+class RootWidget;
 
 class OptionsWindow : virtual public SigC::Object, public gcn::Window {
+public:
+  typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
   gcn::Button * m_applyButton;
   gcn::Button * m_closeButton;
 
   ActionListenerSigC * m_buttonListener;
+
+  std::map<std::string, gcn::Window *> m_windows;
+  CoordDict m_coords;
+
+  RootWidget * m_top;
 public:
-  OptionsWindow();
+  explicit OptionsWindow(RootWidget * top);
   virtual ~OptionsWindow();
 
   void actionPressed(std::string);

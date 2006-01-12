@@ -4,6 +4,9 @@
 
 #include "guichan/RootWidget.h"
 
+#include "renderers/Render.h"
+#include "renderers/RenderSystem.h"
+
 #include <iostream>
 
 namespace Sear {
@@ -31,6 +34,32 @@ void RootWidget::resize(int width, int height, int old_width, int old_height)
     child->setX(x);
     child->setY(y);
   }
+}
+
+void RootWidget::openWindow(gcn::Window * win)
+{
+  int x, y;
+  Render * render = RenderSystem::getInstance().getRenderer();
+  int width = render->getWindowWidth(),
+      height = render->getWindowHeight();
+
+  CoordDict::const_iterator I = m_coords.find(win->getCaption());
+
+  if (I != m_coords.end()) {
+    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
+    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
+  } else {
+    x = width / 2 - win->getWidth() / 2;
+    y = height / 2 - win->getHeight() / 2;
+  }
+
+  add(win, x, y);
+}
+
+void RootWidget::closeWindow(gcn::Window * win)
+{
+  m_coords[win->getCaption()] = std::make_pair(win->getX(), win->getY());
+  remove(win);
 }
 
 } // namespace Sear

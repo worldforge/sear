@@ -49,9 +49,6 @@ protected:
   ActionListenerSigC * m_buttonListener;
 
   void actionPressed(std::string);
-
-  void openWindow(const std::string &, gcn::Window *);
-  void closeWindow(const std::string &, gcn::Window *);
 public:
   explicit Panel(RootWidget * top);
   virtual ~Panel();
@@ -59,7 +56,7 @@ public:
   void registerCommands(Console *);
   virtual void runCommand(const std::string &, const std::string &);
 
-  void addWindow(const std::string & name, gcn::Window * window);
+  void addWindow(gcn::Window * window);
   bool requestConsole();
   bool dismissConsole();
 };

@@ -8,6 +8,7 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        Alert.cpp Alert.h \
                        ConnectWindow.cpp ConnectWindow.h \
                        OptionsWindow.cpp OptionsWindow.h \
+                       VideoOptions.cpp VideoOptions.h \
                        Inventory.cpp Inventory.h \
                        Panel.cpp Panel.h \
                        passwordfield.cpp passwordfield.h \
