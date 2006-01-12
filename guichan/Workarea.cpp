@@ -125,14 +125,14 @@ void Workarea::init()
   // m_top->add(m_panel, 0, 0);
 
   m_windows["panel"] = m_panel;
-  m_coords["panel"] = std::make_pair(0,0);
+  m_top->setWindowCoords(m_panel, std::make_pair(0,0));
   m_windows["connect"] = con_w;
   m_windows["login"] = new LoginWindow;
   m_windows["character"] = new CharacterWindow;
 
   StatusWindow * sw = new StatusWindow;
   m_windows["status"] = sw;
-  m_coords["status"] = std::make_pair(m_width - sw->getWidth(), 0);
+  m_top->setWindowCoords(sw, std::make_pair(m_width - sw->getWidth(), 0));
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
@@ -154,32 +154,6 @@ Workarea::~Workarea()
   delete m_imageLoader;
 }
 
-void Workarea::openWindow(const std::string & name, gcn::Window * win)
-{
-  int x, y;
-  Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-
-  CoordDict::const_iterator I = m_coords.find(name);
-
-  if (I != m_coords.end()) {
-    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
-    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
-  } else {
-    x = width / 2 - win->getWidth() / 2;
-    y = height / 2 - win->getHeight() / 2;
-  }
-
-  m_top->add(win, x, y);
-}
-
-void Workarea::closeWindow(const std::string & name, gcn::Window * win)
-{
-  m_coords[name] = std::make_pair(win->getX(), win->getY());
-  m_top->remove(win);
-}
-
 void Workarea::registerCommands(Console * console)
 {
   if (m_panel != 0) {
@@ -199,7 +173,7 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        closeWindow(args, win);
+        m_top->closeWindow(win);
       }
     } else {
       std::cerr << "Asked to close unknown window " << args
@@ -212,7 +186,7 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       gcn::Window * win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        openWindow(args, win);
+        m_top->openWindow(win);
       }
     } else {
       std::cerr << "Asked to open unknown window " << args

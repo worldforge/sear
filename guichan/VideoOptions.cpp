@@ -26,12 +26,12 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top)
 
   setOpaque(true);
 
+  ActionListenerSigC * buttonListener = new ActionListenerSigC;
+  buttonListener->Action.connect(SigC::slot(*this, &VideoOptions::actionPressed));
+
   gcn::Box * vbox = new gcn::VBox(6);
 
   gcn::Box * hbox = new gcn::HBox(6);
-
-  ActionListenerSigC * buttonListener = new ActionListenerSigC;
-  buttonListener->Action.connect(SigC::slot(*this, &VideoOptions::actionPressed));
 
   gcn::Button * b = new gcn::Button("Apply");
   b->setEventId("apply");

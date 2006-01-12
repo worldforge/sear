@@ -125,34 +125,6 @@ void Panel::actionPressed(std::string event)
   }
 }
 
-#if 0
-void Panel::openWindow(const std::string & name, gcn::Window * win)
-{
-  int x, y;
-  Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-
-  CoordDict::const_iterator I = m_coords.find(name);
-
-  if (I != m_coords.end()) {
-    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
-    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
-  } else {
-    x = width / 2 - win->getWidth() / 2;
-    y = height / 2 - win->getHeight() / 2;
-  }
-
-  m_top->add(win, x, y);
-}
-
-void Panel::closeWindow(const std::string & name, gcn::Window * win)
-{
-  m_coords[name] = std::make_pair(win->getX(), win->getY());
-  m_top->remove(win);
-}
-#endif
-
 void Panel::addWindow(gcn::Window * window)
 {
   gcn::Button * button = new gcn::Button(window->getCaption());

@@ -26,9 +26,6 @@ class OptionsWindow : virtual public SigC::Object, public gcn::Window {
 public:
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
-  gcn::Button * m_applyButton;
-  gcn::Button * m_closeButton;
-
   ActionListenerSigC * m_buttonListener;
 
   std::map<std::string, gcn::Window *> m_windows;

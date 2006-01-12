@@ -66,9 +66,6 @@ protected:
   ConnectWindow * m_connectWindow;
 
   RootWidget * m_top;                  // Top level container widget
-
-  void openWindow(const std::string &, gcn::Window *);
-  void closeWindow(const std::string &, gcn::Window *);
 public:
   Workarea(System *);
   virtual ~Workarea();

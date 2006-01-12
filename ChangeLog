@@ -1,5 +1,18 @@
 2005-01-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/OptionsWindow.cpp, guichan/OptionsWindow.h: Remove obsolete
+	  members that are just widget pointers. Clean up constructor, and
+	  removed commented out code.
+
+	* guichan/Panel.cpp: Remove commented out code.
+
+	* guichan/VideoOptions.cpp: Clean up constructor.
+
+	* guichan/Workarea.cpp, guichan/Workarea.h: Let RootWidget handle
+	  opening and closing windows for this code as well.
+
+2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/Panel.cpp, guichan/Panel.h,
 	  guichan/RootWidget.cpp, guichan/RootWidget.h:
 	  Move functionality for opening and closing windows, and remembering

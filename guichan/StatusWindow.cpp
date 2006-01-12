@@ -23,10 +23,6 @@
 
 namespace Sear {
 
-static std::string PANEL_OPEN = "panel_open";
-static std::string PANEL_CLOSE = "panel_close";
-static std::string PANEL_TOGGLE = "panel_toggle";
-
 StatusWindow::StatusWindow()
 {
   gcn::Color base = getBaseColor();

@@ -31,12 +31,10 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("Options"),
 
   setOpaque(true);
 
-  gcn::Box * vbox = new gcn::VBox(6);
-
-  gcn::Box * hbox = new gcn::HBox(6);
-
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &OptionsWindow::actionPressed));
+
+  gcn::Box * vbox = new gcn::VBox(6);
 
   gcn::Button * b = new gcn::Button("Video");
   b->setEventId("video");
@@ -62,19 +60,11 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("Options"),
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
-  m_applyButton = new gcn::Button("Apply");
-  m_applyButton->setEventId("apply");
-  m_applyButton->setFocusable(false);
-  m_applyButton->addActionListener(m_buttonListener);
-  hbox->pack(m_applyButton);
-
-  m_closeButton = new gcn::Button("Close");
-  m_closeButton->setEventId("close");
-  m_closeButton->setFocusable(false);
-  m_closeButton->addActionListener(m_buttonListener);
-  hbox->pack(m_closeButton);
-
-  vbox->pack(hbox);
+  b = new gcn::Button("Close");
+  b->setEventId("close");
+  b->setFocusable(false);
+  b->addActionListener(m_buttonListener);
+  vbox->pack(b);
 
   setContent(vbox);
 
@@ -108,27 +98,5 @@ void OptionsWindow::actionPressed(std::string event)
     }
   }
 }
-
-#if 0
-void OptionsWindow::openWindow(const std::string & name, gcn::Window * win)
-{
-  int x, y;
-  Render * render = RenderSystem::getInstance().getRenderer();
-  int width = render->getWindowWidth(),
-      height = render->getWindowHeight();
-
-  CoordDict::const_iterator I = m_coords.find(name);
-
-  if (I != m_coords.end()) {
-    x = std::max(std::min(I->second.first, width - win->getWidth()), 0);
-    y = std::max(std::min(I->second.second, height - win->getHeight()), 0);
-  } else {
-    x = width / 2 - win->getWidth() / 2;
-    y = height / 2 - win->getHeight() / 2;
-  }
-
-  m_top->add(win, x, y);
-}
-#endif
 
 } // namespace Sear
