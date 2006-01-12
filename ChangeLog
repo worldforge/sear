@@ -1,5 +1,16 @@
 2005-01-12  Al Riddoch  <alriddoch@zepler.org>
 
+	* common/Makefile.am, common/compose.hpp: Add missing string
+	  composition code.
+
+	* guichan/Panel.cpp: Minimise the length of the caption name to avoid
+	  visual corruption.
+
+	* guichan/StatusWindow.cpp: Add a caption to ensure this window can
+	  have its position handled correctly.
+
+2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/System.cpp, src/System.h: Make code to resize screen into a
 	  public method so the gui can get to it.
 

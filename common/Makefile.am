@@ -13,4 +13,5 @@ libCommon_a_SOURCES = \
 	Utility.cpp Utility.h \
 	types.h \
 	Mesh.h \
+	compose.hpp \
 	$(MMGR_FILES)

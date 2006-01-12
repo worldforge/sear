@@ -23,7 +23,7 @@
 
 namespace Sear {
 
-StatusWindow::StatusWindow()
+StatusWindow::StatusWindow() : gcn::Window("")
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
