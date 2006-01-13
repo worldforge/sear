@@ -70,7 +70,7 @@ public:
   virtual int getNumberOfElements()
   {
     Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return 1; }
+    if (account == 0) { return 0; }
     std::cout << "Types: " << account->getCharacterTypes().size() << std::endl << std::flush;
     return account->getCharacterTypes().size();
   }
@@ -124,6 +124,8 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_refreshButton->addActionListener(m_buttonListener);
   vbox->pack(m_refreshButton);
 
+  gcn::Box * vbox1 = new gcn::VBox(6);
+
   gcn::Box * hbox = new gcn::HBox(6);
 
   hbox->pack(new gcn::Label("Name"));
@@ -131,7 +133,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_nameField->setText("");
   hbox->pack(m_nameField);
 
-  vbox->pack(hbox);
+  vbox1->pack(hbox);
 
   hbox = new gcn::HBox(6);
 
@@ -139,25 +141,32 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_typeField = new gcn::TextField("                ");
   m_typeField->setText("");
   hbox->pack(m_typeField);
+
+  vbox1->pack(hbox);
+
+  hbox = new gcn::HBox(6);
+
+  hbox->pack(vbox1);
+
   TypeListModel * type_list_model = new TypeListModel;
-  m_types = new gcn::DropDown(type_list_model);
-  hbox->pack(m_types);
+  m_types = new gcn::ListBox(type_list_model);
+  scroll_area = new gcn::ScrollArea(m_types,
+                                      gcn::ScrollArea::SHOW_NEVER,
+                                      gcn::ScrollArea::SHOW_ALWAYS);
+  scroll_area->setWidth(100);
+  scroll_area->setHeight(vbox1->getHeight());
+  scroll_area->setBorderSize(1);
+  hbox->pack(scroll_area);
 
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
 
-  m_takeButton = new gcn::Button("Take character");
-  m_takeButton->setFocusable(false);
-  m_takeButton->setEventId("take");
-  m_takeButton->addActionListener(m_buttonListener);
-  hbox->pack(m_takeButton);
-
-  m_createButton = new gcn::Button("Create character");
-  m_createButton->setFocusable(false);
-  m_createButton->setEventId("create");
-  m_createButton->addActionListener(m_buttonListener);
-  hbox->pack(m_createButton);
+  m_charButton = new gcn::Button("Create new character");
+  m_charButton->setFocusable(false);
+  m_charButton->setEventId("create");
+  m_charButton->addActionListener(m_buttonListener);
+  hbox->pack(m_charButton);
 
   vbox->pack(hbox);
 
@@ -182,7 +191,28 @@ void CharacterWindow::logic()
   int new_char_sel = m_characters->getSelected();
   if (new_char_sel != m_charSelected) {
     m_charSelected = new_char_sel;
-    m_nameField->setText("");
+    if (new_char_sel >= 0) {
+      m_nameField->setText("");
+      Eris::Account * account = System::instance()->getClient()->getAccount();
+      if (account != 0) {
+        const Eris::CharacterMap & ci = account->getCharacters();
+        if (m_charSelected >= 0 && (unsigned int)m_charSelected < ci.size()) {
+          Eris::CharacterMap::const_iterator I = ci.begin();
+          Eris::CharacterMap::const_iterator Iend = ci.end();
+          for (int j = 0; I != Iend; ++I, ++j) {
+            if (m_charSelected == j) {
+              m_nameField->setText(I->second->getName());
+              m_typeField->setText(I->second->getParents().front());
+              m_charButton->setCaption("Take character");
+              m_charButton->setEventId("take");
+            }
+          }
+        }
+      }
+      m_types->setSelected(-1);
+    }
+  }
+  if (new_char_sel >= 0) {
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const Eris::CharacterMap & ci = account->getCharacters();
@@ -191,8 +221,12 @@ void CharacterWindow::logic()
         Eris::CharacterMap::const_iterator Iend = ci.end();
         for (int j = 0; I != Iend; ++I, ++j) {
           if (m_charSelected == j) {
-            m_nameField->setText(I->second->getName());
-            m_typeField->setText(I->second->getParents().front());
+            if (m_nameField->getText() != I->second->getName() ||
+                m_typeField->getText() != I->second->getParents().front()) {
+              m_characters->setSelected(-1);
+              m_charButton->setCaption("Create new character");
+              m_charButton->setEventId("create");
+            }
           }
         }
       }
@@ -201,15 +235,32 @@ void CharacterWindow::logic()
   int new_type_sel = m_types->getSelected();
   if (new_type_sel != m_typeSelected) {
     m_typeSelected = new_type_sel;
-    m_typeField->setText("");
+    if (new_type_sel >= 0) {
+      m_typeField->setText("");
+      Eris::Account * account = System::instance()->getClient()->getAccount();
+      if (account != 0) {
+        const std::vector<std::string> & types = account->getCharacterTypes();
+        if (m_typeSelected < types.size()) {
+          m_typeField->setText(types[m_typeSelected]);
+        }
+      }
+      m_characters->setSelected(-1);
+      m_charButton->setCaption("Create new character");
+      m_charButton->setEventId("create");
+    }
+  }
+  if (new_type_sel >= 0) {
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const std::vector<std::string> & types = account->getCharacterTypes();
-      if (m_typeSelected >= 0 && m_typeSelected < types.size()) {
-        m_typeField->setText(types[m_typeSelected]);
+      if (new_type_sel >= 0 && m_typeSelected < types.size()) {
+        if (m_typeField->getText() != types[m_typeSelected]) {
+          m_types->setSelected(-1);
+        }
       }
     }
   }
+  std::cout << new_char_sel << " - " << new_type_sel << std::endl << std::flush;
   gcn::Window::logic();
 }
 

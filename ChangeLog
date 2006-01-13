@@ -1,3 +1,11 @@
+2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h:
+	  Major re-model of the character creation window. Now includes
+	  working type selection, better handling of the distinction
+	  between taking existing characters, and creating new ones.
+	  Less scope for user error.
+
 2005-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* common/Makefile.am, common/compose.hpp: Add missing string
