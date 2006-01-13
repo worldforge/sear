@@ -1,5 +1,11 @@
 2005-01-13  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/OptionsWindow.h, guichan/Panel.h, guichan/Workarea.h:
+	  Remove obsolete member variables that used to be used to store
+	  window coords.
+
+2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h:
 	  Major re-model of the character creation window. Now includes
 	  working type selection, better handling of the distinction

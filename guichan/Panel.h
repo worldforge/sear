@@ -41,7 +41,6 @@ protected:
 
   ButtonDict m_buttons;
   WindowDict m_windows;
-  CoordDict m_coords;
 
   RootWidget * m_top;
   ConsoleWindow * m_console;

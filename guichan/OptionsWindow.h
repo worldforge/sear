@@ -29,7 +29,6 @@ protected:
   ActionListenerSigC * m_buttonListener;
 
   std::map<std::string, gcn::Window *> m_windows;
-  CoordDict m_coords;
 
   RootWidget * m_top;
 public:
