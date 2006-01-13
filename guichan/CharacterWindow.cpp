@@ -71,7 +71,6 @@ public:
   {
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account == 0) { return 0; }
-    std::cout << "Types: " << account->getCharacterTypes().size() << std::endl << std::flush;
     return account->getCharacterTypes().size();
   }
 
@@ -81,7 +80,6 @@ public:
     if (account == 0) { return ""; }
     const std::vector<std::string> & types = account->getCharacterTypes();
     if (i < types.size()) {
-    std::cout << "Type[" << i << "]: " << types[i] << std::endl << std::flush;
       return types[i];
     } else {
       return "UNKNOWN";
@@ -260,7 +258,6 @@ void CharacterWindow::logic()
       }
     }
   }
-  std::cout << new_char_sel << " - " << new_type_sel << std::endl << std::flush;
   gcn::Window::logic();
 }
 

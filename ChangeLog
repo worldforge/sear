@@ -1,5 +1,9 @@
 2005-01-13  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/CharacterWindow.cpp: Remove annoying debug output.
+
+2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/OptionsWindow.h, guichan/Panel.h, guichan/Workarea.h:
 	  Remove obsolete member variables that used to be used to store
 	  window coords.
