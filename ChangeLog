@@ -1,3 +1,9 @@
+2006-01-14  James Turner  <james@worldforge.org>
+
+	* src/System.cpp: fix resizeScreen to update the m_width and m_height
+	  members, so mouse events behave properly after a resize / full-screen
+	  switch.
+
 2005-01-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/CharacterWindow.cpp: Remove annoying debug output.
