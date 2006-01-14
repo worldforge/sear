@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.141 2006-01-12 03:43:44 alriddoch Exp $
+// $Id: System.cpp,v 1.142 2006-01-14 20:22:49 jmt Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -599,6 +599,7 @@ void System::handleAnalogueControllers() {
     SDL_GetMouseState(&dx, &dy);
     dx -= mx;
     dy -= my;
+        
     if (dx != 0) {
       float rotation = dx / 4.f;
       m_character->rotateImmediate(rotation);
@@ -701,6 +702,8 @@ void System::resizeScreen(int w, int h)
 {
   RenderSystem::getInstance().resize(w, h);
   m_workarea->resize();
+  m_width = w;
+  m_height = h;
 }
 
 void System::toggleMouselook() {
