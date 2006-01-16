@@ -1,5 +1,14 @@
 2006-01-16  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/ConsoleWindow.cpp, guichan/CommandLine.h: Move CommandLine
+	  class into its own header.
+
+	* guichan/RootWidget.cpp, guichan/RootWidget.h: Re-write the code that
+	  detects if focus has been taken, and set opaque flag on
+	  gcn::Container if it has, so the view is greyed out.
+
+2006-01-16  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/client.cpp: Emit a disconnected action when connection fails.
 
 	* guichan/Workarea.cpp: Add a command that opens an alert window,

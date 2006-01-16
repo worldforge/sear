@@ -3,6 +3,7 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "guichan/ConsoleWindow.h"
+#include "guichan/CommandLine.h"
 #include "guichan/box.hpp"
 
 #include "src/System.h"
@@ -15,19 +16,6 @@
 #include <iostream>
 
 namespace Sear {
-
-class CommandLine : public gcn::TextField
-{
-protected:
-  virtual void keyPress(const gcn::Key& key) {
-    if (key.getValue() == gcn::Key::ENTER) {
-      ReturnPressed.emit();
-    }
-    gcn::TextField::keyPress(key);
-  }
-public:
-  SigC::Signal0<void> ReturnPressed;
-};
 
 void ConsoleWindow::pushMessage(const std::string & msg, int, int)
 {

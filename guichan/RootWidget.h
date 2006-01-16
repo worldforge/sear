@@ -16,6 +16,7 @@ class RootWidget : public gcn::Container
   protected:
     CoordDict m_coords;
   public:
+    RootWidget();
 
     void setWindowCoords(gcn::Window * win, std::pair<int, int> c) {
       m_coords[win->getCaption()] = c;
@@ -27,7 +28,7 @@ class RootWidget : public gcn::Container
     void openWindow(gcn::Window *);
     void closeWindow(gcn::Window *);
 
-    virtual void draw(gcn::Graphics * graphics);
+    virtual void logic();
 };
 
 } // namespace Sear

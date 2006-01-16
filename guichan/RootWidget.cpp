@@ -3,6 +3,7 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "guichan/RootWidget.h"
+#include "guichan/CommandLine.h"
 
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
@@ -10,6 +11,12 @@
 #include <iostream>
 
 namespace Sear {
+
+RootWidget::RootWidget()
+{
+    setBaseColor(gcn::Color(63, 63, 63, 191));
+    setOpaque(false);
+}
 
 bool RootWidget::childHasMouse()
 {
@@ -74,18 +81,17 @@ void RootWidget::closeWindow(gcn::Window * win)
   remove(win);
 }
 
-void RootWidget::draw(gcn::Graphics * graphics)
+void RootWidget::logic()
 {
-#if 0
   // FIXME We can remove this entire function, and just turn Opaque when we
   // want it drawn.
   gcn::Widget * focus = mFocusHandler->getFocused();
-  if (focus != 0 && focus != this) {
-    graphics->setColor(gcn::Color(127, 127, 127, 127));
-    graphics->fillRectangle(getDimension());
+  if (focus != 0 && focus != this && dynamic_cast<CommandLine *>(focus) == 0) {
+    setOpaque(true);
+  } else {
+    setOpaque(false);
   }
-#endif
-  Container::draw(graphics);
+  gcn::Container::logic();
 }
 
 } // namespace Sear
