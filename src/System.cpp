@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.142 2006-01-14 20:22:49 jmt Exp $
+// $Id: System.cpp,v 1.143 2006-01-16 11:08:02 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,7 +193,7 @@ bool System::init(int argc, char *argv[]) {
   m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
-  Bindings::bind("escape", "/" + QUIT);
+//  Bindings::bind("escape", "/" + QUIT);
   Bindings::bind("backquote", "/toggle_console");
   Bindings::bind("caret", "/toggle_console");
   

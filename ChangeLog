@@ -1,20 +1,28 @@
+2006-01-16  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* data/bindings.cfg, src/System.cpp: Remove default binding for quit as
+	  escape now closes GUI windows.
+
+	* src/WorldEntity.cpp: Set points to (0,0,0) if getPredictedPos returns
+	  an invalid point. Temp work around until this issue is resolved.
+
 2006-01-14  James Turner  <james@worldforge.org>
 
 	* src/System.cpp: fix resizeScreen to update the m_width and m_height
 	  members, so mouse events behave properly after a resize / full-screen
 	  switch.
 
-2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+2006-01-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/CharacterWindow.cpp: Remove annoying debug output.
 
-2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+2006-01-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/OptionsWindow.h, guichan/Panel.h, guichan/Workarea.h:
 	  Remove obsolete member variables that used to be used to store
 	  window coords.
 
-2005-01-13  Al Riddoch  <alriddoch@zepler.org>
+2006-01-13  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/CharacterWindow.cpp, guichan/CharacterWindow.h:
 	  Major re-model of the character creation window. Now includes
@@ -22,7 +30,7 @@
 	  between taking existing characters, and creating new ones.
 	  Less scope for user error.
 
-2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+2006-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* common/Makefile.am, common/compose.hpp: Add missing string
 	  composition code.
@@ -33,7 +41,7 @@
 	* guichan/StatusWindow.cpp: Add a caption to ensure this window can
 	  have its position handled correctly.
 
-2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+2006-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/System.cpp, src/System.h: Make code to resize screen into a
 	  public method so the gui can get to it.
@@ -49,14 +57,14 @@
 	* guichan/RootWidget.cpp: Ensure windows don't get lost off the sise
 	  in a resolution change.
 
-2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+2006-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Panel.cpp: Clean up console widget placement.
 
 	* guichan/OptionsWindow.cpp: Rename from Options to System, and
 	  implement the Quit button.
 
-2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+2006-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/OptionsWindow.cpp, guichan/OptionsWindow.h: Remove obsolete
 	  members that are just widget pointers. Clean up constructor, and
@@ -69,7 +77,7 @@
 	* guichan/Workarea.cpp, guichan/Workarea.h: Let RootWidget handle
 	  opening and closing windows for this code as well.
 
-2005-01-12  Al Riddoch  <alriddoch@zepler.org>
+2006-01-12  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Panel.cpp, guichan/Panel.h,
 	  guichan/RootWidget.cpp, guichan/RootWidget.h:

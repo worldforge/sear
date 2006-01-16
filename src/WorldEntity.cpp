@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.71 2005-12-30 19:20:39 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.72 2006-01-16 11:08:02 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -147,8 +147,17 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
 
   // Cache predicted pos of entity
   WFMath::Point<3> predicted = getPredictedPos();
+  //assert(predicted.isValid());
+  if (!predicted.isValid()) {
+    predicted = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+  }
+
   // Cache abs position of parent
   WFMath::Point<3> location = loc->getAbsPos();
+  //assert(location.isValid());
+  if (!location.isValid()) {
+    location = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+  }
 
   // Get rotation
   WFMath::Quaternion orient =  WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
