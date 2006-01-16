@@ -1,5 +1,10 @@
 2006-01-16  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h: Make the
+	  console window transparent when it does not have focus.
+
+2006-01-16  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/ConsoleWindow.cpp, guichan/CommandLine.h: Move CommandLine
 	  class into its own header.
 

@@ -39,14 +39,14 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   m_textBox->setFocusable(false);
   m_textBox->setEnabled(false);
   m_textBox->setBackgroundColor(gcn::Color(0,0,0,0));
-  gcn::ScrollArea * textBoxScrollArea = new gcn::ScrollArea(m_textBox,
-                                            gcn::ScrollArea::SHOW_AUTO,
-                                            gcn::ScrollArea::SHOW_ALWAYS);
-  textBoxScrollArea->setWidth(400);
-  textBoxScrollArea->setHeight(100);
-  textBoxScrollArea->setBorderSize(1);
+  m_scrollArea = new gcn::ScrollArea(m_textBox,
+                                       gcn::ScrollArea::SHOW_AUTO,
+                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_scrollArea->setWidth(400);
+  m_scrollArea->setHeight(100);
+  m_scrollArea->setBorderSize(1);
 
-  vbox->pack(textBoxScrollArea);
+  vbox->pack(m_scrollArea);
 
   m_entry = new CommandLine;
   m_entry->setWidth(400);
@@ -95,6 +95,24 @@ bool ConsoleWindow::dismissConsoleFocus()
     return true;
   }
   return false;
+}
+
+void ConsoleWindow::logic()
+{
+  if (m_entry->hasFocus()) {
+    gcn::Color base = getBaseColor();
+    base.a = 128;
+    setBaseColor(base);
+    m_scrollArea->setBackgroundColor(gcn::Color(0xffffff));
+    m_entry->setBackgroundColor(gcn::Color(0xffffff));
+  } else {
+    gcn::Color base = getBaseColor();
+    base.a = 31;
+    setBaseColor(base);
+    m_scrollArea->setBackgroundColor(gcn::Color(255,255,255,127));
+    m_entry->setBackgroundColor(gcn::Color(0,0,0,0));
+  }
+  gcn::Window::logic();
 }
 
 } // namespace Sear

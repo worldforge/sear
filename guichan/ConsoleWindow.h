@@ -11,6 +11,7 @@
 
 namespace gcn {
 class TextBox;
+class ScrollArea;
 }
 
 namespace Sear {
@@ -20,6 +21,7 @@ class CommandLine;
 class ConsoleWindow : public gcn::Window, virtual public SigC::Object {
 protected:
   gcn::TextBox * m_textBox;
+  gcn::ScrollArea * m_scrollArea;
   CommandLine * m_entry;
 
   void pushMessage(const std::string &, int, int);
@@ -30,6 +32,8 @@ public:
   void lineEntered();
   bool requestConsoleFocus();
   bool dismissConsoleFocus();
+
+  virtual void logic();
 };
 
 } // namespace Sear
