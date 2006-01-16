@@ -1,5 +1,13 @@
 2006-01-16  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/client.cpp: Use setStatus() when changing state, so that the
+	  right events are triggered. Emit an action when Avatar fails.
+
+	* guichan/Workarea.cpp: Display an alert when avatar fails, so
+	  player knows what happened.
+
+2006-01-16  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h: Make the
 	  console window transparent when it does not have focus.
 

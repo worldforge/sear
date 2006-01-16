@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.74 2006-01-16 15:40:54 alriddoch Exp $
+// $Id: client.cpp,v 1.75 2006-01-16 19:13:54 alriddoch Exp $
 
 #include "System.h"
 
@@ -699,8 +699,9 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
 void Client::AvatarFailure(const std::string &msg) {
   fprintf(stderr, "AvatarFailure: %s\n", msg.c_str());
   m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  m_status = CLIENT_STATUS_LOGGED_IN;
+  setStatus(CLIENT_STATUS_LOGGED_IN);
   m_system->getCharacter()->setAvatar(NULL);
+  m_system->getActionHandler()->handleAction("avatar_failed", 0);
 }
 
 void Client::GotCharacterEntity(Eris::Entity *e) {
