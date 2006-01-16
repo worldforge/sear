@@ -30,6 +30,8 @@ public:
   virtual ~Alert();
 
   void actionPressed(std::string);
+
+  virtual void logic();
 };
 
 } // namespace Sear

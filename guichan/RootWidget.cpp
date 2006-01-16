@@ -74,4 +74,18 @@ void RootWidget::closeWindow(gcn::Window * win)
   remove(win);
 }
 
+void RootWidget::draw(gcn::Graphics * graphics)
+{
+#if 0
+  // FIXME We can remove this entire function, and just turn Opaque when we
+  // want it drawn.
+  gcn::Widget * focus = mFocusHandler->getFocused();
+  if (focus != 0 && focus != this) {
+    graphics->setColor(gcn::Color(127, 127, 127, 127));
+    graphics->fillRectangle(getDimension());
+  }
+#endif
+  Container::draw(graphics);
+}
+
 } // namespace Sear

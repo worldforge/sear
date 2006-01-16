@@ -66,4 +66,16 @@ void Alert::actionPressed(std::string event)
   parent->remove(this);
 }
 
+void Alert::logic()
+{
+  gcn::BasicContainer * parent_widget = getParent();
+  if (parent_widget != 0) {
+    gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
+    if (parent != 0) {
+      parent->moveToTop(this);
+    }
+  }
+  gcn::Window::logic();
+}
+
 } // namespace Sear

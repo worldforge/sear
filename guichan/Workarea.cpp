@@ -12,6 +12,7 @@
 #include "guichan/StatusWindow.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/SpeechBubble.h"
+#include "guichan/Alert.h"
 
 #include "guichan/box.hpp"
 
@@ -38,6 +39,7 @@ static const std::string WORKSPACE = "workspace";
 
 static const std::string WORKAREA_OPEN = "workarea_open";
 static const std::string WORKAREA_CLOSE = "workarea_close";
+static const std::string WORKAREA_ALERT = "workarea_alert";
 
 static const std::string WORKAREA = "workarea";
 
@@ -136,6 +138,8 @@ void Workarea::init()
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
+  m_system->getActionHandler()->addHandler("disconnected", "/workarea_alert Connection to server failed");
+  m_system->getActionHandler()->addHandler("disconnected", "/workarea_open connect");
 
   m_system->getActionHandler()->addHandler("logged_in", "/workarea_close login");
   m_system->getActionHandler()->addHandler("logged_in", "/workarea_open character");
@@ -145,6 +149,7 @@ void Workarea::init()
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_open status");
 
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle inventory");
+
 }
 
 Workarea::~Workarea()
@@ -162,6 +167,7 @@ void Workarea::registerCommands(Console * console)
 
   console->registerCommand(WORKAREA_OPEN, this);
   console->registerCommand(WORKAREA_CLOSE, this);
+  console->registerCommand(WORKAREA_ALERT, this);
 }
 
 void Workarea::runCommand(const std::string & command, const std::string & args)
@@ -192,6 +198,12 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       std::cerr << "Asked to open unknown window " << args
                 << std::endl << std::flush;
     }
+  }
+  else if (command == WORKAREA_ALERT) {
+    std::cerr << "Asked to open ALERT" << args
+              << std::endl << std::flush;
+    Alert * al = new Alert(m_top, args);
+    // m_top->openWindow(al);
   }
 }
 

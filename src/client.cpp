@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.73 2005-10-21 01:58:33 alriddoch Exp $
+// $Id: client.cpp,v 1.74 2006-01-16 15:40:54 alriddoch Exp $
 
 #include "System.h"
 
@@ -716,6 +716,7 @@ void Client::setStatus(int status) {
   assert(m_system->getCharacter());
   switch (status) {
     case CLIENT_STATUS_DISCONNECTED:
+      m_system->getActionHandler()->handleAction("disconnected", 0);
     case CLIENT_STATUS_DISCONNECTING:
     case CLIENT_STATUS_CONNECTING:
       m_system->setState(SYS_CONNECTED, false);

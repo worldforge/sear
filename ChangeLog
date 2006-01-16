@@ -1,3 +1,18 @@
+2006-01-16  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/client.cpp: Emit a disconnected action when connection fails.
+
+	* guichan/Workarea.cpp: Add a command that opens an alert window,
+	  and use it to signal when server connection is lost. Re-open
+	  connect window when this happens.
+
+	* guichan/RootWidget.cpp, guichan/RootWidget.h: Add draw method
+	  to grey out background when gui focus blocks the user from operating
+	  the client as expected.
+
+	* guichan/Alert.cpp, guichan/Alert.h: Add logic method for force
+	  alerts on top.
+
 2006-01-16  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* data/bindings.cfg, src/System.cpp: Remove default binding for quit as
