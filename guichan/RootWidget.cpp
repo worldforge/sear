@@ -5,6 +5,8 @@
 #include "guichan/RootWidget.h"
 #include "guichan/CommandLine.h"
 
+#include "src/System.h"
+
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
@@ -86,7 +88,9 @@ void RootWidget::logic()
   // FIXME We can remove this entire function, and just turn Opaque when we
   // want it drawn.
   gcn::Widget * focus = mFocusHandler->getFocused();
-  if (focus != 0 && focus != this && dynamic_cast<CommandLine *>(focus) == 0) {
+  if (focus != 0 && focus != this &&
+      dynamic_cast<CommandLine *>(focus) == 0 &&
+      System::instance()->checkState(SYS_IN_WORLD)) {
     setOpaque(true);
   } else {
     setOpaque(false);

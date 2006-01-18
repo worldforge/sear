@@ -1,3 +1,9 @@
+2006-01-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/RootWidget.cpp, guichan/Workarea.cpp: Add checks whether
+	  sear is in-game before blanking out the screen if the gui has
+	  focus.
+
 2006-01-16  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/client.cpp: Use setStatus() when changing state, so that the
