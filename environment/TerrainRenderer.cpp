@@ -506,6 +506,10 @@ void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) 
   glDisableClientState (GL_TEXTURE_COORD_ARRAY);
   glDisable (GL_BLEND);
 //    glDisable(GL_TEXTURE_2D);
+
+  delete [] vertices;
+  delete [] texcoords;
+  delete [] indices;
 }
 
 } /* namespace Sear */
