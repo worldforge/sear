@@ -1,3 +1,11 @@
+2006-01-20  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp, src/Character.h: Add /eat command to eat things
+	  from the inventory.
+
+	* guichan/Inventory.h, guichan/Inventory.cpp: Add an eat button
+	  to the inventory widget.
+
 2006-01-19  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp: Fix memory leak in drawShadow 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.71 2006-01-03 20:04:09 jmt Exp $
+// $Id: Character.cpp,v 1.72 2006-01-20 16:48:02 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -90,6 +90,7 @@ namespace Sear {
   static const std::string CMD_PICKUP = "pickup";
   static const std::string CMD_TOUCH = "touch";
   static const std::string CMD_DROP = "drop";
+  static const std::string CMD_EAT = "eat";
   static const std::string CMD_GIVE = "give";
   static const std::string CMD_DISPLAY_INVENTORY = "inventory";
   static const std::string CMD_MAKE = "make";
@@ -392,6 +393,23 @@ void Character::wieldEntity(const std::string &name) {
   m_avatar->wield(toWield);
 }
 
+void Character::eatEntity(const std::string & name) {
+  if (!m_avatar) return;
+  WorldEntity* toEat = findInInventory(name);
+  if (!toEat) {
+    Log::writeLog("no " + name + " in inventory to eat", Log::LOG_DEFAULT);
+    return;
+  }
+
+  Atlas::Objects::Entity::Anonymous food;
+  food->setId(toEat->getId());
+  Atlas::Objects::Operation::Generic eat;
+  eat->setType("eat", -1);
+  eat->setFrom(m_self->getId());
+  eat->setArgs1(food);
+  m_avatar->getConnection()->send(eat);
+}
+
 WorldEntity* Character::findInInventory(const std::string& name) {
     assert(m_avatar);
     
@@ -562,6 +580,7 @@ void Character::registerCommands(Console *console) {
 
   console->registerCommand(CMD_PICKUP, this);
   console->registerCommand(CMD_DROP, this);
+  console->registerCommand(CMD_EAT, this);
   console->registerCommand(CMD_GIVE, this);
   console->registerCommand(CMD_DISPLAY_INVENTORY, this);
   console->registerCommand(CMD_MAKE, this);
@@ -649,6 +668,10 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_WIELD) {
     std::string name = tokeniser.nextToken();
     wieldEntity(name);
+  }
+  else if (command == CMD_EAT) {
+    std::string name = tokeniser.nextToken();
+    eatEntity(name);
   }
   else if (command == CMD_ATTACK) {
     System::instance()->setAction(ACTION_ATTACK);

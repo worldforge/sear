@@ -73,23 +73,33 @@ Inventory::Inventory() : gcn::Window("Inventory")
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &Inventory::actionPressed));
 
-  m_wieldButton = new gcn::Button("Wield");
-  m_wieldButton->setEventId("wield");
-  m_wieldButton->setFocusable(false);
-  m_wieldButton->addActionListener(m_buttonListener);
-  hbox->pack(m_wieldButton);
+  gcn::Button * button = new gcn::Button("Wield");
+  button->setEventId("wield");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
 
-  m_giveButton = new gcn::Button("Give");
-  m_giveButton->setEventId("give");
-  m_giveButton->setFocusable(false);
-  m_giveButton->addActionListener(m_buttonListener);
-  hbox->pack(m_giveButton);
+  button = new gcn::Button("Give");
+  button->setEventId("give");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
 
-  m_dropButton = new gcn::Button("Drop");
-  m_dropButton->setEventId("drop");
-  m_dropButton->setFocusable(false);
-  m_dropButton->addActionListener(m_buttonListener);
-  hbox->pack(m_dropButton);
+  vbox->pack(hbox);
+
+  hbox = new gcn::HBox(6);
+
+  button = new gcn::Button("Drop");
+  button->setEventId("drop");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
+
+  button = new gcn::Button("Eat");
+  button->setEventId("eat");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
 
   vbox->pack(hbox);
 
@@ -126,6 +136,10 @@ void Inventory::actionPressed(std::string event)
     System::instance()->runCommand(cmd);
   } else if (event == "drop") {
     std::string cmd("/drop 1 ");
+    cmd += name;
+    System::instance()->runCommand(cmd);
+  } else if (event == "eat") {
+    std::string cmd("/eat ");
     cmd += name;
     System::instance()->runCommand(cmd);
   } else {

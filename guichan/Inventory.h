@@ -11,7 +11,6 @@
 
 namespace gcn {
 
-class Button;
 class ListBox;
 
 } // namespace gcn
@@ -24,9 +23,6 @@ class ActionListenerSigC;
 class Inventory : virtual public SigC::Object, public gcn::Window {
 protected:
   gcn::ListBox * m_items;
-  gcn::Button * m_wieldButton;
-  gcn::Button * m_giveButton;
-  gcn::Button * m_dropButton;
 
   InventoryListAdaptor * m_inventory;
 
