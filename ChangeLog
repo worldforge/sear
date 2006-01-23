@@ -1,3 +1,11 @@
+2006-01-23  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/AudioOptions.cpp, guichan/AudioOptions.h,
+	  guichan/ControlsOptions.cpp, guichan/ControlsOptions.h,
+	  guichan/OptionsTemplate.cpp, guichan/OptionsTemplate.h,
+	  guichan/OptionsWindow.cpp: Add more options windows, plus a
+	  simple template for making more.
+
 2006-01-20  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp, src/Character.h: Add /eat command to eat things

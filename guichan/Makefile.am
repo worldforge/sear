@@ -9,6 +9,9 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        ConnectWindow.cpp ConnectWindow.h \
                        OptionsWindow.cpp OptionsWindow.h \
                        VideoOptions.cpp VideoOptions.h \
+                       AudioOptions.cpp AudioOptions.h \
+                       ControlsOptions.cpp ControlsOptions.h \
+                       OptionsTemplate.cpp OptionsTemplate.h \
                        Inventory.cpp Inventory.h \
                        Panel.cpp Panel.h \
                        passwordfield.cpp passwordfield.h \

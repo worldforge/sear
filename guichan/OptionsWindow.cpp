@@ -6,6 +6,7 @@
 
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/VideoOptions.h"
+#include "guichan/OptionsTemplate.h"
 #include "guichan/RootWidget.h"
 #include "guichan/box.hpp"
 
@@ -56,6 +57,12 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
+  b = new gcn::Button("Help");
+  b->setEventId("help");
+  b->setFocusable(false);
+  b->addActionListener(m_buttonListener);
+  vbox->pack(b);
+
   b = new gcn::Button("Quit game");
   b->setEventId("quit");
   b->setFocusable(false);
@@ -73,6 +80,9 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   resizeToContent();
 
   m_windows["video"] = new VideoOptions(m_top);
+  m_windows["audio"] = new OptionsTemplate(m_top);
+  m_windows["controls"] = new OptionsTemplate(m_top);
+  m_windows["help"] = new OptionsTemplate(m_top);
 }
 
 OptionsWindow::~OptionsWindow()
