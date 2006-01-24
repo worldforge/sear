@@ -1,13 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.2 2005-04-13 12:16:04 simon Exp $
+// $Id: Frustum.cpp,v 1.3 2006-01-24 18:58:50 simon Exp $
 
 #include "common/Utility.h"
 
 #include "src/System.h"
-#include "src/WorldEntity.h"
+//#include "src/WorldEntity.h"
 #include "Frustum.h"
 #include "environment/Environment.h"
 
@@ -131,37 +131,15 @@ bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
   return true;
 } 
 
-int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {  
-  int c;
-  int c2 = 0;
-  if (!we->hasBBox()) return true;
-  WFMath::AxisBox<3> entity_bbox = we->getBBox();
-  WFMath::Point<3> pos = we->getAbsPos();
-  //Translate BBox to correct position
-  WFMath::Point<3> lowCorner = WFMath::Point<3>(entity_bbox.lowCorner().x() + pos.x(), entity_bbox.lowCorner().y() + pos.y(), entity_bbox.lowCorner().z() + pos.z());
-  WFMath::Point<3> highCorner = WFMath::Point<3>(entity_bbox.highCorner().x() + pos.x(), entity_bbox.highCorner().y() + pos.y(), entity_bbox.highCorner().z() + pos.z());
 
+//int Frustum::cubeInFrustum(float frustum[6][4], WorldEntity *we ) {  
+//  if (!we->hasBBox()) return true;
+//  WFMath::AxisBox<3> entity_bbox = we->getBBox();
+//  WFMath::Point<3> pos = we->getAbsPos();
+//  return axisBoxInFrustum(frustum, entity_bbox.moveCenterTo(pos));
+//}
 
-  WFMath::AxisBox<3> bbox = WFMath::AxisBox<3>(lowCorner, highCorner);
-
-  for(int p = 0; p < 6; ++p) {
-    c = 0;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.lowCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.lowCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.lowCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( frustum[p][0] * (bbox.highCorner().x()) + frustum[p][1] * (bbox.highCorner().y()) + frustum[p][2] * (bbox.highCorner().z()) + frustum[p][3] > 0 ) c++;
-    if( c == 0 ) return 0;
-    if( c == 8 ) c2++;
-  }
-  return (c2 == 6) ? 2 : 1;
-}
-
-
-int Frustum::patchInFrustum(float frustum[6][4], const WFMath::AxisBox<3> & bbox) {  
+int Frustum::axisBoxInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox) {  
   int c;
   int c2 = 0;
 
@@ -186,16 +164,24 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
 }
 
 bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos) {
-  float x, y, z, radius;
-  WFMath::Ball<3> b = bbox.boundingSphere();
-  x = b.getCenter().x() + pos.x();
-  y = b.getCenter().y() + pos.y();
-  z = b.getCenter().z() + pos.z();// + Environment::getInstance().getHeight(pos.x(), pos.y());
-  radius = b.radius();
-  for(int p = 0; p < 6; ++p)
-    if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius )
+  WFMath::AxisBox<3> b(bbox);
+  b.moveCenterTo(pos);
+  return ballInFrustum(frustum, b.boundingSphere());
+}
+
+
+bool Frustum::ballInFrustum(float frustum[6][4], const WFMath::Ball<3> &ball) {
+  float x = ball.getCenter().x();
+  float y = ball.getCenter().y();
+  float z = ball.getCenter().z();
+  float radius = ball.radius();
+
+  for(int p = 0; p < 6; ++p)  {
+    if (frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= -radius) {
       return false;
-    return true;
+    }
+  }
+  return true;
 }
 
 int Frustum::orientBBoxInFrustum(float frustum[6][4], const OrientBBox &orient, const WFMath::Point<3> &pos) {  

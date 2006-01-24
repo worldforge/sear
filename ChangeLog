@@ -1,3 +1,14 @@
+2006-01-24  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Frustum.h, renderers/Frustum.cpp: Tidy up some frustum tests
+	  and make some function names more intuitive. 
+
+	* environment/TerrainRenderer.cpp, renderers/GL.cpp, renderers.GL.h, 
+	  renderers/Render.h: Update for frustum name changes.
+
+	* src/WorldEntity.cpp: Clean up the getAbsPos function a little. Use the
+	  onActed signal to set entity actions instead of the action attribute.
+
 2006-01-24  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Bindings.h: Add accessor to allow the gui code to read the

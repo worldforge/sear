@@ -239,7 +239,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
       WFMath::AxisBox<3> box (WFMath::Point <3> (I->first * segSize, J->first * segSize, min), WFMath::Point < 3 > ((I->first + 1) * segSize, (J->first + 1) * segSize, max));
 
-      if (!r->patchInFrustum (box)) {
+      if (!r->axisBoxInFrustum (box)) {
         continue;
       }
 

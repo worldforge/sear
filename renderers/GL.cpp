@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.134 2005-11-26 16:08:28 simon Exp $
+// $Id: GL.cpp,v 1.135 2006-01-24 18:58:50 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -196,7 +196,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   // Destroy the existing window
   if (m_screen != NULL) destroyWindow();
   
-  if (debug) std::cout << "GL: Creating Window" << std::endl;
+  if (debug) printf("GL: Creating Window\n");
   // Set new window size etc..
   m_width = width;
   m_height = height;
@@ -233,7 +233,6 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   }                                                                                
   /* Check is there are any modes available */
   if (debug) {
-    // TODO is list leaked?
     SDL_Rect **videoModes = SDL_ListModes(NULL, SDL_FULLSCREEN|SDL_HWSURFACE);
     if (videoModes == 0) {
       printf("No modes available!\n");
@@ -254,10 +253,10 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   int bpp = info->vfmt->BitsPerPixel;
   if (m_fullscreen) flags |= SDL_FULLSCREEN;
   if (!(m_width && m_height)) {
-    std::cerr << "Invalid resolution: " << m_width << " x " << m_height << std::endl;
+    fprintf(stderr,"Invalid resolution: %d x %d\n", m_width, m_height);
     return false;
   }
-  if (debug) std::cout << "Setting video to " << m_width << " x " << m_height << std::endl;
+  if (debug) printf("Setting video to %d x %d\n", m_width, m_height);
 
    // TODO:these are probably leaked, however freeing them often causes a segfault!
   SDL_Surface *icon = IMG_ReadXPMFromArray(sear_icon_xpm);
@@ -396,13 +395,6 @@ int GL::setupExtensions() {
   return 0;
 }
                                                                                 
-
-inline WorldEntity *GL::getSelectedID(unsigned int i) {
-
-  if (i >= NUM_COLOURS) return NULL; // Check for array out of bounds
-  return m_entityArray[i]; // Return stored entity pointer
-}
-
 void GL::nextColour(WorldEntity *we) {
   m_entityArray[m_colour_index] = we; // Store entity in array slot
   glColor3ubv(m_colourArray[m_colour_index]); // Set colour from appropriate index
@@ -927,6 +919,7 @@ void GL::rotateObject(ObjectRecord *object_record, ModelRecord *model_record) {
     case Graphics::ROS_NONE: return; break;
     case Graphics::ROS_POSITION: {
        WFMath::Point<3> pos = object_record->position;
+       assert(pos.isValid());
        glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
        break;
     }       
@@ -990,14 +983,16 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
 }
 
 void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
-  // TODO: Reduce ClientState switches
-  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
-  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
   if (!vertex_data) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);
     return;
   }
+
+  // TODO: Reduce ClientState switches
+  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
+  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
+
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
   if (textures && texture_data) {
     if (multitexture) {
@@ -1043,11 +1038,11 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
 }
 
 void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
+  if (!vertex_data) return; 
   // TODO: Reduce ClientState switches
   bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
   bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
  
-  if (!vertex_data) return; 
   glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
 
   if (textures && texture_data) {
@@ -1096,7 +1091,7 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
 
 void GL::drawQueue(QueueMap &queue, bool select_mode) {
 //  static MoelHandler *model_handler = m_system->getModelHandler();
-  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); I++) {
+  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
     // Change state for this queue
     RenderSystem::getInstance().switchState(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
@@ -1110,6 +1105,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       // Apply Object transforms
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
+      assert(pos.isValid());
       translateObject(pos.x(), pos.y(), pos.z() );
       rotateObject(object_record, model_record);
 
@@ -1161,9 +1157,10 @@ void GL::drawNameQueue(MessageList &list) {
   glColor4fv(blue);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
-    WorldEntity *we = (WorldEntity*)*I;
+    WorldEntity *we = *I;
     glPushMatrix();
     WFMath::Point<3> pos = we->getAbsPos();
+    assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= m_graphics->getCameraOrientation(); 
@@ -1180,9 +1177,10 @@ void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
-    WorldEntity *we = (WorldEntity*)*I;
+    WorldEntity *we = *I;
     glPushMatrix();
     WFMath::Point<3> pos = we->getAbsPos();
+    assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= m_graphics->getCameraOrientation(); 
@@ -1198,9 +1196,9 @@ void GL::drawMessageQueue(MessageList &list) {
 inline float GL::distFromNear(float x, float y, float z) {
   return Frustum::distFromNear(m_frustum, x, y, z);
 }
-	
-inline int GL::patchInFrustum(const WFMath::AxisBox<3> & bbox) {
-  return Frustum::patchInFrustum(m_frustum, bbox);
+
+inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) {
+  return Frustum::axisBoxInFrustum(m_frustum, bbox);
 }
 
 void GL::drawOutline(ModelRecord *model_record) {
@@ -1282,6 +1280,7 @@ void GL::drawSplashScreen() {
 }
   
 inline void GL::applyQuaternion(const WFMath::Quaternion & quaternion) {
+  assert(quaternion.isValid());
   float rotation_matrix[4][4];
   QuatToMatrix(quaternion, rotation_matrix); //Get the rotation matrix for base rotation
   glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
@@ -1295,6 +1294,7 @@ void GL::applyCharacterLighting(float x, float y, float z) {
 
 void GL::applyLighting() {
   Calendar *calendar = System::instance()->getCalendar();
+  assert(calendar != NULL);
   float tim = calendar->getTimeInArea();
   float dawn_time = calendar->getDawnStart();
   float day_time = calendar->getDayStart();

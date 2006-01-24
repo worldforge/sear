@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.8 2005-06-05 21:31:07 jmt Exp $
+// $Id: Render.h,v 1.9 2006-01-24 18:58:50 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -82,7 +82,7 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual std::string getActiveID() =0;
 
-  virtual int patchInFrustum(const WFMath::AxisBox<3> &) =0;
+  virtual int axisBoxInFrustum(const WFMath::AxisBox<3> &) =0;
   virtual float distFromNear(float,float,float) =0;
 
   virtual void renderActiveName() =0;

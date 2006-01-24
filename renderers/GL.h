@@ -77,7 +77,7 @@ public:
   float distFromNear(float,float,float);  
   void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
 
-  int patchInFrustum(const WFMath::AxisBox<3> &);
+  int axisBoxInFrustum(const WFMath::AxisBox<3> &bbox);
   
   void procEvent(int, int);
   int getWindowWidth() const { return m_width; }
@@ -186,7 +186,9 @@ protected:
     return (0xFF >> (8 - bits));
   }
   void resetColours() { m_colour_index = 1; }
-  inline WorldEntity *getSelectedID(unsigned int i);
+  WorldEntity *getSelectedID(unsigned int i) const  {
+    return (i >= NUM_COLOURS) ? (NULL) : (m_entityArray[i]);
+  }
   void nextColour(WorldEntity*);
 
   int setupExtensions();

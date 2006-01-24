@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.72 2006-01-16 11:08:02 simon Exp $
+// $Id: WorldEntity.cpp,v 1.73 2006-01-24 18:58:50 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -111,6 +111,7 @@ void WorldEntity::renderMessages() {
   }
   // Render text strings
   Render *renderer = RenderSystem::getInstance().getRenderer();
+  assert(renderer != NULL);
   std::list<std::string>::iterator J;
   for (J = mesgs.begin(); J != mesgs.end(); ++J) { 
     std::string str = (*J);
@@ -135,94 +136,73 @@ void WorldEntity::renderMessages() {
 const WFMath::Quaternion WorldEntity::getAbsOrient() 
 {
     WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
-    WorldEntity *loc =  dynamic_cast<WorldEntity*>(getLocation());
+    WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
     if (loc) parentOrient = loc->getAbsOrient();
     return parentOrient / getOrientation();
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
   // Get parent entity for additional positional information
-  WorldEntity* loc = static_cast<WorldEntity*>(getLocation());
+  WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
   if (!loc) return getPredictedPos(); // nothing below makes sense for the world
 
   // Cache predicted pos of entity
   WFMath::Point<3> predicted = getPredictedPos();
   //assert(predicted.isValid());
-  if (!predicted.isValid()) {
+  if (!predicted.isValid()) { // TODO: Replace with assert once eris is fixed
     predicted = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
   }
 
   // Cache abs position of parent
   WFMath::Point<3> location = loc->getAbsPos();
   //assert(location.isValid());
-  if (!location.isValid()) {
+  if (!location.isValid()) { // TODO: Replace with assert once eris is fixed
     location = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
   }
 
   // Get rotation
-  WFMath::Quaternion orient =  WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
-  orient *= loc->getOrientation();
-  float rot_matrix[4][4];
+  WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
+  WFMath::Quaternion lorient = loc->getOrientation();
+
+  assert(lorient.isValid());
+
+  orient *= lorient;
+  static float rot_matrix[4][4];
   // Calculate rotation matrix
   QuatToMatrix(orient, rot_matrix);
 
-  WFMath::Point<3> pred = predicted;
-  WFMath::Point<3> lpos = location;
-//predicted = location;
-
-#if (1)
   // Calculate rotated components
-  float w;
-  pred.x() = rot_matrix[0][0] * predicted.x()
-           + rot_matrix[0][1] * predicted.y()
-           + rot_matrix[0][2] * predicted.z()
-           + rot_matrix[0][3];
-  pred.y() = rot_matrix[1][0] * predicted.x()
-           + rot_matrix[1][1] * predicted.y()
-           + rot_matrix[1][2] * predicted.z()
-           + rot_matrix[1][3];
-  pred.z() = rot_matrix[2][0] * predicted.x()
-           + rot_matrix[2][1] * predicted.y()
-           + rot_matrix[2][2] * predicted.z()
-           + rot_matrix[2][3];
-  w        = rot_matrix[3][0] * predicted.x()
-           + rot_matrix[3][1] * predicted.y()
-           + rot_matrix[3][2] * predicted.z()
-           + rot_matrix[3][3];
+  float x,y,z,w;
+  x = rot_matrix[0][0] * predicted.x()
+    + rot_matrix[0][1] * predicted.y()
+    + rot_matrix[0][2] * predicted.z()
+    + rot_matrix[0][3];
 
-#else
+  y = rot_matrix[1][0] * predicted.x()
+    + rot_matrix[1][1] * predicted.y()
+    + rot_matrix[1][2] * predicted.z()
+    + rot_matrix[1][3];
 
-  // Calculate rotated components
-  float w;
-  pred.x() = rot_matrix[0][0] * predicted.x()
-           + rot_matrix[1][0] * predicted.y()
-           + rot_matrix[2][0] * predicted.z()
-           + rot_matrix[3][0];
-  pred.y() = rot_matrix[0][1] * predicted.x()
-           + rot_matrix[1][1] * predicted.y()
-           + rot_matrix[2][1] * predicted.z()
-           + rot_matrix[3][1];
-  pred.z() = rot_matrix[0][2] * predicted.x()
-           + rot_matrix[1][2] * predicted.y()
-           + rot_matrix[2][2] * predicted.z()
-           + rot_matrix[3][2];
-  w        = rot_matrix[0][3] * predicted.x()
-           + rot_matrix[1][3] * predicted.y()
-           + rot_matrix[2][3] * predicted.z()
-           + rot_matrix[3][3];
-#endif
+  z = rot_matrix[2][0] * predicted.x()
+    + rot_matrix[2][1] * predicted.y()
+    + rot_matrix[2][2] * predicted.z()
+    + rot_matrix[2][3];
+
+  w = rot_matrix[3][0] * predicted.x()
+    + rot_matrix[3][1] * predicted.y()
+    + rot_matrix[3][2] * predicted.z()
+    + rot_matrix[3][3];
+
   // Apply normalisation factor
-  pred.x() /= w;
-  pred.y() /= w;
-  pred.z() /= w;
-
-
+  x /= w;
+  y /= w;
+  z /= w;
 
   // Work out predicted abs pos.
   WFMath::Point<3> absPos(
-    lpos.x() + pred.x(),
-    lpos.y() + pred.y(),
-    lpos.z() + pred.z());
+    location.x() + x,
+    location.y() + y,
+    location.z() + z);
 
   // Apply modifiers to height.
 
@@ -256,7 +236,9 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
   } else {
     // Assume clamped to terrain
     if (hasHeight) absPos.z() = terrainHeight;
-  }  
+  }
+  // Hack for clamping entity height to jetty objects.
+  // This should be handled better.  
   if (loc->type() == "jetty") {
     float jetty_z = loc->getAbsPos().z();
     if (absPos.z() < jetty_z) absPos.z() = jetty_z;
@@ -332,6 +314,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (record) record->animate(mode);
       last_mode = mode;
     }
+/*
   } else if (str == ACTION) {
     const std::string action = v.asString();
     if (debug) {
@@ -346,6 +329,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (record) record->action(action);
       last_action = action;
     }
+*/
   } else if (str == GUISE) {
     const Atlas::Message::MapType& mt(v.asMap());
     ObjectRecord *record = NULL;
@@ -373,7 +357,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
-    m_attached[slot] =  dynamic_cast<WorldEntity*>(ent);
+    m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
 }
 
 void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
@@ -383,15 +367,23 @@ void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
 }
 
 void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &action) {
+  const std::list<std::string> &p = action->getParents();
+  std::list<std::string>::const_iterator I = p.begin();
+
+  if (I == p.end()) return;
+
+  std::string a = *I;
+
   if (debug) {
-    printf("Entity %s (%s) received action\n", getName().c_str(), getId().c_str());
-    const std::list<std::string> &p = action->getParents();
-    std::list<std::string>::const_iterator I = p.begin();
-    while (I != p.end()) {
-      printf("Parent: %s\n", (*I).c_str());
-      ++I;
-    }
+    printf("Entity %s (%s) received action: %s\n", getName().c_str(), getId().c_str(), a.c_str());
   }
+
+  static ActionHandler *ac = System::instance()->getActionHandler();
+  ac->handleAction(a + "_" + type(), NULL);
+
+  ObjectRecord *record = NULL;
+  record = ModelSystem::getInstance().getObjectRecord(this);
+  if (record) record->action(a);
 }
 
 
