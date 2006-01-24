@@ -1,3 +1,9 @@
+2006-01-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/Overlay.cpp, guichan/Overlay.cpp: New class to handle
+	  adding and removing widgets that overlay the game view, like
+	  status windows, and speech bubbles.
+
 2006-01-24  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Frustum.h, renderers/Frustum.cpp: Tidy up some frustum tests
