@@ -1,5 +1,16 @@
 2006-01-24  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/Bindings.h: Add accessor to allow the gui code to read the
+	  bindings.
+
+	* guichan/Workarea.cpp: Only treat enter as special if nothing
+	  has focus.
+
+	* guichan/ControlsOptions.h, guichan/ControlsOptions.cpp: Add interface
+	  allowing user to view all bindings, and bind new keys.
+
+2006-01-24  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/HelpOptions.cpp: Don't try and read the help directory
 	  if opening it failed.
 

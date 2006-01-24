@@ -9,6 +9,11 @@
 
 #include <sigc++/object.h>
 
+namespace gcn {
+class TextField;
+class TextBox;
+}
+
 namespace Sear {
 
 class RootWidget;
@@ -16,6 +21,12 @@ class RootWidget;
 class ControlsOptions : public gcn::Window, public gcn::ActionListener {
 protected:
   RootWidget * m_top;
+
+  gcn::TextField * m_key;
+  gcn::TextField * m_action;
+  gcn::TextBox * m_controlText;
+
+  void readBindings();
 public:
   explicit ControlsOptions(RootWidget * top);
   virtual ~ControlsOptions();

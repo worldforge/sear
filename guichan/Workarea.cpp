@@ -266,12 +266,14 @@ bool Workarea::handleEvent(const SDL_Event & event)
       break;
     case SDL_KEYDOWN:
       if (event.key.keysym.sym == SDLK_RETURN) {
-        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD)) {
+        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
+            (focus == 0 || focus == m_top)) {
           suppress = m_panel->requestConsole();
         }
         event_eaten = true;
       } else if (event.key.keysym.sym == SDLK_SLASH) {
-        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD)) {
+        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
+            (focus == 0 || focus == m_top)) {
           m_panel->requestConsole();
         }
         event_eaten = true;

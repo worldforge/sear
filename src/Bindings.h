@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Bindings.h,v 1.12 2006-01-09 17:32:24 simon Exp $
+// $Id: Bindings.h,v 1.13 2006-01-24 16:58:28 alriddoch Exp $
 
 #ifndef SEAR_BINDINGS_H
 #define SEAR_BINDINGS_H 1
@@ -78,6 +78,12 @@ public:
 
     /** returns the stirng bound to a given SDL keysym */
   static std::string getBindingForKeysym(const SDL_keysym& sym);
+
+  /*
+   * Return the pointer to the varconf object storing all the bindings.
+   * @return Varconf pointer
+   */
+  static varconf::Config * getBindings() { return m_bindings; }
 
 protected:
   
