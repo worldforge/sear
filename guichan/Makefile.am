@@ -11,6 +11,7 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        VideoOptions.cpp VideoOptions.h \
                        AudioOptions.cpp AudioOptions.h \
                        ControlsOptions.cpp ControlsOptions.h \
+                       HelpOptions.cpp HelpOptions.h \
                        OptionsTemplate.cpp OptionsTemplate.h \
                        Inventory.cpp Inventory.h \
                        Panel.cpp Panel.h \

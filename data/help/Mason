@@ -1,0 +1,56 @@
+So you've managed to log in and have wandered around a bit and view the
+scenery. Now what? Read on to find out how begin in the game of Mason.
+
+The pig seller
+--------------
+
+Your first task is to buy a pig. First find the pig seller (called Dyfed
+Searae) and make sure that there are pigs in the sty. If there are none,
+then the following process will just result in loosing your money. If
+there are pigs then to buy one you need to say "I would like to buy a pig"
+to the pig seller (Note: This is case sensitive). You just need to be
+close by the pig seller. The seller should respond by telling you that
+pigs cost 5 gold coins. To pay the seller, move the mouse cursor over
+the seller which makes the seller the target entity. To give the coins
+to the pig seller, move then mouse cursor over the seller and select
+him. Then either type "/give 5 coin" in the console, or open the inventory
+and select a coin and press &quotgive". Do this five times. This will
+give the coins to the seller and in return you should get a pig. Beware
+however, the pig seller won't sell you a pig at night, nor will you
+get a pig is the sty is empty. He will just keep your money instead.
+
+
+Now you have your own pig, you need to fatten it up before you can sell
+it to the butcher for money. You can do this by feeding it. The Mason
+world has several food items that the pig will eat, such as apples and
+acorns. These can be found by the trees that produce these items. If there
+is no food items by the tree, touching the tree (move the mouse cursor
+over the tree and use the "/touch" command) will cause the tree to drop
+its food, if there is any available. If a pig in near the food, it will
+automatically start to move towards it and eat it. To control where a
+pig moves, you need to "touch" it. The pig will then move away from you.
+
+There are several hazards to pig farming. The most common hazard is
+skeletons. These will chase the pigs around the world. However, they can
+be destroyed by "touching" them. They stay dead until the lych respawns
+them. Another hazard is the wolf which also chases pigs, but it cannot
+be killed. The most dangerous hazard is the crab which will eat any pigs
+it finds.
+
+Pigs are sold to the butcher. To sell a pig, you need to locate the
+butcher, and show him the pig. Tell him you are interested in selling a
+pig by saying "I would like to sell a pig". He will ask you which pig
+you want to see. Show him by selecting the pig in your inventory, and
+pressing the Wield button to hold the pig in your hand. The butcher
+will offer you a price. To accept the offer, give the pig to the butcher
+by selecting him on the screen, selecting the pig in your inventory,
+and pressing the Give button.  You will then get some coins back
+in exchange for the pig. The exact value depends on how fat the pig is.
+
+There are a new set of features allowing you to equip and use objects. By
+equiping an axe, you can use it to chop down a tree, then use it again
+to create lumber. Equiping a scythe and using it on a grassy area allows
+you to collect grass. Equipping a shovel allows you to collect sand.
+
+That's it! You should now be well equipped to continue your adventure. You
+may wish to alter your appearance or visit the village.

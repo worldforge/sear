@@ -6,7 +6,9 @@
 
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/VideoOptions.h"
-#include "guichan/OptionsTemplate.h"
+#include "guichan/AudioOptions.h"
+#include "guichan/ControlsOptions.h"
+#include "guichan/HelpOptions.h"
 #include "guichan/RootWidget.h"
 #include "guichan/box.hpp"
 
@@ -80,9 +82,9 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   resizeToContent();
 
   m_windows["video"] = new VideoOptions(m_top);
-  m_windows["audio"] = new OptionsTemplate(m_top);
-  m_windows["controls"] = new OptionsTemplate(m_top);
-  m_windows["help"] = new OptionsTemplate(m_top);
+  m_windows["audio"] = new AudioOptions(m_top);
+  m_windows["controls"] = new ControlsOptions(m_top);
+  m_windows["help"] = new HelpOptions(m_top);
 }
 
 OptionsWindow::~OptionsWindow()

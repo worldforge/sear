@@ -324,6 +324,7 @@ AC_OUTPUT([
 	renderers/Makefile
 	environment/Makefile
 	data/Makefile
+	data/help/Makefile
 	scripts/Makefile
 	gui/Makefile
 	guichan/Makefile

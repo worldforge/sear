@@ -1,3 +1,5 @@
+SUBDIRS = help
+
 EXTRA_DIST = \
 	sear_icon.ico
 

@@ -9,12 +9,6 @@
 
 #include <guichan.hpp>
 
-#include <sigc++/bind.h>
-#include <sigc++/hide.h>
-#include <sigc++/object_slot.h>
-
-#include <SDL/SDL.h>
-
 #include <iostream>
 
 namespace Sear {

@@ -1,3 +1,16 @@
+2006-01-24  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/HelpOptions.cpp, guichan/HelpOptions.h: New window for
+	  displaying help text.
+
+	* data/help: New directory of online help files. To get more online
+	  help, just add files here.
+
+	* guichan/OptionsWindow.cpp: Hook up the new options windows
+	  to the system menu.
+
+	* guichan/OptionsTemplate.cpp: Clean up the options window template.
+
 2006-01-23  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/AudioOptions.cpp, guichan/AudioOptions.h,
