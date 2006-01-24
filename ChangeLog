@@ -1,5 +1,10 @@
 2006-01-24  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/HelpOptions.cpp: Don't try and read the help directory
+	  if opening it failed.
+
+2006-01-24  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/HelpOptions.cpp, guichan/HelpOptions.h: New window for
 	  displaying help text.
 

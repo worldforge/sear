@@ -32,12 +32,13 @@ public:
     DIR * help_list = opendir(help_dir.c_str());
     if (help_list == NULL) {
       std::cout << "Unable to open help file directory" << std::endl << std::flush;
-    }
-    struct dirent * entry;
-    while ((entry = readdir(help_list)) != NULL) {
-      if (entry->d_name[0] != '.') {
-        files.push_back(entry->d_name);
-        std::cout << "Adding " << entry->d_name << std::endl << std::flush;
+    } else {
+      struct dirent * entry;
+      while ((entry = readdir(help_list)) != NULL) {
+        if (entry->d_name[0] != '.') {
+          files.push_back(entry->d_name);
+          std::cout << "Adding " << entry->d_name << std::endl << std::flush;
+        }
       }
     }
   }
