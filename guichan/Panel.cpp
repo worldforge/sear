@@ -31,7 +31,7 @@ static std::string PANEL_OPEN = "panel_open";
 static std::string PANEL_CLOSE = "panel_close";
 static std::string PANEL_TOGGLE = "panel_toggle";
 
-Panel::Panel(RootWidget * top) : gcn::Window(" "), m_top(top)
+Panel::Panel(RootWidget * top) : gcn::Window(""), m_top(top)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;

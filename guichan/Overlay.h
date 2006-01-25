@@ -7,6 +7,8 @@
 
 #include <guichan.hpp>
 
+#include <Eris/EntityRef.h>
+
 #include <Atlas/Objects/RootOperation.h>
 
 #include <sigc++/object.h>
@@ -22,6 +24,7 @@ namespace Sear {
 
 class RootWidget;
 class SpeechBubble;
+class StatusWindow;
 
 class Overlay : virtual public SigC::Object {
 public:
@@ -32,6 +35,10 @@ protected:
 
   RootWidget * m_top;
   std::map<Eris::Entity *, SpeechBubble *> m_bubbles;
+  Eris::EntityRef m_selection;
+
+  StatusWindow * m_selfStatus;
+  StatusWindow * m_selectionStatus;
 
   static Overlay * m_instance;
 public:

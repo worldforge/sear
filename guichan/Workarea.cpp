@@ -132,10 +132,6 @@ void Workarea::init()
   m_windows["login"] = new LoginWindow;
   m_windows["character"] = new CharacterWindow;
 
-  StatusWindow * sw = new StatusWindow;
-  m_windows["status"] = sw;
-  m_top->setWindowCoords(sw, std::make_pair(m_width - sw->getWidth(), 0));
-
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
   m_system->getActionHandler()->addHandler("disconnected", "/workarea_alert Connection to server failed");
@@ -146,7 +142,6 @@ void Workarea::init()
 
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_close character");
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_open panel");
-  m_system->getActionHandler()->addHandler("world_entered", "/workarea_open status");
   m_system->getActionHandler()->addHandler("avatar_failed", "/workarea_alert Unable to get character");
 
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle inventory");

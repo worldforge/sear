@@ -1,3 +1,16 @@
+2006-01-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/StatusWindow.h, guichan/StatusWindow.cpp: Re-work
+	  status window to holding a reference to the entity it displays
+	  status for, rather than being hardcoded for the avatar entity.
+
+	* guichan/Workarea.cpp: Remove the hard coded status window for
+	  avatar.
+
+	* guichan/Overlay.h, guichan/Overlay.cpp: Implement handling
+	  status windows for the avatar, and whatever entity the player
+	  currently has selected.
+
 2006-01-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/GL.cpp: Remove call to we->renderMessages in drawNameQueue 

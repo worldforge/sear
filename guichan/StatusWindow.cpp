@@ -20,17 +20,22 @@
 #include <sigc++/object_slot.h>
 
 #include <iostream>
+#include <cassert>
 
 namespace Sear {
 
-StatusWindow::StatusWindow() : gcn::Window("")
+StatusWindow::StatusWindow(Eris::Entity * e) : m_entity(e)
 {
+  assert(e != 0);
+
   gcn::Color base = getBaseColor();
   base.a = 128;
   setBaseColor(base);
 
-  setTitleBarHeight(0);
+  // setTitleBarHeight(0);
   setMovable(false);
+
+  setCaption(e->getName());
 
   // setOpaque(true);
 
@@ -70,33 +75,23 @@ StatusWindow::~StatusWindow()
 
 void StatusWindow::logic()
 {
-  System * s = System::instance();
-  if (s != 0) {
-    Character * c = s->getCharacter();
-    if (c != 0) {
-      Eris::Avatar * av = c->getAvatar();
-      if (av != 0) {
-        Eris::Entity * ent = av->getEntity();
-        if (ent != 0) {
-          if (ent->hasAttr("status")) {
-            Atlas::Message::Element status_attr = ent->valueOfAttr("status");
-            if (status_attr.isNum()) {
-              m_healthBar->setValue(status_attr.asNum());
-            }
-          }
-          if (ent->hasAttr("stamina")) {
-            Atlas::Message::Element stamina_attr = ent->valueOfAttr("stamina");
-            if (stamina_attr.isNum()) {
-              m_staminaBar->setValue(stamina_attr.asNum());
-            }
-          }
-          if (ent->hasAttr("mana")) {
-            Atlas::Message::Element mana_attr = ent->valueOfAttr("mana");
-            if (mana_attr.isNum()) {
-              m_manaBar->setValue(mana_attr.asNum());
-            }
-          }
-        }
+  if (m_entity) {
+    if (m_entity->hasAttr("status")) {
+      Atlas::Message::Element status_attr = m_entity->valueOfAttr("status");
+      if (status_attr.isNum()) {
+        m_healthBar->setValue(status_attr.asNum());
+      }
+    }
+    if (m_entity->hasAttr("stamina")) {
+      Atlas::Message::Element stamina_attr = m_entity->valueOfAttr("stamina");
+      if (stamina_attr.isNum()) {
+        m_staminaBar->setValue(stamina_attr.asNum());
+      }
+    }
+    if (m_entity->hasAttr("mana")) {
+      Atlas::Message::Element mana_attr = m_entity->valueOfAttr("mana");
+      if (mana_attr.isNum()) {
+        m_manaBar->setValue(mana_attr.asNum());
       }
     }
   }

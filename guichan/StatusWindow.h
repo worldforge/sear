@@ -5,6 +5,8 @@
 #ifndef SEAR_GUICHAN_STATUSWINDOW_H
 #define SEAR_GUICHAN_STATUSWINDOW_H
 
+#include <Eris/EntityRef.h>
+
 #include <guichan/widgets/window.hpp>
 
 #include <sigc++/object.h>
@@ -28,8 +30,10 @@ protected:
   gcn::Bar * m_healthBar;
   gcn::Bar * m_staminaBar;
   gcn::Bar * m_manaBar;
+
+  Eris::EntityRef m_entity;
 public:
-  StatusWindow();
+  explicit StatusWindow(Eris::Entity *);
   virtual ~StatusWindow();
 
   virtual void logic();
