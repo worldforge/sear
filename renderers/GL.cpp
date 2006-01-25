@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.135 2006-01-24 18:58:50 simon Exp $
+// $Id: GL.cpp,v 1.136 2006-01-25 11:09:43 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1169,7 +1169,6 @@ void GL::drawNameQueue(MessageList &list) {
     glScalef(0.025f, 0.025f, 0.025f);
     glTranslatef(m_speech_offset_x, m_speech_offset_y, m_speech_offset_z);
     print3D(we->getName().c_str(), 0);
-    we->renderMessages();
     glPopMatrix();
   }
 }
