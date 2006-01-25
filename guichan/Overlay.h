@@ -7,15 +7,31 @@
 
 #include <guichan.hpp>
 
+#include <Atlas/Objects/RootOperation.h>
+
+#include <sigc++/object.h>
+
 namespace gcn {
+}
+
+namespace Eris {
+  class Entity;
 }
 
 namespace Sear {
 
-class Overlay {
+class RootWidget;
+class SpeechBubble;
+
+class Overlay : virtual public SigC::Object {
+public:
+  typedef std::map<Eris::Entity *, SpeechBubble *> BubbleMap;
 protected:
   Overlay();
   ~Overlay();
+
+  RootWidget * m_top;
+  std::map<Eris::Entity *, SpeechBubble *> m_bubbles;
 
   static Overlay * m_instance;
 public:
@@ -25,6 +41,10 @@ public:
     }
     return m_instance;
   }
+
+  void heard(Eris::Entity *, const Atlas::Objects::Operation::RootOperation &);
+
+  void logic(RootWidget *);
 };
 
 } // namespace Sear

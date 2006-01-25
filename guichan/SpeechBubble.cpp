@@ -6,19 +6,26 @@
 
 #include <iostream>
 
+namespace Sear {
+
 SpeechBubble::SpeechBubble() : m_overflow(false), m_offset(0.f)
 {
     setWidth(200);
     setHeight(200);
 
-    m_lines.push_back("The cat sat on the matte is a very very gelical cat.");
-    m_lines.push_back("The boy stood on the burning deck when all but he had fled.");
-    m_lines.push_back("The quick brown fox jumped over the lazy dog.");
-    m_lines.push_back("All work and no play make jack a dull boy.");
-    m_lines.push_back("Richard of York gave battle in vain.");
-    m_lines.push_back("To be or not to be, that is the question.");
-    m_lines.push_back("Now is the winter of our discontent.");
-    m_lines.push_back("There would have been a time for such a deed, tomorrow and tomorrow and tomorrow.");
+    // m_lines.push_back("The cat sat on the matte is a very very gelical cat.");
+    // m_lines.push_back("The boy stood on the burning deck when all but he had fled.");
+    // m_lines.push_back("The quick brown fox jumped over the lazy dog.");
+    // m_lines.push_back("All work and no play make jack a dull boy.");
+    // m_lines.push_back("Richard of York gave battle in vain.");
+    // m_lines.push_back("To be or not to be, that is the question.");
+    // m_lines.push_back("Now is the winter of our discontent.");
+    // m_lines.push_back("There would have been a time for such a deed, tomorrow and tomorrow and tomorrow.");
+}
+
+void SpeechBubble::addLine(const std::string & line)
+{
+  m_lines.push_back(line);
 }
 
 void SpeechBubble::logic()
@@ -129,3 +136,5 @@ int SpeechBubble::loadImages(const std::vector<std::string> & filenames)
 #endif
     return 0;
 }
+
+} // namespace Sear

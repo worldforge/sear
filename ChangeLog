@@ -1,3 +1,17 @@
+2006-01-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/WorldEntity.cpp: In overriden method onTalk(), call onTalk
+	  in the base class, so the signals still work.
+
+	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp: Add a method
+	  to push lines into the speech bubble, and remove the debug text.
+
+	* guichan/RootWidget.cpp: Update the overlay handler each
+	  frame.
+
+	* guichan/Overlay.h, guichan/Overlay.cpp: Basic code for handling
+	  speech bubbles triggered by text.
+
 2006-01-24  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Overlay.cpp, guichan/Overlay.cpp: New class to handle

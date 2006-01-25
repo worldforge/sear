@@ -9,6 +9,8 @@
 
 #include <vector>
 
+namespace Sear {
+
 class SpeechBubble: public gcn::Widget
 {
 public:
@@ -19,6 +21,8 @@ public:
     virtual void draw(gcn::Graphics * graphics);
 
     virtual void drawBorder(gcn::Graphics * graphics);
+
+    void addLine(const std::string &);
 
     int loadImages(const std::vector<std::string> &);
 private:
@@ -37,5 +41,7 @@ private:
     bool m_overflow;
     float m_offset;
 };
+
+} // namespace Sear
 
 #endif // SEAR_GUICHAN_SPEECH_BUBBLE_H

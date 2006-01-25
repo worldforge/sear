@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.73 2006-01-24 18:58:50 simon Exp $
+// $Id: WorldEntity.cpp,v 1.74 2006-01-25 02:24:24 alriddoch Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -78,6 +78,7 @@ void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
 
   if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
   messages.push_back(message(msg, System::instance()->getTime() + message_life));  
+  Eris::Entity::onTalk(talk);
 }
 
 void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)

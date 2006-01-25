@@ -4,6 +4,7 @@
 
 #include "guichan/RootWidget.h"
 #include "guichan/CommandLine.h"
+#include "guichan/Overlay.h"
 
 #include "src/System.h"
 
@@ -95,6 +96,7 @@ void RootWidget::logic()
   } else {
     setOpaque(false);
   }
+  Overlay::instance()->logic(this);
   gcn::Container::logic();
 }
 
