@@ -67,6 +67,27 @@ void Overlay::logic(RootWidget * rw)
       m_top->add(m_selectionStatus, render->getWindowWidth() - m_selfStatus->getWidth() - 4 - m_selectionStatus->getWidth(), 0);
     }
   }
+
+  BubbleMap::const_iterator I = m_bubbles.begin();
+  BubbleMap::const_iterator Iend = m_bubbles.end();
+  for (; I != Iend; ++I) {
+    int x = I->second->getX();
+    int y = I->second->getY();
+    BubbleMap::const_iterator J = m_bubbles.begin();
+    for (; J != Iend; ++J) {
+      if (I->second == J->second) { continue; }
+      int ox = J->second->getX();
+      int oy = J->second->getY();
+      if (abs(x - ox) < I->second->getWidth()) {
+        if (x >= ox) {
+          x = std::min(x + 1, m_top->getWidth() - I->second->getWidth());
+        } else {
+          x = std::max(x - 1, 0);
+        }
+        I->second->setX(x);
+      }
+    }
+  }
 }
 
 void Overlay::heard(Eris::Entity * e,
