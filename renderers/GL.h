@@ -5,6 +5,8 @@
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
 
+#include <Eris/EntityRef.h>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 
@@ -23,6 +25,8 @@
 #include "Light.h"
 #include "Render.h"
 #include "RenderSystem.h"
+
+
 
 namespace Sear {
 
@@ -148,7 +152,7 @@ protected:
   
 //  std::string activeID;
   std::string m_active_name;
-  WorldEntity *m_activeEntity;
+  Eris::EntityRef m_activeEntity;
   int m_x_pos;
   int m_y_pos;
   

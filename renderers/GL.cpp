@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.136 2006-01-25 11:09:43 simon Exp $
+// $Id: GL.cpp,v 1.137 2006-01-26 12:26:26 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -463,7 +463,6 @@ GL::GL() :
   m_base(0),
   m_font_id(-1),
   m_splash_id(-1),
-  m_activeEntity(NULL),
   m_x_pos(0), m_y_pos(0),
   m_speech_offset_x(0.0f),
   m_speech_offset_y(0.0f),
@@ -647,8 +646,13 @@ void GL::procEvent(int x, int y) {
   ic += blue;
   //selected_id = getSelectedID(ic);
   WorldEntity *selected_entity = getSelectedID(ic);
-  if (selected_entity != m_activeEntity) {
-    m_activeEntity = selected_entity;
+  if (selected_entity != m_activeEntity.get()) {
+    if (selected_entity != NULL ) {
+      m_activeEntity = Eris::EntityRef(selected_entity);
+    } else {
+      m_activeEntity = Eris::EntityRef();
+    }
+//    m_activeEntity = selected_entity;
     if (debug && m_activeEntity) Log::writeLog(std::string("ActiveID: ") + m_activeEntity->getId(), Log::LOG_DEFAULT);
   }
 }
@@ -1140,7 +1144,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         nextColour(object_record->entity);
         model->render(true);
       } else {
-        if (object_record->entity == m_activeEntity) {
+        if (object_record->entity == m_activeEntity.get()) {
           m_active_name = object_record->name;
           drawOutline(model_record);
         } else {
