@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.28 2006-01-03 20:04:09 jmt Exp $
+// $Id: main.cpp,v 1.29 2006-01-28 16:01:15 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -12,7 +12,7 @@
 #include <iostream>
 #include <string>
 #include "System.h"
-#include "Exception.h"
+//#include "error.h"
 
 #include <signal.h>
 
@@ -90,14 +90,13 @@ under certain conditions; type `show c' for details.
 
   if (!sys->init(p_argc, p_argv)) {
     std::cerr << "Error initialising Sear!" << std::endl;
+//    ErrorDialog("Error initialising Sear. See log files or stdout/stderr for more details");
     exit (1);
   }
   try {
   //  sys->createWindow(false);
     sys->setCaption("Sear", "Sear");
     sys->mainLoop();
-  } catch (Sear::Exception e) {
-    std::cerr << "Exception: " << e.getMessage() << std::endl;
   } catch (...) {
     std::cerr << "Unknown Exception" << std::endl;
   }
