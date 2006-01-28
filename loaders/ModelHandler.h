@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.5 2005-04-25 00:39:56 jmt Exp $
+// $Id: ModelHandler.h,v 1.6 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -37,7 +37,8 @@ public:
   void init();
   void shutdown();
  
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
   
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
@@ -47,11 +48,13 @@ public:
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
   void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
 
-  void checkModelTimeouts();
+  void checkModelTimeouts(bool forceUnload);
   
   void loadModelRecords(const std::string &filename);
 
   varconf::Config &getModelRecords() { return m_model_records; }
+
+  void reset();
 
 protected:
   void TimeoutExpired();

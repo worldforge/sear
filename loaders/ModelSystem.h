@@ -36,7 +36,8 @@ public:
   int init();
   int shutdown();
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
@@ -55,6 +56,9 @@ public:
   ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &mode_id, WorldEntity *we); 
 
   ObjectRecord *getObjectRecord(WorldEntity *we);
+
+  void resetModels();
+
 private:
 
   void loadModels(const std::string &filename);

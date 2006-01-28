@@ -41,7 +41,8 @@ public:
     
     void draw(Render* render);
     
-    void invalidate();
+    void contextCreated();
+    void contextDestroyed(bool check);
     
 private:
     friend class Sprite;

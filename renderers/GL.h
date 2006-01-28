@@ -40,12 +40,15 @@ class ModelRecord;
 class Console;
 
 class GL : public Render, public SigC::Object {
-public:GL();
-~GL();
+public:
+  GL();
+  ~GL();
   void init();
-  void initContext();
   void shutdown();
-  void invalidate();
+
+  int contextCreated();
+  void contextDestroyed(bool check);
+
   bool createWindow(unsigned int width, unsigned int height, bool fullscreen);
   void destroyWindow();
   void toggleFullscreen();
@@ -60,7 +63,11 @@ private:
   bool m_fullscreen;
   SDL_Surface *m_screen;
 
-  static void checkError();
+  /**
+   * Checks to see if OpenGL logged an error.
+   * @return 1 on error, 0 otherwise.
+   */
+  static int checkError();
 
 
 public:
@@ -71,7 +78,7 @@ public:
 
   void initLighting();
   void initFont();
-  void shutdownFont();
+  void shutdownFont(bool check);
   void print(int x, int y, const char*, int set);
   void print3D(const char* string, int set);
   inline void newLine();
@@ -88,7 +95,8 @@ public:
   int getWindowHeight() const { return m_height; }
   bool isFullScreen() const { return m_fullscreen; }
 
-  std::string getActiveID();// { return activeID; }
+  std::string getActiveID() const;// { return activeID; }
+  WorldEntity *getActiveEntity() const;// { return activeID; }
   void checkModelStatus(const std::string &) {}
   void setModelInUse(const std::string &, bool) {}
 

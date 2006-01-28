@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.25 2005-09-15 08:31:31 simon Exp $
+// $Id: StateManager.cpp,v 1.26 2006-01-28 15:35:49 simon Exp $
 
 /*
  * TODO
@@ -88,12 +88,11 @@ StateManager::StateManager() :
 
 StateManager::~StateManager() {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
 }
 
 int StateManager::init() {
   assert(m_initialised == false);
-  if (m_initialised) shutdown();
+
   if (debug) std::cout << "State Loader: Initialising." << std::endl;
 
   m_current_state = -1;
@@ -491,6 +490,7 @@ void StateManager::buildStateChange(unsigned int &list, StateProperties *previou
 
 void StateManager::registerCommands(Console *console) {
   assert(m_initialised);
+  assert(console != NULL);
   console->registerCommand(CMD_LOAD_STATE_CONFIG, this);
 }
 
@@ -503,12 +503,16 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
   }
 }
 
-void StateManager::invalidate() {
+
+void StateManager::contextCreated() {
+  assert(m_initialised);
+}
+void StateManager::contextDestroyed(bool check) {
   assert(m_initialised);
   for (unsigned int i = 0; i < m_state_change_vector.size(); ++i) {
     for (unsigned int j = 0; j < m_state_change_vector[i].size(); ++j) {
       // Delete display list if its still valid
-      if (glIsList(m_state_change_vector[i][j])) {
+      if (check && glIsList(m_state_change_vector[i][j])) {
         glDeleteLists(m_state_change_vector[i][j], 1);
       }
       // reset list value

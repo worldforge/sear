@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.21 2005-06-04 21:23:53 simon Exp $
+// $Id: TextureManager.h,v 1.22 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -64,16 +64,13 @@ public:
    * Destructor
    */ 
   ~TextureManager() {
-    // Call shutdown if it hasn't already been
-    if (m_initialised) shutdown();
+    assert (m_initialised == false);
   }
 
   /**
    * Initialise a TextureManager object
    */ 
   void init();
-
-  void initGL();
 
   /**
    * Clean up the TextureManager object
@@ -158,7 +155,8 @@ public:
   void runCommand(const std::string &command, const std::string &arguments);
   void setupGLExtensions();
  
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   static GLint getFormat(const std::string &fmt);
  

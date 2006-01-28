@@ -1,10 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #include <Eris/TypeInfo.h>
 
+#include "renderers/RenderSystem.h"
+
 #include "src/Console.h"
+#include "src/System.h"
 #include "src/WorldEntity.h"
 
 #include "ModelSystem.h"
@@ -58,6 +61,11 @@ int ModelSystem::init() {
   m_object_handler = new ObjectHandler();
   m_object_handler->init();
 
+  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &ModelSystem::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &ModelSystem::contextDestroyed));
+
+  System::instance()->LeftWorld.connect(SigC::slot(*this, &ModelSystem::resetModels));
+
   m_initialised = true;
   return 0;
 }
@@ -77,11 +85,18 @@ int ModelSystem::shutdown() {
   return 0;
 }
 
-void ModelSystem::invalidate() {
+void ModelSystem::contextCreated() {
   assert(m_initialised);
 
-  m_model_handler->invalidate();
-  m_object_handler->invalidate();
+  m_model_handler->contextCreated();
+  m_object_handler->contextCreated();
+}
+
+void ModelSystem::contextDestroyed(bool check) {
+  assert(m_initialised);
+
+  m_model_handler->contextDestroyed(check);
+  m_object_handler->contextDestroyed(check);
 }
 
 void ModelSystem::registerCommands(Console *console) {
@@ -120,7 +135,8 @@ ModelRecord *ModelSystem::getModel(Render *render, ObjectRecord *record, const s
 ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
   assert (we != NULL);
   // Find object record from entity id
-  ObjectRecord *object_record = m_object_handler->getObjectRecord(we->getId());
+  std::string id = we->getId();
+  ObjectRecord *object_record = m_object_handler->getObjectRecord(id);
 
   // Why did we do this? 
 //  if (object_record && object_record->type.empty()) {
@@ -134,9 +150,9 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
     while (ti != NULL) {
       std::string t = ti->getName();
       varconf::Config::inst()->clean(t);
-      object_record = m_object_handler->getObjectRecord(t);
+      object_record = m_object_handler->instantiateRecord(t, id);
       if (object_record) {
-        type = ti->getName();
+        type = t;
         break;
       } else {
         // TODO, Check this output
@@ -176,11 +192,11 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
     assert(object_record);
     // Copy existing record to the entity ID so we can make entity
     // Specific changes
-    m_object_handler->copyObjectRecord(we->getId(), object_record);
+//    object_record = m_object_handler->instiateRecord(we->getId(), object_record);
     // Get pointer to our new record
-    object_record = m_object_handler->getObjectRecord(we->getId());
+//    object_record = m_object_handler->getObjectRecord(we->getId());
 
-    assert(object_record);
+//    assert(object_record);
 
     // Set the values for the object record
     object_record->type = type;
@@ -189,7 +205,7 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
     object_record->entity = we;
   }
 
-  assert(object_record->entity != NULL);
+  assert(object_record->entity.get() != NULL);
 
   // Copy bounding box value
   if (we->hasBBox()) {
@@ -206,6 +222,11 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
 
 varconf::Config &ModelSystem::getModelRecords() {
   return m_model_handler->getModelRecords();
+}
+
+void ModelSystem::resetModels() {
+  m_object_handler->reset();
+  m_model_handler->reset();
 }
 
 } // namespace Sear

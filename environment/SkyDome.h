@@ -1,3 +1,6 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #ifndef SEAR_SKYDOME_H
 #define SEAR_SKYDOME_H 1
@@ -19,7 +22,8 @@ public:
   virtual ~SkyDome();
   
   void render();
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
     
 private:
     float* genVerts(float radius, int levels, int segments);

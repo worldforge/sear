@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.5 2005-06-13 15:10:46 simon Exp $
+// $Id: LibModelFile.h,v 1.6 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -46,7 +46,8 @@ public:
   int shutdown();
   void render(bool); 
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   void genVBOs(); 
 

@@ -209,7 +209,7 @@ int ParticleSystem::shutdown()
 
 void ParticleSystem::update(float elapsed)
 {
-    double status = m_entity->entity->getStatus();
+    double status = dynamic_cast<WorldEntity*>(m_entity->entity.get())->getStatus();
     int numToCreate = lrintf(m_createPerSec.random() * elapsed * status * 2.f);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {
@@ -323,10 +323,8 @@ void ParticleSystem::submit(const Point3& pos, double sz, const Color_4d& c, dou
     ++m_activeCount;
 }
 
-void ParticleSystem::invalidate()
-{
-    // invalidate the texture
-}
+void ParticleSystem::contextCreated() {}
+void ParticleSystem::contextDestroyed(bool check) {}
 
 void ParticleSystem::activate(Particle* p)
 {            

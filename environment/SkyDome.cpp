@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -206,18 +206,23 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
   }
 }
 
-void SkyDome::invalidate() {
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-    if (glIsBufferARB(m_vb_verts)) {
-      glDeleteBuffersARB(1, &m_vb_verts);
-    }
-    m_vb_verts = 0;
+void SkyDome::contextDestroyed(bool check) {
+  if (check) {
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      if (glIsBufferARB(m_vb_verts)) {
+        glDeleteBuffersARB(1, &m_vb_verts);
+      }
 
-    if (glIsBufferARB(m_vb_texCoords)) {
-      glDeleteBuffersARB(1, &m_vb_texCoords);
+      if (glIsBufferARB(m_vb_texCoords)) {
+        glDeleteBuffersARB(1, &m_vb_texCoords);
+      }
     }
-    m_vb_texCoords = 0;
   }
+  m_vb_verts = 0;
+  m_vb_texCoords = 0;
+}
+
+void SkyDome::contextCreated() {
   domeInit(m_radius, m_levels, m_segments);
 }
 
@@ -290,6 +295,7 @@ void SkyDome::render()
 {
   glColor3f(1.0f, 1.0f, 1.0f);
   Calendar *cal = System::instance()->getCalendar();
+  assert (cal != NULL);
   float val = cal->getHours();
   val *= (float)cal->getMinutesPerHour();
   val += (float)cal->getMinutes();
@@ -317,7 +323,7 @@ void SkyDome::render()
   }
   glVertexPointer(3, GL_FLOAT, 0, m_verts);
 
-glEnable(GL_BLEND);
+  glEnable(GL_BLEND);
 
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   // Setup dome texture coords
@@ -328,7 +334,7 @@ glEnable(GL_BLEND);
   // Renderdome
   glDrawArrays(GL_QUADS, 0, m_size * 4);
 
-glDisable(GL_BLEND);
+  glDisable(GL_BLEND);
 
   // Render Cloud layer one
   glEnable(GL_BLEND);

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.65 2006-01-12 03:43:44 alriddoch Exp $
+// $Id: System.h,v 1.66 2006-01-28 15:35:48 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -24,8 +24,6 @@ class ActionHandler;
 class Calendar;
 class Client;
 class FileHandler;
-//class ModelHandler;
-//class ObjectHandler;
 class ScriptEngine;
 class Console;
 class Workarea;
@@ -149,7 +147,7 @@ public:
    * @param ss Sytem state to set
    * @param state Value of state
    */ 
-  void setState(SystemState ss, bool state) { m_systemState[ss] = state; }
+  void setState(SystemState ss, bool state);// { m_systemState[ss] = state; }
   
   /**
    * Get value of a system state
@@ -158,28 +156,11 @@ public:
    */ 
   bool checkState(SystemState ss) const { return m_systemState[ss]; }
 
-  //Graphics *getGraphics() const { return _graphics; }
-  
   /**
    * Get the General Config object
    * @return Reference to general config object
    */ 
   varconf::Config &getGeneral() { return m_general; }
-  /**
-   * Get the Model Config object
-   * @return Reference to model config object
-   */ 
-//  varconf::Config &getModel() { return m_models; } 
-  /**
-   * Get the ModelRecords Config object
-   * @return Reference to ModelRecords config object
-   */ 
-//  varconf::Config &getModelRecords() { return m_model_records; }
-  /**
-   * Get the ObjectRecords Config object
-   * @return Reference to ObjectRecords config object
-   */ 
-//  varconf::Config &getObjectRecords() { return m_object_records; }
   
   /**
    * Enable or disable key repeating.
@@ -188,10 +169,8 @@ public:
   void vEnableKeyRepeat(bool bEnable = true);
  
   ScriptEngine *getScriptEngine() const { return m_script_engine; }
-//  ModelHandler *getModelHandler() const { return m_model_handler; }
   ActionHandler *getActionHandler() const { return m_action_handler; }
   FileHandler *getFileHandler() const { return m_file_handler; }
-//  ObjectHandler *getObjectHandler() const { return m_object_handler; }
   Calendar *getCalendar() const { return m_calendar; }
   
   Console *getConsole() const { return m_console; }
@@ -239,17 +218,11 @@ protected:
 
   ScriptEngine *m_script_engine; ///< Pointer to scripting engine object
   FileHandler *m_file_handler; ///< Pointer to file handler object
-//  ModelHandler *m_model_handler; ///< Pointer to model handler object
   ActionHandler *m_action_handler; ///< Pointer to action handler object
-//  ObjectHandler *m_object_handler; ///< Pointer to object handler object
   Calendar *m_calendar; ///< Pointer to calender object
    
   varconf::Config m_general;
-//  varconf::Config m_models;
 
-//  varconf::Config m_model_records;
-//  varconf::Config m_object_records;
-  
   SDL_Joystick *m_controller;
   Console *m_console;
   Workarea *m_workarea;
@@ -257,7 +230,6 @@ protected:
  
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
-//  std::string install_path;  
 
   bool m_mouse_move_select;
 
@@ -289,6 +261,9 @@ public:
   void varconf_error_callback(const char *);
   
   SigC::Signal3<void, std::string, int, int> pushedMessage;
+
+  sigc::signal<void> EnteredWorld;
+  sigc::signal<void> LeftWorld;
 private:
   bool m_systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool m_system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.30 2005-06-29 21:32:48 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.31 2006-01-28 15:35:49 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -52,7 +52,6 @@ Cal3dModel::Cal3dModel(Render *render) :
 
 Cal3dModel::~Cal3dModel() {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
 }
 
 int Cal3dModel::init(Cal3dCoreModel *core_model) {
@@ -85,16 +84,20 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
 }
 
 void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode) {
+  assert(m_render != NULL);
+
   // get the renderer of the model
-  CalRenderer *pCalRenderer;
-  pCalRenderer = m_calModel->getRenderer();
+  CalRenderer *pCalRenderer = m_calModel->getRenderer();
+  assert(pCalRenderer !=  NULL);
 
   // begin the rendering loop
-  if(!pCalRenderer->beginRendering()) return;
+  if (!pCalRenderer->beginRendering()) {
+    // Some kind of error here!
+    return;
+  }
 
   // get the number of meshes
-  int meshCount;
-  meshCount = pCalRenderer->getMeshCount();
+  int meshCount = pCalRenderer->getMeshCount();
 
   // render all meshes of the model
   for(int meshId = 0; meshId < meshCount; ++meshId)  {
@@ -244,7 +247,7 @@ void Cal3dModel::animate(const std::string &action) {
   // See if there is a combined animation defined.
   Cal3dCoreModel::Animations::const_iterator anim_next = anims.find(action);
   if (anim_next != anims.end()) {
-   addAnimation(anim_next->second);
+    addAnimation(anim_next->second);
     m_cur_anim = action;
     return;
   }
@@ -304,7 +307,7 @@ void Cal3dModel::action(const std::string &action) {
   // See if there is a combined animation defined.
   Cal3dCoreModel::Animations::const_iterator anim_next = anims.find(action);
   if (anim_next != anims.end()) {
-   addAnimation(anim_next->second);
+    addAnimation(anim_next->second);
     m_cur_anim = action;
     return;
   }
@@ -344,7 +347,7 @@ void Cal3dModel::action(const std::string &action) {
 }
 
 void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
-  if (debug) std::cout << "------" << std::endl;
+//  if (debug) std::cout << "------" << std::endl;
   Atlas::Message::MapType map(appearanceMap);
   
   // Get mesh atrributes
@@ -382,7 +385,7 @@ void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
   for (I = meshes.begin(); I != meshes.end(); ++I) {
     std::string name = I->first;
     std::string value = I->second.asString();
-    if (debug) std::cout << "Name: " << name << " - Value: " << value << std::endl;
+//    if (debug) std::cout << "Name: " << name << " - Value: " << value << std::endl;
     // Attach mesh
     if (m_core_model->m_meshes.find(name + "_" + value) 
       != m_core_model->m_meshes.end()) {
@@ -411,7 +414,7 @@ void Cal3dModel::setMaterialSet(unsigned int set) {
 }
 
 void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
-  if (debug) std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
+//  if (debug) std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
   //TODO make this do the correct thing!
 //  m_calModel.setMaterialSet(set);
   // Get mesh name

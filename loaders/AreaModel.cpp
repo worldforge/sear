@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
 #include "AreaModel.h"
 #include "ObjectRecord.h"
@@ -29,8 +29,8 @@ AreaModel::~AreaModel()
 
 bool AreaModel::init()
 {
-    WorldEntity* we = m_object->entity;
-    
+    WorldEntity* we = dynamic_cast<WorldEntity*>(m_object->entity.get());
+    assert(we); 
     if (!we->hasAttr("area")) {
         std::cerr << "AreaModel defined on entity with no area attribute" << std::endl;
         return false;
@@ -83,9 +83,8 @@ bool AreaModel::init()
     return true;
 }
 
-void AreaModel::invalidate()
-{
-}
+void AreaModel::contextCreated() {}
+void AreaModel::contextDestroyed(bool check) {}
 
 int AreaModel::shutdown()
 {

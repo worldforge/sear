@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.9 2005-06-20 16:22:24 simon Exp $
+// $Id: Graphics.h,v 1.10 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -95,6 +95,9 @@ typedef enum {
 
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
+
+  void contextCreated() {}
+  void contextDestroyed(bool check) {}
 
 protected:
   System *m_system;

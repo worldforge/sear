@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.35 2006-01-20 16:48:02 alriddoch Exp $
+// $Id: Character.h,v 1.36 2006-01-28 15:35:48 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -12,6 +12,7 @@
 
 #include <wfmath/quaternion.h>
 #include <Eris/Entity.h>
+#include <Eris/EntityRef.h>
 #include <Eris/Timeout.h>
 #include <Eris/Types.h>
 #include <Eris/Avatar.h>
@@ -122,7 +123,7 @@ private:
   WorldEntity* findInInventory(const std::string& name);
  
   Eris::Avatar *m_avatar;
-  WorldEntity *m_self;
+  Eris::EntityRef m_self;
   float m_walk_speed;
   float m_run_speed;
   float m_rotate_speed;

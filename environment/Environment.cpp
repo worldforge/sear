@@ -1,8 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+
+#include <sigc++/object_slot.h>
 
 #include <Atlas/Objects/Operation.h>
+
+#include "src/System.h"
 
 #include "Environment.h"
 #include "TerrainRenderer.h"
@@ -22,7 +26,13 @@ void Environment::init() {
   m_terrain = new TerrainRenderer();
   m_skyDome = new SkyDome(1.0f, 20, 20);
   m_stars = new Stars();
-  
+ 
+  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Environment::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Environment::contextDestroyed));
+
+  // Clean up terrain data when leaving game world
+  System::instance()->LeftWorld.connect(SigC::slot(*this, &Environment::resetWorld));
+ 
   m_initialised = true;
 }
 
@@ -73,10 +83,16 @@ void Environment::renderSea() {
   m_terrain->renderSea();
 }
 
-void Environment::invalidate() {
+void Environment::contextCreated() {
   assert(m_initialised == true);
-  m_terrain->invalidate();
-  m_skyDome->invalidate();
+  m_terrain->contextCreated();
+  m_skyDome->contextCreated();
+}
+
+void Environment::contextDestroyed(bool check) {
+  assert(m_initialised == true);
+  m_terrain->contextDestroyed(check);
+  m_skyDome->contextDestroyed(check);
 }
 
 void Environment::registerArea(Mercator::Area* ar)
@@ -89,6 +105,10 @@ void Environment::registerTerrainShader(Mercator::Shader* shade, const std::stri
 {
     assert(shade);
     m_terrain->registerShader(shade, texId);
+}
+
+void Environment::resetWorld() {
+  m_terrain->reset();
 }
 
 } // namespace Sear

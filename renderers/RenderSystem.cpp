@@ -1,12 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.13 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: RenderSystem.cpp,v 1.14 2006-01-28 15:35:49 simon Exp $
 
 #include <SDL/SDL.h>
 
 #include "src/System.h"
+#include "src/WorldEntity.h"
 
 #include "RenderSystem.h"
 #include "TextureManager.h"
@@ -73,21 +74,20 @@ void RenderSystem::init() {
   m_mouseState[CURSOR_USE] = m_textureManager->requestTextureID("cursor_use", false);
   m_mouseState[CURSOR_ATTACK] = m_textureManager->requestTextureID("cursor_attack", false);
 
+  ContextCreated.connect(SigC::slot(*this, &RenderSystem::contextCreated));
+  ContextDestroyed.connect(SigC::slot(*this, &RenderSystem::contextDestroyed));
+
   m_initialised = true;
 }
 
 void RenderSystem::registerCommands(Console *console) {
   assert (m_initialised);
+  assert (console  != NULL);
   dynamic_cast<GL*>(m_renderer)->registerCommands(console);
   m_textureManager->registerCommands(console);
   m_stateManager->registerCommands(console);
   m_graphics->registerCommands(console);
   m_cameraSystem->registerCommands(console);
-}
-
-void RenderSystem::initContext() {
-  assert (m_initialised);
-  m_textureManager->initGL();
 }
 
 void RenderSystem::shutdown() {
@@ -143,14 +143,18 @@ void RenderSystem::switchState(StateID state) {
   m_stateManager->stateChange(state);
 }
 
-void RenderSystem::invalidate() {
+void RenderSystem::contextCreated() {
   assert (m_initialised == true);
-  dynamic_cast<GL*>(m_renderer)->invalidate();
-  m_textureManager->invalidate();
-  m_stateManager->invalidate();
-//  m_graphics->invalidate();
-  
-  dynamic_cast<GL*>(m_renderer)->invalidate();
+
+  m_textureManager->contextCreated();
+  m_stateManager->contextCreated();
+}
+
+void RenderSystem::contextDestroyed(bool check) {
+  assert (m_initialised == true);
+
+  m_textureManager->contextDestroyed(check);
+  m_stateManager->contextDestroyed(check);
 }
 
 StateID RenderSystem::getCurrentState() {
@@ -189,8 +193,6 @@ void RenderSystem::readConfig(varconf::Config &config) {
 void RenderSystem::writeConfig(varconf::Config &config) {
   assert (m_initialised);
   m_renderer->writeConfig(config);
-//  m_textureManager->writeConfig();
-//  m_stateManager->writeConfig();
   m_graphics->writeConfig(config);
   m_cameraSystem->writeConfig(config);
 } 
@@ -199,4 +201,25 @@ void RenderSystem::resize(int width, int height) {
   assert(m_initialised);
   dynamic_cast<GL*>(m_renderer)->resize(width, height);
 }
+
+void RenderSystem::processMouseClick(int x, int y) {
+  assert(m_initialised == true);
+  dynamic_cast<GL*>(m_renderer)->procEvent(x, y);
+}
+
+bool RenderSystem::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
+  assert(m_initialised);
+  return dynamic_cast<GL*>(m_renderer)->getWorldCoords(x, y, wx, wy, wz);
+}
+
+WorldEntity *RenderSystem::getActiveEntity() const {
+  assert(m_initialised);
+  return dynamic_cast<GL*>(m_renderer)->getActiveEntity();
+}
+
+std::string RenderSystem::getActiveEntityID() const {
+  assert(m_initialised);
+  return dynamic_cast<GL*>(m_renderer)->getActiveID();
+}
+
 } // namespace Sear

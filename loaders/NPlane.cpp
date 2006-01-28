@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.26 2005-06-29 21:19:41 simon Exp $
+// $Id: NPlane.cpp,v 1.27 2006-01-28 15:35:49 simon Exp $
 
 #include "common/Utility.h"
 
@@ -120,16 +120,20 @@ int NPlane::shutdown() {
   if (m_normal_data) delete [] m_normal_data;
   if (m_texture_data) delete [] m_texture_data;
 
-  invalidate();
+  contextDestroyed(true);
 
   m_initialised = false;
   return 0;
 }
 
-void NPlane::invalidate() {
+void NPlane::contextCreated() {}
+
+void NPlane::contextDestroyed(bool check) {
   assert(m_render);
-  m_render->freeList(m_disp);
-  m_render->freeList(m_select_disp);
+  if (check) {
+    m_render->freeList(m_disp);
+    m_render->freeList(m_select_disp);
+  }
   m_disp = 0;
   m_select_disp = 0;
 }

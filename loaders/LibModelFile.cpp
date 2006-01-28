@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.14 2005-06-25 11:23:00 simon Exp $
+// $Id: LibModelFile.cpp,v 1.15 2006-01-28 15:35:49 simon Exp $
 
 /*
   Debug check list
@@ -167,7 +167,7 @@ int LibModelFile::shutdown() {
   m_initialised = false;
 
   //  Clean up OpenGL data
-  invalidate();
+  contextDestroyed(true);
 
   // Clear up buffers
   delete [] m_vertex_data;
@@ -187,16 +187,26 @@ int LibModelFile::shutdown() {
   return 0;
 }
 
-void LibModelFile::invalidate() {
-  // Clean up Display Lists
-  if (glIsList(m_render_list)) glDeleteLists(1, m_render_list);
-  if (glIsList(m_select_list)) glDeleteLists(1, m_select_list);
+void LibModelFile::contextCreated() {}
 
-  // Clean up VBO's
-  if (glIsBufferARB(m_vbos[0])) glDeleteBuffersARB(1, &m_vbos[0]);
-  if (glIsBufferARB(m_vbos[1])) glDeleteBuffersARB(1, &m_vbos[1]);
-  if (glIsBufferARB(m_vbos[2])) glDeleteBuffersARB(1, &m_vbos[2]);
-  if (glIsBufferARB(m_vbos[3])) glDeleteBuffersARB(1, &m_vbos[3]);
+void LibModelFile::contextDestroyed(bool check) {
+  if (check){
+    // Clean up Display Lists
+    if (glIsList(m_render_list)) glDeleteLists(1, m_render_list);
+    if (glIsList(m_select_list)) glDeleteLists(1, m_select_list);
+
+    // Clean up VBO's
+    if (glIsBufferARB(m_vbos[0])) glDeleteBuffersARB(1, &m_vbos[0]);
+    if (glIsBufferARB(m_vbos[1])) glDeleteBuffersARB(1, &m_vbos[1]);
+    if (glIsBufferARB(m_vbos[2])) glDeleteBuffersARB(1, &m_vbos[2]);
+    if (glIsBufferARB(m_vbos[3])) glDeleteBuffersARB(1, &m_vbos[3]);
+  }
+  m_render_list = 0;
+  m_select_list = 0;
+  m_vbos[0] = 0;
+  m_vbos[1] = 0;
+  m_vbos[2] = 0;
+  m_vbos[3] = 0;
 }
 
 void LibModelFile::genVBOs() {

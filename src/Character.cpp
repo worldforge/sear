@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.72 2006-01-20 16:48:02 alriddoch Exp $
+// $Id: Character.cpp,v 1.73 2006-01-28 15:35:48 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -132,7 +132,6 @@ static const std::string HEIGHT = "height";
 
 Character::Character() :
   m_avatar(NULL),
-  m_self(NULL),
   m_walk_speed(0.0f),
   m_run_speed(0.0f),
   m_rotate_speed(0.0f),
@@ -209,7 +208,7 @@ void Character::rotate(float rate) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
-  if (debug) std::cout << "Character::rotate" << std::endl << std::flush;
+//  if (debug) std::cout << "Character::rotate" << std::endl << std::flush;
   if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
   updateLocals(true);
 
@@ -282,7 +281,7 @@ void Character::setRotationRate(float rate) {
 void Character::updateLocals(bool send_to_server) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
-  assert(m_self != NULL);
+  assert(m_self.get() != NULL);
   float x, y, z;
   float mod_speed;
   float angle;
@@ -291,7 +290,7 @@ void Character::updateLocals(bool send_to_server) {
   static ActionHandler *ac = System::instance()->getActionHandler();
   static float old_speed = m_speed;
   static bool old_run = m_run_modifier;
-  std::string type = m_self->type();
+  std::string type = dynamic_cast<WorldEntity*>(m_self.get())->type();
 
   //float divisor, zaxis;
 //  m_orient = m_self->getOrientation();
@@ -818,13 +817,14 @@ void Character::UpdateTimeoutExpired() {
 void Character::setAvatar(Eris::Avatar *avatar) {
   m_avatar = avatar;
   if (avatar == NULL) {
-    m_self = NULL;
+    m_self = Eris::EntityRef();
   } else {
-    m_self = dynamic_cast<WorldEntity*>(m_avatar->getEntity());
-    assert(m_self != NULL);
-
-    WFMath::Vector<3> q = m_self->getAbsOrient().vector();
-    WFMath::CoordType w = m_self->getAbsOrient().scalar();
+    m_self = Eris::EntityRef(m_avatar->getEntity());
+    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
+    assert (we != NULL);
+    WFMath::Quaternion quat = we->getAbsOrient();
+    WFMath::Vector<3> q = quat.vector();
+    WFMath::CoordType w = quat.scalar();
 
     float v1,v2;
     // Calculate attitude (which way we are facing)

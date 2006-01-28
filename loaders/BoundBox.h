@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.12 2005-06-29 21:19:41 simon Exp $
+// $Id: BoundBox.h,v 1.13 2006-01-28 15:35:48 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -46,7 +46,8 @@ public:
   int shutdown();
   void render(bool); 
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
 private:
   static const int m_num_points = 24; // NUmber of points in model

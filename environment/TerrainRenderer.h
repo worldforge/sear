@@ -45,36 +45,9 @@ public:
       float *harray;
       float *narray;
 
-      void invalidate() {
-        if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-          if (glIsBufferARB(vb_narray)) {
-            glDeleteBuffersARB(1, &vb_narray);
-          }
-          vb_narray = 0;
-  
-          if (glIsBufferARB(vb_harray)) {
-            glDeleteBuffersARB(1, &vb_harray);
-          }
-          vb_harray = 0;
-        }
-        if (glIsList(disp)) {
-          glDeleteLists(1, disp);
-        }
-        disp = 0;
+      void contextCreated() {}
+      void contextDestroyed(bool check);
 
-        // Clean up buffers
-        if (harray) delete [] harray;
-        harray = NULL;
-        narray = NULL;
-
-        // Clean up textures
-        std::map<int, GLuint>::iterator it = m_alphaTextures.begin();
-        for (; it != m_alphaTextures.end(); ++it) {
-            if (glIsTexture(it->second)) glDeleteTextures(1, &it->second);
-        }
-        
-        m_alphaTextures.clear();
-      }
     };
     typedef std::map<int, DataSeg> DisplayListColumn;
     typedef std::map<int, DisplayListColumn> DisplayListStore;
@@ -97,7 +70,10 @@ public:
 
     std::vector<ShaderEntry> m_shaders;
     
-    void invalidate();
+    void contextCreated() {}
+    void contextDestroyed(bool check);
+
+    void reset();
   protected:
     DisplayListStore m_displayLists;
     int m_numLineIndeces;
@@ -116,7 +92,7 @@ public:
     void drawMap(Mercator::Terrain &, const PosType & camPos, bool select_mode);
     void drawSea( Mercator::Terrain &);
     void drawShadow(const WFMath::Point<2> & pos, float radius = 1.f);
-    void readTerrain();
+
   public:
     TerrainRenderer();
     virtual ~TerrainRenderer();

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.8 2005-03-15 17:33:58 simon Exp $
+// $Id: WireFrame.h,v 1.9 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -23,7 +23,8 @@ public:
   int init(WFMath::AxisBox<3>);
   int shutdown();
  
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
  
   void render(bool);
   

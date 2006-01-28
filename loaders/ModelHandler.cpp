@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.25 2005-12-16 13:37:01 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.26 2006-01-28 15:35:49 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -11,7 +11,6 @@
 
 #include <varconf/Config.h>
 #include "src/Console.h"
-#include "src/Exception.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 #include "renderers/RenderSystem.h"
@@ -202,8 +201,8 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
   }
 }
 
-void ModelHandler::checkModelTimeouts() {
-return;
+void ModelHandler::checkModelTimeouts(bool forceUnload) {
+//return;
   assert (m_initialised == true);
 
   // This function checks to see when the last time a model record was rendered.
@@ -219,47 +218,6 @@ return;
 
   std::set<std::string> expired_set;
 
-  // Loop through and find all objects that have expired and add to set object
-  ModelRecordMap::iterator Iend = m_model_records_map.end();
-  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != Iend; ++I) {
-    ModelRecord *record = I->second;
-
-    assert(record);
-
-    Model *model = record->model;
-    if (model) {
-      if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-        // Add to set object
-        expired_set.insert(I->first);
-      }
-    }
-  }
-
-  std::set<std::string>::const_iterator K = expired_set.begin();
-  std::set<std::string>::const_iterator Kend = expired_set.end();
-  for (; K != Kend; ++K) {
-    ModelRecordMap::iterator I = m_model_records_map.find(*K);
-    if (I != Iend) {
-      ModelRecord *record = I->second;
-
-      assert(record);
-      if (debug) std::cout << "Unloading: " << record->id << std::endl;
-
-      Model *model = record->model;
-      if (model) {
-        model->shutdown();
-        delete model;
-      }
-
-      delete record;
-      m_model_records_map.erase(I);
-    }
-  }
-
-  expired_set.clear();
-#if(0)
-  // Do not do this as it leads to a double free!
-
   // Do the same again for the object map
   ModelRecordMap::iterator Jend = m_object_map.end();
   for (ObjectRecordMap::iterator J = m_object_map.begin(); J != Jend; ++J) {
@@ -269,8 +227,49 @@ return;
 
     Model *model = record->model;
     if (model) {
-      if ((System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+      if (forceUnload || (System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
         expired_set.insert(J->first);
+      }
+    }
+  }
+
+  std::set<std::string>::const_iterator K = expired_set.begin();
+  std::set<std::string>::const_iterator Kend = expired_set.end();
+  for (; K != Kend; ++K) {
+    ModelRecordMap::iterator J = m_object_map.find(*K);
+    if (J != Jend) {
+      ModelRecord *record = J->second;
+      assert(record);
+      if (debug) std::cout << "Unloading: " << record->id << std::endl;
+      Model *model = record->model;
+      if (model && !record->model_by_type) {
+        model->shutdown();
+        delete model;
+        record->model = NULL;
+      }
+  //    delete record;
+      m_object_map.erase(J);
+    }
+  }
+
+
+  // Loop through and find all objects that have expired and add to set object
+  ModelRecordMap::iterator Iend = m_model_records_map.end();
+  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != Iend; ++I) {
+    ModelRecord *record = I->second;
+
+    assert(record);
+
+    Model *model = record->model;
+    if (model) {
+      if (forceUnload || (System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
+      if (debug) std::cout << "Unloading: " << record->id << std::endl;
+
+//        model->shutdown();
+//        delete model;
+//        record->model = NULL;
+        // Add to set object
+        expired_set.insert(I->first);
       }
     }
   }
@@ -278,26 +277,34 @@ return;
   K = expired_set.begin();
   Kend = expired_set.end();
   for (; K != Kend; ++K) {
-    ModelRecordMap::iterator J = m_object_map.find(*K);
-    if (J != Jend) {
-      ModelRecord * record = J->second;
+    ModelRecordMap::iterator I = m_model_records_map.find(*K);
+    if (I != Iend) {
+      ModelRecord *record = I->second;
+
       assert(record);
       if (debug) std::cout << "Unloading: " << record->id << std::endl;
-printf("Bptr %i\n",record);
-      Model * model = record->model;
-      if (model) {
+
+      Model *model = record->model;
+  assert(model);
+      if (model ) {
         model->shutdown();
         delete model;
+        record->model = NULL;
       }
-      delete record;
-      m_object_map.erase(J);
+
+     delete record;
+      m_model_records_map.erase(I);
     }
   }
-#endif
+
+  expired_set.clear();
+
+
+  // Do not do this as it leads to a double free!
 }
 
 void ModelHandler::TimeoutExpired() {
-  checkModelTimeouts();
+  checkModelTimeouts(false);
   m_timeout->reset(60000);
 }
 
@@ -335,21 +342,33 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
   }
 
 }
-
-void ModelHandler::invalidate() {
-  // Do the same again for the object map
-  //for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
+void ModelHandler::contextCreated() {
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
     ModelRecord *record = I->second;
     assert(record);
     Model *model = record->model;
     if (model) {
-      model->invalidate();
+      model->contextCreated();
     }
   }
-
-
 }
+
+
+void ModelHandler::contextDestroyed(bool check) {
+  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
+    ModelRecord *record = I->second;
+    assert(record);
+    Model *model = record->model;
+    if (model) {
+      model->contextDestroyed(check);
+    }
+  }
+}
+
+void ModelHandler::reset() {
+//  checkModelTimeouts(true);
+}
+
 
 PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName)
 {
@@ -359,5 +378,6 @@ PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName)
 //    std::cerr << "called getPositionForSubmodel on Model base class : undefined" << std::endl;
     return po;
 }
+
 
 } /* namespace Sear */

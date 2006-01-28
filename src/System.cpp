@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.143 2006-01-16 11:08:02 simon Exp $
+// $Id: System.cpp,v 1.144 2006-01-28 15:35:48 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,7 +27,6 @@
 #include "Character.h"
 #include "client.h"
 #include "Console.h"
-#include "Exception.h"
 #include "FileHandler.h"
 #include "renderers/Graphics.h"
 #include "loaders/ModelSystem.h"
@@ -306,7 +305,7 @@ bool System::init(int argc, char *argv[]) {
   // Hide cursor
   SDL_ShowCursor(0);
 
-  RenderSystem::getInstance().initContext();
+//  RenderSystem::getInstance().initContext();
 
   m_workarea->init();
 
@@ -425,12 +424,6 @@ void System::mainLoop() {
       }
       // draw scene
       RenderSystem::getInstance().drawScene(false, time_elapsed);
-    } catch (ClientException ce) {
-      Log::writeLog(ce.getMessage(), Log::LOG_ERROR);
-      pushMessage(ce.getMessage(), CONSOLE_MESSAGE);
-    } catch (Exception e) {
-      Log::writeLog(e.getMessage(), Log::LOG_ERROR);
-      pushMessage(e.getMessage(), CONSOLE_MESSAGE);
     } catch (Eris::InvalidOperation io) {
       Log::writeLog(io._msg, Log::LOG_ERROR);
       pushMessage(io._msg, CONSOLE_MESSAGE);
@@ -445,10 +438,7 @@ void System::mainLoop() {
 }
 
 void System::handleEvents(const SDL_Event &event) {
-  Render *renderer = RenderSystem::getInstance().getRenderer();
-
   assert(m_character != NULL);
-  assert(renderer != NULL);
 
   if (!m_console->consoleStatus()) {
     if (m_workarea->handleEvent(event)) {
@@ -465,11 +455,11 @@ void System::handleEvents(const SDL_Event &event) {
           m_click_y = event.button.y;
           m_click_seconds = m_seconds;
           float x,y,z;
-          if (dynamic_cast<GL*>(renderer)->getWorldCoords(m_click_x, m_click_y, x,y,z)) {
+          if (RenderSystem::getInstance().getWorldCoords(m_click_x, m_click_y, x,y,z)) {
               m_click_pos = WFMath::Point<3>(x,y,z);
           }
-          renderer->procEvent(event.button.x, event.button.y);
-          m_click_id = renderer->getActiveID();
+          RenderSystem::getInstance().processMouseClick(event.button.x, event.button.y);
+          m_click_id = RenderSystem::getInstance().getActiveEntityID();
           break;
         }
         break;
@@ -519,7 +509,7 @@ void System::handleEvents(const SDL_Event &event) {
       break;
     }
     case SDL_MOUSEMOTION: {
-      if (m_mouse_move_select && !m_mouseLook) renderer->procEvent(event.button.x, event.button.y);
+      if (m_mouse_move_select && !m_mouseLook) RenderSystem::getInstance().processMouseClick(event.button.x, event.button.y);
       break;
     } 
     case SDL_KEYDOWN: {
@@ -570,12 +560,12 @@ void System::handleEvents(const SDL_Event &event) {
     
     case SDL_JOYBUTTONDOWN: {
       if (event.jbutton.button == DEFAULT_joystick_touch_button) {
-        renderer->procEvent(m_width / 2, m_height / 2);
-        m_character->touchEntity(renderer->getActiveID());
+        RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
+        m_character->touchEntity(RenderSystem::getInstance().getActiveEntityID());
       }
       if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
-        renderer->procEvent(m_width / 2, m_height / 2);
-	m_character->getEntity(renderer->getActiveID());
+        RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
+	m_character->getEntity(RenderSystem::getInstance().getActiveEntityID());
       }
       break;
     }
@@ -835,11 +825,7 @@ void System::registerCommands(Console *console) {
 
 void System::runCommand(const std::string &command) {
   if (debug) Log::writeLog(command, Log::LOG_INFO);
-  try {
-    m_console->runCommand(command);
-  } catch (Exception e) {
-    Log::writeLog(e.getMessage(), Log::LOG_ERROR);
-  }
+  m_console->runCommand(command);
 }
 
 void System::runCommand(const std::string &command, const std::string &args_t) {
@@ -895,8 +881,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == TOGGLE_MLOOK) toggleMouselook();
   else if (command == IDENTIFY_ENTITY) {
     if (!m_client->getAvatar()) return;
-    Render *renderer = RenderSystem::getInstance().getRenderer();
-    WorldEntity *we = (dynamic_cast<WorldEntity*>(m_client->getAvatar()->getView()->getEntity(renderer->getActiveID())));
+    WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
   }
 
@@ -972,6 +957,14 @@ void System::varconf_general_callback(const std::string &section, const std::str
       temp = config.getItem(SYSTEM, KEY_window_height);
       m_height = (!temp.is_int()) ? (DEFAULT_window_height) : ((int)temp);
     }
+  }
+}
+
+void System::setState(SystemState ss, bool state) {
+  m_systemState[ss] = state;
+  if (ss == SYS_IN_WORLD) {
+    if (state) EnteredWorld.emit();
+    else LeftWorld.emit();
   }
 }
     

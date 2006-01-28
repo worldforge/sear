@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.7 2005-06-22 15:51:56 simon Exp $
+//$Id: Model.h,v 1.8 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -32,7 +32,8 @@ public:
 //  virtual int init() = 0;
   virtual int shutdown() = 0;
 
-  virtual void invalidate() = 0;
+  virtual void contextCreated() = 0;
+  virtual void contextDestroyed(bool check) = 0;
 
   virtual void update (float time_elapsed) {}
   virtual void render(bool select_mode) {}

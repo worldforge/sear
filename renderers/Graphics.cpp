@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.31 2005-12-20 23:40:31 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.32 2006-01-28 15:35:49 simon Exp $
 
 #include <sage/sage.h>
 
@@ -20,7 +20,6 @@
 #include "Camera.h"
 #include "src/Character.h"
 #include "src/Console.h"
-#include "src/Exception.h"
 #include "Frustum.h"
 #include "Light.h"
 #include "LightManager.h"
@@ -188,8 +187,8 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   if (!select_mode) { 
     Workarea * wa = m_system->getWorkarea();
-    if (wa) wa->draw();
-    else throw Exception("Error no Workarea object");
+    assert (wa != NULL);
+    wa->draw();
 
     Console *con = m_system->getConsole();
     assert(con);
@@ -202,7 +201,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     m_frame_time += time_elapsed;
     m_frame_rate = (float)m_num_frames++ / m_frame_time;
     if (m_frame_time > 1.0f) {
-      std::string fr = string_fmt(m_frame_rate);
+      std::string fr = "Sear: " + string_fmt(m_frame_rate);
       SDL_WM_SetCaption(fr.c_str(), fr.c_str());
       m_num_frames = 0;
       m_frame_time = 0.0f;
@@ -323,6 +322,7 @@ if (c_select) select_mode = true;
 
     WFMath::Point<3> pos(0,0,0); // Initial camera positiona
     pos = focus->getAbsPos();
+    assert (pos.isValid());
 
     m_renderer->getFrustum(m_frustum);
     // Setup main light sources
@@ -396,12 +396,13 @@ void Graphics::buildQueues(WorldEntity *we,
     Render::MessageList &name_list,
     float time_elapsed)
 {
+  if (!we->isVisible()) return;
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  assert(cam != NULL);
   WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
 
 //  we->checkActions(); // See if model animations need to be updated
-  if (!we->isVisible()) return;
 
   assert(we->getType());
     
@@ -451,10 +452,12 @@ void Graphics::drawObject(ObjectRecord* obj,
   // reject for drawing if object bbox is outside frustum   
   if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
     
+  WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
+  assert(obj_we); 
 
   // Get world coord of object
-  WFMath::Point<3> p = obj->entity->getAbsPos();
-
+  WFMath::Point<3> p = obj_we->getAbsPos();
+  assert(p.isValid());
   // Transform world coord into camera coord
   WFMath::Vector<3> cam_pos(
     p.x() * m_modelview_matrix[0][0] 
@@ -491,7 +494,7 @@ void Graphics::drawObject(ObjectRecord* obj,
 
   for (I = Ibegin; I != Iend; ++I) {
     // retrive or create the model and modelRecord as necessary
-    ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj->entity);
+    ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj_we);
     assert(modelRec);
     
     int state = select_mode ? modelRec->select_state : modelRec->state;
@@ -507,11 +510,11 @@ void Graphics::drawObject(ObjectRecord* obj,
         modelRec->model->setLastTime(System::instance()->getTimef());
     } 
     // Add attached objects to the render queues.
-    if (obj->draw_attached || !obj->entity->getAttachments().empty()) {
+    if (obj->draw_attached || !obj_we->getAttachments().empty()) {
       WorldEntity::AttachmentMap::const_iterator it,
-                                      end = obj->entity->getAttachments().end();
+                                      end = obj_we->getAttachments().end();
 
-      for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
+      for (it = obj_we->getAttachments().begin(); it != end; ++it) {
         // retrieving the objectRecord also syncs it's pos with the WorldEntity
         if (!it->second) { continue; }
         Eris::Entity * ee = it->second.get();
@@ -535,9 +538,9 @@ void Graphics::drawObject(ObjectRecord* obj,
   
   // if rendering, add any messages
   if (!select_mode) {
-    name_list.push_back(obj->entity);
-    if (obj->entity->hasMessages()) {
-      message_list.push_back(obj->entity);
+    name_list.push_back(obj_we);
+    if (obj_we->hasMessages()) {
+      message_list.push_back(obj_we);
     }
   } // of object models loop
 }
@@ -586,12 +589,15 @@ void Graphics::drawAttached(ObjectRecord* obj,
                         Render::MessageList &name_list,
                         float time_elapsed)
 {
-  ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, obj->low_quality.front(), obj->entity);
-
+  assert(obj);
+  WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
+  assert(obj_we);
+  ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, obj->low_quality.front(), obj_we);
+  assert(modelRec);
   WorldEntity::AttachmentMap::const_iterator it,
-    end = obj->entity->getAttachments().end();
+    end = obj_we->getAttachments().end();
     
-  for (it = obj->entity->getAttachments().begin(); it != end; ++it) {
+  for (it = obj_we->getAttachments().begin(); it != end; ++it) {
     // retrieving the objectRecord also syncs it's pos with the WorldEntity
     if (!it->second) { continue; }
     Eris::Entity * ee = it->second.get();
@@ -768,9 +774,8 @@ void Graphics::registerCommands(Console * console) {
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
   if (command == "invalidate") {
-    RenderSystem::getInstance().invalidate();
-    Environment::getInstance().invalidate();
-    ModelSystem::getInstance().invalidate();
+    m_renderer->contextDestroyed(true);
+    m_renderer->contextCreated();
   } else if (command == "+show_names") {
     m_show_names = true;
   } else if (command == "-show_names") {

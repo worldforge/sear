@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.75 2006-01-16 19:13:54 alriddoch Exp $
+// $Id: client.cpp,v 1.76 2006-01-28 15:35:48 simon Exp $
 
 #include "System.h"
 
@@ -38,7 +38,6 @@
 #include "loaders/Model.h"
 #include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
-#include "Exception.h"
 #include "WorldEntity.h"
 
 
@@ -718,11 +717,13 @@ void Client::setStatus(int status) {
   switch (status) {
     case CLIENT_STATUS_DISCONNECTED:
       m_system->getActionHandler()->handleAction("disconnected", 0);
+      m_avatar = NULL;
     case CLIENT_STATUS_DISCONNECTING:
     case CLIENT_STATUS_CONNECTING:
       m_system->setState(SYS_CONNECTED, false);
       m_system->setState(SYS_LOGGED_IN, false);
       m_system->setState(SYS_IN_WORLD, false);
+      m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
       break;
     case CLIENT_STATUS_CONNECTED:
@@ -731,6 +732,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, false);
       m_system->setState(SYS_IN_WORLD, false);
+      m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("connected", 0);
       break;
@@ -740,6 +742,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, true);
       m_system->setState(SYS_IN_WORLD, false);
+      m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("logged_in", 0);
       break;

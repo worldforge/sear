@@ -3,11 +3,9 @@
 
 #include "loaders/Model.h"
 
-namespace Sear
-{
+namespace Sear {
 
-class NullModel : public Model
-{
+class NullModel : public Model {
 public:
     NullModel(Render* r) : Model(r)
     {
@@ -22,9 +20,8 @@ public:
         return 0;
     }
     
-    virtual void invalidate()
-    {
-    }
+    virtual void contextCreated() {}
+    virtual void contextDestroyed(bool check) {}
 };
 
 }

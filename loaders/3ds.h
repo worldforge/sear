@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.19 2005-06-13 15:10:46 simon Exp $
+// $Id: 3ds.h,v 1.20 2006-01-28 15:35:48 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -51,7 +51,8 @@ public:
   int shutdown();
   void render(bool);
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
   void setHeight(float height) { m_height = height; }
 
 protected:

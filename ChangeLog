@@ -1,7 +1,84 @@
+2006-01-28  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Exception.h, loaders/cal3d/Cal3dCoreModel.cpp, renderers/GL.cpp, 
+	  renderers/Graphics.cpp, src/Sound.cpp, src/System.cpp: Remove 
+	  Exception.h as it is not needed.
+
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/SkyDome.cpp, environment/SkyDome.h,
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h, 
+	  loaders/3ds.cpp, loaders/3ds.h, loaders/AreaModel.cpp,
+	  loaders/AreaModel.h, loaders/BoundBox.cpp, loaders/BounddBox.h,
+	  loaders/LibModelFile.cpp, loaders/LibModelFile.h, loaders/Model.h, 
+	  loaders/ModelHandler.cpp, loaders/ModelHandler.h, 
+	  loaders/ModelSystem.cpp, loaders/ModelSystem.h, loaders/Nplane.cpp,
+	  loaders/NPlane.h, loaders/NullModel.h, loaders/ObjectHandler.cpp,
+	  loaders/ObjectHandler.h, loaders/ParticleSystem.cpp,
+	  loaders/ParticleSystem.h, loaders/WireFrame.cpp, loaders/WireFrame.h,
+	  loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h,
+	  renderers/GL.cpp, renderers/GL.h, renderers/Graphics.cpp, 
+	  renderers/Graphics.h, renderers/RenderSystem.cpp,
+	  renderers/RenderSystem.h, renderers/Sprite.cpp, renderers/Sprite.h, 
+	  renderers/StateManager.cpp, renderers/StateManager.h, 
+	  renderers/TextureManager.cpp, renderers/TextureManager.h,
+	  src/System.cpp: Replace invalidate with contextCreated and
+	  contextDestroyed functions. Create some signals in the RenderSystem
+	  class that other parts of Sear can connect to for notification of
+	  context creation/destruction. contextDestroyed takes a flag (check)
+	  that when set to true will assume that the context has not really
+	  been destroyed and it should call glDeleteXXX for its context
+	  information.
+
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  loaders/ModelHandler.cpp, loaders/ModelHandler.h: Create a reset
+	  function to remove instance data.
+
+	* loaders/AreaModel.cpp, loaders/ObjectRecord.cpp,
+	  loaders/ObjectRecord.h, loaders/ParticleSystem.cpp,
+	  renderers/Graphics.cpp: Use an EntityRef in ObjectRecord in case of
+	  entity deletion. Update objectrecord->entity usage to use EntityRef 
+	  methods and perform casting to WorldEntity.
+
+	* loaders/ModelHandler.cpp: Fix model unloading. Add a flag to force
+	  unload.
+
+	* loaders/ModelSystem.cpp, enviroment/Environment.cpp: Create an
+	  EnteredWorld and LeftWorld signal. Connect Environment and 
+	  ModelSystem to LeftWorld so instance data can be cleaned up. Update 
+	  the setState function to fire the signals as required.
+
+	* loaders/ModelSytem.cpp, loaders/ObjectHandler.cpp,
+	  loaders/ObjectHandler.h: Update ObjectHandler to separate the records
+	  from config files to those instantiated for a given entity. This 
+	  makes cleaning up instantiated data easier.
+
+	* loaders/cal3d/Cal3dModel.cpp: Remove some debugging information.
+
+	* renderers/Frustum.cpp: Remove unneeded includes.
+
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h,
+	  renderers/GL.cpp, renderers/GL.h, renderers/Render.h: Allow both 
+	  currently selected entity ID and the entity itself to be obtained
+	  through the RenderSystem class.
+
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h, src/System.cpp:
+	  Export getWorldCoords and procEvent(now processMouseClick) through
+	  RenderSystem.
+
+	* src/client.cpp: Set m_avatar to NULL on relevant state change.
+
+	* src/Render.h: Add start of code to track current context instantation
+	  and make sure all rendering components have reset on context
+	  destruction/creation. Will be linked into the contextCreated and
+	  contextDestroyed functions.
+
 2006-01-26  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/Overlay.cpp: Text code to start separating speech bubbles.
 	  Needs to work with anchors attached to character position.
+
+	* src/Character.cpp, src/Character.h: Use EntityRef to store pointer to character entity.
 
 2006-01-26  Simon Goodall  <sear@simongoodall.co.uk>
 

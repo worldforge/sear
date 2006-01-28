@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.9 2006-01-24 18:58:50 simon Exp $
+// $Id: Render.h,v 1.10 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -45,7 +45,10 @@ typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
 
-  Render() {
+  Render() :
+    m_context_instantiation(-1),
+    m_context_valid(false)
+{
   }
   virtual ~Render() {}
    
@@ -55,6 +58,9 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void init() =0;
   virtual void shutdown() =0;
+
+  virtual int contextCreated() = 0;
+  virtual void contextDestroyed(bool check) = 0;
 
   virtual void print(int x, int y, const char*, int set) =0;
   virtual void print3D(const char*, int set) =0;
@@ -80,7 +86,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual int getWindowWidth() const = 0;
   virtual int getWindowHeight() const = 0;
 
-  virtual std::string getActiveID() =0;
+  virtual std::string getActiveID()const =0;
+  virtual WorldEntity * getActiveEntity()const =0;
 
   virtual int axisBoxInFrustum(const WFMath::AxisBox<3> &) =0;
   virtual float distFromNear(float,float,float) =0;
@@ -114,8 +121,12 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void freeList(unsigned int list) = 0;
 
   virtual void selectTerrainColour(WorldEntity * we) = 0;
-  
+
+  void incrementContext() { m_context_instantiation++; }
+
 protected:
+  int m_context_instantiation ;
+  bool m_context_valid;;
 };
   
 } /* namespace Sear */

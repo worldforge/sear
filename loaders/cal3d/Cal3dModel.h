@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.16 2005-06-22 15:51:56 simon Exp $
+// $Id: Cal3dModel.h,v 1.17 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -29,7 +29,8 @@ public:
   int init(Cal3dCoreModel *);
   int shutdown();
 
-  void invalidate() {}
+  void contextCreated() {}
+  void contextDestroyed(bool check) {}
 
   float getLodLevel() const { return m_lodLevel; }
   float getScale() const { return m_renderScale; }

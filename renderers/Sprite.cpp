@@ -1,4 +1,4 @@
-// $Id: Sprite.cpp,v 1.7 2005-06-13 15:10:46 simon Exp $
+// $Id: Sprite.cpp,v 1.8 2006-01-28 15:35:49 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"
@@ -70,12 +70,16 @@ SpriteData::SpriteData(const std::string& spriteName) :
 SpriteData::~SpriteData()
 {
     assert(m_refCount == 0);
-    invalidate();
+    contextDestroyed(true);
 }
 
-void SpriteData::invalidate()
+void SpriteData::contextCreated() {
+
+}
+
+void SpriteData::contextDestroyed(bool check)
 {
-    if (m_valid && glIsTexture(m_textureId)) {
+    if (m_valid && check && glIsTexture(m_textureId)) {
         glDeleteTextures(1, &m_textureId);
     }
     

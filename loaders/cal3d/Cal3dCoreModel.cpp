@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.31 2005-06-22 07:16:56 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.32 2006-01-28 15:35:49 simon Exp $
 
 
 #include "Cal3dModel.h"
@@ -17,8 +17,6 @@
 #include "common/Utility.h"
 #include "src/System.h"
 #include "renderers/Render.h"
-
-#include "src/Exception.h"
 
 #include "renderers/RenderSystem.h"
 
@@ -85,8 +83,6 @@ int Cal3dCoreModel::init(const std::string &filename) {
     printf("Error while loading %s\n", filename.c_str());
     delete m_core_model;
     m_core_model = NULL;
-
-    #warning "Possible memleak here"
 
     return 1;
   }

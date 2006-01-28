@@ -75,7 +75,8 @@ public:
 
     virtual void update(float dt);
 
-    virtual void invalidate();
+    virtual void contextCreated();
+    virtual void contextDestroyed(bool check);
 
     virtual void render(bool select_mode);
 

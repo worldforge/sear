@@ -38,6 +38,40 @@ static GLfloat ty0[] = { 0.f, 0.125f, 0.f, 0.f };
 static GLfloat sx1[] = { 0.015625f, 0.f, 0.f, 0.f };
 static GLfloat ty1[] = { 0.f, 0.015625f, 0.f, 0.f };
 
+
+void TerrainRenderer::DataSeg::contextDestroyed(bool check) {
+  if (check) {
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      if (glIsBufferARB(vb_narray)) {
+        glDeleteBuffersARB(1, &vb_narray);
+      }
+
+      if (glIsBufferARB(vb_harray)) {
+        glDeleteBuffersARB(1, &vb_harray);
+      }     
+    }
+    if (glIsList(disp)) {
+      glDeleteLists(1, disp);
+    }
+  }
+  vb_narray = 0;
+  vb_harray = 0;
+  disp = 0;
+
+  // Clean up buffers
+  if (harray) delete [] harray;
+  harray = NULL;
+  narray = NULL;
+
+  // Clean up textures
+  std::map<int, GLuint>::iterator it = m_alphaTextures.begin();
+  for (; it != m_alphaTextures.end(); ++it) {
+      if (check && glIsTexture(it->second)) glDeleteTextures(1, &it->second);
+  }
+  
+  m_alphaTextures.clear();
+}
+
 void TerrainRenderer::enableRendererState() {
   static const float ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
   static const float diffuse[] = { 0.8f, 0.8f, 0.8f, 1.0f };
@@ -392,6 +426,7 @@ TerrainRenderer::TerrainRenderer ():
   }
   m_numLineIndeces = ++idx;
 
+  // TODO set these texture names in a config file
   registerShader(new Mercator::FillShader(), "granite.png");
   registerShader(new Mercator::BandShader (-2.f, 1.5f), "sand.png");  // Sandy beach
   registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
@@ -404,7 +439,21 @@ TerrainRenderer::~TerrainRenderer() {
     delete m_shaders[i].shader;
   }
   delete [] m_lineIndeces;
-  invalidate();
+  contextDestroyed(true);
+}
+
+void TerrainRenderer::reset() {
+  // Clear all data
+  contextDestroyed(true);
+#if(0)
+  m_terrain = Mercator::Terrain(Mercator::Terrain::SHADED);
+  // TODO set these texture names in a config file
+  registerShader(new Mercator::FillShader(), "granite.png");
+  registerShader(new Mercator::BandShader (-2.f, 1.5f), "sand.png");  // Sandy beach
+  registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
+  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
+  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
+#endif
 }
 
 void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
@@ -417,13 +466,13 @@ void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
   }
 }
 
-void TerrainRenderer::invalidate() {
+void TerrainRenderer::contextDestroyed(bool check) {
   DisplayListStore::iterator I = m_displayLists.begin();
   while (I != m_displayLists.end()) {
     DisplayListColumn &dcol = (I->second);
     DisplayListColumn::iterator J = dcol.begin();
     while (J != dcol.end()) {
-      (J->second).invalidate(); 
+      (J->second).contextDestroyed(check); 
       ++J;
     }
     ++I;
@@ -431,10 +480,10 @@ void TerrainRenderer::invalidate() {
  
   m_displayLists.clear();
   
-  for (unsigned int i = 0; i < m_shaders.size();  ++i) {
+//  for (unsigned int i = 0; i < m_shaders.size();  ++i) {
     // done by texture manager?
   //  if (glIsTexture(m_shaders[i].texId)) glIsTexture(1, &m_shaders[i].texId);
-  }
+//  }
 }
 
 void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& texName)

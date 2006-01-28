@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.4 2005-05-19 18:34:56 jmt Exp $
+// $Id: ObjectHandler.cpp,v 1.5 2006-01-28 15:35:49 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -47,14 +47,14 @@ void ObjectHandler::init() {
   assert(m_initialised == false);
   if (debug) std::cout << "Object Handler: Initialise" << std::endl;
 
-  m_object_records_map = ObjectRecordMap();
+//  m_object_records_map = ObjectRecordMap();
   // Create default record
   ObjectRecord *r = new ObjectRecord();
   r->name = "default";
   r->draw_self = true;
   r->draw_members = true;
   r->low_quality.push_back("default");
-  m_object_records_map["default"] = r;
+  m_type_map["default"] = r;
   m_initialised = true;
 }
 
@@ -64,11 +64,18 @@ void ObjectHandler::shutdown() {
   if (debug) std::cout << "Object Handler: Shutdown" << std::endl;
 
   // Clean up object records	
-  while (!m_object_records_map.empty()) {
-    ObjectRecord *record = m_object_records_map.begin()->second;
+  while (!m_id_map.empty()) {
+    ObjectRecord *record = m_id_map.begin()->second;
     assert(record != NULL);
     delete record;
-    m_object_records_map.erase(m_object_records_map.begin());
+    m_type_map.erase(m_id_map.begin());
+  }
+  // Clean up object records	
+  while (!m_type_map.empty()) {
+    ObjectRecord *record = m_type_map.begin()->second;
+    assert(record != NULL);
+    delete record;
+    m_type_map.erase(m_type_map.begin());
   }
   m_initialised = false;
 }
@@ -81,28 +88,34 @@ void ObjectHandler::loadObjectRecords(const std::string &filename) {
 }
 
 ObjectRecord *ObjectHandler::getObjectRecord(const std::string &id) {
-  return (m_object_records_map.find(id) != m_object_records_map.end()) 
-        ? (m_object_records_map[id]) : (NULL);
+  return (m_id_map.find(id) != m_id_map.end()) 
+        ? (m_id_map[id]) : (NULL);
 }
 
-void ObjectHandler::copyObjectRecord(const std::string &id, ObjectRecord *object_record) {
-  assert(object_record != NULL);
+ObjectRecord *ObjectHandler::instantiateRecord(const std::string &type, const std::string &id) {
+
+  assert(getObjectRecord(id) == NULL);
+
+  if (m_type_map.find(type) == m_type_map.end()) return NULL;
+
+  ObjectRecord *type_record = m_type_map[type];
 
   ObjectRecord *record = new ObjectRecord();
-  record->draw_self = object_record->draw_self;
-  record->draw_members = object_record->draw_members;
-  record->draw_attached = object_record->draw_attached;
+  record->draw_self = type_record->draw_self;
+  record->draw_members = type_record->draw_members;
+  record->draw_attached = type_record->draw_attached;
   
   // hopefully this will copy the lists. Need to check tho
-  record->low_quality = object_record->low_quality;
-  record->medium_quality = object_record->medium_quality;
-  record->high_quality = object_record->high_quality;
+  record->low_quality = type_record->low_quality;
+  record->medium_quality = type_record->medium_quality;
+  record->high_quality = type_record->high_quality;
 
-  if (m_object_records_map[id]) { // Clean up existing record
-    delete m_object_records_map[id];
-  }
+//  if (m_object_records_map[id]) { // Clean up existing record
+//    delete m_object_records_map[id];
+//  }
 
-  m_object_records_map[id] = record;
+  m_id_map[id] = record;
+  return record;
 }
 
 void ObjectHandler::registerCommands(Console *console) {
@@ -116,14 +129,14 @@ void ObjectHandler::runCommand(const std::string &command, const std::string &ar
 }
 
 void ObjectHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  ObjectRecord *record = m_object_records_map[section];
+  ObjectRecord *record = m_type_map[section];
   // If record does not exist, create it.
   if (!record) {
     record = new ObjectRecord();
     record->name = section;
     record->draw_self = true;
     record->draw_members = true;
-    m_object_records_map[section] = record;
+    m_type_map[section] = record;
     if (debug) {
       std::cout << "Adding ObjectRecord: " << section << std::endl;
     }
@@ -151,6 +164,15 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
 
 void ObjectHandler::varconf_error_callback(const char *message) {
   Log::writeLog(message, Log::LOG_ERROR);
+}
+
+void ObjectHandler::reset() {
+  ObjectRecordMap::iterator I = m_id_map.begin();
+  while(I != m_id_map.end()) {
+    delete I->second;
+    I++;
+  }
+  m_id_map.clear();
 }
 
 } /* namespace Sear */

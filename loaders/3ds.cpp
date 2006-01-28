@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.47 2005-06-25 15:42:23 simon Exp $
+// $Id: 3ds.cpp,v 1.48 2006-01-28 15:35:48 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -153,7 +153,7 @@ int ThreeDS::shutdown() {
   assert(m_initialised == true);
 
   // Clean up OpenGL bits
-  invalidate();
+  contextDestroyed(true);
 
   while (!m_render_objects.empty()) {
     RenderObject *ro = *m_render_objects.begin();
@@ -177,7 +177,9 @@ int ThreeDS::shutdown() {
   return 0;
 }
 
-void ThreeDS::invalidate() {
+void ThreeDS::contextCreated() {}
+
+void ThreeDS::contextDestroyed(bool check) {
   assert(m_render);
 
   // Clean up display lists
@@ -193,18 +195,20 @@ void ThreeDS::invalidate() {
                                                   ++I) {
       RenderObject *ro = *I;
       if (ro) {
-        if (glIsBufferARB(ro->vb_vertex_data)) {
-          glDeleteBuffersARB(1, &ro->vb_vertex_data);
-          ro->vb_vertex_data = 0;
+        if (check == true) {
+          if (glIsBufferARB(ro->vb_vertex_data)) {
+            glDeleteBuffersARB(1, &ro->vb_vertex_data);
+          }
+          if (glIsBufferARB(ro->vb_texCoords_data)) {
+            glDeleteBuffersARB(1, &ro->vb_texCoords_data);
+          }
+          if (glIsBufferARB(ro->vb_normal_data)) {
+            glDeleteBuffersARB(1, &ro->vb_normal_data);
+          }
         }
-        if (glIsBufferARB(ro->vb_texCoords_data)) {
-          glDeleteBuffersARB(1, &ro->vb_texCoords_data);
-          ro->vb_texCoords_data = 0;
-        }
-        if (glIsBufferARB(ro->vb_normal_data)) {
-          glDeleteBuffersARB(1, &ro->vb_normal_data);
-          ro->vb_normal_data = 0;
-        }
+        ro->vb_vertex_data = 0;
+        ro->vb_texCoords_data = 0;
+        ro->vb_normal_data = 0;
       }
     }
   }

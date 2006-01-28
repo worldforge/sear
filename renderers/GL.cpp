@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.137 2006-01-26 12:26:26 simon Exp $
+// $Id: GL.cpp,v 1.138 2006-01-28 15:35:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -36,7 +36,6 @@
 #include "src/Calendar.h"
 #include "Camera.h"
 #include "src/Console.h"
-#include "src/Exception.h"
 #include "Frustum.h"
 #include "Graphics.h"
 #include "loaders/ModelSystem.h"
@@ -49,7 +48,6 @@
 
 #include "GL.h"
 
-#include "environment/Environment.h"
 #include "common/Mesh.h"
 
 #include "src/sear_icon.xpm"
@@ -192,9 +190,10 @@ static const bool debug = false;
 namespace Sear {
 
 bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
+  assert(m_screen == NULL);
   m_graphics = RenderSystem::getInstance().getGraphics();
   // Destroy the existing window
-  if (m_screen != NULL) destroyWindow();
+//  if (m_screen != NULL) destroyWindow();
   
   if (debug) printf("GL: Creating Window\n");
   // Set new window size etc..
@@ -263,7 +262,6 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_WM_SetIcon(icon, NULL);
   SDL_FreeSurface(icon);
 
-
   //Is this the correct way to free a window?
   m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
   if (m_screen == NULL ) {
@@ -271,8 +269,8 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     return false;
   }
   // Check OpenGL flags
-  int value;
   if (debug) {
+    int value;
     SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
     Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
     SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
@@ -287,29 +285,31 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
   }
 
-  SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
+  std::string vendor = string_fmt(glGetString(GL_VENDOR));
+  std::string renderer = string_fmt(glGetString(GL_RENDERER));
+  std::string version = string_fmt(glGetString(GL_VERSION));
+  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
                                                                                 
-    std::string vendor = string_fmt(glGetString(GL_VENDOR));
-    std::string renderer = string_fmt(glGetString(GL_RENDERER));
-    // TODO - CHECK OPENGL VERSION
-    std::string version = string_fmt(glGetString(GL_VERSION));
-    std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
-                                                                                
-//  if (debug) {
-    Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
-    Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
-//  }
+  Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
+  Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
                                                                                 
   // These will be empty if there was a problem initialising the driver
   if (vendor.empty() || renderer.empty()) {
     std::cerr << "Error with OpenGL system" << std::endl;
     return false;
   }
-                                                                                
-  //RenderSystem::getInstance().getStateManager()->initGL();
-                                                                                
+
+  // TODO: Check that the OpenGL version is at least 1.2
+
+  if (contextCreated()) return false;
+
+  return true;
+        
+}                                                                       
+
+int GL::contextCreated() {                                                                                
   initLighting();
   // TODO: initialisation need to go into system?
   setupStates();
@@ -318,7 +318,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
                                                                                 
   //TODO: this needs to go into the set viewport method
   //Check for divide by 0
-  if (height == 0) height = 1;
+  if (m_height == 0) m_height = 1;
 //  glLineWidth(2.0f);
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
@@ -332,22 +332,27 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   setViewMode(PERSPECTIVE);
   if (setupExtensions()) {
     fprintf(stderr, "Error finding required extensions\n");
-    return false;
+    return 1;
   }
 
 //  initFont();
 
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
-  return true;
+
+  RenderSystem::getInstance().ContextCreated.emit();
+
+  return 0;
 }
 void GL::destroyWindow() {
-  RenderSystem::getInstance().invalidate();
-  if (m_screen) {
+  assert(m_screen != NULL);
+
+//  if (m_screen) {
     SDL_FreeSurface(m_screen);
     m_screen = NULL;
-  }
+//  }
   SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
 }
 
 void GL::toggleFullscreen() {
@@ -355,14 +360,11 @@ void GL::toggleFullscreen() {
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
   if (!SDL_WM_ToggleFullScreen(m_screen)) {
     destroyWindow();
-    RenderSystem::getInstance().invalidate();
-    Environment::getInstance().invalidate();
     createWindow(m_width, m_height, m_fullscreen);
-    RenderSystem::getInstance().invalidate();
-    Environment::getInstance().invalidate();
   }
 }
-void GL::checkError() {
+int GL::checkError() {
+  int iserr = 0;
   GLenum err = glGetError();
   std::string msg;
   switch (err) {
@@ -375,7 +377,11 @@ void GL::checkError() {
     case GL_OUT_OF_MEMORY: msg = "GL Error: Out of memory!"; break;
     default: msg = std::string("GL Error: Unknown Error: ") +  string_fmt(err); break;
   }
-  if (!msg.empty()) std::cerr << msg << std::endl;
+  if (!msg.empty()) {
+    std::cerr << msg << std::endl;
+    iserr = 1;
+  }
+  return iserr;
 }   
 
 
@@ -488,10 +494,10 @@ GL::~GL() {
 
 void GL::shutdown() {
   assert(m_initialised == true);
-//  if (!m_initialised) return;
+
   if (debug) std::cout << "GL: Shutdown" << std::endl;
 
-  invalidate();
+  assert(m_screen == NULL);
 
   m_initialised = false;
 }
@@ -506,11 +512,11 @@ void GL::init() {
   m_initialised = true;
 }
 
-void GL::invalidate() {
+void GL::contextDestroyed(bool check) {
   // Clear font display list
-  shutdownFont();
-  setupStates();
-  //
+  shutdownFont(check);
+
+  RenderSystem::getInstance().ContextDestroyed.emit(check);
 }
 
 void GL::initLighting() {
@@ -565,9 +571,13 @@ void GL::initFont() {
   m_fontInitialised = true;
 }
 
-void GL::shutdownFont() {
+void GL::shutdownFont(bool check) {
   if (debug) Log::writeLog("Render: Shutting down fonts", Log::LOG_DEFAULT);
-  glDeleteLists(m_base,256); // Delete All 256 Display Lists
+  if (check) {
+    if (glIsList(m_base)) {
+      glDeleteLists(m_base, 256); // Delete All 256 Display Lists
+    }
+  }
   m_fontInitialised = false;
 }
 
@@ -1141,10 +1151,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
  
       // Draw Model
       if (select_mode) {
-        nextColour(object_record->entity);
+        nextColour(dynamic_cast<WorldEntity*>(object_record->entity.get()));
         model->render(true);
       } else {
-        if (object_record->entity == m_activeEntity.get()) {
+        if (object_record->entity.get() == m_activeEntity.get()) {
           m_active_name = object_record->name;
           drawOutline(model_record);
         } else {
@@ -1496,8 +1506,12 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
   }
 }
 
-std::string GL::getActiveID() {
+std::string GL::getActiveID() const {
   return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
+} 
+WorldEntity *GL::getActiveEntity() const {
+  return dynamic_cast<WorldEntity*>(m_activeEntity.get());
+//  return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
 } 
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   // TODO: Reduce ClientState switches
@@ -1626,10 +1640,11 @@ void GL::resize(int width, int height) {
   }
   // Have the textures been destroyed?
   if (!glIsTexture(1)) {
-    Environment::getInstance().invalidate();
+    // TODO: What is going on in this situation
+    // The window has been resized, however the GL context needs to be
+    // re-created. Do we need to destroy the whole window?
+    RenderSystem::getInstance().ContextDestroyed.emit(false);
     createWindow(m_width, m_height, m_fullscreen);
-    RenderSystem::getInstance().invalidate();
-    Environment::getInstance().invalidate(); 
     return;
   }
   // Update view port

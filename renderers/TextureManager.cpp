@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.41 2005-09-19 21:27:51 alriddoch Exp $
+// $Id: TextureManager.cpp,v 1.42 2006-01-28 15:35:49 simon Exp $
 
 #include "TextureManager.h"
 
@@ -177,8 +177,7 @@ void TextureManager::init()
   m_initialised = true;
 }
 
-void TextureManager::initGL()
-{
+void TextureManager::contextCreated() {
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL == false);
   
@@ -536,8 +535,10 @@ void TextureManager::generalConfigChanged(const std::string &section, const std:
         std::cout << "set base mipmap level to " << m_baseMipmapLevel << std::endl;
         
         // restart stuff as necessary
-        if (m_initGL)
-            invalidate();
+        if (m_initGL) {
+            contextDestroyed(true);
+            contextCreated();
+        }
     }
 }
 
@@ -727,41 +728,24 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
 
 }
 
-void TextureManager::invalidate()
+void TextureManager::contextDestroyed(bool check)
 {
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL);
   
   // unload textures first.
-  for (unsigned int i = 0; i < m_textures.size(); i++) {
+  for (unsigned int i = 0; i < m_textures.size(); ++i) {
     // Unload texture if its still valid
-    if (glIsTexture(m_textures[i])) {
+    if (check  && glIsTexture(m_textures[i])) {
       glDeleteTextures(1, &m_textures[i]);
     }
     m_textures[i] = 0;
   }
 
   for (SpriteInstanceMap::iterator S=m_sprites.begin(); S != m_sprites.end(); ++S) {
-    S->second->invalidate();
+    S->second->contextDestroyed(check);
   }
-
-  // Determine available OpenGL extensions
-  setupGLExtensions();
-  
-  // Initialise our current texture cache
-  for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
-  // Setup default texture properties
-  m_default_texture = createDefaultTexture();
-  if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
-
-  // create default font
-  m_default_font = createDefaultFont();
-  if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
-
-  createCursor("cursor_default", arrow);
-  createCursor("cursor_pickup", pickup);
-  createCursor("cursor_touch", touch);
-  createCursor("cursor_use", use);
+  m_initGL = false;
 }
 
 GLint TextureManager::getFormat(const std::string &fmt) {

@@ -1,11 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #ifndef RENDERSYSTEM_H
 #define RENDERSYSTEM_H 1
 
 #include <string>
+
+#include <sigc++/signal.h>
+#include <sigc++/object.h>
 
 namespace varconf {
   class Config;
@@ -22,8 +25,9 @@ class Console;
 class Render;
 class Graphics;
 class CameraSystem;
+class WorldEntity;
 
-class RenderSystem {
+class RenderSystem : public SigC::Object{
 public:
   typedef enum {
     RENDER_UNKNOWN = 0,
@@ -57,7 +61,6 @@ public:
   virtual ~RenderSystem() {}
 
   void init();
-  void initContext();
   void shutdown();
 
   // Texture Manager Functions
@@ -70,8 +73,8 @@ public:
   void switchState(StateID state);
   StateID getCurrentState();
 
-  void invalidate();
-
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   TextureManager *getTextureManager() const { return m_textureManager; }
   StateManager *getStateManager() const { return m_stateManager; }
@@ -105,6 +108,15 @@ public:
   int getMouseCursor() const { return m_mouseState[m_mouseCurState]; }
   bool isMouseVisible() const { return m_mouseVisible; }
   void setMouseVisible(bool v) { m_mouseVisible= v; }
+
+  WorldEntity *getActiveEntity() const;
+  std::string getActiveEntityID() const;
+
+  void processMouseClick(int x, int y);
+  bool getWorldCoords(int x, int y, float &wx, float &wy, float &wz);
+
+  sigc::signal<void> ContextCreated;
+  sigc::signal<void, bool> ContextDestroyed;
 
 private:
   static RenderSystem m_instance;

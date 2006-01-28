@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.28 2005-06-29 21:19:41 simon Exp $
+// $Id: BoundBox.cpp,v 1.29 2006-01-28 15:35:48 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"
@@ -161,18 +161,22 @@ int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wra
 int BoundBox::shutdown() {
   assert(m_initialised == true);
 
-  invalidate();
+  contextDestroyed(true);
 
   m_initialised = false;
   return 0;
 }
 
-void BoundBox::invalidate() {
-  assert(m_render != NULL);
-  // Clear up display lists
-  m_render->freeList(m_list);
-  m_render->freeList(m_list_select);
+void BoundBox::contextCreated() {}
 
+void BoundBox::contextDestroyed(bool check) {
+  assert(m_render != NULL);
+
+  if (check) {
+    // Clear up display lists
+    m_render->freeList(m_list);
+    m_render->freeList(m_list_select);
+  }
   m_list = 0;
   m_list_select = 0;
 }

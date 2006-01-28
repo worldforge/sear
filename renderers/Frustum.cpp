@@ -2,14 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.3 2006-01-24 18:58:50 simon Exp $
+// $Id: Frustum.cpp,v 1.4 2006-01-28 15:35:49 simon Exp $
 
 #include "common/Utility.h"
 
 #include "src/System.h"
-//#include "src/WorldEntity.h"
 #include "Frustum.h"
-#include "environment/Environment.h"
 
 
 #ifdef USE_MMGR

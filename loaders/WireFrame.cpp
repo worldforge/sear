@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.16 2005-04-13 12:16:04 simon Exp $
+// $Id: WireFrame.cpp,v 1.17 2006-01-28 15:35:49 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"
@@ -100,15 +100,19 @@ int WireFrame::init(WFMath::AxisBox<3> bbox) {
 int WireFrame::shutdown() {
   assert(m_initialised == true);
 
-  invalidate();
+  contextDestroyed(true);
  
   m_initialised = false;
   return 0;
 }
 
-void WireFrame::invalidate() {
+void WireFrame::contextCreated() {}
+
+void WireFrame::contextDestroyed(bool check) {
   assert(m_render);
-  m_render->freeList(m_disp);
+  if (check) {
+    m_render->freeList(m_disp);
+  }
   m_disp = 0;
 }
 

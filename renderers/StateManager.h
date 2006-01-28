@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.9 2005-09-15 08:31:31 simon Exp $
+// $Id: StateManager.h,v 1.10 2006-01-28 15:35:49 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -79,7 +79,8 @@ public:
   
   StateID getCurrentState() const { return m_current_state; }
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
 private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);

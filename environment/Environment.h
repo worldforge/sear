@@ -1,12 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #ifndef SEAR_ENVIRONMENT_H
 #define SEAR_EnVIRONMENT_H
 
 #include <stdlib.h>
 #include <map>
+
+#include <sigc++/object.h>
 
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
@@ -23,7 +25,7 @@ class SkyDome;
 class Stars;
 class WorldEntity;
 
-class Environment {
+class Environment : public SigC::Object {
   Environment() :
     m_initialised(false),
     m_terrain(NULL),
@@ -49,11 +51,14 @@ public:
   void renderTerrain(const WFMath::Point<3> &pos, bool select_mode);
   void renderSea();
 
-  void invalidate();
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   void registerArea(Mercator::Area* we);
   void registerTerrainShader(Mercator::Shader* s, const std::string& texId);
   
+  void resetWorld();
+
 private:
   bool m_initialised;
 
