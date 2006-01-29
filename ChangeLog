@@ -1,5 +1,10 @@
 2006-01-29  Al Riddoch  <alriddoch@zepler.org>
 
+	* guichan/SpeechBubble.cpp: Ensure that exceptions are caught if
+	  loading the media for speech bubbles fails.
+
+2006-01-29  Al Riddoch  <alriddoch@zepler.org>
+
 	* src/System.h, src/System.cpp: Store the time calculated since the
 	  the last frame, as it it likely to be used in many parts of the
 	  code for animation.
