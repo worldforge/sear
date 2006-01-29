@@ -4,6 +4,8 @@
 
 #include "guichan/SpeechBubble.h"
 
+#include "src/System.h"
+
 #include <iostream>
 
 namespace Sear {
@@ -31,7 +33,7 @@ void SpeechBubble::addLine(const std::string & line)
 void SpeechBubble::logic()
 {
     if (m_overflow) {
-        m_offset += 0.1f;
+        m_offset += System::instance()->getTimeElapsed() * 10.f;
         m_overflow = false;
     }
 }

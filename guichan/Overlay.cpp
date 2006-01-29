@@ -35,10 +35,19 @@ void Overlay::logic(RootWidget * rw)
 {
   Eris::Avatar * avatar = System::instance()->getClient()->getAvatar();
   Render * render = RenderSystem::getInstance().getRenderer();
-  if (avatar == 0) {
-    return;
-  }
-  if (avatar->getEntity() == 0) {
+  if (avatar == 0 || avatar->getEntity() == 0) {
+    if (m_top != 0) {
+      // If this overlay is initialised, clean it up.
+      m_top->remove(m_selfStatus);
+      delete m_selfStatus;
+      if (m_selectionStatus != 0) {
+        m_top->remove(m_selectionStatus);
+        delete m_selectionStatus;
+        m_selectionStatus = 0;
+      }
+      // Clean up any bubbles.
+      m_top = 0;
+    }
     return;
   }
 
@@ -68,6 +77,8 @@ void Overlay::logic(RootWidget * rw)
     }
   }
 
+  double elapsed = System::instance()->getTimeElapsed();
+
   BubbleMap::const_iterator I = m_bubbles.begin();
   BubbleMap::const_iterator Iend = m_bubbles.end();
   for (; I != Iend; ++I) {
@@ -80,9 +91,9 @@ void Overlay::logic(RootWidget * rw)
       int oy = J->second->getY();
       if (abs(x - ox) < I->second->getWidth()) {
         if (x >= ox) {
-          x = std::min(x + 1, m_top->getWidth() - I->second->getWidth());
+          x = std::min(int(x + 64 * elapsed), m_top->getWidth() - I->second->getWidth());
         } else {
-          x = std::max(x - 1, 0);
+          x = std::max(int(x - 64 * elapsed), 0);
         }
         I->second->setX(x);
       }

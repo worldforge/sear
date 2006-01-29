@@ -1,3 +1,15 @@
+2006-01-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/System.h, src/System.cpp: Store the time calculated since the
+	  the last frame, as it it likely to be used in many parts of the
+	  code for animation.
+
+	* guichan/SpeechBubble.cpp: Make speech bubble scrolling speed
+	  independant of frame rate.
+
+	* guichan/Overlay.cpp: Reset overlay state when server disconnects.
+	  Make speech bubble movement speed independant of frame rate.
+
 2006-01-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp, src/Calendar.h: Add a reset method and link it

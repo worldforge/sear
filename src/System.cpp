@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.144 2006-01-28 15:35:48 simon Exp $
+// $Id: System.cpp,v 1.145 2006-01-29 18:33:56 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -136,6 +136,7 @@ System::System() :
   m_character(NULL),
   m_mouse_move_select(false),
   m_seconds(0.0),
+  m_elapsed(0.0),
   m_process_records(false),
   m_sound(NULL),
   m_system_running(false),
@@ -404,7 +405,7 @@ void System::mainLoop() {
   while (m_system_running) {
     try {
       m_seconds = (double)SDL_GetTicks() / 1000.0f;
-      double time_elapsed = m_seconds - last_time;
+      m_elapsed = m_seconds - last_time;
       last_time = m_seconds;
       while (SDL_PollEvent(&event)  ) {
         handleEvents(event);
@@ -423,7 +424,7 @@ void System::mainLoop() {
         m_calendar->update(m_client->getAvatar()->getWorldTime());
       }
       // draw scene
-      RenderSystem::getInstance().drawScene(false, time_elapsed);
+      RenderSystem::getInstance().drawScene(false, m_elapsed);
     } catch (Eris::InvalidOperation io) {
       Log::writeLog(io._msg, Log::LOG_ERROR);
       pushMessage(io._msg, CONSOLE_MESSAGE);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.66 2006-01-28 15:35:48 simon Exp $
+// $Id: System.h,v 1.67 2006-01-29 18:33:56 alriddoch Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -143,6 +143,13 @@ public:
   double getTimeD() const { return (double)SDL_GetTicks() / 1000.0; }
 
   /**
+   * Gets the time in seconds from the last frame start to the current
+   * frame start.
+   * @return Elapsed time in seconds
+   */
+  double getTimeElapsed() const { return m_elapsed; }
+
+  /**
    * Set a system state
    * @param ss Sytem state to set
    * @param state Value of state
@@ -234,6 +241,7 @@ protected:
   bool m_mouse_move_select;
 
   double m_seconds;
+  double m_elapsed;
 
   typedef struct {
     std::string section;
