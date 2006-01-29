@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.138 2006-01-28 15:35:49 simon Exp $
+// $Id: GL.cpp,v 1.139 2006-01-29 22:35:19 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -615,6 +615,26 @@ inline void GL::newLine() {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
 
+void GL::getScreenCoords(int & x, int & y, double z_offset)
+{
+    GLint viewport[4];
+
+    GLdouble mvmatrix[16], projmatrix[16];
+
+    GLdouble wx, wy, wz;  /*  returned window x, y, z coords  */
+
+    glGetIntegerv (GL_VIEWPORT, viewport);
+    glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+    glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+
+    gluProject (0, 0, z_offset, mvmatrix, projmatrix, viewport, &wx, &wy, &wz);
+
+    x = (int)wx;
+    y = (int)wy;
+
+    std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
+}
+
 void GL::drawTextRect(int x, int y, int width, int height, int texture) {
   RenderSystem::getInstance().switchTexture(texture);
   setViewMode(ORTHOGRAPHIC);
@@ -1195,6 +1215,10 @@ void GL::drawMessageQueue(MessageList &list) {
     WFMath::Point<3> pos = we->getAbsPos();
     assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
+    if (we->screenCoordsRequest() > 0) {
+      double height = 2;
+      getScreenCoords(we->screenX(), we->screenY(), height);
+    }
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= m_graphics->getCameraOrientation(); 
     applyQuaternion(orient2);

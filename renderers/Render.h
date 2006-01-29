@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.10 2006-01-28 15:35:49 simon Exp $
+// $Id: Render.h,v 1.11 2006-01-29 22:35:19 alriddoch Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -65,6 +65,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void print(int x, int y, const char*, int set) =0;
   virtual void print3D(const char*, int set) =0;
   virtual void newLine() =0;
+
+  virtual void getScreenCoords(int & x, int & y, double z_offset) = 0;
 
   virtual void store() =0;
   virtual void restore() =0;

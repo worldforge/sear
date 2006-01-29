@@ -1,3 +1,21 @@
+2006-01-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/WorldEntity.h, src/WorldEntity.cpp: Add interface to
+	  WorldEntity to request that screen coordinates be calculated,
+	  and retrieved later.
+
+	* renderers/GL.cpp, renderers/GL.h, renderers/Render.h:
+	  Add a new method to the render interface allowing screen
+	  coordinates to be calculated for the current origin in modelview
+	  coordinates. When rendering messages on an entity, calculate its
+	  screen coordinates.
+
+	* renderers/Graphics.cpp: Add entities to the message_list if their
+	  screen coordinates have been requested.
+
+	* guichan/Overlay.cpp: Use screen coordinates of characters to move
+	  speech bubbles to a height roughly matching the character.
+
 2006-01-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/3ds.cpp: Allow texture maps with no name to be overridden in

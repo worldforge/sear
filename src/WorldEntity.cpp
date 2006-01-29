@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.74 2006-01-25 02:24:24 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.75 2006-01-29 22:35:19 alriddoch Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -50,7 +50,8 @@ static const std::string GUISE = "guise";
 	
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
-   m_status(1.0)
+   m_status(1.0),
+   m_screenCoordRequest(0)
 {
   Acted.connect(SigC::slot(*this, &WorldEntity::onAction));
 }

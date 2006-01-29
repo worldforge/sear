@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.34 2005-12-30 19:20:39 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.35 2006-01-29 22:35:19 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -57,7 +57,22 @@ public:
   
   double getStatus() const
   { return m_status; }
+
+  void requestScreenCoords()
+  { ++m_screenCoordRequest; }
   
+  void releaseScreenCoords()
+  { --m_screenCoordRequest; }
+
+  int screenCoordsRequest() const
+  { return m_screenCoordRequest; }
+  
+  int & screenX()
+  { return m_screenX; }
+
+  int & screenY()
+  { return m_screenY; }
+
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -79,6 +94,9 @@ protected:
   OrientBBox m_orientBBox;
   AttachmentMap m_attached;
   double m_status;
+
+  int m_screenCoordRequest;
+  int m_screenX, m_screenY;
 };
 
 } /* namespace Sear */

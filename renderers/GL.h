@@ -83,6 +83,8 @@ public:
   void print3D(const char* string, int set);
   inline void newLine();
 
+  void getScreenCoords(int & x, int & y, double z_offset);
+
   void buildColourSet();
   void drawTextRect(int, int, int, int, int);
   float distFromNear(float,float,float);  

@@ -11,6 +11,7 @@
 #include "renderers/RenderSystem.h"
 
 #include "src/System.h"
+#include "src/WorldEntity.h"
 #include "src/client.h"
 
 #include <Eris/Avatar.h>
@@ -98,6 +99,14 @@ void Overlay::logic(RootWidget * rw)
         I->second->setX(x);
       }
     }
+    WorldEntity * we = dynamic_cast<WorldEntity *>(I->first);
+    if (we != NULL) {
+      int entity_y = we->screenY();
+      if (entity_y >= 0) {
+        entity_y = (m_top->getHeight() - entity_y) - I->second->getHeight();
+        I->second->setY(entity_y);
+      }
+    }
   }
 }
 
@@ -114,6 +123,10 @@ void Overlay::heard(Eris::Entity * e,
     bubble->loadImages(std::vector<std::string>());
     m_top->add(bubble, 50, 50);
     m_bubbles[e] = bubble;
+    WorldEntity * we = dynamic_cast<WorldEntity *>(e);
+    if (we != NULL) {
+      we->requestScreenCoords();
+    }
   } else {
     bubble = I->second;
   }

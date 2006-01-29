@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.32 2006-01-28 15:35:49 simon Exp $
+// $Id: Graphics.cpp,v 1.33 2006-01-29 22:35:19 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -539,7 +539,7 @@ void Graphics::drawObject(ObjectRecord* obj,
   // if rendering, add any messages
   if (!select_mode) {
     name_list.push_back(obj_we);
-    if (obj_we->hasMessages()) {
+    if (obj_we->hasMessages() || obj_we->screenCoordsRequest() > 0) {
       message_list.push_back(obj_we);
     }
   } // of object models loop
