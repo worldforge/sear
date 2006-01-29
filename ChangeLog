@@ -1,3 +1,8 @@
+2006-01-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/SpeechBubble.cpp: Load the speech bubble images from the
+	  propper place.
+
 2006-01-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loader/3ds_Loader.cpp, loaders/LibModelFile_Loader.cpp,

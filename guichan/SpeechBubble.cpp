@@ -5,6 +5,7 @@
 #include "guichan/SpeechBubble.h"
 
 #include "src/System.h"
+#include "src/FileHandler.h"
 
 #include <iostream>
 
@@ -110,7 +111,7 @@ void SpeechBubble::drawBorder(gcn::Graphics * graphics)
     // Do we have a border for this? Why abstract?
 }
 
-int SpeechBubble::loadImages(const std::vector<std::string> & filenames)
+int SpeechBubble::loadImages(const std::vector<std::string> &)
 {
 #if 0
     if (filenames.size() != 9) {
@@ -127,23 +128,37 @@ int SpeechBubble::loadImages(const std::vector<std::string> & filenames)
     m_nw = new gcn::Image(filenames[7]);
     m_mid = new gcn::Image(filenames[8]);
 #else 
+    std::string filenames[9];
+    filenames[0] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_n.png";
+    filenames[1] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_s.png";
+    filenames[2] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_e.png";
+    filenames[3] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_w.png";
+    filenames[4] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_ne.png";
+    filenames[5] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_se.png";
+    filenames[6] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_sw.png";
+    filenames[7] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_nw.png";
+    filenames[8] = "${SEAR_MEDIA}/ui/sear-bubble/bubble_mid.png";
+#endif
+
+    for (int i = 0; i < 9; ++i) {
+      System::instance()->getFileHandler()->expandString(filenames[i]);
+    }
     std::cout << "Loading images" << std::endl << std::flush;
 
     try {
-      m_n = new gcn::Image("/home/ajr/sear/bubble_n.png");
-      m_s = new gcn::Image("/home/ajr/sear/bubble_s.png");
-      m_e = new gcn::Image("/home/ajr/sear/bubble_e.png");
-      m_w = new gcn::Image("/home/ajr/sear/bubble_w.png");
-      m_ne = new gcn::Image("/home/ajr/sear/bubble_ne.png");
-      m_se = new gcn::Image("/home/ajr/sear/bubble_se.png");
-      m_sw = new gcn::Image("/home/ajr/sear/bubble_sw.png");
-      m_nw = new gcn::Image("/home/ajr/sear/bubble_nw.png");
-      m_mid = new gcn::Image("/home/ajr/sear/bubble_mid.png");
+      m_n = new gcn::Image(filenames[0]);
+      m_s = new gcn::Image(filenames[1]);
+      m_e = new gcn::Image(filenames[2]);
+      m_w = new gcn::Image(filenames[3]);
+      m_ne = new gcn::Image(filenames[4]);
+      m_se = new gcn::Image(filenames[5]);
+      m_sw = new gcn::Image(filenames[6]);
+      m_nw = new gcn::Image(filenames[7]);
+      m_mid = new gcn::Image(filenames[8]);
     }
     catch (...) {
       m_n = 0;
     }
-#endif
     return 0;
 }
 
