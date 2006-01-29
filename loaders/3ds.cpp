@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.48 2006-01-28 15:35:48 simon Exp $
+// $Id: 3ds.cpp,v 1.49 2006-01-29 21:27:09 simon Exp $
 
 #include <iostream>
 #include <list>
@@ -402,25 +402,24 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       material_name = "sear:default";
       m_config.clean(material_name);
     }
-    int texture_id = -1;
-    int texture_mask_id = -1;
-    // If a material is set get texture map names.
-    if (mat && mat->texture1_map.name[0]) {
 
+    int texture_id = 0;
+    int texture_mask_id = 0;
+    // If a material is set get texture map names.
+    if (mat) {
       if (m_config.findItem(material_name,"texture_map_0")) {
         std::string name = (std::string)m_config.getItem(material_name,
                                                          "texture_map_0");
         texture_id = RenderSystem::getInstance().requestTexture(name);
         texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
-      } else  {
+      } else if ( mat->texture1_map.name[0]) {
         texture_id = RenderSystem::getInstance().requestTexture(
                                                         mat->texture1_map.name);
         texture_mask_id = RenderSystem::getInstance().requestTexture(
                                                   mat->texture1_map.name, true);
+      } else {
+      // Do nothing, use default vals
       }
-    } else {
-      texture_id = 0;
-      texture_mask_id = 0;
     }
     // Create new render object for change in texture
     if (texture_id != current_texture) {

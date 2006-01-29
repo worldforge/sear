@@ -1,3 +1,8 @@
+2006-01-29  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp: Allow texture maps with no name to be overridden in
+	  config file.
+
 2006-01-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/SpeechBubble.cpp: Load the speech bubble images from the
