@@ -210,6 +210,11 @@ int ParticleSystem::shutdown()
 void ParticleSystem::update(float elapsed)
 {
     double status = dynamic_cast<WorldEntity*>(m_entity->entity.get())->getStatus();
+    if ((status < 0.0) || (status >= 1.0)) {
+        std::cout << "invalid status " << status << " for particle system" << std::endl;
+        return;
+    }
+    
     int numToCreate = lrintf(m_createPerSec.random() * elapsed * status * 2.f);
 
     for (unsigned int p=0; p < m_particles.size(); ++p) {

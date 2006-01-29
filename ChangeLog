@@ -1,3 +1,8 @@
+2006-01-29  James Turner  <james@worldforge.org>
+
+	* loaders/ParticleSystem.cpp: don't allocate huge numbers of particles
+	  if an entity's status is outside the normal range.
+
 2006-01-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/WorldEntity.h, src/WorldEntity.cpp: Add interface to
