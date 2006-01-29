@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.h,v 1.9 2005-06-03 15:35:34 simon Exp $
+// $Id: Calendar.h,v 1.10 2006-01-29 13:03:56 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -221,6 +221,7 @@ public:
    */
   std::string getMonthName() const { return m_current_month_name; }  
 
+  void reset() { m_firstUpdate = true; }
   
 private:
   bool m_initialised; ///< Calendar initialisation state

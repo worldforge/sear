@@ -1,3 +1,9 @@
+2006-01-29  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Calendar.cpp, src/Calendar.h: Add a reset method and link it
+	  to the EnteredWorld signal to reset the server_time reference. This 
+	  fixes a bug when connecting to different servers without exiting Sear.
+
 2006-01-28  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Makefile.am, src/main.cpp: Remove references to Exception.h

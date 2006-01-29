@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.20 2005-06-05 17:23:08 simon Exp $
+// $Id: Calendar.cpp,v 1.21 2006-01-29 13:03:56 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -109,7 +109,10 @@ void Calendar::init() {
   assert(m_initialised == false);
   // Bind signal to config for further updates
   m_config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
-  
+
+  // Reset calendar on enter world. 
+  System::instance()->EnteredWorld.connect(SigC::slot(*this, &Calendar::reset));
+ 
   m_initialised = true;
 }
 
