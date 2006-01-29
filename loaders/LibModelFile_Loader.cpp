@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.4 2005-06-06 21:27:48 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.5 2006-01-29 19:09:10 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -43,12 +43,19 @@ LibModelFile_Loader::~LibModelFile_Loader() {
 ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
 
+  assert(model_record);
 
-  if (!ModelSystem::getInstance().getModels().findItem(LIBMODELFILE, model_record->data_file_id)) {
-    std::cerr << "Error: No MD3 filename" << std::endl;
-    return NULL;
+  std::string file_name = model_record->data_file_path;
+
+  if (file_name.empty()) {
+    // Use old style path finder
+    if (!ModelSystem::getInstance().getModels().findItem(LIBMODELFILE, model_record->data_file_id)) {
+      std::cerr << "Error: No MD3 filename" << std::endl;
+      return NULL;
+    }
+    file_name = (std::string)ModelSystem::getInstance().getModels().getItem(LIBMODELFILE, model_record->data_file_id);
   }
-  std::string file_name = ModelSystem::getInstance().getModels().getItem(LIBMODELFILE, model_record->data_file_id);
+
   System::instance()->getFileHandler()->expandString(file_name);
 
   if (debug) printf("LibModelFile_Loader: Loading %s\n", file_name.c_str());

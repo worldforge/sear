@@ -123,6 +123,9 @@ ModelRecord* ModelLoader::loadModel(Render *,
     else if (rotation_style == "billboard") model_record->rotation_style = Graphics::ROS_BILLBOARD;
     // Object is rotates to face the camera in x,y,z plane
     else if (rotation_style == "halo") model_record->rotation_style = Graphics::ROS_HALO;
+    if (model_config.findItem(model_id, ModelRecord::DATA_FILE_PATH)) {
+      model_record->data_file_path = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_PATH);
+    }
     if (model_config.findItem(model_id, ModelRecord::DATA_FILE_ID)) {
       model_record->data_file_id = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
     }

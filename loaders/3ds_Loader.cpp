@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.19 2005-06-02 23:58:14 alriddoch Exp $
+// $Id: 3ds_Loader.cpp,v 1.20 2006-01-29 19:09:10 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -41,14 +41,19 @@ ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, con
   // Get basic model record
   ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
 
-  // See if a filename has been specified
-  if (!ModelSystem::getInstance().getModels().findItem(THREEDS, model_record->data_file_id)) {
-    std::cerr << "Error: No 3DS filename" << std::endl;
-    return NULL;
-  }
+  assert(model_record);
 
-  // Get 3ds filename
-  std::string file_name = ModelSystem::getInstance().getModels().getItem(THREEDS, model_record->data_file_id);
+  std::string file_name = model_record->data_file_path;
+
+  if (file_name.empty()) {
+    // See if a filename has been specified
+    if (!ModelSystem::getInstance().getModels().findItem(THREEDS, model_record->data_file_id)) {
+      std::cerr << "Error: No 3DS filename" << std::endl;
+      return NULL;
+    }
+    // Get 3ds filename
+    file_name = (std::string)ModelSystem::getInstance().getModels().getItem(THREEDS, model_record->data_file_id);
+  }
   System::instance()->getFileHandler()->expandString(file_name);
 
   // Create new ThreeDS model

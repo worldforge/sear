@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2004 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.5 2005-07-02 12:31:02 simon Exp $
+// $Id: ModelRecord.cpp,v 1.6 2006-01-29 19:09:10 simon Exp $
 
 #include "ModelRecord.h"
 
@@ -31,6 +31,7 @@ namespace Sear {
   const std::string ModelRecord::OUTLINE = "outline";
   const std::string ModelRecord::ROTATION_STYLE = "rotation_style";
   const std::string ModelRecord::DATA_FILE_ID = "data_file_id";
+  const std::string ModelRecord::DATA_FILE_PATH = "data_file_path";
   const std::string ModelRecord::DEFAULT_SKIN = "default_skin";
 
 ModelRecord::ModelRecord() :
