@@ -25,16 +25,17 @@ namespace Sear {
 class RootWidget;
 class SpeechBubble;
 class StatusWindow;
+class WorldEntity;
 
 class Overlay : virtual public SigC::Object {
 public:
-  typedef std::map<Eris::Entity *, SpeechBubble *> BubbleMap;
+  typedef std::map<WorldEntity *, SpeechBubble *> BubbleMap;
 protected:
   Overlay();
   ~Overlay();
 
   RootWidget * m_top;
-  std::map<Eris::Entity *, SpeechBubble *> m_bubbles;
+  BubbleMap m_bubbles;
   Eris::EntityRef m_selection;
 
   StatusWindow * m_selfStatus;

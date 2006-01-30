@@ -55,7 +55,6 @@ void Overlay::logic(RootWidget * rw)
   if (m_top == 0) {
     avatar->Hear.connect(SigC::slot(*this, &Overlay::heard));
     m_top = rw;
-    std::cout << "Overlay init" << std::endl << std::flush;
 
     m_selfStatus = new StatusWindow(avatar->getEntity());
     m_top->setWindowCoords(m_selfStatus, std::make_pair(render->getWindowWidth() - m_selfStatus->getWidth(), 0));
@@ -80,32 +79,66 @@ void Overlay::logic(RootWidget * rw)
 
   double elapsed = System::instance()->getTimeElapsed();
 
+  std::set<WorldEntity *> obsoletes;
+
   BubbleMap::const_iterator I = m_bubbles.begin();
   BubbleMap::const_iterator Iend = m_bubbles.end();
   for (; I != Iend; ++I) {
-    int x = I->second->getX();
-    int y = I->second->getY();
+    WorldEntity * we = dynamic_cast<WorldEntity *>(I->first);
+    SpeechBubble * sb = I->second;
+    if (we == NULL) {
+      continue;
+    }
+    int ex = we->screenX();
+    int ey = we->screenY();
+    if (ey < 0 || ey >= m_top->getHeight() ||
+        ex < 0 || ex >= m_top->getWidth()) {
+      obsoletes.insert(we);
+      // Obsolete speech bubble?
+      continue;
+    }
+    ex = (ex - sb->getWidth() / 2);
+    ey = (m_top->getHeight() - ey) - sb->getHeight();
+    // sb->setX(ex + sb->m_xoff);
+    sb->setY(ey);
+
+    const int x = ex + (int)sb->m_xoff; // sb->getX();
+    const int y = sb->getY();
+    float xoff = sb->m_xoff;
     BubbleMap::const_iterator J = m_bubbles.begin();
     for (; J != Iend; ++J) {
-      if (I->second == J->second) { continue; }
-      int ox = J->second->getX();
-      int oy = J->second->getY();
-      if (abs(x - ox) < I->second->getWidth()) {
+      if (sb == J->second) { continue; }
+      const int ox = J->second->getX();
+      const int oy = J->second->getY();
+      if (abs(y - oy) < sb->getHeight() && abs(x - ox) < sb->getWidth()) {
         if (x >= ox) {
-          x = std::min(int(x + 64 * elapsed), m_top->getWidth() - I->second->getWidth());
+          xoff += std::min(64.f * elapsed, (double)x - ox);
+          // , (float)(m_top->getWidth() - sb->getWidth()));
         } else {
-          x = std::max(int(x - 64 * elapsed), 0);
+          xoff -= std::min(64.f * elapsed, (double)ox - x);
         }
-        I->second->setX(x);
       }
     }
-    WorldEntity * we = dynamic_cast<WorldEntity *>(I->first);
-    if (we != NULL) {
-      int entity_y = we->screenY();
-      if (entity_y >= 0) {
-        entity_y = (m_top->getHeight() - entity_y) - I->second->getHeight();
-        I->second->setY(entity_y);
-      }
+    // Ensure the xoffset does not move the bubbles off the screen
+    // Right hand side
+    xoff = std::min(xoff, (float)(m_top->getWidth() - (ex + sb->getWidth())));
+    // Left hand side
+    xoff = std::max(xoff, (float)-ex);
+    // Limit new xoffset to half bubble width
+    xoff = std::min(xoff, sb->getWidth() / 2.f);
+    xoff = std::max(xoff, -(sb->getWidth() / 2.f));
+    sb->m_xoff = xoff;
+    sb->setX(ex + (int)sb->m_xoff);
+  }
+  std::set<WorldEntity *>::const_iterator K = obsoletes.begin();
+  std::set<WorldEntity *>::const_iterator Kend = obsoletes.end();
+  for (; K != Kend; ++K) {
+    BubbleMap::iterator J = m_bubbles.find(*K);
+    if (J != m_bubbles.end()) {
+      J->first->releaseScreenCoords();
+      m_top->remove(J->second);
+      delete J->second;
+      m_bubbles.erase(J);
     }
   }
 }
@@ -114,19 +147,19 @@ void Overlay::heard(Eris::Entity * e,
                     const Atlas::Objects::Operation::RootOperation & talk)
 {
   assert(m_top != 0);
-    std::cout << "Overlay talk" << std::endl << std::flush;
 
+  WorldEntity * we = dynamic_cast<WorldEntity *>(e);
+  if (we == NULL) {
+    return;
+  }
   SpeechBubble * bubble;
-  BubbleMap::const_iterator I = m_bubbles.find(e);
+  BubbleMap::const_iterator I = m_bubbles.find(we);
   if (I == m_bubbles.end()) {
     bubble = new SpeechBubble;
     bubble->loadImages(std::vector<std::string>());
     m_top->add(bubble, 50, 50);
-    m_bubbles[e] = bubble;
-    WorldEntity * we = dynamic_cast<WorldEntity *>(e);
-    if (we != NULL) {
-      we->requestScreenCoords();
-    }
+    m_bubbles[we] = bubble;
+    we->requestScreenCoords();
   } else {
     bubble = I->second;
   }

@@ -11,7 +11,8 @@
 
 namespace Sear {
 
-SpeechBubble::SpeechBubble() : m_n(0), m_overflow(false), m_offset(0.f)
+SpeechBubble::SpeechBubble() : m_xoff(0.f), m_n(0), m_overflow(false),
+                               m_offset(0.f)
 {
     setWidth(200);
     setHeight(200);

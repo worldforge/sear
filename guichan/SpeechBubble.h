@@ -14,6 +14,8 @@ namespace Sear {
 class SpeechBubble: public gcn::Widget
 {
 public:
+    float m_xoff;
+
     SpeechBubble();
 
     virtual void logic();
