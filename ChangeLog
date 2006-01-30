@@ -1,3 +1,10 @@
+2006-01-30  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Makefile.am, src/error.cpp, src/error.h, src.main.cpp: Add a
+	  function to display a popup dialog if there is an error starting Sear.
+	  This uses MessageBox on Win32 and printf for other platforms. Platform
+	  specific code needs to be added here.
+
 2006-01-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/SpeechBubble.h, guichan/SpeechBubble.cpp: Add a public
