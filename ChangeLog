@@ -1,3 +1,12 @@
+2006-01-31  Al Riddoch  <alriddoch@zepler.org>
+
+	* renderers/Graphics.cpp: If an object that requires screen
+	  coordinates is not being drawn, mark its screen coordinates as
+	  -1,-1.
+
+	* guichan/Overlay.cpp: Don't render a speech bubble for the player's
+	  own avatar, or if that entity has now disappeared.
+
 2006-01-30  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Makefile.am, src/error.cpp, src/error.h, src.main.cpp: Add a

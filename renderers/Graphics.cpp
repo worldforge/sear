@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.33 2006-01-29 22:35:19 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.34 2006-01-31 16:59:00 alriddoch Exp $
 
 #include <sage/sage.h>
 
@@ -449,12 +449,16 @@ void Graphics::drawObject(ObjectRecord* obj,
                         float time_elapsed) {
   assert(obj != NULL);
 
-  // reject for drawing if object bbox is outside frustum   
-  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) return;
-    
   WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
   assert(obj_we); 
 
+  // reject for drawing if object bbox is outside frustum   
+  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) {
+    obj_we->screenX() = -1;
+    obj_we->screenY() = -1;
+    return;
+  }
+    
   // Get world coord of object
   WFMath::Point<3> p = obj_we->getAbsPos();
   assert(p.isValid());

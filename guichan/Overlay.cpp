@@ -92,7 +92,8 @@ void Overlay::logic(RootWidget * rw)
     int ex = we->screenX();
     int ey = we->screenY();
     if (ey < 0 || ey >= m_top->getHeight() ||
-        ex < 0 || ex >= m_top->getWidth()) {
+        ex < 0 || ex >= m_top->getWidth() ||
+        !we->isVisible()) {
       obsoletes.insert(we);
       // Obsolete speech bubble?
       continue;
@@ -147,6 +148,12 @@ void Overlay::heard(Eris::Entity * e,
                     const Atlas::Objects::Operation::RootOperation & talk)
 {
   assert(m_top != 0);
+
+  Eris::Avatar * avatar = System::instance()->getClient()->getAvatar();
+  assert(avatar != 0);
+  if (e == avatar->getEntity()) {
+    return;
+  }
 
   WorldEntity * we = dynamic_cast<WorldEntity *>(e);
   if (we == NULL) {
