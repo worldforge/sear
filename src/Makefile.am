@@ -114,7 +114,8 @@ libSear_a_SOURCES = \
 	Editor.cpp \
 	Editor.h \
 	TerrainEntity.cpp TerrainEntity.h \
-	prefix.c prefix.h
+	prefix.c prefix.h \
+	error.cpp error.h
 
 #	Lobby.cpp \
 #	Lobby.h \
