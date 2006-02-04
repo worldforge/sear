@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.139 2006-01-29 22:35:19 alriddoch Exp $
+// $Id: GL.cpp,v 1.140 2006-02-04 18:52:44 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -303,13 +303,18 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 
   // TODO: Check that the OpenGL version is at least 1.2
 
-  if (contextCreated()) return false;
+  if (contextCreated()) {
+    fprintf(stderr, "Error initialising context.\n");
+    SDL_FreeSurface(m_screen);
+    m_screen = NULL;
+    return false;
+  }
 
   return true;
         
 }                                                                       
 
-int GL::contextCreated() {                                                                                
+int GL::contextCreated() {
   initLighting();
   // TODO: initialisation need to go into system?
   setupStates();
@@ -331,7 +336,7 @@ int GL::contextCreated() {
                                                                                 
   setViewMode(PERSPECTIVE);
   if (setupExtensions()) {
-    fprintf(stderr, "Error finding required extensions\n");
+    fprintf(stderr, "Error finding required extensions.\n");
     return 1;
   }
 

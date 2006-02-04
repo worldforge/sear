@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.145 2006-01-29 18:33:56 alriddoch Exp $
+// $Id: System.cpp,v 1.146 2006-02-04 18:52:45 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,12 +296,46 @@ bool System::init(int argc, char *argv[]) {
   if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen))) {
     // Only try again if stencil buffer was enabled first time round
     if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
+      printf("Creating window with stencil buffer failed. Trying again without stencil buffer.\n");
       // Disable stencil buffer and try again
       RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, false);
       success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen);
     }
   }
-  if (!success) return false;
+  if (!success) {
+    // TODO lots more cleaning up required!
+
+    m_client->shutdown();
+    delete m_client; m_client = NULL;
+    m_calendar->shutdown();
+    delete m_calendar; m_calendar = NULL;
+    m_action_handler->shutdown();
+    delete m_action_handler; m_action_handler = NULL;
+    m_script_engine->shutdown();
+    delete m_script_engine; m_script_engine = NULL;
+
+    delete m_editor; m_editor = NULL;
+    m_console->shutdown();
+    delete m_console; m_console = NULL;
+
+    delete m_workarea; m_workarea = NULL;
+    m_character->shutdown();
+    delete m_character; m_character = NULL;
+
+    if (m_sound) {
+      delete m_sound;
+      m_sound = NULL;
+    }
+
+    Bindings::shutdown();
+
+    Environment::getInstance().shutdown();
+    ModelSystem::getInstance().shutdown(); 
+    RenderSystem::getInstance().shutdown();
+    SDL_Quit();
+
+    return false;
+  }
 
   // Hide cursor
   SDL_ShowCursor(0);

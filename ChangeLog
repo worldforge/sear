@@ -1,3 +1,12 @@
+2006-02-04  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/Makefile.am: Include CommandLine.h in SOURCES list.
+
+	* renderers/GL.cpp: Clean up m_screen should contextCreated return an
+	  error. Print error msg in this situation.
+
+	* src/System.cpp: Shutdown objects on failure to create window.
+
 2006-01-31  Al Riddoch  <alriddoch@zepler.org>
 
 	* renderers/Graphics.cpp: If an object that requires screen
