@@ -1,3 +1,8 @@
+2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Lobby.cpp, src/Lobby.h: Removed as they have not been used in a
+	  long time.
+
 2006-02-04  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/Makefile.am: Include CommandLine.h in SOURCES list.
