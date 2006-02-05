@@ -11,10 +11,10 @@ there are pigs then to buy one you need to say "I would like to buy a pig"
 to the pig seller (Note: This is case sensitive). You just need to be
 close by the pig seller. The seller should respond by telling you that
 pigs cost 5 gold coins. To pay the seller, move the mouse cursor over
-the seller which makes the seller the target entity. To give the coins
+The seller which makes the seller the target entity. To give the coins
 to the pig seller, move then mouse cursor over the seller and select
 him. Then either type "/give 5 coin" in the console, or open the inventory
-and select a coin and press &quotgive". Do this five times. This will
+and select a coin and press "give". Do this five times. This will
 give the coins to the seller and in return you should get a pig. Beware
 however, the pig seller won't sell you a pig at night, nor will you
 get a pig is the sty is empty. He will just keep your money instead.

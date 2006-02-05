@@ -1,5 +1,9 @@
 2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* data/help/Mason: Fix typo.
+
+2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Editor.cpp, src/Editor.h, src/error.h, renderers/Sprite.cpp, 
 	  renderers/Sprite.h, renderers/ImageUtils.cpp, renderers/ImageUtils.h,
 	  common/Mesh.h, loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
