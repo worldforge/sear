@@ -1,3 +1,9 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2003 - 2006 Simon Goodall
+
+// $Id: Mesh.h,v 1.2 2006-02-05 21:09:49 simon Exp $
+
 #ifndef SEAR_COMMON_MESH_H
 #define SEAR_COMMON_MESH_H
 

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #ifndef SEAR_AREAMODEL_H
 #define SEAR_AREAMODEL_H

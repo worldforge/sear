@@ -1,3 +1,9 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2002 - 2006 Simon Goodall
+
+// $Id: ModelLoader.cpp,v 1.4 2006-02-05 21:09:50 simon Exp $
+
 #include "ModelLoader.h"
 
 #include <varconf/Config.h>

@@ -1,3 +1,9 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2005 - 2006 Simon Goodall
+
+// $Id: AreaModelLoader.h,v 1.3 2006-02-05 21:09:50 simon Exp $
+
 #ifndef SEAR_AREAMODEL_LOADER_H
 #define SEAR_AREAMODEL_LOADER_H
 

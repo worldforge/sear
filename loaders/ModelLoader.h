@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.h,v 1.5 2005-04-20 08:25:04 jmt Exp $
+// $Id: ModelLoader.h,v 1.6 2006-02-05 21:09:50 simon Exp $
 
 #ifndef SEAR_MODELOADER_H
 #define SEAR_MODELOADER_H 1

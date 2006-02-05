@@ -1,5 +1,18 @@
 2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Editor.cpp, src/Editor.h, src/error.h, renderers/Sprite.cpp, 
+	  renderers/Sprite.h, renderers/ImageUtils.cpp, renderers/ImageUtils.h,
+	  common/Mesh.h, loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/ParticleSystemLoader.cpp, loaders/ParticleSystemLoader.h,
+	  loaders/AreaModel.cpp, loaders/AreaModel.h,
+	  loaders/AreaModelLoader.cpp, loaders/AreaModelLoader.h, 
+	  loaders/NullModel.h, loaders/ModelLoader.cpp, loaders/ModelLoader.h,
+	  environment/Stars.cpp, environment/Stars.h, 
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h: Add /
+	  update copyright information. 
+
+2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Lobby.cpp, src/Lobby.h: Removed as they have not been used in a
 	  long time.
 

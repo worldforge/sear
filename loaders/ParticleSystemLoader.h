@@ -1,3 +1,9 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2005 - 2006 Simon Goodall
+
+// $Id: ParticleSystemLoader.h,v 1.2 2006-02-05 21:09:50 simon Exp $
+
 #ifndef SEAR_PARTICLE_SYSTEM_LOADER_H
 #define SEAR_PARTICLE_SYSTEM_LOADER_H
 

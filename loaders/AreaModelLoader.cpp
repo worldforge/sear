@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #include "AreaModelLoader.h"
 #include "ModelHandler.h"

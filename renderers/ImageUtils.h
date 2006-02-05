@@ -1,5 +1,11 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2004 - 2006 Simon Goodall
+
+// $Id: ImageUtils.h,v 1.3 2006-02-05 21:09:48 simon Exp $
+
 #ifndef SEAR_IMAGE_UTILS_H
-#define SEAR_IMAGE_UTILS_H
+#define SEAR_IMAGE_UTILS_H 1
 
 #include <SDL/SDL.h>
 #include <string>

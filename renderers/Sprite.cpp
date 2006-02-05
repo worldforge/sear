@@ -1,4 +1,8 @@
-// $Id: Sprite.cpp,v 1.8 2006-01-28 15:35:49 simon Exp $
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2004 - 2006 Simon Goodall
+
+// $Id: Sprite.cpp,v 1.9 2006-02-05 21:09:48 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"

@@ -1,18 +1,22 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2004 - 2006 Simon Goodall
+
+// $Id: Sprite.h,v 1.5 2006-02-05 21:09:48 simon Exp $
+
 #ifndef SEAR_RENDER_SPRITE_H
-#define SEAR_RENDER_SPRITE_H
+#define SEAR_RENDER_SPRITE_H 1
 
 #include <varconf/Config.h>
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-namespace Sear
-{
+namespace Sear {
 
 class Render;
 class SpriteData;
 
-class Sprite
-{
+class Sprite {
 public:
     Sprite() : m_data(NULL) { ; }
     

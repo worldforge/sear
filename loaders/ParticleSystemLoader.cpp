@@ -1,3 +1,9 @@
+// This file may be redistributed and modified only under the terms of
+// the GNU General Public License (See COPYING for details).
+// Copyright (C) 2005 - 2006 Simon Goodall
+
+// $Id: ParticleSystemLoader.cpp,v 1.5 2006-02-05 21:09:49 simon Exp $
+
 #include "ParticleSystemLoader.h"
 #include "ParticleSystem.h"
 #include "ModelHandler.h"
