@@ -1,3 +1,7 @@
+2006-02-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac, NEWS: Update for 0.6.1 release.
+
 2006-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* data/help/Mason: Fix typo.

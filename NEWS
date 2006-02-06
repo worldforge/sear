@@ -1,3 +1,6 @@
+6th Feb 2006
+Sear 0.6.1 is released. Major changines include updating to Eris 1.3.10 API, using builtin Eris ops instead of sear custom ones for use, wield, create etc.. New commands have been added. /me for emotes and /eat (added to inventory dialog) to  nourish our character. There are many GUI improvements including the addition of altering video mode, keybindings, basic help system, improved character creation dialog and speech bubbles. There have also been numerous stability and code improvements.
+
 29th November 2005
 Sear 0.6.0 uses the lastest mercator updates for procedurally added area and paths. A particle system has also been implemented. This version of sear also uses the latest Eris version providing greater stability than before. There has also been many internal changes and overall stability improvements.
 Other improvements include a GUI system based on Guichan.
