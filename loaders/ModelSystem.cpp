@@ -14,6 +14,8 @@
 #include "ObjectHandler.h"
 #include "ModelHandler.h"
 #include "ObjectRecord.h"
+#include "ModelRecord.h"
+#include "Model.h"
 
 #include "3ds_Loader.h"
 #include "cal3d/Cal3d_Loader.h"
@@ -124,25 +126,20 @@ void ModelSystem::writeConfig(varconf::Config &config) {
 }
 
 void ModelSystem::loadModels(const std::string &filename) {
-  if (debug) printf("ModelSystem: Loading Models config\n");
+  if (debug) printf("ModelSystem: Loading Models config.\n");
   m_models.readFromFile(filename);
 }
 
-ModelRecord *ModelSystem::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
-  return m_model_handler->getModel(render, record, model_id, we);
+SPtr<ModelRecord> ModelSystem::getModel(Render *render, const std::string &model_id, WorldEntity *we) {
+  return m_model_handler->getModel(render, model_id, we);
 }
 
-ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
+SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
   assert (we != NULL);
   // Find object record from entity id
   std::string id = we->getId();
-  ObjectRecord *object_record = m_object_handler->getObjectRecord(id);
+  SPtr<ObjectRecord> object_record = m_object_handler->getObjectRecord(id);
 
-  // Why did we do this? 
-//  if (object_record && object_record->type.empty()) {
-//    object_record->type = we->getId();
-//  }
-#if(1)
   std::string type = DEFAULT;
   if (!object_record) {
     Eris::TypeInfo *ti = we->getType();
@@ -165,38 +162,6 @@ ObjectRecord *ModelSystem::getObjectRecord(WorldEntity *we) {
         }
       }
     }
-
-#else
-  std::string type = we->type();
-  if (!object_record) {
-    // No record for this ID yet, so lets see if there is a record for 
-    // the object type
-    varconf::Config::inst()->clean(type);
-    object_record = m_object_handler->getObjectRecord(type);
-
-    if (object_record == NULL) {
-      // No record for object type either! Lets try the parent type then
-      type = we->parent();
-      varconf::Config::inst()->clean(type);
-      object_record = m_object_handler->getObjectRecord(type);
-    }
-
-    if (object_record == NULL) {
-      // Still no record? then lets use the default record
-      type = DEFAULT;
-      varconf::Config::inst()->clean(type);
-      object_record = m_object_handler->getObjectRecord(type);
-      if (debug) printf("Object ID: %s Type: %s using default record.\n", we->getId().c_str(), we->type().c_str());
-    }
-#endif 
-    assert(object_record);
-    // Copy existing record to the entity ID so we can make entity
-    // Specific changes
-//    object_record = m_object_handler->instiateRecord(we->getId(), object_record);
-    // Get pointer to our new record
-//    object_record = m_object_handler->getObjectRecord(we->getId());
-
-//    assert(object_record);
 
     // Set the values for the object record
     object_record->type = type;

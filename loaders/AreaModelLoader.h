@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: AreaModelLoader.h,v 1.3 2006-02-05 21:09:50 simon Exp $
+// $Id: AreaModelLoader.h,v 1.4 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_AREAMODEL_LOADER_H
 #define SEAR_AREAMODEL_LOADER_H
@@ -23,8 +23,8 @@ public:
   AreaModelLoader(ModelHandler *mh);
   ~AreaModelLoader();
 
-  virtual ModelRecord *loadModel(Render *render, 
-    ObjectRecord *record, const std::string &model_id, varconf::Config &model_config);
+  virtual SPtr<ModelRecord> loadModel(Render *render, 
+    WorldEntity *we, const std::string &model_id, varconf::Config &model_config);
     
 private:
   typedef std::map<int, Mercator::AreaShader*> Shaderstore;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.140 2006-02-04 18:52:44 simon Exp $
+// $Id: GL.cpp,v 1.141 2006-02-07 11:31:02 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -47,6 +47,8 @@
 #include "src/WorldEntity.h"
 
 #include "GL.h"
+
+//#include "StaticObject.h"
 
 #include "common/Mesh.h"
 
@@ -952,7 +954,7 @@ inline void GL::rotate(float angle, float x, float y, float z) {
 }
 
 //void GL::rotateObject(WorldEntity *we, int type) {
-void GL::rotateObject(ObjectRecord *object_record, ModelRecord *model_record) {
+void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) {
 //  if (!we) return; // THROW ERROR;
   switch (model_record->rotation_style) {
     case Graphics::ROS_NONE: return; break;
@@ -1135,27 +1137,31 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
     RenderSystem::getInstance().switchState(I->first);
     for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
 
-      ObjectRecord *object_record = J->first;
-      ModelRecord *model_record = J->second;
-      Model *model = model_record->model;
+      SPtr<ObjectRecord> object_record = J->first;
+      SPtr<ModelRecord> model_record = J->second;
+      SPtrShutdown<Model> model = model_record->model;
       assert(model);
 
       glPushMatrix();
 
-      // Apply Object transforms
+      // 1) Apply Object transforms
       WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
       assert(pos.isValid());
       translateObject(pos.x(), pos.y(), pos.z() );
+
       rotateObject(object_record, model_record);
 
-      // Apply model transforms
-      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
-      glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
+      // 2) Apply Model Transforms
 
       // Scale Object
       float scale = model_record->scale;
       // Do not perform scaling if it is to zero or has no effect
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+      // Apply model transforms
+      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
+      glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
+
+      // 3) Apply final scaling once model is in place
 
       if (model_record->scale_bbox && object_record->entity->hasBBox()) {
         WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
@@ -1174,6 +1180,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         glScalef(z_scale, z_scale, z_scale);
       }
  
+
       // Draw Model
       if (select_mode) {
         nextColour(dynamic_cast<WorldEntity*>(object_record->entity.get()));
@@ -1243,9 +1250,10 @@ inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) {
   return Frustum::axisBoxInFrustum(m_frustum, bbox);
 }
 
-void GL::drawOutline(ModelRecord *model_record) {
+void GL::drawOutline(SPtr<ModelRecord> model_record) {
   StateID cur_state = RenderSystem::getInstance().getCurrentState();
-  Model *model = model_record->model;
+  SPtrShutdown<Model> model = model_record->model;
+  assert(model);
   bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
   if (use_stencil) { // Using Stencil Buffer
     glEnable(GL_STENCIL_TEST);

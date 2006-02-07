@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.9 2006-01-28 15:35:49 simon Exp $
+// $Id: ObjectRecord.h,v 1.10 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -33,17 +33,18 @@ public:
   std::string name;
   std::string id;
   std::string type;
+
   ModelList low_quality;
   ModelList medium_quality;
   ModelList high_quality;
-  int icon;
+
   bool draw_self;
   bool draw_members;
   bool draw_attached;
   WFMath::AxisBox<3> bbox;
   WFMath::Point<3> position;
   WFMath::Quaternion orient;
-//  WorldEntity *entity;
+
   Eris::EntityRef entity;
 };
 

@@ -12,29 +12,31 @@ namespace Mercator
     class Area;
 }
 
-namespace Sear
-{
+namespace Sear {
 
-class ObjectRecord;
+class WorldEntity;
 
-class AreaModel : public Model
-{
+class AreaModel : public Model {
 public:
-    AreaModel(Render*, ObjectRecord* orec);
-    /**
-    initialise the model. Result indicates success (true) or failure
-    */
-    bool init();    
-    virtual ~AreaModel();
-    
-    virtual int shutdown();
-    virtual void contextCreated();    
-    virtual void contextDestroyed(bool check);
-    
-    int getLayer() const;
+  AreaModel(Render*, WorldEntity *we);
+  /**
+   * initialise the model. Result indicates success (true) or failure
+  */
+  bool init();    
+  virtual ~AreaModel();
+  
+  virtual int shutdown();
+
+  virtual bool isInitialised() const { return m_initialised; }
+
+  virtual void contextCreated();    
+  virtual void contextDestroyed(bool check);
+  
+  int getLayer() const;
 private:
-    ObjectRecord* m_object;
-    Mercator::Area* m_area;
+  bool m_initialised;
+  WorldEntity *m_entity;
+  Mercator::Area* m_area;
 };
 
 }

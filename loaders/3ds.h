@@ -2,12 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.20 2006-01-28 15:35:48 simon Exp $
+// $Id: 3ds.h,v 1.21 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
 
-//#include <stdlib.h>
 #include <string>
 #include <list>
 #include <map>
@@ -23,10 +22,12 @@
 
 #include "Model.h"
 
+#include "common/SPtr.h"
+
 namespace Sear {
 
 // Forward declarations	
-class RenderObject;
+class StaticObject;
 
 class ThreeDS : public Model, public SigC::Object {
 public:
@@ -48,12 +49,14 @@ public:
   /*
    * Called when model is to be removed from memory. It cleans up its children.
    */
-  int shutdown();
-  void render(bool);
+  virtual int shutdown();
+  virtual void render(bool);
 
-  void contextCreated();
-  void contextDestroyed(bool check);
-  void setHeight(float height) { m_height = height; }
+  virtual bool isInitialised() const { return m_initialised; }
+
+  virtual void contextCreated();
+  virtual void contextDestroyed(bool check);
+  virtual void setHeight(float height) { m_height = height; }
 
 protected:
   
@@ -68,16 +71,13 @@ protected:
   void render_file(Lib3dsFile *file);
   void render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *d);
   
-//  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
 
-
-  std::list<RenderObject*> m_render_objects;
+  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
+  StaticObjectList m_render_objects;
   typedef std::map<std::string, Material*> MaterialMap;
   MaterialMap m_material_map;
   bool m_initialised;
-  unsigned int m_list;
-  unsigned int m_list_select;
   float m_height;
   varconf::Config m_config;  
 };

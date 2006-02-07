@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.34 2006-01-31 16:59:00 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.35 2006-02-07 11:31:02 simon Exp $
 
 #include <sage/sage.h>
 
@@ -406,7 +406,7 @@ void Graphics::buildQueues(WorldEntity *we,
 
   assert(we->getType());
     
-  ObjectRecord *obj = ModelSystem::getInstance().getObjectRecord(we);
+  SPtr<ObjectRecord> obj = ModelSystem::getInstance().getObjectRecord(we);
   assert (obj);
 
   // Setup lights as we go
@@ -441,13 +441,13 @@ void Graphics::buildQueues(WorldEntity *we,
 //  }
 }
 
-void Graphics::drawObject(ObjectRecord* obj, 
+void Graphics::drawObject(SPtr<ObjectRecord> obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
                         Render::MessageList &name_list,
                         float time_elapsed) {
-  assert(obj != NULL);
+  assert(obj);
 
   WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
   assert(obj_we); 
@@ -498,7 +498,7 @@ void Graphics::drawObject(ObjectRecord* obj,
 
   for (I = Ibegin; I != Iend; ++I) {
     // retrive or create the model and modelRecord as necessary
-    ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, *I, obj_we);
+    SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(m_renderer, *I, obj_we);
     assert(modelRec);
     
     int state = select_mode ? modelRec->select_state : modelRec->state;
@@ -524,7 +524,7 @@ void Graphics::drawObject(ObjectRecord* obj,
         Eris::Entity * ee = it->second.get();
         WorldEntity * we = dynamic_cast<WorldEntity*>(ee);
         assert(we!=0);
-        ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(we);
+        SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
         assert (attached);
 
         std::string submodel = mapAttachSlotToSubmodel(it->first);
@@ -586,7 +586,7 @@ std::string mapAttachSlotToSubmodel(const std::string& s)
     return s;
 }
 
-void Graphics::drawAttached(ObjectRecord* obj, 
+void Graphics::drawAttached(SPtr<ObjectRecord> obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
@@ -596,7 +596,7 @@ void Graphics::drawAttached(ObjectRecord* obj,
   assert(obj);
   WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
   assert(obj_we);
-  ModelRecord* modelRec = ModelSystem::getInstance().getModel(m_renderer, obj, obj->low_quality.front(), obj_we);
+  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(m_renderer, obj->low_quality.front(), obj_we);
   assert(modelRec);
   WorldEntity::AttachmentMap::const_iterator it,
     end = obj_we->getAttachments().end();
@@ -606,7 +606,7 @@ void Graphics::drawAttached(ObjectRecord* obj,
     if (!it->second) { continue; }
     Eris::Entity * ee = it->second.get();
     WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
-    ObjectRecord *attached = ModelSystem::getInstance().getObjectRecord(we);
+    SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
     assert (attached);
   
     std::string submodel = mapAttachSlotToSubmodel(it->first);

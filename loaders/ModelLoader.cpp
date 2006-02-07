@@ -2,24 +2,25 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.4 2006-02-05 21:09:50 simon Exp $
+// $Id: ModelLoader.cpp,v 1.5 2006-02-07 11:31:03 simon Exp $
 
 #include "ModelLoader.h"
 
 #include <varconf/Config.h>
 
+#include "Model.h"
 #include "ModelRecord.h"
-#include "ObjectRecord.h"
+#include "src/WorldEntity.h"
 
 namespace Sear
 {
 
-ModelRecord* ModelLoader::loadModel(Render *, 
-        ObjectRecord *record, 
+SPtr<ModelRecord> ModelLoader::loadModel(Render *, 
+       WorldEntity *we, 
         const std::string &model_id, 
         varconf::Config &model_config)
 {
-    ModelRecord * model_record = new ModelRecord();
+    SPtr<ModelRecord> model_record = SPtr<ModelRecord>(new ModelRecord());
     model_record->id = model_id;
     // Get model scale
     if (model_config.findItem(model_id, ModelRecord::SCALE)) {

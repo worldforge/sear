@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #ifndef SEAR_LOADERS_MODELSYSTEM_H
 #define SEAR_LOADERS_MODELSYSTEM_H 1
@@ -12,6 +12,7 @@
 #include <varconf/Config.h>
 
 #include "interfaces/ConsoleObject.h"
+#include "common/SPtr.h"
 
 namespace Sear {
 
@@ -31,6 +32,7 @@ public:
   ModelSystem() :
     m_initialised(false)
   { }
+
   virtual ~ModelSystem() {}
 
   int init();
@@ -50,13 +52,29 @@ public:
 
   varconf::Config &getModels() { return m_models; }
   varconf::Config &getModelRecords();
-//  varconf::Config &getObjectRecords();
-//  varconf::Config &getObjectRecords() { return m_object_records; }
  
-  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &mode_id, WorldEntity *we); 
+  /** The getModel method returns a model record for the given object and model
+   * ID. NULL is returned if no record can be found.
+   * @param render The current render object. This is required to create the 
+   * model instance.
+   * @param model_id The name of the model record to instantiate
+   * @param we The Entity owning this model.
+   */
+  SPtr<ModelRecord> getModel(Render *render, const std::string &model_id, WorldEntity *we); 
 
-  ObjectRecord *getObjectRecord(WorldEntity *we);
 
+  /** The getObjectRecord method searches for the most appropriate record
+   * for the given entity. This will search through the type hierarchy if
+   * required until a matching record is found. An instance of the record is
+   * then associated with this entity.
+   * @param we The Entity to get the ObjectRecord of.
+   * @return The suitable ObjectRecord, or NULL if none is found.
+   */
+  SPtr<ObjectRecord> getObjectRecord(WorldEntity *we);
+
+
+  /** The resetModels method removes all entity based information stored.
+   */
   void resetModels();
 
 private:
@@ -68,8 +86,6 @@ private:
   bool m_initialised;
 
   varconf::Config m_models;
-//  varconf::Config m_model_records;
-//  varconf::Config m_object_records;
 
   ModelHandler  *m_model_handler;
   ObjectHandler *m_object_handler;

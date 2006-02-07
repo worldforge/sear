@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.26 2006-01-28 15:35:49 simon Exp $
+// $Id: ModelHandler.cpp,v 1.27 2006-02-07 11:31:03 simon Exp $
 
 #include <set>
 #include <string.h>
@@ -37,6 +37,9 @@
 namespace Sear {
 
 static const std::string CMD_LOAD_MODEL_RECORDS = "load_model_records";
+
+static const std::string ATTR_GUISE= "guise";
+static const std::string ATTR_MODE = "mode";
 
 ModelHandler::ModelHandler() :
   m_initialised(false),
@@ -78,42 +81,20 @@ void ModelHandler::shutdown() {
     m_model_loaders.erase(m_model_loaders.begin());
   }
   // Delete all unique records
-  while (!m_object_map.empty()) {
-    ModelRecord *mr = m_object_map.begin()->second;
-    if (mr) {
-      if (!mr->model_by_type) { // If model_by_type then record is not unique
-        if (mr->model) {
-          mr->model->shutdown();
-          delete mr->model;
-          mr->model = NULL;
-        }
-        delete mr;
-      }
-    }
-    m_object_map.erase(m_object_map.begin());
-  }
+  m_object_map.clear();
   // Delete all remaining records
-  while (!m_model_records_map.empty()) {
-    ModelRecord *mr = m_model_records_map.begin()->second;
-    if (mr) {
-      if (mr->model) {
-        mr->model->shutdown();
-        delete mr->model;
-        mr->model = NULL;
-      }
-      delete mr;
-    }
-    m_model_records_map.erase(m_model_records_map.begin());
-  }
+  m_model_records_map.clear();
+
   m_initialised = false;
 }
   
-ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we) {
+SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &model_id, WorldEntity *we) {
   assert (m_initialised == true);
-  assert(record);
-//  assert(we);
+
+  assert(we);
   // Model loaded for this object?
-  std::string id = record->id + model_id;
+
+  std::string id = we->getId() + model_id;
   ObjectRecordMap::const_iterator I = m_object_map.find(id);
   if (I != m_object_map.end()) {
     return I->second;
@@ -121,18 +102,15 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
 
   ModelRecordMap::const_iterator J = m_model_records_map.find(model_id);
   if (J != m_model_records_map.end()) {
-    m_object_map[record->id + model_id] = J->second;
+    m_object_map[id] = J->second;
     return J->second;
   }
-//  assert(render);
   // No existing model found, load up a new one
   if (!render) {
-//    std::cerr << "renderer is null" << std::endl;	  
     if (debug && we) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
-    return NULL;
+    return SPtr<ModelRecord>();
   }
 
-  ModelRecord *model = NULL;
   varconf::Config &m_model_records = ModelSystem::getInstance().getModelRecords();
   std::string model_loader = (std::string)m_model_records.getItem(model_id, ModelRecord::MODEL_LOADER);
 
@@ -147,36 +125,35 @@ ModelRecord *ModelHandler::getModel(Render *render, ObjectRecord *record, const 
     model_loader = "boundbox";
     K = m_model_loaders.find(model_loader);
   }
+  SPtr<ModelRecord> model;
   if (K != Kend) {
-    model = K->second->loadModel(render, record, model_id, m_model_records);
+    model = K->second->loadModel(render, we, model_id, m_model_records);
   } else {
     std::cerr << "No loader found: " << model_loader << std::endl;
-    return NULL;
+    return model;
   }
   
   // Check model was loaded, and fall back to a NullModel
   if (!model) {
     std::cerr << "Error loading model of type " << model_loader << std::endl;
-    model = new ModelRecord;
-    model->model = new NullModel(render);
+    model = SPtr<ModelRecord>(new ModelRecord);
+    model->model = SPtrShutdown<Model>(new NullModel(render));
   }
 
-  if (we != NULL) {
-    if (we->hasAttr("action")) {
-      model->model->action(we->valueOfAttr("action").asString());
+//  if (we != NULL) {
+    if (we->hasAttr(ATTR_MODE)) {
+      model->model->animate(we->valueOfAttr(ATTR_MODE).asString());
     }
-    if (we->hasAttr("mode")) {
-      model->model->animate(we->valueOfAttr("mode").asString());
-    }
-    if (we->hasAttr("guise")) {
-      Atlas::Message::MapType mt = we->valueOfAttr("guise").asMap();
+    if (we->hasAttr(ATTR_GUISE)) {
+      Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
       model->model->setAppearance(mt);
     }                                                                          
-  }
+//  }
 
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
-  m_object_map[record->id + model_id] = model;
+  m_object_map[id] = model;
+
   return model; 
 }
 
@@ -202,7 +179,6 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoa
 }
 
 void ModelHandler::checkModelTimeouts(bool forceUnload) {
-//return;
   assert (m_initialised == true);
 
   // This function checks to see when the last time a model record was rendered.
@@ -220,87 +196,35 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
 
   // Do the same again for the object map
   ModelRecordMap::iterator Jend = m_object_map.end();
-  for (ObjectRecordMap::iterator J = m_object_map.begin(); J != Jend; ++J) {
-    ModelRecord *record = J->second;
-
-    assert(record);
-
-    Model *model = record->model;
-    if (model) {
-      if (forceUnload || (System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-        expired_set.insert(J->first);
+  ObjectRecordMap::iterator J = m_object_map.begin();
+  while (J != Jend) {
+    SPtr<ModelRecord> record = J->second;
+    SPtrShutdown<Model> model = record->model;
+    bool unload = forceUnload;
+    if (!unload && model) {
+      if (System::instance()->getTimef() - model->getLastTime() > 60.0f) {
+        unload = true;
       }
     }
+    if (unload) m_object_map.erase(J++);
+    else ++J;
   }
-
-  std::set<std::string>::const_iterator K = expired_set.begin();
-  std::set<std::string>::const_iterator Kend = expired_set.end();
-  for (; K != Kend; ++K) {
-    ModelRecordMap::iterator J = m_object_map.find(*K);
-    if (J != Jend) {
-      ModelRecord *record = J->second;
-      assert(record);
-      if (debug) std::cout << "Unloading: " << record->id << std::endl;
-      Model *model = record->model;
-      if (model && !record->model_by_type) {
-        model->shutdown();
-        delete model;
-        record->model = NULL;
-      }
-  //    delete record;
-      m_object_map.erase(J);
-    }
-  }
-
 
   // Loop through and find all objects that have expired and add to set object
   ModelRecordMap::iterator Iend = m_model_records_map.end();
-  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != Iend; ++I) {
-    ModelRecord *record = I->second;
-
-    assert(record);
-
-    Model *model = record->model;
-    if (model) {
-      if (forceUnload || (System::instance()->getTimef() - model->getLastTime()) > 60.0f) {
-      if (debug) std::cout << "Unloading: " << record->id << std::endl;
-
-//        model->shutdown();
-//        delete model;
-//        record->model = NULL;
-        // Add to set object
-        expired_set.insert(I->first);
+  ModelRecordMap::iterator I = m_model_records_map.begin();
+  while (I != Iend) {
+    SPtr<ModelRecord> record = I->second;
+    SPtrShutdown<Model> model = record->model;
+    bool unload = forceUnload;
+    if (!unload && model) {
+      if (System::instance()->getTimef() - model->getLastTime() > 60.0f) {
+        unload = true;
       }
     }
+    if (unload) m_model_records_map.erase(I++);
+    else ++I;
   }
-
-  K = expired_set.begin();
-  Kend = expired_set.end();
-  for (; K != Kend; ++K) {
-    ModelRecordMap::iterator I = m_model_records_map.find(*K);
-    if (I != Iend) {
-      ModelRecord *record = I->second;
-
-      assert(record);
-      if (debug) std::cout << "Unloading: " << record->id << std::endl;
-
-      Model *model = record->model;
-  assert(model);
-      if (model ) {
-        model->shutdown();
-        delete model;
-        record->model = NULL;
-      }
-
-     delete record;
-      m_model_records_map.erase(I);
-    }
-  }
-
-  expired_set.clear();
-
-
-  // Do not do this as it leads to a double free!
 }
 
 void ModelHandler::TimeoutExpired() {
@@ -344,9 +268,9 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
 }
 void ModelHandler::contextCreated() {
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
-    ModelRecord *record = I->second;
-    assert(record);
-    Model *model = record->model;
+    SPtr<ModelRecord> record = I->second;
+
+    SPtrShutdown<Model> model = record->model;
     if (model) {
       model->contextCreated();
     }
@@ -356,9 +280,9 @@ void ModelHandler::contextCreated() {
 
 void ModelHandler::contextDestroyed(bool check) {
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
-    ModelRecord *record = I->second;
-    assert(record);
-    Model *model = record->model;
+    SPtr<ModelRecord> record = I->second;
+
+    SPtrShutdown<Model> model = record->model;
     if (model) {
       model->contextDestroyed(check);
     }
@@ -366,7 +290,7 @@ void ModelHandler::contextDestroyed(bool check) {
 }
 
 void ModelHandler::reset() {
-//  checkModelTimeouts(true);
+  checkModelTimeouts(true);
 }
 
 

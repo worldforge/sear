@@ -14,7 +14,6 @@ namespace Sear
 
 ObjectRecord::ObjectRecord() :
   name("object"),
-  icon(0),
   draw_self(false),
   draw_members(false),
   draw_attached(false),
@@ -28,15 +27,15 @@ ObjectRecord::~ObjectRecord() {}
 void ObjectRecord::action(const std::string &action)
 {
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->action(action);
 }
 for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->action(action);
 }
 for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->action(action);
 }
 }
@@ -45,15 +44,15 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 void ObjectRecord::animate(const std::string &action)
 {
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->animate(action);
 }
 for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->animate(action);
 }
 for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->animate(action);
 }
 }
@@ -61,15 +60,15 @@ for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end()
 void ObjectRecord::setAppearance(const Atlas::Message::MapType &map)
 {
 for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->setAppearance(map);
 }
 for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->setAppearance(map);
 }
 for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-  ModelRecord *rec = ModelSystem::getInstance().getModel(NULL, this, *I, dynamic_cast<WorldEntity*>(entity.get()));
+  SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(NULL, *I, dynamic_cast<WorldEntity*>(entity.get()));
   if (rec && rec->model) rec->model->setAppearance(map);
 }
 

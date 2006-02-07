@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.10 2006-01-28 15:35:49 simon Exp $
+// $Id: NPlane.h,v 1.11 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -23,14 +23,16 @@ public:
   ~NPlane();
   
   int init(const std::string &, unsigned int num_planes, float width, float height);
-  int shutdown();
- 
-  void contextCreated();
-  void contextDestroyed(bool check);
- 
-  void render(bool); 
+  virtual int shutdown();
 
-  Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
+  virtual bool isInitialised() const { return m_initialised; }
+ 
+  virtual void contextCreated();
+  virtual void contextDestroyed(bool check);
+ 
+  virtual void render(bool); 
+
+  virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
   
 private:
   unsigned int m_num_planes;

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -111,7 +111,7 @@ public:
   void translateObject(float x, float y, float z);
   void rotate(float angle, float x, float y, float z);
 //  void rotateObject(WorldEntity *we, int type);
-  inline void rotateObject(ObjectRecord *, ModelRecord *);
+  inline void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>);
   inline void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
@@ -120,7 +120,7 @@ public:
   void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
-  void drawOutline(ModelRecord *);
+  void drawOutline(SPtr<ModelRecord>);
  
   inline void store();
   inline void restore();

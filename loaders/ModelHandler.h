@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.6 2006-01-28 15:35:49 simon Exp $
+// $Id: ModelHandler.h,v 1.7 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -14,6 +14,8 @@
 #include <varconf/Config.h>
 
 #include "interfaces/ConsoleObject.h"
+
+#include "common/SPtr.h"
 
 namespace varconf  {
   class Config;
@@ -43,7 +45,7 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
  
-  ModelRecord *getModel(Render *render, ObjectRecord *record, const std::string &model_id, WorldEntity *we = NULL);
+  SPtr<ModelRecord> getModel(Render *render, const std::string &model_id, WorldEntity *we = NULL);
 
   void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
   void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
@@ -62,8 +64,8 @@ protected:
   void varconf_error_callback(const char *message);
 
   typedef std::map<std::string, ModelLoader*> ModelLoaderMap;
-  typedef std::map<std::string, ModelRecord*> ModelRecordMap; 
-  typedef std::map<std::string, ModelRecord*> ObjectRecordMap;
+  typedef std::map<std::string, SPtr<ModelRecord> > ModelRecordMap; 
+  typedef std::map<std::string, SPtr<ModelRecord> > ObjectRecordMap;
 
   ModelLoaderMap m_model_loaders; // Stores all the model loaders
   ModelRecordMap m_model_records_map; // Stores all the model_by_type models

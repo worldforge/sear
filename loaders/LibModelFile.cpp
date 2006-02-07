@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.15 2006-01-28 15:35:49 simon Exp $
+// $Id: LibModelFile.cpp,v 1.16 2006-02-07 11:31:03 simon Exp $
 
 /*
   Debug check list
@@ -32,6 +32,8 @@ extern "C" {
 
 #include "LibModelFile.h"
 
+#include "StaticObject.h"
+
 #ifdef USE_MMGR
   #include "common/mmgr.h"
 #endif
@@ -46,14 +48,7 @@ namespace Sear {
 static const float default_scale = 1.0f / 64.0f;
 
 LibModelFile::LibModelFile(Render *render) : Model(render), 
-  m_initialised(false),
-  m_vertex_data(NULL),
-  m_normal_data(NULL),
-  m_texel_data(NULL),
-  m_num_triangles(0),
-  m_num_vertices(0),
-  m_render_list(0),
-  m_select_list(0)
+  m_initialised(false)
 {
   m_config.sige.connect(SigC::slot(*this, &LibModelFile::varconf_error_callback));
 }
@@ -92,39 +87,16 @@ int LibModelFile::init(const std::string &filename) {
 
   for (int i = 0; i < modelFile->header->mesh_count; ++i) {
     libmd3_unpack_normals(&modelFile->meshes[i]);
-//    libmd3_strip_env_texcoords(&modelFile->meshes[i]);
   }
-
-  // Create one big array to store all data, then just swap the textures when rendering.
-
-  // Store boundaries in data
-  m_boundaries.resize(modelFile->header->mesh_count  + 1);
-  m_textures.resize(modelFile->header->mesh_count);
-  m_mask_textures.resize(modelFile->header->mesh_count);
-
-  // Get number of triangles
-  m_num_triangles = 0;
-  m_num_vertices = 0;
-  libmd3_mesh *meshp = modelFile->meshes;
-
-  m_boundaries[0] = 0;
-  for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
-    m_num_triangles += meshp->mesh_header->triangle_count;
-    m_num_vertices += meshp->mesh_header->vertex_count;
-    // Record where the different meshes end
-    m_boundaries[i+1] = m_num_triangles;
-  }
-
-  // Create data arrays
-  m_vertex_data = new short[m_num_vertices * 3];
-  m_texel_data  = new float[m_num_vertices * 2];
-  m_normal_data = new float[m_num_vertices * 3];
-  m_faces       = new unsigned int[m_num_triangles * 3];
 
   // Get mesh data
-  meshp = modelFile->meshes;
+  libmd3_mesh *meshp = modelFile->meshes;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
+    SPtrShutdown<StaticObject> so(new StaticObject());
+    so->init();
+
     // Get Texture data from Mesh
+    int texture_id = 0, texture_mask_id = 0;
     if (meshp->mesh_header->skin_count != 0) {
       std::string name = (const char*)(meshp->skins[0].name);
       m_config.clean(name);
@@ -133,27 +105,31 @@ int LibModelFile::init(const std::string &filename) {
         name = (std::string)m_config.getItem(name, "filename");
       }
       // Request Texture ID
-      m_textures[i] = RenderSystem::getInstance().requestTexture(name);
-      m_mask_textures[i] = RenderSystem::getInstance().requestTexture(name, true);
-    } else {
-      m_textures[i] = 0;
-      m_mask_textures[i] = 0;
+      texture_id = RenderSystem::getInstance().requestTexture(name);
+      texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
     }
-   
+    so->setTexture(0, texture_id, texture_mask_id);
+    so->setNumPoints(meshp->mesh_header->triangle_count * 3);
+    
+    so->setAmbient(1.0f,1.0f,1.0f,1.0f);
+    so->setDiffuse(1.0f,1.0f,1.0f,1.0f);
+    so->setSpecular(1.0f,1.0f,1.0f,1.0f);
+    so->setEmission(0.0f,0.0f,0.0f,0.0f);
+    so->setShininess(50.0f);
+
     // Copy data into array.
-    memcpy(&m_vertex_data[m_boundaries[i] * 3 * 3], meshp->vertices, meshp->mesh_header->vertex_count * 3 * sizeof(short));
+    so->createVertexData(meshp->mesh_header->vertex_count * 3);
+    float *ptr = so->getVertexDataPtr();
+    for (int i = 0; i <  meshp->mesh_header->vertex_count * 3; ++i){
+      ptr[i] = default_scale * (float)meshp->vertices[i];
+    }  
+ 
+    so->copyTextureData(meshp->texcoords, meshp->mesh_header->vertex_count * 2);
+    so->copyNormalData(meshp->normals, meshp->mesh_header->vertex_count * 3);
 
-    memcpy(&m_texel_data[m_boundaries[i] * 3 * 2], meshp->texcoords, meshp->mesh_header->vertex_count * 2 * sizeof(float));
+    so->copyIndices(meshp->triangles, meshp->mesh_header->triangle_count * 3);
 
-    memcpy(&m_normal_data[m_boundaries[i] * 3 * 3], meshp->normals, meshp->mesh_header->vertex_count * 3 * sizeof(float));
-
-    memcpy(&m_faces[m_boundaries[i] * 3], meshp->triangles, meshp->mesh_header->triangle_count * 3 * sizeof(unsigned int));
-
-    // We are using one buffer for all objects, so adjust face vertex 
-    // numbers accordingly
-    for (int j = 0; j < meshp->mesh_header->triangle_count * 3; ++j) {
-      m_faces[m_boundaries[i] * 3 + j] += m_boundaries[i] * 3;
-    }
+    m_static_objects.push_back(so);
   }
 
   libmd3_file_free(modelFile);
@@ -169,164 +145,29 @@ int LibModelFile::shutdown() {
   //  Clean up OpenGL data
   contextDestroyed(true);
 
-  // Clear up buffers
-  delete [] m_vertex_data;
-  m_vertex_data = NULL;
-
-  delete [] m_normal_data;
-  m_normal_data = NULL;
-
-  delete [] m_texel_data;
-  m_texel_data = NULL;
-
-  delete [] m_faces;
-  m_faces = NULL;
-
-  m_num_triangles = 0;
-
   return 0;
 }
 
 void LibModelFile::contextCreated() {}
 
 void LibModelFile::contextDestroyed(bool check) {
-  if (check){
-    // Clean up Display Lists
-    if (glIsList(m_render_list)) glDeleteLists(1, m_render_list);
-    if (glIsList(m_select_list)) glDeleteLists(1, m_select_list);
-
-    // Clean up VBO's
-    if (glIsBufferARB(m_vbos[0])) glDeleteBuffersARB(1, &m_vbos[0]);
-    if (glIsBufferARB(m_vbos[1])) glDeleteBuffersARB(1, &m_vbos[1]);
-    if (glIsBufferARB(m_vbos[2])) glDeleteBuffersARB(1, &m_vbos[2]);
-    if (glIsBufferARB(m_vbos[3])) glDeleteBuffersARB(1, &m_vbos[3]);
+  StaticObjectList::const_iterator I = m_static_objects.begin();
+  for (; I != m_static_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextDestroyed(check);
   }
-  m_render_list = 0;
-  m_select_list = 0;
-  m_vbos[0] = 0;
-  m_vbos[1] = 0;
-  m_vbos[2] = 0;
-  m_vbos[3] = 0;
+
 }
 
-void LibModelFile::genVBOs() {
-  // Create VBO's if required.
-  assert (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] == true);
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-    // Create VBOS
-    glGenBuffersARB(4, &m_vbos[0]);
-
-    // Generate Vertex Array VBO
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[0]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * sizeof(short), m_vertex_data, GL_STATIC_DRAW_ARB);
-    
-    // Generate Normal Array VBO
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[1]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
-
-    // Generate Texel Array VBO
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[2]);
-    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_vertices * 2 * sizeof(float), m_texel_data, GL_STATIC_DRAW_ARB);
-
-    // Generate faces vbo
-    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vbos[3]);
-    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_num_triangles * 3 * sizeof(unsigned int), m_faces, GL_STATIC_DRAW_ARB);
-    
-    // Reset buffer status
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-  }
-}
- 
 void LibModelFile::render(bool select_mode) {
   assert(m_render && "LibModelFile m_render is null");
 
-  // Default material properties
-  static float ambient[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static float diffuse[]  = { 1.0f, 1.0f, 1.0f, 1.0f };
-  static float shininess = 50.0f;
-
-  // Scale to 1/64 
-  glScalef(default_scale, default_scale, default_scale);
- 
-  glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) { // Use Vertex Buffer Objects
-    // Generate buffers if they do not exist
-    if (!glIsBufferARB(m_vbos[0])) genVBOs();
-
-    // Set material properties
-    m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
-
-    // Bind Vertex Array
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[0]);
-    glVertexPointer(3, GL_SHORT, 0, NULL);
-
-    // Bind Normal array
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[1]);
-    glNormalPointer(GL_FLOAT, 0, NULL);
-
-    // Bind texel array
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vbos[2]);
-    glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-
-    // Bind face data
-    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vbos[3]);
-
-    // Render meshes
-    for (unsigned int i = 0; i < m_boundaries.size() - 1; ++i) {
-      // Switch to required texture 
-      if (select_mode) RenderSystem::getInstance().switchTexture(m_mask_textures[i]);
-      else RenderSystem::getInstance().switchTexture(m_textures[i]);
-      // Calculate how many elements to render
-      int count = m_boundaries[i + 1] - m_boundaries[i];
-      glDrawElements(GL_TRIANGLES, count * 3,
-                     GL_UNSIGNED_INT, (void*)(NULL + (m_boundaries[i] * 3 * sizeof(unsigned int))));
-    }
-
-    // Reset VBO buffer
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-
-  } else { // Use Vertex Arrays
-    GLuint &list = (select_mode) ? (m_select_list) : (m_render_list);
-    // Call display list if created
-    if (glIsList(list)) {
-      glCallList(list);
-    } else { // Generate new display list
-      list = glGenLists(1);
-      glNewList(list, GL_COMPILE_AND_EXECUTE);
-
-      // Set material properties
-      m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
-
-      // Setup vertex pointers
-      glVertexPointer(3, GL_SHORT, 0, m_vertex_data);
-      glNormalPointer(GL_FLOAT, 0, m_normal_data);
-      glTexCoordPointer(2, GL_FLOAT, 0, m_texel_data);
-
-      // Use the Lock arrays extension if available.
-      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) glLockArraysEXT(0, m_num_triangles * 3);
-      // Start rendering the meshes
-      for (unsigned int i = 0; i < m_boundaries.size() - 1; ++i) {
-        // Switch to required texture 
-        if (select_mode) RenderSystem::getInstance().switchTexture(m_mask_textures[i]);
-        else RenderSystem::getInstance().switchTexture(m_textures[i]);
-        // Calculate how many elements to render
-        int count = m_boundaries[i + 1] - m_boundaries[i];
-        glDrawElements(GL_TRIANGLES, count * 3,
-                       GL_UNSIGNED_INT, &m_faces[m_boundaries[i] * 3]);
-      }
-      // We are finished with the vertex arrays now.
-      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) glUnlockArraysEXT();
-
-      glEndList();
-    }
+  for (StaticObjectList::const_iterator I = m_static_objects.begin(); I != m_static_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->render(select_mode);
   }
-  glDisableClientState(GL_NORMAL_ARRAY);
-  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 void LibModelFile::varconf_error_callback(const char *message) {

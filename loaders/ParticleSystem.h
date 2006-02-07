@@ -12,6 +12,7 @@ namespace Sear
 {
 
 class Particle;
+class WorldEntity;
 
 typedef WFMath::Point<3> Point3;
 typedef WFMath::Vector<3> Vector3;
@@ -67,11 +68,13 @@ public:
 class ParticleSystem : public Model
 {
 public:
-    ParticleSystem(Render *render, ObjectRecord* rec);
+    ParticleSystem(Render *render, WorldEntity *we);
     virtual ~ParticleSystem();
     
     virtual void init();
     virtual int shutdown();
+
+    virtual bool isInitialised() const { return m_initialised; }
 
     virtual void update(float dt);
 
@@ -94,9 +97,11 @@ private:
     Vector3 initialVelocity() const;
     Point3 initialPos() const;
     
+    bool m_initialised;
+
     std::vector<Particle*> m_particles;
     TextureID m_texture, m_texture_mask;
-    ObjectRecord* m_entity;
+    WorldEntity* m_entity;
     
     Vertex_3* m_vertexBuffer;
     Texel* m_texCoordBuffer;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.10 2006-01-28 15:35:49 simon Exp $
+// $Id: Graphics.h,v 1.11 2006-02-07 11:31:02 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -132,7 +132,7 @@ private:
     /**
     Helper to qeueue the models for a single object record
     */
-    void drawObject(ObjectRecord* obj, 
+    void drawObject(SPtr<ObjectRecord> obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
@@ -141,7 +141,7 @@ private:
                         
     void drawFire(WorldEntity*);
     
-    void drawAttached(ObjectRecord* obj, 
+    void drawAttached(SPtr<ObjectRecord> obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,

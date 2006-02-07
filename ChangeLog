@@ -1,5 +1,47 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp, loaders/3ds.h, loaders/LibModelFile.cpp,
+	  loaders/LibModelFile.h: Use StaticObject to store mesh data and
+	  perform rendering.
+
+	* loaders/3ds.h, loaders/AreaModel.h, loaders/BoundBox.h,
+	  loaders/LibModelFile.h, loaders/Model.h, loaders/NPlane.h,
+	  loaders/NullModel.h, loaders/particleSystem.h, loaders/WireFrame.h,
+	  loaders/cal3d/Cal3dModel.h: Add an isInitialised method to work with
+	  SPtrShutdown.
+
+	* loaders/3ds_Loader.cpp, loaders/3ds_Loader.h, loaders/AreaModel.cpp,
+	  loaders/AreaModel.h, loaders/AreaModelLoader.cpp, 
+	  loaders/AreaModelLoader.h, loadders/BoundBox_Loader.cpp,
+	  loaders/BoundBox_Loader.h, loaders/LibModelFile_Loader.cpp,
+	  loaders/LibModelFile_Loader.h, loaders/ModelHandler.cpp,
+	  loaders/ModelHandler.h, loaders/ModelLoader.cpp, 
+	  loaders/ModelLoader.h, loaders/ModelSystem.cpp, loaders/ModelSystem.h,
+	  loaders/NPlane_Loader.cpp, loaders/NPlane_Loader.h,
+	  loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/ParticleSystemLoader.cpp, loaders/ParticleSystemLoader.h, 
+	  loaders/WireFrame_Loader.cpp, loaders/WireFrame_Loader.h,
+	  loaders/cal3d/Cal3d_Loader.cpp, loaders/cal3d/Cal3d_Loader.h,
+	  renderers/Graphics.cpp: Update loadModel method to operate directly
+	  on a WorldEntity instead of ObjectRecord to simply SPtr integration
+	  and code redundancy. This may lead to BoundingBox issues for entities
+	  with no bounding box defined.
+
+	* loaders/Model.h:  Add some comments and remove redundant functions.
+
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.cpp,
+	  loaders/ModelLoader.cpp, loaders/ModelLoader.h, 
+	  loaders/ModelRecord.cpp, loaders/ModelRecord.h, 
+	  loaders/ModelSystem.cpp, loaders/ModelSystem.h, 
+	  loaders/ObjectHandler.cpp, loaders/ObjectHandler.h, 
+	  loaders/ObjectRecord.cpp, loaders/ObjectRecord.h, src/Character.cpp,
+	  src/WorldEntity.cpp, renderers/GL.cpp, renderers/GL.h,
+	  renderers/Render.h, renderers/Graphics.cpp, renderers/Graphics.h: Use
+	  SPtr to store ObjectRecord and ModelRecord objects and SPtrShutdown 
+	  to handle Model objects. This simplifies cleaning up tremendously.
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.cpp, loaders/StaticObject.h, 
 	  loaders/Makefile.am, renderers/Makefile.am: Move from renderers dir 
 	  to loaders dir to solve linking problems.

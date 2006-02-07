@@ -3,7 +3,6 @@
 // Copyright (C) 2005 - 2006 Simon Goodall
 
 #include "AreaModel.h"
-#include "ObjectRecord.h"
 #include "environment/Environment.h"
 #include <Mercator/Area.h>
 #include "src/WorldEntity.h"
@@ -15,72 +14,75 @@ namespace Sear
 typedef WFMath::Point<2> Point2;
 typedef WFMath::Vector<3> Vector3;
 
-AreaModel::AreaModel(Render* r, ObjectRecord* orec) :
+AreaModel::AreaModel(Render* r, WorldEntity *we) :
     Model(r),
-    m_object(orec),
+    m_initialised(false),
+    m_entity(we),
     m_area(NULL)
 {
 }
 
 AreaModel::~AreaModel()
 {
-
+  assert (m_initialised == false);
 }
 
-bool AreaModel::init()
-{
-    WorldEntity* we = dynamic_cast<WorldEntity*>(m_object->entity.get());
-    assert(we); 
-    if (!we->hasAttr("area")) {
-        std::cerr << "AreaModel defined on entity with no area attribute" << std::endl;
-        return false;
-    }
+bool AreaModel::init() {
+  assert (m_initialised == false);
+  WorldEntity* we = m_entity;
+  assert(we); 
+  if (!we->hasAttr("area")) {
+    std::cerr << "AreaModel defined on entity with no area attribute" << std::endl;
+    return false;
+  }
     
-    const Atlas::Message::MapType& areaData(we->valueOfAttr("area").asMap());
-    Atlas::Message::MapType::const_iterator it = areaData.find("points");
-    if ((it == areaData.end()) || !it->second.isList()) {
-        std::cerr << "malformed area attribute on entity, no points data" << std::endl;
-        return false;
-    }
+  const Atlas::Message::MapType& areaData(we->valueOfAttr("area").asMap());
+  Atlas::Message::MapType::const_iterator it = areaData.find("points");
+  if ((it == areaData.end()) || !it->second.isList()) {
+    std::cerr << "malformed area attribute on entity, no points data" << std::endl;
+    return false;
+  }
     
-    const Atlas::Message::ListType& pointsData(it->second.asList());
-    it = areaData.find("layer");
-    if ((it == areaData.end()) || !it->second.isInt()) {
-        std::cerr << "malformed area attribute on entity, no layer data" << std::endl;
-        return false;
-    }
+  const Atlas::Message::ListType& pointsData(it->second.asList());
+  it = areaData.find("layer");
+  if ((it == areaData.end()) || !it->second.isInt()) {
+    std::cerr << "malformed area attribute on entity, no layer data" << std::endl;
+    return false;
+  }
 
-    int layer = it->second.asInt();
-    m_area = new Mercator::Area(layer, false);
-       
-    WFMath::Polygon<2> poly;
-    for (unsigned int p=0; p<pointsData.size(); ++p) {
-        if (!pointsData[p].isList()) {
-            std::cerr << "skipped malformed point in area" << std::endl;
-            continue;
-        }
-        
-        const Atlas::Message::ListType& point(pointsData[p].asList());
-        if ((point.size() < 2) || !point[0].isNum() || !point[1].isNum()) {
-            std::cerr << "skipped malformed point in area" << std::endl;
-            continue;
-        }
-        
-        Point2 wpt(point[0].asNum(), point[1].asNum());
-        poly.addCorner(poly.numCorners(), wpt);
+  int layer = it->second.asInt();
+  m_area = new Mercator::Area(layer, false);
+     
+  WFMath::Polygon<2> poly;
+  for (unsigned int p=0; p<pointsData.size(); ++p) {
+    if (!pointsData[p].isList()) {
+      std::cerr << "skipped malformed point in area" << std::endl;
+      continue;
     }
+        
+    const Atlas::Message::ListType& point(pointsData[p].asList());
+    if ((point.size() < 2) || !point[0].isNum() || !point[1].isNum()) {
+      std::cerr << "skipped malformed point in area" << std::endl;
+      continue;
+    }
+     
+    Point2 wpt(point[0].asNum(), point[1].asNum());
+    poly.addCorner(poly.numCorners(), wpt);
+  }
     
 // transform polygon into terrain coords
-    Vector3 xVec = Vector3(1.0, 0.0, 0.0).rotate(m_object->orient);
-    double theta = atan2(xVec.y(), xVec.x()); // rotation about Z
+  Vector3 xVec = Vector3(1.0, 0.0, 0.0).rotate(m_entity->getAbsOrient());
+  double theta = atan2(xVec.y(), xVec.x()); // rotation about Z
     
-    WFMath::RotMatrix<2> rm;
-    poly.rotatePoint(rm.rotation(theta), Point2(0,0));
-    poly.shift(WFMath::Vector<2>(m_object->position.x(), m_object->position.y()));
+  WFMath::RotMatrix<2> rm;
+  poly.rotatePoint(rm.rotation(theta), Point2(0,0));
+  WFMath::Point<3> pos = m_entity->getAbsPos();
+  poly.shift(WFMath::Vector<2>(pos.x(), pos.y()));
     
-    m_area->setShape(poly);
-    Environment::getInstance().registerArea(m_area);
-    return true;
+  m_area->setShape(poly);
+  Environment::getInstance().registerArea(m_area);
+  m_initialised = true;
+  return true;
 }
 
 void AreaModel::contextCreated() {}
@@ -88,6 +90,8 @@ void AreaModel::contextDestroyed(bool check) {}
 
 int AreaModel::shutdown()
 {
+  assert (m_initialised == true);
+  m_initialised = false;
     return 0;
 }
 

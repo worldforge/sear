@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.16 2005-06-06 21:27:49 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.17 2006-02-07 11:31:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -44,16 +44,16 @@ Cal3d_Loader::~Cal3d_Loader() {
   delete m_core_model_handler;
 }
 
-ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
+SPtr<ModelRecord> Cal3d_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
 
-  ModelRecord *model_record =
-                ModelLoader::loadModel(render, record, model_id, model_config);
+  SPtr<ModelRecord> model_record =
+                ModelLoader::loadModel(render, we, model_id, model_config);
 
   assert(model_record);
 
   if (!ModelSystem::getInstance().getModels().findItem(CAL3D, model_record->data_file_id)) {
     std::cerr << "Error: No Cal3D filename" << std::endl;
-    return NULL;
+    return SPtr<ModelRecord>();
   }
 
   std::string file_name = ModelSystem::getInstance().getModels().getItem(CAL3D, model_record->data_file_id);
@@ -65,7 +65,7 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
   
     if (!model) {
       std::cerr << "Unable to load model" << std::endl;	  
-      return NULL;
+      return SPtr<ModelRecord>();
     }
 
     // Set model default texture set
@@ -86,10 +86,10 @@ ModelRecord *Cal3d_Loader::loadModel(Render *render, ObjectRecord *record, const
         model->setMaterialPartSet(*I, (std::string)v);
       }
     }
-    model_record->model = model;
+    model_record->model = SPtrShutdown<Model>(model);
   } catch (...) {
     std::cerr << "Cal3d_Loader: Unknown Exception" << std::endl;
-    return NULL;
+    return SPtr<ModelRecord>();
   }
 
   return model_record;

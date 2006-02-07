@@ -9,6 +9,7 @@
 #include "environment/Environment.h"
 #include "renderers/StateManager.h"
 #include <Mercator/AreaShader.h>
+#include "src/WorldEntity.h"
 
 namespace Sear
 {
@@ -27,23 +28,24 @@ AreaModelLoader::~AreaModelLoader()
 {
 }
 
-ModelRecord* AreaModelLoader::loadModel(Render *render, 
-    ObjectRecord *record,
+SPtr<ModelRecord> AreaModelLoader::loadModel(Render *render, 
+    WorldEntity *we,
     const std::string &model_id, 
     varconf::Config &model_config)
 {
-    ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
-    AreaModel* amodel = new AreaModel(render, record);
-    model_record->model = amodel;
-    model_record->select_state = 0; // default
-    model_record->select_state = 2; // select
+    SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
+    AreaModel* amodel = new AreaModel(render, we);
     
     if (!amodel->init()) {
-        delete model_record;
+//        delete model_record;
         delete amodel;
-        return NULL;
+        return SPtr<ModelRecord>();
+  //      return NULL;
     }
     
+    model_record->model = SPtrShutdown<Model>(amodel);
+    model_record->select_state = 0; // default
+    model_record->select_state = 2; // select
 // create a shader if required
     if (model_config.findItem(model_id, KEY_shader_tex) &&
         !m_shaders.count(amodel->getLayer())) 

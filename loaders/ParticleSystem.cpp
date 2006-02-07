@@ -5,7 +5,6 @@
 #include "loaders/ParticleSystem.h"
 #include "common/types.h"
 #include "renderers/Render.h"
-#include "ObjectRecord.h"
 #include "src/WorldEntity.h"
 
 #include <wfmath/MersenneTwister.h>
@@ -96,6 +95,7 @@ public:
         m_spinAngle = 0.0;
         m_spinSpeed = spinSpeed;
         m_spinAcc = spinAcc;
+
     }
     
     void render() const
@@ -140,9 +140,10 @@ private:
 
 //////////////////////////////////////
 
-ParticleSystem::ParticleSystem(Render *render, ObjectRecord* e) : 
+ParticleSystem::ParticleSystem(Render *render, WorldEntity *we) : 
     Model(render),
-    m_entity(e)
+        m_initialised(false),
+    m_entity(we)
 {   
     m_origin = Point3(0, 0, 0);
     m_posDeviation = Vector3(0.5, 0.5, 0.0);
@@ -151,12 +152,14 @@ ParticleSystem::ParticleSystem(Render *render, ObjectRecord* e) :
 
 ParticleSystem::~ParticleSystem()
 {
+assert(m_initialised == false);
     // should be empty if we got shutdown ok.
     assert(m_particles.empty());
 }
 
 void ParticleSystem::init()
 {
+  assert(m_initialised == false);
     // arbitrary low starting number; we re-allocate storage if required
     // during update()
     int numParticles = 100;
@@ -192,10 +195,12 @@ void ParticleSystem::init()
     
     m_finalColors[0] = Color_4d(1.0, 1.0, 1.0, 1.0);
     m_finalColors[1] = Color_4d(1.0, 0.5, 0.0, 1.0);
+    m_initialised = true;
 }
 
 int ParticleSystem::shutdown()
 {
+    assert(m_initialised == true);
     // get rid of everything
     for (unsigned int p=0; p < m_particles.size(); ++p) delete m_particles[p];
     m_particles.clear();
@@ -203,13 +208,13 @@ int ParticleSystem::shutdown()
     delete[] m_vertexBuffer;
     delete[] m_texCoordBuffer;
     delete[] m_colorBuffer;
-    
+   m_initialised = false; 
     return 0; // what does this indicate?
 }
 
 void ParticleSystem::update(float elapsed)
 {
-    double status = dynamic_cast<WorldEntity*>(m_entity->entity.get())->getStatus();
+    double status = m_entity->getStatus();
     if ((status < 0.0) || (status >= 1.0)) {
         std::cout << "invalid status " << status << " for particle system" << std::endl;
         return;

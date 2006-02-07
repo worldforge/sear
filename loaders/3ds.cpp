@@ -2,7 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.49 2006-01-29 21:27:09 simon Exp $
+// $Id: 3ds.cpp,v 1.50 2006-02-07 11:31:03 simon Exp $
+
+/** TODO
+ * - Currently each render object is created to store all the data in the mesh,
+ *   however, if the material changes, a new object is created (of the same 
+ *   size) but with the new points. Perhaps assume that 1 mesh == 1 material?
+ */
+
 
 #include <iostream>
 #include <list>
@@ -25,9 +32,9 @@
 #include "renderers/Graphics.h"
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
+#include "StaticObject.h"
 
 #include "3ds.h"
-
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -40,38 +47,8 @@
 #endif
 namespace Sear {
 
-class RenderObject {
-public:
-   RenderObject() : 
-     vertex_data(NULL),
-     normal_data(NULL),
-     texture_data(NULL),
-     num_points(0),
-     texture_id(0),
-     texture_mask_id(0),
-     vb_vertex_data(0),
-     vb_texCoords_data(0),
-     vb_normal_data(0)
- {}
-
-    Vertex_3 *vertex_data;
-    Normal *normal_data;
-    Texel *texture_data;
-    unsigned int num_points;
-    int texture_id;
-    int texture_mask_id;
-    std::string material_name;
-
-    GLuint vb_vertex_data;
-    GLuint vb_texCoords_data;
-    GLuint vb_normal_data;
-};
-
-
 ThreeDS::ThreeDS(Render *render) : Model(render),
   m_initialised(false),
-  m_list(0),
-  m_list_select(0),
   m_height(1.0f)
 {
   m_config.sige.connect(SigC::slot(*this, &ThreeDS::varconf_error_callback));
@@ -154,18 +131,14 @@ int ThreeDS::shutdown() {
 
   // Clean up OpenGL bits
   contextDestroyed(true);
-
-  while (!m_render_objects.empty()) {
-    RenderObject *ro = *m_render_objects.begin();
-    if (ro) {
-      if (ro->vertex_data) delete [] (ro->vertex_data);
-      if (ro->texture_data) delete [] (ro->texture_data);
-      if (ro->normal_data) delete [] (ro->normal_data);
-
-      delete ro;
-    }
-    m_render_objects.erase(m_render_objects.begin());
-  }
+  m_render_objects.clear();
+//  while (!m_render_objects.empty()) {
+//    StaticObject *ro = *m_render_objects.begin();
+//    assert(ro);
+//    ro->shutdown();
+//    delete ro;
+//    m_render_objects.erase(m_render_objects.begin());
+//  }
   while (!m_material_map.empty()) {
     Material *m = m_material_map.begin()->second;
     assert(m);
@@ -182,140 +155,23 @@ void ThreeDS::contextCreated() {}
 void ThreeDS::contextDestroyed(bool check) {
   assert(m_render);
 
-  // Clean up display lists
-  m_render->freeList(m_list);
-  m_list = 0;
-
-  m_render->freeList(m_list_select);
-  m_list_select = 0;
-
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-    for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin();
-                                                  I != m_render_objects.end();
-                                                  ++I) {
-      RenderObject *ro = *I;
-      if (ro) {
-        if (check == true) {
-          if (glIsBufferARB(ro->vb_vertex_data)) {
-            glDeleteBuffersARB(1, &ro->vb_vertex_data);
-          }
-          if (glIsBufferARB(ro->vb_texCoords_data)) {
-            glDeleteBuffersARB(1, &ro->vb_texCoords_data);
-          }
-          if (glIsBufferARB(ro->vb_normal_data)) {
-            glDeleteBuffersARB(1, &ro->vb_normal_data);
-          }
-        }
-        ro->vb_vertex_data = 0;
-        ro->vb_texCoords_data = 0;
-        ro->vb_normal_data = 0;
-      }
-    }
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  for (; I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> ro = *I;
+    assert(ro);
+    ro->contextDestroyed(check);
   }
 }
 
 void ThreeDS::render(bool select_mode) {
   assert(m_render);
 
-  std::string current_material = "sear:blank";
-  m_config.clean(current_material);
-
   m_render->scaleObject(m_height);
-  bool end_list = false;
-  if (select_mode) {
-    if (m_list_select) {
-      m_render->playList(m_list_select);
-      return;
-    } else {
-      if (!sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-        m_list_select = m_render->getNewList();
-        m_render->beginRecordList(m_list_select);
-        end_list = true;
-      }
-    }
-  } else  {
-    if (m_list) {
-      m_render->playList(m_list);
-      return;
-    } else {
-      if (!sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-        m_list = m_render->getNewList();
-        m_render->beginRecordList(m_list);
-        end_list = true;
-      }
-    }
-  }
 
-  for (std::list<RenderObject*>::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
-    RenderObject *ro = *I;
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> ro = *I;
     assert(ro);
-
-    if (ro->material_name != current_material) {
-      MaterialMap::const_iterator I = m_material_map.find(ro->material_name);
-      if (I != m_material_map.end()) {
-        Material *m = I->second;
-        assert(m);
-        m_render->setMaterial(m->ambient, m->diffuse, m->specular, m->shininess, NULL);
-      }
-      current_material = ro->material_name;
-    }
-    if (ro->texture_data) {
-      if (select_mode) {
-        RenderSystem::getInstance().switchTexture(ro->texture_mask_id);
-      } else {
-        RenderSystem::getInstance().switchTexture(ro->texture_id);
-      }
-    } else {
-      RenderSystem::getInstance().switchTexture(0);
-    }
-    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-      // Generate VBO's if required
-      if (!glIsBufferARB(ro->vb_vertex_data)) {
-        glGenBuffersARB(1, &ro->vb_vertex_data);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->vertex_data, GL_STATIC_DRAW_ARB);
-        if (ro->normal_data != NULL) {
-          glGenBuffersARB(1, &ro->vb_normal_data);
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 3 * sizeof(float), ro->normal_data, GL_STATIC_DRAW_ARB);
-        }
-        if (ro->texture_data != NULL) {
-          glGenBuffersARB(1, &ro->vb_texCoords_data);
-          glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-          glBufferDataARB(GL_ARRAY_BUFFER_ARB, ro->num_points * 2 * sizeof(float), ro->texture_data, GL_STATIC_DRAW_ARB);
-        }
-      }
-
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_vertex_data);
-      glVertexPointer(3, GL_FLOAT, 0, NULL);
-
-      if (ro->normal_data != NULL) {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_normal_data);
-        glNormalPointer(GL_FLOAT, 0, NULL);
-      }
-
-      if (ro->texture_data != NULL) {
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, ro->vb_texCoords_data);
-        glTexCoordPointer(2, GL_FLOAT, 0, NULL);
-      }
-      // Draw object
-      glDrawArrays(GL_TRIANGLES, 0, ro->num_points);
-      // Reset states
-      if (ro->normal_data != NULL) {
-        glDisableClientState(GL_NORMAL_ARRAY);
-      }
-      if (ro->texture_data != NULL) {
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      }
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-    } else {
-      m_render->renderArrays(Graphics::RES_TRIANGLES, 0, ro->num_points, ro->vertex_data, ro->texture_data, ro->normal_data, false);
-    }
-  }
-  if (end_list) {
-    m_render->endRecordList();
+    ro->render(select_mode);
   }
 }
 
@@ -354,12 +210,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   unsigned int n_counter = 0;
   unsigned int t_counter = 0;
 
-  RenderObject *ro = NULL;//new RenderObject();
-//  m_render_objects.push_back(ro);
-//  ro->num_points = 3 * mesh->faces;
-//  ro->vertex_data = new Vertex_3[ro->num_points];
-//  ro->normal_data = new Normal[ro->num_points];
-//  ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
+  SPtrShutdown<StaticObject> ro;// = NULL;
   int current_texture = -2;
   std::string material_name = "sear:noname";
 
@@ -403,6 +254,9 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       m_config.clean(material_name);
     }
 
+    Material *cm = m_material_map[material_name];
+    assert(cm);
+
     int texture_id = 0;
     int texture_mask_id = 0;
     // If a material is set get texture map names.
@@ -425,19 +279,25 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     if (texture_id != current_texture) {
       current_texture = texture_id;
       // Set correct num of points in old render object
-      if (ro) ro->num_points = v_counter;
+      if (ro) ro->setNumPoints(v_counter);
 
       // Reset counters
       v_counter = n_counter = t_counter = 0;
       // Create a new render object and create data structures        
-      ro = new RenderObject();
-      ro->texture_id = texture_id;
-      ro->texture_mask_id = texture_mask_id;
-      ro->num_points = 3 * mesh->faces;
-      ro->vertex_data = new Vertex_3[ro->num_points];
-      ro->normal_data = new Normal[ro->num_points];
-      ro->texture_data = (mesh->texels) ? (new Texel[ro->num_points]) : (NULL);
-      ro->material_name = material_name;
+      ro = SPtrShutdown<StaticObject>(new StaticObject());
+      ro->init();
+      ro->setTexture(0, texture_id, texture_mask_id);
+      ro->setNumPoints(3 * mesh->faces)
+;
+      ro->createVertexData(ro->getNumPoints() * 3);
+      ro->createNormalData(ro->getNumPoints() * 3);
+      if (mesh->texels) ro->createTextureData(ro->getNumPoints() * 2);
+
+      ro->setAmbient(cm->ambient);
+      ro->setDiffuse(cm->diffuse);
+      ro->setSpecular(cm->specular);
+      ro->setEmission(0.0f, 0.0f,0.0f,0.0f);
+      ro->setShininess(cm->shininess);
 
       m_render_objects.push_back(ro);
     }
@@ -451,8 +311,8 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         out[1] -= d->pivot[1];
         out[2] -= d->pivot[2];
       }
-      lib3ds_vector_transform((float*)&ro->vertex_data[v_counter++], mesh->matrix, out);
-  
+      lib3ds_vector_transform(&ro->getVertexDataPtr()[v_counter * 3], mesh->matrix, out);
+       ++v_counter;
        /* It is very likely the normals have been completely messed up by these transformations */
       lib3ds_vector_transform(out, M,  normalL[3 * p + i]);
       if (d) {
@@ -460,17 +320,17 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         out[1] -= d->pivot[1];
         out[2] -= d->pivot[2];
       }
-      lib3ds_vector_transform((float*)&ro->normal_data[n_counter], mesh->matrix, out);
+      lib3ds_vector_transform(&ro->getNormalDataPtr()[n_counter * 3], mesh->matrix, out);
       ++n_counter;
   
       if (mesh->texels) {
-        ro->texture_data[t_counter].s = mesh->texelL[f->points[i]][0];
-        ro->texture_data[t_counter++].t = mesh->texelL[f->points[i]][1];
+        ro->getTextureDataPtr()[t_counter++] = mesh->texelL[f->points[i]][0];
+        ro->getTextureDataPtr()[t_counter++] = mesh->texelL[f->points[i]][1];
       }
     }
   }
  
-  ro->num_points = v_counter;
+  ro->setNumPoints(v_counter);
   free(normalL);
 }
 

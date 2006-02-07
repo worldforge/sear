@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.9 2006-01-28 15:35:49 simon Exp $
+// $Id: WireFrame.h,v 1.10 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -21,12 +21,13 @@ public:
   ~WireFrame();
   
   int init(WFMath::AxisBox<3>);
-  int shutdown();
+  virtual int shutdown();
+  virtual bool isInitialised() const { return m_initialised;  }
  
-  void contextCreated();
-  void contextDestroyed(bool check);
+  virtual void contextCreated();
+  virtual void contextDestroyed(bool check);
  
-  void render(bool);
+  virtual void render(bool);
   
 private:
   static const int m_num_points = 32;

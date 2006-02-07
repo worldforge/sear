@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.11 2006-01-29 22:35:19 alriddoch Exp $
+// $Id: Render.h,v 1.12 2006-02-07 11:31:02 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -16,6 +16,7 @@
 #include <wfmath/axisbox.h>
 
 #include "common/types.h"
+#include "common/SPtr.h"
 
 #define RENDER_FOV (45.0f)
 #define RENDER_FAR_CLIP (1000.0f)
@@ -40,7 +41,7 @@ class Render {
 
 public:
 
-typedef std::pair<ObjectRecord*, ModelRecord*> QueueItem;
+typedef std::pair<SPtr<ObjectRecord>, SPtr<ModelRecord> > QueueItem;
 typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
@@ -102,7 +103,7 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void translateObject(float x, float y, float z) =0;
   virtual void rotate(float angle, float x, float y, float z) =0;
-  virtual void rotateObject(ObjectRecord *, ModelRecord *) =0;
+  virtual void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) =0;
   virtual void scaleObject(float scale) =0;
   virtual void setViewMode(int type) =0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;

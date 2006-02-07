@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.75 2006-01-29 22:35:19 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.76 2006-02-07 11:31:02 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -309,10 +309,10 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
   if (str == MODE) {
     const std::string mode = v.asString();
     static ActionHandler *ac = System::instance()->getActionHandler();
+    assert(ac);
     ac->handleAction(mode + "_" + type(), NULL);
     if (mode != last_mode) {
-      ObjectRecord *record = NULL;
-      record = ModelSystem::getInstance().getObjectRecord(this);
+      SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
       if (record) record->animate(mode);
       last_mode = mode;
     }
@@ -334,8 +334,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
 */
   } else if (str == GUISE) {
     const Atlas::Message::MapType& mt(v.asMap());
-    ObjectRecord *record = NULL;
-    record = ModelSystem::getInstance().getObjectRecord(this);
+    SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
     if (record) record->setAppearance(mt);
   } else if (str == "right_hand_wield") {
     std::string id = v.asString();
@@ -383,10 +382,8 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
   static ActionHandler *ac = System::instance()->getActionHandler();
   ac->handleAction(a + "_" + type(), NULL);
 
-  ObjectRecord *record = NULL;
-  record = ModelSystem::getInstance().getObjectRecord(this);
+  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
   if (record) record->action(a);
 }
-
 
 } /* namespace Sear */

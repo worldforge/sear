@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.5 2006-01-28 15:35:49 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.6 2006-02-07 11:31:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -49,7 +49,7 @@ void ObjectHandler::init() {
 
 //  m_object_records_map = ObjectRecordMap();
   // Create default record
-  ObjectRecord *r = new ObjectRecord();
+  SPtr<ObjectRecord> r(new ObjectRecord());
   r->name = "default";
   r->draw_self = true;
   r->draw_members = true;
@@ -64,19 +64,23 @@ void ObjectHandler::shutdown() {
   if (debug) std::cout << "Object Handler: Shutdown" << std::endl;
 
   // Clean up object records	
-  while (!m_id_map.empty()) {
-    ObjectRecord *record = m_id_map.begin()->second;
-    assert(record != NULL);
-    delete record;
-    m_type_map.erase(m_id_map.begin());
-  }
+//  while (!m_id_map.empty()) {
+//    SPtr<ObjectRecord> record = m_id_map.begin()->second;
+//    assert(record != NULL);
+//    delete record;
+//    m_type_map.erase(m_id_map.begin());
+//  }
+  m_id_map.clear();
   // Clean up object records	
-  while (!m_type_map.empty()) {
-    ObjectRecord *record = m_type_map.begin()->second;
-    assert(record != NULL);
-    delete record;
-    m_type_map.erase(m_type_map.begin());
-  }
+//  while (!m_type_map.empty()) {
+//    ObjectRecord *record = m_type_map.begin()->second;
+//    assert(record != NULL);
+//    delete record;
+//    m_type_map.erase(m_type_map.begin());
+//  }
+
+  m_type_map.clear();
+
   m_initialised = false;
 }
 
@@ -87,20 +91,18 @@ void ObjectHandler::loadObjectRecords(const std::string &filename) {
   config.readFromFile(filename);
 }
 
-ObjectRecord *ObjectHandler::getObjectRecord(const std::string &id) {
+SPtr<ObjectRecord> ObjectHandler::getObjectRecord(const std::string &id) {
   return (m_id_map.find(id) != m_id_map.end()) 
-        ? (m_id_map[id]) : (NULL);
+        ? (m_id_map[id]) : SPtr<ObjectRecord>();
 }
 
-ObjectRecord *ObjectHandler::instantiateRecord(const std::string &type, const std::string &id) {
+SPtr<ObjectRecord> ObjectHandler::instantiateRecord(const std::string &type, const std::string &id) {
 
-  assert(getObjectRecord(id) == NULL);
+  if (m_type_map.find(type) == m_type_map.end()) return SPtr<ObjectRecord>();
 
-  if (m_type_map.find(type) == m_type_map.end()) return NULL;
+  SPtr<ObjectRecord> type_record = m_type_map[type];
 
-  ObjectRecord *type_record = m_type_map[type];
-
-  ObjectRecord *record = new ObjectRecord();
+  SPtr<ObjectRecord> record(new ObjectRecord());
   record->draw_self = type_record->draw_self;
   record->draw_members = type_record->draw_members;
   record->draw_attached = type_record->draw_attached;
@@ -129,10 +131,10 @@ void ObjectHandler::runCommand(const std::string &command, const std::string &ar
 }
 
 void ObjectHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  ObjectRecord *record = m_type_map[section];
+  SPtr<ObjectRecord> record = m_type_map[section];
   // If record does not exist, create it.
   if (!record) {
-    record = new ObjectRecord();
+    record = SPtr<ObjectRecord>(new ObjectRecord());
     record->name = section;
     record->draw_self = true;
     record->draw_members = true;
@@ -167,11 +169,11 @@ void ObjectHandler::varconf_error_callback(const char *message) {
 }
 
 void ObjectHandler::reset() {
-  ObjectRecordMap::iterator I = m_id_map.begin();
-  while(I != m_id_map.end()) {
-    delete I->second;
-    I++;
-  }
+//  ObjectRecordMap::iterator I = m_id_map.begin();
+//  while(I != m_id_map.end()) {
+//    delete I->second;
+//    ++I;
+//  }
   m_id_map.clear();
 }
 

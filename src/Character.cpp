@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.73 2006-01-28 15:35:48 simon Exp $
+// $Id: Character.cpp,v 1.74 2006-02-07 11:31:01 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -690,9 +690,10 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   }
   else if (command == CMD_READ_APPEARANCE) {
     ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
+    assert(object_handler);
+
     Atlas::Message::MapType mt;
-    ObjectRecord *record = NULL;
-    if (object_handler) record = object_handler->getObjectRecord(m_self->getId());
+    SPtr<ObjectRecord> record = object_handler->getObjectRecord(m_self->getId());
     if (m_self->hasAttr(GUISE)) { // Read existing values
       mt = m_self->valueOfAttr(GUISE).asMap();
       if (record) record->setAppearance(mt);

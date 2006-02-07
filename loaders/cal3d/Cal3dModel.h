@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.17 2006-01-28 15:35:49 simon Exp $
+// $Id: Cal3dModel.h,v 1.18 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -28,6 +28,7 @@ public:
 
   int init(Cal3dCoreModel *);
   int shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   void contextCreated() {}
   void contextDestroyed(bool check) {}

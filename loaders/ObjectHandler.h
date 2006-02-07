@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.3 2006-01-28 15:35:49 simon Exp $
+// $Id: ObjectHandler.h,v 1.4 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -11,6 +11,8 @@
 #include <string>
 
 #include <sigc++/object_slot.h>
+
+#include "common/SPtr.h"
 
 #include "interfaces/ConsoleObject.h"
 
@@ -33,8 +35,8 @@ public:
   void shutdown();
 
   void loadObjectRecords(const std::string &filename);
-  ObjectRecord *getObjectRecord(const std::string &id);
-  ObjectRecord *instantiateRecord(const std::string &type, const std::string &id);
+  SPtr<ObjectRecord> getObjectRecord(const std::string &id);
+  SPtr<ObjectRecord> instantiateRecord(const std::string &type, const std::string &id);
 
   void contextCreated() {}
   void contextDestroyed(bool check) {}
@@ -47,7 +49,7 @@ public:
   void reset();
 
 protected:
-  typedef std::map<std::string, ObjectRecord*> ObjectRecordMap;
+  typedef std::map<std::string, SPtr<ObjectRecord> > ObjectRecordMap;
 
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);

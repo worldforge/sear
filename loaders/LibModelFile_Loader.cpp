@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.5 2006-01-29 19:09:10 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.6 2006-02-07 11:31:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -13,7 +13,7 @@
 
 #include "ModelHandler.h"
 #include "ModelRecord.h"
-#include "ObjectRecord.h"
+#include "src/WorldEntity.h"
 
 #include "LibModelFile_Loader.h"
 #include "LibModelFile.h"
@@ -40,8 +40,8 @@ LibModelFile_Loader::~LibModelFile_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
-  ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
+SPtr<ModelRecord> LibModelFile_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
 
   assert(model_record);
 
@@ -51,7 +51,7 @@ ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record
     // Use old style path finder
     if (!ModelSystem::getInstance().getModels().findItem(LIBMODELFILE, model_record->data_file_id)) {
       std::cerr << "Error: No MD3 filename" << std::endl;
-      return NULL;
+      return SPtr<ModelRecord>();
     }
     file_name = (std::string)ModelSystem::getInstance().getModels().getItem(LIBMODELFILE, model_record->data_file_id);
   }
@@ -64,11 +64,10 @@ ModelRecord *LibModelFile_Loader::loadModel(Render *render, ObjectRecord *record
   if (model->init(file_name)) {
 //    model->shutdown();
     delete model;
-    return NULL;
+    return SPtr<ModelRecord>();
   }
  
-  model->setInUse(true);
-  model_record->model = model;
+  model_record->model = SPtrShutdown<Model>(model);
   return model_record;
 }
 

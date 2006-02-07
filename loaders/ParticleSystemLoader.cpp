@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: ParticleSystemLoader.cpp,v 1.5 2006-02-05 21:09:49 simon Exp $
+// $Id: ParticleSystemLoader.cpp,v 1.6 2006-02-07 11:31:03 simon Exp $
 
 #include "ParticleSystemLoader.h"
 #include "ParticleSystem.h"
@@ -10,7 +10,7 @@
 #include "ModelRecord.h"
 #include "renderers/StateManager.h"
 #include "renderers/RenderSystem.h"
-#include "ObjectRecord.h"
+#include "src/WorldEntity.h"
 
 #include <iostream>
 
@@ -41,30 +41,31 @@ ParticleSystemLoader::~ParticleSystemLoader()
 {
 }
 
-ModelRecord* ParticleSystemLoader::loadModel(Render *render, 
-    ObjectRecord *record,
+SPtr<ModelRecord> ParticleSystemLoader::loadModel(Render *render, 
+    WorldEntity *we,
     const std::string &model_id, 
     varconf::Config &cfg)
 {
     if (!cfg.findItem(model_id, KEY_particle_tex)) {
         std::cerr << "particle model record is incomplete" << std::endl;
-        return NULL;
+        return SPtr<ModelRecord>();
     }
 
-    ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, cfg);
-    ParticleSystem* ps = new ParticleSystem(render, record);
-    model_record->model = ps;
-    model_record->state = RenderSystem::getInstance().getStateManager()->getState("particles");
-    model_record->select_state = 2; // select
+    SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, cfg);
+    ParticleSystem* ps = new ParticleSystem(render, we);
     
     ps->m_ttl = DRange(getItemWithDefault(cfg, model_id, KEY_min_lifetime, 0.0),
                     getItemWithDefault(cfg, model_id, KEY_max_lifetime, 10.0));
     
     ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
     
-    ps->setBBox(record->bbox);
+    ps->setBBox(we->getBBox());
     ps->init();
     
+    model_record->model = SPtrShutdown<Model>(ps);
+    model_record->state = RenderSystem::getInstance().getStateManager()->getState("particles");
+    model_record->select_state = 2; // select
+
     return model_record;
 }
 

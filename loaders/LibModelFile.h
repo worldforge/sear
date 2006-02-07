@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.6 2006-01-28 15:35:49 simon Exp $
+// $Id: LibModelFile.h,v 1.7 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -20,7 +20,11 @@
 
 #include "Model.h"
 
+#include "common/SPtr.h"
+
 namespace Sear {
+
+class StaticObject;
 
 class LibModelFile : public Model, public SigC::Object {
 public:
@@ -43,37 +47,23 @@ public:
   /*
    * Cleans up object
    */ 
-  int shutdown();
-  void render(bool); 
+  virtual int shutdown();
+  virtual void render(bool); 
 
-  void contextCreated();
-  void contextDestroyed(bool check);
+  virtual bool isInitialised() const { return m_initialised; }
 
-  void genVBOs(); 
+  virtual void contextCreated();
+  virtual void contextDestroyed(bool check);
 
 private:
-//  void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
 
   bool m_initialised;
 
-  short *m_vertex_data; // Vertex data
-  float *m_normal_data; // Normal data
-  float *m_texel_data; // Texture Co-oridinates data
-  unsigned int *m_faces;
-
-  int m_num_triangles;
-  int m_num_vertices;
-  GLuint m_vbos[4];
-
-  GLuint m_render_list;
-  GLuint m_select_list;
-
-  std::vector<int> m_boundaries;
-  std::vector<int> m_textures;
-  std::vector<int> m_mask_textures;
-
   varconf::Config m_config;
+
+  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
+  StaticObjectList m_static_objects;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: NullModel.h,v 1.3 2006-02-05 21:09:50 simon Exp $
+// $Id: NullModel.h,v 1.4 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_NULL_MODEL
 #define SEAR_NULL_MODEL
@@ -25,7 +25,9 @@ public:
     {
         return 0;
     }
-    
+   
+   virtual  bool isInitialised() const { return true; }
+ 
     virtual void contextCreated() {}
     virtual void contextDestroyed(bool check) {}
 };

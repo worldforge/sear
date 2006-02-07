@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.20 2006-01-29 19:09:10 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.21 2006-02-07 11:31:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -13,7 +13,7 @@
 
 #include "ModelHandler.h"
 #include "ModelRecord.h"
-#include "ObjectRecord.h"
+#include "src/WorldEntity.h"
 
 #include "3ds_Loader.h"
 #include "3ds.h"
@@ -37,9 +37,9 @@ ThreeDS_Loader::ThreeDS_Loader(ModelHandler *mh) {
   mh->registerModelLoader(THREEDS, this);
 }
 
-ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
+SPtr<ModelRecord> ThreeDS_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
   // Get basic model record
-  ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
 
   assert(model_record);
 
@@ -49,7 +49,7 @@ ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, con
     // See if a filename has been specified
     if (!ModelSystem::getInstance().getModels().findItem(THREEDS, model_record->data_file_id)) {
       std::cerr << "Error: No 3DS filename" << std::endl;
-      return NULL;
+      return SPtr<ModelRecord>();
     }
     // Get 3ds filename
     file_name = (std::string)ModelSystem::getInstance().getModels().getItem(THREEDS, model_record->data_file_id);
@@ -64,18 +64,17 @@ ModelRecord *ThreeDS_Loader::loadModel(Render *render, ObjectRecord *record, con
 //    model->shutdown();
     std::cerr << "Error: Failed to load \"" << file_name << "\"" << std::endl;
     delete model;
-    return NULL;
+    return SPtr<ModelRecord>();
   }
 
   // Set height
   if (model_record->scaleByHeight) {
-    float height = fabs(record->bbox.highCorner().z() 
-                       - record->bbox.lowCorner().z());
+    float height = fabs(we->getBBox().highCorner().z() 
+                       - we->getBBox().lowCorner().z());
     model->setHeight(height);
   }
 
-  model->setInUse(true);
-  model_record->model = model;
+  model_record->model = SPtrShutdown<Model>(model);
   // Return newly created model
   return model_record;
 }

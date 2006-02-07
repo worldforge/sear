@@ -1,14 +1,18 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.6 2006-01-29 19:09:10 simon Exp $
+// $Id: ModelRecord.h,v 1.7 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
 
 #include <string>
+
+#include "common/SPtr.h"
+
 #include "renderers/Graphics.h"
+
 
 namespace Sear {
   class Model;
@@ -16,10 +20,10 @@ namespace Sear {
 class ModelRecord {
 public:
   ModelRecord();
-  ~ModelRecord() {}
+  virtual ~ModelRecord() throw() {}
  
   float scale;
-//  float offset[3];
+
   std::string id;
   int state;
   bool scale_bbox;
@@ -32,7 +36,7 @@ public:
   std::string default_skin;
   bool model_by_type;
   bool outline;
-  Model *model;	
+  SPtrShutdown<Model> model;	
   Graphics::RotationStyle rotation_style;
   float offset_x, offset_y, offset_z;
   float rotate_x, rotate_y, rotate_z;

@@ -1,11 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.6 2006-01-29 19:09:10 simon Exp $
+// $Id: ModelRecord.cpp,v 1.7 2006-02-07 11:31:03 simon Exp $
 
 #include "ModelRecord.h"
-
+#include "Model.h"
 #include "renderers/RenderSystem.h"
 #include "renderers/StateManager.h"
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.27 2005-06-29 21:19:41 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.28 2006-02-07 11:31:03 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -19,6 +19,8 @@
 
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"
+
+#include "src/WorldEntity.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -45,13 +47,15 @@ BoundBox_Loader::~BoundBox_Loader() {
   // TODO: Add ability to unregister loader.
 }
 
-ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config) {
-  ModelRecord *model_record = ModelLoader::loadModel(render, record, model_id, model_config);
+SPtr<ModelRecord> BoundBox_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
+  assert (we);
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
+
   BoundBox *model = new BoundBox(render);
 
-  WFMath::AxisBox<3> bbox = record->bbox;
+  WFMath::AxisBox<3> bbox = we->getBBox();
  
-  std::string texture = record->type;
+  std::string texture = we->type();
   bool wrap = false; //default to false
 
   // Check whether we specify texture wrapping
@@ -67,11 +71,10 @@ ModelRecord *BoundBox_Loader::loadModel(Render *render, ObjectRecord *record, co
   if (model->init(bbox, texture, wrap)) {
     std::cerr<< "BoundBoxLoader: Error initialising model" << std::endl;
     delete model;
-    return NULL;
+    return SPtr<ModelRecord>();
   }
 
-  model->setInUse(true);
-  model_record->model = model;
+  model_record->model = SPtrShutdown<Model>(model);
 
   return model_record;
 }

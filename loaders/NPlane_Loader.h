@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: NPlane_Loader.h,v 1.7 2005-03-15 17:55:03 simon Exp $
+// $Id: NPlane_Loader.h,v 1.8 2006-02-07 11:31:03 simon Exp $
 
 #ifndef SEAR_NPLANE_LOADER_H
 #define SEAR_NPLANE_LOADER_H 1
@@ -17,7 +17,7 @@ public:
   NPlane_Loader(ModelHandler *mh);
   ~NPlane_Loader();
   
-  ModelRecord *loadModel(Render *render, ObjectRecord *record, const std::string &model_id, varconf::Config &model_config);
+  SPtr<ModelRecord> loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config);
 protected:
   static const std::string NPLANE;  
 };
