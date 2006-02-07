@@ -2,7 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.35 2006-02-07 11:31:02 simon Exp $
+// $Id: Graphics.cpp,v 1.36 2006-02-07 18:45:34 simon Exp $
+
+#include <sigc++/object_slot.h>
 
 #include <sage/sage.h>
 

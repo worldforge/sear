@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.67 2006-01-29 18:33:56 alriddoch Exp $
+// $Id: System.h,v 1.68 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -11,7 +11,7 @@
 #include <list>
 #include <SDL/SDL.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
 #include <varconf/Config.h>
@@ -51,7 +51,7 @@ typedef enum {
  * a single system object.
  * \todo Make System class completly singular (make constructor private)
  */ 
-class System : public ConsoleObject, public SigC::Object{
+class System : public ConsoleObject, public sigc::trackable {
 public:
   /**
    * Default constructor

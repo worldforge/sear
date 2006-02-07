@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.22 2006-01-28 15:35:49 simon Exp $
+// $Id: TextureManager.h,v 1.23 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -11,11 +11,13 @@
 #include <map>
 #include <vector>
 #include <cassert>
-#include <SDL/SDL.h>
+
+#include <sigc++/trackable.h>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include <sigc++/object_slot.h>
+#include <SDL/SDL.h>
 #include "interfaces/ConsoleObject.h"
 
 #include <varconf/Config.h>
@@ -47,7 +49,7 @@ namespace Sear {
 class Console;
 class SpriteData;
 
-class TextureManager : public SigC::Object, public ConsoleObject {
+class TextureManager : public sigc::trackable, public ConsoleObject {
 
 public:
   

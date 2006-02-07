@@ -1,10 +1,13 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.20 2005-09-19 20:34:21 alriddoch Exp $
+// $Id: ActionHandler.cpp,v 1.21 2006-02-07 18:45:34 simon Exp $
 
 #include <unistd.h>
+
+#include <sigc++/object_slot.h>
+
 #include <varconf/varconf.h>
 
 #include "common/Log.h"

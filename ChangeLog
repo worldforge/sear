@@ -1,5 +1,25 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.h, loaders, loaders/LibModelFile.cpp, 
+	  loaders/LibModelFile.h, loaders/ModelHandler.cpp,
+	  loaders/Modelhandler.h, loaders/ModelSystem.cpp,
+	  loaders/ModelSystem.h, loaders/ObjectHandler.cpp,
+	  loaders/ObjectHandler.h, loaders/cal3d/Cal3dCoreModel.cpp, 
+	  loaders/cal3d/Cal3dCoreModel.h, loaders/CoreModelHandler.cpp, 
+	  loaders/CoreModelHandler.h, renderers/Camera.cpp,
+	  renderers/Camera.h, renderers/CameraSystem.cpp,
+	  renderers/CameraSystem.h, renderers/GL.cpp, renderers/GL.h,
+	  renderers/Graphics.cpp, renderers/Graphics.h,
+	  renderers/RenderSystem.cpp, renderers/RenderSystem.h,
+	  renderers/StateManager.cpp, renderers/StateManager.h,
+	  renderers/TextureManager.cpp, renderers/TextureManager.h,
+	  src/ActionHandler.cpp, src/ActionHandler.h, src/Character.cpp,
+	  src/Character.h, src/System.h, src/WorldEntity.cpp: Use 
+	  sigc::trackable instead of SigC::Object to allow sigc to automatically
+	  handle disconnecting signals on object deletion.
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp: Fix segfault for 3ds models with no texture.
 
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>

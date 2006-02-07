@@ -17,7 +17,7 @@
 #include <map>
 #include <set>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
@@ -39,7 +39,7 @@ class ObjectRecord;
 class ModelRecord;
 class Console;
 
-class GL : public Render, public SigC::Object {
+class GL : public Render, public sigc::trackable {
 public:
   GL();
   ~GL();

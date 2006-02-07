@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.21 2006-02-07 11:31:03 simon Exp $
+// $Id: 3ds.h,v 1.22 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -14,7 +14,7 @@
 #include <lib3ds/file.h>
 #include <lib3ds/node.h>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <varconf/Config.h>
 
@@ -29,7 +29,7 @@ namespace Sear {
 // Forward declarations	
 class StaticObject;
 
-class ThreeDS : public Model, public SigC::Object {
+class ThreeDS : public Model, public sigc::trackable {
 public:
   /*
    * Defualt constructor

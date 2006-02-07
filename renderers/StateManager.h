@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.10 2006-01-28 15:35:49 simon Exp $
+// $Id: StateManager.h,v 1.11 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -11,7 +11,7 @@
 #include <map>
 #include <vector>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 #include "interfaces/ConsoleObject.h"
 
 #include "RenderSystem.h"
@@ -55,7 +55,7 @@ typedef std::vector<std::string> NameStateVector;
 typedef std::vector<StateProperties*> StateVector;
 typedef std::vector<std::vector<unsigned int> > StateChangeVector;
 
-class StateManager : public SigC::Object, public ConsoleObject {
+class StateManager : public sigc::trackable, public ConsoleObject {
 public:
   StateManager();
   ~StateManager();

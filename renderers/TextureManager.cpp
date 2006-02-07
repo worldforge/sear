@@ -1,11 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.42 2006-01-28 15:35:49 simon Exp $
+// $Id: TextureManager.cpp,v 1.43 2006-02-07 18:45:34 simon Exp $
 
-#include "TextureManager.h"
+#include <unistd.h>
 
+#include <sigc++/object_slot.h>
+
+#include <sage/sage.h>
 #include <sage/GL.h>
 #include <sage/GLU.h>
 
@@ -17,7 +20,7 @@
 
 #include "src/FileHandler.h"
 
-#include <unistd.h>
+#include "TextureManager.h"
 
 #ifdef WINDOWS
     
@@ -235,7 +238,6 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   std::string clean_name = std::string(texture_name);
   
   bool mask = false;
-//  std::cout << clean_name << " - " << clean_name.substr(0,5) << " - " << clean_name.substr(5) <<  std::endl;
   if (clean_name.substr(0, 5) == "mask_") {
     mask = true;
     clean_name = clean_name.substr(5);
@@ -244,12 +246,12 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   m_texture_config.clean(clean_name);
   // Check texture is defined
   if (!m_texture_config.find(clean_name)) {
-    std::cerr << "Texture " << texture_name << " not defined." << std::endl;
+    fprintf(stderr, "Texture %s not defined.\n", texture_name.c_str());
     return 0;
   }
  
   if (!m_texture_config.findItem(clean_name, KEY_filename)) {
-    std::cerr << "Texture " << clean_name << " has no filename" << std::endl;
+    fprintf(stderr, "Texture %s has no filename.\n", clean_name.c_str());
     return 0;
   }
 

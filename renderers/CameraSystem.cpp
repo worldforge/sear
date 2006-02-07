@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: CameraSystem.cpp,v 1.3 2005-04-13 12:16:04 simon Exp $
+// $Id: CameraSystem.cpp,v 1.4 2006-02-07 18:45:33 simon Exp $
 
 #include <varconf/Config.h>
 

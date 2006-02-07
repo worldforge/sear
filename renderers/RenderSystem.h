@@ -8,7 +8,7 @@
 #include <string>
 
 #include <sigc++/signal.h>
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 
 namespace varconf {
   class Config;
@@ -27,7 +27,7 @@ class Graphics;
 class CameraSystem;
 class WorldEntity;
 
-class RenderSystem : public SigC::Object{
+class RenderSystem : public sigc::trackable {
 public:
   typedef enum {
     RENDER_UNKNOWN = 0,

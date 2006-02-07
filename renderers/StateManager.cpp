@@ -2,19 +2,22 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.26 2006-01-28 15:35:49 simon Exp $
+// $Id: StateManager.cpp,v 1.27 2006-02-07 18:45:34 simon Exp $
 
 /*
  * TODO
  * custom of default settings
  * */
 
+#include <sigc++/object_slot.h>
+
+#include <varconf/varconf.h>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 
 #include "StateManager.h"
 
-#include <varconf/varconf.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"

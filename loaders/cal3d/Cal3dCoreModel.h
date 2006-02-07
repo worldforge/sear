@@ -2,12 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.10 2005-06-22 07:16:56 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.11 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <string>
 #include <map>
@@ -30,7 +30,7 @@ typedef struct {
   int textureID;
 } MapData;
 	
-class Cal3dCoreModel : public SigC::Object {
+class Cal3dCoreModel : public sigc::trackable {
 public:
   // Allow Cal3dModel to access our private parts
   friend class Cal3dModel;

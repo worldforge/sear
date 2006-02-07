@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.36 2006-01-28 15:35:48 simon Exp $
+// $Id: Character.h,v 1.37 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -17,7 +17,7 @@
 #include <Eris/Types.h>
 #include <Eris/Avatar.h>
 #include "interfaces/ConsoleObject.h"
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 namespace varconf {
 class Config;
@@ -35,7 +35,7 @@ class WorldEntity;
  *
  */
 
-class Character : public ConsoleObject, public SigC::Object {
+class Character : public ConsoleObject, public sigc::trackable {
 public:
   /**
    * Constructor.

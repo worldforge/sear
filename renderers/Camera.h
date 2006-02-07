@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006
 
-// $Id: Camera.h,v 1.4 2005-06-23 08:45:12 simon Exp $
+// $Id: Camera.h,v 1.5 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -17,7 +17,7 @@
  */ 
 
 #include <string>
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 namespace varconf {
   class Config;
@@ -28,7 +28,7 @@ namespace Sear {
 /**
  * This class represents the camera in the game world.
  */ 
-class Camera : public SigC::Object {
+class Camera : public sigc::trackable {
 public:
   typedef enum {
     CAMERA_CHASE = 0,

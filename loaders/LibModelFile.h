@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.7 2006-02-07 11:31:03 simon Exp $
+// $Id: LibModelFile.h,v 1.8 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -11,7 +11,7 @@
  * This reprents a model based upon its bounding box.
  *
  */ 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <varconf/Config.h>
 
@@ -26,7 +26,7 @@ namespace Sear {
 
 class StaticObject;
 
-class LibModelFile : public Model, public SigC::Object {
+class LibModelFile : public Model, public sigc::trackable {
 public:
   /*
    * Constructor stores the bounding box for the basis of this model.

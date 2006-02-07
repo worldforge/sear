@@ -1,12 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #ifndef SEAR_RENDERERS_CAMERASYSTEM_H
 #define SEAR_RENDERERS_CAMERASYSTEM_H 1
 
 #include <string>
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -19,7 +19,7 @@ namespace Sear {
 class Camera;
 class Console;
 
-class CameraSystem : public ConsoleObject, public SigC::Object {
+class CameraSystem : public ConsoleObject, public sigc::trackable {
 public:
 
   typedef std::vector<Camera*> CameraVector;

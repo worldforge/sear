@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.16 2006-02-07 11:31:03 simon Exp $
+// $Id: LibModelFile.cpp,v 1.17 2006-02-07 18:45:33 simon Exp $
 
 /*
   Debug check list
@@ -11,6 +11,8 @@
   * Correct normal calculation
 
 */
+
+#include <sigc++/object_slot.h>
 
 extern "C" {
 #include <libmd3/structure.h>

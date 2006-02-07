@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.11 2006-02-07 11:31:02 simon Exp $
+// $Id: Graphics.h,v 1.12 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -11,7 +11,7 @@
 #include <list>
 #include <map>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
@@ -34,7 +34,7 @@ class Console;
 class Compass;
 class LightManager;
 
-class Graphics : public ConsoleObject, public SigC::Object{
+class Graphics : public ConsoleObject, public sigc::trackable {
 
 public:
 

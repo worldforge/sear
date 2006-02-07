@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.4 2006-02-07 11:31:03 simon Exp $
+// $Id: ObjectHandler.h,v 1.5 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include "common/SPtr.h"
 
@@ -26,7 +26,7 @@ namespace Sear {
 class Console;
 class ObjectRecord;
 	
-class ObjectHandler : public ConsoleObject, public SigC::Object {
+class ObjectHandler : public ConsoleObject, public sigc::trackable {
 public:
   ObjectHandler();
   ~ObjectHandler();

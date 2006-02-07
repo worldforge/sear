@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.9 2005-09-19 20:34:21 alriddoch Exp $
+// $Id: ActionHandler.h,v 1.10 2006-02-07 18:45:34 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -12,7 +12,7 @@
 #include <map>
 #include <string>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -27,7 +27,7 @@ namespace Sear {
 class Console;
 class WorldEntity;
 
-class ActionHandler : public ConsoleObject, public SigC::Object {
+class ActionHandler : public ConsoleObject, public sigc::trackable {
 public:
   ActionHandler(System *system);
   ~ActionHandler();

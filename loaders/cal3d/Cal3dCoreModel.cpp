@@ -2,24 +2,23 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.32 2006-01-28 15:35:49 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.33 2006-02-07 18:45:33 simon Exp $
 
-
-#include "Cal3dModel.h"
-#include "Cal3dCoreModel.h"
 #include <string>
+
+#include <SDL/SDL.h>
+#include <sigc++/object_slot.h>
 
 #include <varconf/Config.h>
 
-#include <SDL/SDL.h>
-
-#include "src/FileHandler.h"
 #include "common/Utility.h"
 #include "src/System.h"
+#include "src/FileHandler.h"
 #include "renderers/Render.h"
-
 #include "renderers/RenderSystem.h"
 
+#include "Cal3dModel.h"
+#include "Cal3dCoreModel.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"

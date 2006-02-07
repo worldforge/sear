@@ -1,10 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton 
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.6 2005-06-20 16:27:42 simon Exp $
+// $Id: Camera.cpp,v 1.7 2006-02-07 18:45:33 simon Exp $
 
 #include <string>
+
+#include <sigc++/object_slot.h>
 
 #include <varconf/Config.h>
 

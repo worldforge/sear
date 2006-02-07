@@ -2,11 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.75 2006-02-07 13:02:30 simon Exp $
+// $Id: Character.cpp,v 1.76 2006-02-07 18:45:34 simon Exp $
 
 #include <math.h>
 #include <string>
 #include <SDL/SDL.h>
+
+#include <sigc++/object_slot.h>
 
 #include <Atlas/Objects/Operation.h>
 #include <Atlas/Objects/Anonymous.h>

@@ -2,14 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.27 2006-02-07 11:31:03 simon Exp $
+// $Id: ModelHandler.cpp,v 1.28 2006-02-07 18:45:33 simon Exp $
 
 #include <set>
 #include <string.h>
 
+#include <sigc++/object_slot.h>
+
 #include <Atlas/Message/Element.h>
 
 #include <varconf/Config.h>
+
 #include "src/Console.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"

@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
+#include <sigc++/object_slot.h>
+
 #include <Eris/TypeInfo.h>
 
 #include "renderers/RenderSystem.h"

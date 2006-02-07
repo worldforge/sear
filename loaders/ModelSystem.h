@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 
 #include <varconf/Config.h>
 
@@ -24,7 +24,7 @@ class WorldEntity;
 class ObjectRecord;
 class ModelRecord;
 
-class ModelSystem : public SigC::Object, public ConsoleObject {
+class ModelSystem : public sigc::trackable, public ConsoleObject {
 public:
 
   static ModelSystem &getInstance() { return m_instance; }

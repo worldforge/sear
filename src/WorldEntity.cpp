@@ -2,7 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.76 2006-02-07 11:31:02 simon Exp $
+// $Id: WorldEntity.cpp,v 1.77 2006-02-07 18:45:34 simon Exp $
+
+#include <sigc++/object_slot.h>
 
 #include <Atlas/Message/Element.h>
 

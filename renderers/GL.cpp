@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.141 2006-02-07 11:31:02 simon Exp $
+// $Id: GL.cpp,v 1.142 2006-02-07 18:45:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,6 +15,8 @@
 #else
     #include <SDL/SDL_image.h>
 #endif
+
+#include <sigc++/object_slot.h>
 
 
 #include <sage/sage.h>

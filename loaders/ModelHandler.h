@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.7 2006-02-07 11:31:03 simon Exp $
+// $Id: ModelHandler.h,v 1.8 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -12,6 +12,8 @@
 
 #include <Eris/Timeout.h>
 #include <varconf/Config.h>
+
+#include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -31,7 +33,7 @@ class ObjectRecord;
 class Render;
 class WorldEntity;
 	
-class ModelHandler : public SigC::Object , public ConsoleObject {
+class ModelHandler : public sigc::trackable , public ConsoleObject {
 public:
   ModelHandler();
   ~ModelHandler();

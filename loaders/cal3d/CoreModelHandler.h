@@ -2,12 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CoreModelHandler.h,v 1.6 2005-03-15 17:55:04 simon Exp $
+// $Id: CoreModelHandler.h,v 1.7 2006-02-07 18:45:33 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_COREMODELHANDLER_H
 #define SEAR_LOADERS_CAL3D_COREMODELHANDLER_H 1
 
-#include <sigc++/object_slot.h>
+#include <sigc++/trackable.h>
 #include <string>
 #include <map>
 
@@ -17,7 +17,7 @@ namespace Sear {
 class Cal3dModel;
 class Cal3dCoreModel;
 	
-class CoreModelHandler :public SigC::Object {
+class CoreModelHandler : public sigc::trackable {
 public:
   CoreModelHandler();
   ~CoreModelHandler();

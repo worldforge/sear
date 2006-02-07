@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.14 2006-01-28 15:35:49 simon Exp $
+// $Id: RenderSystem.cpp,v 1.15 2006-02-07 18:45:34 simon Exp $
 
 #include <SDL/SDL.h>
+
+#include <sigc++/object_slot.h>
 
 #include "src/System.h"
 #include "src/WorldEntity.h"
