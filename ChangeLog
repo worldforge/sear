@@ -1,5 +1,9 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Character.cpp: Update displayUseOperations() to new Eris API.
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* Makefile.am: Do not go into tools subdir as recent changes break 
 	  compilation.
 

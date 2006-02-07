@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.74 2006-02-07 11:31:01 simon Exp $
+// $Id: Character.cpp,v 1.75 2006-02-07 13:02:30 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -448,7 +448,10 @@ void Character::attackEntity(const std::string& id) {
 void Character::displayUseOperations() {
   if (!m_avatar) return;
   
-  const Eris::TypeInfoArray& ops = m_avatar->getUseOperationsForWielded();
+  //const Eris::TypeInfoArray& ops = m_avatar->getUseOperationsForWielded();
+  Eris::EntityRef we = dynamic_cast<WorldEntity*>(m_self.get())->getAttachments().begin()->second;
+  if (!we) return;
+  const Eris::TypeInfoArray& ops = we->getUseOperations();
   for (unsigned int i=0; i<ops.size(); ++i) {
     System::instance()->pushMessage(ops[i]->getName(), 1);
   }
