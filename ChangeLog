@@ -1,3 +1,17 @@
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/StaticObject.cpp, loaders/StaticObject.h, 
+	  loaders/Makefile.am, renderers/Makefile.am: Move from renderers dir 
+	  to loaders dir to solve linking problems.
+
+	* common/SPtr.h, common/Makefile.am:  Add two ref counting smart pointer
+	  classes. One is a standard spointer, the other calls shutdown() before
+	  deleting objects.
+
+	* src/System.cpp: Remove StaticObject include. Call 
+	  Eris::execDeleteLaters to clean up eris objects in shutdown. Add 
+	  try/catch for guichan exceptions.
+
 2006-02-06  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac, NEWS: Update for 0.6.1 release.

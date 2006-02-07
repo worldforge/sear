@@ -25,6 +25,7 @@ libModelLoader_a_SOURCES = \
 	AreaModelLoader.cpp AreaModelLoader.h \
 	NullModel.h \
 	ParticleSystem.cpp ParticleSystem.h \
-	ParticleSystemLoader.cpp ParticleSystemLoader.h
+	ParticleSystemLoader.cpp ParticleSystemLoader.h \
+	StaticObject.cpp StaticObject.h
 	
 	

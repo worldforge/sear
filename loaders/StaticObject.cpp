@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #include <cassert>
 
@@ -14,31 +14,50 @@
 namespace Sear {
 
 StaticObject::StaticObject() :
+  m_initialised(false),
   m_vertex_data(NULL),
   m_normal_data(NULL),
   m_texture_data(NULL),
   m_indices(NULL),
   m_num_points(0),
-  m_type(0),
-  m_state(0),
+//  m_type(0),
+//  m_state(0),
   m_vb_vertex_data(0),
   m_vb_normal_data(0),
   m_vb_texture_data(0),
   m_vb_indices(0),
   m_disp_list(0),
   m_select_disp_list(0)
-{}
+{
+  identity();
+}
 
 StaticObject::~StaticObject()  {
- 
-  invalidate();
+  assert(m_initialised == false);
+}
+
+int StaticObject::init() {
+  assert(m_initialised == false);
+
+  m_initialised = true;
+
+  return 0;
+}
+
+void StaticObject::shutdown()  {
+  assert(m_initialised == true);
+  contextDestroyed(true);
 
   if (m_vertex_data) delete [] m_vertex_data;
   if (m_normal_data) delete [] m_normal_data;
   if (m_texture_data) delete [] m_texture_data;
   if (m_indices) delete [] m_indices;
+
+  m_initialised = false;
+
 }
 void StaticObject::createVBOs() {
+  assert(m_initialised == true);
   assert(sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] == true);
 
   // Generate vertex array vbo  
@@ -68,32 +87,43 @@ void StaticObject::createVBOs() {
   }
 }
 
-void StaticObject::invalidate() {
-  // Clean up vertex buffer objects
-  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-    if (glIsBufferARB(m_vb_vertex_data)) {
-      glDeleteBuffersARB(1, &m_vb_vertex_data);
+void StaticObject::contextDestroyed(bool check) {
+  assert(m_initialised == true);
+  if (check) {
+    // Clean up vertex buffer objects
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      if (glIsBufferARB(m_vb_vertex_data)) {
+        glDeleteBuffersARB(1, &m_vb_vertex_data);
+      }
+      if (glIsBufferARB(m_vb_normal_data)) {
+        glDeleteBuffersARB(1, &m_vb_normal_data);
+      }
+      if (glIsBufferARB(m_vb_texture_data)) {
+       glDeleteBuffersARB(1, &m_vb_texture_data);
+      }
     }
-    if (glIsBufferARB(m_vb_normal_data)) {
-      glDeleteBuffersARB(1, &m_vb_normal_data);
-    }
-    if (glIsBufferARB(m_vb_texture_data)) {
-      glDeleteBuffersARB(1, &m_vb_texture_data);
-    }
+
+    // Clean up display lists 
+    if (glIsList(m_select_disp_list)) glDeleteLists(1, m_select_disp_list);
+    if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);
   }
-
-  // Clean up display lists 
-  if (glIsList(m_select_disp_list)) glDeleteLists(1, m_select_disp_list);
-  if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);
-
+  m_vb_vertex_data = 0;
+  m_vb_normal_data = 0;
+  m_vb_texture_data = 0;
+  m_select_disp_list = 0;
+  m_disp_list = 0;
 }
 
 void StaticObject::render(bool select_mode) {
+  assert(m_initialised == true);
+      glEnableClientState(GL_VERTEX_ARRAY);
   // Set transform
   glMultMatrixf(&m_matrix[0][0]);
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
+
     // Setup client states
     glEnableClientState(GL_NORMAL_ARRAY);
 
@@ -129,10 +159,10 @@ void StaticObject::render(bool select_mode) {
 
     if (m_indices) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
-      glDrawElements(m_type, m_num_points, GL_INT, 0);
+      glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, 0);
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     } else  {
-      glDrawArrays(m_type, 0, m_num_points);
+      glDrawArrays(GL_TRIANGLES, 0, m_num_points);
     }
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
@@ -182,14 +212,14 @@ void StaticObject::render(bool select_mode) {
   
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
-        glLockArraysEXT(0, m_num_points);
+        glLockArraysEXT(0, m_num_points  * 3);
       }
- 
+
       if (m_indices) {
-        glDrawElements(m_type, m_num_points, GL_INT, m_indices);
+        glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, m_indices);
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
       } else  {
-        glDrawArrays(m_type, 0, m_num_points);
+        glDrawArrays(GL_TRIANGLES, 0, m_num_points);
       }
 
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
@@ -200,6 +230,10 @@ void StaticObject::render(bool select_mode) {
         glActiveTextureARB(GL_TEXTURE0 + i);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       }
+
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+
       glDisableClientState(GL_NORMAL_ARRAY);
       glEndList();
     }
@@ -207,6 +241,8 @@ void StaticObject::render(bool select_mode) {
 }
 
 int StaticObject::load(const std::string &filename) {
+#if(0)
+  assert(m_initialised == true);
   FILE *fp = fopen(filename.c_str(), "rb");
 
   if (!fp) {
@@ -282,14 +318,18 @@ int StaticObject::load(const std::string &filename) {
   if (num != 1) goto error;
 
   fclose(fp); 
-
   return 0;
+
 error:
   fclose (fp);
   fprintf(stderr, "Error reading StaticObject.\n");
+#endif
   return 1;
+
 }
+
 int StaticObject::save(const std::string &filename) {
+  assert(m_initialised == true);
   return 0;
 }
 

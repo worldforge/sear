@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.146 2006-02-04 18:52:45 simon Exp $
+// $Id: System.cpp,v 1.147 2006-02-07 11:11:41 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +14,7 @@
 #include <sage/GL.h>
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
+#include <Eris/DeleteLater.h>
 #include <Eris/View.h>
 
 #include "common/Log.h"
@@ -43,7 +44,7 @@
 #include "guichan/Workarea.h"
 
 #include "CacheManager.h"
-#include "renderers/StaticObject.h"
+//#include "loaders/StaticObject.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
@@ -355,6 +356,9 @@ void System::shutdown() {
 
   assert (m_initialised == true);
   std::cout << "System: Starting Shutdown" << std::endl;
+
+  Eris::execDeleteLaters();
+
   // Save config
   writeConfig(m_general);
 
@@ -476,8 +480,12 @@ void System::handleEvents(const SDL_Event &event) {
   assert(m_character != NULL);
 
   if (!m_console->consoleStatus()) {
-    if (m_workarea->handleEvent(event)) {
-      return;
+    try {
+      if (m_workarea->handleEvent(event)) {
+        return;
+      }
+    } catch (gcn::Exception &e) {
+      fprintf(stderr, "Guichan Exception: %s\n", e.getMessage().c_str());
     }
   }
 

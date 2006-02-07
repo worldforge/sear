@@ -17,5 +17,4 @@ libRendererGL_a_SOURCES = \
 	RenderSystem.cpp RenderSystem.h \
 	GL.cpp GL.h \
 	Sprite.cpp Sprite.h \
-	ImageUtils.h ImageUtils.cpp \
-	StaticObject.cpp StaticObject.h
+	ImageUtils.h ImageUtils.cpp

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall
+// Copyright (C) 2005 - 2006 Simon Goodall
 
 #ifndef SEAR_RENDERERS_STATICOBJECT_H
 #define SEAR_RENDERERS_STATICOBJECT_H 1
@@ -10,18 +10,24 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include "src/CacheObject.h"
+//#include "src/CacheObject.h"
 
 namespace Sear {
 
-class StaticObject : public CacheObject {
+class StaticObject {//: public CacheObject {
 public:
   StaticObject();
   ~StaticObject();
 
+  int init();
+  void shutdown();
+
+  bool isInitialised() const { return m_initialised; }
+
   void render(bool select_mode);
 
-  void invalidate();
+  int contextCreated() { return 0; }
+  void contextDestroyed(bool check);
 
   void setTexture(unsigned int num, int texture, int texture_mask) {
     if (m_textures.size() <= num) {
@@ -77,11 +83,41 @@ public:
   }
 
   void setNumPoints(int n) { m_num_points = n; }
+  int getNumPoints() const { return m_num_points; }
 
   float *getVertexDataPtr() { return m_vertex_data; }
   float *getNormalDataPtr() { return m_normal_data; }
   float *getTextureDataPtr() { return m_texture_data; }
   int *getIndicesPtr() { return m_indices; }
+
+void setAmbient(float a[4]) {
+    m_ambient[0] = a[0];
+    m_ambient[1] = a[1];
+    m_ambient[2] = a[2];
+    m_ambient[3] = a[3];
+  }
+
+  void setDiffuse(float d[4]) {
+    m_diffuse[0] = d[0];
+    m_diffuse[1] = d[1];
+    m_diffuse[2] = d[2];
+    m_diffuse[3] = d[3];
+  }
+
+  void setSpecular(float s[4]) {
+    m_specular[0] = s[0];
+    m_specular[1] = s[1];
+    m_specular[2] = s[2];;
+    m_specular[3] = s[3];
+  }
+ 
+  void setEmission(float e[4]) {
+    m_emission[0] = e[0];
+    m_emission[1] = e[1];
+    m_emission[2] = e[2];
+    m_emission[3] = e[3];
+  }
+
 
   void setAmbient(float r, float g, float b, float a) {
     m_ambient[0] = r;
@@ -113,10 +149,10 @@ public:
 
   void setShininess(float s) { m_shininess = s; }
 
-  void setState(int s) { m_state = s; }
-  int getState() const { return m_state; }
+//  void setState(int s) { m_state = s; }
+//  int getState() const { return m_state; }
  
-  void setType(GLenum type) { m_type = type; } 
+//  void setType(GLenum type) { m_type = type; } 
 
   void setMatrix(float **m) {
     for (int i = 0; i < 4; ++i) {
@@ -126,13 +162,37 @@ public:
     }
   }
 
-  int getType() { return 1; }
+    void identity() {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
+        if (i == j)  m_matrix[i][j] = 1.0f;
+        else  m_matrix[i][j] = 0.0f;
+      }
+    }
+  }
+
+  void scale(float s) {
+    for (int i = 0; i < 4; ++i) {
+      m_matrix[i][i] *= s;
+    }
+  }
+
+  void translate(float x, float y, float z) {
+    m_matrix[0][3] += x;
+    m_matrix[1][3] += y;
+    m_matrix[2][3] += z;
+  }
+
+
+//  int getType() { return 1; }
   StaticObject *newInstance() { return new StaticObject(); }
   int load(const std::string &filename);
   int save(const std::string &filename);
  
 private:
   void createVBOs();
+
+  bool m_initialised;
 
   float *m_vertex_data;
   float *m_normal_data;
@@ -150,8 +210,8 @@ private:
   float m_shininess;
 
   // I.e. GL_TRIANGLES, GL_QUADS etc..
-  GLenum m_type;
-  int m_state; 
+//  GLenum m_type;
+//  int m_state; 
   
   GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
   GLuint m_disp_list, m_select_disp_list;

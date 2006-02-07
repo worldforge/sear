@@ -14,4 +14,5 @@ libCommon_a_SOURCES = \
 	types.h \
 	Mesh.h \
 	compose.hpp \
+	SPtr.h \
 	$(MMGR_FILES)
