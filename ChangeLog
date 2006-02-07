@@ -1,5 +1,9 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/TerrainEntity.cpp: Add include to sigc++/object_slot.h
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.h, loaders, loaders/LibModelFile.cpp, 
 	  loaders/LibModelFile.h, loaders/ModelHandler.cpp,
 	  loaders/Modelhandler.h, loaders/ModelSystem.cpp,

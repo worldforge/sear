@@ -1,15 +1,19 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2002 - 2003 Alistair Riddoch
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.cpp,v 1.2 2005-03-04 17:58:25 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.3 2006-02-07 19:14:30 simon Exp $
 
-#include "TerrainEntity.h"
+#include <sigc++/object_slot.h>
 
 #include <Eris/View.h>
-#include "System.h"
+
 #include "renderers/Graphics.h"
 #include "environment/Environment.h"
+
+#include "System.h"
+#include "TerrainEntity.h"
 
 #ifdef USE_MMGR
   #include "common/mmgr.h"
