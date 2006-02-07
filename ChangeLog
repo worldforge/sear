@@ -1,5 +1,10 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* Makefile.am: Do not go into tools subdir as recent changes break 
+	  compilation.
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/3ds.h, loaders/LibModelFile.cpp,
 	  loaders/LibModelFile.h: Use StaticObject to store mesh data and
 	  perform rendering.
