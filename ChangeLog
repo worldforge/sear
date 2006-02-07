@@ -1,5 +1,9 @@
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp: Fix segfault for 3ds models with no texture.
+
+2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Character.cpp: Update displayUseOperations() to new Eris API.
 
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>

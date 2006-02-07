@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.50 2006-02-07 11:31:03 simon Exp $
+// $Id: 3ds.cpp,v 1.51 2006-02-07 17:55:39 simon Exp $
 
 /** TODO
  * - Currently each render object is created to store all the data in the mesh,
@@ -10,10 +10,12 @@
  *   size) but with the new points. Perhaps assume that 1 mesh == 1 material?
  */
 
-
 #include <iostream>
 #include <list>
 #include <map>
+
+#include <sigc++/object_slot.h>
+
 #include <sage/sage.h>
 #include <sage/GL.h>
 
@@ -131,14 +133,9 @@ int ThreeDS::shutdown() {
 
   // Clean up OpenGL bits
   contextDestroyed(true);
+
   m_render_objects.clear();
-//  while (!m_render_objects.empty()) {
-//    StaticObject *ro = *m_render_objects.begin();
-//    assert(ro);
-//    ro->shutdown();
-//    delete ro;
-//    m_render_objects.erase(m_render_objects.begin());
-//  }
+
   while (!m_material_map.empty()) {
     Material *m = m_material_map.begin()->second;
     assert(m);
@@ -157,9 +154,9 @@ void ThreeDS::contextDestroyed(bool check) {
 
   StaticObjectList::const_iterator I = m_render_objects.begin();
   for (; I != m_render_objects.end(); ++I) {
-    SPtrShutdown<StaticObject> ro = *I;
-    assert(ro);
-    ro->contextDestroyed(check);
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextDestroyed(check);
   }
 }
 
@@ -169,19 +166,19 @@ void ThreeDS::render(bool select_mode) {
   m_render->scaleObject(m_height);
 
   for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
-    SPtrShutdown<StaticObject> ro = *I;
-    assert(ro);
-    ro->render(select_mode);
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->render(select_mode);
   }
 }
 
 void ThreeDS::render_node(Lib3dsNode *node, Lib3dsFile *file) {
-  Lib3dsNode *p;
-  Lib3dsObjectData *d;
-  d=&node->data.object;
-  for (p=node->childs; p!=0; p=p->next) {
+  assert(node);
+  assert(file);
+  for (Lib3dsNode *p = node->childs; p != 0; p = p->next) {
     render_node(p, file);
   }
+  Lib3dsObjectData *d = &node->data.object;
   if (node->type==LIB3DS_OBJECT_NODE) {
     if (strcmp(node->name,"$$$DUMMY")==0) return;
     if (!node->user.d) {
@@ -286,12 +283,14 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       // Create a new render object and create data structures        
       ro = SPtrShutdown<StaticObject>(new StaticObject());
       ro->init();
-      ro->setTexture(0, texture_id, texture_mask_id);
       ro->setNumPoints(3 * mesh->faces)
 ;
       ro->createVertexData(ro->getNumPoints() * 3);
       ro->createNormalData(ro->getNumPoints() * 3);
-      if (mesh->texels) ro->createTextureData(ro->getNumPoints() * 2);
+      if (mesh->texels) {
+        ro->createTextureData(ro->getNumPoints() * 2);
+        ro->setTexture(0, texture_id, texture_mask_id);
+      }
 
       ro->setAmbient(cm->ambient);
       ro->setDiffuse(cm->diffuse);
