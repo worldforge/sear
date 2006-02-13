@@ -1,0 +1,52 @@
+TODO before the next release (Sear 0.6.2)
+ 
+ * Media Updates
+  - Media needs the scale and offset values adjusted due to the change in the 
+    order they are applied.
+
+  - Fill in data_file_path fields in the model_records in prep for removing 
+    data_file_id and models.cfg
+
+ * Finish moving loaders code to using StaticObject. 
+
+ * Create a DynamicObject for the ParticleSystem and Cal3d models.
+
+ * Make sure MD3 and 3DS both allow full material overrides in config.
+
+ * Finish Eris::Calendar integration
+
+ * Make sure contextDestroyed and contextCreated is properly implemented in all
+   classes and used correctly. James still reports some problems.
+
+ * Make sure GUI is cleaning up correctly.
+
+Other things todo in the slightly longer term (sear 0.7!)
+
+ * libwfut is coming along. It would be good to be able to download media as it
+   is required and update if required.
+   - Need to be able to tell various bits of sear that a file has been updated
+     so reload what ever it is associated with.
+     - Textures just need to unload previous and reset internal ID. (This might
+       break any display lists and the texture object id will change)
+     - Harder for models as they are represented by multiple files
+     - Might need a class that stores a reference between objects and the files
+       it uses. E.g. 3ds_tree->tree.3ds, tree.vconf, tree.png. The updater can
+       tell the handler that the file is updated, that in turn can tell the 
+       object. Probably can be done with some good signal usage.
+   - Need to separate media into chunks associated with a particular entity.
+   - Or download all config files on startup, and grab media files as and when
+     they are required.
+   - Need to be able to search for a file in a number of locations (different
+     prefixes). E.g. $PREFIX/sear-media/.... or ${SEAR_CACHE}/sear-media/...
+
+ * Once the Static/Dynamic objects have been finished, the render queues need 
+   to be built around them instead of the models. Two queues need to be made.
+   One for transparent objects (sorted by Z order) and one for opaque objects
+   (sorted by texture/state/similarity). This will place Sear in a much better
+   position to use more advanced rendering stuff.
+   - At some point it will be necessary to move the render function in 
+     StaticObject to a higher level component that can see that subsequent 
+     objects differ only in position and so do not need VBO buffers to be
+     unbound and then rebound.
+   - A "visual" bounding box will be needed around each mesh so that clipping 
+     can be done per mesh as well as per object.
