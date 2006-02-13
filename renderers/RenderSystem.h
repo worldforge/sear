@@ -10,6 +10,8 @@
 #include <sigc++/signal.h>
 #include <sigc++/trackable.h>
 
+#include "interfaces/ConsoleObject.h"
+
 namespace varconf {
   class Config;
 }
@@ -27,7 +29,7 @@ class Graphics;
 class CameraSystem;
 class WorldEntity;
 
-class RenderSystem : public sigc::trackable {
+class RenderSystem : public sigc::trackable, public ConsoleObject {
 public:
   typedef enum {
     RENDER_UNKNOWN = 0,
@@ -89,8 +91,8 @@ public:
 
   void drawScene(bool select_mode, float time_elapsed);
 
-  void registerCommands(Console *console);
-  void runCommand(const std::string &command) {}
+  void registerCommands(Console *con);
+  void runCommand(const std::string &command, const std::string &args);
 
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);

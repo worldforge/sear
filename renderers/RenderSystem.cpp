@@ -2,12 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.15 2006-02-07 18:45:34 simon Exp $
+// $Id: RenderSystem.cpp,v 1.16 2006-02-13 22:27:27 simon Exp $
 
 #include <SDL/SDL.h>
 
 #include <sigc++/object_slot.h>
 
+#include "src/Console.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
@@ -34,6 +35,8 @@
 namespace Sear {
 
 RenderSystem RenderSystem::m_instance;
+
+static const std::string CMD_TOGGLE_FULLSCREEN = "toggle_fullscreen";
 
 void RenderSystem::init() {
   assert (m_initialised == false);
@@ -82,14 +85,22 @@ void RenderSystem::init() {
   m_initialised = true;
 }
 
-void RenderSystem::registerCommands(Console *console) {
+void RenderSystem::registerCommands(Console *con) {
   assert (m_initialised);
-  assert (console  != NULL);
-  dynamic_cast<GL*>(m_renderer)->registerCommands(console);
-  m_textureManager->registerCommands(console);
-  m_stateManager->registerCommands(console);
-  m_graphics->registerCommands(console);
-  m_cameraSystem->registerCommands(console);
+  assert (con != NULL);
+
+  con->registerCommand(CMD_TOGGLE_FULLSCREEN, this);
+
+  dynamic_cast<GL*>(m_renderer)->registerCommands(con);
+  m_textureManager->registerCommands(con);
+  m_stateManager->registerCommands(con);
+  m_graphics->registerCommands(con);
+  m_cameraSystem->registerCommands(con);
+}
+
+void RenderSystem::runCommand(const std::string &command, const std::string &args) {
+  assert(m_initialised);
+  if (command == CMD_TOGGLE_FULLSCREEN) toggleFullscreen();
 }
 
 void RenderSystem::shutdown() {

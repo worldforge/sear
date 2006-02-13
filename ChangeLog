@@ -1,5 +1,12 @@
 2006-02-13  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp, renderers/RenderSystem.cpp, 
+	  renderers/RenderSystem.h, src/System.cpp, src/System.h: Move 
+	  toggle_fullscreen command to RenderSystem and normalise_on/off to
+	  Graphics. Removed processRecords function from System class. 
+
+2006-02-13  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.h: Return pointer to newly created array on the
 	  createXXX methods.
 

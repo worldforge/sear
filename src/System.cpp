@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.147 2006-02-07 11:11:41 simon Exp $
+// $Id: System.cpp,v 1.148 2006-02-13 22:27:27 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,8 +10,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sigc++/slot.h>
-#include <sage/sage.h>
-#include <sage/GL.h>
+
+//#include <sage/sage.h>
+//#include <sage/GL.h>
+
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
 #include <Eris/DeleteLater.h>
@@ -31,8 +33,8 @@
 #include "FileHandler.h"
 #include "renderers/Graphics.h"
 #include "loaders/ModelSystem.h"
-#include "renderers/Render.h"
-#include "renderers/GL.h"
+//#include "renderers/Render.h"
+//#include "renderers/GL.h"
 #include "Sound.h"
 #include "src/ScriptEngine.h"
 #include "System.h"
@@ -80,7 +82,6 @@ namespace Sear {
   static const std::string READ_CONFIG = "read_config";
   static const std::string BIND_KEY = "bind";
   static const std::string KEY_PRESS = "keypress";
-  static const std::string TOGGLE_FULLSCREEN = "toggle_fullscreen";
   static const std::string TOGGLE_MLOOK = "toggle_mlook";
   static const std::string ADD_EVENT = "event";
   static const std::string IDENTIFY_ENTITY = "identify";
@@ -138,7 +139,6 @@ System::System() :
   m_mouse_move_select(false),
   m_seconds(0.0),
   m_elapsed(0.0),
-  m_process_records(false),
   m_sound(NULL),
   m_system_running(false),
   m_editor(NULL),
@@ -679,7 +679,7 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
   assert (m_character != NULL);
   if (!m_axisBindings.count(axis)) return;
     
-    std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
+    if (debug) std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
     
     switch (m_axisBindings[axis]) {
     case AXIS_STRAFE: // Left right move
@@ -856,12 +856,9 @@ void System::registerCommands(Console *console) {
   console->registerCommand(READ_CONFIG, this);
   console->registerCommand(BIND_KEY, this);
   console->registerCommand(KEY_PRESS, this);
-  console->registerCommand(TOGGLE_FULLSCREEN, this);
   console->registerCommand(TOGGLE_MLOOK, this);
   console->registerCommand(ADD_EVENT, this);
   console->registerCommand(IDENTIFY_ENTITY, this);
-  console->registerCommand("normalise_on", this);
-  console->registerCommand("normalise_off", this);
   console->registerCommand("setvar", this);
   console->registerCommand("getvar", this);
 }
@@ -889,13 +886,8 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     m_general.setItem(section, key, value);
   }
   else if (command == LOAD_GENERAL_CONFIG) {
-    m_process_records = true;
     System::instance()->getFileHandler()->expandString(args);
     m_general.readFromFile(args);
-    if (m_process_records) {
-      m_process_records = false;
-      processRecords();
-    }
   }
   else if (command == LOAD_KEY_BINDINGS) {
     Bindings::loadBindings(args);
@@ -920,16 +912,12 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   else if (command == KEY_PRESS) {
     runCommand(Bindings::getBinding(args));
   }
-  else if (command == TOGGLE_FULLSCREEN) RenderSystem::getInstance().toggleFullscreen();
   else if (command == TOGGLE_MLOOK) toggleMouselook();
   else if (command == IDENTIFY_ENTITY) {
     if (!m_client->getAvatar()) return;
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
   }
-
-  else if (command == "normalise_on") glEnable(GL_NORMALIZE);
-  else if (command == "normalise_off") glDisable(GL_NORMALIZE);
 
   else if (command == "setvar") {
     std::string key = tokeniser.nextToken();
@@ -941,42 +929,15 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     pushMessage(m_file_handler->getVariable(key), CONSOLE_MESSAGE);
   }
   
-  else Log::writeLog(std::string("Command not found: - ") + command, Log::LOG_ERROR);
+  else fprintf(stderr, "[Error:System]Command not found: %s\n", command.c_str());
 }
 
 void System::varconf_error_callback(const char *error) {
-  Log::writeLog(std::string("Varconf Error: ") + error, Log::LOG_ERROR);
+  fprintf(stderr, "[Error:System]Varconf: %s\n", error);
 }
 
 void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  // TODO this should be specific to the model loader config only.
-  if (key == "state") {
-    config.setItem(section, "state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
-  }
-  if (key == "select_state") {
-    config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
-  }
-  if (m_process_records) {
-    varconf::Variable v = config.getItem(section, key);
-    if (v.is_string()) {
-      VarconfRecord *r = new VarconfRecord();
-      r->section = section;
-      r->key = key; 
-      r->config = &config;
-      m_record_list.push_back(r);
-    }
-  }
-}
-
-void System::processRecords() {
-  while (!m_record_list.empty()) {
-    VarconfRecord *r = *m_record_list.begin();
-    std::string value = r->config->getItem(r->section, r->key);
-    m_file_handler->expandString(value);
-    r->config->setItem(r->section, r->key, value);
-    delete r;
-    m_record_list.erase(m_record_list.begin());
-  }
+  // Nothing to do.
 }
 
 void System::addSearchPaths(std::list<std::string> l) {

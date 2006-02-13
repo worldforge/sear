@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.36 2006-02-07 18:45:34 simon Exp $
+// $Id: Graphics.cpp,v 1.37 2006-02-13 22:27:27 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -771,11 +771,16 @@ void Graphics::writeConfig(varconf::Config &config) {
 }  
 
 void Graphics::registerCommands(Console * console) {
+  assert(console);
+
   console->registerCommand("invalidate", this);
   console->registerCommand("+show_names", this);
   console->registerCommand("-show_names", this);
   console->registerCommand("+select_mode", this);
   console->registerCommand("-select_mode", this);
+  console->registerCommand("normalise_on", this);
+  console->registerCommand("normalise_off", this);
+
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
@@ -791,6 +796,9 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
   } else if (command == "-select_mode") {
     c_select = false;
   }
+  else if (command == "normalise_on") glEnable(GL_NORMALIZE);
+  else if (command == "normalise_off") glDisable(GL_NORMALIZE);
+
 }
 
 void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {

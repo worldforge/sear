@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.68 2006-02-07 18:45:34 simon Exp $
+// $Id: System.h,v 1.69 2006-02-13 22:27:28 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -203,7 +203,6 @@ protected:
   void handleEvents(const SDL_Event &);
   void handleAnalogueControllers();
   void handleJoystickMotion(Uint8 axis, Sint16 value);  
-  void processRecords();
 
   int m_action;
   bool m_mouseLook;
@@ -243,14 +242,6 @@ protected:
   double m_seconds;
   double m_elapsed;
 
-  typedef struct {
-    std::string section;
-    std::string key;
-    varconf::Config *config;
-  } VarconfRecord;
-
-  std::list<VarconfRecord*> m_record_list;
-  bool m_process_records;
   Sound *m_sound;
   
   typedef enum {
