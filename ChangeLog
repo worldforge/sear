@@ -1,3 +1,9 @@
+2006-02-13  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/NPlane.cpp, 
+	  loaders/NPlane.h: Convert BoundBox and NPlane models to use 
+	  StaticObject. NPlane may have broken normals.
+
 2006-02-07  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/TerrainEntity.cpp: Add include to sigc++/object_slot.h

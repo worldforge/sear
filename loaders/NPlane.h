@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.11 2006-02-07 11:31:03 simon Exp $
+// $Id: NPlane.h,v 1.12 2006-02-13 22:16:09 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -10,12 +10,15 @@
 #include <string>
 
 #include "common/types.h"
+#include "common/SPtr.h"
 
 #include "Model.h"
 #include "renderers/Graphics.h"
 #include "renderers/RenderSystem.h"
 
 namespace Sear {
+
+class StaticObject;
 	
 class NPlane : public Model {
 public:
@@ -35,15 +38,8 @@ public:
   virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
   
 private:
-  unsigned int m_num_planes;
-  std::string m_texture_name;
-  TextureID m_texture_id, m_texture_mask_id;
-  Vertex_3 *m_vertex_data;
-  Normal *m_normal_data;
-  Texel *m_texture_data;
   bool m_initialised;
-
-  int m_disp, m_select_disp;
+  SPtrShutdown<StaticObject> m_so; 
 };
 
 } /* namespace Sear */ 
