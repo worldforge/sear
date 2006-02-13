@@ -62,24 +62,28 @@ public:
     memcpy(m_indices, ptr, size * sizeof(int));
   }
 
-  void createVertexData(int size) {
+  float *createVertexData(int size) {
     if (m_vertex_data) delete [] m_vertex_data;
     m_vertex_data = new float[size];
+    return m_vertex_data;
   }
 
-  void createNormalData(int size) {
+  float *createNormalData(int size) {
     if (m_normal_data) delete [] m_normal_data;
     m_normal_data = new float[size];
+    return m_normal_data;
   }
 
-  void createTextureData(int size) {
+  float *createTextureData(int size) {
     if (m_texture_data) delete [] m_texture_data;
     m_texture_data = new float[size];
+    return m_texture_data;
   }
 
-  void createIndices(int size) {
+  int *createIndices(int size) {
     if (m_indices) delete [] m_indices;
     m_indices = new int[size];
+    return m_indices;
   }
 
   void setNumPoints(int n) { m_num_points = n; }
