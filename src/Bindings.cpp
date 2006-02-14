@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.22 2006-01-09 17:32:24 simon Exp $
+// $Id: Bindings.cpp,v 1.23 2006-02-14 17:55:23 simon Exp $
 
 
 #include <SDL/SDL.h>
@@ -12,11 +12,6 @@
 #include "common/Log.h"
 
 #include "Bindings.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -185,23 +180,23 @@ void Bindings::shutdown() {
   }
 }
 
-void Bindings::loadBindings(const std::string &file_name) {
+void Bindings::loadBindings(const std::string &file_name, bool user) {
   assert((m_bindings != NULL) && "Bindings config is NULL");
   // Merges key bindings file, file_name with existing contents
-  if (!m_bindings->readFromFile(file_name)) 
+  if (!m_bindings->readFromFile(file_name, (user) ? (varconf::USER) : (varconf::GLOBAL))) 
     Log::writeLog(std::string("Error processing ") + file_name, Log::LOG_ERROR);
 }
 
 void Bindings::saveBindings(const std::string &file_name) {
   assert((m_bindings != NULL) && "Bindings config is NULL");
   // Save current key bindings to file_name
-  m_bindings->writeToFile(file_name);
+  m_bindings->writeToFile(file_name, varconf::USER);
 }
 
 void Bindings::bind(std::string key, std::string command) {
   assert((m_bindings != NULL) && "Bindings config is NULL");
   if (key.empty()) return; // Check we were sent a key
-  m_bindings->setItem("key_bindings", key, command); // Store new binding
+  m_bindings->setItem("key_bindings", key, command, varconf::USER); // Store new binding
 }
 
 std::string Bindings::idToString(int key) {

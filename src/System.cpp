@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.148 2006-02-13 22:27:27 simon Exp $
+// $Id: System.cpp,v 1.149 2006-02-14 17:55:23 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +10,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sigc++/slot.h>
-
-//#include <sage/sage.h>
-//#include <sage/GL.h>
 
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
@@ -22,35 +19,27 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include "guichan/Workarea.h"
+#include "renderers/Camera.h"
+#include "renderers/CameraSystem.h"
+#include "renderers/Graphics.h"
+#include "renderers/RenderSystem.h"
+#include "environment/Environment.h"
+#include "loaders/ModelSystem.h"
+
 #include "ActionHandler.h"
 #include "Bindings.h"
 #include "Calendar.h"
-#include "renderers/Camera.h"
-#include "renderers/CameraSystem.h"
 #include "Character.h"
 #include "client.h"
 #include "Console.h"
 #include "FileHandler.h"
-#include "renderers/Graphics.h"
-#include "loaders/ModelSystem.h"
-//#include "renderers/Render.h"
-//#include "renderers/GL.h"
 #include "Sound.h"
-#include "src/ScriptEngine.h"
+#include "ScriptEngine.h"
 #include "System.h"
 #include "WorldEntity.h"
-#include "renderers/RenderSystem.h"
-#include "environment/Environment.h"
 #include "Editor.h"
-
-#include "guichan/Workarea.h"
-
 #include "CacheManager.h"
-//#include "loaders/StaticObject.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -62,29 +51,30 @@
 static const std::string SYSTEM = "system";
   
 namespace Sear {
-
-
   static const std::string SCRIPTS_DIR = "scripts";
   static const std::string STARTUP_SCRIPT = "startup.script";
   static const std::string SHUTDOWN_SCRIPT = "shutdown.script";
 
   // Console commands
-  static const std::string EXIT = "exit";
-  static const std::string QUIT = "quit";
+  static const std::string CMD_EXIT = "exit";
+  static const std::string CMD_QUIT = "quit";
 
-  static const std::string GET_ATTRIBUTE = "getat";
-  static const std::string SET_ATTRIBUTE = "setat";
+  static const std::string CMD_GET_ATTRIBUTE = "getat";
+  static const std::string CMD_SET_ATTRIBUTE = "setat";
 
-  static const std::string LOAD_GENERAL_CONFIG = "load_general";
-  static const std::string LOAD_KEY_BINDINGS = "load_bindings";
-  static const std::string SAVE_GENERAL_CONFIG = "save_general";
-  static const std::string SAVE_KEY_BINDINGS = "save_bindings";
-  static const std::string READ_CONFIG = "read_config";
-  static const std::string BIND_KEY = "bind";
-  static const std::string KEY_PRESS = "keypress";
-  static const std::string TOGGLE_MLOOK = "toggle_mlook";
-  static const std::string ADD_EVENT = "event";
-  static const std::string IDENTIFY_ENTITY = "identify";
+  static const std::string CMD_LOAD_GENERAL_CONFIG = "load_general";
+  static const std::string CMD_LOAD_KEY_BINDINGS_USER = "load_bindings";
+  static const std::string CMD_LOAD_KEY_BINDINGS_GLOBAL = "load_global_bindings";
+  static const std::string CMD_SAVE_GENERAL_CONFIG = "save_general";
+  static const std::string CMD_SAVE_KEY_BINDINGS = "save_bindings";
+  static const std::string CMD_READ_CONFIG = "read_config";
+  static const std::string CMD_BIND_KEY = "bind";
+  static const std::string CMD_KEY_PRESS = "keypress";
+  static const std::string CMD_TOGGLE_MLOOK = "toggle_mlook";
+  static const std::string CMD_ADD_EVENT = "event";
+  static const std::string CMD_IDENTIFY_ENTITY = "identify";
+  static const std::string CMD_GETVAR = "getvar";
+  static const std::string CMD_SETVAR = "setvar";
 
   // Config key values  
   static const std::string KEY_mouse_move_select = "mouse_move_select";
@@ -168,7 +158,7 @@ bool System::init(int argc, char *argv[]) {
   m_script_engine->init();
 
   m_client = new Client(this, "Sear");
-  if(!m_client->init()) {
+  if (!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
 
     delete m_client;
@@ -194,7 +184,7 @@ bool System::init(int argc, char *argv[]) {
   m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
   
   Bindings::init();
-//  Bindings::bind("escape", "/" + QUIT);
+
   Bindings::bind("backquote", "/toggle_console");
   Bindings::bind("caret", "/toggle_console");
   
@@ -308,14 +298,18 @@ bool System::init(int argc, char *argv[]) {
 
     m_client->shutdown();
     delete m_client; m_client = NULL;
+
     m_calendar->shutdown();
     delete m_calendar; m_calendar = NULL;
+
     m_action_handler->shutdown();
     delete m_action_handler; m_action_handler = NULL;
+
     m_script_engine->shutdown();
     delete m_script_engine; m_script_engine = NULL;
 
     delete m_editor; m_editor = NULL;
+
     m_console->shutdown();
     delete m_console; m_console = NULL;
 
@@ -333,6 +327,7 @@ bool System::init(int argc, char *argv[]) {
     Environment::getInstance().shutdown();
     ModelSystem::getInstance().shutdown(); 
     RenderSystem::getInstance().shutdown();
+
     SDL_Quit();
 
     return false;
@@ -340,8 +335,6 @@ bool System::init(int argc, char *argv[]) {
 
   // Hide cursor
   SDL_ShowCursor(0);
-
-//  RenderSystem::getInstance().initContext();
 
   m_workarea->init();
 
@@ -395,6 +388,7 @@ void System::shutdown() {
   for (FileHandler::FileList::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
     m_script_engine->runScript(*I);
   }
+
   Bindings::shutdown();
 
   m_script_engine->shutdown();
@@ -423,8 +417,7 @@ void System::shutdown() {
 bool System::initVideo() {
   if (debug) Log::writeLog("Initialising Video", Log::LOG_INFO);
 #ifdef DEBUG
-//#warning "PARACHUTE IS DISABLED"
-  // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger
+  // NOPARACHUTE means SDL doesn't handle any errors allowing us to catch them in a debugger. However, this can cause other problems!
   if (SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE) < 0 ) {
 #else
   // We want release versions to die quietly
@@ -543,9 +536,7 @@ void System::handleEvents(const SDL_Event &event) {
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-//          if (m_character != NULL) {
             m_character->moveForward(-1);
-  //        }
         }
         break;
       }
@@ -845,22 +836,23 @@ void System::switchCursor(int cursor) {
 }
 
 void System::registerCommands(Console *console) {
-  console->registerCommand(QUIT, this);
-  console->registerCommand(EXIT, this);
-  console->registerCommand(GET_ATTRIBUTE, this);
-  console->registerCommand(SET_ATTRIBUTE, this);
-  console->registerCommand(LOAD_GENERAL_CONFIG, this);
-  console->registerCommand(LOAD_KEY_BINDINGS, this);
-  console->registerCommand(SAVE_GENERAL_CONFIG, this);
-  console->registerCommand(SAVE_KEY_BINDINGS, this);
-  console->registerCommand(READ_CONFIG, this);
-  console->registerCommand(BIND_KEY, this);
-  console->registerCommand(KEY_PRESS, this);
-  console->registerCommand(TOGGLE_MLOOK, this);
-  console->registerCommand(ADD_EVENT, this);
-  console->registerCommand(IDENTIFY_ENTITY, this);
-  console->registerCommand("setvar", this);
-  console->registerCommand("getvar", this);
+  console->registerCommand(CMD_QUIT, this);
+  console->registerCommand(CMD_EXIT, this);
+  console->registerCommand(CMD_GET_ATTRIBUTE, this);
+  console->registerCommand(CMD_SET_ATTRIBUTE, this);
+  console->registerCommand(CMD_LOAD_GENERAL_CONFIG, this);
+  console->registerCommand(CMD_LOAD_KEY_BINDINGS_USER, this);
+  console->registerCommand(CMD_LOAD_KEY_BINDINGS_GLOBAL, this);
+  console->registerCommand(CMD_SAVE_GENERAL_CONFIG, this);
+  console->registerCommand(CMD_SAVE_KEY_BINDINGS, this);
+  console->registerCommand(CMD_READ_CONFIG, this);
+  console->registerCommand(CMD_BIND_KEY, this);
+  console->registerCommand(CMD_KEY_PRESS, this);
+  console->registerCommand(CMD_TOGGLE_MLOOK, this);
+  console->registerCommand(CMD_ADD_EVENT, this);
+  console->registerCommand(CMD_IDENTIFY_ENTITY, this);
+  console->registerCommand(CMD_SETVAR, this);
+  console->registerCommand(CMD_GETVAR, this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -873,58 +865,63 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   std::string args = args_t;
   m_file_handler->expandString(args);
   tokeniser.initTokens(args);
-  if (command == EXIT || command == QUIT) m_system_running = false;
-  else if (command == GET_ATTRIBUTE) {
+  if (command == CMD_EXIT || command == CMD_QUIT) m_system_running = false;
+  else if (command == CMD_GET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.remainingTokens();
      pushMessage(m_general.getItem(section, key), CONSOLE_MESSAGE);
   }
-  else if (command == SET_ATTRIBUTE) {
+  else if (command == CMD_SET_ATTRIBUTE) {
     std::string section = tokeniser.nextToken();
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
     m_general.setItem(section, key, value);
   }
-  else if (command == LOAD_GENERAL_CONFIG) {
+  else if (command == CMD_LOAD_GENERAL_CONFIG) {
     System::instance()->getFileHandler()->expandString(args);
     m_general.readFromFile(args);
   }
-  else if (command == LOAD_KEY_BINDINGS) {
-    Bindings::loadBindings(args);
+  else if (command == CMD_LOAD_KEY_BINDINGS_USER) {
+    System::instance()->getFileHandler()->expandString(args);
+    Bindings::loadBindings(args, true);
   }
-  else if (command == SAVE_GENERAL_CONFIG) {
-  System::instance()->getFileHandler()->expandString(args);
+  else if (command == CMD_LOAD_KEY_BINDINGS_GLOBAL) {
+    System::instance()->getFileHandler()->expandString(args);
+    Bindings::loadBindings(args, false);
+  }
+  else if (command == CMD_SAVE_GENERAL_CONFIG) {
+    System::instance()->getFileHandler()->expandString(args);
     m_general.writeToFile(args);
   }
-  else if (command == SAVE_KEY_BINDINGS) {
-  System::instance()->getFileHandler()->expandString(args);
+  else if (command == CMD_SAVE_KEY_BINDINGS) {
+    System::instance()->getFileHandler()->expandString(args);
     Bindings::saveBindings(args);
   }
-  else if (command == READ_CONFIG) {
+  else if (command == CMD_READ_CONFIG) {
     readConfig(m_general);
     m_character->readConfig(m_general);
   }
-  else if (command == BIND_KEY) {
+  else if (command == CMD_BIND_KEY) {
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
     Bindings::bind(key, value);
   }
-  else if (command == KEY_PRESS) {
+  else if (command == CMD_KEY_PRESS) {
     runCommand(Bindings::getBinding(args));
   }
-  else if (command == TOGGLE_MLOOK) toggleMouselook();
-  else if (command == IDENTIFY_ENTITY) {
+  else if (command == CMD_TOGGLE_MLOOK) toggleMouselook();
+  else if (command == CMD_IDENTIFY_ENTITY) {
     if (!m_client->getAvatar()) return;
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
   }
 
-  else if (command == "setvar") {
+  else if (command == CMD_SETVAR) {
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
     m_file_handler->setVariable(key, value);
   }
-  else if (command == "getvar") {
+  else if (command == CMD_GETVAR) {
     std::string key = tokeniser.nextToken();
     pushMessage(m_file_handler->getVariable(key), CONSOLE_MESSAGE);
   }
