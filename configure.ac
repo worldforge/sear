@@ -64,22 +64,6 @@ AC_ARG_ENABLE(debug,
 
 CXXFLAGS="$CXXFLAGS -DATLAS_ELEMENT_TYPEDEF_PRIVATE=1"
 
-AC_ARG_ENABLE(mmgr,
-  [  --enable-mmgr	enable memory checker [default=no]],
-  [
-    if test "$enableval" = "yes"; then
-      use_mmgr="true"
-      CXXFLAGS="$CXXFLAGS -DUSE_MMGR=1"
-    else
-      use_mmgr="false"
-    fi
-  ],[
-    use_mmgr="false"
-  ]
-)
-AM_CONDITIONAL(MMGR, test x"$use_mmgr" = xtrue)
-
-
 STATIC_LIBSTDCPP=
 STATIC_LIBGCC=
 

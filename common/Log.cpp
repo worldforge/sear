@@ -1,21 +1,16 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Log.cpp,v 1.9 2005-04-13 12:16:03 simon Exp $
+// $Id: Log.cpp,v 1.10 2006-02-14 17:25:53 simon Exp $
 
 #include "Log.h"
-#include <iostream>
 
 /* LOG AIMS
  * Will provide  ability to log each type to a different file
  * FREQUENT LOG ACTIONS SHOULD BE IN A #if #endif BLOCK and
  * only included in debug mode
  */ 
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -33,8 +28,9 @@ void Log::writeLog(const std::string &msg, LogLevel level) {
     case LOG_WARNING: type = "Warning"; break;
     case LOG_ERIS: type = "Eris"; break;		
     case LOG_INFO: type = "Info"; break;
+    default: type="Unknown";
   }
-  std::cout << type << ": " << msg << std::endl << std::flush;
+  printf("[%s]: %s\n", type.c_str(), msg.c_str());
 }
 
 } /* namespace Sear */
