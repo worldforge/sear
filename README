@@ -3,10 +3,10 @@ Sear
 Dependancies
 ------------
 
-Atlas: 0.5.96
-Eris: 1.3.9
-Varconf: 0.6.3
-LWFmath: 0.3.2
+Atlas: 0.6.0
+Eris: 1.3.10
+Varconf: 0.6.4
+WFmath: 0.3.2
 Skstream2: 0.3.1
 Mercator: 0.2.4
 LibModelFile: 0.1.92
@@ -23,7 +23,7 @@ http://www.libsdl.org/projects/SDL_image
 SDL_mixer 1.2.4
 http://www.libsdl.org/projects/SDL_mixer/
 
-SigC 1.2.4
+libsigc++ 2.0.x (not 2.0.8)
 http://sourceforge.net/projects/libsigc/
 
 Lib3ds 1.2.0

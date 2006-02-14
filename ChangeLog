@@ -1,5 +1,9 @@
 2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* README: Update dependancy versions.
+
+2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/System.cpp, src/Bindings.cpp, src/Bindings.h, 
 	  scripts/startup.script: Re-add the scope changes for the bindings file
 	  only. The /load_bindings command loads in the user settings, and
