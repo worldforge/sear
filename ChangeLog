@@ -1,3 +1,14 @@
+2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/Environment.h: Make Environment inherit from
+	  sigc::trackable instead of SigC::Object.
+
+	* guichan/HelpOptions.cpp: Close DIR pointer.
+
+	* renderers/LightManger.h: Remove some old commented out includes.
+
+	* src/Makefile.am: Remove old references to Lobby.cpp/h
+
 2006-02-13  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp, renderers/RenderSystem.cpp, 

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <map>
 
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
 
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
@@ -25,7 +25,7 @@ class SkyDome;
 class Stars;
 class WorldEntity;
 
-class Environment : public SigC::Object {
+class Environment : public sigc::trackable {
   Environment() :
     m_initialised(false),
     m_terrain(NULL),

@@ -40,7 +40,8 @@ public:
           std::cout << "Adding " << entry->d_name << std::endl << std::flush;
         }
       }
-    }
+      closedir(help_list);
+    } 
   }
 
   virtual ~HelpFileList() {

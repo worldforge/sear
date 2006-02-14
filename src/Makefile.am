@@ -117,8 +117,5 @@ libSear_a_SOURCES = \
 	prefix.c prefix.h \
 	error.cpp error.h
 
-#	Lobby.cpp \
-#	Lobby.h \
-#
 icondir = $(datadir)/icons/worldforge
 icon_DATA = sear_icon.xpm
