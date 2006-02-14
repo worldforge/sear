@@ -1,5 +1,13 @@
 2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.ac, common/Makefile.am, common/mmgr.cpp, common/mmgr.h,
+	  common/nommgr.h, common/readme.txt: Remove mmgr code as valgrind 
+	  works well these days.
+
+	* common/Log.cpp: Change format of output slightly.
+
+2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/Environment.h: Make Environment inherit from
 	  sigc::trackable instead of SigC::Object.
 
@@ -2244,7 +2252,7 @@
 
 2005-03-04  Simon Goodall  <sear@simongoodall.co.uk>
 
-	* environment.Stars.cpp: Add mmgr include.
+	* environment/Stars.cpp: Add mmgr include.
 	* loaders/ModelHandler.cpp: Move creation of loaders to init method
 	  instead of constructor.
 	* renderers/CameraSystem.cpp, renderers/CameraSystem.h,
