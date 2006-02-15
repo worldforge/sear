@@ -1,5 +1,17 @@
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Make indices an
+	  int instead of unsigned int (for now at least!). Fix bug in
+	  copyIndices where the wrong VBO was being reset. Do not attempt to do
+	  anything to textures if there is no texture coord data.
+
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/CoreModel.h,
+	  loaders/cal3d/Cal3dModel.cpp, loaders/Cal3dModel.h: Use Dynamic Object
+	  to render meshes. Create latest DO's in the update function. Update
+	  MapData to store the texture mask ID too.
+
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/System.cpp, src/System.h: Use SPtr for instantated Objects. 
 	  Re-allow Sound object to be created.
 

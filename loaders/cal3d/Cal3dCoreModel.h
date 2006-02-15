@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.11 2006-02-07 18:45:33 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.12 2006-02-15 14:39:54 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -28,6 +28,7 @@ class Cal3dModel;
 
 typedef struct {
   int textureID;
+  int textureMaskID;
 } MapData;
 	
 class Cal3dCoreModel : public sigc::trackable {
@@ -118,7 +119,7 @@ private:
    * @param strFilename image filename
    * @return The texture object id
    */ 
-  unsigned int loadTexture(const std::string &strFilename);
+  unsigned int loadTexture(const std::string &strFilename, bool mask);
   
   bool m_initialised; ///< Flag indicating whether object has been initialised
   CalCoreModel *m_core_model; ///< Pointer to the cal3d core model we represent

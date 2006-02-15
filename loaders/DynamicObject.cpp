@@ -110,16 +110,16 @@ void DynamicObject::copyTextureData(float *ptr, int size) {
   }
 }
 
-void DynamicObject::copyIndices(unsigned int *ptr, int size) {
+void DynamicObject::copyIndices(int *ptr, int size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_indices)) glGenBuffersARB(1, &m_vb_indices);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_vb_indices);
-    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), ptr, GL_STREAM_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(int), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, 0);
   } else {
     if (m_indices) delete [] m_indices;
-    m_indices = new unsigned int[size];
-    memcpy(m_indices, ptr, size * sizeof(unsigned int));
+    m_indices = new int[size];
+    memcpy(m_indices, ptr, size * sizeof(int));
   }
 }
 /*
@@ -242,20 +242,22 @@ void DynamicObject::render(bool select_mode) {
       glNormalPointer(GL_FLOAT, 0, 0);
     }
     
-    for (unsigned int i = 0; i < m_textures.size(); ++i) {
-      // Bind texture array
-      glActiveTextureARB(GL_TEXTURE0_ARB + i);
-      if (select_mode) {
-        RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
-      } else {
-        RenderSystem::getInstance().switchTexture(m_textures[i]); 
+    if (glIsBuffer(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        // Bind texture array
+        glActiveTextureARB(GL_TEXTURE0_ARB + i);
+        if (select_mode) {
+          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+        } else {
+          RenderSystem::getInstance().switchTexture(m_textures[i]); 
+        }
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
+        glTexCoordPointer(2, GL_FLOAT, 0, 0);
       }
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
-      glTexCoordPointer(2, GL_FLOAT, 0, 0);
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
     }
-    // Reset current texture unit
-    glActiveTextureARB(GL_TEXTURE0_ARB);
 
     if (glIsBufferARB(m_vb_colour_data)) {
       glEnableClientState(GL_COLOR_ARRAY);
@@ -272,9 +274,12 @@ void DynamicObject::render(bool select_mode) {
     }
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
-    for (unsigned int i = 0; i < m_textures.size(); ++i) {
-      glActiveTextureARB(GL_TEXTURE0 + i);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    if (glIsBuffer(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        glActiveTextureARB(GL_TEXTURE0 + i);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      glActiveTextureARB(GL_TEXTURE0);
     }
 
     if (glIsBuffer(m_vb_normal_data)) {
@@ -310,20 +315,22 @@ void DynamicObject::render(bool select_mode) {
         glNormalPointer(GL_FLOAT, 0, m_normal_data);
       }
 
-      for (unsigned int i = 0; i < m_textures.size(); ++i) {
-        // Bind texture array
-        glActiveTextureARB(GL_TEXTURE0_ARB + i);
-        if (select_mode) {
-          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
-        } else {
-          RenderSystem::getInstance().switchTexture(m_textures[i]); 
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          // Bind texture array
+          glActiveTextureARB(GL_TEXTURE0_ARB + i);
+          if (select_mode) {
+            RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+          } else {
+            RenderSystem::getInstance().switchTexture(m_textures[i]); 
+          }
+          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+          glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
         }
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
-      }
 
-      // Reset current texture unit
-      glActiveTextureARB(GL_TEXTURE0_ARB);
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
 
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
@@ -341,13 +348,15 @@ void DynamicObject::render(bool select_mode) {
         glUnlockArraysEXT();
       }
 
-      for (unsigned int i = 0; i < m_textures.size(); ++i) {
-        glActiveTextureARB(GL_TEXTURE0 + i);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      }
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          glActiveTextureARB(GL_TEXTURE0 + i);
+          glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
 
-      // Reset current texture unit
-      glActiveTextureARB(GL_TEXTURE0_ARB);
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
 
       if (m_normal_data) {
         glDisableClientState(GL_NORMAL_ARRAY);

@@ -2,21 +2,24 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.19 2006-02-15 09:50:31 simon Exp $
+// $Id: Cal3dModel.h,v 1.20 2006-02-15 14:39:55 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include <cal3d/cal3d.h>
 #include "Cal3dCoreModel.h"
 #include "Model.h"
 #include "renderers/Graphics.h"
-
+#include "common/SPtr.h"
 
 namespace Sear {
+
+class DynamicObject;
 
 class Cal3dModel : public Sear::Model {
 public:
@@ -79,6 +82,8 @@ private:
   float m_rotate;
   //std::string current_head;
   std::string m_cur_anim;
+  typedef std::vector<SPtrShutdown<DynamicObject> > DOVec;
+  DOVec m_dos;
 };
 
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.34 2006-02-15 09:50:31 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.35 2006-02-15 14:39:54 simon Exp $
 
 #include <string>
 
@@ -60,12 +60,10 @@ Cal3dCoreModel::Cal3dCoreModel() :
 
 Cal3dCoreModel::~Cal3dCoreModel() {
   assert(m_initialised == false);
-  //if (m_initialised) shutdown();
 }
 
 int Cal3dCoreModel::init(const std::string &filename) {
   assert(m_initialised == false);
-//  if (_initialised) shutdown();	
   // open the model configuration file
   m_core_model = new CalCoreModel("dummy");
   // create a core model instance
@@ -73,7 +71,7 @@ int Cal3dCoreModel::init(const std::string &filename) {
     CalError::printLastError();
     return 1;
   }
-//  std::cerr << "reading config" << std::endl << std::flush;
+
   if (readConfig(filename)) {
     printf("Error while loading %s\n", filename.c_str());
     delete m_core_model;
@@ -81,7 +79,6 @@ int Cal3dCoreModel::init(const std::string &filename) {
 
     return 1;
   }
- // std::cerr << "done reading config" << std::endl << std::flush;
 
   m_initialised = true;
   return 0;
@@ -89,21 +86,20 @@ int Cal3dCoreModel::init(const std::string &filename) {
 
 int Cal3dCoreModel::shutdown() {
   assert(m_initialised == true);
-//  if (m_core_model) {
-    // Clean up user data
-    // Loop through each material
-    for (int i = 0; i < m_core_model->getCoreMaterialCount(); ++i) {
-      CalCoreMaterial *m = m_core_model->getCoreMaterial(i);
-      MapData *md;
-      // Loop through each map
-      for (int j = 0; j < m->getMapCount(); ++j) {
-        md = reinterpret_cast<MapData*>(m->getMapUserData(j));
-        if (md) delete md;
-      }
+  // Clean up user data
+  // Loop through each material
+  for (int i = 0; i < m_core_model->getCoreMaterialCount(); ++i) {
+    CalCoreMaterial *m = m_core_model->getCoreMaterial(i);
+    MapData *md;
+    // Loop through each map
+    for (int j = 0; j < m->getMapCount(); ++j) {
+      md = reinterpret_cast<MapData*>(m->getMapUserData(j));
+      if (md) delete md;
     }
-    delete m_core_model;
-    m_core_model = NULL;
-//  }
+  }
+  delete m_core_model;
+  m_core_model = NULL;
+
   m_initialised = false;
   return 0;
 }
@@ -142,7 +138,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   }
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
-    if (debug) printf("Rotate %f\n", m_rotate);
+//    if (debug) printf("Rotate %f\n", m_rotate);
   }
 
   // Load all meshes 
@@ -257,7 +253,8 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
 	std::string key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
           std::string texture = (std::string)config.getItem(section, key);
-          unsigned int textureId = loadTexture(texture);
+          unsigned int textureId = loadTexture(texture, false);
+          unsigned int textureMaskId = loadTexture(texture, true);
 	  if (material->getMapCount() <= i) {
             // Increase the space available to store data
 	    material->reserve(i + 1);
@@ -267,15 +264,18 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
 	  }
           MapData *md = new MapData();
           md->textureID = textureId;
+          md->textureMaskID = textureMaskId;
           if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
         } else { // Use default texture
           std::string texture = material->getMapFilename(i);
 	  if (texture.empty()) continue;
-          unsigned int textureId = loadTexture(texture);
+          unsigned int textureId = loadTexture(texture, false);
+          unsigned int textureMaskId = loadTexture(texture, true);
           MapData *md = new MapData();
           md->textureID = textureId;
+          md->textureMaskID = textureMaskId;
           if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
@@ -302,7 +302,6 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
       m_material_list.push_back(key.substr(KEY_material.size() + 1));;
     }
   } else {
-    
     // Add animations weights to map
     // Get weight value
     varconf::Variable temp = config.getItem(section, key);
@@ -312,7 +311,7 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
         // Get animation name
         std::string k = key.substr(KEY_animation.size() + 1);
         // Add pair to map.
-         printf("Adding animation: %s %s %f\n", section.c_str() , k.c_str(), (double)temp);
+        if (debug) printf("[Debug:Cal3d]Adding animation: %s %s %f\n", section.c_str() , k.c_str(), (double)temp);
         m_anims[sec].push_back(AnimWeight(k, (double)temp));
       }
     }
@@ -323,9 +322,9 @@ void Cal3dCoreModel::varconf_error_callback(const char *message) {
   std::cerr << message << std::endl << std::flush;
 }
 
-unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
+unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename, bool mask) {
   unsigned int textureId;
-  textureId = RenderSystem::getInstance().requestTexture(strFilename);
+  textureId = RenderSystem::getInstance().requestTexture(strFilename, mask);
   return textureId;
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.32 2006-02-15 09:50:31 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.33 2006-02-15 14:39:54 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -15,6 +15,8 @@
 
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
+
+#include "DynamicObject.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -80,10 +82,6 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
 }
 
 void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode) {
-  Render *render = RenderSystem::getInstance().getRenderer();
-  float scale = getScale();
-  render->scaleObject(scale);
-  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
   // get the renderer of the model
   CalRenderer *pCalRenderer = m_calModel->getRenderer();
   assert(pCalRenderer !=  NULL);
@@ -96,7 +94,13 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
   // get the number of meshes
   int meshCount = pCalRenderer->getMeshCount();
+  int numSubMeshes = 0;
+  for (int i = 0; i < meshCount; ++i) {
+    numSubMeshes += pCalRenderer->getSubmeshCount(i);
+  }
+  m_dos.resize(numSubMeshes);
 
+  int counter = -1;
   // render all meshes of the model
   for(int meshId = 0; meshId < meshCount; ++meshId)  {
     // get the number of submeshes
@@ -106,64 +110,82 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
     for(int submeshId = 0; submeshId < submeshCount; ++submeshId) {
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId)) {
+
+        SPtrShutdown<DynamicObject> dyno = m_dos[++counter];
+        if (!dyno.isValid()) {
+          dyno = SPtrShutdown<DynamicObject>(new DynamicObject);
+          dyno->init();
+          m_dos[counter] = dyno;
+        }
+
         static unsigned char meshColor[4];
         static float ambient[4];
         static float diffuse[4];
         static float specular[4];
 	static float shininess;
-	if (!select_mode) {
-          pCalRenderer->getAmbientColor(&meshColor[0]);
-          ambient[0] = meshColor[0] / 255.0f;
-          ambient[1] = meshColor[1] / 255.0f;
-          ambient[2] = meshColor[2] / 255.0f;
-          ambient[3] = meshColor[3] / 255.0f;
 
-          // set the material diffuse color
-          pCalRenderer->getDiffuseColor(&meshColor[0]);
-          diffuse[0] = meshColor[0] / 255.0f;
-          diffuse[1] = meshColor[1] / 255.0f;
-          diffuse[2] = meshColor[2] / 255.0f;
-          diffuse[3] = 1.0f;//meshColor[3] / 255.0f;
+        pCalRenderer->getAmbientColor(&meshColor[0]);
+        ambient[0] = meshColor[0] / 255.0f;
+        ambient[1] = meshColor[1] / 255.0f;
+        ambient[2] = meshColor[2] / 255.0f;
+        ambient[3] = meshColor[3] / 255.0f;
+        dyno->setAmbient(ambient);
 
-          // set the material specular color
-          pCalRenderer->getSpecularColor(&meshColor[0]);
-          specular[0] = meshColor[0] / 255.0f;
-          specular[1] = meshColor[1] / 255.0f;
-          specular[2] = meshColor[2] / 255.0f;
-          specular[3] = meshColor[3] / 255.0f;
+        // set the material diffuse color
+        pCalRenderer->getDiffuseColor(&meshColor[0]);
+        diffuse[0] = meshColor[0] / 255.0f;
+        diffuse[1] = meshColor[1] / 255.0f;
+        diffuse[2] = meshColor[2] / 255.0f;
+        diffuse[3] = 1.0f;//meshColor[3] / 255.0f;
+        dyno->setDiffuse(diffuse);
 
-	  shininess = pCalRenderer->getShininess();
+        // set the material specular color
+        pCalRenderer->getSpecularColor(&meshColor[0]);
+        specular[0] = meshColor[0] / 255.0f;
+        specular[1] = meshColor[1] / 255.0f;
+        specular[2] = meshColor[2] / 255.0f;
+        specular[3] = meshColor[3] / 255.0f;
+        dyno->setSpecular(specular);
 
-          render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
-	}
-	
+        dyno->setEmission(0.0f, 0.0f, 0.0f,0.0f);
+
+        shininess = pCalRenderer->getShininess();
+        dyno->setShininess(shininess);
+
         // get the transformed vertices of the submesh
         static Vertex_3 meshVertices[30000];
         int vertexCount;
         vertexCount = pCalRenderer->getVertices((float*)&meshVertices[0]);
+        dyno->copyVertexData((float*)meshVertices, vertexCount * 3);
 
         // get the transformed normals of the submesh
         static Normal meshNormals[30000];
         pCalRenderer->getNormals((float*)&meshNormals[0]);
+        dyno->copyNormalData((float*)meshNormals, vertexCount * 3);
 
         // get the texture coordinates of the submesh
         static Texel meshTextureCoordinates[30000];
         int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, (float*)&meshTextureCoordinates[0]);
+        dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
 
         // get the faces of the submesh
-        static int meshFaces[50000][3];
-        int faceCount = pCalRenderer->getFaces(&meshFaces[0][0]);
+        static int meshFaces[50000 * 3];
+        int faceCount = pCalRenderer->getFaces(&meshFaces[0]);
+        dyno->copyIndices(meshFaces, faceCount * 3);
+
+        dyno->setNumPoints(faceCount * 3);
+
         bool multitexture = false;
         // TODO handle missing MapData more sensibly.
         // set the vertex and normal buffers
-        if(!select_mode && (pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
+        if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           if (pCalRenderer->getMapCount() == 1) {
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
             if (md) {
-              RenderSystem::getInstance().switchTexture(md->textureID);
+              dyno->setTexture(0, md->textureID, md->textureMaskID);
             } else {
-              RenderSystem::getInstance().switchTexture(0);
+              dyno->setTexture(0, 0, 0);
             }
 	  } else {
 	    multitexture = true;
@@ -171,21 +193,18 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
             if (md) {
-              RenderSystem::getInstance().switchTexture(md->textureID);
+              dyno->setTexture(1, md->textureID, md->textureMaskID);
             } else {
-              RenderSystem::getInstance().switchTexture(0);
+              dyno->setTexture(0, 0, 0);
             }
             // Set texture unit 1
             md = reinterpret_cast<MapData*>(pCalRenderer->getMapUserData(1));
             if (md) {
-              RenderSystem::getInstance().switchTexture(1, md->textureID);
+              dyno->setTexture(1, md->textureID, md->textureMaskID);
             } else {
-              RenderSystem::getInstance().switchTexture(1, 0);
+              dyno->setTexture(1, 0, 0);
             }
 	  }
-          render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
-	} else {
-          render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
 	}
       }
     }
@@ -194,12 +213,24 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 }
 
 void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
-  renderMesh(useTextures, useLighting, select_mode);
+  // TODO Make this into a matrix?
+  Render *render = RenderSystem::getInstance().getRenderer();
+  float scale = getScale();
+  render->scaleObject(scale);
+  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
+
+  DOVec::iterator I = m_dos.begin();
+  while (I != m_dos.end()) {
+    SPtrShutdown<DynamicObject> dyno = *I++;
+    dyno->render(select_mode);
+  }
+
 }
 
 void Cal3dModel::update(float time_elapsed) {
   // update the model
   m_calModel->update(time_elapsed);
+  renderMesh(true, true, false);
 }
 
 int Cal3dModel::shutdown() {

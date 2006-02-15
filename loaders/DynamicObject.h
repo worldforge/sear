@@ -42,7 +42,7 @@ public:
   void copyColourData(unsigned char *ptr, int size);
   void copyNormalData(float *ptr, int size);
   void copyTextureData(float *ptr, int size);
-  void copyIndices(unsigned int *ptr, int size);
+  void copyIndices(int *ptr, int size);
 /*
   float *createVertexData(int size) {
     if (m_vertex_data) delete [] m_vertex_data;
@@ -185,7 +185,7 @@ private:
   unsigned char *m_colour_data;
   float *m_normal_data;
   float *m_texture_data;
-  unsigned int *m_indices;
+  int *m_indices;
 
   int m_num_points;
   std::vector<int> m_textures;
