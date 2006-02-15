@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.21 2006-02-07 18:45:34 simon Exp $
+// $Id: ActionHandler.cpp,v 1.22 2006-02-15 12:44:24 simon Exp $
 
 #include <unistd.h>
 
@@ -17,10 +17,6 @@
 #include "src/WorldEntity.h"
 
 #include "ActionHandler.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -59,11 +55,7 @@ void ActionHandler::shutdown() {
   assert(m_initialised == true);
   if (debug) Log::writeLog("Action Handler: Shutdown", Log::LOG_DEFAULT);
   // Free all actions
-  while(!action_map.empty()) {
-    ActionStruct *as = action_map.begin()->second;
-    if (as) delete (as);
-    action_map.erase(action_map.begin());
-  }
+  action_map.clear();
 
   m_initialised = false;
 }
@@ -91,8 +83,7 @@ void ActionHandler::handleAction(const std::string &action, WorldEntity *entity)
   }
 
   for (; I != Iend; ++I) {
-    ActionStruct *as = I->second;
-    assert(as);
+    SPtr<ActionStruct> as = I->second;
     // Execute action if it exists
     // Execute command if present, else fall back to external script.
     if (!as->command.empty()) m_system->runCommand(as->command);
@@ -106,12 +97,15 @@ void ActionHandler::varconf_callback(const std::string &section, const std::stri
   // so the original code which checked for an existing record, and modified
   // it was probably right.
 
+  // NOTE: Yes this is broken. This code only allows one key to be read in
+  //       If there is a second key, then it will create a new astruct.
+  //       However, command and script cannot be used together, and the
+  //       entity flag is almost alway false. 
+
   // Create record and set defaults
-  ActionStruct * record = new ActionStruct();
+  SPtr<ActionStruct> record = SPtr<ActionStruct>(new ActionStruct());
   record->action = section;
   record->entity_based = false;
-
-  assert(record != NULL);
 
   // Set script file
   if (key == SCRIPT) {
@@ -158,7 +152,7 @@ void ActionHandler::addHandler(const std::string &action, const std::string &com
 #endif
   
   // Create action 
-  ActionStruct *record = new ActionStruct();
+  SPtr<ActionStruct> record = SPtr<ActionStruct>(new ActionStruct());
   record->action = action;
   record->entity_based = false;
   record->command = command;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.150 2006-02-15 10:18:03 simon Exp $
+// $Id: System.cpp,v 1.151 2006-02-15 12:44:24 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,7 +112,6 @@ System::System() :
   m_action(ACTION_DEFAULT),
   m_mouseLook(0),
   m_screen(NULL),
-  m_client(NULL),
   m_width(0),
   m_height(0),
   m_KeyRepeatDelay(DEFAULT_key_repeat_delay),
@@ -120,18 +119,11 @@ System::System() :
   m_click_on(false),
   m_click_x(0),
   m_click_y(0),
-  m_script_engine(NULL),
-  m_action_handler(NULL),
-  m_calendar(NULL),
   m_controller(NULL),
-  m_console(NULL),
-  m_character(NULL),
   m_mouse_move_select(false),
   m_seconds(0.0),
   m_elapsed(0.0),
-  m_sound(NULL),
   m_system_running(false),
-  m_editor(NULL),
   m_initialised(false),
   m_startFullscreen(DEFAULT_fullscreen)
 {
@@ -140,15 +132,13 @@ System::System() :
   for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) m_systemState[i] = false;
     
   // create the filehandler early, so we can call addSearchPath on it
-  m_file_handler = new FileHandler();
+  m_file_handler = SPtr<FileHandler>(new FileHandler());
 }
 
 System::~System() {
   assert (m_initialised == false);
 
-  if (m_file_handler) {
-    delete m_file_handler; 
-  }
+  m_file_handler.release();
 
   // Explicity Tell sigc to disconnect signals
   notify_callbacks();
@@ -160,27 +150,23 @@ bool System::init(int argc, char *argv[]) {
 
   if (!initVideo()) return false;
 
-  m_script_engine = new ScriptEngine();
+  m_script_engine = SPtrShutdown<ScriptEngine>(new ScriptEngine());
   m_script_engine->init();
 
-  m_client = new Client(this, "Sear");
+  m_client = SPtrShutdown<Client>(new Client(this, "Sear"));
   if (!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
 
-    delete m_client;
-    m_client = NULL;
-
-    m_script_engine->shutdown();
-    delete m_script_engine;
-    m_script_engine = NULL;
+    m_client.release();
+    m_script_engine.release();
 
     return false;
   }
   
-  m_action_handler = new ActionHandler(this);
+  m_action_handler = SPtrShutdown<ActionHandler>(new ActionHandler(this));
   m_action_handler->init();
 
-  m_calendar = new Calendar();
+  m_calendar = SPtrShutdown<Calendar>(new Calendar());
   m_calendar->init();
  
   // Connect signals for record processing 
@@ -194,24 +180,24 @@ bool System::init(int argc, char *argv[]) {
   Bindings::bind("backquote", "/toggle_console");
   Bindings::bind("caret", "/toggle_console");
   
-  m_console = new Console(this);
+  m_console = SPtrShutdown<Console>(new Console(this));
   m_console->init();
-  registerCommands(m_console);
+  registerCommands(m_console.get());
 
-  m_client->registerCommands(m_console);
-  m_script_engine->registerCommands(m_console);
-  m_action_handler->registerCommands(m_console);
-  m_file_handler->registerCommands(m_console);
-  m_calendar->registerCommands(m_console);
+  m_client->registerCommands(m_console.get());
+  m_script_engine->registerCommands(m_console.get());
+  m_action_handler->registerCommands(m_console.get());
+  m_file_handler->registerCommands(m_console.get());
+  m_calendar->registerCommands(m_console.get());
 
-  m_character = new Character();
+  m_character = SPtrShutdown<Character>(new Character());
   m_character->init();
-  m_character->registerCommands(m_console);
+  m_character->registerCommands(m_console.get());
 
-  m_editor = new Editor();
-  m_editor->registerCommands(m_console);
+  m_editor = SPtr<Editor>(new Editor());
+  m_editor->registerCommands(m_console.get());
 
-  m_workarea = new Workarea(this);
+  m_workarea = SPtr<Workarea>(new Workarea(this));
 
   int sticks = SDL_NumJoysticks();
 
@@ -253,19 +239,18 @@ bool System::init(int argc, char *argv[]) {
         m_axisBindings[3] = AXIS_ELEVATE;
   }
 
-/*
-    sound = new Sound();
-    if (sound->init()) {
-      delete sound;
-      sound = NULL;
-    } else { 
-      sound->registerCommands(m_console);
-    }
-*/
+
+  m_sound = SPtrShutdown<Sound>(new Sound());
+  if (m_sound->init()) {
+    m_sound.release();
+  } else { 
+    m_sound->registerCommands(m_console.get());
+  }
+
   RenderSystem::getInstance().init();
-  RenderSystem::getInstance().registerCommands(m_console);
+  RenderSystem::getInstance().registerCommands(m_console.get());
   ModelSystem::getInstance().init();
-  ModelSystem::getInstance().registerCommands(m_console);
+  ModelSystem::getInstance().registerCommands(m_console.get());
 //  CacheManager::getInstance().init();
 
   // Register StaticObject with CacheManager
@@ -301,32 +286,15 @@ bool System::init(int argc, char *argv[]) {
   }
   if (!success) {
     // TODO lots more cleaning up required!
-
-    m_client->shutdown();
-    delete m_client; m_client = NULL;
-
-    m_calendar->shutdown();
-    delete m_calendar; m_calendar = NULL;
-
-    m_action_handler->shutdown();
-    delete m_action_handler; m_action_handler = NULL;
-
-    m_script_engine->shutdown();
-    delete m_script_engine; m_script_engine = NULL;
-
-    delete m_editor; m_editor = NULL;
-
-    m_console->shutdown();
-    delete m_console; m_console = NULL;
-
-    delete m_workarea; m_workarea = NULL;
-    m_character->shutdown();
-    delete m_character; m_character = NULL;
-
-    if (m_sound) {
-      delete m_sound;
-      m_sound = NULL;
-    }
+    m_client.release();
+    m_calendar.release();
+    m_action_handler.release();
+    m_script_engine.release();
+    m_editor.release();
+    m_console.release();
+    m_workarea.release();
+    m_character.release();
+    m_sound.release();
 
     Bindings::shutdown();
 
@@ -346,7 +314,7 @@ bool System::init(int argc, char *argv[]) {
 
   m_workarea->init();
 
-  m_workarea->registerCommands(m_console);
+  m_workarea->registerCommands(m_console.get());
 
   m_system_running = true;
   m_initialised = true;
@@ -363,17 +331,11 @@ void System::shutdown() {
   // Save config
   writeConfig(m_general);
 
-  m_client->shutdown();
-  delete m_client;
-  m_client = NULL;
+  m_client.release();
   
-  m_character->shutdown();
-  delete m_character;
-  m_character = NULL;
+  m_character.release();
 
-  m_action_handler->shutdown();
-  delete m_action_handler;
-  m_action_handler = NULL;
+  m_action_handler.release();
 
 //  CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();
@@ -381,15 +343,11 @@ void System::shutdown() {
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
 
-  delete m_editor;
-  m_editor = NULL;
+  m_editor.release();
 
-  delete m_workarea;
-  m_workarea = NULL;
+  m_workarea.release();
 
-  m_calendar->shutdown();
-  delete m_calendar;
-  m_calendar = NULL;
+  m_calendar.release();
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileList shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
@@ -399,22 +357,13 @@ void System::shutdown() {
 
   Bindings::shutdown();
 
-  m_script_engine->shutdown();
-  delete m_script_engine;
-  m_script_engine = NULL;
+  m_script_engine.release();
 
-  delete m_file_handler;
-  m_file_handler = NULL;
+  m_file_handler.release();
 
-  m_console->shutdown();
-  delete m_console;
-  m_console = NULL;
+  m_console.release();
  
-  if (m_sound) {
-    m_sound->shutdown();
-    delete m_sound;
-    m_sound = NULL;
-  }
+  m_sound.release();
 
   // Explicity Tell sigc to disconnect signals
   notify_callbacks();
@@ -463,7 +412,7 @@ void System::mainLoop() {
       }
       // Update Calendar
       if (checkState(SYS_IN_WORLD)) {
-        m_calendar->update(m_client->getAvatar()->getWorldTime());
+        m_calendar->update();
       }
       // draw scene
       RenderSystem::getInstance().drawScene(false, m_elapsed);
@@ -481,8 +430,6 @@ void System::mainLoop() {
 }
 
 void System::handleEvents(const SDL_Event &event) {
-  assert(m_character != NULL);
-
   if (!m_console->consoleStatus()) {
     try {
       if (m_workarea->handleEvent(event)) {
@@ -678,7 +625,7 @@ void System::handleAnalogueControllers() {
 
 void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 {
-  assert (m_character != NULL);
+
   if (!m_axisBindings.count(axis)) return;
     
     if (debug) std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;

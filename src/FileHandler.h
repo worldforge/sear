@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.h,v 1.10 2005-03-15 17:55:05 simon Exp $
+// $Id: FileHandler.h,v 1.11 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -45,11 +45,11 @@ public:
   void runCommand(const std::string &command, const std::string &args);
   
   void setVariable(const std::string &var, const std::string &value) {
-    varMap[var] = value;
+    m_varMap[var] = value;
   }
 
   std::string getVariable(const std::string &var) {
-    return varMap[var];
+    return m_varMap[var];
   }
 
   void expandString(std::string &str);
@@ -71,12 +71,12 @@ public:
   bool mkdir(const std::string &dirname) const;
 
 protected:
-  FileList  _searchpaths;
+  FileList  m_searchpaths;
 
 private:
   
   typedef std::map<std::string, std::string> VarMap; 
-  VarMap varMap; 
+  VarMap m_varMap; 
 };
 
 } /* namespace Sear */

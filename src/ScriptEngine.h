@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ScriptEngine.h,v 1.4 2005-12-06 20:59:06 simon Exp $
+// $Id: ScriptEngine.h,v 1.5 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_SCRIPTENGINE_H
 #define SEAR_SCRIPTENGINE_H 1
@@ -21,6 +21,7 @@ public:
 
   void init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
  
   void runScript(const std::string &file_name);
   
@@ -28,8 +29,6 @@ public:
   void runCommand(const std::string &command, const std::string &args);
 
   std::string getFileDirectory() const { return m_file_dir; }
-//  bool prefixEnabled() const { return _prefix_enabled; }
-  
   
 private:  
   bool m_initialised;

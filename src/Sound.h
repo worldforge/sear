@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Sound.h,v 1.9 2005-06-13 15:10:46 simon Exp $
+// $Id: Sound.h,v 1.10 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_SOUND_H
 #define SEAR_SOUND_H 1
@@ -28,8 +28,7 @@ public:
   ~Sound();
   int init();
   void shutdown();
-  Mix_Chunk *getSample(const std::string &file_name);
-  Mix_Music *getMusic(const std::string &file_name);
+  bool isInitialised() const { return m_initialised; }
 
   void playSound(const std::string &);
   void playSoundLoop(const std::string &);
@@ -41,9 +40,13 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 private:
- std::map<std::string, Mix_Chunk*> sound_map;
-  std::map<std::string, Mix_Music*> music_map;
-  bool _initialised;
+
+  Mix_Chunk *getSample(const std::string &file_name);
+  Mix_Music *getMusic(const std::string &file_name);
+
+  std::map<std::string, Mix_Chunk*> m_sound_map;
+  std::map<std::string, Mix_Music*> m_music_map;
+  bool m_initialised;
 };
   
 } /* namespace Sear */

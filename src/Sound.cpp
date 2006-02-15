@@ -8,15 +8,9 @@
 #include <SDL/SDL.h>
 #include <unistd.h>
 
-// $Id: Sound.cpp,v 1.18 2006-01-28 15:35:48 simon Exp $
+// $Id: Sound.cpp,v 1.19 2006-02-15 12:44:24 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -33,15 +27,15 @@ namespace Sear {
   static const std::string ENABLE_SOUND = "enable_sound";
   
 Sound::Sound() :
-  _initialised(false)
+  m_initialised(false)
 {}
 
 Sound::~Sound() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
 }
 	
 int Sound::init() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
   if (SDL_InitSubSystem(SDL_INIT_AUDIO) != 0) {
     Log::writeLog(std::string("Error init SDL_AUDIO: ") + SDL_GetError(), Log::LOG_ERROR);
     return 1;
@@ -50,33 +44,34 @@ int Sound::init() {
     Log::writeLog(std::string("Error init SDL_mixer: ") + Mix_GetError(), Log::LOG_ERROR);
     return 1;
   }
-  _initialised = true;
+  m_initialised = true;
   return 0;
 }
 
 void Sound::shutdown() {
+  assert(m_initialised == true);
   Mix_CloseAudio();
-  while(!sound_map.empty()) {
-    Mix_Chunk *sample = (sound_map.begin())->second;
+  while(!m_sound_map.empty()) {
+    Mix_Chunk *sample = (m_sound_map.begin())->second;
     if (sample) Mix_FreeChunk(sample);
-    sound_map.erase(sound_map.begin());
+    m_sound_map.erase(m_sound_map.begin());
   }
-  while(!music_map.empty()) {
-    Mix_Music *music = (music_map.begin())->second;
+  while(!m_music_map.empty()) {
+    Mix_Music *music = (m_music_map.begin())->second;
     if (music) Mix_FreeMusic(music);
-    music_map.erase(music_map.begin());
+    m_music_map.erase(m_music_map.begin());
   }
   SDL_QuitSubSystem(SDL_INIT_AUDIO);
-  _initialised = false;
+  m_initialised = false;
 }
 
 Mix_Chunk *Sound::getSample(const std::string &file_name) {
   Mix_Chunk *sample = NULL;
-  sample = sound_map[file_name];
+  sample = m_sound_map[file_name];
   if (sample) return sample;
   sample=Mix_LoadWAV(file_name.c_str());
   if (sample) {
-    sound_map[file_name] = sample;
+    m_sound_map[file_name] = sample;
     return sample;
   }
   Log::writeLog(std::string("Mix_LoadWAV: ") + Mix_GetError(), Log::LOG_ERROR);
@@ -85,11 +80,11 @@ Mix_Chunk *Sound::getSample(const std::string &file_name) {
 
 Mix_Music *Sound::getMusic(const std::string &file_name) {
   Mix_Music *music = NULL;
-  music = music_map[file_name];
+  music = m_music_map[file_name];
   if (music) return music;
   music=Mix_LoadMUS(file_name.c_str());
   if (music) {
-    music_map[file_name] = music;
+    m_music_map[file_name] = music;
     return music;
   }
   Log::writeLog(std::string("Mix_LoadMUS: ") + Mix_GetError(), Log::LOG_ERROR);

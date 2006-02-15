@@ -2,15 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.76 2006-01-28 15:35:48 simon Exp $
+// $Id: client.cpp,v 1.77 2006-02-15 12:44:24 simon Exp $
 
 #include "System.h"
 
-#include <sigc++/object.h>
-#include <sigc++/slot.h>
 #include <sigc++/object_slot.h>
-#include <sigc++/bind.h>
-
 
 #include <Atlas/Objects/Entity.h>
 
@@ -19,10 +15,7 @@
 #include <Eris/DeleteLater.h>
 #include <Eris/Log.h>
 #include <Eris/Entity.h>
-#include <Eris/Person.h>
 #include <Eris/PollDefault.h>
-#include <Eris/Metaserver.h>
-#include <Eris/ServerInfo.h>
 #include <Eris/Exceptions.h>
 #include <Eris/View.h>
 #include <Eris/Types.h>
@@ -34,16 +27,7 @@
 #include "Console.h"
 #include "Factory.h"
 #include "Character.h"
-#include "renderers/Render.h"
-#include "loaders/Model.h"
-#include "loaders/ObjectHandler.h"
-#include "loaders/ObjectRecord.h"
-#include "WorldEntity.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
+#include "Calendar.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -60,6 +44,20 @@
 
 namespace Sear {
 
+
+//  Small class to pass a smart pointer to Eris::deleteLater
+template<class T>
+class DelLater {
+public:
+  DelLater(const SPtr<T> &s) :
+    ptr(s){
+  }
+  ~DelLater() {
+  }
+private:
+  SPtr<T> ptr;
+};
+
 static const int DEFAULT_PORT = 6767;
 
 // Console Command strings
@@ -71,9 +69,6 @@ static const std::string ACCOUNT_LOGOUT = "logout";
 static const std::string CHARACTER_LIST = "get";
 static const std::string CHARACTER_CREATE = "add";
 static const std::string CHARACTER_TAKE = "take";
-static const std::string GET_SERVERS = "get_servers";
-static const std::string STOP_SERVERS = "stop_servers";
-
 
 // Config items
 static const std::string SECTION_CONNECTION = "connection";
@@ -86,10 +81,6 @@ static const std::string KEY_LOGLEVEL = "loglevel";
 */
 Client::Client(System *system, const std::string &client_name) :
   m_system(system),
-  m_connection(NULL),
-  m_account(NULL),
-  m_avatar(NULL),
-  m_factory(NULL),
   m_status(CLIENT_STATUS_DISCONNECTED),
   m_client_name(client_name),
   m_initialised(false),
@@ -118,20 +109,12 @@ bool Client::init() {
 void Client::shutdown() {
   assert(m_initialised == true);
 
-  if (m_account) {
-    delete m_account;
-    m_account = NULL;
-  }
+  notify_callbacks();
 
-  if (m_connection) {
-    delete m_connection;
-    m_connection = NULL;
-  }
+  m_account.release();
+//  m_avatar.release();
+  m_connection.release();
 
-//  if (m_factory) {
-//    delete m_factory;
-//    m_factory = NULL;
-//  }
 
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
@@ -159,10 +142,10 @@ int Client::connect(const std::string &host, int port) {
 
   if (debug) printf("Connecting to %s on port %d\n",  host.c_str(), port);
 
-  assert(m_connection == NULL);
+  assert(m_connection.get() == NULL);
 
   // Create new eris connection object
-  m_connection = new Eris::Connection(m_client_name, host, port, DEBUG_ERIS);
+  m_connection = SPtr<Eris::Connection>(new Eris::Connection(m_client_name, host, port, DEBUG_ERIS));
 
   // Set up connection callbacks
   m_connection->Failure.connect(SigC::slot(*this, &Client::NetFailure));
@@ -178,8 +161,7 @@ int Client::connect(const std::string &host, int port) {
     fprintf(stderr, "Error: Connection Error\n");
     m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
     setStatus( CLIENT_STATUS_DISCONNECTED);
-    delete m_connection;
-    m_connection = NULL;
+    m_connection.release();
     return 1;
   }
 
@@ -206,8 +188,7 @@ int Client::disconnect() {
     setStatus(CLIENT_STATUS_CONNECTED);
     fprintf(stderr, "Error: Disconnect Error\n");
     m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
-    delete m_connection;
-    m_connection = NULL;
+    m_connection.release();
     setStatus(CLIENT_STATUS_DISCONNECTED);
     return 1;
   }
@@ -248,8 +229,8 @@ int Client::createAccount(const std::string &username, const std::string &fullna
 
   if (debug) printf("Client::createAccount: Creating player\n");
   // m_account will still be around if previous attempts have failed
-  if (m_account == NULL) {
-    m_account = new Eris::Account(m_connection);
+  if (m_account.get() == NULL) {
+    m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
     // Setup callbacks
     m_account->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
     m_account->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
@@ -276,8 +257,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_CONNECTED);
       // Clean up object just to be safe
-      delete m_account;
-      m_account = NULL;
+      m_account.release();
       return 1;
       break;
   }
@@ -300,7 +280,7 @@ int Client::login(const std::string &username, const std::string &password) {
     }
     return 1;
   }
-  assert(m_connection != NULL);
+  assert(m_connection.get() != NULL);
   assert(m_connection->isConnected() == true);
 
   if (username.empty()) {
@@ -314,8 +294,8 @@ int Client::login(const std::string &username, const std::string &password) {
 
   if (debug) printf("Client::login: Creating player\n");
   
-  if (m_account == NULL) {
-    m_account = new Eris::Account(m_connection);
+  if (m_account.get() == NULL) {
+    m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
     // setup player callbacks
     m_account->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
     m_account->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
@@ -342,8 +322,7 @@ int Client::login(const std::string &username, const std::string &password) {
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_CONNECTED);
       // Clean up object just to be safe
-      delete m_account;
-      m_account = NULL;
+      m_account.release();
       return 1;
       break;
   }
@@ -370,12 +349,10 @@ void Client::NetFailure(const std::string &msg)  {
   m_system->pushMessage("Network Failure: " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
-  if (m_account) {
-    delete m_account;
-    m_account = NULL;
-  }
-  Eris::deleteLater(m_connection);
-  m_connection = NULL;
+  m_account.release();
+
+  Eris::deleteLater(new DelLater<Eris::Connection >(m_connection));
+  m_connection.release();
 
 }
 
@@ -383,7 +360,6 @@ void Client::NetConnected() {
   if (debug) printf("Client:NetConnected\n");
   m_system->pushMessage(CLIENT_CONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
-
 }
 
 void Client::NetDisconnected() {
@@ -391,12 +367,10 @@ void Client::NetDisconnected() {
   m_system->pushMessage(CLIENT_DISCONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
-  if (m_account) {
-    delete m_account;
-    m_account = NULL;
-  }
-  Eris::deleteLater(m_connection);
-  m_connection = NULL;
+  m_account.release();
+
+  Eris::deleteLater(new DelLater<Eris::Connection>(m_connection));
+  m_connection.release();
 }
 
 bool Client::NetDisconnecting() {
@@ -424,9 +398,9 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
     return 1;
   }
 
-  assert(m_connection != NULL);
+  assert(m_connection.get() != NULL);
   assert(m_connection->isConnected() == true);
-  assert(m_account != NULL);
+  assert(m_account.get() != NULL);
 
   if (name.empty()) {
     m_system->pushMessage("Error: No character name specified", CONSOLE_MESSAGE);
@@ -491,9 +465,9 @@ int Client::takeCharacter(const std::string &id) {
      return 1;
   }
 
-  assert(m_connection != NULL);
+  assert(m_connection.get() != NULL);
   assert(m_connection->isConnected() == true);
-  assert (m_account != NULL);
+  assert (m_account.get() != NULL);
 
   if (id.empty()) {
     m_takeFirst = true;
@@ -541,7 +515,7 @@ int Client::logout() {
   assert ((m_initialised == true) && "Client not initialised");
   if (debug) printf("Client::logout\n");
 
-  if (m_account == NULL) {
+  if (m_account.get() == NULL) {
     m_system->pushMessage("Error: Not logged in", CONSOLE_MESSAGE);
     return 1;
   }
@@ -568,7 +542,7 @@ int Client::getCharacters() {
 std::string Client::getStatus() {
   assert ((m_initialised == true) && "Client not initialised");
   printf("Client::getStatus\n");
-  if (m_connection == NULL) return "No Connection object";
+  if (m_connection.get() == NULL) return "No Connection object";
   switch (m_connection->getStatus()) {
     case 0: return "INVALID_STATUS";
     case 1: return "NEGOTIATE";
@@ -601,8 +575,8 @@ void Client::LogoutComplete(bool clean_logout) {
   m_system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
 
-  Eris::deleteLater(m_account);
-  m_account = NULL;
+  Eris::deleteLater(new DelLater<Eris::Account>(m_account));
+  m_account.release();
 }
 
 void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
@@ -633,8 +607,6 @@ void Client::registerCommands(Console *console) {
   console->registerCommand(CHARACTER_LIST, this);
   console->registerCommand(CHARACTER_CREATE, this);
   console->registerCommand(CHARACTER_TAKE, this);
-  console->registerCommand(GET_SERVERS, this);
-  console->registerCommand(STOP_SERVERS, this);
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
@@ -700,6 +672,7 @@ void Client::AvatarFailure(const std::string &msg) {
   m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_LOGGED_IN);
   m_system->getCharacter()->setAvatar(NULL);
+  m_system->getCalendar()->setAvatar(NULL);
   m_system->getActionHandler()->handleAction("avatar_failed", 0);
 }
 
@@ -708,6 +681,7 @@ void Client::GotCharacterEntity(Eris::Entity *e) {
   assert(m_avatar != NULL);
 
   m_system->getCharacter()->setAvatar(m_avatar);
+  m_system->getCalendar()->setAvatar(m_avatar);
   setStatus(CLIENT_STATUS_IN_WORLD);
 }
 
@@ -725,6 +699,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_IN_WORLD, false);
       m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
+      m_system->getCalendar()->setAvatar(NULL);
       break;
     case CLIENT_STATUS_CONNECTED:
     case CLIENT_STATUS_LOGGING_IN:
@@ -734,6 +709,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_IN_WORLD, false);
       m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
+      m_system->getCalendar()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("connected", 0);
       break;
     case CLIENT_STATUS_LOGGED_IN:
@@ -744,6 +720,7 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_IN_WORLD, false);
       m_avatar = NULL;
       m_system->getCharacter()->setAvatar(NULL);
+      m_system->getCalendar()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("logged_in", 0);
       break;
     case CLIENT_STATUS_IN_WORLD:

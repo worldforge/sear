@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.37 2006-02-07 18:45:34 simon Exp $
+// $Id: Character.h,v 1.38 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -57,6 +57,7 @@ public:
    * Shutdown character object
    */
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   void moveForward(float);
   void moveUpward(float);

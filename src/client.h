@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.23 2005-12-15 00:17:14 alriddoch Exp $
+// $Id: client.h,v 1.24 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -15,7 +15,9 @@
 #include <Atlas/Message/DecoderBase.h>
 #include "interfaces/ConsoleObject.h"
 
-#include <sigc++/object.h>
+#include <sigc++/trackable.h>
+
+#include "common/SPtr.h"
 
 namespace varconf {
 class Config;
@@ -67,7 +69,7 @@ class Factory;
 class Console;
 class System;
 
-class Client : public SigC::Object, public ConsoleObject {
+class Client : public sigc::trackable, public ConsoleObject {
 
 public:
   Client(System *system, const std::string &client_name);
@@ -75,6 +77,7 @@ public:
 
   bool init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
   
   int connect(const std::string &, int port = 6767);
   int disconnect();
@@ -93,9 +96,9 @@ public:
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
  
-  Eris::Account    *getAccount() const { return m_account; }
+  Eris::Account    *getAccount() { return m_account.get(); }
+  Eris::Connection *getConnection() { return m_connection.get(); }
   Eris::Avatar     *getAvatar() const { return m_avatar; }
-  Eris::Connection *getConnection() const { return m_connection;  }
 
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config) const;
@@ -127,12 +130,11 @@ protected:
 
   System *m_system;
 
-  Eris::Connection *m_connection;
-  Eris::Account    *m_account;
-  Eris::Avatar     *m_avatar;
+  SPtr<Eris::Connection> m_connection;
+  SPtr<Eris::Account>    m_account;
 
-  Factory *m_factory;
-  
+  Eris::Avatar *m_avatar;
+
   int m_status;
   std::string m_client_name;
   bool m_initialised;

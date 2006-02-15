@@ -1,5 +1,31 @@
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/System.cpp, src/System.h: Use SPtr for instantated Objects. 
+	  Re-allow Sound object to be created.
+
+	* src/Calendar.cpp, src/Calendar.h, src/System.cpp, src/client.cpp: Use
+	  Eris::Calendar. Remove old /set_XXX commands. Remove Day/Month names.
+	  Update no longer takes the cuurent time as it gets it from the
+	  eris::calendar object. Calendar is initialised when the avatar
+	  becomes available in client::gotCharacter callback.
+
+	* src/ActionHandler.cpp, src/ActionHander.h: Use SPtr to store 
+	  ActionStructs.
+
+	* src/client.cpp, src/client.h: Remove unused headers. Make 
+	  Eris::Connection and Eris::Account into a sptr. Create small class 
+	  for use with eris::deleteLater
+
+	* src/Console.cpp, src/Console.h, src/FileHandler.cpp,
+	  src/Filehandler.h, src/Sound.cpp, src/Sound.h: Make all member vars
+	  begin with m_.
+
+	* src/ActionHandler.h, src/Character.h, src/Console.h, src/Sound.h,
+	  src/ScriptEngine.h, src/Calendar.h:: Add isInitialised method for use
+	  with SPtrShutDown.
+
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* common/SPtr.h: Use 0 instead of NULL. Make release() public for 
 	  explicit resource de-allocation. Fix NULL pointer error on get().
 

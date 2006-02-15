@@ -2,12 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.10 2006-02-07 18:45:34 simon Exp $
+// $Id: ActionHandler.h,v 1.11 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
-
-#include "System.h"
 
 #include <map>
 #include <string>
@@ -15,6 +13,8 @@
 #include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
+#include "common/SPtr.h"
+#include "System.h"
 
 // Forward declaration
 namespace varconf {
@@ -34,6 +34,7 @@ public:
 
   void init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   void loadConfiguration(const std::string &filename);
   
@@ -53,7 +54,7 @@ private:
     bool entity_based;
   } ActionStruct;
  
-  typedef std::multimap<std::string, ActionStruct*> ActionMap; 
+  typedef std::multimap<std::string, SPtr<ActionStruct> > ActionMap; 
   ActionMap action_map;
 
   System *m_system;

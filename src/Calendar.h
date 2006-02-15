@@ -2,18 +2,24 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.h,v 1.10 2006-01-29 13:03:56 simon Exp $
+// $Id: Calendar.h,v 1.11 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
 
 #include <string>
 
-#include <sigc++/object_slot.h>
-#include <sigc++/connection.h>
+#include <sigc++/trackable.h>
+
 #include <varconf/Config.h>
+
 #include "interfaces/ConsoleObject.h"
-#include <wfmath/timestamp.h>
+#include "common/SPtr.h"
+
+namespace Eris {
+  class Avatar;
+  class Calendar;
+}
 
 /**
  * Sear namespace
@@ -25,9 +31,8 @@ class Console;
 
 /**
  * This class regulates the client-side game time.
- * \todo Link this with server time
  */ 
-class Calendar : public SigC::Object, public ConsoleObject {
+class Calendar : public sigc::trackable, public ConsoleObject {
 public:
   // List of time areas
   typedef enum {
@@ -57,12 +62,13 @@ public:
    *  Shutdown Calendar
    */  
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   /**
    * Update calendar to server_time seconds.
    * @param server_time The current time from the server
    */
-  void update(double server_time);
+  void update();
 
   /**
    * Read Calendar config data
@@ -114,16 +120,10 @@ public:
   int getHoursPerDay() const { return m_hours_per_day; }
   
   /**
-   * Returns number of days per week
-   * @return Days per week
+   * Returns number of days per month
+   * @return Days per month
    */ 
-  int getDaysPerWeek() const { return m_days_per_week; }
-  
-  /**
-   * Returns number of weeks per month
-   * @return Weeks per month
-   */
-  int getWeeksPerMonth() const { return m_weeks_per_month; }
+  int getDaysPerMonth() const { return m_days_per_month; }
   
   /**
    * Returns number of months per year
@@ -154,12 +154,6 @@ public:
    * @return Current days
    */ 
   int getDays() const { return m_days; }
-  
-  /**
-   * Return weeks
-   * @return Current weeks
-   */ 
-  int getWeeks() const { return m_weeks; }
   
   /**
    * Return months
@@ -209,28 +203,17 @@ public:
    */ 
   double getTimeInArea() const { return m_time_in_area; }
   
-  /**
-   * Return name of day
-   * @return Day name
-   */
-  std::string getDayName() const { return m_current_day_name; }
-  
-  /**
-   * Return name of month
-   * @return Month name
-   */
-  std::string getMonthName() const { return m_current_month_name; }  
-
   void reset() { m_firstUpdate = true; }
   
+  void setAvatar(Eris::Avatar *avatar);
+
 private:
   bool m_initialised; ///< Calendar initialisation state
   
   int m_seconds_per_minute; ///< Number of seconds in a minute
   int m_minutes_per_hour;   ///< Number of minutes in an hour
   int m_hours_per_day;      ///< Number of hours in a day
-  int m_days_per_week;      ///< Number of days in a week
-  int m_weeks_per_month;    ///< Number of weeks in a month
+  int m_days_per_month;      ///< Number of days in a month
   int m_months_per_year;    //</ Number of months in a year
 
   // Current time and date values
@@ -240,7 +223,6 @@ private:
   int m_minutes; ///< Current minutes
   int m_hours; ///< Current hour
   int m_days; ///< Current day
-  int m_weeks; ///< Current week
   int m_months; ///< Current month
   int m_years; ///< Current years
   
@@ -252,20 +234,9 @@ private:
 
   double m_time_in_area; ///< Time duration in current time area
   
-  /**
-   * Mapping between number and name
-   */  
-  typedef std::map<int, std::string> NameMap;
-  
-  NameMap m_day_names;   ///< Mapping for day names
-  NameMap m_month_names; ///< Mapping for month names
-
-  std::string m_current_day_name;   ///< Name of current day
-  std::string m_current_month_name; ///< Name of current month
-
-  SigC::Connection m_config_connection; ///< Connection object for signal
-  
   bool m_firstUpdate;
+
+  SPtr<Eris::Calendar> m_cal;
 };
 	
 } /* namespace Sear */

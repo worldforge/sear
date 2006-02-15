@@ -2,11 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.21 2006-01-29 13:03:56 simon Exp $
+// $Id: Calendar.cpp,v 1.22 2006-02-15 12:44:24 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
 
+#include <sigc++/object_slot.h>
+
+#include <Eris/Calendar.h>
 
 #include "Calendar.h"
 #include "common/Utility.h"
@@ -14,11 +17,6 @@
 #include "src/ActionHandler.h"
 #include "src/Console.h"
 #include "src/System.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -33,26 +31,12 @@ static const std::string CALENDER = "calendar";
 static const std::string KEY_SECONDS_PER_MINUTE = "seconds_per_minute";
 static const std::string KEY_MINUTES_PER_HOUR = "minutes_per_hour";
 static const std::string KEY_HOURS_PER_DAY = "hours_per_day";
-static const std::string KEY_DAYS_PER_WEEK = "days_per_week";
-static const std::string KEY_WEEKS_PER_MONTH = "weeks_per_month";
 static const std::string KEY_MONTHS_PER_YEAR = "months_per_year";
 
 static const std::string KEY_DAWN_START = "dawn_starts";
 static const std::string KEY_DAY_START = "day_starts";
 static const std::string KEY_DUSK_START = "dusk_starts";
 static const std::string KEY_NIGHT_START = "night_starts";
-
-// Config Key prefix's for day and month names
-static const std::string KEY_DAY_NAME = "day_name_";
-static const std::string KEY_MONTH_NAME = "month_name_";
-
-// Default config values
-static const int DEFAULT_SECONDS_PER_MINUTE = 20;
-static const int DEFAULT_MINUTES_PER_HOUR = 60;
-static const int DEFAULT_HOURS_PER_DAY = 24;
-static const int DEFAULT_DAYS_PER_WEEK = 7;
-static const int DEFAULT_WEEKS_PER_MONTH = 4;
-static const int DEFAULT_MONTHS_PER_YEAR = 12;
 
 static const int DEFAULT_DAWN_START = 6;
 static const int DEFAULT_DAY_START = 9;
@@ -65,7 +49,6 @@ static const std::string SET_SECONDS = "set_seconds";
 static const std::string SET_MINUTES = "set_minutes";
 static const std::string SET_HOURS = "set_hours";
 static const std::string SET_DAYS = "set_days";
-static const std::string SET_WEEKS = "set_weeks";
 static const std::string SET_MONTHS = "set_months";
 static const std::string SET_YEARS =  "set_years";
 
@@ -79,17 +62,15 @@ namespace Sear {
 
 Calendar::Calendar() :
   m_initialised(false),
-  m_seconds_per_minute(DEFAULT_SECONDS_PER_MINUTE),
-  m_minutes_per_hour(DEFAULT_MINUTES_PER_HOUR),
-  m_hours_per_day(DEFAULT_HOURS_PER_DAY),
-  m_days_per_week(DEFAULT_DAYS_PER_WEEK),
-  m_weeks_per_month(DEFAULT_WEEKS_PER_MONTH),
-  m_months_per_year(DEFAULT_MONTHS_PER_YEAR),
+  m_seconds_per_minute(1),
+  m_minutes_per_hour(1),
+  m_hours_per_day(1),
+  m_days_per_month(1),
+  m_months_per_year(1),
   m_server_seconds(0.0),
   m_minutes(0),
   m_hours(0), // Default start time is midnight
   m_days(0),
-  m_weeks(0),
   m_months(0),
   m_years(0),
   m_time_area(DAY),
@@ -108,7 +89,7 @@ Calendar::~Calendar() {
 void Calendar::init() {
   assert(m_initialised == false);
   // Bind signal to config for further updates
-  m_config_connection = System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
+  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Calendar::config_update));
 
   // Reset calendar on enter world. 
   System::instance()->EnteredWorld.connect(SigC::slot(*this, &Calendar::reset));
@@ -118,73 +99,65 @@ void Calendar::init() {
 
 void Calendar::shutdown() {
   assert(m_initialised == true);
-  // Remove update signal
-  m_config_connection.disconnect();
+
+  m_cal.release();
+ 
+  // Explicity Tell sigc to disconnect signals
+  notify_callbacks();
+
   m_initialised = false;
 }
 
-void Calendar::update(double server_time) {
+void Calendar::setAvatar(Eris::Avatar *avatar)  {
+  assert(m_initialised == true);
+
+  if (avatar) {
+    m_cal = SPtr<Eris::Calendar>(new Eris::Calendar(avatar));
+
+    m_seconds_per_minute = m_cal->secondsPerMinute();
+    m_minutes_per_hour   = m_cal->minutesPerHour();
+    m_hours_per_day      = m_cal->hoursPerDay();
+    m_days_per_month     = m_cal->daysPerMonth();
+    m_months_per_year    = m_cal->monthsPerYear();
+  } else {
+    m_cal = SPtr<Eris::Calendar>();
+  }
+  reset();
+}
+
+void Calendar::update() {
   assert ((m_initialised == true) && "Calender not initialised");
 
-  double time_elapsed = server_time - m_server_seconds;
-  m_server_seconds = server_time;
+//  if (!m_cal) return;
+
+  Eris::DateTime dt = m_cal->now();
+
+//  assert(dt.valid());
+  if (dt.valid() == false) return;
+
+  m_server_seconds = m_seconds;
+
+  m_seconds = dt.seconds();
+  m_minutes = dt.minutes();
+  m_hours   = dt.hours();
+  m_days    = dt.dayOfMonth();
+  m_years   = dt.year();
+/*
+  // Need to update each time as initially there *could* be no 
+  m_seconds_per_minute = m_cal->secondsPerMinute();
+  m_minutes_per_hour   = m_cal->minutesPerHour();
+  m_hours_per_day      = m_cal->hoursPerDay();
+  m_days_per_month     = m_cal->daysPerMonth();
+  m_months_per_year    = m_cal->monthsPerYear();
+*/
+  double time_elapsed = m_seconds - m_server_seconds;
 
   if (m_firstUpdate) {
     // initial update
-    m_seconds = m_server_seconds;
-    m_seconds_counter = m_seconds;
     time_elapsed = 0.0;
     m_firstUpdate = false;
-  } else {
-    // incremental update
-    m_seconds += time_elapsed;
-    m_seconds_counter += time_elapsed;
   }
 
-  // Check for seconds overflow  
-  while (m_seconds >= m_seconds_per_minute) {
-    ++m_minutes;
-    m_seconds -= m_seconds_per_minute;
-  } 
-  // Check for minutes overflow
-  while (m_minutes >= m_minutes_per_hour) {
-    ++m_hours;
-    m_minutes -= m_minutes_per_hour;
-  }
-  
-  // Check for hours overflow
-  while (m_hours >= m_hours_per_day) {
-    ++m_days;
-    // Update day name
-    m_current_day_name = m_day_names[m_days];
-    m_hours -= m_hours_per_day;
-  }
-  // Check our seconds in day counter is ok
-  int sec_per_day = m_seconds_per_minute * m_minutes_per_hour * m_hours_per_day;
-  while (m_seconds_counter >= sec_per_day) {
-    m_seconds_counter -= sec_per_day;
-  }
-  // Check for days overflow
-  while (m_days >= m_days_per_week) {
-    ++m_weeks;
-    m_days -= m_days_per_week;
-    // Update day name
-    m_current_day_name = m_day_names[m_days];
-  }
-  // Check for weeks overflow
-  while (m_weeks >= m_weeks_per_month) {
-    ++m_months;
-    // Update month name
-    m_current_month_name = m_month_names[m_months];
-    m_weeks -= m_weeks_per_month;
-  }
-  // Check for months overflow
-  while (m_months >= m_months_per_year) {
-    ++m_years;
-    m_months -= m_months_per_year;
-    // Update month name
-    m_current_month_name = m_month_names[m_months];
-  }
   // Update Time Area
   TimeArea ta = m_time_area; // Store current time area
   // Set new time area
@@ -193,6 +166,10 @@ void Calendar::update(double server_time) {
   else if (m_hours < m_dusk_start) m_time_area = DAY;
   else if (m_hours < m_night_start) m_time_area = DUSK;
   else if (m_hours < m_hours_per_day) m_time_area = NIGHT;
+
+  float cur_seconds = m_hours * m_minutes_per_hour * m_seconds_per_minute;
+  cur_seconds += m_minutes * m_seconds_per_minute;
+  cur_seconds += m_seconds;
 
   if (ta != m_time_area) {
     int time_1 = 0;
@@ -203,7 +180,8 @@ void Calendar::update(double server_time) {
       case DAY: time_1 = m_day_start; break;
       case DUSK: time_1 = m_dusk_start; break;
     }
-    m_time_in_area = m_seconds_counter - (time_1 * m_seconds_per_minute * m_minutes_per_hour);
+    // Assuming that it will be less than a minute between updates
+    m_time_in_area = m_seconds;
 
     // Emit an action event
     ActionHandler *action_handler = System::instance()->getActionHandler();
@@ -222,43 +200,6 @@ void Calendar::update(double server_time) {
 
 void Calendar::readConfig(varconf::Config &config) {
   varconf::Variable temp;
-
-  if (config.findItem(CALENDER, KEY_SECONDS_PER_MINUTE)) {
-    temp = config.getItem(CALENDER, KEY_SECONDS_PER_MINUTE);
-    m_seconds_per_minute = (!temp.is_int()) ? (DEFAULT_SECONDS_PER_MINUTE) : ((int)temp);
-  } else {
-    m_seconds_per_minute = DEFAULT_SECONDS_PER_MINUTE;
-  }
-  if (config.findItem(CALENDER, KEY_MINUTES_PER_HOUR)) {
-    temp = config.getItem(CALENDER, KEY_MINUTES_PER_HOUR);
-    m_minutes_per_hour = (!temp.is_int()) ? (DEFAULT_MINUTES_PER_HOUR) : ((int)temp);
-  } else {
-    m_minutes_per_hour = DEFAULT_MINUTES_PER_HOUR;
-  }
-  if (config.findItem(CALENDER, KEY_HOURS_PER_DAY)) {
-    temp = config.getItem(CALENDER, KEY_HOURS_PER_DAY);
-    m_hours_per_day = (!temp.is_int()) ? (DEFAULT_HOURS_PER_DAY) : ((int)temp);
-  } else {
-    m_hours_per_day = DEFAULT_HOURS_PER_DAY;
-  }
-  if (config.findItem(CALENDER, KEY_DAYS_PER_WEEK)) {
-    temp = config.getItem(CALENDER, KEY_DAYS_PER_WEEK);
-    m_days_per_week = (!temp.is_int()) ? (DEFAULT_DAYS_PER_WEEK) : ((int)temp);
-  } else {
-    m_days_per_week = DEFAULT_DAYS_PER_WEEK;
-  }
-  if (config.findItem(CALENDER, KEY_WEEKS_PER_MONTH)) {
-    temp = config.getItem(CALENDER, KEY_WEEKS_PER_MONTH);
-    m_weeks_per_month = (!temp.is_int()) ? (DEFAULT_WEEKS_PER_MONTH) : ((int)temp);
-  } else {
-    m_weeks_per_month = DEFAULT_WEEKS_PER_MONTH;
-  }
-  if (config.findItem(CALENDER, KEY_MONTHS_PER_YEAR)) {
-    temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
-    m_months_per_year = (!temp.is_int()) ? (DEFAULT_MONTHS_PER_YEAR) : ((int)temp);
-  } else {
-    m_months_per_year = DEFAULT_MONTHS_PER_YEAR;
-  }
 
   if (config.findItem(CALENDER, KEY_DAWN_START)) {
     temp = config.getItem(CALENDER, KEY_DAWN_START);
@@ -284,86 +225,22 @@ void Calendar::readConfig(varconf::Config &config) {
   } else {
     m_night_start = DEFAULT_NIGHT_START;
   }
-  
-  for (int i = 0; i < m_days_per_week; ++i) {
-    std::string key = KEY_DAY_NAME + string_fmt(i);
-    if (config.findItem(CALENDER, key)) {
-      temp = config.getItem(CALENDER, key);
-      m_day_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
-    } else {
-      m_day_names[i] = key;
-    }
-  }
-  
-  for (int i = 0; i < m_months_per_year; ++i) {
-    std::string key = KEY_MONTH_NAME + string_fmt(i);
-    if (config.findItem(CALENDER, key)) {
-      temp = config.getItem(CALENDER, key);
-      m_month_names[i] = (!temp.is_string()) ? (key) : ((std::string)temp);
-    } else {
-      m_month_names[i] = key;
-    }
-  }
-  m_current_day_name = m_day_names[m_days];
-  m_current_month_name = m_month_names[m_months];
 }
 
 void Calendar::writeConfig(varconf::Config &config) {
   assert ((m_initialised == true) && "Calender not initialised");
 
-  config.setItem(CALENDER, KEY_SECONDS_PER_MINUTE, (int)m_seconds_per_minute);
-  config.setItem(CALENDER, KEY_MINUTES_PER_HOUR, (int)m_minutes_per_hour);
-  config.setItem(CALENDER, KEY_HOURS_PER_DAY, (int)m_hours_per_day);
-  config.setItem(CALENDER, KEY_DAYS_PER_WEEK, (int)m_days_per_week);
-  config.setItem(CALENDER, KEY_WEEKS_PER_MONTH, (int)m_weeks_per_month);
-  config.setItem(CALENDER, KEY_MONTHS_PER_YEAR, (int)m_months_per_year);
-
   config.setItem(CALENDER, KEY_DAWN_START, (int)m_dawn_start);
   config.setItem(CALENDER, KEY_DAY_START, (int)m_day_start);
   config.setItem(CALENDER, KEY_DUSK_START, (int)m_dusk_start);
   config.setItem(CALENDER, KEY_NIGHT_START, (int)m_night_start);
-  
-  for (int i = 0; i < m_days_per_week; ++i) {
-    std::string key = KEY_DAY_NAME + string_fmt(i);
-    config.setItem(CALENDER, key, m_day_names[i]);
-  }
-  
-  for (int i = 0; i < m_months_per_year; ++i) {
-    std::string key = KEY_MONTH_NAME + string_fmt(i);
-    config.setItem(CALENDER, key, m_month_names[i]);
-  }
-
 }
 
 void Calendar::config_update(const std::string &section, const std::string &key, varconf::Config &config) {
   assert ((m_initialised == true) && "Calender not initialised");
   if (section == CALENDER) {
     varconf::Variable temp;
-    if (key == KEY_SECONDS_PER_MINUTE) {
-      temp = config.getItem(CALENDER, KEY_SECONDS_PER_MINUTE);
-      if (temp.is_int()) m_seconds_per_minute = ((int)temp);
-    }
-    else if (key == KEY_MINUTES_PER_HOUR) {
-      temp = config.getItem(CALENDER, KEY_MINUTES_PER_HOUR);
-      if (temp.is_int()) m_minutes_per_hour = ((int)temp);
-    }
-    else if (key == KEY_HOURS_PER_DAY) {
-      temp = config.getItem(CALENDER, KEY_HOURS_PER_DAY);
-      if (temp.is_int()) m_hours_per_day = ((int)temp);
-    }
-    else if (key == KEY_DAYS_PER_WEEK) {
-      temp = config.getItem(CALENDER, KEY_DAYS_PER_WEEK);
-      if (temp.is_int()) m_days_per_week = ((int)temp);
-    }
-    else if (key == KEY_WEEKS_PER_MONTH) {
-      temp = config.getItem(CALENDER, KEY_WEEKS_PER_MONTH);
-      if (temp.is_int()) m_weeks_per_month = ((int)temp);
-    }
-    else if (key == KEY_MONTHS_PER_YEAR) {
-      temp = config.getItem(CALENDER, KEY_MONTHS_PER_YEAR);
-      if (temp.is_int()) m_months_per_year = ((int)temp);
-    }
-    else if (key == KEY_DAWN_START) {
+    if (key == KEY_DAWN_START) {
       temp = config.getItem(CALENDER, KEY_DAWN_START);
       if (temp.is_int()) m_dawn_start = ((int)temp);
     }
@@ -380,79 +257,23 @@ void Calendar::config_update(const std::string &section, const std::string &key,
       if (temp.is_int()) m_night_start = ((int)temp);
     }
 
-    else if (key.substr(0, KEY_DAY_NAME.length()) == KEY_DAY_NAME) {
-      temp = config.getItem(CALENDER, key);
-      int index;
-      cast_stream(key.substr(KEY_DAY_NAME.length()), index);
-      if (temp.is_string()) m_day_names[index] = ((std::string)temp);
-    }
-     else if (key.substr(0, KEY_MONTH_NAME.length()) == KEY_MONTH_NAME) {
-      temp = config.getItem(CALENDER, key);
-      int index;
-      cast_stream(key.substr(KEY_MONTH_NAME.length()), index);
-      if (temp.is_string()) m_month_names[index] = ((std::string)temp);
-    }
   }
-  m_current_day_name = m_day_names[m_days];
-  m_current_month_name = m_month_names[m_months];
 }
  
 void Calendar::registerCommands(Console *console) {
   assert ((m_initialised == true) && "Calender not initialised");
   assert ((console != NULL) && "Console is NULL");
+
   console->registerCommand(GET_TIME, this);
-  console->registerCommand(SET_SECONDS, this);
-  console->registerCommand(SET_MINUTES, this);
-  console->registerCommand(SET_HOURS, this);
-  console->registerCommand(SET_DAYS, this);
-  console->registerCommand(SET_WEEKS, this);
-  console->registerCommand(SET_MONTHS, this);
-  console->registerCommand(SET_YEARS, this);
 }
 
 void Calendar::runCommand(const std::string &command, const std::string &args) {
   assert ((m_initialised == true) && "Calender not initialised");
   if (command == GET_TIME) {
-    std::string message = string_fmt(m_hours) + ":" + string_fmt(m_minutes) + ":" + string_fmt((int)m_seconds) + " " + getDayName() + " " + string_fmt(m_days + m_weeks * m_days_per_week + 1) + " of " + getMonthName() + " " + string_fmt(m_years);
+    const char fmt[] = "%02d:%02d:%02d %04d-%02d-%02d";
+    char message[19]; // HH:MM:SS YYYY:MM:DD
+    snprintf(message, 19, fmt, m_hours, m_minutes, (int)m_seconds, m_years, m_months, m_days);
     System::instance()->pushMessage(message, 0x1);
-  }
-  else if (command == SET_SECONDS) {
-    cast_stream(args, m_seconds);
-    // Calculate new seconds_counter value
-    m_seconds_counter = (m_minutes_per_hour * m_hours + m_minutes) * m_seconds_per_minute + m_seconds;
-    // Force update of time area
-    m_time_area = INVALID;
-    
-  }
-  else if (command == SET_MINUTES) {
-    cast_stream(args, m_minutes);
-    // Calculate new seconds_counter value
-    m_seconds_counter = (m_minutes_per_hour * m_hours + m_minutes) * m_seconds_per_minute + m_seconds;
-    // Force update of time area
-    m_time_area = INVALID;
-  }
-  else if (command == SET_HOURS) {
-    cast_stream(args, m_hours);
-    // Calculate new seconds_counter value
-    m_seconds_counter = (m_minutes_per_hour * m_hours + m_minutes) * m_seconds_per_minute + m_seconds;
-    // Force update of time area
-    m_time_area = INVALID;
-  }
-  else if (command == SET_DAYS) {
-    cast_stream(args, m_days);
-    // Update day name as well
-    m_current_day_name = m_day_names[m_days];
-  }
-  else if (command == SET_WEEKS) {
-    cast_stream(args, m_weeks);
-  }
-  else if (command == SET_MONTHS) {
-    cast_stream(args, m_months);
-    // Update Month name as well
-    m_current_month_name = m_month_names[m_months];
-  }
-  else if (command == SET_YEARS) {
-    cast_stream(args, m_years);
   }
 }
 

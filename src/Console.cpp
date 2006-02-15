@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.36 2005-06-21 17:04:36 alriddoch Exp $
+// $Id: Console.cpp,v 1.37 2006-02-15 12:44:24 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -14,10 +14,6 @@
 #include "FileHandler.h"
 
 #include "renderers/RenderSystem.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -84,97 +80,99 @@ std::istream &operator>>(std::istream &IStream, std::list< std::string > &List) 
 }
 
 Console::Console(System *system) :
-  animateConsole(false),
-  showConsole(false),
-  consoleHeight(0),
-  console_messages(std::list<std::string>()),
-  screen_messages(std::list<screenMessage>()),
-  panel_id(0),
-  _system(system),
+  m_animateConsole(false),
+  m_showConsole(false),
+  m_consoleHeight(0),
+  m_console_messages(std::list<std::string>()),
+  m_screen_messages(std::list<screenMessage>()),
+  m_panel_id(0),
+  m_system(system),
   m_CaretPosition(0),
   m_bTabOnce(false),
-  _initialised(false)
+  m_initialised(false)
 {
   assert((system != NULL) && "System is NULL");
 }
 
 Console::~Console() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
 }
 
 bool Console::init() {
-  if (_initialised) shutdown();
+  assert(m_initialised == false);
+
   // Register console commands
   registerCommand(TOGGLE_CONSOLE, this);
   registerCommand(LIST_CONSOLE_COMMANDS, this);
   //Makes sure at least one key is bound to the console
   Bindings::bind("backquote", "/" + std::string(TOGGLE_CONSOLE));
   
-  std::ifstream HistoryFile((_system->getFileHandler()->getUserDataPath() + "history").c_str());
+  std::ifstream HistoryFile((m_system->getFileHandler()->getUserDataPath() + "history").c_str());
   
   HistoryFile >> m_CommandHistory;
   m_CommandHistoryIterator = m_CommandHistory.end();
-  _initialised = true;
+  m_initialised = true;
   return true;
 }
 
 void Console::shutdown() {
+  assert(m_initialised == true);
   if (debug) Log::writeLog("Shutting down console.", Log::LOG_DEFAULT);
   
-  std::ofstream HistoryFile((_system->getFileHandler()->getUserDataPath() + "history").c_str());
+  std::ofstream HistoryFile((m_system->getFileHandler()->getUserDataPath() + "history").c_str());
   
   HistoryFile << m_CommandHistory;
   m_CommandHistory.clear();
   m_CommandHistoryIterator = m_CommandHistory.end();
-  _registered_commands.clear();
+  m_registered_commands.clear();
   m_CommandStarts.clear();
-  console_messages.clear();
-  screen_messages.clear();
-  _initialised = false;
+  m_console_messages.clear();
+  m_screen_messages.clear();
+  m_initialised = false;
 }
 
 void Console::pushMessage(const std::string &message, int type, int duration) {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   // Is this a screen message
   if (type & SCREEN_MESSAGE) {	
     //If we have reached our message limit, remove the oldest message regardless of duration
-    if (screen_messages.size() >= MAX_MESSAGES) screen_messages.erase(screen_messages.begin());
-    screen_messages.push_back(screenMessage(message, _system->getTime() + duration));
+    if (m_screen_messages.size() >= MAX_MESSAGES) m_screen_messages.erase(m_screen_messages.begin());
+    m_screen_messages.push_back(screenMessage(message, m_system->getTime() + duration));
   }
   // Is this a console message?
   if (type & CONSOLE_MESSAGE) {
     //If we have reached our message limit, remove the oldest message regardless of duration
-    if (console_messages.size() >= MAX_MESSAGES) console_messages.erase(console_messages.begin());
-    console_messages.push_back(message);
+    if (m_console_messages.size() >= MAX_MESSAGES) m_console_messages.erase(m_console_messages.begin());
+    m_console_messages.push_back(message);
   }
 }
 
 void Console::draw(void) {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   // If we are animating and putting console into visible state,
   //  the raise height a tad
-  if (animateConsole && showConsole) {
-    consoleHeight += CONSOLE_SPEED;
+  if (m_animateConsole && m_showConsole) {
+    m_consoleHeight += CONSOLE_SPEED;
     // Have we reached full height?
-    if (consoleHeight >= CONSOLE_HEIGHT) {
+    if (m_consoleHeight >= CONSOLE_HEIGHT) {
       // Disable animation
-      consoleHeight = CONSOLE_HEIGHT;
-      animateConsole = 0;
+      m_consoleHeight = CONSOLE_HEIGHT;
+      m_animateConsole = 0;
     }
     renderConsoleMessages();
   // Ife we are animating and putting console into hidden state,
   //  the lower height a tad
-  } else if (animateConsole && !showConsole) {
-    consoleHeight -= CONSOLE_SPEED;
+  } else if (m_animateConsole && !m_showConsole) {
+    m_consoleHeight -= CONSOLE_SPEED;
     // Have we become visible?
-    if (consoleHeight <= 0) {
+    if (m_consoleHeight <= 0) {
       //Disable animation
-      consoleHeight = 0;
-      animateConsole = 0;
+      m_consoleHeight = 0;
+      m_animateConsole = 0;
     }
     renderConsoleMessages();
   // Else are we just plain visible?    
-  } else if (showConsole) {
+  } else if (m_showConsole) {
     renderConsoleMessages();
   }
   //Screen messages are always visible
@@ -182,7 +180,7 @@ void Console::draw(void) {
 }
 
 void Console::renderConsoleMessages(void) {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   Render *renderer = RenderSystem::getInstance().getRenderer();
   if (!renderer) {
     Log::writeLog("Console: Error - Renderer object not created", Log::LOG_ERROR);
@@ -191,17 +189,17 @@ void Console::renderConsoleMessages(void) {
   std::list<std::string>::const_iterator I;
   int i;
   //Render console panel
-  int consoleOffset = CONSOLE_HEIGHT - consoleHeight;
+  int consoleOffset = CONSOLE_HEIGHT - m_consoleHeight;
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(PANEL));
   //Make panel slightly transparent
   renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  if (panel_id == 0) panel_id = RenderSystem::getInstance().requestTexture(PANEL);
-  renderer->drawTextRect(0, 0, renderer->getWindowWidth(), consoleHeight, panel_id);
+  if (m_panel_id == 0) m_panel_id = RenderSystem::getInstance().requestTexture(PANEL);
+  renderer->drawTextRect(0, 0, renderer->getWindowWidth(), m_consoleHeight, m_panel_id);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
-  for (I = console_messages.begin(), i = 0; I != console_messages.end(); ++I, ++i) {
-    int j = console_messages.size() - i;
+  for (I = m_console_messages.begin(), i = 0; I != m_console_messages.end(); ++I, ++i) {
+    int j = m_console_messages.size() - i;
     renderer->print(CONSOLE_TEXT_OFFSET_X, CONSOLE_TEXT_OFFSET_Y + j * FONT_HEIGHT - consoleOffset, (char*)(*I).c_str(), 0);
   }
   //Render current command string
@@ -218,9 +216,9 @@ void Console::renderConsoleMessages(void) {
 }
 
 void Console::renderScreenMessages() {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   Render *renderer = RenderSystem::getInstance().getRenderer();
-  if (screen_messages.empty()) return;	
+  if (m_screen_messages.empty()) return;	
   std::list<screenMessage>::const_iterator I;
   int i;
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
@@ -228,9 +226,9 @@ void Console::renderScreenMessages() {
   // Get screen height so we can calculate offset correctly
   int height = renderer->getWindowHeight();
   //Get time so we can remove expired messages
-  unsigned int current_time = _system->getTime();
+  unsigned int current_time = m_system->getTime();
   //Render messges
-  for (I = screen_messages.begin(), i = 0; I != screen_messages.end(); ++I, ++i) {
+  for (I = m_screen_messages.begin(), i = 0; I != m_screen_messages.end(); ++I, ++i) {
     const std::string str = (const std::string)((*I).first);
     renderer->print(CONSOLE_TEXT_OFFSET_X, height - ((i + 1) * FONT_HEIGHT ), const_cast<char*>(str.c_str()), 0);
   }
@@ -241,24 +239,24 @@ void Console::renderScreenMessages() {
   //     higher entries have been removed
   bool loop = true;
   while (loop) {
-  if (screen_messages.empty()) break;	
+  if (m_screen_messages.empty()) break;	
     loop = false; // break unless it gets set to true again
-    screenMessage sm = *screen_messages.begin(); // Get first messge
+    screenMessage sm = *m_screen_messages.begin(); // Get first messge
     unsigned int message_time = sm.second;
     if (current_time > message_time) { // Check expiry time
-      screen_messages.erase(screen_messages.begin());
+      m_screen_messages.erase(m_screen_messages.begin());
       loop = true; // Go again
     }
   }
 }
 
 void Console::toggleConsole() {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   // Start the animation	
-  animateConsole = 1;
+  m_animateConsole = 1;
   // Toggle state
-  showConsole = !showConsole;
-  _system->vEnableKeyRepeat(showConsole);
+  m_showConsole = !m_showConsole;
+  m_system->vEnableKeyRepeat(m_showConsole);
 }
 
 void Console::vHandleInput(const SDLKey &KeySym, const Uint16 &UnicodeCharacter)
@@ -314,7 +312,7 @@ void Console::vHandleInput(const SDLKey &KeySym, const Uint16 &UnicodeCharacter)
   } else if(KeySym == SDLK_RETURN) {
     // accept the current command and execute it; reset the command
     if(m_Command.empty() == false) {
-      _system->runCommand(m_Command);
+      m_system->runCommand(m_Command);
       m_CommandHistory.push_back(m_Command);
       m_CommandHistoryIterator = m_CommandHistory.end();
       m_Command = "";
@@ -388,9 +386,10 @@ void Console::vHandleInput(const SDLKey &KeySym, const Uint16 &UnicodeCharacter)
 }
 
 void Console::registerCommand(const std::string &command, ConsoleObject *object) {
-  if (debug) Log::writeLog(std::string("registering: ") + command, Log::LOG_INFO);
+  if (debug) Log::writeLog(std::string("Registering: ") + command, Log::LOG_INFO);
   // Assign the ConsoleObject to the command
-  _registered_commands[command] = object;
+  assert(m_registered_commands.find(command) == m_registered_commands.end());
+  m_registered_commands[command] = object;
   // Prepare the command starts = a multimap that assigns the command start to the full commands.
   for(std::string::size_type i = 1; i <= command.length(); ++i) {
     m_CommandStarts.insert(std::make_pair(command.substr(0, i), command));
@@ -398,7 +397,7 @@ void Console::registerCommand(const std::string &command, ConsoleObject *object)
 }
 
 void Console::runCommand(const std::string &comd) {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   if (comd.empty()) return; // Ignore empty string
   std::string command = comd;
   System::instance()->getFileHandler()->expandString(command);
@@ -408,7 +407,7 @@ void Console::runCommand(const std::string &comd) {
   if ((c != '/' && c != '+' && c != '-')) {
     // Its a speech string, so SAY it
     // FIXME /say is not always available!
-    if (_registered_commands[SAY]) {
+    if (m_registered_commands[SAY]) {
       runCommand(std::string(CMD_SAY) + command);
     } else {
       if (debug) Log::writeLog(std::string("Cannot SAY, not in game yet: ") + command, Log::LOG_ERROR);
@@ -432,12 +431,12 @@ void Console::runCommand(const std::string &comd) {
     pushMessage("Unknown command: " + cmd, CONSOLE_MESSAGE, 0);
   } else if(Count == 1) {
     cmd = m_CommandStarts.find(cmd)->second;
-  } else if (_registered_commands.find(cmd) == _registered_commands.end()) {
+  } else if (m_registered_commands.find(cmd) == m_registered_commands.end()) {
     // the above checks for commands that are abbrevs of others 'get' <=> 'get_time'
     pushMessage("Ambigious command: " + cmd, CONSOLE_MESSAGE, 0);
   }
   
-  ConsoleObject* con_obj = _registered_commands[cmd];
+  ConsoleObject* con_obj = m_registered_commands[cmd];
   // Print all commands apart form toggle console to the console
   if (cmd != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
   // If object exists, run the command
@@ -445,14 +444,14 @@ void Console::runCommand(const std::string &comd) {
 }
 
 void Console::runCommand(const std::string &command, const std::string &args) {
-  assert ((_initialised == true) && "Console not initialised");
+  assert ((m_initialised == true) && "Console not initialised");
   // This command toggles the console
   if (command == TOGGLE_CONSOLE) {
     toggleConsole();
   }
   // This commands prints all currently registers commands to the Log File
   else if (command == LIST_CONSOLE_COMMANDS) {
-    for (std::map<std::string, ConsoleObject*>::const_iterator I = _registered_commands.begin(); I != _registered_commands.end(); ++I) {
+    for (std::map<std::string, ConsoleObject*>::const_iterator I = m_registered_commands.begin(); I != m_registered_commands.end(); ++I) {
       // TODO - should we check to see if I->second is valid?
 //      if (debug)
 	      Log::writeLog(I->first, Log::LOG_INFO);

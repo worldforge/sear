@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Console.h,v 1.14 2004-07-29 18:27:02 simon Exp $
+// $Id: Console.h,v 1.15 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_CONSOLE_H
 #define SEAR_CONSOLE_H 1
@@ -47,6 +47,7 @@ public:
   
   bool init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
  
   /**
    * Add a message to the console and/or screen message queue
@@ -66,7 +67,7 @@ public:
   /**
    * Returns whether the console is visible or not
    */ 
-  bool consoleStatus() { return showConsole; }
+  bool consoleStatus() const { return m_showConsole; }
   
   /**
    * This function will change the content of the console according to the key that was  pressed.
@@ -104,16 +105,16 @@ protected:
    */ 
   void renderScreenMessages();
 
-  bool animateConsole; // Flag determining whether console is moving
-  bool showConsole; // flag to say whether console is visible/useable or not
-  int consoleHeight; // the height of the console. determined by number of messages allowed
-  std::list<std::string> console_messages; // Current console messages
-  std::list<screenMessage> screen_messages; // Current screen messages
-  int panel_id; // The texture id of the console's panel texture
-  System *_system;
+  bool m_animateConsole; // Flag determining whether console is moving
+  bool m_showConsole; // flag to say whether console is visible/useable or not
+  int m_consoleHeight; // the height of the console. determined by number of messages allowed
+  std::list<std::string> m_console_messages; // Current console messages
+  std::list<screenMessage> m_screen_messages; // Current screen messages
+  int m_panel_id; // The texture id of the console's panel texture
+  System *m_system;
 
   // Mapping of registered commands to assoicated object
-  std::map<std::string, ConsoleObject*> _registered_commands;
+  std::map<std::string, ConsoleObject*> m_registered_commands;
   
   /// Storage of the least recent commands in reverse order
   std::list< std::string > m_CommandHistory;
@@ -131,7 +132,7 @@ protected:
   /// Whether the tab key was the last key pressed once.
   bool m_bTabOnce;
  
-  bool _initialised;
+  bool m_initialised;
   
 };
 

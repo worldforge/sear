@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.69 2006-02-13 22:27:28 simon Exp $
+// $Id: System.h,v 1.70 2006-02-15 12:44:24 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -13,9 +13,10 @@
 
 #include <sigc++/trackable.h>
 
-#include "interfaces/ConsoleObject.h"
 #include <varconf/Config.h>
 #include <wfmath/point.h>
+#include "interfaces/ConsoleObject.h"
+#include "common/SPtr.h"
 
 namespace Sear {
 	
@@ -175,14 +176,14 @@ public:
    **/
   void vEnableKeyRepeat(bool bEnable = true);
  
-  ScriptEngine *getScriptEngine() const { return m_script_engine; }
-  ActionHandler *getActionHandler() const { return m_action_handler; }
-  FileHandler *getFileHandler() const { return m_file_handler; }
-  Calendar *getCalendar() const { return m_calendar; }
-  
-  Console *getConsole() const { return m_console; }
-  Workarea *getWorkarea() const { return m_workarea; }
-  Character *getCharacter() const { return m_character; }
+  ScriptEngine *getScriptEngine() { return m_script_engine.get(); }
+  ActionHandler *getActionHandler() { return m_action_handler.get(); }
+  FileHandler *getFileHandler() { return m_file_handler.get(); }
+  Calendar *getCalendar() { return m_calendar.get(); }
+  Console *getConsole() { return m_console.get(); }
+  Workarea *getWorkarea() { return m_workarea.get(); }
+  Character *getCharacter() { return m_character.get(); }
+  Client *getClient() { return m_client.get(); }
   
   static System *instance() { return m_instance; }
 
@@ -193,7 +194,6 @@ public:
 
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
-  Client *getClient() const { return m_client; }
 
   int getWidth() const { return m_width; }
   int getHeight() const { return m_height; }
@@ -207,7 +207,6 @@ protected:
   int m_action;
   bool m_mouseLook;
   SDL_Surface *m_screen;
-  Client *m_client;
   static System *m_instance;
   
   int m_width;
@@ -222,17 +221,19 @@ protected:
   double m_click_seconds;
   WFMath::Point<3> m_click_pos;
 
-  ScriptEngine *m_script_engine; ///< Pointer to scripting engine object
-  FileHandler *m_file_handler; ///< Pointer to file handler object
-  ActionHandler *m_action_handler; ///< Pointer to action handler object
-  Calendar *m_calendar; ///< Pointer to calender object
+  SPtrShutdown<Client> m_client;
+  SPtrShutdown<ScriptEngine> m_script_engine; ///< Pointer to scripting engine object
+  SPtr<FileHandler> m_file_handler; ///< Pointer to file handler object
+  SPtrShutdown<ActionHandler> m_action_handler; ///< Pointer to action handler object
+  SPtrShutdown<Calendar> m_calendar; ///< Pointer to calender object
+  SPtr<Editor> m_editor;
+  SPtrShutdown<Console> m_console;
+  SPtr<Workarea> m_workarea;
+  SPtrShutdown<Character> m_character;
    
   varconf::Config m_general;
 
   SDL_Joystick *m_controller;
-  Console *m_console;
-  Workarea *m_workarea;
-  Character *m_character;
  
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
@@ -242,7 +243,7 @@ protected:
   double m_seconds;
   double m_elapsed;
 
-  Sound *m_sound;
+  SPtrShutdown<Sound> m_sound;
   
   typedef enum {
     AXIS_STRAFE,
@@ -267,7 +268,6 @@ private:
   bool m_systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool m_system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)
 
-  Editor *m_editor;
   bool m_initialised; ///< Initialisation state of System
   bool m_startFullscreen;
 };
