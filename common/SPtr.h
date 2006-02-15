@@ -16,8 +16,8 @@ namespace Sear {
 template<class T>
 class SPtr {
 public:
-  explicit SPtr(T *t = NULL) :
-    m_spd(NULL)
+  explicit SPtr(T *t = 0) :
+    m_spd(0)
   {
     if (t) m_spd = new SPtrData(t, 1);
   }
@@ -28,7 +28,7 @@ public:
 
   ~SPtr() throw() { release(); }
 
-  SPtr &operator=(const SPtr &sp) {
+  SPtr &operator=(const SPtr &sp) throw() {
     if (this != &sp) {
       release();
       aquire(sp.m_spd);
@@ -36,35 +36,48 @@ public:
     return *this;
   }
 
-  const T &operator*() const {
+  const T &operator*() const throw() {
     return *m_spd->ptr;
   }
 
-  T &operator*() {
+  T &operator*() throw() {
     return *m_spd->ptr;
   }
 
-  const T *operator->() const {
+  const T *operator->() const throw() {
     return m_spd->ptr;
   }
 
-  T *operator->() {
+  T *operator->() throw() {
     return m_spd->ptr;
   }
 
-  operator bool() const {
-    return m_spd && m_spd->ptr != NULL;
+  operator bool() const throw() {
+    return m_spd && m_spd->ptr != 0;
   }
 
-  bool operator!() const {
-    return !m_spd || m_spd->ptr == NULL;
+  bool operator!() const throw() {
+    return !m_spd || m_spd->ptr == 0;
   }
 
-  const T *get() const { return m_spd->ptr; }
+  const T *get() const throw() { return (m_spd) ? (m_spd->ptr) : (0); }
+  T *get() throw() { return (m_spd) ? (m_spd->ptr) : (0); }
 
-  bool isValid() const {
-    return ((m_spd) && (m_spd->ptr != NULL));
+  bool isValid() const throw() {
+    return ((m_spd) && (m_spd->ptr != 0));
   }
+
+  void release() throw() {
+    if (m_spd) {
+      --m_spd->cnt;
+      if (m_spd->cnt == 0) {
+        delete m_spd->ptr;
+        delete m_spd;
+      }
+      m_spd = 0;
+    }
+  }
+
 
 private:
   typedef struct t_SPtrData{
@@ -77,17 +90,6 @@ private:
   void aquire(SPtrData *spd) throw() {
     m_spd = spd;
     if (m_spd) ++m_spd->cnt;
-  }
-
-  void release() throw() {
-    if (m_spd) {
-      --m_spd->cnt;
-      if (m_spd->cnt == 0) {
-        delete m_spd->ptr;
-        delete m_spd;
-      }
-      m_spd = NULL;
-    }
   }
 
   SPtrData *m_spd;
@@ -101,8 +103,8 @@ private:
 template<class T>
 class SPtrShutdown {
 public:
-  explicit SPtrShutdown(T *t = NULL) :
-    m_spd(NULL)
+  explicit SPtrShutdown(T *t = 0) :
+    m_spd(0)
   {
     if (t) m_spd = new SPtrData(t, 1);
   }
@@ -113,7 +115,7 @@ public:
 
   ~SPtrShutdown() throw() { release(); }
 
-  SPtrShutdown &operator=(const SPtrShutdown &sp) {
+  SPtrShutdown &operator=(const SPtrShutdown &sp) throw() {
     if (this != &sp) {
       release();
       aquire(sp.m_spd);
@@ -121,35 +123,51 @@ public:
     return *this;
   }
 
-  const T &operator*() const {
+  const T &operator*() const throw() {
     return *m_spd->ptr;
   }
 
-  T &operator*() {
+  T &operator*() throw() {
     return *m_spd->ptr;
   }
 
-  const T *operator->() const {
+  const T *operator->() const throw() {
     return m_spd->ptr;
   }
 
-  T *operator->() {
+  T *operator->() throw() {
     return m_spd->ptr;
   }
 
-  operator bool() const {
-    return m_spd && m_spd->ptr != NULL;
+  operator bool() const throw() {
+    return m_spd && m_spd->ptr != 0;
   }
 
-  bool operator!() const {
-    return !m_spd || m_spd->ptr == NULL;
+  bool operator!() const throw() {
+    return !m_spd || m_spd->ptr == 0;
   }
 
-  const T *get() const { return m_spd->ptr; }
+  const T *get() const throw() { return (m_spd) ? (m_spd->ptr) : (0); }
+  T *get() throw() { return (m_spd) ? (m_spd->ptr) : (0); }
 
   bool isValid() const {
-    return ((m_spd) && (m_spd->ptr != NULL));
+    return ((m_spd) && (m_spd->ptr != 0));
   }
+
+  void release() throw() {
+    if (m_spd) {
+      --m_spd->cnt;
+      if (m_spd->cnt == 0) {
+        if (m_spd->ptr->isInitialised()) {
+          m_spd->ptr->shutdown();
+        }
+        delete m_spd->ptr;
+        delete m_spd;
+      }
+      m_spd = 0;
+    }
+  }
+
 
 private:
   typedef struct t_SPtrData{
@@ -163,21 +181,6 @@ private:
     m_spd = spd;
     if (m_spd) ++m_spd->cnt;
   }
-
-  void release() throw() {
-    if (m_spd) {
-      --m_spd->cnt;
-      if (m_spd->cnt == 0) {
-        if (m_spd->ptr->isInitialised()) {
-          m_spd->ptr->shutdown();
-        }
-        delete m_spd->ptr;
-        delete m_spd;
-      }
-      m_spd = NULL;
-    }
-  }
-
   SPtrData *m_spd;
 
 };

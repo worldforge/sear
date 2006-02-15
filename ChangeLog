@@ -1,5 +1,10 @@
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* common/SPtr.h: Use 0 instead of NULL. Make release() public for 
+	  explicit resource de-allocation. Fix NULL pointer error on get().
+
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/System.cpp, src/main.cpp: Fix some leaks when window creation
 	  fails.
 
