@@ -14,8 +14,8 @@ namespace Sear
 typedef WFMath::Point<2> Point2;
 typedef WFMath::Vector<3> Vector3;
 
-AreaModel::AreaModel(Render* r, WorldEntity *we) :
-    Model(r),
+AreaModel::AreaModel(WorldEntity *we) :
+    Model(),
     m_initialised(false),
     m_entity(we),
     m_area(NULL)

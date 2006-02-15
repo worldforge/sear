@@ -2,9 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.28 2006-02-07 18:45:33 simon Exp $
+// $Id: ModelHandler.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
 
-#include <set>
 #include <string.h>
 
 #include <sigc++/object_slot.h>
@@ -17,7 +16,6 @@
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 #include "renderers/RenderSystem.h"
-#include "renderers/Render.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
@@ -26,10 +24,6 @@
 #include "Model.h"
 #include "ModelSystem.h"
 #include "NullModel.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -48,8 +42,6 @@ ModelHandler::ModelHandler() :
   m_initialised(false),
   m_timeout(NULL)
 {
-  m_model_records.sigsv.connect(SigC::slot(*this, &ModelHandler::varconf_callback));
-  m_model_records.sige.connect(SigC::slot(*this, &ModelHandler::varconf_error_callback));
 }
 
 ModelHandler::~ModelHandler() {
@@ -58,6 +50,9 @@ ModelHandler::~ModelHandler() {
 
 void ModelHandler::init() {
   assert (m_initialised == false);
+
+  m_model_records.sigsv.connect(SigC::slot(*this, &ModelHandler::varconf_callback));
+  m_model_records.sige.connect(SigC::slot(*this, &ModelHandler::varconf_error_callback));
 
   m_timeout = new Eris::Timeout(60000);
   m_timeout->Expired.connect(SigC::slot(*this, &ModelHandler::TimeoutExpired));
@@ -78,20 +73,19 @@ void ModelHandler::shutdown() {
   delete m_timeout;
 
   // Clean up model loaders
-  while (!m_model_loaders.empty()) {
-    ModelLoader *ml = m_model_loaders.begin()->second;
-    if (ml) delete (ml);
-    m_model_loaders.erase(m_model_loaders.begin());
-  }
+  m_model_loaders.clear();
   // Delete all unique records
   m_object_map.clear();
   // Delete all remaining records
   m_model_records_map.clear();
 
+  // Disconnect the sigc callbacks
+  notify_callbacks();
+
   m_initialised = false;
 }
   
-SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &model_id, WorldEntity *we) {
+SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntity *we) {
   assert (m_initialised == true);
 
   assert(we);
@@ -109,10 +103,10 @@ SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &mode
     return J->second;
   }
   // No existing model found, load up a new one
-  if (!render) {
-    if (debug && we) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
-    return SPtr<ModelRecord>();
-  }
+//  if (!render) {
+//    if (debug && we) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
+//    return SPtr<ModelRecord>();
+//  }
 
   varconf::Config &m_model_records = ModelSystem::getInstance().getModelRecords();
   std::string model_loader = (std::string)m_model_records.getItem(model_id, ModelRecord::MODEL_LOADER);
@@ -121,7 +115,8 @@ SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &mode
     printf("Model Loader not defined. Using BoundBox.\n");
     model_loader = "boundbox";
   }
-  ModelLoaderMap::const_iterator K = m_model_loaders.find(model_loader);
+
+  ModelLoaderMap::iterator K = m_model_loaders.find(model_loader);
   ModelLoaderMap::const_iterator Kend = m_model_loaders.end();
   if (K == Kend) {
     printf("Unknown Model Loader. Using BoundBox.\n");
@@ -130,7 +125,7 @@ SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &mode
   }
   SPtr<ModelRecord> model;
   if (K != Kend) {
-    model = K->second->loadModel(render, we, model_id, m_model_records);
+    model = K->second->loadModel(we, model_id, m_model_records);
   } else {
     std::cerr << "No loader found: " << model_loader << std::endl;
     return model;
@@ -140,18 +135,16 @@ SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &mode
   if (!model) {
     std::cerr << "Error loading model of type " << model_loader << std::endl;
     model = SPtr<ModelRecord>(new ModelRecord);
-    model->model = SPtrShutdown<Model>(new NullModel(render));
+    model->model = SPtrShutdown<Model>(new NullModel());
   }
 
-//  if (we != NULL) {
-    if (we->hasAttr(ATTR_MODE)) {
-      model->model->animate(we->valueOfAttr(ATTR_MODE).asString());
-    }
-    if (we->hasAttr(ATTR_GUISE)) {
-      Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
-      model->model->setAppearance(mt);
-    }                                                                          
-//  }
+  if (we->hasAttr(ATTR_MODE)) {
+    model->model->animate(we->valueOfAttr(ATTR_MODE).asString());
+  }
+  if (we->hasAttr(ATTR_GUISE)) {
+    Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
+    model->model->setAppearance(mt);
+  }                                                                          
 
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
@@ -160,23 +153,22 @@ SPtr<ModelRecord> ModelHandler::getModel(Render *render, const std::string &mode
   return model; 
 }
 
-void ModelHandler::registerModelLoader(const std::string &model_type, ModelLoader *model_loader) {
+void ModelHandler::registerModelLoader(SPtr<ModelLoader> model_loader) {
   assert (m_initialised == true);
-  assert(model_type.empty() == false);
-  assert(model_loader != NULL);
+  std::string model_type = model_loader->getType();
 
   // Throw error if we already have a loader for this type
-  assert(m_model_loaders[model_type] ==  NULL);
+  assert(m_model_loaders.find(model_type) == m_model_loaders.end());
 
   // If all is well, assign loader
   m_model_loaders[model_type] = model_loader;
 }
 
-void ModelHandler::unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader) {
+void ModelHandler::unregisterModelLoader(const std::string &model_type) {
   assert (m_initialised == true);
   // Only unregister a model laoder if it is properly registered
   ModelLoaderMap::iterator I = m_model_loaders.find(model_type);
-  if (I != m_model_loaders.end() && I->second == model_loader) {
+  if (I != m_model_loaders.end()) {
     m_model_loaders.erase(I);
   }
 }
@@ -188,14 +180,7 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
   // If the time has been longer than a threshold, we unload the model record 
   // and associated models.
 
-  // NOTE: Perhaps we could just unload the model and not the record?
-
-  // Only look thorugh unique records list. 
-
-  // TODO what about records with no model?
-  if (debug) std::cout << "Checking Timeouts" << std::endl;
-
-  std::set<std::string> expired_set;
+  if (debug) printf("Checking Timeouts\n");
 
   // Do the same again for the object map
   ModelRecordMap::iterator Jend = m_object_map.end();
@@ -231,11 +216,13 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
 }
 
 void ModelHandler::TimeoutExpired() {
+  assert (m_initialised == true);
   checkModelTimeouts(false);
   m_timeout->reset(60000);
 }
 
 void ModelHandler::loadModelRecords(const std::string &filename) {
+  assert (m_initialised == true);
   m_model_records.readFromFile(filename);
 }
 
@@ -253,7 +240,7 @@ void ModelHandler::varconf_callback(const std::string &section, const std::strin
 }
 
 void ModelHandler::varconf_error_callback(const char *message) {
-  std::cerr << message << std::endl;
+  fprintf(stderr, "%s\n", message);
 }
 
 void ModelHandler::registerCommands(Console *console) {
@@ -264,12 +251,14 @@ void ModelHandler::registerCommands(Console *console) {
 }
 
 void ModelHandler::runCommand(const std::string &command, const std::string &args) {
+  assert (m_initialised == true);
   if (command == CMD_LOAD_MODEL_RECORDS) {
     loadModelRecords(args);
   }
 
 }
 void ModelHandler::contextCreated() {
+  assert (m_initialised == true);
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
@@ -282,6 +271,7 @@ void ModelHandler::contextCreated() {
 
 
 void ModelHandler::contextDestroyed(bool check) {
+  assert (m_initialised == true);
   for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
@@ -293,17 +283,16 @@ void ModelHandler::contextDestroyed(bool check) {
 }
 
 void ModelHandler::reset() {
+  assert (m_initialised == true);
   checkModelTimeouts(true);
 }
 
 
-PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName)
-{
+PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName) {
   PosAndOrient po;
   po.pos = WFMath::Vector<3>(0.0f,0.0f,0.0f);
   po.orient = WFMath::Quaternion(1.0f, 0.0f,0.0f,0.0f);
-//    std::cerr << "called getPositionForSubmodel on Model base class : undefined" << std::endl;
-    return po;
+  return po;
 }
 
 

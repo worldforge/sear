@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.6 2006-02-07 11:31:03 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.7 2006-02-15 09:50:31 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -11,17 +11,11 @@
 
 #include "ModelSystem.h"
 
-#include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "src/WorldEntity.h"
 
 #include "LibModelFile_Loader.h"
 #include "LibModelFile.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -32,16 +26,14 @@ namespace Sear {
 
 const std::string LibModelFile_Loader::LIBMODELFILE = "md3";
 	
-LibModelFile_Loader::LibModelFile_Loader(ModelHandler *mh) {
-  mh->registerModelLoader(LIBMODELFILE, this);
+LibModelFile_Loader::LibModelFile_Loader() {
 }
 
 LibModelFile_Loader::~LibModelFile_Loader() {
-  // TODO: Add ability to unregister loader.
 }
 
-SPtr<ModelRecord> LibModelFile_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
-  SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
+SPtr<ModelRecord> LibModelFile_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
 
   assert(model_record);
 
@@ -60,7 +52,7 @@ SPtr<ModelRecord> LibModelFile_Loader::loadModel(Render *render, WorldEntity *we
 
   if (debug) printf("LibModelFile_Loader: Loading %s\n", file_name.c_str());
 
-  LibModelFile *model = new LibModelFile(render);
+  LibModelFile *model = new LibModelFile();
   if (model->init(file_name)) {
 //    model->shutdown();
     delete model;

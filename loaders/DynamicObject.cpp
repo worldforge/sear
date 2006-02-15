@@ -9,13 +9,14 @@
 
 #include "renderers/RenderSystem.h"
 
-#include  "StaticObject.h"
+#include  "DynamicObject.h"
 
 namespace Sear {
 
-StaticObject::StaticObject() :
+DynamicObject::DynamicObject() :
   m_initialised(false),
   m_vertex_data(NULL),
+  m_colour_data(NULL),
   m_normal_data(NULL),
   m_texture_data(NULL),
   m_indices(NULL),
@@ -23,6 +24,7 @@ StaticObject::StaticObject() :
 //  m_type(0),
 //  m_state(0),
   m_vb_vertex_data(0),
+  m_vb_colour_data(0),
   m_vb_normal_data(0),
   m_vb_texture_data(0),
   m_vb_indices(0),
@@ -32,11 +34,11 @@ StaticObject::StaticObject() :
   identity();
 }
 
-StaticObject::~StaticObject()  {
+DynamicObject::~DynamicObject()  {
   assert(m_initialised == false);
 }
 
-int StaticObject::init() {
+int DynamicObject::init() {
   assert(m_initialised == false);
 
   m_initialised = true;
@@ -44,7 +46,7 @@ int StaticObject::init() {
   return 0;
 }
 
-void StaticObject::shutdown()  {
+void DynamicObject::shutdown()  {
   assert(m_initialised == true);
   contextDestroyed(true);
 
@@ -56,7 +58,98 @@ void StaticObject::shutdown()  {
   m_initialised = false;
 
 }
-void StaticObject::createVBOs() {
+
+void DynamicObject::copyVertexData(float *ptr, int size) {
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_vertex_data)) glGenBuffersARB(1, &m_vb_vertex_data);
+    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_vertex_data);
+    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+  } else {
+    if (m_vertex_data) delete [] m_vertex_data;
+    m_vertex_data = new float[size];
+    memcpy(m_vertex_data, ptr, size * sizeof(float));
+  }
+}
+
+void DynamicObject::copyColourData(unsigned char *ptr, int size) {
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_colour_data)) glGenBuffersARB(1, &m_vb_colour_data);
+    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_colour_data);
+    glBufferDataARB(GL_ARRAY_BUFFER, size  * sizeof(unsigned char), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+  } else {
+    if (m_colour_data) delete [] m_colour_data;
+    m_colour_data = new unsigned char[size];
+    memcpy(m_colour_data, ptr, size * sizeof(unsigned char));
+  }
+}
+
+void DynamicObject::copyNormalData(float *ptr, int size) {
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_normal_data)) glGenBuffersARB(1, &m_vb_normal_data);
+    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_normal_data);
+    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+  } else {
+    if (m_normal_data) delete [] m_normal_data;
+    m_normal_data = new float[size];
+    memcpy(m_normal_data, ptr, size * sizeof(float));
+  }
+}
+void DynamicObject::copyTextureData(float *ptr, int size) {
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_texture_data)) glGenBuffersARB(1, &m_vb_texture_data);
+    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_texture_data);
+    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+  } else {
+    if (m_texture_data) delete [] m_texture_data;
+    m_texture_data = new float[size];
+    memcpy(m_texture_data, ptr, size * sizeof(float));
+  }
+}
+
+void DynamicObject::copyIndices(unsigned int *ptr, int size) {
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_indices)) glGenBuffersARB(1, &m_vb_indices);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_vb_indices);
+    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(unsigned int), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+  } else {
+    if (m_indices) delete [] m_indices;
+    m_indices = new unsigned int[size];
+    memcpy(m_indices, ptr, size * sizeof(unsigned int));
+  }
+}
+/*
+  float *createVertexData(int size) {
+    if (m_vertex_data) delete [] m_vertex_data;
+    m_vertex_data = new float[size];
+    return m_vertex_data;
+  }
+
+  float *createNormalData(int size) {
+    if (m_normal_data) delete [] m_normal_data;
+    m_normal_data = new float[size];
+    return m_normal_data;
+  }
+
+  float *createTextureData(int size) {
+    if (m_texture_data) delete [] m_texture_data;
+    m_texture_data = new float[size];
+    return m_texture_data;
+  }
+
+  int *createIndices(int size) {
+    if (m_indices) delete [] m_indices;
+    m_indices = new int[size];
+    return m_indices;
+  }
+
+*/
+/*
+void DynamicObject::createVBOs() {
   assert(m_initialised == true);
   assert(sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] == true);
 
@@ -86,14 +179,17 @@ void StaticObject::createVBOs() {
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
   }
 }
-
-void StaticObject::contextDestroyed(bool check) {
+*/
+void DynamicObject::contextDestroyed(bool check) {
   assert(m_initialised == true);
   if (check) {
     // Clean up vertex buffer objects
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
       if (glIsBufferARB(m_vb_vertex_data)) {
         glDeleteBuffersARB(1, &m_vb_vertex_data);
+      }
+      if (glIsBufferARB(m_vb_colour_data)) {
+        glDeleteBuffersARB(1, &m_vb_colour_data);
       }
       if (glIsBufferARB(m_vb_normal_data)) {
         glDeleteBuffersARB(1, &m_vb_normal_data);
@@ -111,6 +207,7 @@ void StaticObject::contextDestroyed(bool check) {
     if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);
   }
   m_vb_vertex_data = 0;
+  m_vb_colour_data = 0;
   m_vb_normal_data = 0;
   m_vb_texture_data = 0;
   m_vb_indices = 0;
@@ -118,19 +215,15 @@ void StaticObject::contextDestroyed(bool check) {
   m_disp_list = 0;
 }
 
-void StaticObject::render(bool select_mode) {
+void DynamicObject::render(bool select_mode) {
   assert(m_initialised == true);
-//  glEnableClientState(GL_VERTEX_ARRAY);
+
   // Set transform
   glMultMatrixf(&m_matrix[0][0]);
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
-    if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
-
     // Setup client states
-    glEnableClientState(GL_NORMAL_ARRAY);
-
     // Set material properties
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
@@ -143,8 +236,11 @@ void StaticObject::render(bool select_mode) {
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
     // Bind normal array
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
-    glNormalPointer(GL_FLOAT, 0, 0);
+    if (glIsBuffer(m_vb_normal_data)) {
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
+      glNormalPointer(GL_FLOAT, 0, 0);
+    }
     
     for (unsigned int i = 0; i < m_textures.size(); ++i) {
       // Bind texture array
@@ -161,7 +257,13 @@ void StaticObject::render(bool select_mode) {
     // Reset current texture unit
     glActiveTextureARB(GL_TEXTURE0_ARB);
 
-    if (m_indices) {
+    if (glIsBufferARB(m_vb_colour_data)) {
+      glEnableClientState(GL_COLOR_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_colour_data);
+      glColorPointer(4, GL_UNSIGNED_BYTE, 0, 0);
+    }
+
+    if (glIsBufferARB(m_vb_indices)) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
       glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, 0);
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
@@ -175,7 +277,14 @@ void StaticObject::render(bool select_mode) {
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
 
-    glDisableClientState(GL_NORMAL_ARRAY);
+    if (glIsBuffer(m_vb_normal_data)) {
+      glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
+    if (glIsBufferARB(m_vb_colour_data)) {
+      glDisableClientState(GL_COLOR_ARRAY);
+    }
+
   } else {
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
     if (glIsList(disp)) {
@@ -184,7 +293,6 @@ void StaticObject::render(bool select_mode) {
       disp = glGenLists(1);
       glNewList(disp, GL_COMPILE_AND_EXECUTE);
       // Setup client states
-      glEnableClientState(GL_NORMAL_ARRAY);
 
       // Set material properties
       glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
@@ -197,7 +305,10 @@ void StaticObject::render(bool select_mode) {
       glVertexPointer(3, GL_FLOAT, 0, m_vertex_data);
 
       // Bind normal array
-      glNormalPointer(GL_FLOAT, 0, m_normal_data);
+      if (m_normal_data) {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, m_normal_data);
+      }
 
       for (unsigned int i = 0; i < m_textures.size(); ++i) {
         // Bind texture array
@@ -238,13 +349,16 @@ void StaticObject::render(bool select_mode) {
       // Reset current texture unit
       glActiveTextureARB(GL_TEXTURE0_ARB);
 
-      glDisableClientState(GL_NORMAL_ARRAY);
+      if (m_normal_data) {
+        glDisableClientState(GL_NORMAL_ARRAY);
+      }
+
       glEndList();
     }
   }
 }
 
-int StaticObject::load(const std::string &filename) {
+int DynamicObject::load(const std::string &filename) {
 #if(0)
   assert(m_initialised == true);
   FILE *fp = fopen(filename.c_str(), "rb");
@@ -326,13 +440,13 @@ int StaticObject::load(const std::string &filename) {
 
 error:
   fclose (fp);
-  fprintf(stderr, "Error reading StaticObject.\n");
+  fprintf(stderr, "Error reading DynamicObject.\n");
 #endif
   return 1;
 
 }
 
-int StaticObject::save(const std::string &filename) {
+int DynamicObject::save(const std::string &filename) {
   assert(m_initialised == true);
   return 0;
 }

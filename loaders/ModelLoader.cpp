@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.5 2006-02-07 11:31:03 simon Exp $
+// $Id: ModelLoader.cpp,v 1.6 2006-02-15 09:50:31 simon Exp $
 
 #include "ModelLoader.h"
 
@@ -15,8 +15,7 @@
 namespace Sear
 {
 
-SPtr<ModelRecord> ModelLoader::loadModel(Render *, 
-       WorldEntity *we, 
+SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we, 
         const std::string &model_id, 
         varconf::Config &model_config)
 {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.18 2006-02-07 11:31:03 simon Exp $
+// $Id: Cal3dModel.h,v 1.19 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -18,33 +18,30 @@
 
 namespace Sear {
 
-class Render;
-//class Cal3dCoreModel;
-	
 class Cal3dModel : public Sear::Model {
 public:
-  Cal3dModel(Render *);
-  ~Cal3dModel();
+  Cal3dModel();
+  virtual ~Cal3dModel();
 
   int init(Cal3dCoreModel *);
-  int shutdown();
-  bool isInitialised() const { return m_initialised; }
+  virtual int shutdown();
+  virtual bool isInitialised() const { return m_initialised; }
 
-  void contextCreated() {}
-  void contextDestroyed(bool check) {}
+  virtual void contextCreated() {}
+  virtual void contextDestroyed(bool check) {}
 
   float getLodLevel() const { return m_lodLevel; }
   float getScale() const { return m_renderScale; }
-  void render(bool select_mode) { render(true, true, select_mode); }
+  virtual void render(bool select_mode) { render(true, true, select_mode); }
   void render(bool, bool, bool);
-  void update(float elapsedSeconds);
+  virtual void update(float elapsedSeconds);
   void setDetailLevel(float level) { setLodLevel(level); }
   void setLodLevel(float lodLevel);
 
-  void action(const std::string &action);
-  void animate(const std::string &action);
-  void setAppearance(const Atlas::Message::MapType &map);
-  Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
+  virtual void action(const std::string &action);
+  virtual void animate(const std::string &action);
+  virtual void setAppearance(const Atlas::Message::MapType &map);
+  virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NORMAL; }
  
   unsigned int getPartID(const std::string &part) { return m_core_model->m_parts[part]; }
   unsigned int getSetID(const std::string &set) { return m_core_model->m_sets[set]; }
@@ -69,6 +66,7 @@ public:
 
   void addAnimation(const Cal3dCoreModel::WeightList &list);
   void removeAnimation(const Cal3dCoreModel::WeightList &list);
+
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
 

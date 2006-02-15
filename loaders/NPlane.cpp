@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.28 2006-02-13 22:16:09 simon Exp $
+// $Id: NPlane.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
 
 #include <iostream>
 
@@ -20,7 +20,8 @@
 #endif
 namespace Sear {
 
-NPlane::NPlane(Render *) : Model(NULL),
+NPlane::NPlane() :
+  Model(),
   m_initialised(false)
 {}
 

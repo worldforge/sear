@@ -26,6 +26,7 @@ libModelLoader_a_SOURCES = \
 	NullModel.h \
 	ParticleSystem.cpp ParticleSystem.h \
 	ParticleSystemLoader.cpp ParticleSystemLoader.h \
-	StaticObject.cpp StaticObject.h
+	StaticObject.cpp StaticObject.h \
+	DynamicObject.cpp DynamicObject.h
 	
 	

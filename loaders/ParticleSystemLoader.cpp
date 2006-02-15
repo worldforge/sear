@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: ParticleSystemLoader.cpp,v 1.6 2006-02-07 11:31:03 simon Exp $
+// $Id: ParticleSystemLoader.cpp,v 1.7 2006-02-15 09:50:31 simon Exp $
+
+#include <varconf/Config.h>
 
 #include "ParticleSystemLoader.h"
 #include "ParticleSystem.h"
-#include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "renderers/StateManager.h"
 #include "renderers/RenderSystem.h"
@@ -14,10 +15,9 @@
 
 #include <iostream>
 
-namespace Sear
-{
+namespace Sear {
 
-static const char* PARTICLE_MODEL = "particle";
+const std::string ParticleSystemLoader::PARTICLE_MODEL = "particle";
 
 static const char* KEY_particle_tex = "texture";
 static const char* KEY_min_lifetime = "min_life";
@@ -32,17 +32,15 @@ varconf::Variable getItemWithDefault(varconf::Config& cfg,
     return def;
 }
 
-ParticleSystemLoader::ParticleSystemLoader(ModelHandler* mh)
+ParticleSystemLoader::ParticleSystemLoader()
 {
-    mh->registerModelLoader(PARTICLE_MODEL, this);
 }
 
 ParticleSystemLoader::~ParticleSystemLoader()
 {
 }
 
-SPtr<ModelRecord> ParticleSystemLoader::loadModel(Render *render, 
-    WorldEntity *we,
+SPtr<ModelRecord> ParticleSystemLoader::loadModel(WorldEntity *we,
     const std::string &model_id, 
     varconf::Config &cfg)
 {
@@ -51,16 +49,16 @@ SPtr<ModelRecord> ParticleSystemLoader::loadModel(Render *render,
         return SPtr<ModelRecord>();
     }
 
-    SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, cfg);
-    ParticleSystem* ps = new ParticleSystem(render, we);
+    SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, cfg);
+    ParticleSystem* ps = new ParticleSystem(we);
     
     ps->m_ttl = DRange(getItemWithDefault(cfg, model_id, KEY_min_lifetime, 0.0),
                     getItemWithDefault(cfg, model_id, KEY_max_lifetime, 10.0));
     
-    ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
     
     ps->setBBox(we->getBBox());
     ps->init();
+    ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
     
     model_record->model = SPtrShutdown<Model>(ps);
     model_record->state = RenderSystem::getInstance().getStateManager()->getState("particles");

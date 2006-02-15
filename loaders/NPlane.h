@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.12 2006-02-13 22:16:09 simon Exp $
+// $Id: NPlane.h,v 1.13 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -14,7 +14,6 @@
 
 #include "Model.h"
 #include "renderers/Graphics.h"
-#include "renderers/RenderSystem.h"
 
 namespace Sear {
 
@@ -22,8 +21,8 @@ class StaticObject;
 	
 class NPlane : public Model {
 public:
-  NPlane(Render*);
-  ~NPlane();
+  NPlane();
+  virtual ~NPlane();
   
   int init(const std::string &, unsigned int num_planes, float width, float height);
   virtual int shutdown();

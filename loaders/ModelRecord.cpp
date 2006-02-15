@@ -2,17 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.7 2006-02-07 11:31:03 simon Exp $
+// $Id: ModelRecord.cpp,v 1.8 2006-02-15 09:50:31 simon Exp $
 
 #include "ModelRecord.h"
 #include "Model.h"
 #include "renderers/RenderSystem.h"
 #include "renderers/StateManager.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 namespace Sear {
   const std::string ModelRecord::SCALE = "scale";

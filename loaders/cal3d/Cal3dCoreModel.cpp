@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.33 2006-02-07 18:45:33 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.34 2006-02-15 09:50:31 simon Exp $
 
 #include <string>
 
@@ -19,10 +19,6 @@
 
 #include "Cal3dModel.h"
 #include "Cal3dCoreModel.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -334,7 +330,7 @@ unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename) {
 }
 
 Cal3dModel *Cal3dCoreModel::instantiate() {
-  Cal3dModel *model = new Cal3dModel(RenderSystem::getInstance().getRenderer());
+  Cal3dModel *model = new Cal3dModel();
   if (model->init(this)) {
     delete model;
     model = NULL;

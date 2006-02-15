@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.8 2006-02-07 18:45:33 simon Exp $
+// $Id: LibModelFile.h,v 1.9 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -32,7 +32,7 @@ public:
    * Constructor stores the bounding box for the basis of this model.
    * wrap indicates how to produce the texture coords. IE 0->1 or 0->size of face
    */ 	
-  LibModelFile(Render*);
+  LibModelFile();
 
   /*
    * Default destructor

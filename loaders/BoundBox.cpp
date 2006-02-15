@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.30 2006-02-13 22:16:09 simon Exp $
+// $Id: BoundBox.cpp,v 1.31 2006-02-15 09:50:31 simon Exp $
 
 #include "renderers/RenderSystem.h"
 
@@ -17,7 +17,8 @@
 #endif
 namespace Sear {
 
-BoundBox::BoundBox(Render *) : Model(NULL), 
+BoundBox::BoundBox() :
+  Model(), 
   m_initialised(false)
 {}
 

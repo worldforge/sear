@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.15 2006-02-13 22:16:09 simon Exp $
+// $Id: BoundBox.h,v 1.16 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -19,8 +19,6 @@
 #include "common/types.h"
 #include "common/SPtr.h"
 
-#include "renderers/RenderSystem.h"
-
 namespace Sear {
 
 class StaticObject;
@@ -31,7 +29,7 @@ public:
    * Constructor stores the bounding box for the basis of this model.
    * wrap indicates how to produce the texture coords. IE 0->1 or 0->size of face
    */ 	
-  BoundBox(Render*);
+  BoundBox();
 
   /*
    * Default destructor

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.31 2006-01-28 15:35:49 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.32 2006-02-15 09:50:31 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -12,13 +12,9 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 #include "src/System.h"
+
 #include "renderers/Render.h"
-
 #include "renderers/RenderSystem.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -39,8 +35,8 @@ static const std::string ANIM_default = "default";
 // Constructors                                                               //
 //----------------------------------------------------------------------------//
 
-Cal3dModel::Cal3dModel(Render *render) :
-  Model(render),
+Cal3dModel::Cal3dModel() :
+  Model(),
   m_initialised(false),
   m_core_model(NULL),
   m_calModel(NULL),
@@ -84,8 +80,10 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
 }
 
 void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode) {
-  assert(m_render != NULL);
-
+  Render *render = RenderSystem::getInstance().getRenderer();
+  float scale = getScale();
+  render->scaleObject(scale);
+  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
   // get the renderer of the model
   CalRenderer *pCalRenderer = m_calModel->getRenderer();
   assert(pCalRenderer !=  NULL);
@@ -136,7 +134,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
 	  shininess = pCalRenderer->getShininess();
 
-          m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
+          render->setMaterial(&ambient[0], &diffuse[0], &specular[0], shininess, NULL);
 	}
 	
         // get the transformed vertices of the submesh
@@ -185,9 +183,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
               RenderSystem::getInstance().switchTexture(1, 0);
             }
 	  }
-          m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
+          render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], &meshTextureCoordinates[0], &meshNormals[0], multitexture);
 	} else {
-          m_render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
+          render->renderElements(Graphics::RES_TRIANGLES, faceCount * 3, &meshFaces[0][0], &meshVertices[0], NULL, &meshNormals[0], false);
 	}
       }
     }
@@ -196,14 +194,8 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 }
 
 void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
-  assert(m_render);
-//  if (m_render) {
-    float scale = getScale();
-    m_render->scaleObject(scale);
-    m_render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east    
-    renderMesh(useTextures, useLighting, select_mode);
-  }
-//}
+  renderMesh(useTextures, useLighting, select_mode);
+}
 
 void Cal3dModel::update(float time_elapsed) {
   // update the model

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.22 2006-02-07 18:45:33 simon Exp $
+// $Id: 3ds.h,v 1.23 2006-02-15 09:50:30 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -34,7 +34,7 @@ public:
   /*
    * Defualt constructor
    */ 
-  ThreeDS(Render*);
+  ThreeDS();
 
   /*
    * Destructor

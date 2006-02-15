@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.h,v 1.9 2006-02-07 11:31:03 simon Exp $
+// $Id: 3ds_Loader.h,v 1.10 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_3DS_LOADER_H
 #define SEAR_3DS_LOADER_H 1
@@ -17,10 +17,11 @@ class ModelHandler;
 	
 class ThreeDS_Loader : public ModelLoader {
 public:	
-  ThreeDS_Loader(ModelHandler *mh);
-  ~ThreeDS_Loader() {}
+  ThreeDS_Loader() {}
+  virtual ~ThreeDS_Loader() {}
 
-  SPtr<ModelRecord> loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config);
+  virtual std::string getType() const { return THREEDS; }
+  virtual SPtr<ModelRecord> loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config);
 	  
 protected:
   static const std::string THREEDS;

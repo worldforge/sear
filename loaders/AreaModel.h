@@ -18,7 +18,7 @@ class WorldEntity;
 
 class AreaModel : public Model {
 public:
-  AreaModel(Render*, WorldEntity *we);
+  AreaModel(WorldEntity *we);
   /**
    * initialise the model. Result indicates success (true) or failure
   */

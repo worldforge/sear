@@ -2,16 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.11 2005-06-04 21:23:53 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.12 2006-02-15 09:50:31 simon Exp $
 
 #include "CoreModelHandler.h"
 #include "Cal3dCoreModel.h"
 #include "Cal3dModel.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 namespace Sear {
 	

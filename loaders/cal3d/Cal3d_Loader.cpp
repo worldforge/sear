@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.17 2006-02-07 11:31:03 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -18,11 +18,6 @@
 #include "Cal3dModel.h"
 #include "CoreModelHandler.h"
 
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -33,8 +28,7 @@ namespace Sear {
 	
 const std::string Cal3d_Loader::CAL3D = "cal3d";
 	
-Cal3d_Loader::Cal3d_Loader(ModelHandler *mh) {
-  mh->registerModelLoader(CAL3D, this);
+Cal3d_Loader::Cal3d_Loader() {
   m_core_model_handler = new CoreModelHandler();
   m_core_model_handler->init();
 }
@@ -44,10 +38,10 @@ Cal3d_Loader::~Cal3d_Loader() {
   delete m_core_model_handler;
 }
 
-SPtr<ModelRecord> Cal3d_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
+SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
 
   SPtr<ModelRecord> model_record =
-                ModelLoader::loadModel(render, we, model_id, model_config);
+                ModelLoader::loadModel(we, model_id, model_config);
 
   assert(model_record);
 

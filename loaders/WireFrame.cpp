@@ -2,17 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.17 2006-01-28 15:35:49 simon Exp $
+// $Id: WireFrame.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
 
 #include "src/System.h"
 #include "renderers/Graphics.h"
 #include "renderers/Render.h"
+#include "renderers/RenderSystem.h"
 
 #include "WireFrame.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -21,8 +18,8 @@
 #endif
 namespace Sear {
 
-WireFrame::WireFrame(Render *render) :
-  Model(render),
+WireFrame::WireFrame() :
+  Model(),
   m_initialised(false),
   m_disp(0)
 {}
@@ -109,27 +106,29 @@ int WireFrame::shutdown() {
 void WireFrame::contextCreated() {}
 
 void WireFrame::contextDestroyed(bool check) {
-  assert(m_render);
+  Render *render = RenderSystem::getInstance().getRenderer();
+  assert(render);
   if (check) {
-    m_render->freeList(m_disp);
+    render->freeList(m_disp);
   }
   m_disp = 0;
 }
 
 void WireFrame::render(bool) {
-  assert(m_render);
+  Render *render = RenderSystem::getInstance().getRenderer();
+  assert(render);
   static float ambient[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
   if (m_disp > 0) {
-    m_render->playList(m_disp);
+    render->playList(m_disp);
   } else {
-    m_disp = m_render->getNewList();
-    m_render->beginRecordList(m_disp);
-    m_render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-    m_render->renderArrays(Graphics::RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
-    m_render->endRecordList();
+    m_disp = render->getNewList();
+    render->beginRecordList(m_disp);
+    render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
+    render->renderArrays(Graphics::RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
+    render->endRecordList();
   }
 }
 

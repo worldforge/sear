@@ -28,10 +28,6 @@
 #include "AreaModelLoader.h"
 #include "ParticleSystemLoader.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -52,15 +48,15 @@ int ModelSystem::init() {
   m_model_handler->init();
 
   // Register ModelLoaders
-  // The ModelHandler class cleans these up.
-  new BoundBox_Loader(m_model_handler); // This is the default loader
-  new WireFrame_Loader(m_model_handler);
-  new NPlane_Loader(m_model_handler);
-  new ThreeDS_Loader(m_model_handler);
-  new Cal3d_Loader(m_model_handler);
-  new LibModelFile_Loader(m_model_handler);
-  new AreaModelLoader(m_model_handler);
-  new ParticleSystemLoader(m_model_handler);
+  // The smart pointer makes sure they get clean up.
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new BoundBox_Loader())); // This is the default loader
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new WireFrame_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new NPlane_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ThreeDS_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new LibModelFile_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new AreaModelLoader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ParticleSystemLoader()));
   
   m_object_handler = new ObjectHandler();
   m_object_handler->init();
@@ -84,6 +80,9 @@ int ModelSystem::shutdown() {
   m_model_handler->shutdown();
   delete m_model_handler;
   m_model_handler = NULL;
+
+  // Cleanp signals
+  notify_callbacks();
 
   m_initialised = false;
   return 0;
@@ -128,12 +127,12 @@ void ModelSystem::writeConfig(varconf::Config &config) {
 }
 
 void ModelSystem::loadModels(const std::string &filename) {
-  if (debug) printf("ModelSystem: Loading Models config.\n");
+  if (debug) printf("[Debug]ModelSystem: Loading Models config.\n");
   m_models.readFromFile(filename);
 }
 
-SPtr<ModelRecord> ModelSystem::getModel(Render *render, const std::string &model_id, WorldEntity *we) {
-  return m_model_handler->getModel(render, model_id, we);
+SPtr<ModelRecord> ModelSystem::getModel(const std::string &model_id, WorldEntity *we) {
+  return m_model_handler->getModel(model_id, we);
 }
 
 SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {

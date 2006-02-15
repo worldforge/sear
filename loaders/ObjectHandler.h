@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.5 2006-02-07 18:45:33 simon Exp $
+// $Id: ObjectHandler.h,v 1.6 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -31,10 +31,9 @@ public:
   ObjectHandler();
   ~ObjectHandler();
 
-  void init();
+  int init();
   void shutdown();
 
-  void loadObjectRecords(const std::string &filename);
   SPtr<ObjectRecord> getObjectRecord(const std::string &id);
   SPtr<ObjectRecord> instantiateRecord(const std::string &type, const std::string &id);
 
@@ -44,11 +43,12 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
   
-  varconf::Config &getObjectRecords() { return m_object_records; }
+//  varconf::Config &getObjectRecords() { return m_object_records; }
 
   void reset();
 
 protected:
+  void loadObjectRecords(const std::string &filename);
   typedef std::map<std::string, SPtr<ObjectRecord> > ObjectRecordMap;
 
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);

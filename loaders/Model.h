@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.9 2006-02-07 11:31:03 simon Exp $
+//$Id: Model.h,v 1.10 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -12,7 +12,6 @@
 
 #include <Atlas/Message/Element.h>
 
-#include "renderers/Render.h"
 #include "renderers/Graphics.h"
 
 namespace Sear {
@@ -24,9 +23,7 @@ typedef struct {
 
 class Model {
 public:
-  Model(Render *render) :
-    m_render(render)
-  {}
+  Model() {}
   virtual ~Model() {}
 //  virtual int init() = 0;
   virtual int shutdown() = 0;
@@ -125,7 +122,6 @@ public:
   virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
   
 protected: 
-  Render *m_render;
   float m_last_time;
   
 };

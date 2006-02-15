@@ -1,3 +1,58 @@
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* common/Utility.h: Use ostringstream instead of stringstream to avoid
+	  valgrind warning.
+
+	* loaders/3ds_Loader.h,loaders/AreaModelLoader.cpp,
+	  loaders/AreaModelLoader.h, loaders/BoundBox_Loader.h,
+	  loaders/LibModelFile_Loader.h, loaders/ModelHandler.cpp,
+	  loaders/ModelHandler.h, loaders/ModelLoader.h, 
+	  loaders/ModelSystem.cpp, loaders/NPlane_Loader.h,
+	  loaders/ParticleSystemLoader.cpp, loaders/ParticleSystemLoader.h,
+	  loaders/WireFrame_Loader.h, loaders/cal3d/Cal3d_Loader.h: Add a 
+	  getType function to the model loaders to return its name. Use a SPtr
+	  to store the model loaders in the model handler. Update the 
+	  registerModelLoader fruntion to just take the smart pointer and use 
+	  getType() to map the name. Update the de-register function to just
+	  take the name.
+
+	* loaders/3ds.cpp, loaders/3ds.h, loaders/3ds_Loader.cpp,
+	  loaders/3ds_Loader.h, loaders/AreaModel.cpp,loaders/AreaModel.h,
+	  loaders/AreaModelLoader.cpp, loaders/AreaModelLoader.h,
+	  loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/BoundBox_Loader.cpp,
+	  loaders/BoundBox_Loader.h, loaders/LibModelFile.cpp,
+	  loaders/LibModelFile.h, loaders/LibModelFile_Loader.cpp,
+	  loaders/LibModelFile_Loader.h, loaders/Model.h,
+	  loaders/ModelHandler.cpp, loaders/ModelHandler.h,
+	  loaders/ModelLoader.cpp, loaders/ModelLoader.h,
+	  loaders/ModelSystem.cpp, loaders/ModelSystem.h, loaders/NPlane.cpp,
+	  loaders/NPlane.h, loaders/NPlane_Loader.cpp, loaders/NPlane_Loader.h,
+	  loaders/NullModel.h, loaders/ObjectRecord.cpp,
+	  loaders/ParticleSystem.cpp, loaders/ParticleSystem.h,
+	  loaders/ParticleSystemLoader.cpp, loaders/ParticleSystemLoader.h,
+	  loaders/WireFrame.cpp, loaders/WireFrame.h,
+	  loaders/WireFrame_Loader.cpp, loaders/WireFrame_Loader.h, 
+	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/Cal3dModel.h,loaders/cal3d/Cal3d_Loader.cpp,
+	  loaders/cal3d/Cal3d_Loader.h, renderers/Graphics.cpp: Remove passing
+	  the Render object to the Model constructor as the StaticObject code
+	  does not need it. No longer need to pass the Render object to the
+	  loadModel/getModel functions. Grab the Render object through the
+	  RenderSystem interface for the remainin code that requires it.
+
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h,
+	  loaders/Makefile.am: Create a DynamicObject which is designed to be
+	  updated once per frame.
+
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: Use the 
+	  DynamicObject for rendering.
+
+	* loaders/ObjectHandler.cpp, loaders/ObjectHandler.h: Add objects to
+	  medium and high quality queues for the default object. Remove so old
+	  comments. Remove getObjectRecords accessor.
+
+	* loaders/StaticObject.cpp: Clean up indices VBO
+
 2006-02-14  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* README: Update dependancy versions.

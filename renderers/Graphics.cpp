@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.37 2006-02-13 22:27:27 simon Exp $
+// $Id: Graphics.cpp,v 1.38 2006-02-15 09:50:30 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -39,10 +39,6 @@
 #include "CameraSystem.h"
 #include "gui/Compass.h"
 #include "guichan/Workarea.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -500,7 +496,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
   for (I = Ibegin; I != Iend; ++I) {
     // retrive or create the model and modelRecord as necessary
-    SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(m_renderer, *I, obj_we);
+    SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(*I, obj_we);
     assert(modelRec);
     
     int state = select_mode ? modelRec->select_state : modelRec->state;
@@ -598,7 +594,7 @@ void Graphics::drawAttached(SPtr<ObjectRecord> obj,
   assert(obj);
   WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
   assert(obj_we);
-  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(m_renderer, obj->low_quality.front(), obj_we);
+  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(obj->low_quality.front(), obj_we);
   assert(modelRec);
   WorldEntity::AttachmentMap::const_iterator it,
     end = obj_we->getAttachments().end();

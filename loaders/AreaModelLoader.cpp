@@ -2,39 +2,33 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
+#include <varconf/Config.h>
+#include <Mercator/AreaShader.h>
+
 #include "AreaModelLoader.h"
-#include "ModelHandler.h"
 #include "AreaModel.h"
 #include "ModelRecord.h"
 #include "environment/Environment.h"
 #include "renderers/StateManager.h"
-#include <Mercator/AreaShader.h>
 #include "src/WorldEntity.h"
 
-namespace Sear
-{
+namespace Sear {
 
 class AreaModel;
 
-static const char* AREA_MODEL = "area";
+const std::string AreaModelLoader::AREA_MODEL = "area";
 static const char* KEY_shader_tex = "shader_texture";
 
-AreaModelLoader::AreaModelLoader(ModelHandler* mh)
-{
-    mh->registerModelLoader(AREA_MODEL, this);
-}
+AreaModelLoader::AreaModelLoader() {}
 
-AreaModelLoader::~AreaModelLoader()
-{
-}
+AreaModelLoader::~AreaModelLoader() {}
 
-SPtr<ModelRecord> AreaModelLoader::loadModel(Render *render, 
-    WorldEntity *we,
+SPtr<ModelRecord> AreaModelLoader::loadModel(WorldEntity *we,
     const std::string &model_id, 
     varconf::Config &model_config)
 {
-    SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
-    AreaModel* amodel = new AreaModel(render, we);
+    SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
+    AreaModel* amodel = new AreaModel(we);
     
     if (!amodel->init()) {
 //        delete model_record;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.28 2006-02-07 11:31:03 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -13,7 +13,6 @@
 #include "common/Utility.h"
 
 #include "renderers/Graphics.h"
-#include "ModelHandler.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 
@@ -21,10 +20,6 @@
 #include "BoundBox.h"
 
 #include "src/WorldEntity.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -39,19 +34,17 @@ const std::string BoundBox_Loader::BOUNDBOX = "boundbox";
 const std::string KEY_wrap_texture = "wrap_texture";
 const std::string KEY_texture = "texture";
 	
-BoundBox_Loader::BoundBox_Loader(ModelHandler *mh) {
-  mh->registerModelLoader(BOUNDBOX, this);
+BoundBox_Loader::BoundBox_Loader() {
 }
 
 BoundBox_Loader::~BoundBox_Loader() {
-  // TODO: Add ability to unregister loader.
 }
 
-SPtr<ModelRecord> BoundBox_Loader::loadModel(Render *render, WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
+SPtr<ModelRecord> BoundBox_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
   assert (we);
-  SPtr<ModelRecord> model_record = ModelLoader::loadModel(render, we, model_id, model_config);
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
 
-  BoundBox *model = new BoundBox(render);
+  BoundBox *model = new BoundBox();
 
   WFMath::AxisBox<3> bbox = we->getBBox();
  

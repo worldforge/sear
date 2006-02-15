@@ -2,9 +2,16 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.51 2006-02-07 17:55:39 simon Exp $
+// $Id: 3ds.cpp,v 1.52 2006-02-15 09:50:30 simon Exp $
 
 /** TODO
+ * - Make Material map only available within loader routines, not as a member
+ *   variable.
+ * - Move matrix transforms into StaticObject.
+ * - There appears to be a hierarchy of meshes that all need the matrix 
+ *   combined before storing in StaticObject
+ * - We could possibly re-write the 3ds stuff to allow animations?
+ *
  * - Currently each render object is created to store all the data in the mesh,
  *   however, if the material changes, a new object is created (of the same 
  *   size) but with the new points. Perhaps assume that 1 mesh == 1 material?
@@ -38,10 +45,6 @@
 
 #include "3ds.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -49,7 +52,7 @@
 #endif
 namespace Sear {
 
-ThreeDS::ThreeDS(Render *render) : Model(render),
+ThreeDS::ThreeDS() : Model(),
   m_initialised(false),
   m_height(1.0f)
 {
@@ -150,8 +153,6 @@ int ThreeDS::shutdown() {
 void ThreeDS::contextCreated() {}
 
 void ThreeDS::contextDestroyed(bool check) {
-  assert(m_render);
-
   StaticObjectList::const_iterator I = m_render_objects.begin();
   for (; I != m_render_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
@@ -161,9 +162,9 @@ void ThreeDS::contextDestroyed(bool check) {
 }
 
 void ThreeDS::render(bool select_mode) {
-  assert(m_render);
-
-  m_render->scaleObject(m_height);
+  // TODO Combine this scale into the matrix transform
+  Render *render = RenderSystem::getInstance().getRenderer();
+  render->scaleObject(m_height);
 
   for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;

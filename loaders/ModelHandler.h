@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.8 2006-02-07 18:45:33 simon Exp $
+// $Id: ModelHandler.h,v 1.9 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -30,7 +30,6 @@ class Console;
 class ModelLoader;
 class ModelRecord;
 class ObjectRecord;
-class Render;
 class WorldEntity;
 	
 class ModelHandler : public sigc::trackable , public ConsoleObject {
@@ -47,10 +46,10 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
  
-  SPtr<ModelRecord> getModel(Render *render, const std::string &model_id, WorldEntity *we = NULL);
+  SPtr<ModelRecord> getModel(const std::string &model_id, WorldEntity *we = NULL);
 
-  void registerModelLoader(const std::string &model_type, ModelLoader *model_loader);
-  void unregisterModelLoader(const std::string &model_type, ModelLoader *model_loader);
+  void registerModelLoader(SPtr<ModelLoader> model_loader);
+  void unregisterModelLoader(const std::string &model_type);
 
   void checkModelTimeouts(bool forceUnload);
   
@@ -65,7 +64,7 @@ protected:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
 
-  typedef std::map<std::string, ModelLoader*> ModelLoaderMap;
+  typedef std::map<std::string, SPtr<ModelLoader> > ModelLoaderMap;
   typedef std::map<std::string, SPtr<ModelRecord> > ModelRecordMap; 
   typedef std::map<std::string, SPtr<ModelRecord> > ObjectRecordMap;
 

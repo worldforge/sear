@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.16 2004-07-29 18:27:01 simon Exp $
+// $Id: Utility.h,v 1.17 2006-02-15 09:50:30 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -46,7 +46,7 @@ void cast_stream(const in_value &in, out_value &out) {
 
 template <class T>
 std::string string_fmt(const T & t) {
-  std::stringstream ss;
+  std::ostringstream ss;
   ss << t;
   return ss.str();
 }

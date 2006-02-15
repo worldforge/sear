@@ -16,7 +16,6 @@
 
 namespace Sear {
 
-class Render;
 class Console;
 class ModelHandler;
 class ObjectHandler;
@@ -60,7 +59,7 @@ public:
    * @param model_id The name of the model record to instantiate
    * @param we The Entity owning this model.
    */
-  SPtr<ModelRecord> getModel(Render *render, const std::string &model_id, WorldEntity *we); 
+  SPtr<ModelRecord> getModel(const std::string &model_id, WorldEntity *we); 
 
 
   /** The getObjectRecord method searches for the most appropriate record

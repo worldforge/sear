@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.10 2006-02-07 11:31:03 simon Exp $
+// $Id: WireFrame.h,v 1.11 2006-02-15 09:50:31 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -17,8 +17,8 @@ namespace Sear {
 
 class WireFrame : public Model{
 public:
-  WireFrame(Render*);
-  ~WireFrame();
+  WireFrame();
+  virtual ~WireFrame();
   
   int init(WFMath::AxisBox<3>);
   virtual int shutdown();

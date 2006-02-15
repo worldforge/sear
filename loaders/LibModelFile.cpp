@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.17 2006-02-07 18:45:33 simon Exp $
+// $Id: LibModelFile.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
 
 /*
   Debug check list
@@ -29,16 +29,11 @@ extern "C" {
 #include "src/System.h"
 #include "src/FileHandler.h"
 
-#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include "LibModelFile.h"
 
 #include "StaticObject.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -49,7 +44,7 @@ namespace Sear {
 
 static const float default_scale = 1.0f / 64.0f;
 
-LibModelFile::LibModelFile(Render *render) : Model(render), 
+LibModelFile::LibModelFile() : Model(), 
   m_initialised(false)
 {
   m_config.sige.connect(SigC::slot(*this, &LibModelFile::varconf_error_callback));
@@ -163,8 +158,6 @@ void LibModelFile::contextDestroyed(bool check) {
 }
 
 void LibModelFile::render(bool select_mode) {
-  assert(m_render && "LibModelFile m_render is null");
-
   for (StaticObjectList::const_iterator I = m_static_objects.begin(); I != m_static_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);

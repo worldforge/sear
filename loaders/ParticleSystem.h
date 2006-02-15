@@ -5,12 +5,14 @@
 #ifndef SEAR_PARTICLE_SYSTEM_H
 #define SEAR_PARTICLE_SYSTEM_H
 
+#include <common/SPtr.h>
+
 #include "loaders/Model.h"
 #include "renderers/RenderSystem.h"
 
-namespace Sear
-{
+namespace Sear {
 
+class DynamicObject;
 class Particle;
 class WorldEntity;
 
@@ -68,7 +70,7 @@ public:
 class ParticleSystem : public Model
 {
 public:
-    ParticleSystem(Render *render, WorldEntity *we);
+    ParticleSystem(WorldEntity *we);
     virtual ~ParticleSystem();
     
     virtual void init();
@@ -87,46 +89,47 @@ public:
     void setBBox(const WFMath::AxisBox<3>& bb);
     
 private:
-    friend class Particle;
-    friend class ParticleSystemLoader;
-    
-    void submit(const Point3& pos, double size, const Color_4d&, double spin);
+  friend class Particle;
+  friend class ParticleSystemLoader;
+  
+  void submit(const Point3& pos, double size, const Color_4d&, double spin);
 
-    void activate(Particle*);
+  void activate(Particle*);
     
-    Vector3 initialVelocity() const;
-    Point3 initialPos() const;
+  Vector3 initialVelocity() const;
+  Point3 initialPos() const;
     
-    bool m_initialised;
+  bool m_initialised;
 
-    std::vector<Particle*> m_particles;
-    TextureID m_texture, m_texture_mask;
-    WorldEntity* m_entity;
+  std::vector<Particle*> m_particles;
+  WorldEntity* m_entity;
     
-    Vertex_3* m_vertexBuffer;
-    Texel* m_texCoordBuffer;
-    Color_4* m_colorBuffer;
+  Vertex_3* m_vertexBuffer;
+  Texel* m_texCoordBuffer;
+  Color_4* m_colorBuffer;
     
-    Vector3 m_billboardX, m_billboardY;
-    unsigned int m_activeCount;
+  Vector3 m_billboardX, m_billboardY;
+  unsigned int m_activeCount;
 // config data
-    DRange m_createPerSec;
-    DRange m_ttl;
-    Vector3 m_basicVel, m_velocityDeviation;
-    DRange m_initialVelMag;
+  DRange m_createPerSec;
+  DRange m_ttl;
+  Vector3 m_basicVel, m_velocityDeviation;
+  DRange m_initialVelMag;
     
-    Point3 m_origin;
-    Vector3 m_posDeviation;
-    Vector3 m_accelVector;
-    DRange m_accelMag;
-    DRange m_initialSize;
-    DRange m_finalSize;
+  Point3 m_origin;
+  Vector3 m_posDeviation;
+  Vector3 m_accelVector;
+  DRange m_accelMag;
+  DRange m_initialSize;
+  DRange m_finalSize;
         
-    DRange m_emitSpinSpeed;
+  DRange m_emitSpinSpeed;
         
-    DRange m_initialAlpha, m_finalAlpha;
-    Color_4d m_initialColors[2];
-    Color_4d m_finalColors[2];
+  DRange m_initialAlpha, m_finalAlpha;
+  Color_4d m_initialColors[2];
+  Color_4d m_finalColors[2];
+
+  SPtrShutdown<DynamicObject> m_do;
 };
 
 } // of namespace Sear
