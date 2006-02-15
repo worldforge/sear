@@ -1,5 +1,16 @@
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h: Fix bug
+	  where model with no texture coords would still tell the DynamicObject
+	  that it had some. Remove render with with args function.
+
+	* loaders/StaticObject.cpp, loaders/DynamicObject.cpp: Move call to
+	  identity() to the init function. Initialise material properties.
+
+	* loaders/DynamicObject.cpp: Use colour arrays in no VBO mode too.
+
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Make indices an
 	  int instead of unsigned int (for now at least!). Fix bug in
 	  copyIndices where the wrong VBO was being reset. Do not attempt to do

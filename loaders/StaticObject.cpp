@@ -29,7 +29,6 @@ StaticObject::StaticObject() :
   m_disp_list(0),
   m_select_disp_list(0)
 {
-  identity();
 }
 
 StaticObject::~StaticObject()  {
@@ -38,6 +37,14 @@ StaticObject::~StaticObject()  {
 
 int StaticObject::init() {
   assert(m_initialised == false);
+
+  setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
+  setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+  setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+  setEmission(0.0f, 0.0f, 0.0f, 0.0f);
+  setShininess(50.0f);
+
+  identity();
 
   m_initialised = true;
 

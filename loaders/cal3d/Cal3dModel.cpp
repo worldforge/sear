@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.33 2006-02-15 14:39:54 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.34 2006-02-15 15:58:54 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -155,6 +155,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // get the transformed vertices of the submesh
         static Vertex_3 meshVertices[30000];
         int vertexCount;
+assert(vertexCount);
         vertexCount = pCalRenderer->getVertices((float*)&meshVertices[0]);
         dyno->copyVertexData((float*)meshVertices, vertexCount * 3);
 
@@ -166,16 +167,20 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // get the texture coordinates of the submesh
         static Texel meshTextureCoordinates[30000];
         int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, (float*)&meshTextureCoordinates[0]);
-        dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
+        if (textureCoordinateCount > 0) {
+          dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
+        }
 
         // get the faces of the submesh
         static int meshFaces[50000 * 3];
         int faceCount = pCalRenderer->getFaces(&meshFaces[0]);
-        dyno->copyIndices(meshFaces, faceCount * 3);
+        if (faceCount) {
+          dyno->copyIndices(meshFaces, faceCount * 3);
+          dyno->setNumPoints(faceCount * 3);
+        } else {
+          dyno->setNumPoints(vertexCount / 3);
+        }
 
-        dyno->setNumPoints(faceCount * 3);
-
-        bool multitexture = false;
         // TODO handle missing MapData more sensibly.
         // set the vertex and normal buffers
         if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
@@ -188,7 +193,6 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
               dyno->setTexture(0, 0, 0);
             }
 	  } else {
-	    multitexture = true;
             // Set texture unit 0
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
@@ -212,7 +216,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
   pCalRenderer->endRendering();
 }
 
-void Cal3dModel::render(bool useTextures, bool useLighting, bool select_mode) {
+void Cal3dModel::render(bool select_mode) {
   // TODO Make this into a matrix?
   Render *render = RenderSystem::getInstance().getRenderer();
   float scale = getScale();

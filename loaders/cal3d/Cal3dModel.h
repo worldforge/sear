@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.20 2006-02-15 14:39:55 simon Exp $
+// $Id: Cal3dModel.h,v 1.21 2006-02-15 15:58:54 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -35,8 +35,7 @@ public:
 
   float getLodLevel() const { return m_lodLevel; }
   float getScale() const { return m_renderScale; }
-  virtual void render(bool select_mode) { render(true, true, select_mode); }
-  void render(bool, bool, bool);
+  virtual void render(bool select_mode);
   virtual void update(float elapsedSeconds);
   void setDetailLevel(float level) { setLodLevel(level); }
   void setLodLevel(float lodLevel);

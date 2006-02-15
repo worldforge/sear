@@ -31,7 +31,6 @@ DynamicObject::DynamicObject() :
   m_disp_list(0),
   m_select_disp_list(0)
 {
-  identity();
 }
 
 DynamicObject::~DynamicObject()  {
@@ -40,6 +39,14 @@ DynamicObject::~DynamicObject()  {
 
 int DynamicObject::init() {
   assert(m_initialised == false);
+
+  setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
+  setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+  setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+  setEmission(0.0f, 0.0f, 0.0f, 0.0f);
+  setShininess(50.0f);
+
+  identity();
 
   m_initialised = true;
 
@@ -332,6 +339,12 @@ void DynamicObject::render(bool select_mode) {
         glActiveTextureARB(GL_TEXTURE0_ARB);
       }
 
+      if (glIsBufferARB(m_vb_colour_data)) {
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
+      }
+
+
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
         glLockArraysEXT(0, m_num_points  * 3);
@@ -356,6 +369,10 @@ void DynamicObject::render(bool select_mode) {
 
         // Reset current texture unit
         glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
+
+      if (glIsBufferARB(m_vb_colour_data)) {
+        glDisableClientState(GL_COLOR_ARRAY);
       }
 
       if (m_normal_data) {
