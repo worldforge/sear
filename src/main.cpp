@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.30 2006-01-30 17:32:24 simon Exp $
+// $Id: main.cpp,v 1.31 2006-02-15 10:18:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,10 +15,6 @@
 #include "error.h"
 
 #include <signal.h>
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -89,8 +85,9 @@ under certain conditions; type `show c' for details.
   sys->addSearchPaths(path_list);
 
   if (!sys->init(p_argc, p_argv)) {
-    std::cerr << "Error initialising Sear!" << std::endl;
+    fprintf(stderr, "Error initialising Sear!\n");
     Sear::ErrorDialog("Error initialising Sear. See log files or stdout/stderr for more details");
+    delete sys;
     exit (1);
   }
   try {

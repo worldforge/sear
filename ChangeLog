@@ -1,5 +1,10 @@
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/System.cpp, src/main.cpp: Fix some leaks when window creation
+	  fails.
+
+2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* common/Utility.h: Use ostringstream instead of stringstream to avoid
 	  valgrind warning.
 

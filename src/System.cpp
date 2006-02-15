@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.149 2006-02-14 17:55:23 simon Exp $
+// $Id: System.cpp,v 1.150 2006-02-15 10:18:03 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -145,7 +145,13 @@ System::System() :
 
 System::~System() {
   assert (m_initialised == false);
-  if (m_initialised) shutdown();
+
+  if (m_file_handler) {
+    delete m_file_handler; 
+  }
+
+  // Explicity Tell sigc to disconnect signals
+  notify_callbacks();
 }
 
 
@@ -330,6 +336,8 @@ bool System::init(int argc, char *argv[]) {
 
     SDL_Quit();
 
+    Eris::execDeleteLaters();
+
     return false;
   }
 
@@ -407,6 +415,9 @@ void System::shutdown() {
     delete m_sound;
     m_sound = NULL;
   }
+
+  // Explicity Tell sigc to disconnect signals
+  notify_callbacks();
 
   SDL_Quit();
 
