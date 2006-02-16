@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: LightManager.h,v 1.3 2006-02-14 16:39:45 simon Exp $
+// $Id: LightManager.h,v 1.4 2006-02-16 17:45:20 simon Exp $
 
 #ifndef SEAR_LIGHTMANAGER_H
 #define SEAR_LIGHTMANAGER_H 1
@@ -19,6 +19,7 @@ public:
 
   int init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   void reset();
   void applyLight(const Light &light); 

@@ -2,14 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-#include "AreaModel.h"
-#include "environment/Environment.h"
-#include <Mercator/Area.h>
-#include "src/WorldEntity.h"
 #include <iostream>
 
-namespace Sear
-{
+#include <Mercator/Area.h>
+
+#include "environment/Environment.h"
+
+#include "src/WorldEntity.h"
+
+#include "AreaModel.h"
+
+namespace Sear {
 
 typedef WFMath::Point<2> Point2;
 typedef WFMath::Vector<3> Vector3;

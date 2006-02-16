@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.35 2006-01-29 22:35:19 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.36 2006-02-16 17:45:21 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -41,7 +41,7 @@ public:
 
   const OrientBBox &getOrientBBox() const { return m_orientBBox; }
   bool hasMessages() const { return !messages.empty(); }
-  void renderMessages();
+//  void renderMessages();
   void displayInfo();
 
   std::string type();

@@ -2,8 +2,17 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.77 2006-02-07 18:45:34 simon Exp $
+// $Id: WorldEntity.cpp,v 1.78 2006-02-16 17:45:21 simon Exp $
 
+/*
+ TODO
+  * getAbsPos and getAbsOrient should cache the value unless it has changed
+  * Easy for none moving chars, but moving chars will need resetting once per
+  * frame.
+*/
+
+//#include <set>
+#include <sigc++/bind.h>
 #include <sigc++/object_slot.h>
 
 #include <Atlas/Message/Element.h>
@@ -21,23 +30,12 @@
 
 #include "System.h"
 #include "Console.h"
-#include "loaders/ObjectHandler.h"
 #include "loaders/ObjectRecord.h"
 #include "loaders/ModelSystem.h"
-#include "loaders/Model.h"
-#include "renderers/Render.h"
-#include "renderers/RenderSystem.h"
 #include "WorldEntity.h"
 #include "ActionHandler.h"
 
 #include "environment/Environment.h"
-#include <set>
-#include <sigc++/bind.h>
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -92,7 +90,7 @@ void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)
     }
     System::instance()->pushMessage(getName()+" " + attr.String(), CONSOLE_MESSAGE | SCREEN_MESSAGE);
 }
-
+/*
 void WorldEntity::renderMessages() {
   if (messages.empty()) return;
   //Convert messages into char arrays up x characters long
@@ -136,7 +134,7 @@ void WorldEntity::renderMessages() {
     }
   }
 }
-
+*/
 const WFMath::Quaternion WorldEntity::getAbsOrient() 
 {
     WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
