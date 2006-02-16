@@ -1,5 +1,9 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Character.h: Fix missing forward decl.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ParticleSystem.h, loaders/ParticleSystem.cpp: Fix includes.
 
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>

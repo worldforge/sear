@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.38 2006-02-15 12:44:24 simon Exp $
+// $Id: Character.h,v 1.39 2006-02-16 17:39:44 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -26,6 +26,7 @@ class Config;
 namespace Sear {
 
 // Forward declarations
+class Console;
 class Client;
 class System;
 class WorldEntity;
