@@ -1,5 +1,15 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/Weather.cpp, environment/Weather.h, data/states.cfg,
+	  environment/Environment.cpp, environment/Environment.h,
+	  renderers/Graphics.cpp: Tidy up reading rain and snow attributes from
+	  weather entity. Render "rain" using random points. Use the 
+	  GL_ARB_POINT_SPRITE if available to render rain, else use a single pt
+	  point. Create a new "weather" render state. New media for the rain is
+	  in wfut media channel.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ModelLoader.cpp: Remove some debugging asserts.
 
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>

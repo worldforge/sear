@@ -46,6 +46,7 @@ public:
   void renderSky();
   void renderTerrain(const WFMath::Point<3> &pos, bool select_mode);
   void renderSea();
+  void renderWeather();
 
   void contextCreated();
   void contextDestroyed(bool check);

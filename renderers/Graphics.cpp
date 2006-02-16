@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.39 2006-02-16 15:59:01 simon Exp $
+// $Id: Graphics.cpp,v 1.40 2006-02-16 21:23:30 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -379,6 +379,11 @@ if (c_select) select_mode = true;
 
       m_compass->update(cam->getRotation());
       m_compass->draw(m_renderer, select_mode);
+
+      m_renderer->setViewMode(ORTHOGRAPHIC);
+
+      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("weather"));
+      Environment::getInstance().renderWeather();
     } 
 
   } else {

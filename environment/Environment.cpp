@@ -83,6 +83,10 @@ void Environment::renderTerrain(const WFMath::Point<3> &pos, bool select_mode) {
   m_terrain->render(pos, select_mode);
 }
 
+void Environment::renderWeather() {
+  assert(m_initialised == true);
+  m_weather->render();
+}
 void Environment::renderSea() {
   assert(m_initialised == true);
   m_terrain->renderSea();
