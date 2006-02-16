@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Sprite.cpp,v 1.9 2006-02-05 21:09:48 simon Exp $
+// $Id: Sprite.cpp,v 1.10 2006-02-16 15:59:01 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"
@@ -224,7 +224,7 @@ void SpriteData::draw(Render* render)
                           m_width/2.f, m_height/2.f, 0.f,
                          -m_width/2.f, m_height/2.f, 0.f };
   
-    render->renderArrays(Graphics::RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
+    render->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
     
     RenderSystem::getInstance().getTextureManager()->clearLastTexture(0);
 }

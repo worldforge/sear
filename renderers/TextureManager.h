@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.23 2006-02-07 18:45:34 simon Exp $
+// $Id: TextureManager.h,v 1.24 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -78,6 +78,7 @@ public:
    * Clean up the TextureManager object
    */ 
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
   
   /**
    * This reads in texture configuration data from the specified file

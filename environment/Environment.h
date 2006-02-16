@@ -3,7 +3,7 @@
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 #ifndef SEAR_ENVIRONMENT_H
-#define SEAR_EnVIRONMENT_H
+#define SEAR_ENVIRONMENT_H 1
 
 #include <stdlib.h>
 #include <map>
@@ -12,6 +12,8 @@
 
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
+
+#include "common/SPtr.h"
 
 namespace Mercator { 
     class Area;
@@ -24,18 +26,12 @@ class TerrainRenderer;
 class SkyDome;
 class Stars;
 class WorldEntity;
+class Weather;
 
 class Environment : public sigc::trackable {
-  Environment() :
-    m_initialised(false),
-    m_terrain(NULL),
-    m_skyDome(NULL)
-  {}
-
 public:
-  ~Environment() {
-    assert(m_initialised == false);
-  }
+  Environment();
+  ~Environment();
 
   void init();
   void shutdown();
@@ -58,14 +54,17 @@ public:
   void registerTerrainShader(Mercator::Shader* s, const std::string& texId);
   
   void resetWorld();
+  void setWeatherEntity(WorldEntity *we);
 
 private:
   bool m_initialised;
 
   static Environment instance;
-  TerrainRenderer *m_terrain;
-  SkyDome *m_skyDome;
-  Stars* m_stars;
+
+  SPtr<TerrainRenderer> m_terrain;
+  SPtr<SkyDome> m_skyDome;
+  SPtr<Stars> m_stars;
+  SPtrShutdown<Weather> m_weather;
 };
 
 } // namespace Sear

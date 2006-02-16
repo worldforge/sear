@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.30 2006-02-16 15:59:01 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -10,11 +10,7 @@
 
 #include <string>
 
-#include "common/Utility.h"
-
-#include "renderers/Graphics.h"
 #include "ModelRecord.h"
-#include "ObjectRecord.h"
 
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"
@@ -46,7 +42,7 @@ SPtr<ModelRecord> BoundBox_Loader::loadModel(WorldEntity *we, const std::string 
 
   BoundBox *model = new BoundBox();
 
-  WFMath::AxisBox<3> bbox = we->getBBox();
+  WFMath::AxisBox<3> bbox = we->hasBBox() ? (we->getBBox()) : (WFMath::AxisBox<3>(WFMath::Point<3>(0.0f,0.0f,0.0f), WFMath::Point<3>(1.0f,1.0f,1.0f)));
  
   std::string texture = we->type();
   bool wrap = false; //default to false

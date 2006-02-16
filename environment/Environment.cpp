@@ -8,24 +8,31 @@
 
 #include "src/System.h"
 
+#include "Weather.h"
 #include "Environment.h"
 #include "TerrainRenderer.h"
 #include "SkyDome.h"
 #include "Stars.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 namespace Sear {
 
 Environment  Environment::instance;
+Environment::Environment() :
+  m_initialised(false)
+{}
+
+Environment::~Environment() {
+  assert(m_initialised == false);
+}
+
 
 void Environment::init() {
   assert(m_initialised == false);
-  m_terrain = new TerrainRenderer();
-  m_skyDome = new SkyDome(1.0f, 20, 20);
-  m_stars = new Stars();
+  m_terrain = SPtr<TerrainRenderer>(new TerrainRenderer());
+  m_skyDome = SPtr<SkyDome>(new SkyDome(1.0f, 20, 20));
+  m_stars = SPtr<Stars>(new Stars());
+  m_weather = SPtrShutdown<Weather>(new Weather());
+  m_weather->init();
  
   RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Environment::contextCreated));
   RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Environment::contextDestroyed));
@@ -39,15 +46,13 @@ void Environment::init() {
 void Environment::shutdown() {
   assert(m_initialised == true);
 
-  delete m_terrain;
-  m_terrain = NULL;
- 
-  delete m_skyDome;
-  m_skyDome = NULL;
+  m_terrain.release();
+  m_skyDome.release();
+  m_stars.release();
+  m_weather.release();
 
-  delete m_stars;
-  m_stars = NULL;
-  
+  notify_callbacks();
+ 
   m_initialised = false;
 }
 
@@ -103,12 +108,19 @@ void Environment::registerArea(Mercator::Area* ar)
 
 void Environment::registerTerrainShader(Mercator::Shader* shade, const std::string& texId)
 {
+  assert(m_initialised == true);
     assert(shade);
     m_terrain->registerShader(shade, texId);
 }
 
 void Environment::resetWorld() {
+  assert(m_initialised == true);
   m_terrain->reset();
+}
+
+void Environment::setWeatherEntity(WorldEntity *we) {
+  assert(m_initialised == true);
+  m_weather->setWeatherEntity(we);
 }
 
 } // namespace Sear

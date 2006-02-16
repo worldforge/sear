@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.11 2006-02-07 18:45:34 simon Exp $
+// $Id: StateManager.h,v 1.12 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -62,6 +62,7 @@ public:
 
   int init();
   int shutdown();
+  bool isInitialised() const { return m_initialised; }
   void readFiles(const std::string &);
 
   StateID getState(const std::string &state_name) const;

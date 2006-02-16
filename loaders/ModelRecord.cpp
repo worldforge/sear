@@ -2,12 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.cpp,v 1.8 2006-02-15 09:50:31 simon Exp $
+// $Id: ModelRecord.cpp,v 1.9 2006-02-16 15:59:01 simon Exp $
 
 #include "ModelRecord.h"
 #include "Model.h"
 #include "renderers/RenderSystem.h"
-#include "renderers/StateManager.h"
 
 namespace Sear {
   const std::string ModelRecord::SCALE = "scale";
@@ -35,13 +34,13 @@ ModelRecord::ModelRecord() :
     state_name("default"),
     select_state_name("select"),
     model_by_type(false),
-    rotation_style(Graphics::ROS_NONE),
+    rotation_style(ROS_NONE),
     offset_x(0.0f), offset_y(0.0f), offset_z(0.0f),
     scaleByHeight(false)
   {
     // Initialise state numbers
-    state = RenderSystem::getInstance().getStateManager()->getState(state_name);
-    select_state = RenderSystem::getInstance().getStateManager()->getState(select_state_name);
+    state = RenderSystem::getInstance().requestState(state_name);
+    select_state = RenderSystem::getInstance().requestState(select_state_name);
   }
 
 

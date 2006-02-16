@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006
 
-// $Id: Camera.h,v 1.5 2006-02-07 18:45:33 simon Exp $
+// $Id: Camera.h,v 1.6 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -57,7 +57,7 @@ public:
    * Shutdown camera
    */ 
   void shutdown();
-
+  bool isInitialised() const { return m_initialised; }
   /**
    * updates camera values according to current rates
    * @param time_elapsed Time elapsed in seconds since last update

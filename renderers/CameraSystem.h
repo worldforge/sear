@@ -29,6 +29,7 @@ public:
 
   int init();
   int shutdown();
+  bool isInitialised() const { return m_initialised; }
   
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.38 2006-02-15 09:50:30 simon Exp $
+// $Id: Graphics.cpp,v 1.39 2006-02-16 15:59:01 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -17,28 +17,29 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 #include "environment/Environment.h"
-#include "GL.h"
-#include "renderers/Sprite.h"
-#include "Camera.h"
 #include "src/Character.h"
 #include "src/Console.h"
-#include "Frustum.h"
-#include "Light.h"
-#include "LightManager.h"
 #include "loaders/ModelSystem.h"
 #include "loaders/Model.h"
 #include "loaders/ModelRecord.h"
 #include "loaders/ObjectRecord.h"
 #include "loaders/ObjectHandler.h"
-#include "Render.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 #include "src/client.h"
-
-#include "renderers/RenderSystem.h"
-#include "CameraSystem.h"
 #include "gui/Compass.h"
 #include "guichan/Workarea.h"
+
+#include "Graphics.h"
+#include "Camera.h"
+#include "Sprite.h"
+#include "Frustum.h"
+#include "Light.h"
+#include "LightManager.h"
+#include "GL.h"
+#include "RenderSystem.h"
+#include "Render.h"
+#include "CameraSystem.h"
 
 #ifdef DEBUG
   static const bool debug = true;

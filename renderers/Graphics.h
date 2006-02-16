@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.12 2006-02-07 18:45:34 simon Exp $
+// $Id: Graphics.h,v 1.13 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -18,6 +18,7 @@
 
 #include "Light.h"
 #include "Render.h"
+#include "RenderTypes.h"
 #include "interfaces/ConsoleObject.h"
 
 namespace varconf {
@@ -38,27 +39,6 @@ class Graphics : public ConsoleObject, public sigc::trackable {
 
 public:
 
-typedef enum {
-  RES_INVALID = 0,
-  RES_POINT,
-  RES_LINES,
-  RES_TRIANGLES,
-  RES_QUADS,
-  RES_TRIANGLE_FAN,
-  RES_TRIANGLE_STRIP,
-  RES_QUAD_STRIP,
-  RES_LAST_STYLE
-} RenderStyle;
-
-typedef enum {
-  ROS_NONE = 0,
-  ROS_NORMAL,
-  ROS_POSITION,
-  ROS_BILLBOARD,
-  ROS_HALO
-} RotationStyle;
-
-
   Graphics(System *system);
   ~Graphics();
 
@@ -66,6 +46,7 @@ typedef enum {
   void init();
   void initWindow(int width, int height);
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   float getLightLevel();
   

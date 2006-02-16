@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.16 2006-02-13 22:27:27 simon Exp $
+// $Id: RenderSystem.cpp,v 1.17 2006-02-16 15:59:01 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -22,10 +22,6 @@
 #include "Render.h"
 #include "GL.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -38,25 +34,33 @@ RenderSystem RenderSystem::m_instance;
 
 static const std::string CMD_TOGGLE_FULLSCREEN = "toggle_fullscreen";
 
+RenderSystem::RenderSystem() :
+  m_initialised(false),
+  m_mouseCurState(0),
+  m_mouseVisible(true)
+{ }
+
+RenderSystem::~RenderSystem() {}
+
 void RenderSystem::init() {
   assert (m_initialised == false);
   
   if (debug) std::cout << "RenderSystem: Initialise" << std::endl;
 
-  m_renderer = new GL();
+  m_renderer = SPtrShutdown<Render>(new GL());
   m_renderer->init();
 
-  m_stateManager = new StateManager();
+  m_stateManager = SPtrShutdown<StateManager>(new StateManager());
   m_stateManager->init();
 
-  m_textureManager = new TextureManager();
+  m_textureManager = SPtrShutdown<TextureManager>(new TextureManager());
   m_textureManager->init();
 
-  m_graphics = new Graphics(System::instance());
+  m_graphics = SPtrShutdown<Graphics>(new Graphics(System::instance()));
   m_graphics->init();
-  m_graphics->setRenderer(m_renderer);
+  m_graphics->setRenderer(m_renderer.get());
 
-  m_cameraSystem = new CameraSystem();
+  m_cameraSystem = SPtrShutdown<CameraSystem>(new CameraSystem());
   m_cameraSystem->init();
   // Create default cameras
   // Chase camera
@@ -91,7 +95,7 @@ void RenderSystem::registerCommands(Console *con) {
 
   con->registerCommand(CMD_TOGGLE_FULLSCREEN, this);
 
-  dynamic_cast<GL*>(m_renderer)->registerCommands(con);
+  dynamic_cast<GL*>(m_renderer.get())->registerCommands(con);
   m_textureManager->registerCommands(con);
   m_stateManager->registerCommands(con);
   m_graphics->registerCommands(con);
@@ -108,25 +112,11 @@ void RenderSystem::shutdown() {
   
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
 
-  m_cameraSystem->shutdown();
-  delete m_cameraSystem;
-  m_cameraSystem = NULL;
-
-  m_graphics->shutdown();
-  delete m_graphics;
-  m_graphics = NULL;
-
-  m_textureManager->shutdown();
-  delete m_textureManager;
-  m_textureManager = NULL;
-
-  m_stateManager->shutdown();
-  delete m_stateManager;
-  m_stateManager = NULL;
-
-  m_renderer->shutdown();
-  delete m_renderer;
-  m_renderer = NULL;
+  m_cameraSystem.release();
+  m_graphics.release();
+  m_textureManager.release();
+  m_stateManager.release();
+  m_renderer.release();
 
   m_initialised = false;
 }
@@ -178,16 +168,16 @@ StateID RenderSystem::getCurrentState() {
 
 bool RenderSystem::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
   assert (m_initialised);
-  return dynamic_cast<GL*>(m_renderer)->createWindow(width, height, fullscreen);
+  return dynamic_cast<GL*>(m_renderer.get())->createWindow(width, height, fullscreen);
 }
 void RenderSystem::destroyWindow() {
   assert (m_initialised);
-  dynamic_cast<GL*>(m_renderer)->destroyWindow();
+  dynamic_cast<GL*>(m_renderer.get())->destroyWindow();
 }
 
 void RenderSystem::toggleFullscreen() {
   assert (m_initialised);
-  dynamic_cast<GL*>(m_renderer)->toggleFullscreen();
+  dynamic_cast<GL*>(m_renderer.get())->toggleFullscreen();
 }
 
 void RenderSystem::drawScene(bool select_mode, float time_elapsed) {
@@ -212,27 +202,27 @@ void RenderSystem::writeConfig(varconf::Config &config) {
 
 void RenderSystem::resize(int width, int height) {
   assert(m_initialised);
-  dynamic_cast<GL*>(m_renderer)->resize(width, height);
+  dynamic_cast<GL*>(m_renderer.get())->resize(width, height);
 }
 
 void RenderSystem::processMouseClick(int x, int y) {
   assert(m_initialised == true);
-  dynamic_cast<GL*>(m_renderer)->procEvent(x, y);
+  m_renderer->procEvent(x, y);
 }
 
 bool RenderSystem::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   assert(m_initialised);
-  return dynamic_cast<GL*>(m_renderer)->getWorldCoords(x, y, wx, wy, wz);
+  return dynamic_cast<GL*>(m_renderer.get())->getWorldCoords(x, y, wx, wy, wz);
 }
 
 WorldEntity *RenderSystem::getActiveEntity() const {
   assert(m_initialised);
-  return dynamic_cast<GL*>(m_renderer)->getActiveEntity();
+  return m_renderer->getActiveEntity();
 }
 
 std::string RenderSystem::getActiveEntityID() const {
   assert(m_initialised);
-  return dynamic_cast<GL*>(m_renderer)->getActiveID();
+  return m_renderer->getActiveID();
 }
 
 } // namespace Sear

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.20 2006-02-15 09:50:31 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.21 2006-02-16 15:59:01 simon Exp $
 
 #include <string>
 
@@ -37,7 +37,8 @@ SPtr<ModelRecord> WireFrame_Loader::loadModel(WorldEntity *we, const std::string
   SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
   WireFrame *model = new WireFrame();
 
-  WFMath::AxisBox<3> bbox = we->getBBox();
+  WFMath::AxisBox<3> bbox = we->hasBBox() ? (we->getBBox()) : (WFMath::AxisBox<3>(WFMath::Point<3>(0.0f,0.0f,0.0f), WFMath::Point<3>(1.0f,1.0f,1.0f)));
+
   if (model->init(bbox)) {
     delete model;
     return SPtr<ModelRecord>();

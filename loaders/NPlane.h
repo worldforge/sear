@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.13 2006-02-15 09:50:31 simon Exp $
+// $Id: NPlane.h,v 1.14 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -13,7 +13,6 @@
 #include "common/SPtr.h"
 
 #include "Model.h"
-#include "renderers/Graphics.h"
 
 namespace Sear {
 
@@ -34,7 +33,7 @@ public:
  
   virtual void render(bool); 
 
-  virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_POSITION; }
+  virtual RotationStyle rotationStyle() { return ROS_POSITION; }
   
 private:
   bool m_initialised;

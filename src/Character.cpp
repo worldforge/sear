@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.76 2006-02-07 18:45:34 simon Exp $
+// $Id: Character.cpp,v 1.77 2006-02-16 15:59:00 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -38,10 +38,6 @@
 #include "loaders/ObjectRecord.h"
 
 #include "loaders/ModelSystem.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 using Atlas::Objects::Operation::Use;
 using Atlas::Objects::Operation::Wield;
@@ -735,7 +731,7 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
 
 void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
   if (!m_avatar) return;
-  assert(!name.empty());
+  if (name.empty()) return;
       
   Atlas::Message::MapType guiseMap;
   if (m_self->hasAttr(GUISE)) guiseMap = m_self->valueOfAttr(GUISE).asMap();

@@ -12,6 +12,8 @@
 
 #include "interfaces/ConsoleObject.h"
 
+#include "common/SPtr.h"
+
 namespace varconf {
   class Config;
 }
@@ -51,19 +53,12 @@ public:
 
   static RenderSystem &getInstance() { return m_instance; }
 
-  RenderSystem() :
-    m_initialised(false),
-    m_stateManager(NULL),
-    m_textureManager(NULL),
-    m_renderer(NULL),
-    m_graphics(NULL),
-    m_mouseCurState(0),
-    m_mouseVisible(true)
-  { }
-  virtual ~RenderSystem() {}
+  RenderSystem();
+  ~RenderSystem(); 
 
   void init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   // Texture Manager Functions
   TextureID requestTexture(const std::string &textureName, bool mask = false);
@@ -78,11 +73,11 @@ public:
   void contextCreated();
   void contextDestroyed(bool check);
 
-  TextureManager *getTextureManager() const { return m_textureManager; }
-  StateManager *getStateManager() const { return m_stateManager; }
-  Render *getRenderer() const { return m_renderer; }
-  Graphics *getGraphics() const { return m_graphics; }
-  CameraSystem *getCameraSystem() const { return m_cameraSystem; }
+  TextureManager *getTextureManager() { return m_textureManager.get(); }
+//  StateManager *getStateManager() { return m_stateManager.get(); }
+  Render *getRenderer() { return m_renderer.get(); }
+  Graphics *getGraphics() { return m_graphics.get(); }
+  CameraSystem *getCameraSystem() { return m_cameraSystem.get(); }
  
   // Renderer Functions
   bool createWindow(unsigned int width, unsigned int height, bool fullscreen);
@@ -125,11 +120,11 @@ private:
 
   bool m_initialised;
 
-  StateManager *m_stateManager;
-  TextureManager *m_textureManager;
-  Render *m_renderer;
-  Graphics *m_graphics;
-  CameraSystem *m_cameraSystem;
+  SPtrShutdown<StateManager> m_stateManager;
+  SPtrShutdown<TextureManager> m_textureManager;
+  SPtrShutdown<Render> m_renderer;
+  SPtrShutdown<Graphics> m_graphics;
+  SPtrShutdown<CameraSystem> m_cameraSystem;
 
   bool  m_renderState[RENDER_LAST_STATE];
 

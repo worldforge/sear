@@ -45,6 +45,7 @@ public:
   ~GL();
   void init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   int contextCreated();
   void contextDestroyed(bool check);

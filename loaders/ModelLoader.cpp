@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.6 2006-02-15 09:50:31 simon Exp $
+// $Id: ModelLoader.cpp,v 1.7 2006-02-16 15:59:01 simon Exp $
 
 #include "ModelLoader.h"
 
@@ -75,6 +75,7 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     if (model_config.findItem(model_id, "state_num")) {
       model_record->state = model_config.getItem(model_id, "state_num");
     } else {
+      assert(false);
       model_record->state = 0;
     }
 
@@ -88,6 +89,7 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     if (model_config.findItem(model_id, "select_state_num")) {
       model_record->select_state = model_config.getItem(model_id, "select_state_num");
     } else {
+      assert(false);
       model_record->select_state = 0;
     }
     // Get render select state name
@@ -120,15 +122,15 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
       rotation_style = (std::string)model_config.getItem(model_id, ModelRecord::ROTATION_STYLE);
     }
     // Object doesn't rotate at all
-    if (rotation_style == "none") model_record->rotation_style = Graphics::ROS_NONE;
+    if (rotation_style == "none") model_record->rotation_style = ROS_NONE;
     // Object is rotated to its specified orientation
-    else if (rotation_style == "normal") model_record->rotation_style = Graphics::ROS_NORMAL;
+    else if (rotation_style == "normal") model_record->rotation_style = ROS_NORMAL;
     // Object is rotated based on position
-    else if (rotation_style == "position") model_record->rotation_style = Graphics::ROS_POSITION;
+    else if (rotation_style == "position") model_record->rotation_style = ROS_POSITION;
     // Object is rotates to face the camera in x,y plane
-    else if (rotation_style == "billboard") model_record->rotation_style = Graphics::ROS_BILLBOARD;
+    else if (rotation_style == "billboard") model_record->rotation_style = ROS_BILLBOARD;
     // Object is rotates to face the camera in x,y,z plane
-    else if (rotation_style == "halo") model_record->rotation_style = Graphics::ROS_HALO;
+    else if (rotation_style == "halo") model_record->rotation_style = ROS_HALO;
     if (model_config.findItem(model_id, ModelRecord::DATA_FILE_PATH)) {
       model_record->data_file_path = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_PATH);
     }

@@ -110,6 +110,8 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
 Inventory::~Inventory()
 {
+  delete m_items;
+  delete m_inventory;
 }
 
 void Inventory::actionPressed(std::string event)

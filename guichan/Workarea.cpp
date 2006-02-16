@@ -59,7 +59,16 @@ Gui::~Gui()
 {
 }
 
-Workarea::Workarea(System * s) : m_system(s), m_input(0)
+Workarea::Workarea(System * s) : 
+  m_system(s), 
+  m_input(0),
+  m_graphics(0),
+  m_imageLoader(0),
+  m_hostImageLoader(0),
+  m_gui(0),
+  m_panel(0),
+  m_connectWindow(0),
+  m_top(0)
 {
 }
 
@@ -150,9 +159,12 @@ void Workarea::init()
 
 Workarea::~Workarea()
 {
+  delete m_gui;
   delete m_input;
   delete m_graphics;
   delete m_imageLoader;
+  delete m_hostImageLoader;
+  delete m_top;
 }
 
 void Workarea::registerCommands(Console * console)

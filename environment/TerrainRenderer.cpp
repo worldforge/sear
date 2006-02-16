@@ -3,7 +3,6 @@
 // Copyright (C) 2000 - 2003 Alistair Riddoch
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-
 #include "TerrainRenderer.h"
 
 #include "renderers/RenderSystem.h"
@@ -24,10 +23,6 @@
 #include <Mercator/Surface.h>
 
 #include <iostream>
-
-#ifdef USE_MMGR
-#include "common/mmgr.h"
-#endif
 
 namespace Sear {
 
@@ -198,6 +193,11 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map,
     ++Iend;
   }
 
+  // Use the Lock arrays extension if available.
+  if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+    glLockArraysEXT(0, m_numLineIndeces);
+  }
+
   for (; I != Iend; ++I) {    
     // Set up the first texture unit with the ground texture
     RenderSystem::getInstance ().switchTexture (0, m_shaders[I->first].texId);
@@ -224,6 +224,11 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map,
       glEnable (GL_TEXTURE_2D);
     }
   }
+
+  if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+    glUnlockArraysEXT();
+  }
+
 
   // This restores the state we want to be in for the first pass of
   // the next segment

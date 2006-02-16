@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
+// $Id: ModelHandler.cpp,v 1.30 2006-02-16 15:59:01 simon Exp $
 
 #include <string.h>
 
@@ -112,14 +112,14 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   std::string model_loader = (std::string)m_model_records.getItem(model_id, ModelRecord::MODEL_LOADER);
 
   if (model_loader.empty()) {
-    printf("Model Loader not defined. Using BoundBox.\n");
+    fprintf(stderr, "Model Loader not defined for %s. Using BoundBox.\n", model_id.c_str());
     model_loader = "boundbox";
   }
 
   ModelLoaderMap::iterator K = m_model_loaders.find(model_loader);
   ModelLoaderMap::const_iterator Kend = m_model_loaders.end();
   if (K == Kend) {
-    printf("Unknown Model Loader. Using BoundBox.\n");
+    fprintf(stderr, "Unknown Model Loader for %s. Using BoundBox.\n", model_id.c_str());
     model_loader = "boundbox";
     K = m_model_loaders.find(model_loader);
   }
@@ -127,13 +127,13 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   if (K != Kend) {
     model = K->second->loadModel(we, model_id, m_model_records);
   } else {
-    std::cerr << "No loader found: " << model_loader << std::endl;
+    fprintf(stderr, "No loader found (%s) for %s\n ", model_loader.c_str(), model_id.c_str());
     return model;
   }
   
   // Check model was loaded, and fall back to a NullModel
   if (!model) {
-    std::cerr << "Error loading model of type " << model_loader << std::endl;
+    fprintf(stderr, "Error loading model of type %s for %s\n", model_loader.c_str(), model_id.c_str());
     model = SPtr<ModelRecord>(new ModelRecord);
     model->model = SPtrShutdown<Model>(new NullModel());
   }

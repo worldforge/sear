@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.8 2005-10-21 01:58:33 alriddoch Exp $
+// $Id: Factory.cpp,v 1.9 2006-02-16 15:59:00 simon Exp $
 
 #include "Factory.h"
 
@@ -14,19 +14,17 @@
 #include "environment/Environment.h"
 #include "TerrainEntity.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 namespace Sear {
 
    Eris::EntityPtr Factory::instantiate(const Atlas::Objects::Entity::RootEntity & ge, Eris::TypeInfo *type, Eris::View *view) {
-
-    //std::cout << "Type: " << type->getName() << std::endl;
     if (type->isA(terrainType)) {
       return new TerrainEntity(ge->getId(), type, view);
     } else {
-      return new WorldEntity(ge->getId(), type, view);
+      WorldEntity *we = new WorldEntity(ge->getId(), type, view);
+      if (type->getName() == "weather") {
+        Environment::getInstance().setWeatherEntity(we);
+      }
+      return we;
     }
   }
 

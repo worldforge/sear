@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.10 2006-02-15 09:50:31 simon Exp $
+//$Id: Model.h,v 1.11 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -12,7 +12,10 @@
 
 #include <Atlas/Message/Element.h>
 
-#include "renderers/Graphics.h"
+#include <wfmath/vector.h>
+#include <wfmath/quaternion.h>
+
+#include "renderers/RenderTypes.h"
 
 namespace Sear {
 
@@ -96,7 +99,7 @@ public:
    * that need to be rotated to face the camera.
    * @return The rotation style.
    */  
-  virtual Graphics::RotationStyle rotationStyle() { return Graphics::ROS_NONE; }
+  virtual RotationStyle rotationStyle() { return ROS_NONE; }
 
   /** The getLastTime function returns the last time value set by the 
    * setLastTime function. This is the time the model was last rendered.

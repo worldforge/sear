@@ -73,17 +73,21 @@ void StaticObject::createVBOs() {
   glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_points * 3 * sizeof(float), m_vertex_data, GL_STATIC_DRAW_ARB);
 
   // Generate normal vbo
-  glGenBuffersARB(1, &m_vb_normal_data);
-  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
-  glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_points * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
+  if (m_normal_data) {
+    glGenBuffersARB(1, &m_vb_normal_data);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_points * 3 * sizeof(float), m_normal_data, GL_STATIC_DRAW_ARB);
+  }
 
   // Generate texture coord vbo
-  glGenBuffersARB(1, &m_vb_texture_data);
-  glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
-  glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_points * 2 * sizeof(float), m_texture_data, GL_STATIC_DRAW_ARB);
-
+  if (m_texture_data) {
+    glGenBuffersARB(1, &m_vb_texture_data);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, m_num_points * 2 * sizeof(float), m_texture_data, GL_STATIC_DRAW_ARB);
+  }
   // Reset VBO buffer
   glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+
   if (m_indices) {
     // Bind indices
     glGenBuffersARB(1, &m_vb_indices);
@@ -127,16 +131,12 @@ void StaticObject::contextDestroyed(bool check) {
 
 void StaticObject::render(bool select_mode) {
   assert(m_initialised == true);
-//  glEnableClientState(GL_VERTEX_ARRAY);
   // Set transform
   glMultMatrixf(&m_matrix[0][0]);
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
-
-    // Setup client states
-    glEnableClientState(GL_NORMAL_ARRAY);
 
     // Set material properties
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
@@ -150,23 +150,28 @@ void StaticObject::render(bool select_mode) {
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
     // Bind normal array
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
-    glNormalPointer(GL_FLOAT, 0, 0);
-    
-    for (unsigned int i = 0; i < m_textures.size(); ++i) {
-      // Bind texture array
-      glActiveTextureARB(GL_TEXTURE0_ARB + i);
-      if (select_mode) {
-        RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
-      } else {
-        RenderSystem::getInstance().switchTexture(m_textures[i]); 
-      }
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
-      glTexCoordPointer(2, GL_FLOAT, 0, 0);
+    if (glIsBufferARB(m_vb_normal_data)) {
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
+      glNormalPointer(GL_FLOAT, 0, 0);
     }
-    // Reset current texture unit
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+
+    if (glIsBufferARB(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        // Bind texture array
+        glActiveTextureARB(GL_TEXTURE0_ARB + i);
+        if (select_mode) {
+          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+        } else {
+          RenderSystem::getInstance().switchTexture(m_textures[i]); 
+        }
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
+        glTexCoordPointer(2, GL_FLOAT, 0, 0);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
 
     if (m_indices) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
@@ -177,17 +182,32 @@ void StaticObject::render(bool select_mode) {
     }
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
-    for (unsigned int i = 0; i < m_textures.size(); ++i) {
-      glActiveTextureARB(GL_TEXTURE0 + i);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    if (glIsBufferARB(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        glActiveTextureARB(GL_TEXTURE0 + i);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
     }
-
-    glDisableClientState(GL_NORMAL_ARRAY);
+    if (glIsBufferARB(m_vb_normal_data)) {
+      glDisableClientState(GL_NORMAL_ARRAY);
+    }
   } else {
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
     if (glIsList(disp)) {
       glCallList(disp);
     } else {
+      // Need to reset textures otherwise the display list may not record a
+      // texture change if the previous object has the same texture. This is 
+      // fine until the order of objects changes and the wrong texture is in 
+      // place.
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        RenderSystem::getInstance().switchTexture(i, 0);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+
       disp = glGenLists(1);
       glNewList(disp, GL_COMPILE_AND_EXECUTE);
       // Setup client states
@@ -204,22 +224,28 @@ void StaticObject::render(bool select_mode) {
       glVertexPointer(3, GL_FLOAT, 0, m_vertex_data);
 
       // Bind normal array
-      glNormalPointer(GL_FLOAT, 0, m_normal_data);
-
-      for (unsigned int i = 0; i < m_textures.size(); ++i) {
-        // Bind texture array
-        glActiveTextureARB(GL_TEXTURE0_ARB + i);
-        if (select_mode) {
-          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
-        } else {
-          RenderSystem::getInstance().switchTexture(m_textures[i]); 
-        }
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
+      if (m_normal_data) {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, m_normal_data);
       }
 
-      // Reset current texture unit
-      glActiveTextureARB(GL_TEXTURE0_ARB);
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          // Bind texture array
+          glActiveTextureARB(GL_TEXTURE0_ARB + i);
+          if (select_mode) {
+            RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+          } else {
+            RenderSystem::getInstance().switchTexture(m_textures[i]); 
+          }
+          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+          glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
+        }
+
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
+
 
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
@@ -237,15 +263,19 @@ void StaticObject::render(bool select_mode) {
         glUnlockArraysEXT();
       }
 
-      for (unsigned int i = 0; i < m_textures.size(); ++i) {
-        glActiveTextureARB(GL_TEXTURE0 + i);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          glActiveTextureARB(GL_TEXTURE0 + i);
+          glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
+  
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
       }
 
-      // Reset current texture unit
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-
-      glDisableClientState(GL_NORMAL_ARRAY);
+      if (m_normal_data) {
+        glDisableClientState(GL_NORMAL_ARRAY);
+      }
       glEndList();
     }
   }

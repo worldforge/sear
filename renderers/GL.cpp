@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.142 2006-02-07 18:45:33 simon Exp $
+// $Id: GL.cpp,v 1.143 2006-02-16 15:59:01 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -55,10 +55,6 @@
 #include "common/Mesh.h"
 
 #include "src/sear_icon.xpm"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
   // Consts
   static const int sleep_time = 5000;
@@ -269,7 +265,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   //Is this the correct way to free a window?
   m_screen = SDL_SetVideoMode(m_width, m_height, bpp, flags);
   if (m_screen == NULL ) {
-    std::cerr << "Unable to set " << m_width << " x " << m_height << " video: " << SDL_GetError() << std::endl;
+    fprintf(stderr, "Unable to set %d x %d video: %s\n", m_width, m_height, SDL_GetError());
     return false;
   }
   // Check OpenGL flags
@@ -959,19 +955,19 @@ inline void GL::rotate(float angle, float x, float y, float z) {
 void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) {
 //  if (!we) return; // THROW ERROR;
   switch (model_record->rotation_style) {
-    case Graphics::ROS_NONE: return; break;
-    case Graphics::ROS_POSITION: {
+    case ROS_NONE: return; break;
+    case ROS_POSITION: {
        WFMath::Point<3> pos = object_record->position;
        assert(pos.isValid());
        glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
        break;
     }       
-    case Graphics::ROS_NORMAL: {
+    case ROS_NORMAL: {
       applyQuaternion(object_record->orient);
       break;
     }
-    case Graphics::ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
-    case Graphics::ROS_HALO: {
+    case ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
+    case ROS_HALO: {
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient2 /= m_graphics->getCameraOrientation();
@@ -1056,14 +1052,14 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   }
 
   switch (type) {
-    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (Graphics::RES_POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
-    case (Graphics::RES_LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
-    case (Graphics::RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
-    case (Graphics::RES_QUADS): glDrawArrays(GL_QUADS, offset, number_of_points); break;
-    case (Graphics::RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
-    case (Graphics::RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
-    case (Graphics::RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
+    case (RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (RES_POINT): glDrawArrays(GL_POINT, offset, number_of_points); break;
+    case (RES_LINES): glDrawArrays(GL_LINES, offset, number_of_points); break;
+    case (RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, number_of_points); break;
+    case (RES_QUADS): glDrawArrays(GL_QUADS, offset, number_of_points); break;
+    case (RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, number_of_points); break;
+    case (RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, number_of_points); break;
+    case (RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, number_of_points); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  
@@ -1107,14 +1103,14 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
   }
   if (use_ext_compiled_vertex_array) glLockArraysEXT(0, number_of_points);
   switch (type) {
-    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (Graphics::RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (Graphics::RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
+    case (RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
   if (use_ext_compiled_vertex_array) glUnlockArraysEXT();
@@ -1233,6 +1229,7 @@ void GL::drawMessageQueue(MessageList &list) {
       double height = 2;
       getScreenCoords(we->screenX(), we->screenY(), height);
     }
+/*
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 /= m_graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
@@ -1240,6 +1237,7 @@ void GL::drawMessageQueue(MessageList &list) {
     glScalef(0.025f, 0.025f, 0.025f);
     glTranslatef(m_speech_offset_x, m_speech_offset_y, m_speech_offset_z);
     we->renderMessages();
+*/
     glPopMatrix();
   }
 }
@@ -1587,14 +1585,14 @@ void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   }
 
   switch (mesh.data_type) {
-    case (Graphics::RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (Graphics::RES_POINT): glDrawArrays(GL_POINT, offset, mesh.number_of_points); break;
-    case (Graphics::RES_LINES): glDrawArrays(GL_LINES, offset, mesh.number_of_points); break;
-    case (Graphics::RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, mesh.number_of_points); break;
-    case (Graphics::RES_QUADS): glDrawArrays(GL_QUADS, offset, mesh.number_of_points); break;
-    case (Graphics::RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, mesh.number_of_points); break;
-    case (Graphics::RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, mesh.number_of_points); break;
-    case (Graphics::RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, mesh.number_of_points); break;
+    case (RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
+    case (RES_POINT): glDrawArrays(GL_POINT, offset, mesh.number_of_points); break;
+    case (RES_LINES): glDrawArrays(GL_LINES, offset, mesh.number_of_points); break;
+    case (RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, mesh.number_of_points); break;
+    case (RES_QUADS): glDrawArrays(GL_QUADS, offset, mesh.number_of_points); break;
+    case (RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, mesh.number_of_points); break;
+    case (RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, mesh.number_of_points); break;
+    case (RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, mesh.number_of_points); break;
     default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
   }
  

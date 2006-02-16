@@ -2,10 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
+// $Id: WireFrame.cpp,v 1.19 2006-02-16 15:59:01 simon Exp $
 
 #include "src/System.h"
-#include "renderers/Graphics.h"
+#include "renderers/RenderTypes.h"
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
@@ -127,7 +127,7 @@ void WireFrame::render(bool) {
     m_disp = render->getNewList();
     render->beginRecordList(m_disp);
     render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
-    render->renderArrays(Graphics::RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
+    render->renderArrays(RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
     render->endRecordList();
   }
 }

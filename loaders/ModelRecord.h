@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.7 2006-02-07 11:31:03 simon Exp $
+// $Id: ModelRecord.h,v 1.8 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -11,7 +11,7 @@
 
 #include "common/SPtr.h"
 
-#include "renderers/Graphics.h"
+#include "renderers/RenderTypes.h"
 
 
 namespace Sear {
@@ -37,7 +37,7 @@ public:
   bool model_by_type;
   bool outline;
   SPtrShutdown<Model> model;	
-  Graphics::RotationStyle rotation_style;
+  RotationStyle rotation_style;
   float offset_x, offset_y, offset_z;
   float rotate_x, rotate_y, rotate_z;
   bool scaleByHeight;

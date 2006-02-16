@@ -182,6 +182,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 
 CharacterWindow::~CharacterWindow()
 {
+  delete m_characterListModel;
 }
 
 void CharacterWindow::logic()

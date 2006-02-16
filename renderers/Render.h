@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.12 2006-02-07 11:31:02 simon Exp $
+// $Id: Render.h,v 1.13 2006-02-16 15:59:01 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -59,6 +59,7 @@ typedef std::list<WorldEntity*> MessageList;
 
   virtual void init() =0;
   virtual void shutdown() =0;
+  virtual bool isInitialised() const = 0;
 
   virtual int contextCreated() = 0;
   virtual void contextDestroyed(bool check) = 0;

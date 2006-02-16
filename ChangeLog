@@ -1,5 +1,54 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/Environment.h, environment/Environment.cpp, 
+	  renderers/RenderSystem.cpp, renderers/RenderSystem.h: Use SPtr to
+	  handle member objects. Move constructor/destructor to .cpp to fix
+	  template compile time problems.
+
+	* environment/Weather.cpp, environment/Weather.h,
+	  environment/Environment.cpp, environment/Environment.h,
+	  environment/Makefile.am, src/Factory.cpp: Add a handler to read
+	  weather information.
+
+	* environment/TerrainRenderer.cpp: Use glLockArrays.
+
+	* guichan/CharacterWindow.cpp: Cleanup m_characterListModel.
+
+	* guichan/Inventory.cpp: Cleanup m_items and m_inventory.
+
+	* guichan/Workarea.cpp: Initialise many pointers and clean some up.
+
+	* loaders/BoundBox_Loader.cpp, loaders/WireFrame_Loader.cpp: Check to
+	  see if an entity has a bbox before using it. Create a default one 
+	  otherwise.
+
+	* loaders/Model.h, loaders/ModelLoader.cpp, loaders/ModelRecord.cpp,
+	  loaders/ModelRecord.h, loaders/NPlane.h, loaders/WireFrame.cpp,
+	  loaders/cal3d/Cal3dModel.h, renderers/GL.cpp, renderers/Graphics.cpp,
+	  renderers/Graphics.h, renderers/Makefile.am, renderers/Sprite.cpp:
+	  Create a new header, RenderTypes storing Rotation- and Render-Style 
+	  enums to avoid having to include Graphics.h.
+
+	* renderers/RenderSystem.h, loaders/ParticleSystemLoader.cpp,
+	  loaders/ModelRecord.cpp: Do not export StateManager and use
+	  RenderSystem functions instead.
+
+	* loaders/ModelHandler.cpp: Make error output more verbose.
+
+	* loaders/StaticObject.cpp: Fix bug where the display lists would not 
+	  record the texture change and so could use the wrong one. Make sure
+	  there is data in the buffers before using them.
+
+	* renderers/Camera.h, renderers/CameraSystem.h, renderers/GL.h,
+	  renderers/Graphics.h, renderers/Render.h, renderers/StateManager.h,
+	  renderers/TextureManager.h: Add isInitialised for use with
+	  SPtrShutdown
+
+	* src/Character.cpp: Remove an assert to avoid failure on passing 
+	  /set_app with no args.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Calendar.cpp, src/Calendar.h: Remove daysPerMonth and 
 	  monthsPerYear stuff.
 
