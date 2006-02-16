@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.22 2006-02-15 12:44:24 simon Exp $
+// $Id: Calendar.cpp,v 1.23 2006-02-16 14:14:15 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -65,8 +65,6 @@ Calendar::Calendar() :
   m_seconds_per_minute(1),
   m_minutes_per_hour(1),
   m_hours_per_day(1),
-  m_days_per_month(1),
-  m_months_per_year(1),
   m_server_seconds(0.0),
   m_minutes(0),
   m_hours(0), // Default start time is midnight
@@ -117,8 +115,6 @@ void Calendar::setAvatar(Eris::Avatar *avatar)  {
     m_seconds_per_minute = m_cal->secondsPerMinute();
     m_minutes_per_hour   = m_cal->minutesPerHour();
     m_hours_per_day      = m_cal->hoursPerDay();
-    m_days_per_month     = m_cal->daysPerMonth();
-    m_months_per_year    = m_cal->monthsPerYear();
   } else {
     m_cal = SPtr<Eris::Calendar>();
   }
@@ -147,8 +143,6 @@ void Calendar::update() {
   m_seconds_per_minute = m_cal->secondsPerMinute();
   m_minutes_per_hour   = m_cal->minutesPerHour();
   m_hours_per_day      = m_cal->hoursPerDay();
-  m_days_per_month     = m_cal->daysPerMonth();
-  m_months_per_year    = m_cal->monthsPerYear();
 */
   double time_elapsed = m_seconds - m_server_seconds;
 

@@ -1,5 +1,10 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Calendar.cpp, src/Calendar.h: Remove daysPerMonth and 
+	  monthsPerYear stuff.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Remove display 
 	  lists as this object changes each frame.
 

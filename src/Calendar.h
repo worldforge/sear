@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.h,v 1.11 2006-02-15 12:44:24 simon Exp $
+// $Id: Calendar.h,v 1.12 2006-02-16 14:14:15 simon Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -123,13 +123,13 @@ public:
    * Returns number of days per month
    * @return Days per month
    */ 
-  int getDaysPerMonth() const { return m_days_per_month; }
+//  int getDaysPerMonth() const { return m_days_per_month; }
   
   /**
    * Returns number of months per year
    * @param Months per year
    */
-  int getMonthsPerYear() const { return m_months_per_year; }
+//  int getMonthsPerYear() const { return m_months_per_year; }
   
   /**
    * Return current seconds
@@ -213,8 +213,6 @@ private:
   int m_seconds_per_minute; ///< Number of seconds in a minute
   int m_minutes_per_hour;   ///< Number of minutes in an hour
   int m_hours_per_day;      ///< Number of hours in a day
-  int m_days_per_month;      ///< Number of days in a month
-  int m_months_per_year;    //</ Number of months in a year
 
   // Current time and date values
   double m_seconds; ///< Current seconds
