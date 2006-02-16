@@ -1,5 +1,9 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ModelLoader.cpp: Remove some debugging asserts.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/AreaModel.cpp: Some #include changes
 
 	* renderers/LightMananger.h: Added isInitialised for Sptr.

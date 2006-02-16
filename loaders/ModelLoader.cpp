@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.7 2006-02-16 15:59:01 simon Exp $
+// $Id: ModelLoader.cpp,v 1.8 2006-02-16 18:08:16 simon Exp $
 
 #include "ModelLoader.h"
 
@@ -75,7 +75,6 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     if (model_config.findItem(model_id, "state_num")) {
       model_record->state = model_config.getItem(model_id, "state_num");
     } else {
-      assert(false);
       model_record->state = 0;
     }
 
@@ -89,7 +88,6 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     if (model_config.findItem(model_id, "select_state_num")) {
       model_record->select_state = model_config.getItem(model_id, "select_state_num");
     } else {
-      assert(false);
       model_record->select_state = 0;
     }
     // Get render select state name
