@@ -5,10 +5,10 @@
 #ifndef SEAR_PARTICLE_SYSTEM_H
 #define SEAR_PARTICLE_SYSTEM_H
 
+#include <common/types.h>
 #include <common/SPtr.h>
 
 #include "loaders/Model.h"
-#include "renderers/RenderSystem.h"
 
 namespace Sear {
 

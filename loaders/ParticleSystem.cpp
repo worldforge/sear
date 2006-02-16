@@ -15,16 +15,18 @@ glTexEnv <--to tell GL how to map the texture
 
  */
 
-
-#include "loaders/ParticleSystem.h"
-#include "common/types.h"
-#include "src/WorldEntity.h"
-
-#include <wfmath/MersenneTwister.h>
 #include <iostream>
 #include <sage/sage.h>
 #include <sage/GL.h>
 
+#include <wfmath/MersenneTwister.h>
+
+#include "common/types.h"
+#include "renderers/RenderSystem.h"
+#include "renderers/Render.h"
+#include "src/WorldEntity.h"
+
+#include "ParticleSystem.h"
 #include "DynamicObject.h"
 
 namespace Sear {
