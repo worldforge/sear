@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.34 2006-02-15 15:58:54 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.35 2006-02-16 12:06:21 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -155,7 +155,6 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // get the transformed vertices of the submesh
         static Vertex_3 meshVertices[30000];
         int vertexCount;
-assert(vertexCount);
         vertexCount = pCalRenderer->getVertices((float*)&meshVertices[0]);
         dyno->copyVertexData((float*)meshVertices, vertexCount * 3);
 
