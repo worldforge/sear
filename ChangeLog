@@ -1,5 +1,10 @@
 2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Remove display 
+	  lists as this object changes each frame.
+
+2006-02-16  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dModel.cpp: Remove buggy assert.
 
 2006-02-15  Simon Goodall  <sear@simongoodall.co.uk>

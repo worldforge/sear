@@ -202,7 +202,6 @@ private:
 //  int m_state; 
   
   GLuint m_vb_vertex_data, m_vb_colour_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
-  GLuint m_disp_list, m_select_disp_list;
 
   float m_matrix[4][4];  
 };

@@ -27,9 +27,7 @@ DynamicObject::DynamicObject() :
   m_vb_colour_data(0),
   m_vb_normal_data(0),
   m_vb_texture_data(0),
-  m_vb_indices(0),
-  m_disp_list(0),
-  m_select_disp_list(0)
+  m_vb_indices(0)
 {
 }
 
@@ -208,18 +206,12 @@ void DynamicObject::contextDestroyed(bool check) {
        glDeleteBuffersARB(1, &m_vb_indices);
       }
     }
-
-    // Clean up display lists 
-    if (glIsList(m_select_disp_list)) glDeleteLists(1, m_select_disp_list);
-    if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);
   }
   m_vb_vertex_data = 0;
   m_vb_colour_data = 0;
   m_vb_normal_data = 0;
   m_vb_texture_data = 0;
   m_vb_indices = 0;
-  m_select_disp_list = 0;
-  m_disp_list = 0;
 }
 
 void DynamicObject::render(bool select_mode) {
@@ -298,88 +290,77 @@ void DynamicObject::render(bool select_mode) {
     }
 
   } else {
-    GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
-    if (glIsList(disp)) {
-      glCallList(disp);
-    } else {
-      disp = glGenLists(1);
-      glNewList(disp, GL_COMPILE_AND_EXECUTE);
-      // Setup client states
+    // Set material properties
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  m_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  m_emission);
+    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
 
-      // Set material properties
-      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  m_specular);
-      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  m_emission);
-      glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
+    // Bind vertex array
+    glVertexPointer(3, GL_FLOAT, 0, m_vertex_data);
 
-      // Bind vertex array
-      glVertexPointer(3, GL_FLOAT, 0, m_vertex_data);
+    // Bind normal array
+    if (m_normal_data) {
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNormalPointer(GL_FLOAT, 0, m_normal_data);
+    }
 
-      // Bind normal array
-      if (m_normal_data) {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, m_normal_data);
-      }
-
-      if (m_texture_data) {
-        for (unsigned int i = 0; i < m_textures.size(); ++i) {
-          // Bind texture array
-          glActiveTextureARB(GL_TEXTURE0_ARB + i);
-          if (select_mode) {
-            RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
-          } else {
-            RenderSystem::getInstance().switchTexture(m_textures[i]); 
-          }
-          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-          glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
+    if (m_texture_data) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        // Bind texture array
+        glActiveTextureARB(GL_TEXTURE0_ARB + i);
+        if (select_mode) {
+          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+        } else {
+          RenderSystem::getInstance().switchTexture(m_textures[i]); 
         }
-
-        // Reset current texture unit
-        glActiveTextureARB(GL_TEXTURE0_ARB);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
       }
 
-      if (glIsBufferARB(m_vb_colour_data)) {
-        glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
+
+    if (glIsBufferARB(m_vb_colour_data)) {
+      glEnableClientState(GL_COLOR_ARRAY);
+      glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
+    }
+
+
+    // Use the Lock arrays extension if available.
+    if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+      glLockArraysEXT(0, m_num_points  * 3);
+    }
+
+    if (m_indices) {
+      glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, m_indices);
+      glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    } else  {
+      glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+    }
+
+    if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+      glUnlockArraysEXT();
+    }
+
+    if (m_texture_data) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        glActiveTextureARB(GL_TEXTURE0 + i);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
       }
 
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
 
-      // Use the Lock arrays extension if available.
-      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
-        glLockArraysEXT(0, m_num_points  * 3);
-      }
+    if (glIsBufferARB(m_vb_colour_data)) {
+      glDisableClientState(GL_COLOR_ARRAY);
+    }
 
-      if (m_indices) {
-        glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, m_indices);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-      } else  {
-        glDrawArrays(GL_TRIANGLES, 0, m_num_points);
-      }
-
-      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
-        glUnlockArraysEXT();
-      }
-
-      if (m_texture_data) {
-        for (unsigned int i = 0; i < m_textures.size(); ++i) {
-          glActiveTextureARB(GL_TEXTURE0 + i);
-          glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        }
-
-        // Reset current texture unit
-        glActiveTextureARB(GL_TEXTURE0_ARB);
-      }
-
-      if (glIsBufferARB(m_vb_colour_data)) {
-        glDisableClientState(GL_COLOR_ARRAY);
-      }
-
-      if (m_normal_data) {
-        glDisableClientState(GL_NORMAL_ARRAY);
-      }
-
-      glEndList();
+    if (m_normal_data) {
+      glDisableClientState(GL_NORMAL_ARRAY);
     }
   }
 }
