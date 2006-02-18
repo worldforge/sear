@@ -11,17 +11,15 @@
 #include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
-
 #include "common/SPtr.h"
+
+#include "RenderTypes.h"
 
 namespace varconf {
   class Config;
 }
 
 namespace Sear {
-
-typedef int TextureID;
-typedef int StateID;
 
 class TextureManager;
 class StateManager;

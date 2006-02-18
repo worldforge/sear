@@ -27,6 +27,9 @@ typedef enum {
   ROS_HALO
 } RotationStyle;
 
+typedef int TextureID;
+typedef int StateID;
+
 } // namespace Sear
 
 #endif // SEAR_RENDERTYPES_H

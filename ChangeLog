@@ -1,5 +1,10 @@
 2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/RenderSystem.h, renderers/RenderTypes.h: Move TextureID and
+	  StateID declaration to RenderTypes.h.
+
+2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ParticleSystem.cpp: Allow a status value of 1.0.
 
 	* loaders/cal3d/Cal3dModel.cpp: Check that there are texture
