@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.13 2006-02-16 15:59:01 simon Exp $
+// $Id: Graphics.h,v 1.14 2006-02-18 17:40:29 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -109,6 +109,7 @@ private:
   bool m_show_names;
   float m_modelview_matrix[4][4];
   float m_medium_dist, m_high_dist;
+  StateID m_state_weather, m_state_terrain, m_state_select, m_state_cursor;
 
     /**
     Helper to qeueue the models for a single object record
