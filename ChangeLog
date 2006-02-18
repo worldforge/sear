@@ -1,3 +1,11 @@
+2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+	
+	* guichan/WorkArea.cpp: Fix inventory gui opening with /inventory 
+	  command. It was broken due to a lower case 'i'.
+
+	* src/Character.cpp: Do not display inventory as a system message now 
+	  gui window is fixed.
+
 2006-02-17  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Weather.cpp: Do not hardcode window size! Only use 2 

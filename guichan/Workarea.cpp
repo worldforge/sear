@@ -153,7 +153,7 @@ void Workarea::init()
   m_system->getActionHandler()->addHandler("world_entered", "/workarea_open panel");
   m_system->getActionHandler()->addHandler("avatar_failed", "/workarea_alert Unable to get character");
 
-  m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle inventory");
+  m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle Inventory");
 
 }
 
