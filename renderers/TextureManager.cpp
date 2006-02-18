@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.43 2006-02-07 18:45:34 simon Exp $
+// $Id: TextureManager.cpp,v 1.44 2006-02-18 15:41:12 simon Exp $
 
 #include <unistd.h>
 
@@ -35,11 +35,6 @@ int ilogb(double x)
 #include "default_image.xpm"
 #include "default_font.h"
 #include "cursors.h"
-
-#ifdef USE_MMGR
-#include "common/mmgr.h"
-  
-#endif
 
 #include "Sprite.h"
 #include "ImageUtils.h"
@@ -158,6 +153,7 @@ bool use_ext_texture_filter_anisotropic = false;
 TextureManager::TextureManager() :
   m_initialised(false),
   m_initGL(false),
+  m_texture_counter(1),
   m_texture_units(1),
   m_baseMipmapLevel(0)
 {  
@@ -170,6 +166,7 @@ void TextureManager::init()
   if (m_initialised) shutdown();
   if (debug) std::cout << "Initialising TextureManager" << std::endl;
 
+  m_texture_counter = 1;
   m_textures.resize(1); // we need to leave texture ID zero free
   m_names.resize(1); // ditto
 
@@ -246,12 +243,12 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   m_texture_config.clean(clean_name);
   // Check texture is defined
   if (!m_texture_config.find(clean_name)) {
-    fprintf(stderr, "Texture %s not defined.\n", texture_name.c_str());
+    fprintf(stderr, "Texture %s (%s) not defined.\n", texture_name.c_str(), clean_name.c_str());
     return 0;
   }
  
   if (!m_texture_config.findItem(clean_name, KEY_filename)) {
-    fprintf(stderr, "Texture %s has no filename.\n", clean_name.c_str());
+    fprintf(stderr, "Texture %s has no filename(clean name).\n", clean_name.c_str());
     return 0;
   }
 
@@ -695,8 +692,9 @@ TextureID TextureManager::createCursor(const std::string &texture_name, const ch
 
 
 void TextureManager::registerCommands(Console *console) {
-  assert((m_initialised == true) && "TextureManager not initialised");
-  if (debug) std::cout << "Registering commands" << std::endl;
+  assert(m_initialised == true);
+  assert(console);
+
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
   console->registerCommand(CMD_LOAD_SPRITE_CONFIG, this);
   console->registerCommand(CMD_SET_TEXTURE_BASE_LEVEL, this);

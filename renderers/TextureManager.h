@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.24 2006-02-16 15:59:01 simon Exp $
+// $Id: TextureManager.h,v 1.25 2006-02-18 15:41:12 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -88,6 +88,7 @@ public:
 
   TextureID requestTextureID(const std::string &texture_name, bool mask)
   {
+    assert(!texture_name.empty());
     assert(m_initialised);
     // Convert to internal name
     std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
@@ -96,7 +97,7 @@ public:
     TextureID texId; 
     if (I == m_texture_map.end()) {
       // Assign new texture ID
-      texId = m_names.size();
+      texId = m_texture_counter++;
       m_texture_map[name] = texId;
       m_names.push_back(name);
       m_textures.push_back(0);
@@ -107,16 +108,6 @@ public:
     
     return texId;
   }
-
-  /** 
-   * Loads the requested texture. Parameters for the textures are taken from thr
-   * config values accessed by texture_name. The return value should be used 
-   * with getTextureObejct to get the actual ID value.
-   * @param texture_name Name of texture to load
-   * @return ID for texture.
-   */ 
-  GLuint loadTexture(const std::string &texture_name);
-
   /**
    * Unloads the specified texture from the OpenGL system
    * @param texture_name Name of texture to unload
@@ -172,8 +163,22 @@ public:
     void clearLastTexture(unsigned int index);
     
 private:
+
+  /** 
+   * Loads the requested texture. Parameters for the textures are taken from thr
+   * config values accessed by texture_name. The return value should be used 
+   * with getTextureObejct to get the actual ID value.
+   * @param texture_name Name of texture to load
+   * @return ID for texture.
+   */ 
+  GLuint loadTexture(const std::string &texture_name);
+  GLuint loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
+
+
+
   bool m_initialised; ///< Flag indicating whether object has had init called
   bool m_initGL; ///< flag indicating if initGL has been done or not
+  int m_texture_counter;
   
   varconf::Config m_texture_config; ///< Config object for all texture
   TextureMap m_texture_map; ///< Mapping between texture name and its TextureID
@@ -186,10 +191,6 @@ private:
 
   int m_baseMipmapLevel;
   
-  /**
-   * This function is used to setup the required OpenGL texture extensions
-   */ 
-  GLuint loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
   void generalConfigChanged(const std::string &section, const std::string &key, varconf::Config &config);  
 
   TextureID createDefaultTexture();
@@ -203,13 +204,13 @@ private:
    */ 
   static int getFilter(const std::string &filter_name);
 
-void varconf_error_callback(const char *error);
+  void varconf_error_callback(const char *error);
     
-    typedef std::map<std::string, SpriteData*> SpriteInstanceMap;
-    SpriteInstanceMap m_sprites;
+  typedef std::map<std::string, SpriteData*> SpriteInstanceMap;
+  SpriteInstanceMap m_sprites;
     
-    /** sprite configuration file */
-    varconf::Config m_spriteConfig;
+  /** sprite configuration file */
+  varconf::Config m_spriteConfig;
 };
   
 } /* namespace Sear */

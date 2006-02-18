@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.35 2006-02-16 12:06:21 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.36 2006-02-18 15:41:12 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -166,9 +166,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // get the texture coordinates of the submesh
         static Texel meshTextureCoordinates[30000];
         int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, (float*)&meshTextureCoordinates[0]);
-        if (textureCoordinateCount > 0) {
-          dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
-        }
+        //Copy data later
 
         // get the faces of the submesh
         static int meshFaces[50000 * 3];
@@ -179,36 +177,28 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         } else {
           dyno->setNumPoints(vertexCount / 3);
         }
-
-        // TODO handle missing MapData more sensibly.
-        // set the vertex and normal buffers
+        // There are several situation that can happen here. 
+        // Model with/without texture coordinates
+        // Model with/without texture maps
+        // Model with/without texture mas name defined
+        // Each model can be a mixture of the above. We only want to 
+        bool mapDataFound = false;
         if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
-          if (pCalRenderer->getMapCount() == 1) {
+          for (int i = 0; i < pCalRenderer->getMapCount(); ++i) {
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
             if (md) {
               dyno->setTexture(0, md->textureID, md->textureMaskID);
+              mapDataFound = true;
             } else {
-              dyno->setTexture(0, 0, 0);
-            }
-	  } else {
-            // Set texture unit 0
-            MapData *md = reinterpret_cast<MapData*>
-                                          (pCalRenderer->getMapUserData(0));
-            if (md) {
-              dyno->setTexture(1, md->textureID, md->textureMaskID);
-            } else {
-              dyno->setTexture(0, 0, 0);
-            }
-            // Set texture unit 1
-            md = reinterpret_cast<MapData*>(pCalRenderer->getMapUserData(1));
-            if (md) {
-              dyno->setTexture(1, md->textureID, md->textureMaskID);
-            } else {
-              dyno->setTexture(1, 0, 0);
+              // Can't have a missing texture map between units.
+              break; 
             }
 	  }
 	}
+        if (mapDataFound){
+          dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
+        }
       }
     }
   }

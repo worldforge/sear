@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.40 2006-02-16 21:23:30 simon Exp $
+// $Id: Graphics.cpp,v 1.41 2006-02-18 15:41:12 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -150,6 +150,11 @@ void Graphics::init() {
   m_lm = new LightManager();
   m_lm->init();
 
+  m_state_weather = RenderSystem::getInstance().requestState("weather");
+  m_state_terrain = RenderSystem::getInstance().requestState("terrain");
+  m_state_select  = RenderSystem::getInstance().requestState("select");
+  m_state_cursor  = RenderSystem::getInstance().requestState("cursor");
+
   m_initialised = true;
 }
 
@@ -212,7 +217,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   // Render the mouse cursor
   if (RenderSystem::getInstance().isMouseVisible()) {
-    RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("cursor"));
+    RenderSystem::getInstance().switchState(m_state_cursor);
     int mouse_x, mouse_y;
     SDL_GetMouseState(&mouse_x, &mouse_y);
     mouse_y = m_renderer->getWindowHeight() - mouse_y - 32;
@@ -272,7 +277,7 @@ void Graphics::setCameraTransform() {
 }
 
 void Graphics::drawWorld(bool select_mode, float time_elapsed) {
-if (c_select) select_mode = true;
+  if (c_select) select_mode = true;
   /*
     Camera coords
     //Should be stored in camera object an updated as required
@@ -354,9 +359,9 @@ if (c_select) select_mode = true;
     m_renderer->store();
 
     if (select_mode) {
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("select"));
+      RenderSystem::getInstance().switchState(m_state_select);
     } else {
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+      RenderSystem::getInstance().switchState(m_state_terrain);
     }
 
     Environment::getInstance().renderTerrain(pos, select_mode);
@@ -373,17 +378,20 @@ if (c_select) select_mode = true;
 
     if (!select_mode ) {
       m_renderer->store();
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("terrain"));
+      RenderSystem::getInstance().switchState(m_state_terrain);
       Environment::getInstance().renderSea();
       m_renderer->restore();
 
-      m_compass->update(cam->getRotation());
-      m_compass->draw(m_renderer, select_mode);
-
+      //  Switch to 2D mode for rendering rain
       m_renderer->setViewMode(ORTHOGRAPHIC);
 
-      RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("weather"));
+      RenderSystem::getInstance().switchState(m_state_weather);
       Environment::getInstance().renderWeather();
+      // Switch back
+      m_renderer->setViewMode(PERSPECTIVE);
+
+      m_compass->update(cam->getRotation());
+      m_compass->draw(m_renderer, select_mode);
     } 
 
   } else {

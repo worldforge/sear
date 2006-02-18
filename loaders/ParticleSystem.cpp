@@ -232,7 +232,7 @@ int ParticleSystem::shutdown()
 void ParticleSystem::update(float elapsed)
 {
   double status = m_entity->getStatus();
-  if ((status < 0.0) || (status >= 1.0)) {
+  if ((status < 0.0) || (status > 1.0)) {
     std::cout << "invalid status " << status << " for particle system" << std::endl;
     return;
   }

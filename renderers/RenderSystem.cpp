@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.17 2006-02-16 15:59:01 simon Exp $
+// $Id: RenderSystem.cpp,v 1.18 2006-02-18 15:41:12 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -47,14 +47,14 @@ void RenderSystem::init() {
   
   if (debug) std::cout << "RenderSystem: Initialise" << std::endl;
 
-  m_renderer = SPtrShutdown<Render>(new GL());
-  m_renderer->init();
-
   m_stateManager = SPtrShutdown<StateManager>(new StateManager());
   m_stateManager->init();
 
   m_textureManager = SPtrShutdown<TextureManager>(new TextureManager());
   m_textureManager->init();
+
+  m_renderer = SPtrShutdown<Render>(new GL());
+  m_renderer->init();
 
   m_graphics = SPtrShutdown<Graphics>(new Graphics(System::instance()));
   m_graphics->init();
@@ -137,8 +137,8 @@ void RenderSystem::switchTexture(unsigned int texUnit, TextureID to) {
 }
 
 StateID RenderSystem::requestState(const std::string &state) {
-  assert (m_initialised);
-  return m_stateManager->getState(state);
+  assert (m_stateManager.isValid());
+  return m_stateManager->requestState(state);
 }
 
 void RenderSystem::switchState(StateID state) {
@@ -161,7 +161,7 @@ void RenderSystem::contextDestroyed(bool check) {
 }
 
 StateID RenderSystem::getCurrentState() {
-  assert (m_initialised);
+  assert (m_stateManager.isValid());
   return m_stateManager->getCurrentState();
 }
 

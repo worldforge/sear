@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.12 2006-02-16 15:59:01 simon Exp $
+// $Id: StateManager.h,v 1.13 2006-02-18 15:41:12 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -12,7 +12,9 @@
 #include <vector>
 
 #include <sigc++/trackable.h>
+
 #include "interfaces/ConsoleObject.h"
+#include "common/SPtr.h"
 
 #include "RenderSystem.h"
 
@@ -52,7 +54,7 @@ typedef struct {
 //typedef int StateID;
 typedef std::map<std::string, StateID> StateNameMap;
 typedef std::vector<std::string> NameStateVector;
-typedef std::vector<StateProperties*> StateVector;
+typedef std::vector<SPtr<StateProperties> > StateVector;
 typedef std::vector<std::vector<unsigned int> > StateChangeVector;
 
 class StateManager : public sigc::trackable, public ConsoleObject {
@@ -63,9 +65,10 @@ public:
   int init();
   int shutdown();
   bool isInitialised() const { return m_initialised; }
+
   void readFiles(const std::string &);
 
-  StateID getState(const std::string &state_name) const;
+  StateID requestState(const std::string &state_name);
 
   void stateChange(StateID state);
 //  std::map<std::string, StateProperties*> getMap() const { return _state_properties; }
@@ -90,7 +93,7 @@ private:
   static int getAlphaFunction(const std::string &alpha_function);
   static int getBlendFunction(const std::string &blend_function);
  
-  void buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state);
+  void buildStateChange(unsigned int &list, SPtr<StateProperties> previous_state, SPtr<StateProperties> next_state);
   
   bool m_initialised;
   StateVector m_states; ///< This stores all the state records

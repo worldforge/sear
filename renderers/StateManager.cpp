@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.27 2006-02-07 18:45:34 simon Exp $
+// $Id: StateManager.cpp,v 1.28 2006-02-18 15:41:12 simon Exp $
 
 /*
  * TODO
@@ -25,12 +25,6 @@
 #include "src/Console.h"
 #include "src/System.h"
 #include "src/FileHandler.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -106,10 +100,10 @@ int StateManager::init() {
   m_state_change_vector.resize(256);
   for (unsigned int i = 0; i < 256; m_state_change_vector[i++].resize(256));
   
-  StateProperties *default_state = new StateProperties;
-  StateProperties *font_state = new StateProperties;
-  StateProperties *select_state = new StateProperties;
-  StateProperties *cursor_state = new StateProperties;
+  SPtr<StateProperties> default_state = SPtr<StateProperties> (new StateProperties);
+  SPtr<StateProperties> font_state = SPtr<StateProperties> (new StateProperties);
+  SPtr<StateProperties> select_state = SPtr<StateProperties> (new StateProperties);
+  SPtr<StateProperties> cursor_state = SPtr<StateProperties> (new StateProperties);
   // Create a default record
   default_state->state = "default";
   default_state->alpha_test = false;
@@ -214,21 +208,15 @@ int StateManager::init() {
   m_name_state_vector[m_state_counter] = cursor_state->state;
   ++m_state_counter;
 
-
   m_initialised = true;
   return 0;
 }
 
 int StateManager::shutdown() {
   assert(m_initialised == true);
-  if (debug) std::cout << "State Loader: Shutdown" << std::endl;
-  while (!m_states.empty()) {
-//    if (*m_states.begin()) {
-      StateProperties *sp = *(m_states.begin());
-      delete sp;
-  //  }
-    m_states.erase(m_states.begin());
-  }
+
+  m_states.clear();
+
   m_initialised = false;
   return 0;
 }
@@ -243,12 +231,28 @@ void StateManager::readFiles(const std::string &file_name) {
 
 void StateManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   assert(m_initialised);
-  int in = m_state_name_map[section];
-  StateProperties *record = m_states[m_state_name_map[section]];
+  StateID sID = m_state_name_map[section];
+
+  SPtr<StateProperties> record = SPtr<StateProperties>();
+  bool create_record = false;
+  if (sID > 0) {
+    // Record ID already exists, lets see if the record is valid.
+    record = m_states[sID];
+    if (record.isValid()) {
+      // Record already exists, all good
+    } else {
+      // Record does not exist, lets make a new one.
+      create_record = true;
+    }
+  } else {
+    // Not seen this record name yet, so need to fill in all the data structures.
+    sID = m_state_counter++;
+    create_record = true;
+  }
+  
   // If record does not exist, create it.
-//  if (!record) {
-  if (in == 0) {
-      record = new StateProperties();
+  if (create_record) {
+      record = SPtr<StateProperties> (new StateProperties());
       record->state = section;
       // Setup default values
       record->alpha_test = false;
@@ -270,11 +274,11 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
       record->blend_src_function = GL_SRC_ALPHA;
       record->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
   
-      m_states[m_state_counter] = record;
-      m_state_name_map[record->state] = m_state_counter;
-      m_name_state_vector[m_state_counter] = record->state;
-      ++m_state_counter;
-      if (debug) std::cout << "Adding State: " << section << std::endl;
+      m_states[sID] = record;
+      m_state_name_map[record->state] = sID;
+      m_name_state_vector[sID] = record->state;
+
+      if (debug) printf("[StateManager] Adding State: %s\n", section.c_str());
   }
 
   if (key == ALPHA_TEST) record->alpha_test = (bool)config.getItem(section, key);
@@ -298,24 +302,28 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
     cast_stream(key.substr(TEXTURE.size()), unit);
     if (unit < MAX_UNITS) {
       record->textures[unit] = (bool)config.getItem(section, key);
-//      std::cout << "Setting " << section << " texture unit " << unit << " to " << record->textures[unit] << std::endl;
     }
   }
-//  try {
-//  std::cout << key << " - " << key.substr(0, TEXTURE.size()) << " - " << key.substr(TEXTURE.size()) << std::endl;
-//  } catch (...) {}
 }
 
 void StateManager::varconf_error_callback(const char *message) {
   Log::writeLog(message, Log::LOG_ERROR);
 }
 
-StateID StateManager::getState(const std::string &state_name) const {
+StateID StateManager::requestState(const std::string &state_name) {
   assert(m_initialised);
+
   StateNameMap::const_iterator S = m_state_name_map.find(state_name);
+  StateID stateId;
+
   if (S == m_state_name_map.end()) {
-    std::cerr << "state " << state_name << " is unknown" << std::endl;
-    return 1;
+    // Create empty dummy state record to be filled in later
+    stateId = m_state_counter++;
+
+    m_state_name_map[state_name] = stateId;
+    m_name_state_vector[stateId] = state_name;
+    m_states[stateId] = SPtr<StateProperties>();
+    return stateId;
   }
   assert(S->second > 0); 
   return S->second;
@@ -354,16 +362,16 @@ void StateManager::stateChange(StateID state) {
   assert(m_initialised == true);
   if (m_current_state == state) return; // No need to do anything
 
-  assert (state < m_states.size());
-  StateProperties *sp = m_states[state];
+  assert (state < (int)m_states.size());
+  SPtr<StateProperties> sp = m_states[state];
   // If state doesn't exist, take first one
-  assert(sp);
+  assert(sp.isValid());
   if (!sp) {
     std::cout << "bad state found - " << state <<  std::endl;
     sp = m_states[1];
     state = 1;
   }
-  assert(sp != NULL);
+  assert(sp.isValid());
   // First time round, we have no states
   if (m_current_state != -1) {
     unsigned int list = m_state_change_vector[m_current_state][state];
@@ -420,10 +428,10 @@ void StateManager::stateChange(StateID state) {
   m_current_state = state;
 }
 
-void StateManager::buildStateChange(unsigned int &list, StateProperties *previous_state, StateProperties *next_state) {
+void StateManager::buildStateChange(unsigned int &list, SPtr<StateProperties> previous_state, SPtr<StateProperties> next_state) {
   assert(m_initialised);
-  assert (previous_state != NULL);
-  assert (next_state != NULL);
+  assert (previous_state.isValid());
+  assert (next_state.isValid());
   glNewList(list, GL_COMPILE);
   if (previous_state->alpha_test != next_state->alpha_test) {
     if (next_state->alpha_test) glEnable(GL_ALPHA_TEST);

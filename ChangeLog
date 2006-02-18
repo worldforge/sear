@@ -1,5 +1,30 @@
 2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ParticleSystem.cpp: Allow a status value of 1.0.
+
+	* loaders/cal3d/Cal3dModel.cpp: Check that there are texture
+	  coordinates defined, texture maps defined and a filename for a 
+	  texture map before allowing a mesh to be textured. This stop the
+	  "texture  not defined" message on the stdout.
+
+	* renderers/Graphics.cpp: Request State during init instead of each 
+	  frame. Render the compass after the weather effects. Switch back to
+	  perspective mode after rendering rain.
+
+	* renderers/RenderSystem.cpp, renderers/StateManager.cpp, 
+	  renderers/StateManager.h: Rename getState to requestState. Tell 
+	  requestState to create a new empty record and return a valid stateID 
+	  even if one does not exist. This allows requesting state id's before
+	  the state records have been loaded. (similar behaviour to the
+	  TextureManager). Use SPtr to store StateProperties.
+
+	* renderers/TextureManager.cpp, renderers/TextureManager.h: Use a
+	  variable to store next available texture id instead of using the size
+	  of the names array. (I suspect that there was an out-by-one error in
+	  here). Make the loadTexture functions private.
+
+2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Character.cpp, src/Character.h: Create a map (InvetoryMap) 
 	  storing entity name (or type name) and the number of times it occurs
 	  in the characters inventory. Allow other classes to access this map.
