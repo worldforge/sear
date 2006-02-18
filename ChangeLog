@@ -1,3 +1,9 @@
+2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Character.cpp, src/Character.h: Use WFMath directly to handle 
+	  predicted velocity and rotation. Refresh predicated orientation from
+	  entity on location change.
+
 2006-02-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Sound.cpp: Add cassert include required by some compilers.
@@ -3348,9 +3354,9 @@
 
 2004-05-26  James Turner  <james@worldforge.org>
 
-        * Remove <strstream> check from configure, and usage from
-          Utility.h
-        * Updated version of XCode project
+	* Remove <strstream> check from configure, and usage from
+	  Utility.h
+	* Updated version of XCode project
 
 2004-05-26  Al Riddoch  <alriddoch@zepler.org>
 

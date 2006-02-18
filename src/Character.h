@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.40 2006-02-18 13:20:36 simon Exp $
+// $Id: Character.h,v 1.41 2006-02-18 23:04:25 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -95,7 +95,8 @@ public:
   void make(const std::string&type, const std::string &name);
   void displayUseOperations();
 
-  float getAngle() const { return m_angle; }
+//  float getAngle() const { return m_angle; }
+  const WFMath::Quaternion &getRotation() { return m_pred_orient; }
 //  WFMath::Quaternion getOrientation() { return m_orient; }
   Eris::Avatar *getAvatar() const { return m_avatar; }
 //  WorldEntity *getSelf() { return m_self; }
@@ -118,6 +119,9 @@ public:
   const InventoryMap &getInventoryMap() const { return m_imap; }
 
 private:
+  void onLocationChanged(Eris::Entity *);
+  void onMoved();
+  void getOrientation(WorldEntity *);
   /**
   @brief Locate an item in the inventory by instance or type name
   @param name The instance or type name to search for
@@ -141,6 +145,9 @@ private:
   float m_up_speed;
   float m_strafe_speed;
 
+  WFMath::Quaternion m_pred_orient;
+  WFMath::Point<3> m_pred_pos;
+
   unsigned int m_lastUpdate;
   bool m_updateScheduled;
 
@@ -159,7 +166,7 @@ private:
   Eris::Timeout *m_timeout_rotate, *m_timeout_update;
 
   InventoryMap m_imap;
-
+  bool m_refresh_orient;
 };
 
 } /* namespace Sear */

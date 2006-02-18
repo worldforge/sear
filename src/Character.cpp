@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.79 2006-02-18 13:20:36 simon Exp $
+// $Id: Character.cpp,v 1.80 2006-02-18 23:04:25 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -133,7 +133,6 @@ Character::Character() :
   m_walk_speed(0.0f),
   m_run_speed(0.0f),
   m_rotate_speed(0.0f),
-  m_angle(0.0f),
   m_rate(0.0f),
   m_speed(0.0f),
   m_up_speed(0.0f),
@@ -144,7 +143,8 @@ Character::Character() :
   m_run_modifier(false),
   m_initialised(false),
   m_timeout_rotate(NULL),
-  m_timeout_update(NULL)
+  m_timeout_update(NULL),
+  m_refresh_orient(true)
 {
 }
 
@@ -159,6 +159,8 @@ bool Character::init() {
 
   m_timeout_rotate = new Eris::Timeout(0);
   m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
+
+  m_pred_orient = WFMath::Quaternion(1,0,0,0);
 
   m_initialised = true;
   return true;
@@ -212,7 +214,7 @@ void Character::rotate(float rate) {
   if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
   updateLocals(true);
 
-  if (m_rate > 0.000001f &&  m_timeout_rotate->isExpired()) {
+  if (fabs(m_rate) > 0.000001f &&  m_timeout_rotate->isExpired()) {
     m_timeout_rotate->reset(server_update_interval);
   }
 }
@@ -223,7 +225,8 @@ void Character::rotateImmediate(float rot)
   if (!m_avatar) return;
 
   float angle = deg_to_rad(rot);
-  m_angle += angle;
+  
+  m_pred_orient /= WFMath::Quaternion(2,angle);
   // Only send to server if we haven't recently.
   bool send = ((SDL_GetTicks() - m_lastUpdate) > 1000);
   updateLocals(send);
@@ -273,7 +276,7 @@ void Character::setRotationRate(float rate) {
   if (!m_avatar) return;
 
   m_rate = rate * m_rotate_speed;
-  if (m_rate > 0.000001f && m_timeout_rotate->isExpired()) {
+  if (fabs(m_rate) > 0.000001f && m_timeout_rotate->isExpired()) {
     m_timeout_rotate->reset(server_update_interval);
   }
 }
@@ -282,21 +285,13 @@ void Character::updateLocals(bool send_to_server) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   assert(m_self.get() != NULL);
-  float x, y, z;
-  float mod_speed;
-  float angle;
+
   unsigned int ticks;
 
   static ActionHandler *ac = System::instance()->getActionHandler();
   static float old_speed = m_speed;
   static bool old_run = m_run_modifier;
   std::string type = dynamic_cast<WorldEntity*>(m_self.get())->type();
-
-  //float divisor, zaxis;
-//  m_orient = m_self->getOrientation();
-//  divisor = sqrt(square(m_orient.vector().x()) + square(m_orient.vector().y()) + square(m_orient.vector().z()));
-//  zaxis = (divisor != 0.0f) ? (m_orient.vector().z() / divisor) : 0.0f; // Check for possible divide by zero error;
-//  m_angle = -2.0f * acos(m_self->getOrientation().scalar()) * zaxis;
 
   if (old_speed != m_speed || old_run != m_run_modifier) {
     if (m_speed ==  0.0f) {
@@ -310,28 +305,26 @@ void Character::updateLocals(bool send_to_server) {
     old_run = m_run_modifier;
   }
   ticks = SDL_GetTicks();
-  angle = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
-  m_angle += angle;
+  float a = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
+  WFMath::Quaternion angle = WFMath::Quaternion(2, a);
 
-  // m_angle = limitAngle(m_angle);
+  m_pred_orient /= angle;
 
-//  if (_angle == WFMath::Pi) _angle += 0.01; // Stops entity points due west which causes cyphesis to flip it upside down;
-  mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
+//printf("[Character] Orient (%f,%f,%f) - %f\n", m_pred_orient.vector().x(), m_pred_orient.vector().y(), m_pred_orient.vector().z(), m_pred_orient.scalar());
+
+  // Forward/Backward Speed
+  float x_mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
+  // Stafe Speed
+  float y_mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
   // TODO - Perhaps add the walk/run modifier
-  z = m_up_speed;
-  y = mod_speed * -sin(m_angle);
-  x = mod_speed * cos(m_angle);
-  mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
+  WFMath::Vector<3> vel(x_mod_speed, y_mod_speed, m_up_speed);
+  // Rotate velocity to current heading
+  vel = vel.rotate(m_pred_orient);
 
-//  z += 0.0f;
-
-  static const float PI_BY_2 = WFMath::Pi / 2.0f;
-  y += mod_speed * -sin(m_angle + PI_BY_2);
-  x += mod_speed * cos(m_angle + PI_BY_2);
   m_time = ticks;
-  WFMath::Quaternion m_orient = WFMath::Quaternion(WFMath::Vector<3>(0.0f, 0.0f, 1.0f), -m_angle);
+
   if (send_to_server) {
-    updateMove(WFMath::Vector<3>(x, y, z), m_orient);
+    updateMove(vel, m_pred_orient);
     m_lastUpdate = ticks;
   }
 }
@@ -366,7 +359,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
     WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getContained(i));
     if (we->getName() == name) {
       m_avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
-      quantity--;
+      --quantity;
     }
   }
   setAction("drop");
@@ -623,10 +616,10 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_ROTATE_STOP_LEFT) rotate( 1);
   else if (command == CMD_ROTATE_STOP_RIGHT) rotate(-1);
 
-  else if (command == CMD_STRAFE_LEFT) strafe(-1);
-  else if (command == CMD_STRAFE_RIGHT) strafe( 1);
-  else if (command == CMD_STRAFE_STOP_LEFT) strafe( 1);
-  else if (command == CMD_STRAFE_STOP_RIGHT) strafe(-1);
+  else if (command == CMD_STRAFE_LEFT) strafe( 1);
+  else if (command == CMD_STRAFE_RIGHT) strafe(-1);
+  else if (command == CMD_STRAFE_STOP_LEFT) strafe(-1);
+  else if (command == CMD_STRAFE_STOP_RIGHT) strafe( 1);
 
   else if (command == CMD_RUN || command == CMD_STOP_RUN || command == CMD_TOGGLE_RUN) toggleRunModifier();
 
@@ -826,46 +819,24 @@ void Character::setAvatar(Eris::Avatar *avatar) {
   } else {
     m_self = Eris::EntityRef(m_avatar->getEntity());
     WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
-    assert (we != NULL);
-    WFMath::Quaternion quat = we->getAbsOrient();
-    WFMath::Vector<3> q = quat.vector();
-    WFMath::CoordType w = quat.scalar();
 
-    float v1,v2;
-    // Calculate attitude (which way we are facing)
-    v1  = 2.0f * q.x() * q.y() + 2.0f * q.z() * w;
-
-    // asin is very sensitive to numbers which it thinks are
-    // outside its numeric range.
-    if (v1 > 1.f) v1 = 1.f;
-    if (v1 < -1.f) v1 = -1.f;
-
-    float attitude = asin(v1);
-    // Attitude is now in the range -pi/2 -> pi/2
-
-    // Calculate bank so we can adjust attitude into the range
-    // -pi -> +pi
-    // Heading also exhibits the same behaviour, however should the angle of the
-    // z axis change, heading may be preferrable to bank. We shall have to see.
-    v1 = 2.0f * q.x() * w - 2.0f * q.y() * q.z();
-    v2 = 1.0f - 2.0f * q.x() * q.x()- 2.0f * q.z() * q.z();
-
-    float bank = atan2(v1, v2);
-
-    // Adjust attitude as neccessary
-    // bank actually flips to +=M_PI, but it is safer to test this way.
-    if  (bank > M_PI_2) attitude  = M_PI - attitude;
-    if  (bank < -M_PI_2) attitude  = -M_PI - attitude;
-
-    m_angle = attitude;
     we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded));    
-    we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));    
+    we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));
+    we->LocationChanged.connect(sigc::mem_fun(this, &Character::onLocationChanged));
+    we->Moved.connect(sigc::mem_fun(this, &Character::onMoved));
+    m_refresh_orient = true;
+
     m_imap.clear();
     for (unsigned int i = 0; i < m_self->numContained(); ++i) {
       onChildAdded(m_self->getContained(i));
     }
  
   }
+}
+
+void Character::getOrientation(WorldEntity *we){
+  assert (we != NULL);
+  m_pred_orient = we->getEntityOrientation();
 }
 
 void Character::onChildAdded(Eris::Entity *child) {
@@ -891,6 +862,18 @@ void Character::onChildRemoved(Eris::Entity *child) {
     m_imap.erase(I);
   } else {
     m_imap[name] = --count;
+  }
+}
+
+void Character::onLocationChanged(Eris::Entity *loc) {
+  printf("[Character] Location Changed\n");
+  m_refresh_orient = true;
+}
+void Character::onMoved() {
+  if (m_refresh_orient) {
+    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
+    m_pred_orient = we->getEntityOrientation();
+    m_refresh_orient = false;
   }
 }
 
