@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.78 2006-02-16 17:45:21 simon Exp $
+// $Id: WorldEntity.cpp,v 1.79 2006-02-18 23:09:12 simon Exp $
 
 /*
  TODO
@@ -13,6 +13,7 @@
 
 //#include <set>
 #include <sigc++/bind.h>
+#include <sigc++/hide.h>
 #include <sigc++/object_slot.h>
 
 #include <Atlas/Message/Element.h>
@@ -51,13 +52,16 @@ static const std::string GUISE = "guise";
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
    m_status(1.0),
-   m_screenCoordRequest(0)
+   m_screenCoordRequest(0),
+   m_has_local_orient(false),
+   m_has_local_pos(false)
 {
   Acted.connect(SigC::slot(*this, &WorldEntity::onAction));
+  LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));
 }
 
 void WorldEntity::onMove() {
-  rotateBBox(getOrientation());
+  rotateBBox(getEntityOrientation());
 }
 
 void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
@@ -140,16 +144,16 @@ const WFMath::Quaternion WorldEntity::getAbsOrient()
     WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
     WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
     if (loc) parentOrient = loc->getAbsOrient();
-    return parentOrient / getOrientation();
+    return parentOrient / getEntityOrientation();
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
   // Get parent entity for additional positional information
   WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
-  if (!loc) return getPredictedPos(); // nothing below makes sense for the world
+  if (!loc) return getEntityPosition(); // nothing below makes sense for the world
 
   // Cache predicted pos of entity
-  WFMath::Point<3> predicted = getPredictedPos();
+  WFMath::Point<3> predicted = getEntityPosition();
   //assert(predicted.isValid());
   if (!predicted.isValid()) { // TODO: Replace with assert once eris is fixed
     predicted = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
@@ -163,51 +167,11 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
   }
 
   // Get rotation
-  WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
-  WFMath::Quaternion lorient = loc->getOrientation();
+//  WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
+  WFMath::Quaternion lorient = loc->getEntityOrientation();
 
-  assert(lorient.isValid());
-
-  orient *= lorient;
-  static float rot_matrix[4][4];
-  // Calculate rotation matrix
-  QuatToMatrix(orient, rot_matrix);
-
-  // Calculate rotated components
-  float x,y,z,w;
-  x = rot_matrix[0][0] * predicted.x()
-    + rot_matrix[0][1] * predicted.y()
-    + rot_matrix[0][2] * predicted.z()
-    + rot_matrix[0][3];
-
-  y = rot_matrix[1][0] * predicted.x()
-    + rot_matrix[1][1] * predicted.y()
-    + rot_matrix[1][2] * predicted.z()
-    + rot_matrix[1][3];
-
-  z = rot_matrix[2][0] * predicted.x()
-    + rot_matrix[2][1] * predicted.y()
-    + rot_matrix[2][2] * predicted.z()
-    + rot_matrix[2][3];
-
-  w = rot_matrix[3][0] * predicted.x()
-    + rot_matrix[3][1] * predicted.y()
-    + rot_matrix[3][2] * predicted.z()
-    + rot_matrix[3][3];
-
-  // Apply normalisation factor
-  x /= w;
-  y /= w;
-  z /= w;
-
-  // Work out predicted abs pos.
-  WFMath::Point<3> absPos(
-    location.x() + x,
-    location.y() + y,
-    location.z() + z);
-
-  // Apply modifiers to height.
-
+// WFMath::Point<3> absPos = location + ((predicted - WFMath::Point<3>(0,0,0)).rotate(lorient.inverse()));
+  WFMath::Point<3> absPos = location + ((predicted - WFMath::Point<3>(0,0,0)).rotate(lorient));
   float terrainHeight = 0.0f;
   bool hasHeight = false;
   if (loc->hasAttr("terrain")) {  
@@ -258,6 +222,8 @@ void WorldEntity::displayInfo() {
 //  WFMath::Vector<3> pos = getInterpolatedPos();
 //  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   
+  WFMath::Point<3> pos = getEntityPosition();
+  Log::writeLog(std::string("Pos - X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   WFMath::Point<3> abspos = getAbsPos();
   Log::writeLog(std::string("ABS - X: ") + string_fmt(abspos.x()) + std::string(" Y: ") + string_fmt(abspos.y()) + std::string(" Z: ") + string_fmt(abspos.z()), Log::LOG_DEFAULT);
   Eris::Entity *e = getLocation();
@@ -316,22 +282,6 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (record) record->animate(mode);
       last_mode = mode;
     }
-/*
-  } else if (str == ACTION) {
-    const std::string action = v.asString();
-    if (debug) {
-      printf("Entity %s (%s) action prop changed\n", getName().c_str(), getId().c_str());
-      printf("Action is %s\n", action.c_str());
-    }
-    static ActionHandler *ac = System::instance()->getActionHandler();
-    ac->handleAction(action + "_" + type(), NULL);
-    if (action != last_action) {
-      ObjectRecord *record = NULL;
-      record = ModelSystem::getInstance().getObjectRecord(this);
-      if (record) record->action(action);
-      last_action = action;
-    }
-*/
   } else if (str == GUISE) {
     const Atlas::Message::MapType& mt(v.asMap());
     SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
@@ -345,7 +295,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (attach) {
         m_attached["right_hand_wield"] = attach;
       } else {
-        Eris::View::EntitySightSlot ess(SigC::bind( 
+        Eris::View::EntitySightSlot ess(sigc::bind( 
           SigC::slot(*this, &WorldEntity::onSightAttached),
           str));
         getView()->notifyWhenEntitySeen(id, ess);
@@ -375,15 +325,19 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
 
   std::string a = *I;
 
-  if (debug) {
-    printf("Entity %s (%s) received action: %s\n", getName().c_str(), getId().c_str(), a.c_str());
-  }
+//  if (debug) {
+//    printf("[WorldEntity] Entity %s (%s) received action: %s\n", getName().c_str(), getId().c_str(), a.c_str());
+//  }
 
   static ActionHandler *ac = System::instance()->getActionHandler();
   ac->handleAction(a + "_" + type(), NULL);
 
   SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
   if (record) record->action(a);
+}
+
+void WorldEntity::locationChanged(Eris::Entity *loc) {
+  resetLocalPO();
 }
 
 } /* namespace Sear */

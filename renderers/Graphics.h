@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.14 2006-02-18 17:40:29 simon Exp $
+// $Id: Graphics.h,v 1.15 2006-02-18 23:09:12 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -67,7 +67,6 @@ public:
   void setRenderer(Render *r) { m_renderer = r; }
   
   Render *getRender() { return m_renderer; }
-//  Camera* getCamera() { return m_camera; }
   void setupStates();
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
@@ -83,8 +82,6 @@ public:
 protected:
   System *m_system;
   Render *m_renderer;
-//  Character *m_character;
-//  Camera *m_camera;
 
   WFMath::Quaternion m_orient;
 
@@ -109,6 +106,7 @@ private:
   bool m_show_names;
   float m_modelview_matrix[4][4];
   float m_medium_dist, m_high_dist;
+
   StateID m_state_weather, m_state_terrain, m_state_select, m_state_cursor;
 
     /**
@@ -123,12 +121,6 @@ private:
                         
     void drawFire(WorldEntity*);
     
-    void drawAttached(SPtr<ObjectRecord> obj, 
-                        bool select_mode,
-                        Render::QueueMap &render_queue,
-                        Render::MessageList &message_list,
-                        Render::MessageList &name_list,
-                        float time_elapsed);
 };
 
 } /* namespace Sear */

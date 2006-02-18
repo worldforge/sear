@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.36 2006-02-16 17:45:21 simon Exp $
+// $Id: WorldEntity.h,v 1.37 2006-02-18 23:09:12 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -73,6 +73,29 @@ public:
   int & screenY()
   { return m_screenY; }
 
+  void setLocalPos(const WFMath::Point<3> &pos) {
+    m_local_pos = pos;
+    m_has_local_pos = true;
+  }
+
+  void setLocalOrient(const WFMath::Quaternion &orient) {
+    m_local_orient = orient;
+    m_has_local_orient = true;
+  }
+
+  void resetLocalPO() {
+    m_has_local_orient = false;
+    m_has_local_pos = false;
+  }
+
+  WFMath::Point<3> getEntityPosition() const {
+    if (m_has_local_pos) return m_local_pos;
+    else return getPredictedPos();
+  }
+  const WFMath::Quaternion &getEntityOrientation() const {
+    if (m_has_local_orient) return m_local_orient;
+    else return getOrientation();
+  }
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -85,7 +108,7 @@ protected:
   std::string last_mode;
   
   void onAttrChanged(const std::string& attr, const Atlas::Message::Element& v);
-  
+  void locationChanged(Eris::Entity *loc);
   void onSightAttached(Eris::Entity* ent, const std::string slot);
   void onAction(const Atlas::Objects::Operation::RootOperation &action);
   
@@ -97,6 +120,11 @@ protected:
 
   int m_screenCoordRequest;
   int m_screenX, m_screenY;
+
+  bool m_has_local_orient, m_has_local_pos;
+  WFMath::Quaternion m_local_orient;
+  WFMath::Point<3> m_local_pos;
+
 };
 
 } /* namespace Sear */

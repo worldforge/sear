@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.41 2006-02-18 15:41:12 simon Exp $
+// $Id: Graphics.cpp,v 1.42 2006-02-18 23:09:12 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -306,8 +306,16 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Apply camera rotations
     m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
     m_orient /= WFMath::Quaternion(z_vector, cam->getRotation());
-      
-    m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
+ 
+    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+    assert(avatar != NULL);
+    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
+    assert(focus != NULL);
+     
+//    m_orient *= System::instance()->getCharacter()->getRotation();
+    m_orient /= focus->getAbsOrient();
+    //m_orient /= System::instance()->getCharacter()->getRotation();
+//    m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
 
     // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
     if (!select_mode) {
@@ -318,11 +326,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     }
 
     setCameraTransform();
-
-    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
-    assert(avatar != NULL);
-    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
-    assert(focus != NULL);
 
     WFMath::Point<3> pos(0,0,0); // Initial camera positiona
     pos = focus->getAbsPos();
@@ -414,8 +417,6 @@ void Graphics::buildQueues(WorldEntity *we,
   assert(cam != NULL);
   WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
 
-//  we->checkActions(); // See if model animations need to be updated
-
   assert(we->getType());
     
   SPtr<ObjectRecord> obj = ModelSystem::getInstance().getObjectRecord(we);
@@ -446,11 +447,6 @@ void Graphics::buildQueues(WorldEntity *we,
                       time_elapsed);
     }
   } // of draw_members case
-  
-//  if (obj->draw_attached || !we->getAttachments().empty()) {
-//    drawAttached(obj, select_mode, render_queue, message_list,
-//                      name_list, time_elapsed);
-//  }
 }
 
 void Graphics::drawObject(SPtr<ObjectRecord> obj, 
@@ -536,18 +532,37 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
         Eris::Entity * ee = it->second.get();
         WorldEntity * we = dynamic_cast<WorldEntity*>(ee);
         assert(we!=0);
-        SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
-        assert (attached);
 
         std::string submodel = mapAttachSlotToSubmodel(it->first);
         PosAndOrient po = modelRec->model->getPositionForSubmodel(submodel);
 
-        attached->orient = obj->orient * po.orient;
-        attached->position = obj->position +
-                                         (po.pos.rotate(obj->orient.inverse()));
+//        we->setLocalOrient(we->getOrientation() * po.orient);
+//        we->setLocalOrient(we->getAbsOrient() * po.orient);
+        we->setLocalOrient(po.orient);
+//        we->setLocalOrient(po.orient.inverse());
+//        we->setLocalPos(we->getPredictedPos() + (po.pos.rotate(we->getOrientation().inverse())));
+        we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
 
-        drawObject(attached, select_mode, render_queue, message_list, name_list,
-                   time_elapsed);
+        SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
+        assert (attached);
+//
+//        attached->orient = obj->orient * po.orient;
+//        attached->position = obj->position +
+//                                         (po.pos.rotate(obj->orient.inverse()));
+
+
+
+        buildQueues(we,
+                      2,
+                      select_mode,
+                      render_queue,
+                      message_list,
+                      name_list,
+                      time_elapsed);
+
+  //      drawObject(attached, select_mode, render_queue, message_list, name_list,
+//
+    //               time_elapsed);
       }
     }
   }
@@ -561,8 +576,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   } // of object models loop
 }
 
-void Graphics::drawFire(WorldEntity* we)
-{
+void Graphics::drawFire(WorldEntity* we) {
   // Turn on light source
   m_fire.enabled = true;
 
@@ -596,39 +610,6 @@ std::string mapAttachSlotToSubmodel(const std::string& s)
     
     std::cerr << "no mapping from entity attachment slot '" << s << "'  to a submodel name" << std::endl;
     return s;
-}
-
-void Graphics::drawAttached(SPtr<ObjectRecord> obj, 
-                        bool select_mode,
-                        Render::QueueMap &render_queue,
-                        Render::MessageList &message_list,
-                        Render::MessageList &name_list,
-                        float time_elapsed)
-{
-  assert(obj);
-  WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
-  assert(obj_we);
-  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(obj->low_quality.front(), obj_we);
-  assert(modelRec);
-  WorldEntity::AttachmentMap::const_iterator it,
-    end = obj_we->getAttachments().end();
-    
-  for (it = obj_we->getAttachments().begin(); it != end; ++it) {
-    // retrieving the objectRecord also syncs it's pos with the WorldEntity
-    if (!it->second) { continue; }
-    Eris::Entity * ee = it->second.get();
-    WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
-    SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
-    assert (attached);
-  
-    std::string submodel = mapAttachSlotToSubmodel(it->first);
-    PosAndOrient po = modelRec->model->getPositionForSubmodel(submodel);
-    
-    attached->orient = obj->orient * po.orient;
-    attached->position = obj->position + (po.pos.rotate(obj->orient.inverse()));
-        
-    drawObject(attached, select_mode, render_queue, message_list, name_list, time_elapsed);
-  }
 }
 
 void Graphics::readConfig(varconf::Config &config) {
