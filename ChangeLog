@@ -1,4 +1,14 @@
 2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Character.cpp, src/Character.h: Create a map (InvetoryMap) 
+	  storing entity name (or type name) and the number of times it occurs
+	  in the characters inventory. Allow other classes to access this map.
+
+	* guichan/Inventory.cpp: Use the new Character::InventoryMap to "stack"
+	  items in the list. You will now see an entry like "coin (5)". Any
+	  actions still apply to only one instance of an item.
+
+2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 	
 	* guichan/WorkArea.cpp: Fix inventory gui opening with /inventory 
 	  command. It was broken due to a lower case 'i'.

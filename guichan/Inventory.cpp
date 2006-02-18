@@ -2,8 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
 
-#include "guichan/Inventory.h"
+#include "common/Utility.h"
 
+#include "guichan/Inventory.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -29,19 +30,32 @@ public:
   {
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return 0; }
-    Eris::Avatar * av = chr->getAvatar();
-    if (av == 0) { return 0; }
-    return av->getEntity()->numContained();
+    const Character::InventoryMap imap = chr->getInventoryMap();
+    return imap.size();
+//    Eris::Avatar * av = chr->getAvatar();
+//    if (av == 0) { return 0; }
+//    return av->getEntity()->numContained();
   }
-
   virtual std::string getElementAt(int i)
   {
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return ""; }
-    Eris::Avatar * av = chr->getAvatar();
-    if (av == 0) { return ""; }
-    if (i >= av->getEntity()->numContained()) { return ""; }
-    return av->getEntity()->getContained(i)->getName();
+    const Character::InventoryMap imap = chr->getInventoryMap();
+    if ((unsigned int)i >= imap.size()) return  "";
+    Character::InventoryMap::const_iterator  I = imap.begin();
+    for (int n = 0; n < i; ++n, ++I);
+    return I->first + " (" + string_fmt(I->second) + ")";
+  }
+
+  std::string getElementNameAt(int i)
+  {
+    Character * chr = System::instance()->getCharacter();
+    if (chr == 0) { return ""; }
+    const Character::InventoryMap imap = chr->getInventoryMap();
+    if (i >= imap.size()) return  "";
+    Character::InventoryMap::const_iterator  I = imap.begin();
+    for (int n = 0; n < i; ++n, ++I);
+    return I->first;
   }
 };
 
@@ -118,15 +132,11 @@ void Inventory::actionPressed(std::string event)
 {
   int selected = m_items->getSelected();
 
-  Character * chr = System::instance()->getCharacter();
-  if (chr == 0) { return; }
-  Eris::Avatar * av = chr->getAvatar();
-  if (av == 0) { return; }
   if ((selected < 0) ||
-      ((unsigned int)selected >= av->getEntity()->numContained())) {
+        (selected >= m_inventory->getNumberOfElements())) {
     return;
   }
-  std::string name = av->getEntity()->getContained(selected)->getName();
+  std::string name = m_inventory->getElementNameAt(selected);
 
   if (event == "wield") {
     std::string cmd("/wield ");

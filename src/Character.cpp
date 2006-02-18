@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.78 2006-02-18 12:32:29 simon Exp $
+// $Id: Character.cpp,v 1.79 2006-02-18 13:20:36 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -166,6 +166,8 @@ bool Character::init() {
 
 void Character::shutdown() {
   assert (m_initialised == true);
+
+  notify_callbacks();
 
   // Cleanup timeouts
   if (m_timeout_update) {
@@ -820,6 +822,7 @@ void Character::setAvatar(Eris::Avatar *avatar) {
   m_avatar = avatar;
   if (avatar == NULL) {
     m_self = Eris::EntityRef();
+    m_imap.clear();
   } else {
     m_self = Eris::EntityRef(m_avatar->getEntity());
     WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
@@ -855,6 +858,40 @@ void Character::setAvatar(Eris::Avatar *avatar) {
     if  (bank < -M_PI_2) attitude  = -M_PI - attitude;
 
     m_angle = attitude;
+    we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded));    
+    we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));    
+    m_imap.clear();
+    for (unsigned int i = 0; i < m_self->numContained(); ++i) {
+      onChildAdded(m_self->getContained(i));
+    }
+ 
   }
 }
+
+void Character::onChildAdded(Eris::Entity *child) {
+  std::string name = child->getName();
+  if (name.empty()) name = child->getType()->getName();
+
+  int count = 0;
+  if (m_imap.find(name) != m_imap.end()) {
+    count = m_imap[name];
+  }
+  m_imap[name] = ++count;
+}
+
+void Character::onChildRemoved(Eris::Entity *child) {
+  std::string name = child->getName();
+  if (name.empty()) name = child->getType()->getName();
+
+  InventoryMap::iterator I = m_imap.find(name);
+  assert (I != m_imap.end());
+
+  int count = I->second;
+  if (count == 1) {
+    m_imap.erase(I);
+  } else {
+    m_imap[name] = --count;
+  }
+}
+
 } /* namespace Sear */

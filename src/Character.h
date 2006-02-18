@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.39 2006-02-16 17:39:44 simon Exp $
+// $Id: Character.h,v 1.40 2006-02-18 13:20:36 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -38,6 +38,7 @@ class WorldEntity;
 
 class Character : public ConsoleObject, public sigc::trackable {
 public:
+  typedef std::map<std::string,  int> InventoryMap;
   /**
    * Constructor.
    */
@@ -114,6 +115,7 @@ public:
   void setAction(const std::string &action);
 
   void setAvatar(Eris::Avatar *avatar);
+  const InventoryMap &getInventoryMap() const { return m_imap; }
 
 private:
   /**
@@ -123,6 +125,8 @@ private:
   items are present.
   */
   WorldEntity* findInInventory(const std::string& name);
+  void onChildAdded(Eris::Entity*);
+  void onChildRemoved(Eris::Entity*);
  
   Eris::Avatar *m_avatar;
   Eris::EntityRef m_self;
@@ -153,6 +157,8 @@ private:
   void RotateTimeoutExpired();
   void UpdateTimeoutExpired();
   Eris::Timeout *m_timeout_rotate, *m_timeout_update;
+
+  InventoryMap m_imap;
 
 };
 
