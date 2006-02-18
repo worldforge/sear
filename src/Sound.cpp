@@ -7,8 +7,9 @@
 #include "common/Log.h"
 #include <SDL/SDL.h>
 #include <unistd.h>
+#include <cassert>
 
-// $Id: Sound.cpp,v 1.19 2006-02-15 12:44:24 simon Exp $
+// $Id: Sound.cpp,v 1.20 2006-02-18 22:57:02 alriddoch Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 

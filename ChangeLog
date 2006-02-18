@@ -1,3 +1,7 @@
+2006-02-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Sound.cpp: Add cassert include required by some compilers.
+
 2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.h: Add member vars for cached stateIDs
