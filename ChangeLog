@@ -1,3 +1,9 @@
+2006-02-19  James Turner  <james@worldforge.org>
+
+	* src/error.cpp: On OS-X, use the Dialog Manager to display a
+	  standard alert via Carbon. Inside Macintosh is dead, but the
+	  toolbox will never die.
+
 2006-02-18  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/WorldEntity.cpp, src/WorldEntity.h: Allow a local position and
