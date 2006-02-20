@@ -1,5 +1,9 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Change some debugging ouput
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/CoreModel.cpp, loaders/cal3d/Cal3dModel.h: Remove scale
 	  transform as it is done within the core model directly. Change 
 	  getPositionForSubModel to use the new bone-mapping api and perform

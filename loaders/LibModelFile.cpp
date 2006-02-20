@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
+// $Id: LibModelFile.cpp,v 1.19 2006-02-20 20:13:36 simon Exp $
 
 /*
   Debug check list
@@ -62,23 +62,23 @@ int LibModelFile::init(const std::string &filename) {
     if (m_config.findItem("model", "filename")) {
       object = (std::string)m_config.getItem("model", "filename");
     } else {
-      fprintf(stderr, "Error: No md3 filename specified.\n");
+      fprintf(stderr, "[LibModelFile] Error: No md3 filename specified.\n");
       return 1;
     }
   } else {
-    fprintf(stderr, "Error reading %s as varconf file. Trying as .md3 file.\n",
+    fprintf(stderr, "[LibModelFile] Error reading %s as varconf file. Trying as .md3 file.\n",
             filename.c_str());
     object = filename;
   }
 
   System::instance()->getFileHandler()->expandString(object);
 
-  // Load 3ds file
-  if (debug) printf("LibModelFile: Loading: %s\n", object.c_str());
+  // Load md3 file
+  if (debug) printf("[LibModelFile] Loading: %s\n", object.c_str());
 
   libmd3_file *modelFile = libmd3_file_load(object.c_str());
   if (!modelFile) {
-    fprintf(stderr, "LibModelFile: Error loading %s file\n", object.c_str());
+    fprintf(stderr, "[LibModelFile] Error loading %s file\n", object.c_str());
     return 1;
   }
 
@@ -166,7 +166,7 @@ void LibModelFile::render(bool select_mode) {
 }
 
 void LibModelFile::varconf_error_callback(const char *message) {
-  fprintf(stderr, "LibModelFile: %s\n", message);
+  fprintf(stderr, "[LibModelFile] %s\n", message);
 }
 
 } /* namespace Sear */

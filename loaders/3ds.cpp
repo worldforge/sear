@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.52 2006-02-15 09:50:30 simon Exp $
+// $Id: 3ds.cpp,v 1.53 2006-02-20 20:13:36 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -72,23 +72,23 @@ int ThreeDS::init(const std::string &file_name) {
     if (m_config.findItem("model", "filename")) {
       object = (std::string)m_config.getItem("model", "filename");
     } else {
-      fprintf(stderr, "Error: No 3ds filename specified.\n");
+      fprintf(stderr, "[3ds] Error: No 3ds filename specified.\n");
       return 1;
     }
   } else {
-    fprintf(stderr, "Error reading %s as varconf file. Trying as .3ds file.\n", file_name.c_str());
+    fprintf(stderr, "[3ds] Error reading %s as varconf file. Trying as .3ds file.\n", file_name.c_str());
     object = file_name;
   }
 
   System::instance()->getFileHandler()->expandString(object);
 
   // Load 3ds file
-  if (debug) printf("3ds: Loading: %s\n", object.c_str());
+  if (debug) printf("[3ds] Loading: %s\n", object.c_str());
 
   Lib3dsFile *model = lib3ds_file_load(object.c_str());
 
   if (!model) {
-    fprintf(stderr, "3ds: Unable to load %s\n", object.c_str());
+    fprintf(stderr, "[3ds] Unable to load %s\n", object.c_str());
     return 1;
   }
 
@@ -117,7 +117,7 @@ int ThreeDS::init(const std::string &file_name) {
   // Calculate initial positions
   lib3ds_file_eval(model,1);
   if (model->nodes == NULL) {
-    if (debug) printf("3ds: Rendering Meshes direct\n");
+    if (debug) printf("[3ds] Rendering Meshes direct\n");
     render_file(model);
   } else {
     for (Lib3dsNode *n = model->nodes; n != NULL; n = n->next) {
@@ -270,7 +270,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         texture_mask_id = RenderSystem::getInstance().requestTexture(
                                                   mat->texture1_map.name, true);
       } else {
-      // Do nothing, use default vals
+        // Do nothing, use default vals
       }
     }
     // Create new render object for change in texture
@@ -335,7 +335,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
 }
 
 void ThreeDS::varconf_error_callback(const char *message) {
-  fprintf(stderr, "3DS: %s\n", message);
+  fprintf(stderr, "[3DS] %s\n", message);
 }
 
 } /* namespace Sear */
