@@ -1,5 +1,12 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp: Update code to properly use rotations from 
+	  WorldEntity and new rotations from Camera objects. The camera no
+	  longer is stopped from going through terrain. Removed old attachment
+	  code.
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/Camera.cpp, renderers/Camera.h, renderers/CameraSystem.cpp:
 	  Use a wfmath vector and rotation to handle camera settings and remove
 	  old getAngle and getX/Y/ZPos functions. Add a /reset_camera to re-read

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.42 2006-02-18 23:09:12 simon Exp $
+// $Id: Graphics.cpp,v 1.43 2006-02-20 20:39:08 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -49,9 +49,13 @@
 
 namespace Sear {
 
+static const WFMath::Vector<3> x_vector = WFMath::Vector<3>(1.0f, 0.0f, 0.0f);
+static const WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
+static const WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
+static const WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
+
 static bool c_select = false;
 
- extern void renderDome(float, int, int);
 static const std::string GRAPHICS = "graphics";
 
 static const std::string DEFAULT = "default";
@@ -115,8 +119,6 @@ static const std::string SELECT = "select_state";
 //  static const float DEFAULT_low_dist    = 1000.0f;
   static const float DEFAULT_medium_dist = 9000.0f;
   static const float DEFAULT_high_dist   = 4500.0f; 
-
-std::string mapAttachSlotToSubmodel(const std::string& s);
 
 Graphics::Graphics(System *system) :
   m_system(system),
@@ -228,9 +230,6 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   m_renderer->endFrame(select_mode);
 }
 
-static WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
-static WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
-
 void Graphics::setCameraTransform() {
   if (!m_system->checkState(SYS_IN_WORLD)) {
     return;
@@ -247,8 +246,7 @@ void Graphics::setCameraTransform() {
   // Calculate entity height so camera is always at the top
   float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
 
-  WFMath::Point<3> pos(0,0,0); // Initial camera positiona
-  pos = focus->getAbsPos();
+  WFMath::Point<3> pos = focus->getAbsPos();
   float char_x = pos.x(),
         char_y = pos.y(),
         char_z = pos.z();
@@ -256,22 +254,45 @@ void Graphics::setCameraTransform() {
   // Adjust height so camera doesn't go underneath the terrain
   // Find terrain height at camera position, and adjust as if camera is at
   // entity feet. (the - height part)
-  float terrain_z = Environment::getInstance().getHeight(char_x - cam->getXPos(), char_y + cam->getYPos()) + cam->getZPos() - height;
+  const WFMath::Point<3> &cam_pos = cam->getPosition();
+//  WFMath::Vector<3>cam_vec(-cam->getDistance(), 0.0f,0.0f);
+//  WFMath::Vector<3>cam_vec(0.0f, -cam->getDistance(), 0.0f);
+//  WFMath::Vector<3>cam_vec(0.0f, 0.0f,cam->getDistance());
+
+//  cam_vec.rotate(cam->getOrientation());
+//  cam_vec.rotate(focus->getAbsOrient().inverse());
+//  cam_vec.rotate(quaternion_by_90.inverse());
+
+  WFMath::Point<3> p2 (0,0,0);
+  p2.rotate(focus->getAbsOrient(), cam_pos);
+
+//  p2 = pos + cam_v#ec;
+  p2.z() += height;
+
+  p2.x() += pos.x();
+  p2.y() += pos.y();
+  p2.z() += pos.z();
+
+//p2 = cam_pos;
+  float terrain_z = Environment::getInstance().getHeight(p2.x(), p2.y());
+//  float c_z = Environment::getInstance().getHeight(char_x, char_y);
+//printf("X %f,Y %f, Z %f TZ %f, Char_Z %f  cz %f\n", p2.x(), p2.y(), p2.z(), terrain_z, char_z, c_z);
   // If the calculated terrain height is larger than the current Z for the 
   // camera, adjust to bound
-  if (terrain_z > char_z) {
-    char_z = terrain_z;
+  if (terrain_z - height> char_z) {
+    char_z = terrain_z = height;
   }
 
   if (cam->getType() == Camera::CAMERA_CHASE) {
     // Translate camera getDist() units away from the character. Allows closups or large views
-    m_renderer->translateObject(0.0f, cam->getDistance(), -1.0f);
+    m_renderer->translateObject(0.0f, cam->getDistance(), 0.0f);
   }
   m_renderer->applyCharacterLighting(0.5, 0, 0.5);
 
-  m_renderer->applyQuaternion(m_orient);
+  m_renderer->applyQuaternion(m_orient.inverse());
 
   m_renderer->translateObject(-char_x, -char_y, -char_z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
+//  m_renderer->translateObject(-p2.x(), -p2.y(), -p2.z()); //Translate to accumulated position - Also adjust so origin is nearer head level
   glGetFloatv(GL_MODELVIEW_MATRIX,&m_modelview_matrix[0][0]);
 
 }
@@ -299,30 +320,29 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     //if (!m_character) m_character = m_system->getCharacter();
     //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
 
-    static WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
-    m_orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-    m_orient /= quaternion_by_90; // Rotate by 90 degrees as WF 0 degrees is East
+    m_orient.identity(); // = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+    m_orient *= quaternion_by_90; // Rotate by 90 degrees, WF 0 degrees is East
 
-    // Apply camera rotations
-    m_orient /= WFMath::Quaternion(y_vector, cam->getElevation());
-    m_orient /= WFMath::Quaternion(z_vector, cam->getRotation());
  
     Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
     assert(focus != NULL);
-     
-//    m_orient *= System::instance()->getCharacter()->getRotation();
-    m_orient /= focus->getAbsOrient();
-    //m_orient /= System::instance()->getCharacter()->getRotation();
-//    m_orient /= WFMath::Quaternion(z_vector,  System::instance()->getCharacter()->getAngle());
+    
+    // Apply character orientation 
+    m_orient *= focus->getAbsOrient().inverse();
+
+    // Apply camera rotations
+    m_orient *= cam->getOrientation();
+//    m_orient *= WFMath::Quaternion(z_vector, cam->getRotation());
+//    m_orient *= WFMath::Quaternion(x_vector, cam->getElevation());
 
     // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
     if (!select_mode) {
-      m_renderer->store();
-      m_renderer->applyQuaternion(m_orient);
+      glPushMatrix();
+      m_renderer->applyQuaternion(m_orient.inverse());
       Environment::getInstance().renderSky();
-      m_renderer->restore();
+      glPopMatrix();
     }
 
     setCameraTransform();
@@ -359,7 +379,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
       m_renderer->selectTerrainColour(root);
     }
 
-    m_renderer->store();
+    glPushMatrix();
 
     if (select_mode) {
       RenderSystem::getInstance().switchState(m_state_select);
@@ -369,7 +389,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     Environment::getInstance().renderTerrain(pos, select_mode);
 
-    m_renderer->restore();
+    glPopMatrix();
 
     m_renderer->drawQueue(m_render_queue, select_mode);
     if (!select_mode) {
@@ -380,10 +400,10 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     }
 
     if (!select_mode ) {
-      m_renderer->store();
+      glPushMatrix();
       RenderSystem::getInstance().switchState(m_state_terrain);
       Environment::getInstance().renderSea();
-      m_renderer->restore();
+      glPopMatrix();
 
       //  Switch to 2D mode for rendering rain
       m_renderer->setViewMode(ORTHOGRAPHIC);
@@ -396,7 +416,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
       m_compass->update(cam->getRotation());
       m_compass->draw(m_renderer, select_mode);
     } 
-
   } else {
     m_renderer->drawSplashScreen();
   }
@@ -533,36 +552,20 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
         WorldEntity * we = dynamic_cast<WorldEntity*>(ee);
         assert(we!=0);
 
-        std::string submodel = mapAttachSlotToSubmodel(it->first);
-        PosAndOrient po = modelRec->model->getPositionForSubmodel(submodel);
+        PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
 
-//        we->setLocalOrient(we->getOrientation() * po.orient);
-//        we->setLocalOrient(we->getAbsOrient() * po.orient);
         we->setLocalOrient(po.orient);
-//        we->setLocalOrient(po.orient.inverse());
-//        we->setLocalPos(we->getPredictedPos() + (po.pos.rotate(we->getOrientation().inverse())));
+        // Convert Vector<3> to a Point<3>
         we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
 
-        SPtr<ObjectRecord> attached = ModelSystem::getInstance().getObjectRecord(we);
-        assert (attached);
-//
-//        attached->orient = obj->orient * po.orient;
-//        attached->position = obj->position +
-//                                         (po.pos.rotate(obj->orient.inverse()));
-
-
-
         buildQueues(we,
-                      2,
+                      2, // depth is not used, so no need to give a real value.
                       select_mode,
                       render_queue,
                       message_list,
                       name_list,
                       time_elapsed);
 
-  //      drawObject(attached, select_mode, render_queue, message_list, name_list,
-//
-    //               time_elapsed);
       }
     }
   }
@@ -601,15 +604,6 @@ void Graphics::drawFire(WorldEntity* we) {
         
   // Disable as we don't need it again for now 
   m_fire.enabled = false;
-}
-
-std::string mapAttachSlotToSubmodel(const std::string& s)
-{
-    // temporary .. should be done via a config file
-    if (s == "right_hand_wield") return "male_builder_right_hand";
-    
-    std::cerr << "no mapping from entity attachment slot '" << s << "'  to a submodel name" << std::endl;
-    return s;
 }
 
 void Graphics::readConfig(varconf::Config &config) {
