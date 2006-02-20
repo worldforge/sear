@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.80 2006-02-18 23:04:25 simon Exp $
+// $Id: Character.cpp,v 1.81 2006-02-20 20:42:02 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -226,7 +226,7 @@ void Character::rotateImmediate(float rot)
 
   float angle = deg_to_rad(rot);
   
-  m_pred_orient /= WFMath::Quaternion(2,angle);
+  m_pred_orient *= WFMath::Quaternion(2,angle);
   // Only send to server if we haven't recently.
   bool send = ((SDL_GetTicks() - m_lastUpdate) > 1000);
   updateLocals(send);
@@ -308,7 +308,7 @@ void Character::updateLocals(bool send_to_server) {
   float a = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
   WFMath::Quaternion angle = WFMath::Quaternion(2, a);
 
-  m_pred_orient /= angle;
+  m_pred_orient *= angle;
 
 //printf("[Character] Orient (%f,%f,%f) - %f\n", m_pred_orient.vector().x(), m_pred_orient.vector().y(), m_pred_orient.vector().z(), m_pred_orient.scalar());
 
@@ -318,11 +318,15 @@ void Character::updateLocals(bool send_to_server) {
   float y_mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
   // TODO - Perhaps add the walk/run modifier
   WFMath::Vector<3> vel(x_mod_speed, y_mod_speed, m_up_speed);
+//  WFMath::Vector<3> vel(y_mod_speed, x_mod_speed, m_up_speed);
   // Rotate velocity to current heading
   vel = vel.rotate(m_pred_orient);
 
   m_time = ticks;
 
+
+ // TODO, we should link this to a timeout so we don't 
+ // send too many updates, but allow forced updates for certain actions? 
   if (send_to_server) {
     updateMove(vel, m_pred_orient);
     m_lastUpdate = ticks;
@@ -611,10 +615,10 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_MOVE_STOP_UPWARD) moveUpward(-1);
   else if (command == CMD_MOVE_STOP_DOWNWARD) moveUpward( 1);
 
-  else if (command == CMD_ROTATE_LEFT) rotate(-1);
-  else if (command == CMD_ROTATE_RIGHT) rotate( 1);
-  else if (command == CMD_ROTATE_STOP_LEFT) rotate( 1);
-  else if (command == CMD_ROTATE_STOP_RIGHT) rotate(-1);
+  else if (command == CMD_ROTATE_LEFT) rotate( 1);
+  else if (command == CMD_ROTATE_RIGHT) rotate(-1);
+  else if (command == CMD_ROTATE_STOP_LEFT) rotate(-1);
+  else if (command == CMD_ROTATE_STOP_RIGHT) rotate( 1);
 
   else if (command == CMD_STRAFE_LEFT) strafe( 1);
   else if (command == CMD_STRAFE_RIGHT) strafe(-1);
@@ -789,7 +793,7 @@ void Character::setHeight(float height) {
 
 void Character::setAction(const std::string &action) {
   assert ((m_initialised == true) && "Character not initialised");
-//  init();
+
   Atlas::Objects::Operation::Set set;
   set->setFrom(m_self->getId());
 
@@ -805,6 +809,7 @@ void Character::setAction(const std::string &action) {
 void Character::RotateTimeoutExpired() {
   rotate(CMD_modifier);
 }
+
 void Character::UpdateTimeoutExpired() {
   Eris::deleteLater(m_timeout_update);
   m_timeout_update = NULL;
@@ -825,6 +830,7 @@ void Character::setAvatar(Eris::Avatar *avatar) {
     we->LocationChanged.connect(sigc::mem_fun(this, &Character::onLocationChanged));
     we->Moved.connect(sigc::mem_fun(this, &Character::onMoved));
     m_refresh_orient = true;
+    onMoved();
 
     m_imap.clear();
     for (unsigned int i = 0; i < m_self->numContained(); ++i) {
@@ -867,10 +873,16 @@ void Character::onChildRemoved(Eris::Entity *child) {
 
 void Character::onLocationChanged(Eris::Entity *loc) {
   printf("[Character] Location Changed\n");
+    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
+    if (!we) return;
+//    m_pred_orient = we->getEntityOrientation();
+//sendUpdate();
   m_refresh_orient = true;
 }
 void Character::onMoved() {
+//return;
   if (m_refresh_orient) {
+  printf("[Character] Moved\n");
     WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
     m_pred_orient = we->getEntityOrientation();
     m_refresh_orient = false;

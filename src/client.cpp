@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.77 2006-02-15 12:44:24 simon Exp $
+// $Id: client.cpp,v 1.78 2006-02-20 20:42:03 simon Exp $
 
 #include "System.h"
 
@@ -123,12 +123,12 @@ void Client::shutdown() {
 
 void Client::Log(Eris::LogLevel lvl, const std::string &msg) {
   assert(m_initialised == true);
-  printf("ErisLog: %s\n", msg.c_str());
+  printf("[ErisLog] %s\n", msg.c_str());
 }
 
 int Client::connect(const std::string &host, int port) {
   assert(m_initialised == true);
-  if (debug) printf("Client: Connect\n");
+  if (debug) printf("[Client] Connect\n");
 
   if (m_status >= CLIENT_STATUS_CONNECTING) {
     m_system->pushMessage("Error: Connection already in progress", CONSOLE_MESSAGE);
@@ -140,7 +140,7 @@ int Client::connect(const std::string &host, int port) {
     return 1;
   }
 
-  if (debug) printf("Connecting to %s on port %d\n",  host.c_str(), port);
+  if (debug) printf("[Client] Connecting to %s on port %d\n",  host.c_str(), port);
 
   assert(m_connection.get() == NULL);
 
@@ -158,7 +158,7 @@ int Client::connect(const std::string &host, int port) {
 
   setStatus(CLIENT_STATUS_CONNECTING);
   if (m_connection->connect()  != 0) {
-    fprintf(stderr, "Error: Connection Error\n");
+    fprintf(stderr, "[Client] Error: Connection Error\n");
     m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
     setStatus( CLIENT_STATUS_DISCONNECTED);
     m_connection.release();
@@ -171,7 +171,7 @@ int Client::connect(const std::string &host, int port) {
 int Client::disconnect() {
   assert ((m_initialised == true) && "Client not initialised");
 
-  if (debug) printf("Client: disconnect\n");
+  if (debug) printf("[Client] disconnect\n");
 
   m_system->pushMessage(CLIENT_DISCONNECTING, CONSOLE_MESSAGE);
 
@@ -186,7 +186,7 @@ int Client::disconnect() {
   setStatus(CLIENT_STATUS_DISCONNECTING);
   if (m_connection->disconnect() != 0) {
     setStatus(CLIENT_STATUS_CONNECTED);
-    fprintf(stderr, "Error: Disconnect Error\n");
+    fprintf(stderr, "[Client] Error: Disconnect Error\n");
     m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
     m_connection.release();
     setStatus(CLIENT_STATUS_DISCONNECTED);
@@ -227,7 +227,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   assert(m_connection);
   assert(m_connection->isConnected());
 
-  if (debug) printf("Client::createAccount: Creating player\n");
+  if (debug) printf("[Client] Creating player\n");
   // m_account will still be around if previous attempts have failed
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
@@ -252,7 +252,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
     case Eris::DUPLICATE_CHAR_ACTIVE:
     case Eris::BAD_CHARACTER_ID:
       assert(false);
-      fprintf(stderr, "We've hit an unexpected return code\n");
+      fprintf(stderr, "[Client] We've hit an unexpected return code\n");
       m_system->pushMessage("An Unknown error occured", 
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_CONNECTED);
@@ -267,7 +267,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
 int Client::login(const std::string &username, const std::string &password) {
   assert ((m_initialised == true) && "Client not initialised");
 
-  if (debug) printf("Client: login\n");
+  if (debug) printf("[Client] login\n");
 
   if (m_status != CLIENT_STATUS_CONNECTED) {
     if (m_status == CLIENT_STATUS_LOGGING_IN) {
@@ -292,7 +292,7 @@ int Client::login(const std::string &username, const std::string &password) {
     return 1;
   }
 
-  if (debug) printf("Client::login: Creating player\n");
+  if (debug) printf("[Client] Creating player\n");
   
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
@@ -317,7 +317,7 @@ int Client::login(const std::string &username, const std::string &password) {
     case Eris::DUPLICATE_CHAR_ACTIVE:
     case Eris::BAD_CHARACTER_ID:
       assert(false);
-      fprintf(stderr, "We've hit an unexpected return code\n");
+      fprintf(stderr, "[Client] We've hit an unexpected return code\n");
       m_system->pushMessage("An Unknown error occured", 
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_CONNECTED);
@@ -334,18 +334,18 @@ void Client::poll() {
   try {
     Eris::PollDefault::poll();   
   } catch (Eris::InvalidOperation io) {
-    fprintf(stderr,"Eris Exception: %s\n", io._msg.c_str());
+    fprintf(stderr,"[Client] Eris Exception: %s\n", io._msg.c_str());
   } catch (Eris::BaseException be) {
-    fprintf(stderr, "Eris Exception: %s\n", be._msg.c_str());
+    fprintf(stderr, "[Client] Eris Exception: %s\n", be._msg.c_str());
   } catch (std::runtime_error re) {
-    fprintf(stderr, "STD::RUNTIME ERROR\n");
+    fprintf(stderr, "[Client] STD::RUNTIME ERROR\n");
   } catch (...) {
-    fprintf(stderr,"Caught some error - ignoring\n");
+    fprintf(stderr,"[Client] Caught some error - ignoring\n");
   }
 }
 
 void Client::NetFailure(const std::string &msg)  {
-  printf("Client::NetFailure\n");
+  printf("[Client] NetFailure\n");
   m_system->pushMessage("Network Failure: " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
@@ -357,13 +357,13 @@ void Client::NetFailure(const std::string &msg)  {
 }
 
 void Client::NetConnected() {
-  if (debug) printf("Client:NetConnected\n");
+  if (debug) printf("[Client] NetConnected\n");
   m_system->pushMessage(CLIENT_CONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
 }
 
 void Client::NetDisconnected() {
-  printf("Client::NetDisconnected\n");
+  printf("[Client] NetDisconnected\n");
   m_system->pushMessage(CLIENT_DISCONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
@@ -374,13 +374,13 @@ void Client::NetDisconnected() {
 }
 
 bool Client::NetDisconnecting() {
-  if (debug) printf("Client::Disconnecting\n");
+  if (debug) printf("[Client] Disconnecting\n");
   m_system->pushMessage(CLIENT_DISCONNECTING,1);;
   return false;
 }
 
 void Client::LoginSuccess() {
-  if (debug) printf("Client::LoginSuccess\n");
+  if (debug) printf("[Client] LoginSuccess\n");
   m_system->pushMessage("Login Success", CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_LOGGED_IN);
   m_account->refreshCharacterInfo();
@@ -420,7 +420,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   }
 
 
-  if  (debug) printf("Client: Creating character - Name: %s Type: %s Sex: %s Description: %s\n", name.c_str(), type.c_str(), sex.c_str(), description.c_str());
+  if  (debug) printf("[Client] Creating character - Name: %s Type: %s Sex: %s Description: %s\n", name.c_str(), type.c_str(), sex.c_str(), description.c_str());
 
   m_system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
 
@@ -437,7 +437,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
   switch (res) {
     case Eris::NO_ERR: break;
     case Eris::DUPLICATE_CHAR_ACTIVE:
-      fprintf(stderr, "Character is already in use.\n");
+      fprintf(stderr, "[Client] Character is already in use.\n");
       m_system->pushMessage("Character is already in use.",
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_LOGGED_IN);
@@ -448,7 +448,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
     case Eris::NOT_CONNECTED:
     case Eris::NOT_LOGGED_IN:
       assert(false);
-      fprintf(stderr, "We've hit an unexpected return code %d\n", res);
+      fprintf(stderr, "[Client] We've hit an unexpected return code %d\n", res);
       m_system->pushMessage("An Unknown error occured", 
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_LOGGED_IN);
@@ -460,7 +460,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
 
 int Client::takeCharacter(const std::string &id) {
   assert ((m_initialised == true) && "Client not initialised");
-  if (debug) printf("Client::takeCharacter\n");
+  if (debug) printf("[Client] takeCharacter\n");
   if (m_status != CLIENT_STATUS_LOGGED_IN) {
      return 1;
   }
@@ -475,7 +475,7 @@ int Client::takeCharacter(const std::string &id) {
     return 0;
   }
 
-  if (debug) printf("Client::takeCharacter: Taking character - %s\n", id.c_str());
+  if (debug) printf("[Client] Taking character - %s\n", id.c_str());
   m_system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
   
   setStatus(CLIENT_STATUS_GOING_IN_WORLD);
@@ -485,13 +485,13 @@ int Client::takeCharacter(const std::string &id) {
     case Eris::NO_ERR: break;
     case Eris::BAD_CHARACTER_ID:
       break;
-      fprintf(stderr, "Bad character ID\n");
+      fprintf(stderr, "[Client] Bad character ID\n");
       m_system->pushMessage("Bad character ID",
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_LOGGED_IN);
       return 1;
     case Eris::DUPLICATE_CHAR_ACTIVE:
-      fprintf(stderr, "Character is already in use.\n");
+      fprintf(stderr, "[Client] Character is already in use.\n");
       m_system->pushMessage("Character is already in use.",
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_LOGGED_IN);
@@ -501,7 +501,7 @@ int Client::takeCharacter(const std::string &id) {
     case Eris::NOT_CONNECTED:
     case Eris::NOT_LOGGED_IN:
       assert(false);
-      fprintf(stderr, "We've hit an unexpected return code\n");
+      fprintf(stderr, "[Client] We've hit an unexpected return code\n");
       m_system->pushMessage("An Unknown error occured", 
                             CONSOLE_MESSAGE | SCREEN_MESSAGE);
       setStatus(CLIENT_STATUS_LOGGED_IN);
@@ -513,7 +513,7 @@ int Client::takeCharacter(const std::string &id) {
 
 int Client::logout() {
   assert ((m_initialised == true) && "Client not initialised");
-  if (debug) printf("Client::logout\n");
+  if (debug) printf("[Client] logout\n");
 
   if (m_account.get() == NULL) {
     m_system->pushMessage("Error: Not logged in", CONSOLE_MESSAGE);
@@ -522,7 +522,7 @@ int Client::logout() {
 
   if (m_status >= CLIENT_STATUS_LOGGED_IN) {
     m_system->pushMessage(CLIENT_LOGGING_OUT,CONSOLE_MESSAGE);
-    printf("Client::logout: Logging Out\n");
+    printf("[Client] Logging Out\n");
     setStatus(CLIENT_STATUS_LOGGING_OUT);
     m_account->logout();
   }
@@ -541,7 +541,7 @@ int Client::getCharacters() {
 
 std::string Client::getStatus() {
   assert ((m_initialised == true) && "Client not initialised");
-  printf("Client::getStatus\n");
+  printf("[Client] getStatus\n");
   if (m_connection.get() == NULL) return "No Connection object";
   switch (m_connection->getStatus()) {
     case 0: return "INVALID_STATUS";
@@ -555,11 +555,11 @@ std::string Client::getStatus() {
 }
 
 void Client::StatusChanged(Eris::Connection::Status s) {
-  if (debug) printf("Status Changed: %s\n", getStatus().c_str());
+  if (debug) printf("[Client] Status Changed: %s\n", getStatus().c_str());
 }
 
 void Client::LoginFailure(const std::string& msg) {
-  fprintf(stderr, "Login Failure: %s\n", msg.c_str());
+  fprintf(stderr, "[Client] Login Failure: %s\n", msg.c_str());
   m_system->pushMessage("Login Failure" + msg, CONSOLE_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
 }
@@ -567,10 +567,10 @@ void Client::LoginFailure(const std::string& msg) {
 void Client::LogoutComplete(bool clean_logout) {
   if (clean_logout) {
     //Logged out cleanly
-    printf("Clean Logout\n");
+    printf("[Client] Clean Logout\n");
   }  else {
     // Emitted due to timeout or other error
-    fprintf(stderr, "Error during Logout\n");
+    fprintf(stderr, "[Client] Error during Logout\n");
   }
   m_system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_CONNECTED);
@@ -580,11 +580,11 @@ void Client::LogoutComplete(bool clean_logout) {
 }
 
 void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
-  if (debug) printf("Got Char - Name: %s ID: %s\n ", ge->getName().c_str(), ge->getId().c_str());
+  if (debug) printf("[Client] Got Char - Name: %s ID: %s\n ", ge->getName().c_str(), ge->getId().c_str());
 }
 
 void Client::GotAllCharacters() {
-  if (debug) printf("Client::getCharacters\n");
+  if (debug) printf("[Client] getCharacters\n");
   assert(m_account);
 
   Eris::CharacterMap m = m_account->getCharacters();
@@ -658,7 +658,7 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 
 void Client::AvatarSuccess(Eris::Avatar *avatar) {
   assert(avatar != NULL);
-  printf("Avatar sucessfully created\n");
+  printf("[Client] Avatar sucessfully created\n");
   m_avatar = avatar;
 
   Factory* f = new Factory(*m_connection->getTypeService());
@@ -668,7 +668,7 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
 }
 
 void Client::AvatarFailure(const std::string &msg) {
-  fprintf(stderr, "AvatarFailure: %s\n", msg.c_str());
+  fprintf(stderr, "[Client] AvatarFailure: %s\n", msg.c_str());
   m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_LOGGED_IN);
   m_system->getCharacter()->setAvatar(NULL);
@@ -751,7 +751,7 @@ void Client::setErisLogLevel(const std::string &level) {
   else if (level == "verbose")  m_loglevel = Eris::LOG_VERBOSE;
   else if (level == "debug")    m_loglevel = Eris::LOG_DEBUG;
   else {
-    fprintf(stderr, "Unknown eris log level %s\n", level.c_str());
+    fprintf(stderr, "[Client] Unknown eris log level %s\n", level.c_str());
   }
   Eris::setLogLevel(m_loglevel);
 }

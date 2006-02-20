@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.151 2006-02-15 12:44:24 simon Exp $
+// $Id: System.cpp,v 1.152 2006-02-20 20:42:03 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -278,7 +278,7 @@ bool System::init(int argc, char *argv[]) {
   if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen))) {
     // Only try again if stencil buffer was enabled first time round
     if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
-      printf("Creating window with stencil buffer failed. Trying again without stencil buffer.\n");
+      printf("[System] Creating window with stencil buffer failed. Trying again without stencil buffer.\n");
       // Disable stencil buffer and try again
       RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, false);
       success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen);
@@ -324,7 +324,7 @@ bool System::init(int argc, char *argv[]) {
 void System::shutdown() {
 
   assert (m_initialised == true);
-  std::cout << "System: Starting Shutdown" << std::endl;
+  printf("[System] Starting Shutdown\n");
 
   Eris::execDeleteLaters();
 
@@ -371,7 +371,7 @@ void System::shutdown() {
   SDL_Quit();
 
   m_initialised = false;
-  std::cout << "System: Finished Shutdown" << std::endl;
+  printf("[System] Finished Shutdown\n");
 }
 
 bool System::initVideo() {
@@ -436,7 +436,7 @@ void System::handleEvents(const SDL_Event &event) {
         return;
       }
     } catch (gcn::Exception &e) {
-      fprintf(stderr, "Guichan Exception: %s\n", e.getMessage().c_str());
+      fprintf(stderr, "[System] Guichan Exception: %s\n", e.getMessage().c_str());
     }
   }
 
@@ -458,9 +458,7 @@ void System::handleEvents(const SDL_Event &event) {
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-//          if (m_character != NULL) {
-            m_character->moveForward(1);
-  //        }
+          m_character->moveForward(1);
         }
         break;
       }
@@ -475,10 +473,10 @@ void System::handleEvents(const SDL_Event &event) {
               if ((period > DEFAULT_max_click_time) &&
                   ((event.button.x != m_click_x) ||
                    (event.button.y != m_click_y))) {
-                  if (debug) std::cout << "DRAG" << std::endl << std::flush;
+                  if (debug) printf("[System] DRAG\n"); fflush(stdout);
                   m_character->getEntity(m_click_id);
               } else {
-                  if (debug) std::cout << "CLICK" << std::endl << std::flush;
+                  if (debug) printf("[System] CLICK\n"); fflush(stdout);
                   m_character->touchEntity(m_click_id);
               }
             }
@@ -628,7 +626,7 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 
   if (!m_axisBindings.count(axis)) return;
     
-    if (debug) std::cout << "got joy motion for axis " << (int)axis << ", value=" << value << std::endl;
+    if (debug) printf("[System] got joy motion for axis %d, value =%d\n", (int)axis, value);
     
     switch (m_axisBindings[axis]) {
     case AXIS_STRAFE: // Left right move
@@ -689,7 +687,7 @@ void System::resizeScreen(int w, int h)
 }
 
 void System::toggleMouselook() {
-  if (debug) std::cout << "System::toggleMouselook()" << std::endl << std::flush;
+  if (debug) printf("[System] toggleMouselook()\n"); fflush(stdout);
   m_mouseLook = ! m_mouseLook;
   if (m_mouseLook) {
     RenderSystem::getInstance().setMouseVisible(false);
@@ -884,11 +882,11 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     pushMessage(m_file_handler->getVariable(key), CONSOLE_MESSAGE);
   }
   
-  else fprintf(stderr, "[Error:System]Command not found: %s\n", command.c_str());
+  else fprintf(stderr, "[System] Command not found: %s\n", command.c_str());
 }
 
 void System::varconf_error_callback(const char *error) {
-  fprintf(stderr, "[Error:System]Varconf: %s\n", error);
+  fprintf(stderr, "[System] Varconf: %s\n", error);
 }
 
 void System::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
