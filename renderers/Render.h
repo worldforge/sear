@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.13 2006-02-16 15:59:01 simon Exp $
+// $Id: Render.h,v 1.14 2006-02-20 20:36:23 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -118,11 +118,11 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void getFrustum(float [6][4]) =0;
   virtual void getModelviewMatrix(float m[4][4]) = 0;
   
-  virtual void beginRecordList(unsigned int list) = 0;
-  virtual void endRecordList() = 0;
-  virtual unsigned int getNewList() = 0;
-  virtual void playList(unsigned int list) =0;
-  virtual void freeList(unsigned int list) = 0;
+//  virtual void beginRecordList(unsigned int list) = 0;
+//  virtual void endRecordList() = 0;
+//  virtual unsigned int getNewList() = 0;
+//  virtual void playList(unsigned int list) =0;
+//  virtual void freeList(unsigned int list) = 0;
 
   virtual void selectTerrainColour(WorldEntity * we) = 0;
 

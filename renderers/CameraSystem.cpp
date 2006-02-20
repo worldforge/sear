@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: CameraSystem.cpp,v 1.4 2006-02-07 18:45:33 simon Exp $
+// $Id: CameraSystem.cpp,v 1.5 2006-02-20 20:36:23 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -13,10 +13,6 @@
 
 #include "Camera.h"
 #include "CameraSystem.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -39,6 +35,7 @@ static const std::string CMD_ELEVATE_UP = "+camera_elevate_up";
 static const std::string CMD_ELEVATE_DOWN = "+camera_elevate_down";
 static const std::string CMD_ELEVATE_STOP_UP = "-camera_elevate_up";
 static const std::string CMD_ELEVATE_STOP_DOWN = "-camera_elevate_down";
+static const std::string CMD_RESET_CAMERA = "reset_camera";
 
 CameraSystem::CameraSystem() :
   m_initialised(false),
@@ -90,6 +87,8 @@ void CameraSystem::registerCommands(Console *console) {
   console->registerCommand(CMD_ELEVATE_DOWN, this);
   console->registerCommand(CMD_ELEVATE_STOP_UP, this);
   console->registerCommand(CMD_ELEVATE_STOP_DOWN, this);
+
+  console->registerCommand(CMD_RESET_CAMERA, this);
 }
 
 void CameraSystem::runCommand(const std::string &command, const std::string &args) {
@@ -102,9 +101,7 @@ void CameraSystem::runCommand(const std::string &command, const std::string &arg
     cast_stream(cam, i);
     setCurrentCamera(i);
   }
-  else if (m_current > -1){
-    assert (m_cameras[m_current]);
-
+  else if (m_current > -1 && m_current < (int)m_cameras.size()) {
     if (command == CMD_ZOOM_IN) m_cameras[m_current]->zoom(-1);
     else if (command == CMD_ZOOM_OUT) m_cameras[m_current]->zoom(1);
     else if (command == CMD_ZOOM_STOP_IN) m_cameras[m_current]->zoom(1);
@@ -115,10 +112,11 @@ void CameraSystem::runCommand(const std::string &command, const std::string &arg
     else if (command == CMD_ROTATE_STOP_LEFT) m_cameras[m_current]->rotate(1);
     else if (command == CMD_ROTATE_STOP_RIGHT) m_cameras[m_current]->rotate(-1);
 
-    else if (command == CMD_ELEVATE_UP) m_cameras[m_current]->elevate(1);
-    else if (command == CMD_ELEVATE_DOWN) m_cameras[m_current]->elevate(-1);
-    else if (command == CMD_ELEVATE_STOP_UP) m_cameras[m_current]->elevate(-1);
-    else if (command == CMD_ELEVATE_STOP_DOWN) m_cameras[m_current]->elevate(1);
+    else if (command == CMD_ELEVATE_UP) m_cameras[m_current]->elevate(-1);
+    else if (command == CMD_ELEVATE_DOWN) m_cameras[m_current]->elevate( 1);
+    else if (command == CMD_ELEVATE_STOP_UP) m_cameras[m_current]->elevate( 1);
+    else if (command == CMD_ELEVATE_STOP_DOWN) m_cameras[m_current]->elevate(-1);
+    else if (command == CMD_RESET_CAMERA) m_cameras[m_current]->reset();
   }
 
 }

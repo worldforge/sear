@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006
 
-// $Id: Camera.h,v 1.6 2006-02-16 15:59:01 simon Exp $
+// $Id: Camera.h,v 1.7 2006-02-20 20:36:23 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -18,6 +18,8 @@
 
 #include <string>
 #include <sigc++/trackable.h>
+#include <wfmath/quaternion.h>
+#include <wfmath/point.h>
 
 namespace varconf {
   class Config;
@@ -123,24 +125,6 @@ public:
   const float getDistance() const { return m_distance; }
 
   /**
-   * Get camera X position
-   * @return X position
-   */ 
-  float getXPos() const { return m_x_pos; }
-
-  /**
-   * Get camera Y position
-   * @return Y position
-   */ 
-  float getYPos() const { return m_y_pos; }
-
-  /**
-   * Get camera Z position
-   * @return Z position
-   */ 
-  float getZPos() const { return m_z_pos; }
-
-  /**
    * Read camera config data
    */ 
   void readConfig(varconf::Config &config);
@@ -159,6 +143,11 @@ public:
   float getMinDistance() const { return m_min_distance; }
   float getMaxDistance() const { return m_max_distance; }
  
+  void reset();
+
+  const WFMath::Quaternion &getOrientation() const { return m_orient; }
+  const WFMath::Point<3> &getPosition() const { return m_pos; }
+ 
 protected:
   /**
    * Callback used when config data changes
@@ -167,6 +156,10 @@ protected:
    * @param config Config object that has been changed
    */ 
    void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
+
+  // Update orientation and position based on current elevation, rotation and 
+  //distance.
+  void updateValues();
 
   bool m_initialised; ///< Camera initialisation state 
 
@@ -185,12 +178,11 @@ protected:
   float m_min_distance; ///< Minimum camera distance allowed
   float m_max_distance; ///< Maximum camera distance allowed
 
-  float m_x_pos; ///< X position of camera
-  float m_y_pos; ///< Y position of camera
-  float m_z_pos; ///< Z position of camera
-
   bool m_save_camera_position; ///< Flag for whether camera state should be saved
   CameraType m_type;
+
+  WFMath::Quaternion m_orient;
+  WFMath::Point<3> m_pos;
 };
 
 } /* namespace Sear */

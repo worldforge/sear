@@ -123,8 +123,8 @@ public:
   void drawNameQueue(MessageList &list);
   void drawOutline(SPtr<ModelRecord>);
  
-  inline void store();
-  inline void restore();
+  void store() { glPushMatrix(); }
+  void restore() { glPopMatrix(); }
   void beginFrame();
   void endFrame(bool select_mode);
   void drawSplashScreen();
@@ -139,7 +139,7 @@ public:
   void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
   void endRecordList() { glEndList(); }
   void playList(unsigned int list) { glCallList(list); }
-  unsigned int getNewList() { return glGenLists(1); }
+  GLuint getNewList() { return glGenLists(1); }
   void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void selectTerrainColour(WorldEntity * we);
   void resize(int width, int height);

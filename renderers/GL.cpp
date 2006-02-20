@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.143 2006-02-16 15:59:01 simon Exp $
+// $Id: GL.cpp,v 1.144 2006-02-20 20:36:23 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -951,8 +951,8 @@ inline void GL::rotate(float angle, float x, float y, float z) {
   glRotatef(angle, x, y, z);
 }
 
-//void GL::rotateObject(WorldEntity *we, int type) {
 void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) {
+  WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
 //  if (!we) return; // THROW ERROR;
   switch (model_record->rotation_style) {
     case ROS_NONE: return; break;
@@ -963,16 +963,17 @@ void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_
        break;
     }       
     case ROS_NORMAL: {
-      applyQuaternion(object_record->orient);
+      applyQuaternion(we->getAbsOrient().inverse());
       break;
     }
     case ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
     case ROS_HALO: {
       float rotation_matrix[4][4];
       WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-      orient2 /= m_graphics->getCameraOrientation();
+      orient2 *= m_graphics->getCameraOrientation();
       QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
       glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
+//      glMultMatrixf(rotation_matrix); //Apply rotation matrix
       break;
     }
   }
@@ -1140,12 +1141,14 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       SPtrShutdown<Model> model = model_record->model;
       assert(model);
 
+      WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
+
       glPushMatrix();
 
       // 1) Apply Object transforms
-      WFMath::Point<3> pos = object_record->position;//we->getAbsPos();
+      WFMath::Point<3> pos = we->getAbsPos();
       assert(pos.isValid());
-      translateObject(pos.x(), pos.y(), pos.z() );
+      glTranslatef(pos.x(), pos.y(), pos.z() );
 
       rotateObject(object_record, model_record);
 
@@ -1155,25 +1158,25 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       float scale = model_record->scale;
       // Do not perform scaling if it is to zero or has no effect
       if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
-      // Apply model transforms
-      translateObject(model_record->offset_x, model_record->offset_y, model_record->offset_z);
+
+      glTranslatef(model_record->offset_x, model_record->offset_y, model_record->offset_z);
+
       glRotatef(model_record->rotate_z, 0.0f, 0.0f, 1.0f);   
 
       // 3) Apply final scaling once model is in place
 
-      if (model_record->scale_bbox && object_record->entity->hasBBox()) {
-        WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
+      // Scale model by all bonding box axis
+      if (model_record->scale_bbox && we->hasBBox()) {
+        WFMath::AxisBox<3> bbox = we->getBBox();
         float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
         float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
 
         glScalef(x_scale, y_scale, z_scale);
       }
-
-      if (model_record->scaleByHeight && object_record->entity->hasBBox()) {
-        WFMath::AxisBox<3> bbox = object_record->entity->getBBox();
-//        float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
-//        float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+      // Scale model by bounding box height
+      else if (model_record->scaleByHeight && we->hasBBox()) {
+        WFMath::AxisBox<3> bbox = we->getBBox();
         float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
         glScalef(z_scale, z_scale, z_scale);
       }
@@ -1181,10 +1184,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       // Draw Model
       if (select_mode) {
-        nextColour(dynamic_cast<WorldEntity*>(object_record->entity.get()));
+        nextColour(we);
         model->render(true);
       } else {
-        if (object_record->entity.get() == m_activeEntity.get()) {
+        if (m_activeEntity && (object_record->entity.get()->getId() == m_activeEntity.get()->getId())) {
           m_active_name = object_record->name;
           drawOutline(model_record);
         } else {
@@ -1207,7 +1210,7 @@ void GL::drawNameQueue(MessageList &list) {
     assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-    orient2 /= m_graphics->getCameraOrientation(); 
+    orient2 *= m_graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
     glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
     glScalef(0.025f, 0.025f, 0.025f);
@@ -1229,15 +1232,6 @@ void GL::drawMessageQueue(MessageList &list) {
       double height = 2;
       getScreenCoords(we->screenX(), we->screenY(), height);
     }
-/*
-    WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-    orient2 /= m_graphics->getCameraOrientation(); 
-    applyQuaternion(orient2);
-    glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
-    glScalef(0.025f, 0.025f, 0.025f);
-    glTranslatef(m_speech_offset_x, m_speech_offset_y, m_speech_offset_z);
-    we->renderMessages();
-*/
     glPopMatrix();
   }
 }
@@ -1280,10 +1274,6 @@ void GL::drawOutline(SPtr<ModelRecord> model_record) {
   RenderSystem::getInstance().switchState(cur_state); // Restore state
 }
 
-
-inline void GL::store() { glPushMatrix(); }
-inline void GL::restore() { glPopMatrix(); }
-
 inline void GL::beginFrame() {
   // TODO into display list
   m_active_name = "";
@@ -1293,7 +1283,7 @@ inline void GL::beginFrame() {
   } else {
     glClear(GL_DEPTH_BUFFER_BIT);
   }
-// TODO remove
+// TODO remove -- can't! it is required for the skybox
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity(); // Reset The View
   //Rotate Coordinate System so Z points upwards and Y points into the screen. 
