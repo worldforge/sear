@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.12 2006-02-15 14:39:54 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.13 2006-02-20 19:53:17 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -48,6 +48,7 @@ public:
   typedef std::pair<std::string, float> AnimWeight;
   typedef std::list<AnimWeight> WeightList;
   typedef std::map<std::string, WeightList> Animations;
+  typedef std::map<std::string, std::string> BoneMap;
   /**
    * Default constructor
    */ 
@@ -89,6 +90,8 @@ public:
 
   float getRotate() const  { return m_rotate; }
   
+  std::string mapBoneName(const std::string &bone) const;
+
 private:
   /**
    * This function processes a cal3d config file
@@ -133,6 +136,7 @@ private:
   SetMap m_sets; ///< mapping between set name and id  
   float m_rotate;
   Animations m_anims;
+  BoneMap m_bone_map;
 };
 
 } /* namespace Sear */

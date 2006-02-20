@@ -30,7 +30,7 @@ public:
   {
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return 0; }
-    const Character::InventoryMap imap = chr->getInventoryMap();
+    const Character::InventoryMap &imap = chr->getInventoryMap();
     return imap.size();
 //    Eris::Avatar * av = chr->getAvatar();
 //    if (av == 0) { return 0; }
@@ -40,7 +40,7 @@ public:
   {
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return ""; }
-    const Character::InventoryMap imap = chr->getInventoryMap();
+    const Character::InventoryMap &imap = chr->getInventoryMap();
     if ((unsigned int)i >= imap.size()) return  "";
     Character::InventoryMap::const_iterator  I = imap.begin();
     for (int n = 0; n < i; ++n, ++I);
@@ -51,7 +51,7 @@ public:
   {
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return ""; }
-    const Character::InventoryMap imap = chr->getInventoryMap();
+    const Character::InventoryMap &imap = chr->getInventoryMap();
     if (i >= imap.size()) return  "";
     Character::InventoryMap::const_iterator  I = imap.begin();
     for (int n = 0; n < i; ++n, ++I);

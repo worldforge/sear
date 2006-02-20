@@ -1,3 +1,14 @@
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/Inventory.cpp: Use a reference to the InventoryMap instead of
+	  copying it.
+
+	* loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h: 
+	  Allow a new section in the configfile called "bone_map". This maps the
+	  wielded slot names from cyphesis to the name of a bone in the cal3d
+	  model. Scale the model using the Cal3D Api instead of peforming an 
+	  extra opengl transform.
+
 2006-02-19  James Turner  <james@worldforge.org>
 
 	* src/error.cpp: On OS-X, use the Dialog Manager to display a

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.35 2006-02-15 14:39:54 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.36 2006-02-20 19:53:17 simon Exp $
 
 #include <string>
 
@@ -29,6 +29,7 @@
 namespace Sear {
 static const std::string SECTION_model = "model";
 static const std::string SECTION_material = "material";
+static const std::string SECTION_bone_map = "bone_map";
 
 static const std::string KEY_scale = "scale";
 static const std::string KEY_path = "path";
@@ -136,6 +137,8 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   } else {
     m_scale = 1.0f;
   }
+
+
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
 //    if (debug) printf("Rotate %f\n", m_rotate);
@@ -283,6 +286,8 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
       }
     }
   }
+  // Scale the object
+  m_core_model->scale(m_scale);
 
   return 0;
 }
@@ -301,6 +306,8 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
     else if (key.substr(0, KEY_material.size()) == KEY_material) {
       m_material_list.push_back(key.substr(KEY_material.size() + 1));;
     }
+  } else if (section == SECTION_bone_map) {
+    m_bone_map[key] = (std::string)config.getItem(section, key);
   } else {
     // Add animations weights to map
     // Get weight value
@@ -335,6 +342,12 @@ Cal3dModel *Cal3dCoreModel::instantiate() {
     model = NULL;
   }
   return model;
+}
+
+std::string Cal3dCoreModel::mapBoneName(const std::string &bone) const {
+  BoneMap::const_iterator I = m_bone_map.find(bone);
+  if (I != m_bone_map.end()) return I->second;
+  else return "";
 }
 
 } /* namespace Sear */
