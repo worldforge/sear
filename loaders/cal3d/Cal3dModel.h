@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.22 2006-02-16 15:59:01 simon Exp $
+// $Id: Cal3dModel.h,v 1.23 2006-02-20 19:57:59 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -34,7 +34,7 @@ public:
   virtual void contextDestroyed(bool check) {}
 
   float getLodLevel() const { return m_lodLevel; }
-  float getScale() const { return m_renderScale; }
+
   virtual void render(bool select_mode);
   virtual void update(float elapsedSeconds);
   void setDetailLevel(float level) { setLodLevel(level); }
@@ -77,7 +77,7 @@ private:
   Cal3dCoreModel *m_core_model;
   CalModel *m_calModel;
   float m_lodLevel;
-  float m_renderScale;
+
   float m_rotate;
   //std::string current_head;
   std::string m_cur_anim;

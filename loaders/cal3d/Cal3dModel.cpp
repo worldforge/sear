@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.36 2006-02-18 15:41:12 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.37 2006-02-20 19:57:59 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -44,7 +44,6 @@ Cal3dModel::Cal3dModel() :
   m_calModel(NULL),
   m_rotate(90.0f)
 {
-  m_renderScale = 1.0f;
   m_lodLevel = 1.0f;
 }
 
@@ -74,9 +73,8 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
   // set initial animation state
   m_calModel->getMixer()->blendCycle(m_core_model->m_animations[STANDING], 1.0f, 0.0f);
 
-  m_renderScale = m_core_model->getScale();
-
   m_rotate = m_core_model->getRotate();
+
   m_initialised = true;
   return 0;
 }
@@ -208,8 +206,6 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 void Cal3dModel::render(bool select_mode) {
   // TODO Make this into a matrix?
   Render *render = RenderSystem::getInstance().getRenderer();
-  float scale = getScale();
-  render->scaleObject(scale);
   render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
 
   DOVec::iterator I = m_dos.begin();
@@ -271,95 +267,25 @@ void Cal3dModel::animate(const std::string &action) {
   m_cur_anim = "";
   // Check default 
   if (action == IDLE) {
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
     m_calModel->getMixer()->blendCycle(animations[IDLE], 1.0f, 0.2f);
   } else if (action == STANDING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
   } else if (action == WALKING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
   } else if (action == RUNNING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
     m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
-//  } else {
-    // Search map for animation with matching name
-//    if (animations.find(action) != animations.end()) {
-//      m_calModel->getMixer()->executeAction(animations[action], 0.0f, 0.0f);
-//    } else {
-//      // Play default animation if none others found
-//      m_calModel->getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
-//    }
   }
 }
 
 
 void Cal3dModel::action(const std::string &action) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
-#if(0)
-  Cal3dCoreModel::Animations anims = m_core_model->m_anims;
-
-  Cal3dCoreModel::Animations::const_iterator anim_cur = anims.find(m_cur_anim);
-  // First clear previous animations.
-  if (anim_cur != anims.end()) {
-    // Clear previous combined anim
-    removeAnimation(anim_cur->second);
+  if (animations.find(action) != animations.end()) {
+    m_calModel->getMixer()->executeAction(animations[action], 0.0f, 0.0f);
   } else {
-    // Clear previous single anim
-    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-    m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
-    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
+    // Play default animation if none others found
+    m_calModel->getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
   }
- 
-  // See if there is a combined animation defined.
-  Cal3dCoreModel::Animations::const_iterator anim_next = anims.find(action);
-  if (anim_next != anims.end()) {
-    addAnimation(anim_next->second);
-    m_cur_anim = action;
-    return;
-  }
-  // Else play named anim directly
-  m_cur_anim = "";
-  // Check default 
-  if (action == IDLE) {
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING], 0.2f);
-    m_calModel->getMixer()->blendCycle(animations[IDLE], 1.0f, 0.2f);
-  } else if (action == STANDING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-    m_calModel->getMixer()->blendCycle(animations[STANDING], 1.0f, 0.2f);
-  } else if (action == WALKING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[RUNNING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
-    m_calModel->getMixer()->blendCycle(animations[WALKING], 1.0f, 0.2f);
-  } else if (action == RUNNING) {
-//    m_calModel->getMixer()->clearCycle(animations[IDLE], 0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[WALKING],  0.2f);
-//    m_calModel->getMixer()->clearCycle(animations[STANDING],  0.2f);
-    m_calModel->getMixer()->blendCycle(animations[RUNNING], 1.0f, 0.2f);
-  } else {
-    // Search map for animation with matching name
-#endif
-    if (animations.find(action) != animations.end()) {
-      m_calModel->getMixer()->executeAction(animations[action], 0.0f, 0.0f);
-    } else {
-      // Play default animation if none others found
-      m_calModel->getMixer()->executeAction(animations[ANIM_default], 0.0f, 0.0f);
-    }
-//  }
 }
 
 void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
@@ -401,21 +327,20 @@ void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
   for (I = meshes.begin(); I != meshes.end(); ++I) {
     std::string name = I->first;
     std::string value = I->second.asString();
-//    if (debug) std::cout << "Name: " << name << " - Value: " << value << std::endl;
+
     // Attach mesh
     if (m_core_model->m_meshes.find(name + "_" + value) 
       != m_core_model->m_meshes.end()) {
       m_calModel->attachMesh(m_core_model->m_meshes[name + "_" + value]);
-    // Set material set
+      // Set material set
     
-    Atlas::Message::MapType::const_iterator K = materials.find(name);
-    if (K != materials.end()) {
-      setMaterialPartSet(name + "_" + value, K->second.asString());
-    } else {
-      // set default material
-      setMaterialPartSet(name + "_" + value, "default");
-//      materials[name] = "default";
-    }
+      Atlas::Message::MapType::const_iterator K = materials.find(name);
+      if (K != materials.end()) {
+        setMaterialPartSet(name + "_" + value, K->second.asString());
+      } else {
+        // set default material
+        setMaterialPartSet(name + "_" + value, "default");
+      }
     }
   }
   for (I = materials.begin(); I != materials.end(); ++I) {
@@ -430,9 +355,6 @@ void Cal3dModel::setMaterialSet(unsigned int set) {
 }
 
 void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
-//  if (debug) std::cout << "Mesh: " << msh << " - Set: " << set << std::endl;
-  //TODO make this do the correct thing!
-//  m_calModel.setMaterialSet(set);
   // Get mesh name
   CalMesh *mesh = m_calModel->getMesh(msh);
   if (mesh) {
@@ -451,68 +373,54 @@ std::list<std::string> Cal3dModel::getMeshNames() {
   }
   return l;
 }
-/*
-void Cal3dModel::showMesh(const std::string &mesh) {
-  int meshId = _core_model->meshes[mesh];  
-  m_calModel.attachMesh(meshId);
-}
-void Cal3dModel::showMesh(int meshId) {
-  m_calModel.attachMesh(meshId);
-}
 
-void Cal3dModel::hideMesh(const std::string &mesh) {
-  int meshId = _core_model->meshes[mesh];  
-  m_calModel.detachMesh(meshId);
-}
-void Cal3dModel::hideMesh(int meshId) {
-  m_calModel.detachMesh(meshId);
-}
-*/
+PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) {
+  PosAndOrient po;
+  po.orient.identity();
+  po.pos = WFMath::Vector<3>(0, 0, 0);
 
-PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string&)
-{
-    PosAndOrient po;
-    po.orient.identity();
-    po.pos = WFMath::Vector<3>(0, 0, 0);
+  std::string mapped_bone = m_core_model->mapBoneName(bone);
 
-    // Get a pointer to the bone we need from cal3d
-    CalSkeleton * cs = m_calModel->getSkeleton();
-    if (cs == 0) {
-        return po;
-    }
-    CalCoreSkeleton * ccs = cs->getCoreSkeleton();
-    if (ccs == 0) {
-        return po;
-    }
-    int boneId = ccs->getCoreBoneId("Bip01 R Hand");
-    if (boneId == -1) {
-        return po;
-    }
-    CalBone * cb1 = cs->getBone(boneId);
-    if (cb1 == 0) {
-        return po;
-    }
+  if (mapped_bone.empty()) return po;
 
-    // Get the position and orientation of the bone in cal3d coordinates
-    const CalQuaternion & cq2 = cb1->getRotationAbsolute();
-    const CalVector & cv1 = cb1->getTranslationAbsolute();
-
-    // Rotate the orienation into out coordinate system
-    po.orient = WFMath::Quaternion(0, 3.14) * WFMath::Quaternion(1, 3.14 / 2) * WFMath::Quaternion(cq2.w, -cq2.x, -cq2.y, -cq2.z);
-    
-    // Rotate the vector into our coordinate system
-    po.pos = WFMath::Vector<3>(cv1.x * 0.025, cv1.y * 0.025, cv1.z * 0.025);
-    po.pos = po.pos.rotate(WFMath::Quaternion(2, 3.1415927f / 2.f));
-
+  // Get a pointer to the bone we need from cal3d
+  CalSkeleton * cs = m_calModel->getSkeleton();
+  if (cs == 0) {
     return po;
+  }
+  CalCoreSkeleton * ccs = cs->getCoreSkeleton();
+  if (ccs == 0) {
+    return po;
+  }
+  int boneId = ccs->getCoreBoneId(mapped_bone);
+  if (boneId == -1) {
+    return po;
+  }
+  CalBone * cb1 = cs->getBone(boneId);
+  if (cb1 == 0) {
+    return po;
+  }
+
+  // Get the position and orientation of the bone in cal3d coordinates
+  const CalQuaternion & cq = cb1->getRotationAbsolute();
+  const CalVector & cv = cb1->getTranslationAbsolute();
+
+  // Rotate the orienation into out coordinate system
+  WFMath::Quaternion model_rotation(2, deg_to_rad(m_rotate));
+
+  po.orient = WFMath::Quaternion(cq.w,  cq.x,  cq.y,  cq.z).inverse() * model_rotation;
+    
+  // Rotate the vector into our coordinate system
+  po.pos = WFMath::Vector<3>(cv.x, cv.y, cv.z).rotate(model_rotation);
+  return po;
 }
 
 void Cal3dModel::addAnimation(const Cal3dCoreModel::WeightList &list) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
-    std::string name = (*I).first;
-    double weight = (*I).second;
+    std::string name = I->first;
+    double weight = I->second;
     m_calModel->getMixer()->blendCycle(animations[name], weight, 0.2f);
     ++I;
   }
@@ -522,9 +430,8 @@ void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
-    std::string name = (*I).first;
+    std::string name = (*I++).first;
     m_calModel->getMixer()->clearCycle(animations[name], 0.2f);
-    ++I;
   }
 }
 } /* namespace Sear */

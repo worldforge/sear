@@ -1,5 +1,14 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/CoreModel.cpp, loaders/cal3d/Cal3dModel.h: Remove scale
+	  transform as it is done within the core model directly. Change 
+	  getPositionForSubModel to use the new bone-mapping api and perform
+	  more correct transforms. (Remove scaling as it is done within the api 
+	  and rotate according with m_rotate instead of hardcoded 90.0 degrees).
+	  Remove lots of old, commented out code.
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/Inventory.cpp: Use a reference to the InventoryMap instead of
 	  copying it.
 
