@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.144 2006-02-20 20:36:23 simon Exp $
+// $Id: GL.cpp,v 1.145 2006-02-20 21:47:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1188,7 +1188,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         model->render(true);
       } else {
         if (m_activeEntity && (object_record->entity.get()->getId() == m_activeEntity.get()->getId())) {
-          m_active_name = object_record->name;
+          m_active_name = object_record->entity->getName();
           drawOutline(model_record);
         } else {
           model->render(false);
@@ -1386,6 +1386,7 @@ inline void GL::resetSelection() {
 
 inline void GL::renderActiveName() {
   if (m_active_name.empty()) return;
+
   glColor4fv(activeNameColour);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
   print(m_x_pos, m_y_pos, m_active_name.c_str(), 1);
@@ -1538,8 +1539,8 @@ std::string GL::getActiveID() const {
 } 
 WorldEntity *GL::getActiveEntity() const {
   return dynamic_cast<WorldEntity*>(m_activeEntity.get());
-//  return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
 } 
+
 void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
   // TODO: Reduce ClientState switches
   bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);

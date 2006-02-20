@@ -1,5 +1,9 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/GL.cpp: Fix rendering of currently selected entity.
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/System.cpp, src/client.cpp: Change some debgging output.
 
 	* src/Character.cpp: Fix some rotation code.
