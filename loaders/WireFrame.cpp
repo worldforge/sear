@@ -2,7 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.19 2006-02-16 15:59:01 simon Exp $
+// $Id: WireFrame.cpp,v 1.20 2006-02-20 20:16:21 simon Exp $
+
+#include <sage/sage.h>
+#include <sage/GL.h>
 
 #include "src/System.h"
 #include "renderers/RenderTypes.h"
@@ -26,12 +29,12 @@ WireFrame::WireFrame() :
  
 WireFrame::~WireFrame() {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
+
 }
   
 int WireFrame::init(WFMath::AxisBox<3> bbox) {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
+
   m_vertex_data[0].x = bbox.lowCorner().x(); m_vertex_data[0].y = bbox.highCorner().y(); m_vertex_data[0].z = bbox.lowCorner().z();
   m_vertex_data[1].x = bbox.lowCorner().x();m_vertex_data[1].y = bbox.lowCorner().y(); m_vertex_data[1].z = bbox.lowCorner().z();
 
@@ -109,7 +112,7 @@ void WireFrame::contextDestroyed(bool check) {
   Render *render = RenderSystem::getInstance().getRenderer();
   assert(render);
   if (check) {
-    render->freeList(m_disp);
+    if (glIsList(m_disp)) glDeleteLists(m_disp, 1);
   }
   m_disp = 0;
 }
@@ -121,14 +124,13 @@ void WireFrame::render(bool) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-  if (m_disp > 0) {
-    render->playList(m_disp);
+  if (glIsList(m_disp)) {
+    glCallList(m_disp);
   } else {
-    m_disp = render->getNewList();
-    render->beginRecordList(m_disp);
+    glNewList(m_disp, GL_COMPILE_AND_EXECUTE);
     render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
     render->renderArrays(RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
-    render->endRecordList();
+    glEndList();
   }
 }
 

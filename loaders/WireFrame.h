@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.11 2006-02-15 09:50:31 simon Exp $
+// $Id: WireFrame.h,v 1.12 2006-02-20 20:16:21 simon Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
@@ -32,7 +32,7 @@ public:
 private:
   static const int m_num_points = 32;
   bool m_initialised;
-  int m_disp;
+  unsigned int m_disp;
   Vertex_3 m_vertex_data[m_num_points];
 };
 

@@ -1,5 +1,10 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/WireFrame.cpp, loaders/WireFrame.h: Call display list
+	  functions directly instead of via the Render class.
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Change some debugging ouput
 
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
