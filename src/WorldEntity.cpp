@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.79 2006-02-18 23:09:12 simon Exp $
+// $Id: WorldEntity.cpp,v 1.80 2006-02-20 20:20:02 simon Exp $
 
 /*
  TODO
@@ -94,57 +94,24 @@ void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)
     }
     System::instance()->pushMessage(getName()+" " + attr.String(), CONSOLE_MESSAGE | SCREEN_MESSAGE);
 }
-/*
-void WorldEntity::renderMessages() {
-  if (messages.empty()) return;
-  //Convert messages into char arrays up x characters long
-  std::list<std::string> mesgs = std::list<std::string>();
-  std::list<screenMessage>::reverse_iterator I;
-  for (I = messages.rbegin(); I != messages.rend(); ++I) {
-    const std::string str = (const std::string)((*I).first);
-    std::list<std::string> message_list = std::list<std::string>();
-    unsigned int pos = 0;
-    while (pos < str.length()) {
-      message_list.push_back( std::string(str, pos, pos + string_size));
-      pos+=string_size;
-    }
 
-    std::list<std::string>::reverse_iterator K;
-    for (K = message_list.rbegin(); K != message_list.rend(); ++K) {
-      mesgs.push_back(*K);
+const WFMath::Quaternion WorldEntity::getAbsOrient() {
+
+  WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
+  if (!loc) return getEntityOrientation(); // nothing below makes sense for the world
+  
+  WFMath::Quaternion orient = getEntityOrientation();
+  while (loc != 0 ) {
+    WFMath::Quaternion lorient = loc->getEntityOrientation();
+
+    if (!lorient.isValid()) { // TODO: Replace with assert once eris is fixed
+      lorient.identity();
     }
-     
+    orient *= lorient;
+
+    loc = dynamic_cast<WorldEntity*>(loc->getLocation());
   }
-  // Render text strings
-  Render *renderer = RenderSystem::getInstance().getRenderer();
-  assert(renderer != NULL);
-  std::list<std::string>::iterator J;
-  for (J = mesgs.begin(); J != mesgs.end(); ++J) { 
-    std::string str = (*J);
-    renderer->newLine();
-    renderer->print3D((char*)str.c_str(), 0);
-  }
-  //Print all character arrays
-  bool loop = true;
-  unsigned int current_time = System::instance()->getTime();
-  while (loop) {
-    if (messages.empty()) break;
-    loop = false;
-    message sm = *messages.begin();
-    unsigned int message_time = sm.second;
-    if (current_time > message_time) {
-      messages.erase(messages.begin());
-      loop = true;
-    }
-  }
-}
-*/
-const WFMath::Quaternion WorldEntity::getAbsOrient() 
-{
-    WFMath::Quaternion parentOrient(1.0f, 0.0f, 0.0f, 0.0f);
-    WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
-    if (loc) parentOrient = loc->getAbsOrient();
-    return parentOrient / getEntityOrientation();
+  return orient;
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
@@ -159,19 +126,27 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
     predicted = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
   }
 
-  // Cache abs position of parent
-  WFMath::Point<3> location = loc->getAbsPos();
-  //assert(location.isValid());
-  if (!location.isValid()) { // TODO: Replace with assert once eris is fixed
-    location = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+  WFMath::Point<3> absPos = predicted;
+  while (loc != NULL) {
+    WFMath::Point<3> lpos = loc->getEntityPosition();
+
+    if (!lpos.isValid()) { // TODO: Replace with assert once eris is fixed
+      lpos = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+    }
+    WFMath::Quaternion lorient = loc->getEntityOrientation();
+    if (!lorient.isValid()) { // TODO: Replace with assert once eris is fixed
+      lorient.identity();
+    }
+
+    // Silly WFMath syntax makes it hard to rotate a point
+    absPos = lpos + ((absPos - WFMath::Point<3>(0,0,0)).rotate(lorient));
+
+    loc = dynamic_cast<WorldEntity*>(loc->getLocation());
   }
+ 
+  // reset loc back to real parent
+  loc = dynamic_cast<WorldEntity*>(getLocation());
 
-  // Get rotation
-//  WFMath::Quaternion orient = WFMath::Quaternion(1.0f, 0.0f, 0.0f,0.0f);
-  WFMath::Quaternion lorient = loc->getEntityOrientation();
-
-// WFMath::Point<3> absPos = location + ((predicted - WFMath::Point<3>(0,0,0)).rotate(lorient.inverse()));
-  WFMath::Point<3> absPos = location + ((predicted - WFMath::Point<3>(0,0,0)).rotate(lorient));
   float terrainHeight = 0.0f;
   bool hasHeight = false;
   if (loc->hasAttr("terrain")) {  
@@ -219,8 +194,6 @@ void WorldEntity::displayInfo() {
   Log::writeLog(std::string("Entity Name: ") + getName(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Type: ") + type(), Log::LOG_DEFAULT);
   Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
-//  WFMath::Vector<3> pos = getInterpolatedPos();
-//  Log::writeLog(std::string("X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
   
   WFMath::Point<3> pos = getEntityPosition();
   Log::writeLog(std::string("Pos - X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
@@ -324,10 +297,6 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
   if (I == p.end()) return;
 
   std::string a = *I;
-
-//  if (debug) {
-//    printf("[WorldEntity] Entity %s (%s) received action: %s\n", getName().c_str(), getId().c_str(), a.c_str());
-//  }
 
   static ActionHandler *ac = System::instance()->getActionHandler();
   ac->handleAction(a + "_" + type(), NULL);
