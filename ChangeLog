@@ -1,4 +1,8 @@
-2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+2006-02-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/System.cpp: Fix mouse look movement (it was inverted).
+
+2006-02-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Fix wielded entity position for entityies 
 	  scaled by bbox or by height.

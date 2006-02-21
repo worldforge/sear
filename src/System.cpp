@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.152 2006-02-20 20:42:03 simon Exp $
+// $Id: System.cpp,v 1.153 2006-02-21 11:36:33 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -582,7 +582,7 @@ void System::handleAnalogueControllers() {
         
     if (dx != 0) {
       float rotation = dx / 4.f;
-      m_character->rotateImmediate(rotation);
+      m_character->rotateImmediate(-rotation);
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
@@ -591,7 +591,7 @@ void System::handleAnalogueControllers() {
       if (g != NULL) {
         c = g->getCurrentCamera();
         if (c != NULL) {
-          c->elevateImmediate(elevation);
+          c->elevateImmediate(-elevation);
           // m_character->setPitch(c->getElevation());
         }
       }
