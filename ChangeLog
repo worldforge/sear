@@ -1,5 +1,10 @@
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp: Fix wielded entity position for entityies 
+	  scaled by bbox or by height.
+
+2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Fix rendering of currently selected entity.
 
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>

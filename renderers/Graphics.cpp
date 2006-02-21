@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.43 2006-02-20 20:39:08 simon Exp $
+// $Id: Graphics.cpp,v 1.44 2006-02-21 09:48:39 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -555,6 +555,23 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
         PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
 
         we->setLocalOrient(po.orient);
+
+       if (modelRec->scale_bbox && obj_we->hasBBox()) {
+          WFMath::AxisBox<3> bbox = obj_we->getBBox();
+          float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+          float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+          float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+          po.pos.x() *= x_scale;
+          po.pos.y() *= y_scale;
+          po.pos.z() *= z_scale;
+        }
+        // Scale model by bounding box height
+        else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
+          WFMath::AxisBox<3> bbox = obj_we->getBBox();
+          float scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+          po.pos *= scale;
+        }
+
         // Convert Vector<3> to a Point<3>
         we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
 
