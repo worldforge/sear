@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.36 2006-02-20 19:53:17 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.37 2006-02-22 18:29:08 simon Exp $
 
 #include <string>
 
@@ -29,7 +29,7 @@
 namespace Sear {
 static const std::string SECTION_model = "model";
 static const std::string SECTION_material = "material";
-static const std::string SECTION_bone_map = "bone_map";
+static const std::string SECTION_bone_map = "bone_mapping";
 
 static const std::string KEY_scale = "scale";
 static const std::string KEY_path = "path";
@@ -313,7 +313,7 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
     // Get weight value
     varconf::Variable temp = config.getItem(section, key);
     std::string sec = section.substr(KEY_animation.size() + 1);
-    if (section.substr(0, KEY_animation.size()) == KEY_animation) {
+    if (section.size() >= KEY_animation.size() && section.substr(0, KEY_animation.size()) == KEY_animation) {
       if (temp.is_double()) {
         // Get animation name
         std::string k = key.substr(KEY_animation.size() + 1);

@@ -1,3 +1,10 @@
+2006-02-22  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dCoreModel.cpp: Fix bug where a section name less 
+	  than the size of "animation" would cause an out of range error. Rename
+	  bone_map to bone_mapping so that the .cal config files will work with
+	  versions of sear without this fix.
+
 2006-02-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/System.cpp: Fix mouse look movement (it was inverted).
