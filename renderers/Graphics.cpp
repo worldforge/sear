@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.44 2006-02-21 09:48:39 simon Exp $
+// $Id: Graphics.cpp,v 1.45 2006-02-23 20:47:16 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -234,65 +234,63 @@ void Graphics::setCameraTransform() {
   if (!m_system->checkState(SYS_IN_WORLD)) {
     return;
   }
+
+  // Get the current camera
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
 
   // Get the current focus entity
   Eris::Avatar *avatar = m_system->getClient()->getAvatar();
   assert(avatar != NULL);
-  WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
+
+  //Get the player character entity
+  WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity());
   assert(focus != NULL);
 
-  // Calculate entity height so camera is always at the top
-  float height = (focus->hasBBox()) ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z()) : (1.0f);
+  // Calculate entity height so camera is always at the top of entity.
+  float height = (focus->hasBBox())
+       ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z())
+       : (1.0f);
+
+  height += 1.0f; // Make the camera be just above focus height.
 
   WFMath::Point<3> pos = focus->getAbsPos();
-  float char_x = pos.x(),
-        char_y = pos.y(),
-        char_z = pos.z();
 
   // Adjust height so camera doesn't go underneath the terrain
   // Find terrain height at camera position, and adjust as if camera is at
   // entity feet. (the - height part)
-  const WFMath::Point<3> &cam_pos = cam->getPosition();
-//  WFMath::Vector<3>cam_vec(-cam->getDistance(), 0.0f,0.0f);
-//  WFMath::Vector<3>cam_vec(0.0f, -cam->getDistance(), 0.0f);
-//  WFMath::Vector<3>cam_vec(0.0f, 0.0f,cam->getDistance());
 
-//  cam_vec.rotate(cam->getOrientation());
-//  cam_vec.rotate(focus->getAbsOrient().inverse());
-//  cam_vec.rotate(quaternion_by_90.inverse());
+  // Create camera vector
+  WFMath::Vector<3>cam_vec(0.0f, -cam->getDistance(), 0.0f);
 
-  WFMath::Point<3> p2 (0,0,0);
-  p2.rotate(focus->getAbsOrient(), cam_pos);
-
-//  p2 = pos + cam_v#ec;
-  p2.z() += height;
-
-  p2.x() += pos.x();
-  p2.y() += pos.y();
-  p2.z() += pos.z();
-
-//p2 = cam_pos;
+  // Rotate vec by camera orientation
+  cam_vec.rotate(cam->getOrientation().inverse());
+  // Rotate by focused entity orientation
+  cam_vec.rotate(focus->getAbsOrient());
+  // Rotate by 90 degrees -- So 0 deg is east
+  cam_vec.rotate(quaternion_by_90.inverse());
+  // Calculate new camera position
+  WFMath::Point<3> p2 =  pos + cam_vec;
+  // Get height for camera
   float terrain_z = Environment::getInstance().getHeight(p2.x(), p2.y());
-//  float c_z = Environment::getInstance().getHeight(char_x, char_y);
-//printf("X %f,Y %f, Z %f TZ %f, Char_Z %f  cz %f\n", p2.x(), p2.y(), p2.z(), terrain_z, char_z, c_z);
-  // If the calculated terrain height is larger than the current Z for the 
-  // camera, adjust to bound
-  if (terrain_z - height> char_z) {
-    char_z = terrain_z = height;
+  // Adjust height by distance below ground so camera does not go below ground
+  if (p2.z() < terrain_z) {
+    height += (terrain_z - p2.z());
   }
 
   if (cam->getType() == Camera::CAMERA_CHASE) {
-    // Translate camera getDist() units away from the character. Allows closups or large views
+    // Translate camera getDist() units away from the character. Allows closups
+    // or large views.
     m_renderer->translateObject(0.0f, cam->getDistance(), 0.0f);
   }
   m_renderer->applyCharacterLighting(0.5, 0, 0.5);
 
   m_renderer->applyQuaternion(m_orient.inverse());
 
-  m_renderer->translateObject(-char_x, -char_y, -char_z - height); //Translate to accumulated position - Also adjust so origin is nearer head level
-//  m_renderer->translateObject(-p2.x(), -p2.y(), -p2.z()); //Translate to accumulated position - Also adjust so origin is nearer head level
+  // Translate to accumulated position - Also adjust so origin is nearer head
+  // level
+  m_renderer->translateObject(-pos.x(), -pos.y(), -pos.z() - height); 
+
   glGetFloatv(GL_MODELVIEW_MATRIX,&m_modelview_matrix[0][0]);
 
 }
