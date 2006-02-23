@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.80 2006-02-20 20:20:02 simon Exp $
+// $Id: WorldEntity.cpp,v 1.81 2006-02-23 19:51:59 simon Exp $
 
 /*
  TODO
@@ -48,7 +48,9 @@ namespace Sear {
 static const std::string ACTION = "action";
 static const std::string MODE = "mode";
 static const std::string GUISE = "guise";
-	
+
+static const WFMath::Point<3> point_zero = WFMath::Point<3>(0.0f,0.0f,0.0f);
+
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
    m_status(1.0),
@@ -78,7 +80,7 @@ void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
   }
   std::string msg = talkArg->getAttr("say").asString();
 
-  Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);	
+  Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);
   System::instance()->pushMessage(getName()+ ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
 
   if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
@@ -115,23 +117,17 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
 }
 
 const WFMath::Point<3> WorldEntity::getAbsPos() {
-  // Get parent entity for additional positional information
-  WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
-  if (!loc) return getEntityPosition(); // nothing below makes sense for the world
-
-  // Cache predicted pos of entity
-  WFMath::Point<3> predicted = getEntityPosition();
-  //assert(predicted.isValid());
-  if (!predicted.isValid()) { // TODO: Replace with assert once eris is fixed
-    predicted = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-  }
-
-  WFMath::Point<3> absPos = predicted;
+  WFMath::Point<3> absPos(point_zero);
+  WorldEntity *loc = this;
+  
   while (loc != NULL) {
+    // Cache parent location
+    WorldEntity *loc_loc = dynamic_cast<WorldEntity*>(loc->getLocation());
+
     WFMath::Point<3> lpos = loc->getEntityPosition();
 
     if (!lpos.isValid()) { // TODO: Replace with assert once eris is fixed
-      lpos = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
+      lpos = point_zero;
     }
     WFMath::Quaternion lorient = loc->getEntityOrientation();
     if (!lorient.isValid()) { // TODO: Replace with assert once eris is fixed
@@ -139,50 +135,67 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
     }
 
     // Silly WFMath syntax makes it hard to rotate a point
-    absPos = lpos + ((absPos - WFMath::Point<3>(0,0,0)).rotate(lorient));
+    WFMath::Vector<3> newVec((absPos-point_zero).rotate(lorient));
 
-    loc = dynamic_cast<WorldEntity*>(loc->getLocation());
-  }
- 
-  // reset loc back to real parent
-  loc = dynamic_cast<WorldEntity*>(getLocation());
+    // Do lots of hackish stuff to set the Z value
+    if (loc_loc) {
+      bool needTerrainHeight = false;
+      bool setHeight = false;
+      bool clampHeight = false;
+      // Get the terrain height for x,y pos, but don't set it yet as the mode
+      // needs to have a say first.
+      if (loc->hasAttr(MODE)) {
+        std::string mode = loc->valueOfAttr(MODE).asString();
+        if (mode == "swimming") {
+          // Make sure height is > terrain height
+          needTerrainHeight = clampHeight = true;
+        } else if (mode == "fixed") {
+          // Do nothing at all.
+        } else {
+          needTerrainHeight = setHeight = true;
+        }
+      } else {
+        needTerrainHeight = setHeight = true;
+      }
+      if (!loc_loc->hasAttr("terrain")) {
+        needTerrainHeight = false;
+      }
+      if (needTerrainHeight) {
+        float h = Environment::getInstance().getHeight(lpos.x(), lpos.y());
+        if (setHeight) {
+          lpos.z() = h;
+        } else if (clampHeight) {
+          if (lpos.z() < h) lpos.z() = h;
+        }
+      }
 
-  float terrainHeight = 0.0f;
-  bool hasHeight = false;
-  if (loc->hasAttr("terrain")) {  
-    terrainHeight = Environment::getInstance().getHeight(absPos.x(), absPos.y()); 
-    hasHeight = true;
-  }
-    
-  // Set Z coord to terrain height if required
-  if (hasAttr(MODE)) {
-    std::string mode = valueOfAttr(MODE).asString();
-    if (mode == "floating") {
-      // Set to water level
-      absPos.z() = 0.0f;
-    } else if (mode == "swimming") {
-      // Clamp between sea level and terrain height.
-      // If there is a dispute, then place object on top of terrain.
-      if (absPos.z() > 0.0f) absPos.z() = 0.0f;
-      if (absPos.z() < terrainHeight) absPos.z() = terrainHeight;
-    } else if (mode == "fixed") {
-      // Do predited entity pos as absolute position
-//      absPos.x() = pred.x();
-//      absPos.y() = pred.y();
-//      absPos.z() = pred.z();
-    } else {
-      // Assume clamped to terrain
-      if (hasHeight) absPos.z() = terrainHeight;
+      // Hack for clamping entity height to jetty objects.
+      // This should be handled better, perhaps by checking an attribute.
+      if (loc_loc->type() == "jetty") {
+        // We want to make sure the height is jetty height, unless the terrain 
+        // is poking through, then we want to use terrain height
+        // This is assuming that the jetty object is directly in the world.
+
+        // Getty jetty position
+        WFMath::Point<3> p = loc_loc->getAbsPos();
+        // Calculate the position of the current entity in terms of the jetty.
+        WFMath::Point<3> p2 = p + (lpos - point_zero).rotate(loc_loc->getEntityOrientation());
+        // Get the predicted height for the current entity. This is assuming
+        // that the jetty is contained by an entity with a terrain attribute.
+        // Perhaps we could recurse through parents until we find the terrain 
+        // entity. That is kinda duplicating this function to make this function
+        // work.
+        float h1 = Environment::getInstance().getHeight(p2.x(), p2.y());
+        // If the current entity is higher than the jetty, set Z pos to the 
+        // difference, else set to 0. (Assuming that the jetty platform is at 0
+        // on the model!
+        lpos.z() = (h1 > p.z()) ? (h1 - p.z()) : (0.0);
+      }
     }
-  } else {
-    // Assume clamped to terrain
-    if (hasHeight) absPos.z() = terrainHeight;
-  }
-  // Hack for clamping entity height to jetty objects.
-  // This should be handled better.  
-  if (loc->type() == "jetty") {
-    float jetty_z = loc->getAbsPos().z();
-    if (absPos.z() < jetty_z) absPos.z() = jetty_z;
+   
+    absPos = lpos + newVec;
+
+    loc = loc_loc;
   }
 
   return absPos;

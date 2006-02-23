@@ -1,5 +1,13 @@
 2006-02-23  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/WorldEntity.cpp: Update getAbsPos to take into account the terrain
+	  height for all entities in the hierarchy. This fixes the wielded
+	  object staying at a constant height while the container entity changed
+	  height until the next move op was received. Fix the heights for
+	  swimming and walking on the jetty.
+
+2006-02-23  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dModel.cpp: Give a consitent orientaion in both 
 	  hands. Wielded models need a secondary rotation to make then face the 
 	  right way.
