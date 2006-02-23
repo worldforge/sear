@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.37 2006-02-20 19:57:59 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.38 2006-02-23 18:24:57 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -407,8 +407,13 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) {
 
   // Rotate the orienation into out coordinate system
   WFMath::Quaternion model_rotation(2, deg_to_rad(m_rotate));
-
-  po.orient = WFMath::Quaternion(cq.w,  cq.x,  cq.y,  cq.z).inverse() * model_rotation;
+  // The second rotation translates object coords to world coords
+  // the first rotation makes the coord system compatible
+  // The third rotation takes into account the model rotation to make it
+  // face the right way. 
+  po.orient = WFMath::Quaternion(1, WFMath::Pi / 2.0) * 
+    WFMath::Quaternion(cq.w,  cq.x,  cq.y,  cq.z).inverse() * 
+    model_rotation;
     
   // Rotate the vector into our coordinate system
   po.pos = WFMath::Vector<3>(cv.x, cv.y, cv.z).rotate(model_rotation);

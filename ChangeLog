@@ -1,3 +1,9 @@
+2006-02-23  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dModel.cpp: Give a consitent orientaion in both 
+	  hands. Wielded models need a secondary rotation to make then face the 
+	  right way.
+
 2006-02-22  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/cal3d/Cal3dCoreModel.cpp: Fix bug where a section name less 
