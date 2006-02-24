@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.81 2006-02-20 20:42:02 simon Exp $
+// $Id: Character.cpp,v 1.82 2006-02-24 19:14:00 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -21,7 +21,6 @@
 #include <Eris/Avatar.h>
 #include <Eris/Account.h>
 #include <Eris/View.h>
-#include <Eris/DeleteLater.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"
@@ -102,9 +101,9 @@ namespace Sear {
   static const std::string CMD_READ_APPEARANCE = "read_app";
   static const std::string CMD_SET_HEIGHT = "set_height";
   static const std::string CMD_SET_ACTION = "set_action";
-  static const std::string CMD_WAVE = "wave";
 
   static const int server_update_interval = 500;
+
 
   // Config section  names
   static const std::string SECTION_character = "character";
@@ -117,8 +116,6 @@ namespace Sear {
   static const float DEFAULT_character_walk_speed = 2.0f;
   static const float DEFAULT_character_run_speed = 3.0f;
   static const float DEFAULT_character_rotate_speed = 20.0f;
-
-const float Character::CMD_modifier = 9999.9f;
 
 //actions
 static const std::string STOPPED = "ch_stopped_";
@@ -138,12 +135,9 @@ Character::Character() :
   m_up_speed(0.0f),
   m_strafe_speed(0.0f),
   m_lastUpdate(SDL_GetTicks()),
-  m_updateScheduled(false),
   m_time(0),
   m_run_modifier(false),
   m_initialised(false),
-  m_timeout_rotate(NULL),
-  m_timeout_update(NULL),
   m_refresh_orient(true)
 {
 }
@@ -157,10 +151,8 @@ bool Character::init() {
 
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
 
-  m_timeout_rotate = new Eris::Timeout(0);
-  m_timeout_rotate->Expired.connect(SigC::slot(*this, &Character::RotateTimeoutExpired));
+  m_pred_orient.identity();
 
-  m_pred_orient = WFMath::Quaternion(1,0,0,0);
 
   m_initialised = true;
   return true;
@@ -171,14 +163,6 @@ void Character::shutdown() {
 
   notify_callbacks();
 
-  // Cleanup timeouts
-  if (m_timeout_update) {
-    delete m_timeout_update;
-  }
-  if (m_timeout_rotate) {
-    delete m_timeout_rotate;
-  }
-
   m_initialised = false;
 }
 
@@ -187,7 +171,6 @@ void Character::moveUpward(float speed) {
   if (!m_avatar) return;
 
   m_up_speed += speed;
-  updateLocals(true);
 }
 
 void Character::moveForward(float speed) {
@@ -195,7 +178,6 @@ void Character::moveForward(float speed) {
   if (!m_avatar) return;
 
   m_speed += speed;
-  updateLocals(true);
 }
 
 void Character::strafe(float speed) {
@@ -203,48 +185,29 @@ void Character::strafe(float speed) {
   if (!m_avatar) return;
 
   m_strafe_speed += speed;
-  updateLocals(true);
 }
 
 void Character::rotate(float rate) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
-//  if (debug) std::cout << "Character::rotate" << std::endl << std::flush;
-  if (rate != CMD_modifier) m_rate += rate * m_rotate_speed;
-  updateLocals(true);
-
-  if (fabs(m_rate) > 0.000001f &&  m_timeout_rotate->isExpired()) {
-    m_timeout_rotate->reset(server_update_interval);
-  }
+  m_rate += rate * m_rotate_speed;
 }
 
-void Character::rotateImmediate(float rot)
-{
-  assert ((m_initialised == true) && "Character not initialised");
+void Character::rotateImmediate(float rot) {
+  assert (m_initialised == true);
   if (!m_avatar) return;
 
   float angle = deg_to_rad(rot);
   
   m_pred_orient *= WFMath::Quaternion(2,angle);
-  // Only send to server if we haven't recently.
-  bool send = ((SDL_GetTicks() - m_lastUpdate) > 1000);
-  updateLocals(send);
-  // If we don't send, we need to schedule an update.
-  if (!send && !m_updateScheduled) {
-    m_timeout_update = new Eris::Timeout(server_update_interval);
-    m_timeout_update->Expired.connect(SigC::slot(*this, &Character::UpdateTimeoutExpired));
-
-    m_updateScheduled = true;
-  }
+  dynamic_cast<WorldEntity*>(m_self.get())->setLocalOrient(m_pred_orient);
 }
 
-void Character::sendUpdate()
-{
+void Character::sendUpdate() {
   if (!m_avatar) return;
   // Send update of our rotation etc to server.
-  updateLocals(true);
-  m_updateScheduled = false;
+   updateLocals(false);
 }
 
 void Character::setMovementSpeed(float speed) {
@@ -252,7 +215,6 @@ void Character::setMovementSpeed(float speed) {
   if (!m_avatar) return;
 
   m_speed = speed;
-  updateLocals(true);
 }
 
 void Character::setUpwardSpeed(float speed) {
@@ -260,7 +222,6 @@ void Character::setUpwardSpeed(float speed) {
   if (!m_avatar) return;
 
   m_up_speed = speed;
-  updateLocals(true);
 }
 
 void Character::setStrafeSpeed(float speed) {
@@ -268,7 +229,6 @@ void Character::setStrafeSpeed(float speed) {
   if (!m_avatar) return;
 
   m_strafe_speed = speed;
-  updateLocals(true);
 }
 
 void Character::setRotationRate(float rate) {
@@ -276,9 +236,6 @@ void Character::setRotationRate(float rate) {
   if (!m_avatar) return;
 
   m_rate = rate * m_rotate_speed;
-  if (fabs(m_rate) > 0.000001f && m_timeout_rotate->isExpired()) {
-    m_timeout_rotate->reset(server_update_interval);
-  }
 }
 
 void Character::updateLocals(bool send_to_server) {
@@ -287,49 +244,59 @@ void Character::updateLocals(bool send_to_server) {
   assert(m_self.get() != NULL);
 
   unsigned int ticks;
+  bool changed = false;
 
-  static ActionHandler *ac = System::instance()->getActionHandler();
   static float old_speed = m_speed;
   static bool old_run = m_run_modifier;
+  static WFMath::Quaternion oldOrient = m_pred_orient;
   std::string type = dynamic_cast<WorldEntity*>(m_self.get())->type();
 
   if (old_speed != m_speed || old_run != m_run_modifier) {
-    if (m_speed ==  0.0f) {
-      ac->handleAction(std::string(STOPPED) + type, NULL);
-    } else if (m_run_modifier) {
-      ac->handleAction(std::string(RUNNING) + type, NULL);
-    } else {
-      ac->handleAction(std::string(WALKING) + type, NULL);
-    }
-    old_speed = m_speed;
-    old_run = m_run_modifier;
+    changed = true;
   }
   ticks = SDL_GetTicks();
   float a = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
-  WFMath::Quaternion angle = WFMath::Quaternion(2, a);
-
-  m_pred_orient *= angle;
-
-//printf("[Character] Orient (%f,%f,%f) - %f\n", m_pred_orient.vector().x(), m_pred_orient.vector().y(), m_pred_orient.vector().z(), m_pred_orient.scalar());
 
   // Forward/Backward Speed
   float x_mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
   // Stafe Speed
   float y_mod_speed = (m_run_modifier) ? (m_strafe_speed * m_run_speed) : (m_strafe_speed * m_walk_speed);
-  // TODO - Perhaps add the walk/run modifier
+  // New velocity vector
   WFMath::Vector<3> vel(x_mod_speed, y_mod_speed, m_up_speed);
-//  WFMath::Vector<3> vel(y_mod_speed, x_mod_speed, m_up_speed);
+
   // Rotate velocity to current heading
   vel = vel.rotate(m_pred_orient);
 
+  dynamic_cast<WorldEntity*>(m_self.get())->setLocalOrient(m_pred_orient);
+
+  // If there is anything to rotate, do so
+  if (fabs(a) > 0.000001f) {
+    WFMath::Quaternion angle = WFMath::Quaternion(2, a);
+
+    m_pred_orient *= angle;
+    changed = true;
+  }
+  if (m_pred_orient != oldOrient) {
+    changed = true;
+  }
+
   m_time = ticks;
 
+   // Only send update on a change
+  if (changed) {
+    // See how long its been since the last server update
+    bool send = ((SDL_GetTicks() - m_lastUpdate) > server_update_interval);
+    // Update if interval has passed, or the force flag is set.
+    if (send || send_to_server) {
+//      printf("MoveOp: %f, %f, %f\n", vel.x(), vel.y(), vel.z());
+      updateMove(vel, m_pred_orient);
+      m_lastUpdate = ticks;
 
- // TODO, we should link this to a timeout so we don't 
- // send too many updates, but allow forced updates for certain actions? 
-  if (send_to_server) {
-    updateMove(vel, m_pred_orient);
-    m_lastUpdate = ticks;
+      oldOrient = m_pred_orient;
+      old_speed = m_speed;
+      old_run = m_run_modifier;
+      
+    }
   }
 }
 
@@ -503,7 +470,6 @@ void Character::toggleRunModifier() {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   m_run_modifier = !m_run_modifier;
-  updateLocals(true);
 }
 
 void Character::readConfig(varconf::Config &config) {
@@ -543,7 +509,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; (quantity) && (i < m_self->numContained()); ++i) {
-    WorldEntity *we = (WorldEntity*)m_self->getContained(i);
+    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self->getContained(i));
     if (we->getName() == name) {
       m_avatar->place(we, te, WFMath::Point<3>(0,0,0));
       quantity--;
@@ -594,7 +560,6 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_READ_APPEARANCE, this);
   console->registerCommand(CMD_SET_HEIGHT, this);
   console->registerCommand(CMD_SET_ACTION, this);
-  console->registerCommand(CMD_WAVE, this);
   console->registerCommand(CMD_DISPLAY_USE_OPS, this);
 }
 
@@ -704,9 +669,6 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_SET_ACTION) {
     setAction(args);
   }
-  else if (command == CMD_WAVE) {
-    setAction("wave");
-  }
 }
 
 void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
@@ -806,26 +768,20 @@ void Character::setAction(const std::string &action) {
   m_avatar->getConnection()->send(set);
 }
 
-void Character::RotateTimeoutExpired() {
-  rotate(CMD_modifier);
-}
-
-void Character::UpdateTimeoutExpired() {
-  Eris::deleteLater(m_timeout_update);
-  m_timeout_update = NULL;
-  sendUpdate();
-}
-
 void Character::setAvatar(Eris::Avatar *avatar) {
   m_avatar = avatar;
   if (avatar == NULL) {
     m_self = Eris::EntityRef();
+    // TODO we also need to disconnect any signals at this point!
+    // Otherwise we can clear the list during a disconnect, and then the
+    // ChildRemoved signal can get fired!
+    // We can't use notify_callbacks as other signals are used in this class.
     m_imap.clear();
   } else {
     m_self = Eris::EntityRef(m_avatar->getEntity());
     WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
 
-    we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded));    
+    we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded)); 
     we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));
     we->LocationChanged.connect(sigc::mem_fun(this, &Character::onLocationChanged));
     we->Moved.connect(sigc::mem_fun(this, &Character::onMoved));
@@ -836,7 +792,6 @@ void Character::setAvatar(Eris::Avatar *avatar) {
     for (unsigned int i = 0; i < m_self->numContained(); ++i) {
       onChildAdded(m_self->getContained(i));
     }
- 
   }
 }
 
@@ -857,6 +812,8 @@ void Character::onChildAdded(Eris::Entity *child) {
 }
 
 void Character::onChildRemoved(Eris::Entity *child) {
+  // Check for null pointer. On
+  if (child == 0) return;
   std::string name = child->getName();
   if (name.empty()) name = child->getType()->getName();
 
@@ -872,19 +829,17 @@ void Character::onChildRemoved(Eris::Entity *child) {
 }
 
 void Character::onLocationChanged(Eris::Entity *loc) {
-  printf("[Character] Location Changed\n");
-    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
-    if (!we) return;
-//    m_pred_orient = we->getEntityOrientation();
-//sendUpdate();
+  // Location changed, get the new orientation when the Moved
+  // signal fires.
   m_refresh_orient = true;
 }
+
 void Character::onMoved() {
-//return;
+  // Only update the orientation is the location has changed
   if (m_refresh_orient) {
-  printf("[Character] Moved\n");
     WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
     m_pred_orient = we->getEntityOrientation();
+    
     m_refresh_orient = false;
   }
 }

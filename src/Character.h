@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.41 2006-02-18 23:04:25 simon Exp $
+// $Id: Character.h,v 1.42 2006-02-24 19:14:01 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -71,7 +71,6 @@ public:
    * @param Angle in degrees of rotation
    */
   void rotateImmediate(float);
-  void sendUpdate();
 
   void setMovementSpeed(float);
   void setUpwardSpeed(float);
@@ -79,7 +78,6 @@ public:
   void setRotationRate(float);
 
   void updateLocals(bool);
-  void updateMove(const WFMath::Vector<3> &, const WFMath::Quaternion &);
 
   void getEntity(const std::string&);
   void dropEntity(const std::string&, int);
@@ -108,7 +106,6 @@ public:
   void registerCommands(Console*);
   void runCommand(const std::string &, const std::string &);
 	
-  static const float CMD_modifier;
   void setAppearance(const std::string &, const std::string &, const std::string &);
   void sendGuise(const Atlas::Message::Element& guise);
   void clearApp();
@@ -119,6 +116,8 @@ public:
   const InventoryMap &getInventoryMap() const { return m_imap; }
 
 private:
+  void updateMove(const WFMath::Vector<3> &, const WFMath::Quaternion &);
+  void sendUpdate();
   void onLocationChanged(Eris::Entity *);
   void onMoved();
   void getOrientation(WorldEntity *);
@@ -149,9 +148,6 @@ private:
   WFMath::Point<3> m_pred_pos;
 
   unsigned int m_lastUpdate;
-  bool m_updateScheduled;
-
-//  WFMath::Quaternion m_orient;
 
   unsigned int m_time; ///< Used to record time since last server update
 
@@ -160,10 +156,6 @@ private:
   bool m_initialised; ///< Initialisation state of character object
 
   void varconf_callback(const std::string &key, const std::string &section, varconf::Config &config);
-
-  void RotateTimeoutExpired();
-  void UpdateTimeoutExpired();
-  Eris::Timeout *m_timeout_rotate, *m_timeout_update;
 
   InventoryMap m_imap;
   bool m_refresh_orient;
