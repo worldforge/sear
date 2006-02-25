@@ -217,6 +217,8 @@ void DynamicObject::contextDestroyed(bool check) {
 void DynamicObject::render(bool select_mode) {
   assert(m_initialised == true);
 
+  glPushMatrix();
+
   // Set transform
   glMultMatrixf(&m_matrix[0][0]);
 
@@ -363,6 +365,7 @@ void DynamicObject::render(bool select_mode) {
       glDisableClientState(GL_NORMAL_ARRAY);
     }
   }
+  glPopMatrix();
 }
 
 int DynamicObject::load(const std::string &filename) {

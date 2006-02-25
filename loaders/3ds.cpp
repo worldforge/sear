@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.53 2006-02-20 20:13:36 simon Exp $
+// $Id: 3ds.cpp,v 1.54 2006-02-25 23:27:53 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -52,12 +52,24 @@
 #endif
 namespace Sear {
 
+static const std::string SECTION_model = "model";
+
+static const std::string KEY_filename = "filename";
+static const std::string KEY_rotation = "rotation";
+static const std::string KEY_scale = "scale";
+
+static const std::string KEY_texture_map_0 = "texture_map_0";
+static const std::string KEY_ambient = "ambient";
+static const std::string KEY_diffuse = "diffuse";
+static const std::string KEY_specular = "specular";
+static const std::string KEY_emission = "emission";
+static const std::string KEY_shininess = "shininess";
+
 ThreeDS::ThreeDS() : Model(),
   m_initialised(false),
   m_height(1.0f)
 {
   m_config.sige.connect(SigC::slot(*this, &ThreeDS::varconf_error_callback));
-
 }
 
 ThreeDS::~ThreeDS() {
@@ -69,8 +81,8 @@ int ThreeDS::init(const std::string &file_name) {
  
   std::string object;
   if (m_config.readFromFile(file_name)) {
-    if (m_config.findItem("model", "filename")) {
-      object = (std::string)m_config.getItem("model", "filename");
+    if (m_config.findItem(SECTION_model, KEY_filename)) {
+      object = (std::string)m_config.getItem(SECTION_model, KEY_filename);
     } else {
       fprintf(stderr, "[3ds] Error: No 3ds filename specified.\n");
       return 1;
@@ -208,9 +220,29 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   unsigned int n_counter = 0;
   unsigned int t_counter = 0;
 
-  SPtrShutdown<StaticObject> ro;// = NULL;
+  SPtrShutdown<StaticObject> ro;
   int current_texture = -2;
   std::string material_name = "sear:noname";
+
+  // Initialise transform matrix
+  float matrix[4][4];
+  for (int j = 0; j < 4; ++j) {
+    for (int i = 0; i < 4; ++i) {
+      if (i == j) matrix[j][i] = 1.0f;
+      else matrix[j][i] = 0.0f;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_rotation)) {
+    std::string str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
+    float w,x,y,z;
+    sscanf(str.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
+    WFMath::Quaternion q(w,x,y,z);
+    QuatToMatrix(q, matrix);
+  }
+  if (m_config.findItem(SECTION_model, KEY_scale)) {
+    double s = (double)m_config.getItem(SECTION_model, KEY_scale);
+    for (int i = 0; i < 4; ++i) matrix[i][i] *= s;
+  }
 
   for (p=0; p<mesh->faces; ++p) {
     Lib3dsFace *f=&mesh->faceL[p];
@@ -226,22 +258,43 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       // If material obj does not exist, create it
       if (I == m_material_map.end()) {
         Material *m = new Material;
-        m->ambient[0] = 0.0f;
-        m->ambient[1] = 0.0f;
-        m->ambient[2] = 0.0f;
-        m->ambient[3] = 1.0f;
+        if (m_config.findItem(material_name, KEY_ambient)) {
+          std::string str = (std::string)m_config.getItem(material_name, KEY_ambient);
+          sscanf(str.c_str(), "%f;%f;%f;%f", &m->ambient[0], &m->ambient[1], &m->ambient[2], &m->ambient[3]);
+        } else {
+          m->ambient[0] = 0.0f;
+          m->ambient[1] = 0.0f;
+          m->ambient[2] = 0.0f;
+          m->ambient[3] = 1.0f;
+        }
 
-        m->diffuse[0] = mat->diffuse[0];
-        m->diffuse[1] = mat->diffuse[1];
-        m->diffuse[2] = mat->diffuse[2];
-        m->diffuse[3] = mat->diffuse[3];
-        m->specular[0] = mat->specular[0];
-        m->specular[1] = mat->specular[1];
-        m->specular[2] = mat->specular[2];
-        m->specular[3] = mat->specular[3];
-        m->shininess = pow(2, 10.0*mat->shininess);
-        // Clamp shininess
-        if (m->shininess>128.0f) m->shininess = 128.0f;
+        if (m_config.findItem(material_name, KEY_diffuse)) {
+          std::string str = (std::string)m_config.getItem(material_name, KEY_diffuse);
+          sscanf(str.c_str(), "%f;%f;%f;%f", &m->diffuse[0], &m->diffuse[1], &m->diffuse[2], &m->diffuse[3]);
+        } else {
+          m->diffuse[0] = mat->diffuse[0];
+          m->diffuse[1] = mat->diffuse[1];
+          m->diffuse[2] = mat->diffuse[2];
+          m->diffuse[3] = mat->diffuse[3];
+        }
+
+        if (m_config.findItem(material_name, KEY_specular)) {
+          std::string str = (std::string)m_config.getItem(material_name, KEY_specular);
+          sscanf(str.c_str(), "%f;%f;%f;%f", &m->specular[0], &m->specular[1], &m->specular[2], &m->specular[3]);
+        } else {
+          m->specular[0] = mat->specular[0];
+          m->specular[1] = mat->specular[1];
+          m->specular[2] = mat->specular[2];
+          m->specular[3] = mat->specular[3];
+        }
+
+        if (m_config.findItem(material_name, KEY_shininess)) {
+          m->shininess = (double)m_config.getItem(material_name, KEY_shininess);
+        } else {
+          m->shininess = pow(2, 10.0*mat->shininess);
+          // Clamp shininess
+          if (m->shininess>128.0f) m->shininess = 128.0f;
+        }
         
         // Store in material map for later use
         m_material_map[material_name] = m;
@@ -259,9 +312,9 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     int texture_mask_id = 0;
     // If a material is set get texture map names.
     if (mat) {
-      if (m_config.findItem(material_name,"texture_map_0")) {
+      if (m_config.findItem(material_name,KEY_texture_map_0)) {
         std::string name = (std::string)m_config.getItem(material_name,
-                                                         "texture_map_0");
+                                                         KEY_texture_map_0);
         texture_id = RenderSystem::getInstance().requestTexture(name);
         texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
       } else if ( mat->texture1_map.name[0]) {
@@ -281,11 +334,13 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
 
       // Reset counters
       v_counter = n_counter = t_counter = 0;
-      // Create a new render object and create data structures        
+      // Create a new render object and create data structures
       ro = SPtrShutdown<StaticObject>(new StaticObject());
       ro->init();
-      ro->setNumPoints(3 * mesh->faces)
-;
+      ro->setNumPoints(3 * mesh->faces);
+
+      ro->setMatrix(matrix);
+
       ro->createVertexData(ro->getNumPoints() * 3);
       ro->createNormalData(ro->getNumPoints() * 3);
       if (mesh->texels) {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.19 2006-02-20 20:13:36 simon Exp $
+// $Id: LibModelFile.cpp,v 1.20 2006-02-25 23:27:53 simon Exp $
 
 /*
   Debug check list
@@ -44,6 +44,19 @@ namespace Sear {
 
 static const float default_scale = 1.0f / 64.0f;
 
+static const std::string SECTION_model = "model";
+
+static const std::string KEY_filename = "filename";
+static const std::string KEY_rotation = "rotation";
+static const std::string KEY_scale = "scale";
+
+static const std::string KEY_texture_map_0 = "texture_map_0";
+static const std::string KEY_ambient = "ambient";
+static const std::string KEY_diffuse = "diffuse";
+static const std::string KEY_specular = "specular";
+static const std::string KEY_emission = "emission";
+static const std::string KEY_shininess = "shininess";
+
 LibModelFile::LibModelFile() : Model(), 
   m_initialised(false)
 {
@@ -59,8 +72,8 @@ int LibModelFile::init(const std::string &filename) {
 
   std::string object;
   if (m_config.readFromFile(filename)) {
-    if (m_config.findItem("model", "filename")) {
-      object = (std::string)m_config.getItem("model", "filename");
+    if (m_config.findItem(SECTION_model, KEY_filename)) {
+      object = (std::string)m_config.getItem(SECTION_model, KEY_filename);
     } else {
       fprintf(stderr, "[LibModelFile] Error: No md3 filename specified.\n");
       return 1;
@@ -69,6 +82,25 @@ int LibModelFile::init(const std::string &filename) {
     fprintf(stderr, "[LibModelFile] Error reading %s as varconf file. Trying as .md3 file.\n",
             filename.c_str());
     object = filename;
+  }
+  // Initialise transform matrix
+  float matrix[4][4];
+  for (int j = 0; j < 4; ++j) {
+    for (int i = 0; i < 4; ++i) {
+      if (i == j) matrix[j][i] = 1.0f;
+      else matrix[j][i] = 0.0f;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_rotation)) {
+    std::string str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
+    float w,x,y,z;
+    sscanf(str.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
+    WFMath::Quaternion q(w,x,y,z);
+    QuatToMatrix(q, matrix);
+  }
+  if (m_config.findItem(SECTION_model, KEY_scale)) {
+    double s = (double)m_config.getItem(SECTION_model, KEY_scale);
+    for (int i = 0; i < 4; ++i) matrix[i][i] *= s;
   }
 
   System::instance()->getFileHandler()->expandString(object);
@@ -98,22 +130,51 @@ int LibModelFile::init(const std::string &filename) {
       std::string name = (const char*)(meshp->skins[0].name);
       m_config.clean(name);
       // Check for texture name overrides in vconf file
-      if (m_config.findItem(name, "filename")) {
-        name = (std::string)m_config.getItem(name, "filename");
+      // Backwards compatibility.
+      if (m_config.findItem(name, KEY_filename)) {
+        name = (std::string)m_config.getItem(name, KEY_filename);
+      }
+      // Check for texture name overrides in vconf file
+      // New method
+      if (m_config.findItem(name, KEY_texture_map_0)) {
+        name = (std::string)m_config.getItem(name, KEY_texture_map_0);
       }
       // Request Texture ID
       texture_id = RenderSystem::getInstance().requestTexture(name);
       texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
+
+      float m[4];
+      if (m_config.findItem(name, KEY_ambient)) {
+        std::string str = (std::string)m_config.getItem(name, KEY_ambient);
+        sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
+        so->setAmbient(m); 
+      }
+      if (m_config.findItem(name, KEY_diffuse)) {
+        std::string str = (std::string)m_config.getItem(name, KEY_diffuse);
+        sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
+        so->setDiffuse(m); 
+      }
+      if (m_config.findItem(name, KEY_specular)) {
+        std::string str = (std::string)m_config.getItem(name, KEY_specular);
+        sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
+        so->setSpecular(m); 
+      }
+      if (m_config.findItem(name, KEY_emission)) {
+        std::string str = (std::string)m_config.getItem(name, KEY_emission);
+        sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
+        so->setEmission(m); 
+      }
+      if (m_config.findItem(name, KEY_shininess)) {
+        so->setShininess((double)m_config.getItem(name, KEY_shininess));
+      }
+      
     }
+    // Set the transform
+    so->setMatrix(matrix);
+    // Set the textures
     so->setTexture(0, texture_id, texture_mask_id);
     so->setNumPoints(meshp->mesh_header->triangle_count * 3);
     
-    so->setAmbient(1.0f,1.0f,1.0f,1.0f);
-    so->setDiffuse(1.0f,1.0f,1.0f,1.0f);
-    so->setSpecular(1.0f,1.0f,1.0f,1.0f);
-    so->setEmission(0.0f,0.0f,0.0f,0.0f);
-    so->setShininess(50.0f);
-
     // Copy data into array.
     so->createVertexData(meshp->mesh_header->vertex_count * 3);
     float *ptr = so->getVertexDataPtr();
@@ -154,7 +215,6 @@ void LibModelFile::contextDestroyed(bool check) {
     assert(so);
     so->contextDestroyed(check);
   }
-
 }
 
 void LibModelFile::render(bool select_mode) {

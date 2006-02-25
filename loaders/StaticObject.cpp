@@ -131,6 +131,7 @@ void StaticObject::contextDestroyed(bool check) {
 
 void StaticObject::render(bool select_mode) {
   assert(m_initialised == true);
+  glPushMatrix();
   // Set transform
   glMultMatrixf(&m_matrix[0][0]);
 
@@ -279,6 +280,7 @@ void StaticObject::render(bool select_mode) {
       glEndList();
     }
   }
+  glPopMatrix();
 }
 
 int StaticObject::load(const std::string &filename) {

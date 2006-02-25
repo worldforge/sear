@@ -1,5 +1,14 @@
 2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/StaticObject.cpp, loaders/DynamicObject.cpp: Add glPushMatrix
+	  and glPopMatrix to the render function.
+
+	* loaders/LibModelFile.cpp, loaders/3ds.cpp: Allow material properties
+	  to be overridden in config file. Add a scale and rotation option to
+	  config file.
+
+2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dCoreModel.cpp,
 	  loaders/cal3d/Cal3dCoreModel.h: Add new config section called 
 	  bone_rotations allowing a rotation to be applied to each bone when 
