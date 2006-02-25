@@ -2,24 +2,20 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.13 2006-02-20 19:53:17 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.14 2006-02-25 21:51:14 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
 
-#include <sigc++/trackable.h>
 
 #include <string>
 #include <map>
 #include <list>
 
+#include <sigc++/trackable.h>
 #include <varconf/Config.h>
 #include <cal3d/cal3d.h>
-
-// Forward declare carconf::Config
-namespace varconf {
-  class Config;
-}
+#include <wfmath/quaternion.h>
 
 namespace Sear {
 
@@ -49,6 +45,7 @@ public:
   typedef std::list<AnimWeight> WeightList;
   typedef std::map<std::string, WeightList> Animations;
   typedef std::map<std::string, std::string> BoneMap;
+  typedef std::map<std::string, WFMath::Quaternion> BoneRotation;
   /**
    * Default constructor
    */ 
@@ -91,6 +88,7 @@ public:
   float getRotate() const  { return m_rotate; }
   
   std::string mapBoneName(const std::string &bone) const;
+  WFMath::Quaternion getBoneRotation(const std::string &name) const;
 
 private:
   /**
@@ -137,6 +135,7 @@ private:
   float m_rotate;
   Animations m_anims;
   BoneMap m_bone_map;
+  BoneRotation m_bone_rotation;
 };
 
 } /* namespace Sear */

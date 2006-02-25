@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.37 2006-02-22 18:29:08 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.38 2006-02-25 21:51:14 simon Exp $
 
 #include <string>
 
@@ -30,6 +30,7 @@ namespace Sear {
 static const std::string SECTION_model = "model";
 static const std::string SECTION_material = "material";
 static const std::string SECTION_bone_map = "bone_mapping";
+static const std::string SECTION_bone_rotation = "bone_rotations";
 
 static const std::string KEY_scale = "scale";
 static const std::string KEY_path = "path";
@@ -308,6 +309,11 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
     }
   } else if (section == SECTION_bone_map) {
     m_bone_map[key] = (std::string)config.getItem(section, key);
+  } else if (section == SECTION_bone_rotation) {
+    std::string rot = (std::string)config.getItem(section, key);
+    float w,x,y,z;
+    sscanf(rot.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
+    m_bone_rotation[key] = WFMath::Quaternion(w,x,y,z);
   } else {
     // Add animations weights to map
     // Get weight value
@@ -348,6 +354,12 @@ std::string Cal3dCoreModel::mapBoneName(const std::string &bone) const {
   BoneMap::const_iterator I = m_bone_map.find(bone);
   if (I != m_bone_map.end()) return I->second;
   else return "";
+}
+
+WFMath::Quaternion Cal3dCoreModel::getBoneRotation(const std::string &name) const {
+  BoneRotation::const_iterator I = m_bone_rotation.find(name);
+  if (I != m_bone_rotation.end()) return I->second;
+  return WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f);
 }
 
 } /* namespace Sear */

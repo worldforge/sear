@@ -1,5 +1,13 @@
 2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dCoreModel.cpp,
+	  loaders/cal3d/Cal3dCoreModel.h: Add new config section called 
+	  bone_rotations allowing a rotation to be applied to each bone when 
+	  wielding an object. Format is wield_slot_name = "w;x;y;z" where w, x,
+	  y and z are components of a quaternion.
+
+2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/WireFrame.cpp: Fix bug where the display list was never 
 	  created before using it.
 
