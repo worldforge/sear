@@ -2,17 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.4 2006-01-28 15:35:49 simon Exp $
+// $Id: Frustum.cpp,v 1.5 2006-02-25 16:24:54 simon Exp $
 
 #include "common/Utility.h"
 
 #include "src/System.h"
 #include "Frustum.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -163,7 +158,7 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
 
 bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos) {
   WFMath::AxisBox<3> b(bbox);
-  b.moveCenterTo(pos);
+  b.shift(WFMath::Vector<3>(pos.x(), pos.y(),  pos.z()));
   return ballInFrustum(frustum, b.boundingSphere());
 }
 

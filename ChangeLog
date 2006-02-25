@@ -1,3 +1,12 @@
+2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/WireFrame.cpp: Fix bug where the display list was never 
+	  created before using it.
+
+	* renderers/Frustum.cpp: Fix bug in sphereInFrustum() where the bounding
+	  box center was moved to entity position, instead of just being 
+	  translated by the position.
+
 2006-02-24  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Character.cpp, src/Character.h: Limit move ops to no more than 

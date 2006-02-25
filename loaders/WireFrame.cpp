@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.20 2006-02-20 20:16:21 simon Exp $
+// $Id: WireFrame.cpp,v 1.21 2006-02-25 16:24:54 simon Exp $
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -127,6 +127,7 @@ void WireFrame::render(bool) {
   if (glIsList(m_disp)) {
     glCallList(m_disp);
   } else {
+    m_disp = glGenLists(1);
     glNewList(m_disp, GL_COMPILE_AND_EXECUTE);
     render->setMaterial(&ambient[0], &diffuse[0], &specular[0], 50.0f, NULL);
     render->renderArrays(RES_LINES, 0, m_num_points, &m_vertex_data[0], NULL, NULL, false);
