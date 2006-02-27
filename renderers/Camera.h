@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006
 
-// $Id: Camera.h,v 1.7 2006-02-20 20:36:23 simon Exp $
+// $Id: Camera.h,v 1.8 2006-02-27 17:52:36 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -70,19 +70,33 @@ public:
    * Change zoom state
    * @param dir Direction of zoom. -1 is move closer, 0 is stationary, 1 is move away
    */ 
-  void zoom(int dir) { m_zoom_dir += dir; }
+  void zoom(int dir) {
+    m_zoom_dir += dir;
+    // Clamp speed
+    if (m_zoom_dir >  1) m_zoom_dir =  1;
+    if (m_zoom_dir < -1) m_zoom_dir = -1;
+  }
 
   /**
    * Change rotate state
    * @param dir Direction of rotation. -1 is rotate --, 0 is stationary, 1 is rotate --
    */ 
-  void rotate(int dir) { m_rotation_dir += dir; }
+  void rotate(int dir) { 
+    m_rotation_dir += dir;
+    // Clamp motion
+    if (m_rotation_dir >  1) m_rotation_dir =  1;
+    if (m_rotation_dir < -1) m_rotation_dir = -1;
+  }
 
   /**
    * Change elevation state
    * @param dir Direction of elevation. -1 is elevate --, 0 is stationary, 1 is elevate --
    */ 
-  void elevate(int dir) { m_elevation_dir += dir; }
+  void elevate(int dir) {
+    m_elevation_dir += dir;
+    if (m_elevation_dir >  1) m_elevation_dir =  1;
+    if (m_elevation_dir < -1) m_elevation_dir = -1;
+  }
 
   /**
    * Make an immediate change to the rotation

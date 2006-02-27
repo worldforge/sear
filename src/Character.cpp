@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.82 2006-02-24 19:14:00 simon Exp $
+// $Id: Character.cpp,v 1.83 2006-02-27 17:52:36 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -171,6 +171,10 @@ void Character::moveUpward(float speed) {
   if (!m_avatar) return;
 
   m_up_speed += speed;
+
+  // Clamp speed
+  if (m_up_speed >  1.0f) m_up_speed =  1.0f;
+  if (m_up_speed < -1.0f) m_up_speed = -1.0f;
 }
 
 void Character::moveForward(float speed) {
@@ -178,6 +182,10 @@ void Character::moveForward(float speed) {
   if (!m_avatar) return;
 
   m_speed += speed;
+
+  // Clamp speed
+  if (m_speed > 1.0f) m_speed = 1.0f;
+  if (m_speed < -1.0f) m_speed = -1.0f;
 }
 
 void Character::strafe(float speed) {
@@ -185,13 +193,20 @@ void Character::strafe(float speed) {
   if (!m_avatar) return;
 
   m_strafe_speed += speed;
+
+  // Clamp speed
+  if (m_strafe_speed >  1.0f) m_strafe_speed =  1.0f;
+  if (m_strafe_speed < -1.0f) m_strafe_speed = -1.0f;
 }
 
 void Character::rotate(float rate) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
-  m_rate += rate * m_rotate_speed;
+  m_rate += rate;
+
+  if (m_rate >  1.0f) m_rate =  1.0f;
+  if (m_rate < -1.0f) m_rate = -1.0f;
 }
 
 void Character::rotateImmediate(float rot) {
@@ -235,7 +250,7 @@ void Character::setRotationRate(float rate) {
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
 
-  m_rate = rate * m_rotate_speed;
+  m_rate = rate;
 }
 
 void Character::updateLocals(bool send_to_server) {
@@ -247,15 +262,16 @@ void Character::updateLocals(bool send_to_server) {
   bool changed = false;
 
   static float old_speed = m_speed;
+  static float old_strafe_speed = m_strafe_speed;
   static bool old_run = m_run_modifier;
   static WFMath::Quaternion oldOrient = m_pred_orient;
   std::string type = dynamic_cast<WorldEntity*>(m_self.get())->type();
 
-  if (old_speed != m_speed || old_run != m_run_modifier) {
+  if (old_speed != m_speed || old_run != m_run_modifier || old_strafe_speed != m_strafe_speed) {
     changed = true;
   }
   ticks = SDL_GetTicks();
-  float a = deg_to_rad(m_rate * ((ticks - m_time) / 1000.0f));
+  float a = deg_to_rad(m_rate * m_rotate_speed * ((ticks - m_time) / 1000.0f));
 
   // Forward/Backward Speed
   float x_mod_speed = (m_run_modifier) ? (m_speed * m_run_speed) : (m_speed * m_walk_speed);
@@ -294,6 +310,7 @@ void Character::updateLocals(bool send_to_server) {
 
       oldOrient = m_pred_orient;
       old_speed = m_speed;
+      old_strafe_speed = m_strafe_speed;
       old_run = m_run_modifier;
       
     }

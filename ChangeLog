@@ -1,3 +1,11 @@
+2006-02-27  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Camera.h, src/Character.cpp: Add some checks so that a 
+	  movement or rotation rates are limited to +/- 1. This helps fix some 
+	  of the bugs caused by missing a key press or release. The keypress
+	  will still be missed, but e.g if the char is walking forwards
+	  automatically, pressing and releasing forward again will fix it.
+
 2006-02-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/StaticObject.cpp, loaders/DynamicObject.cpp: Add glPushMatrix
