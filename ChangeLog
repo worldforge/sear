@@ -1,5 +1,10 @@
 2006-02-27  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/StaticObject.h: Change the setMatrix to use float [][] instead
+	  of float **.
+
+2006-02-27  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/Camera.h, src/Character.cpp: Add some checks so that a 
 	  movement or rotation rates are limited to +/- 1. This helps fix some 
 	  of the bugs caused by missing a key press or release. The keypress

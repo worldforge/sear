@@ -158,7 +158,7 @@ void setAmbient(float a[4]) {
  
 //  void setType(GLenum type) { m_type = type; } 
 
-  void setMatrix(float **m) {
+  void setMatrix(float m[4][4]) {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
         m_matrix[i][j] = m[i][j];
