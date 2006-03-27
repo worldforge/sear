@@ -2,11 +2,12 @@ bin_PROGRAMS = sear-bin
 bin_SCRIPTS = sear
 noinst_LIBRARIES = libSear.a
 
+SUFFIXES= .rc
 INCLUDES = -I$(top_srcdir)
 
 #AM_CPPFLAGS = $(BINRELOC_CFLAGS)
 
-EXTRA_DIST = sear.rc
+EXTRA_DIST = sear-res.rc
 
 if BUILD_STATIC
 sear_bin_LDFLAGS = -nodefaultlibs
@@ -53,14 +54,17 @@ SEAR_EXT_LIBS = $(SEAR_LIBS)
 endif
 
 if BUILD_RC_O
-SEAR_RC_O=sear.rc.o
+SEAR_RC_O=sear-res.o
 
 else
 SEAR_RC_O=
 endif
 
-$(SEAR_RC_O): sear.rc
-	$(WINDRES) -i sear.rc -o $(SEAR_RC_O)
+#$(SEAR_RC_O): sear.rc
+#	$(WINDRES) -i sear.rc -o $(SEAR_RC_O)
+
+.rc.o:
+	${WINDRES} $< -o $@
 
 sear_bin_LDADD = \
 	libSear.a \

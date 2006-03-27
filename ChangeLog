@@ -1,3 +1,11 @@
+2006-03-27  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac, src/Makefile.am, src/sear.rc, src/sear-res.rc.in: Rename
+	  sear.rc to sear-res.rc.in to avoid compiling two sear.o objects. Add
+	  Win32 Version information to the resource file and pull the VERSION 
+	  var from configure. Update Makefile.am to avoid circular dependancy
+	  warning for building the resource file.
+
 2006-02-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/StaticObject.h: Change the setMatrix to use float [][] instead
