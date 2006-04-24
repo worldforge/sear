@@ -166,7 +166,15 @@ void setAmbient(float a[4]) {
     }
   }
 
-    void identity() {
+  void getMatrix(float m[4][4]) {
+    for (int i = 0; i < 4; ++i) {
+      for (int j = 0; j < 4; ++j) {
+        m[i][j] = m_matrix[i][j];
+      }
+    }
+  }
+
+  void identity() {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
         if (i == j)  m_matrix[i][j] = 1.0f;

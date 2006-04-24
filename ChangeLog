@@ -1,3 +1,13 @@
+2006-04-24  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/StaticObject.h: Add method to obtain the current transform
+	  matrix.
+
+	* loaders/3ds.h, loaders/3ds.cpp: Add options to anisotropically or
+	  isotropically scale an object to a unit size. Useful when using in
+	  combination with scale_bbox in model_records. This needs to be ported
+	  to libmodelfile and cal3d loaders.
+
 2006-03-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac, src/Makefile.am, src/sear.rc, src/sear-res.rc.in: Rename

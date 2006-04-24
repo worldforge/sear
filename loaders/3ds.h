@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.23 2006-02-15 09:50:30 simon Exp $
+// $Id: 3ds.h,v 1.24 2006-04-24 14:11:38 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -31,6 +31,7 @@ class StaticObject;
 
 class ThreeDS : public Model, public sigc::trackable {
 public:
+  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
   /*
    * Defualt constructor
    */ 
@@ -73,7 +74,6 @@ protected:
   
   void varconf_error_callback(const char *message);
 
-  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
   StaticObjectList m_render_objects;
   typedef std::map<std::string, Material*> MaterialMap;
   MaterialMap m_material_map;
