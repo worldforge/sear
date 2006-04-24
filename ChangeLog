@@ -1,5 +1,11 @@
 2006-04-24  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp: Add a z_align option to work with the new scaling
+	  options to translate the object such that the minimum z value is on
+	  the z axis.
+
+2006-04-24  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.h: Add method to obtain the current transform
 	  matrix.
 

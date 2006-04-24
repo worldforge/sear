@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.55 2006-04-24 14:11:38 simon Exp $
+// $Id: 3ds.cpp,v 1.56 2006-04-24 14:25:56 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -59,6 +59,7 @@ static const std::string KEY_rotation = "rotation";
 static const std::string KEY_scale = "scale";
 static const std::string KEY_scale_isotropic = "scale_isotropic";
 static const std::string KEY_scale_anisotropic = "scale_anisotropic";
+static const std::string KEY_z_align = "z_align";
 
 static const std::string KEY_texture_map_0 = "texture_map_0";
 static const std::string KEY_ambient = "ambient";
@@ -67,7 +68,7 @@ static const std::string KEY_specular = "specular";
 static const std::string KEY_emission = "emission";
 static const std::string KEY_shininess = "shininess";
 
-static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic) {
+static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z_align) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
@@ -161,6 +162,8 @@ printf("Before (%f,%f,%f) - %f\n", x,y,z,w);
       x = nx / nw;
       y = ny / nw;
       z = nz / nw;
+
+      if (z_align) z -= min[2];
 
       // Scale points
       x *= scale_x;
@@ -258,15 +261,20 @@ int ThreeDS::init(const std::string &file_name) {
   }
 
   lib3ds_file_free(model);
-
+  bool z_align = false;
+  if (m_config.findItem(SECTION_model, KEY_z_align)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_z_align)) {
+      z_align = true;
+    }
+  }
   if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic)) {
-      scale_object(m_render_objects, true);
+      scale_object(m_render_objects, true, z_align);
     }
   }
   if (m_config.findItem(SECTION_model, KEY_scale_anisotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_anisotropic)) {
-      scale_object(m_render_objects, false);
+      scale_object(m_render_objects, false, z_align);
     }
   }
 
