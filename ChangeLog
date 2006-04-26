@@ -1,5 +1,25 @@
 2006-04-26  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* common/Log.h, common/types.h, environment/SkyDome.cpp,
+	  environment/Stars.cpp, interfaces/ConsoleObject.h, renderers/Light.h,
+	  renderers/LightManager.cpp, renderers/cursors.h, src/CacheManager.cpp,
+	  src/CacheObject.cpp, src/CacheObject.h, src/ConsoleObject.h,
+	  src/Factory.h, src/ScriptEngine.cpp, src/TerrainEntity.cpp,
+	  src/TerrainEntity.h, tools/model_viewer.cpp: Updated copyright and
+	  remove MMGR includes.
+
+	* loaders/ModelHandler.cpp: Change some output formatting.
+
+	* renderers/Camera.cpp: Remove some commented out code. Change some 
+	  rotation code.
+
+	* renderers/GL.cpp: Update some comments.
+
+	* renderers/Graphics.cpp: Make camera height slightly closer to avatar
+	  height. Update some comments
+
+2006-04-26  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dModel.cpp: Formatting changes.
 
 	* loaders/ModelSystem.cpp: Added some comments.

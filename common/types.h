@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2004 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: types.h,v 1.8 2005-05-06 17:26:00 jmt Exp $
+// $Id: types.h,v 1.9 2006-04-26 14:38:59 simon Exp $
 
 #ifndef SEAR_COMMON_TYPES_H
 #define SEAR_COMMON_TYPES_H 1

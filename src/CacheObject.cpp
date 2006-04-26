@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: CacheObject.cpp,v 1.1 2005-01-09 16:09:44 simon Exp $
+// $Id: CacheObject.cpp,v 1.2 2006-04-26 14:39:00 simon Exp $
 
 #include "CacheObject.h"
 

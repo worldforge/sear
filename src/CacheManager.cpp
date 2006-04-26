@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: CacheManager.cpp,v 1.5 2005-06-29 21:25:29 simon Exp $
+// $Id: CacheManager.cpp,v 1.6 2006-04-26 14:39:00 simon Exp $
 
 #include <stdlib.h>
 #include <cassert>

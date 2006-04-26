@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.3 2005-06-16 14:06:14 simon Exp $
+// $Id: LightManager.cpp,v 1.4 2006-04-26 14:39:00 simon Exp $
 
 #include <sage/GL.h>
 
@@ -10,11 +10,6 @@
 #include "Light.h"
 
 #include "src/System.h"
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 namespace Sear {
 

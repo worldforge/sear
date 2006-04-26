@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.145 2006-02-20 21:47:55 simon Exp $
+// $Id: GL.cpp,v 1.146 2006-04-26 14:39:00 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1165,7 +1165,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       // 3) Apply final scaling once model is in place
 
-      // Scale model by all bonding box axis
+      // Scale model by all bounding box axis
       if (model_record->scale_bbox && we->hasBBox()) {
         WFMath::AxisBox<3> bbox = we->getBBox();
         float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();

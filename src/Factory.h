@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Factory.h,v 1.7 2005-10-21 01:58:33 alriddoch Exp $
+// $Id: Factory.h,v 1.8 2006-04-26 14:39:00 simon Exp $
 
 #ifndef SEAR_FACTORY_H 
 #define SEAR_FACTORY_H 1

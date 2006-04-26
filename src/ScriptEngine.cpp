@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.13 2005-12-06 20:59:06 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.14 2006-04-26 14:39:00 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -15,12 +15,6 @@
 #include "src/System.h"
 
 #include <fstream>
-
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 
 #ifdef DEBUG
   static const bool debug = true;

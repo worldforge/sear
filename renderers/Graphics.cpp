@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.45 2006-02-23 20:47:16 simon Exp $
+// $Id: Graphics.cpp,v 1.46 2006-04-26 14:39:00 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -252,7 +252,7 @@ void Graphics::setCameraTransform() {
        ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z())
        : (1.0f);
 
-  height += 1.0f; // Make the camera be just above focus height.
+  height += 0.5f; // Make the camera be just above focus height.
 
   WFMath::Point<3> pos = focus->getAbsPos();
 
@@ -315,16 +315,18 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   if (m_system->checkState(SYS_IN_WORLD)) {
     Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
     assert(cam != NULL);
-    //if (!m_character) m_character = m_system->getCharacter();
-    //WorldEntity *focus = dynamic_cast<WorldEntity *>(view->getTopLevel()); //Get the player character entity
 
-    m_orient.identity(); // = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
-    m_orient *= quaternion_by_90; // Rotate by 90 degrees, WF 0 degrees is East
+    // Initial Camera rotation
+    m_orient.identity();
 
+    // Rotate by 90 degrees, WF 0 degrees is East
+    m_orient *= quaternion_by_90;
  
     Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
-    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity()); //Get the player character entity
+
+    //Get the player character entity
+    WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity());
     assert(focus != NULL);
     
     // Apply character orientation 
@@ -332,10 +334,9 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     // Apply camera rotations
     m_orient *= cam->getOrientation();
-//    m_orient *= WFMath::Quaternion(z_vector, cam->getRotation());
-//    m_orient *= WFMath::Quaternion(x_vector, cam->getElevation());
 
-    // Draw Sky box, requires the rotation to be done before any translation to keep the camera centered
+    // Draw Sky box, requires the rotation to be done before any translation to
+    // keep the camera centered
     if (!select_mode) {
       glPushMatrix();
       m_renderer->applyQuaternion(m_orient.inverse());
@@ -357,7 +358,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     assert(view);
     WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
     assert(root);
-
 
     // Build entity queues before rendering so entity lighting will be enabled.
     // Need to be careful we don't change our view matrices because of frustum
@@ -408,7 +408,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
       RenderSystem::getInstance().switchState(m_state_weather);
       Environment::getInstance().renderWeather();
-      // Switch back
+      // Switch back to 3D
       m_renderer->setViewMode(PERSPECTIVE);
 
       m_compass->update(cam->getRotation());
@@ -477,8 +477,13 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   WorldEntity *obj_we = dynamic_cast<WorldEntity*>(obj->entity.get());
   assert(obj_we); 
 
+  // TODO: The bounding box should be rotated and translated just like entity
+  // position. However, we can just translate and ignore rotation as we are 
+  // using a sphere test and not working on the bbox directly.
+
   // reject for drawing if object bbox is outside frustum   
-  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) {
+//  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) {
+  if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos())) {
     obj_we->screenX() = -1;
     obj_we->screenY() = -1;
     return;
@@ -546,9 +551,9 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
       for (it = obj_we->getAttachments().begin(); it != end; ++it) {
         // retrieving the objectRecord also syncs it's pos with the WorldEntity
         if (!it->second) { continue; }
-        Eris::Entity * ee = it->second.get();
-        WorldEntity * we = dynamic_cast<WorldEntity*>(ee);
-        assert(we!=0);
+        Eris::Entity *ee = it->second.get();
+        WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
+        assert(we != 0);
 
         PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
 
@@ -602,7 +607,7 @@ void Graphics::drawFire(WorldEntity* we) {
   m_fire.position = we->getAbsPos();
   m_fire.position.z() += 0.5f; // Raise position off the ground a bit
 
-  float status = we->valueOfAttr("status").asNum();
+  float status = we->getStatus();
   // Clamp status range in case of bad values from server.
   if (status > 1.0f) status = 1.0f;
   else if (status < 0.0f) status = 0.0f;
@@ -612,7 +617,7 @@ void Graphics::drawFire(WorldEntity* we) {
   // One component on its own gives too little, or too much light.
 
   // Add light to gl system
-  m_fire.attenuation_constant =  1.0f;// - status;
+  m_fire.attenuation_constant = 1.0f;// - status;
   m_fire.attenuation_linear =  1.0f - status;
   m_fire.attenuation_quadratic =  0.0f;//1.0f - status;
   m_lm->applyLight(m_fire);

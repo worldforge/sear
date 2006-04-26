@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Log.h,v 1.3 2002-09-08 00:26:37 simon Exp $
+// $Id: Log.h,v 1.4 2006-04-26 14:38:59 simon Exp $
 
 #ifndef SEAR_LOG_H
 #define SEAR_LOG_H 1

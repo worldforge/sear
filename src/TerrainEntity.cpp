@@ -3,7 +3,7 @@
 // Copyright (C) 2002 - 2003 Alistair Riddoch
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.cpp,v 1.3 2006-02-07 19:14:30 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.4 2006-04-26 14:39:00 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -15,12 +15,7 @@
 #include "System.h"
 #include "TerrainEntity.h"
 
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 namespace Sear {
-
 
 TerrainEntity::TerrainEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view) : WorldEntity(id, ty, view) {
   Changed.connect(SigC::slot(*this, &TerrainEntity::changed));

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.30 2006-02-16 15:59:01 simon Exp $
+// $Id: ModelHandler.cpp,v 1.31 2006-04-26 14:39:00 simon Exp $
 
 #include <string.h>
 
@@ -180,7 +180,7 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
   // If the time has been longer than a threshold, we unload the model record 
   // and associated models.
 
-  if (debug) printf("Checking Timeouts\n");
+  if (debug) printf("[ModelHandler] Checking Timeouts\n");
 
   // Do the same again for the object map
   ModelRecordMap::iterator Jend = m_object_map.end();

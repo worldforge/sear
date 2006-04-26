@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.8 2006-02-20 20:36:23 simon Exp $
+// $Id: Camera.cpp,v 1.9 2006-04-26 14:39:00 simon Exp $
 
 #include <string>
 
@@ -79,9 +79,6 @@ bool Camera::init() {
 
   // Store initial euclidean camera values
   updateValues();
-//  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
-//  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
-//  m_z_pos = m_distance * sin(m_elevation);
 
   // Connect callback to check for updates
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Camera::varconf_callback));
@@ -126,27 +123,20 @@ void Camera::updateValues() {
   m_orient.rotation(2, m_rotation);
   m_orient.rotate(WFMath::Quaternion(0, m_elevation));
 
-  WFMath::Vector<3> v(-m_distance, 0.0f, 0.0f);
-  v.rotate(m_orient);
+  WFMath::Vector<3> v(0.0f, -m_distance, 0.0f);
+  v.rotate(m_orient.inverse());
   m_pos = WFMath::Point<3>(0,0,0);
   m_pos += v;
-//  m_pos.rotate(m_orient, v);
 }
 
 void Camera::rotateImmediate(float rot) {
   m_rotation  += deg_to_rad(rot);
   updateValues();
-//  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
-//  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
-//  m_z_pos = m_distance * sin(m_elevation);
 }
 
 void Camera::elevateImmediate(float elev) {
   m_elevation += deg_to_rad(elev);
   updateValues();
-//  m_x_pos = m_distance * cos(m_elevation) * cos(m_rotation);
-//  m_y_pos = m_distance * cos(m_elevation) * sin(m_rotation);
-//  m_z_pos = m_distance * sin(m_elevation);
 }
 
 void Camera::readConfig(varconf::Config &config) {

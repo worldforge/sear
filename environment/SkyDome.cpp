@@ -17,10 +17,6 @@
 
 #include "SkyDome.h"
                                                                           
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
-
 #define VERTEX_COORDS { \
   -1.0f,  1.0f,  1.0f,  \
   -1.0f, -1.0f,  1.0f,  \
@@ -291,8 +287,7 @@ void SkyDome::updateFogColor(float t)
     glFogfv(GL_FOG_COLOR, color);
 }
 
-void SkyDome::render()
-{
+void SkyDome::render() {
   glColor3f(1.0f, 1.0f, 1.0f);
   Calendar *cal = System::instance()->getCalendar();
   assert (cal != NULL);

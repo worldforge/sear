@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
 // $id: $
 
@@ -53,10 +53,6 @@
 
 #include "common/Log.h"
 #include "common/Utility.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 Sear::Render *render = NULL;
 Sear::System *sys = NULL;

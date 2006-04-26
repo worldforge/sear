@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 Simon Goodall, University of Southampton
+// Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.h,v 1.1 2005-02-18 17:06:16 simon Exp $
+// $Id: TerrainEntity.h,v 1.2 2006-04-26 14:39:00 simon Exp $
 
 #ifndef SEAR_TERRAINENTITY_H
 #define SEAR_TERRAINENTITY_H 1

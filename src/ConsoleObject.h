@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2002 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ConsoleObject.h,v 1.3 2002-09-08 00:24:53 simon Exp $
+// $Id: ConsoleObject.h,v 1.4 2006-04-26 14:39:00 simon Exp $
 
 #ifndef SEAR_CONSOLEOBJECT_H
 #define SEAR_CONSOLEOBJECT_H 1

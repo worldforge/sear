@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Stars.cpp,v 1.6 2006-02-05 21:09:50 simon Exp $
+// $Id: Stars.cpp,v 1.7 2006-04-26 14:38:59 simon Exp $
 
 
 #include <sage/GL.h>
@@ -10,10 +10,6 @@
 #include <wfmath/MersenneTwister.h>
 
 #include "Stars.h"
-
-#ifdef USE_MMGR
-  #include "common/mmgr.h"
-#endif
 
 namespace Sear {
 
@@ -50,6 +46,7 @@ Stars::~Stars()
 void Stars::render()
 {
     glDepthMask(GL_FALSE);
+    glPointSize(1);
 
     
     glEnableClientState(GL_COLOR_ARRAY);
