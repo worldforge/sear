@@ -1,3 +1,9 @@
+User reported segfault because object_record==NULL is being passed
+to ObjectHandler::copyObjectRecord() by ModelSystem::getObjectRecord()
+This should be the default record if no match is found.
+
+ * Entity bounding box is not the same as the visual bounding box. Objects are clipped when their entity bbox is no longer in the frustum. We need to calculate the visual bbox and clip to that instead.
+
  * The local object rotation/translation is not applied to the child entities of wielded objects. Somehow we need to rotate the bbox and not the model.
 
 * The StaticObject stores indices as an int, but tells GL they are unsigned ints. Might cause a problem somewhere along the line. 

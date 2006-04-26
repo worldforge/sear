@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.146 2006-04-26 14:39:00 simon Exp $
+// $Id: GL.cpp,v 1.147 2006-04-26 18:48:59 alriddoch Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -637,7 +637,7 @@ void GL::getScreenCoords(int & x, int & y, double z_offset)
     x = (int)wx;
     y = (int)wy;
 
-    std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
+    // std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
 }
 
 void GL::drawTextRect(int x, int y, int width, int height, int texture) {
