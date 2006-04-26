@@ -7,13 +7,9 @@ TODO before the next release (Sear 0.6.2)
   - Fill in data_file_path fields in the model_records in prep for removing 
     data_file_id and models.cfg
 
- * Finish moving loaders code to using StaticObject. 
-
- * Create a DynamicObject for the ParticleSystem and Cal3d models.
-
  * Make sure MD3 and 3DS both allow full material overrides in config.
 
- * Finish Eris::Calendar integration
+ * Make sure that any parameters are available for other loaders too
 
  * Make sure contextDestroyed and contextCreated is properly implemented in all
    classes and used correctly. James still reports some problems.

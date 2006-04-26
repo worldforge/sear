@@ -1,11 +1,13 @@
- * Entity bounding box is not the same as the visual bounding box. Objects are clipped when their entity bbox is no longer in the frustum. We need to calculate the visual bbox and clip to that instead.
+ * The local object rotation/translation is not applied to the child entities of wielded objects. Somehow we need to rotate the bbox and not the model.
+
+* The StaticObject stores indices as an int, but tells GL they are unsigned ints. Might cause a problem somewhere along the line. 
+
+* Entity bounding box is not the same as the visual bounding box. Objects are clipped when their entity bbox is no longer in the frustum. We need to calculate the visual bbox and clip to that instead.
 
  * Error msgs such as missing extenions / bad colour depth get lost in all the other output making it difficult to see why sear did not start. Need some method of highlighting these. Popup maybe?
 
  * The settler animation for walking goes funny sometimes when starting up. Could be a malebuiler animation problem, or could be some bad interaction in the mixer.
 
-
-Initial animation does not kick in! (action bug? -- that assert?)
 
 Random Crashes on ATI based hardware. Typically when in the game world. More often on Win32. Valgrind reports numerous errors in the GL library. Perhaps something to do with this.
 

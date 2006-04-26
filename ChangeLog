@@ -1,5 +1,11 @@
 2006-04-26  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* common/Log.cpp: Alter log output slightly.
+
+	* BUGS, TODO, TODO.release: Updated
+
+2006-04-26  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* common/Log.h, common/types.h, environment/SkyDome.cpp,
 	  environment/Stars.cpp, interfaces/ConsoleObject.h, renderers/Light.h,
 	  renderers/LightManager.cpp, renderers/cursors.h, src/CacheManager.cpp,

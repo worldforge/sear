@@ -31,8 +31,7 @@ RenderSystem
  * Implement shadows (Volumes/Maps)
  * Implements Per-Pixel lighting and associated techniques
  * Move OpenGL code into one object. Aim is to allow the "drop in" of other Render objects using another system such as DX
- * Add sun/lens glare effects
- * Add wavy grass like in ATITD
+ * Add wavy grass effects
  * Add foot prints
  * Add weather effects
   - Query weather entity
@@ -42,7 +41,6 @@ RenderSystem
   - Fog
  
 ModelHandler
- * Make global instance and hide backend implementation
  * Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
  * Needs models to query and check for updates from associated world entity's
 
@@ -50,7 +48,6 @@ Media
  * Improve media efficiency 
  * run meshes through poly reductioner ?
  * Make textures smaller
- * Symbolic Link to SVN to automatically update
 
 General
  * Add an oct tree or other space partitioning system.
