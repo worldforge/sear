@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.83 2006-02-27 17:52:36 simon Exp $
+// $Id: Character.cpp,v 1.84 2006-04-26 20:20:48 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -92,6 +92,7 @@ namespace Sear {
   static const std::string CMD_DISPLAY_INVENTORY = "inventory";
   static const std::string CMD_MAKE = "make";
   static const std::string CMD_USE = "use";
+  static const std::string CMD_IDLE = "idle";
   static const std::string CMD_WIELD = "wield";
   static const std::string CMD_ATTACK = "attack";
   static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
@@ -426,6 +427,10 @@ void Character::attackEntity(const std::string& id) {
   setAction("attack");
 }
 
+void Character::becomeIdle() {
+  m_avatar->useStop();
+}
+
 void Character::displayUseOperations() {
   if (!m_avatar) return;
   
@@ -570,6 +575,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_TOUCH, this);
   console->registerCommand(CMD_SAY, this);
   console->registerCommand(CMD_USE, this);
+  console->registerCommand(CMD_IDLE, this);
   console->registerCommand(CMD_WIELD, this);
   console->registerCommand(CMD_ATTACK, this);
   console->registerCommand(CMD_SET_APPEARANCE, this);
@@ -642,6 +648,9 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_USE) {
     System::instance()->setAction(ACTION_USE);
 //    useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
+  }
+  else if (command == CMD_IDLE) {
+    becomeIdle();
   }
   else if (command == CMD_DISPLAY_USE_OPS) {
     displayUseOperations();

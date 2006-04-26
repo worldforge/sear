@@ -1,5 +1,10 @@
 2006-04-26  Al Riddoch  <alriddoch@zepler.org>
 
+	* src/Character.h, src/Character.cpp: Add /idle command, to stop the
+	  current task.
+
+2006-04-26  Al Riddoch  <alriddoch@zepler.org>
+
 	* renderers/GL.cpp: Remove some excessive debug output from 
 	  getScreenCoords().
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.42 2006-02-24 19:14:01 simon Exp $
+// $Id: Character.h,v 1.43 2006-04-26 20:20:48 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -91,6 +91,7 @@ public:
   void say(const std::string&);
   void emote(const std::string&);
   void make(const std::string&type, const std::string &name);
+  void becomeIdle();
   void displayUseOperations();
 
 //  float getAngle() const { return m_angle; }
