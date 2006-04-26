@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.39 2006-02-25 21:51:14 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.40 2006-04-26 13:58:47 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -213,7 +213,6 @@ void Cal3dModel::render(bool select_mode) {
     SPtrShutdown<DynamicObject> dyno = *I++;
     dyno->render(select_mode);
   }
-
 }
 
 void Cal3dModel::update(float time_elapsed) {
@@ -413,7 +412,7 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) {
   // face the right way. 
   po.orient = WFMath::Quaternion(1, WFMath::Pi / 2.0) * 
     m_core_model->getBoneRotation(bone) *
-    WFMath::Quaternion(cq.w,  cq.x,  cq.y,  cq.z).inverse() * 
+    WFMath::Quaternion(cq.w, cq.x, cq.y, cq.z).inverse() * 
     model_rotation;
     
   // Rotate the vector into our coordinate system

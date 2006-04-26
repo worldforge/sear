@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.9 2006-02-15 09:50:31 simon Exp $
+// $Id: LibModelFile.h,v 1.10 2006-04-26 13:58:47 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -28,6 +28,7 @@ class StaticObject;
 
 class LibModelFile : public Model, public sigc::trackable {
 public:
+  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
   /*
    * Constructor stores the bounding box for the basis of this model.
    * wrap indicates how to produce the texture coords. IE 0->1 or 0->size of face
@@ -62,7 +63,6 @@ private:
 
   varconf::Config m_config;
 
-  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
   StaticObjectList m_static_objects;
 };
 

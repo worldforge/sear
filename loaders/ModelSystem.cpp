@@ -53,10 +53,12 @@ int ModelSystem::init() {
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new WireFrame_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new NPlane_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ThreeDS_Loader()));
-  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new LibModelFile_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new AreaModelLoader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ParticleSystemLoader()));
+  // The cal3d loader requires the particle sys loader otherwise the
+  // does not get linked in correctly DynamicObject
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
   
   m_object_handler = new ObjectHandler();
   m_object_handler->init();

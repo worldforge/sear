@@ -1,3 +1,19 @@
+2006-04-26  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dModel.cpp: Formatting changes.
+
+	* loaders/ModelSystem.cpp: Added some comments.
+
+	* loaders/LibModelFile.h: Make StaticObjectList typedef public.
+
+	* loaders/LibModelFile.cpp: Add z_align and scale_isotropic and
+	  scale_anisotropic options as with the 3ds loader.
+
+	* loaders/3ds_Loader.cpp: Do call setHeight as we now end up scaling by
+	  object height twice.
+
+	* loaders/3ds.cpp: Use std::max instead of lots of if statements.
+
 2006-04-24  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/3ds.cpp: Add a z_align option to work with the new scaling
@@ -100,7 +116,7 @@
 
 2006-02-21  Simon Goodall  <sear@simongoodall.co.uk>
 
-	* renderers/Graphics.cpp: Fix wielded entity position for entityies 
+	* renderers/Graphics.cpp: Fix wielded entity position for entities 
 	  scaled by bbox or by height.
 
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
@@ -109,7 +125,7 @@
 
 2006-02-20  Simon Goodall  <sear@simongoodall.co.uk>
 
-	* src/System.cpp, src/client.cpp: Change some debgging output.
+	* src/System.cpp, src/client.cpp: Change some debugging output.
 
 	* src/Character.cpp: Fix some rotation code.
 

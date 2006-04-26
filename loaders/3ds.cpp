@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.56 2006-04-24 14:25:56 simon Exp $
+// $Id: 3ds.cpp,v 1.57 2006-04-26 13:58:47 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -20,6 +20,7 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <algorithm>
 
 #include <sigc++/object_slot.h>
 
@@ -111,25 +112,18 @@ static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z
       }
     }
   }
+
   // Re-scale all points
   float diff_x = fabs(max[0] - min[0]);
   float diff_y = fabs(max[1] - min[1]);
   float diff_z = fabs(max[2] - min[2]);
-  
+ 
+  // Isotropic keeps the "aspect ratio" of the model by performing a constant
+  // Scaling in all axis.
+  // Otherwise each axis is scaled by a different amount
   if (isotropic) {
-    if (diff_x > diff_y) {
-      if (diff_x > diff_z) {
-        diff_z = diff_y = diff_x;
-      } else {
-        diff_x = diff_y = diff_z;
-      }
-    } else {
-      if (diff_y > diff_z) {
-        diff_z = diff_x = diff_y;
-      } else {
-        diff_x = diff_y = diff_z;
-      }
-    }
+    float f = std::max(diff_x, diff_y);
+    diff_x = diff_y = diff_z = std::max(f, diff_z);
   }
 
   float scale_x = 1.0 / (diff_x);
@@ -148,12 +142,9 @@ static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z
       float y = v[i * 3 + 1];
       float z = v[i * 3 + 2];
       float w = 1.0f;
-printf("Before (%f,%f,%f) - %f\n", x,y,z,w);
-      // Transform points by matrix
-      // This requires us to do something
-      // Either transform the points, perform the scaling and transform the points back again
-      // OR transform points and store, then reset matrix. -- Not so good tho 
 
+      // Transform the points: perform the scaling and then transform the 
+      // points back again
       float nx = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * w;
       float ny = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3] * w;
       float nz = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3] * w;
@@ -183,7 +174,6 @@ printf("Before (%f,%f,%f) - %f\n", x,y,z,w);
       v[i * 3 + 1] = y;
       v[i * 3 + 2] = z;
 
-printf("After (%f,%f,%f) - %f\n", x,y,z,w);
     }
   }
 }

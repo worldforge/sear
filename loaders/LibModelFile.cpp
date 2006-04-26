@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.20 2006-02-25 23:27:53 simon Exp $
+// $Id: LibModelFile.cpp,v 1.21 2006-04-26 13:58:47 simon Exp $
 
 /*
   Debug check list
@@ -49,6 +49,9 @@ static const std::string SECTION_model = "model";
 static const std::string KEY_filename = "filename";
 static const std::string KEY_rotation = "rotation";
 static const std::string KEY_scale = "scale";
+static const std::string KEY_scale_isotropic = "scale_isotropic";
+static const std::string KEY_scale_anisotropic = "scale_anisotropic";
+static const std::string KEY_z_align = "z_align";
 
 static const std::string KEY_texture_map_0 = "texture_map_0";
 static const std::string KEY_ambient = "ambient";
@@ -56,6 +59,116 @@ static const std::string KEY_diffuse = "diffuse";
 static const std::string KEY_specular = "specular";
 static const std::string KEY_emission = "emission";
 static const std::string KEY_shininess = "shininess";
+
+
+static void scale_object(LibModelFile::StaticObjectList &objs, bool isotropic, bool z_align) {
+  float min[3], max[3];
+  bool firstPoint = true;
+  // Find bounds of object
+  for (LibModelFile::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+
+    float m[4][4];
+    so->getMatrix(m);
+    float *v = so->getVertexDataPtr();
+    for (int i = 0; i < so->getNumPoints(); ++i) {
+      float x = v[i * 3 + 0];
+      float y = v[i * 3 + 1];
+      float z = v[i * 3 + 2];
+      float w = 1.0f;
+
+      // Transform points by matrix
+      float nx = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * w;
+      float ny = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3] * w;
+      float nz = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3] * w;
+      float nw = m[3][0] * x + m[3][1] * y + m[3][2] * z + m[3][3] * w;
+
+      x = nx / nw;
+      y = ny / nw;
+      z = nz / nw;
+
+      if (firstPoint) {
+        firstPoint = false;
+        min[0] = max[0] = x;
+        min[1] = max[1] = y;
+        min[2] = max[2] = z;
+      } else {
+        if (x < min[0]) min[0] = x;
+        if (y < min[1]) min[1] = y;
+        if (z < min[2]) min[2] = z;
+
+        if (x > max[0]) max[0] = x;
+        if (y > max[1]) max[1] = y;
+        if (z > max[2]) max[2] = z;
+      }
+    }
+  }
+  // Re-scale all points
+  float diff_x = fabs(max[0] - min[0]);
+  float diff_y = fabs(max[1] - min[1]);
+  float diff_z = fabs(max[2] - min[2]);
+
+  // Isotropic keeps the "aspect ratio" of the model by performing a constant
+  // Scaling in all axis.
+  // Otherwise each axis is scaled by a different amount
+  if (isotropic) {
+    float f = std::max(diff_x, diff_y);
+    diff_x = diff_y = diff_z = std::max(f, diff_z);
+  }
+
+  float scale_x = 1.0 / (diff_x);
+  float scale_y = 1.0 / (diff_y);
+  float scale_z = 1.0 / (diff_z);
+
+  for (LibModelFile::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+
+    float *v = so->getVertexDataPtr();
+    float m[4][4];
+    so->getMatrix(m);
+    for (int i = 0; i < so->getNumPoints(); ++i) {
+      float x = v[i * 3 + 0];
+      float y = v[i * 3 + 1];
+      float z = v[i * 3 + 2];
+      float w = 1.0f;
+
+      // Transform the points: perform the scaling and then transform the
+      // points back again
+      float nx = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * w;
+      float ny = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3] * w;
+      float nz = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3] * w;
+      float nw = m[3][0] * x + m[3][1] * y + m[3][2] * z + m[3][3] * w;
+
+      x = nx / nw;
+      y = ny / nw;
+      z = nz / nw;
+
+      if (z_align) z -= min[2];
+
+      // Scale points
+      x *= scale_x;
+      y *= scale_y;
+      z *= scale_z;
+
+      nx = m[0][0] * x + m[1][0] * y + m[2][0] * z + m[3][0] * w;
+      ny = m[0][1] * x + m[1][1] * y + m[2][1] * z + m[3][1] * w;
+      nz = m[0][2] * x + m[1][2] * y + m[2][2] * z + m[3][2] * w;
+      nw = m[0][3] * x + m[1][3] * y + m[2][3] * z + m[3][3] * w;
+
+      x = nx / nw;
+      y = ny / nw;
+      z = nz / nw;
+
+      v[i * 3 + 0] = x;
+      v[i * 3 + 1] = y;
+      v[i * 3 + 2] = z;
+
+    }
+  }
+}
+
 
 LibModelFile::LibModelFile() : Model(), 
   m_initialised(false)
@@ -129,6 +242,7 @@ int LibModelFile::init(const std::string &filename) {
     if (meshp->mesh_header->skin_count != 0) {
       std::string name = (const char*)(meshp->skins[0].name);
       m_config.clean(name);
+
       // Check for texture name overrides in vconf file
       // Backwards compatibility.
       if (m_config.findItem(name, KEY_filename)) {
@@ -191,6 +305,25 @@ int LibModelFile::init(const std::string &filename) {
   }
 
   libmd3_file_free(modelFile);
+
+
+  bool z_align = false;
+  if (m_config.findItem(SECTION_model, KEY_z_align)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_z_align)) {
+      z_align = true;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic)) {
+      scale_object(m_static_objects, true, z_align);
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_scale_anisotropic)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_anisotropic)) {
+      scale_object(m_static_objects, false, z_align);
+    }
+  }
+
 
   m_initialised = true;
   return 0;
