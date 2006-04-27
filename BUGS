@@ -1,3 +1,16 @@
+==24750== Invalid read of size 1
+==24750==    at 0x4021AE0: memcpy (mac_replace_strmem.c:394)
+==24750==    by 0x5B59974: _mesa_memcpy (in /usr/lib/dri/r200_dri.so)
+==24750==    by 0x5B2BEFE: _mesa_buffer_data (in /usr/lib/dri/r200_dri.so)
+==24750==    by 0x5B2D000: _mesa_BufferDataARB (in /usr/lib/dri/r200_dri.so)
+==24750==    by 0x812191E: Sear::StaticObject::createVBOs() (StaticObject.cpp:73)
+Invalid read at StaticObject.cpp:73 4 bytes before and after
+a block allocated at
+==24750==    by 0x811AA6D: Sear::StaticObject::copyNormalData(float*, int) (StaticObject.h:49)
+==24750==    by 0x8119F8C: Sear::LibModelFile::init(std::string const&) (LibModelFile.cpp:300)
+==24750==    by 0x810790A: Sear::LibModelFile_Loader::loadModel(Sear::WorldEntity*, std::string const&, varconf::Config&) (LibModelFile_Loader.cpp:56)
+This found when loading a large mesh.
+
 User reported segfault because object_record==NULL is being passed
 to ObjectHandler::copyObjectRecord() by ModelSystem::getObjectRecord()
 This should be the default record if no match is found.
