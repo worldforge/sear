@@ -162,6 +162,9 @@ SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
           ti = *(ti->getParents().begin());
         } else {
           ti = NULL;
+          // No match in the type hierarchy so request default record.
+          object_record = m_object_handler->instantiateRecord("default", id);
+          assert(object_record);
         }
       }
     }

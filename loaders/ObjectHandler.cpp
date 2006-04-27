@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.8 2006-02-15 09:50:31 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.9 2006-04-27 11:09:39 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -86,11 +86,14 @@ SPtr<ObjectRecord> ObjectHandler::getObjectRecord(const std::string &id) {
 
 SPtr<ObjectRecord> ObjectHandler::instantiateRecord(const std::string &type, const std::string &id) {
   // See if the type exists
-  if (m_type_map.find(type) == m_type_map.end()) return SPtr<ObjectRecord>();
+  ObjectRecordMap::const_iterator I = m_type_map.find(type);
+  if (I == m_type_map.end()) return SPtr<ObjectRecord>();
 
-  SPtr<ObjectRecord> type_record = m_type_map[type];
+  SPtr<ObjectRecord> type_record = I->second;
+
   // Create new record
   SPtr<ObjectRecord> record(new ObjectRecord());
+
   // Copy data
   record->draw_self = type_record->draw_self;
   record->draw_members = type_record->draw_members;
