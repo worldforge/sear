@@ -106,7 +106,7 @@ if (m_rain==0.0f) return;
   }
   float maxSize = 1.0f;
   bool texEnabled = glIsEnabled(GL_TEXTURE_2D);
-  int pSize = 1;
+  GLint pSize = 1;
   glGetIntegerv(GL_POINT_SIZE,  &pSize);
   if (sage_ext[GL_ARB_POINT_SPRITE]) {
     glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);

@@ -1,3 +1,8 @@
+2006-04-29  James Turner  <james@worldforge.org>
+
+	* environment/Waether.cpp: change int to GLint, to keep type-
+	  paranoid Apple OpenGL headers happy.
+	
 2006-04-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/Model.h, src/client.cpp: Initialise some member variables
