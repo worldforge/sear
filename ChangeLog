@@ -1,3 +1,8 @@
+2006-04-29  Al Riddoch  <alriddoch@zepler.org>
+
+	* loaders/Model.h, src/client.cpp: Initialise some member variables
+	  to suppress invalid warnings in valgrind.
+
 2006-04-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/StaticObject.cpp, loaders/StaticObject/h, 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.11 2006-02-16 15:59:01 simon Exp $
+//$Id: Model.h,v 1.12 2006-04-29 13:11:29 alriddoch Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -26,7 +26,7 @@ typedef struct {
 
 class Model {
 public:
-  Model() {}
+  Model() : m_last_time(0) {}
   virtual ~Model() {}
 //  virtual int init() = 0;
   virtual int shutdown() = 0;

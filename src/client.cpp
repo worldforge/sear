@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.78 2006-02-20 20:42:03 simon Exp $
+// $Id: client.cpp,v 1.79 2006-04-29 13:11:30 alriddoch Exp $
 
 #include "System.h"
 
@@ -80,7 +80,7 @@ static const std::string KEY_LOGLEVEL = "loglevel";
  * @param client_name - Name of client to pass to Eris
 */
 Client::Client(System *system, const std::string &client_name) :
-  m_system(system),
+  m_system(system), m_avatar(0),
   m_status(CLIENT_STATUS_DISCONNECTED),
   m_client_name(client_name),
   m_initialised(false),
