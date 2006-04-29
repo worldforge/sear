@@ -15,11 +15,12 @@ namespace Sear {
 
 StaticObject::StaticObject() :
   m_initialised(false),
-  m_vertex_data(NULL),
-  m_normal_data(NULL),
-  m_texture_data(NULL),
-  m_indices(NULL),
+  m_vertex_data(0),
+  m_normal_data(0),
+  m_texture_data(0),
+  m_indices(0),
   m_num_points(0),
+  m_num_faces(0),
 //  m_type(0),
 //  m_state(0),
   m_vb_vertex_data(0),
@@ -92,7 +93,7 @@ void StaticObject::createVBOs() {
     // Bind indices
     glGenBuffersARB(1, &m_vb_indices);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
-    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_num_points * sizeof(int), m_indices, GL_STATIC_DRAW_ARB);
+    glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_num_faces * 3 * sizeof(int), m_indices, GL_STATIC_DRAW_ARB);
     // Reset VBO buffer
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
   }
@@ -176,7 +177,7 @@ void StaticObject::render(bool select_mode) {
 
     if (m_indices) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
-      glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     } else  {
       glDrawArrays(GL_TRIANGLES, 0, m_num_points);
@@ -254,7 +255,7 @@ void StaticObject::render(bool select_mode) {
       }
 
       if (m_indices) {
-        glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, m_indices);
+        glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
       } else  {
         glDrawArrays(GL_TRIANGLES, 0, m_num_points);

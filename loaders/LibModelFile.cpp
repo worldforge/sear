@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.21 2006-04-26 13:58:47 simon Exp $
+// $Id: LibModelFile.cpp,v 1.22 2006-04-29 12:10:29 simon Exp $
 
 /*
   Debug check list
@@ -287,12 +287,13 @@ int LibModelFile::init(const std::string &filename) {
     so->setMatrix(matrix);
     // Set the textures
     so->setTexture(0, texture_id, texture_mask_id);
-    so->setNumPoints(meshp->mesh_header->triangle_count * 3);
-    
+    so->setNumPoints(meshp->mesh_header->vertex_count);
+    so->setNumFaces(meshp->mesh_header->triangle_count);
+
     // Copy data into array.
     so->createVertexData(meshp->mesh_header->vertex_count * 3);
     float *ptr = so->getVertexDataPtr();
-    for (int i = 0; i <  meshp->mesh_header->vertex_count * 3; ++i){
+    for (int i = 0; i < meshp->mesh_header->vertex_count * 3; ++i) {
       ptr[i] = default_scale * (float)meshp->vertices[i];
     }  
  
@@ -305,7 +306,6 @@ int LibModelFile::init(const std::string &filename) {
   }
 
   libmd3_file_free(modelFile);
-
 
   bool z_align = false;
   if (m_config.findItem(SECTION_model, KEY_z_align)) {
@@ -323,7 +323,6 @@ int LibModelFile::init(const std::string &filename) {
       scale_object(m_static_objects, false, z_align);
     }
   }
-
 
   m_initialised = true;
   return 0;

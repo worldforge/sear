@@ -38,11 +38,11 @@ public:
     m_texture_masks[num] = texture_mask;
   }
 
-  void copyVertexData(float *ptr, int size);
-  void copyColourData(unsigned char *ptr, int size);
-  void copyNormalData(float *ptr, int size);
-  void copyTextureData(float *ptr, int size);
-  void copyIndices(int *ptr, int size);
+  void copyVertexData(float *ptr, size_t size);
+  void copyColourData(unsigned char *ptr, size_t size);
+  void copyNormalData(float *ptr, size_t size);
+  void copyTextureData(float *ptr, size_t size);
+  void copyIndices(int *ptr, size_t size);
 /*
   float *createVertexData(int size) {
     if (m_vertex_data) delete [] m_vertex_data;
@@ -70,6 +70,9 @@ public:
 */
   void setNumPoints(int n) { m_num_points = n; }
   int getNumPoints() const { return m_num_points; }
+
+  void setNumFaces(unsigned int n) { m_num_faces = n; }
+  unsigned int getNumFaces() const { return m_num_faces; }
 /*
   float *getVertexDataPtr() { return m_vertex_data; }
   float *getColourDataPtr() { return m_colour_data; }
@@ -187,7 +190,8 @@ private:
   float *m_texture_data;
   int *m_indices;
 
-  int m_num_points;
+  unsigned int m_num_points;
+  unsigned int m_num_faces;
   std::vector<int> m_textures;
   std::vector<int> m_texture_masks;
 

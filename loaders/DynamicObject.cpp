@@ -21,6 +21,7 @@ DynamicObject::DynamicObject() :
   m_texture_data(NULL),
   m_indices(NULL),
   m_num_points(0),
+  m_num_faces(0),
 //  m_type(0),
 //  m_state(0),
   m_vb_vertex_data(0),
@@ -64,7 +65,7 @@ void DynamicObject::shutdown()  {
 
 }
 
-void DynamicObject::copyVertexData(float *ptr, int size) {
+void DynamicObject::copyVertexData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_vertex_data)) glGenBuffersARB(1, &m_vb_vertex_data);
     glBindBufferARB(GL_ARRAY_BUFFER, m_vb_vertex_data);
@@ -77,7 +78,7 @@ void DynamicObject::copyVertexData(float *ptr, int size) {
   }
 }
 
-void DynamicObject::copyColourData(unsigned char *ptr, int size) {
+void DynamicObject::copyColourData(unsigned char *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_colour_data)) glGenBuffersARB(1, &m_vb_colour_data);
     glBindBufferARB(GL_ARRAY_BUFFER, m_vb_colour_data);
@@ -90,7 +91,7 @@ void DynamicObject::copyColourData(unsigned char *ptr, int size) {
   }
 }
 
-void DynamicObject::copyNormalData(float *ptr, int size) {
+void DynamicObject::copyNormalData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_normal_data)) glGenBuffersARB(1, &m_vb_normal_data);
     glBindBufferARB(GL_ARRAY_BUFFER, m_vb_normal_data);
@@ -102,7 +103,7 @@ void DynamicObject::copyNormalData(float *ptr, int size) {
     memcpy(m_normal_data, ptr, size * sizeof(float));
   }
 }
-void DynamicObject::copyTextureData(float *ptr, int size) {
+void DynamicObject::copyTextureData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_texture_data)) glGenBuffersARB(1, &m_vb_texture_data);
     glBindBufferARB(GL_ARRAY_BUFFER, m_vb_texture_data);
@@ -115,7 +116,7 @@ void DynamicObject::copyTextureData(float *ptr, int size) {
   }
 }
 
-void DynamicObject::copyIndices(int *ptr, int size) {
+void DynamicObject::copyIndices(int *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_indices)) glGenBuffersARB(1, &m_vb_indices);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, m_vb_indices);
@@ -268,7 +269,7 @@ void DynamicObject::render(bool select_mode) {
 
     if (glIsBufferARB(m_vb_indices)) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
-      glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     } else  {
       glDrawArrays(GL_TRIANGLES, 0, m_num_points);
@@ -337,7 +338,7 @@ void DynamicObject::render(bool select_mode) {
     }
 
     if (m_indices) {
-      glDrawElements(GL_TRIANGLES, m_num_points, GL_UNSIGNED_INT, m_indices);
+      glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     } else  {
       glDrawArrays(GL_TRIANGLES, 0, m_num_points);

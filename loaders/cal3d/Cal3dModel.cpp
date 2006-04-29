@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.40 2006-04-26 13:58:47 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.41 2006-04-29 12:10:29 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -169,17 +169,17 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // get the faces of the submesh
         static int meshFaces[50000 * 3];
         int faceCount = pCalRenderer->getFaces(&meshFaces[0]);
-        if (faceCount) {
+        if (faceCount > 0) {
           dyno->copyIndices(meshFaces, faceCount * 3);
-          dyno->setNumPoints(faceCount * 3);
-        } else {
-          dyno->setNumPoints(vertexCount / 3);
+          dyno->setNumFaces(faceCount);
         }
-        // There are several situation that can happen here. 
+        dyno->setNumPoints(vertexCount / 3);
+        // There are several situations that can happen here. 
         // Model with/without texture coordinates
         // Model with/without texture maps
         // Model with/without texture mas name defined
-        // Each model can be a mixture of the above. We only want to 
+        // Each model can be a mixture of the above. We want objects with
+        // textures and texture coords.
         bool mapDataFound = false;
         if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           for (int i = 0; i < pCalRenderer->getMapCount(); ++i) {

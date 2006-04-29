@@ -38,56 +38,59 @@ public:
     m_texture_masks[num] = texture_mask;
   }
 
-  void copyVertexData(float *ptr, int size) {
+  void copyVertexData(float *ptr, size_t size) {
     if (m_vertex_data) delete [] m_vertex_data;
     m_vertex_data = new float[size];
     memcpy(m_vertex_data, ptr, size * sizeof(float));
   }
 
-  void copyNormalData(float *ptr, int size) {
+  void copyNormalData(float *ptr, size_t size) {
     if (m_normal_data) delete [] m_normal_data;
     m_normal_data = new float[size];
     memcpy(m_normal_data, ptr, size * sizeof(float));
   }
 
-  void copyTextureData(float *ptr, int size) {
+  void copyTextureData(float *ptr, size_t size) {
     if (m_texture_data) delete [] m_texture_data;
     m_texture_data = new float[size];
     memcpy(m_texture_data, ptr, size * sizeof(float));
   }
 
-  void copyIndices(int *ptr, int size) {
+  void copyIndices(int *ptr, size_t size) {
     if (m_indices) delete [] m_indices;
     m_indices = new int[size];
     memcpy(m_indices, ptr, size * sizeof(int));
   }
 
-  float *createVertexData(int size) {
+  float *createVertexData(size_t size) {
     if (m_vertex_data) delete [] m_vertex_data;
     m_vertex_data = new float[size];
     return m_vertex_data;
   }
 
-  float *createNormalData(int size) {
+  float *createNormalData(size_t size) {
     if (m_normal_data) delete [] m_normal_data;
     m_normal_data = new float[size];
     return m_normal_data;
   }
 
-  float *createTextureData(int size) {
+  float *createTextureData(size_t size) {
     if (m_texture_data) delete [] m_texture_data;
     m_texture_data = new float[size];
     return m_texture_data;
   }
 
-  int *createIndices(int size) {
+  int *createIndices(size_t size) {
     if (m_indices) delete [] m_indices;
     m_indices = new int[size];
     return m_indices;
   }
 
-  void setNumPoints(int n) { m_num_points = n; }
-  int getNumPoints() const { return m_num_points; }
+  void setNumPoints(unsigned int n) { m_num_points = n; }
+  unsigned int getNumPoints() const { return m_num_points; }
+
+  void setNumFaces(unsigned int n) { m_num_faces = n; }
+  unsigned int getNumFaces() const { return m_num_faces; }
 
   float *getVertexDataPtr() { return m_vertex_data; }
   float *getNormalDataPtr() { return m_normal_data; }
@@ -211,7 +214,8 @@ private:
   float *m_texture_data;
   int *m_indices;
 
-  int m_num_points;
+  unsigned int m_num_points;
+  unsigned int m_num_faces;
   std::vector<int> m_textures;
   std::vector<int> m_texture_masks;
 

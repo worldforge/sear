@@ -1,3 +1,12 @@
+2006-04-29  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/StaticObject.cpp, loaders/StaticObject/h, 
+	  loaders/DynamicObject.cpp, loaders/DynamicObject.h: Distinguish
+	  between number of points (vertices) and the number of faces in a mesh.	  Use size_t instead of int for array sizes.
+
+	* loaders/LibModelFile.cpp, loaders/cal3d/Cal3dModel.cpp: Use new 
+	  get/set faces methods to fix mem probs.
+
 2006-04-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* data/bindings.cfg: Bind z to /idle.
