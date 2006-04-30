@@ -10,7 +10,6 @@
 #include "src/System.h"
 #include "src/Character.h"
 
-#include <Eris/Avatar.h>
 #include <Eris/Entity.h>
 
 #include <guichan.hpp>

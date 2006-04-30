@@ -5,6 +5,7 @@
 #include "Overlay.h"
 #include "SpeechBubble.h"
 #include "StatusWindow.h"
+#include "TaskWindow.h"
 #include "RootWidget.h"
 
 #include "renderers/Render.h"
@@ -59,6 +60,10 @@ void Overlay::logic(RootWidget * rw)
     m_selfStatus = new StatusWindow(avatar->getEntity());
     m_top->setWindowCoords(m_selfStatus, std::make_pair(render->getWindowWidth() - m_selfStatus->getWidth(), 0));
     m_top->openWindow(m_selfStatus);
+
+    m_selfTask = new TaskWindow(avatar->getEntity());
+    m_top->setWindowCoords(m_selfTask, std::make_pair(render->getWindowWidth() - m_selfTask->getWidth(), m_selfStatus->getHeight()));
+    m_top->openWindow(m_selfTask);
   }
 
   std::string selection_id = render->getActiveID();

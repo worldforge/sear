@@ -25,6 +25,7 @@ namespace Sear {
 class RootWidget;
 class SpeechBubble;
 class StatusWindow;
+class TaskWindow;
 class WorldEntity;
 
 class Overlay : virtual public SigC::Object {
@@ -40,6 +41,7 @@ protected:
 
   StatusWindow * m_selfStatus;
   StatusWindow * m_selectionStatus;
+  TaskWindow * m_selfTask;
 
   static Overlay * m_instance;
 public:

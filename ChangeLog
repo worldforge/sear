@@ -1,8 +1,18 @@
+2006-04-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/TaskWindow.h, guichan/TaskWindow.cpp: Add a new task
+	  monitoring window, with progress bar.
+
+	* guichan/Overlay.h, guichan/Overlay.cpp: Add a permanent task
+	  window to the overlay.
+
+	* guichan/StatusWindow.cpp: Remove obsolete include.
+
 2006-04-29  James Turner  <james@worldforge.org>
 
 	* environment/Waether.cpp: change int to GLint, to keep type-
 	  paranoid Apple OpenGL headers happy.
-	
+
 2006-04-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/Model.h, src/client.cpp: Initialise some member variables
