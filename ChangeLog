@@ -1,3 +1,9 @@
+2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/TextureManager.cpp: Set glPixelFormat to PACK when rescaling
+	  to avoid funny shearing effects. Hopefully this doesn't break other
+	  texturing.
+
 2006-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/TaskWindow.h, guichan/TaskWindow.cpp: Add a new task

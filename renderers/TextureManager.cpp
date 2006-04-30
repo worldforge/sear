@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.44 2006-02-18 15:41:12 simon Exp $
+// $Id: TextureManager.cpp,v 1.45 2006-04-30 12:17:16 simon Exp $
 
 #include <unistd.h>
 
@@ -404,6 +404,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
   int height = scaleDimension(surface->h);
 
   // Scale the image to a 2^N x 2^M size that is within the size allowed by GL
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
   bool free_surface = false;
   if  (width != surface->w || height != surface->h) {
 
