@@ -13,6 +13,8 @@
 
 #include <sigc++/object.h>
 
+#include <common/SPtr.h>
+
 namespace gcn {
 }
 
@@ -29,6 +31,7 @@ class TaskWindow;
 class WorldEntity;
 
 class Overlay : virtual public SigC::Object {
+  friend class SPtr<Overlay>;
 public:
   typedef std::map<WorldEntity *, SpeechBubble *> BubbleMap;
 protected:
@@ -43,13 +46,13 @@ protected:
   StatusWindow * m_selectionStatus;
   TaskWindow * m_selfTask;
 
-  static Overlay * m_instance;
+  static SPtr<Overlay> m_instance;
 public:
   static Overlay * instance() {
-    if (m_instance == 0) {
-      m_instance = new Overlay();
+    if (!m_instance) {
+      m_instance = SPtr<Overlay>(new Overlay());
     }
-    return m_instance;
+    return m_instance.get();
   }
 
   void heard(Eris::Entity *, const Atlas::Objects::Operation::RootOperation &);

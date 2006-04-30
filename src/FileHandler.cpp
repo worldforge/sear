@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.19 2006-02-15 12:44:24 simon Exp $
+// $Id: FileHandler.cpp,v 1.20 2006-04-30 15:49:04 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -197,10 +197,10 @@ void FileHandler::expandString(std::string &str) {
     for (VarMap::const_iterator I = m_varMap.begin(); I != m_varMap.end(); ++I) {
       std::string var = I->first;
       std::string value = I->second;
-      var = "${" + var + "}";
-      for (std::string::size_type p=str.find(var); p != str.npos; p=str.find(var, p))
+      std::string new_var = "${" + var + "}";
+      for (std::string::size_type p=str.find(new_var); p != str.npos; p=str.find(new_var, p))
      {
-        str.replace(p, var.length(), value);
+        str.replace(p, new_var.length(), value);
         p += value.length();
         changed = true;
      }

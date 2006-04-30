@@ -22,7 +22,7 @@
 
 namespace Sear {
 
-Overlay * Overlay::m_instance = 0;
+SPtr<Overlay> Overlay::m_instance;
 
 Overlay::Overlay() : m_top(0), m_selfStatus(0), m_selectionStatus(0)
 {

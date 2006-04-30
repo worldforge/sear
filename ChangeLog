@@ -1,5 +1,12 @@
 2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/FileHandler.cpp: Fix warning from valgrind.
+
+	* guichan/Overlay.cpp, guichan/Overlay.h: Use SPtr to handle static 
+	  instance.
+
+2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* common/Matrix.h, common/Makefile.am: Add a basic transform matrix 
 	  class.
 
