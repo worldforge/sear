@@ -40,38 +40,45 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   m_buttonListener->Action.connect(SigC::slot(*this, &OptionsWindow::actionPressed));
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   gcn::Button * b = new gcn::Button("Video");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("video");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Audio");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("audio");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Controls");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("controls");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Help");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("help");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Quit game");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("quit");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Return to game");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("close");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
@@ -81,14 +88,16 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
 
   resizeToContent();
 
-  m_windows["video"] = new VideoOptions(m_top);
-  m_windows["audio"] = new AudioOptions(m_top);
-  m_windows["controls"] = new ControlsOptions(m_top);
-  m_windows["help"] = new HelpOptions(m_top);
+  m_windows["video"] = SPtr<gcn::Window>(new VideoOptions(m_top));
+  m_windows["audio"] = SPtr<gcn::Window>(new AudioOptions(m_top));
+  m_windows["controls"] = SPtr<gcn::Window>(new ControlsOptions(m_top));
+  m_windows["help"] = SPtr<gcn::Window>(new HelpOptions(m_top));
 }
 
 OptionsWindow::~OptionsWindow()
 {
+
+  delete m_buttonListener;
 }
 
 void OptionsWindow::actionPressed(std::string event)
@@ -100,16 +109,16 @@ void OptionsWindow::actionPressed(std::string event)
     std::cout << "Close window" << std::endl << std::flush;
     m_top->closeWindow(this);
   } else {
-    std::map<std::string, gcn::Window *>::const_iterator I = m_windows.find(event);
+    std::map<std::string, SPtr<gcn::Window> >::const_iterator I = m_windows.find(event);
     if (I == m_windows.end()) {
       std::cout << "Unknown options window " << event << " requested"
                 << std::endl << std::flush;
       return;
     }
-    gcn::Window * win = I->second;
+    SPtr<gcn::Window> win = I->second;
     assert(win != 0);
     if (win->getParent() == 0) {
-      m_top->openWindow(win);
+      m_top->openWindow(win.get());
     }
   }
 }

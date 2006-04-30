@@ -33,6 +33,10 @@ public:
     m_metaQuery->refresh();
   }
 
+  virtual ~ServerListModel() {
+    delete m_metaQuery;
+  }
+
   virtual int getNumberOfElements()
   {
     return m_metaQuery->getGameServerCount();
@@ -70,36 +74,43 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   m_serverListModel = new ServerListModel;
 
   m_servers = new gcn::ListBox(m_serverListModel);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_servers));
   m_servers->setWidth(200);
   m_servers->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_servers,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(200);
   scroll_area->setHeight(200);
   scroll_area->setBorderSize(1);
   vbox->pack(scroll_area);
 
   m_serverField = new gcn::TextField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_serverField));
   m_serverField->setText("");
   vbox->pack(m_serverField);
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
 
   m_connectButton = new gcn::Button("Connect");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_connectButton));
   m_connectButton->setFocusable(false);
   m_connectButton->setEventId("connect");
   m_connectButton->addActionListener(m_buttonListener);
   hbox->pack(m_connectButton);
 
   m_closeButton = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
   m_closeButton->setEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
@@ -114,6 +125,9 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
 
 ConnectWindow::~ConnectWindow()
 {
+  delete m_serverListModel;
+  delete m_buttonListener;
+
 }
 
 void ConnectWindow::logic()

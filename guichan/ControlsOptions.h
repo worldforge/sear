@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 class TextField;
 class TextBox;
@@ -20,6 +22,7 @@ class RootWidget;
 
 class ControlsOptions : public gcn::Window, public gcn::ActionListener {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   RootWidget * m_top;
 
   gcn::TextField * m_key;

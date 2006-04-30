@@ -69,13 +69,16 @@ Inventory::Inventory() : gcn::Window("Inventory")
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   m_inventory = new InventoryListAdaptor;
   m_items = new gcn::ListBox(m_inventory);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_items));
   m_items->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_items,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(120);
   scroll_area->setHeight(100);
   scroll_area->setBorderSize(1);
@@ -83,17 +86,20 @@ Inventory::Inventory() : gcn::Window("Inventory")
   vbox->pack(scroll_area);
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &Inventory::actionPressed));
 
   gcn::Button * button = new gcn::Button("Wield");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
   button->setEventId("wield");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
 
   button = new gcn::Button("Give");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
   button->setEventId("give");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
@@ -102,14 +108,17 @@ Inventory::Inventory() : gcn::Window("Inventory")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   button = new gcn::Button("Drop");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
   button->setEventId("drop");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
 
   button = new gcn::Button("Eat");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
   button->setEventId("eat");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
@@ -124,8 +133,8 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
 Inventory::~Inventory()
 {
-  delete m_items;
   delete m_inventory;
+  delete m_buttonListener;
 }
 
 void Inventory::actionPressed(std::string event)

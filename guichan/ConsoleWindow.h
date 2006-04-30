@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 class TextBox;
 class ScrollArea;
@@ -20,6 +22,7 @@ class CommandLine;
 
 class ConsoleWindow : public gcn::Window, virtual public SigC::Object {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::TextBox * m_textBox;
   gcn::ScrollArea * m_scrollArea;
   CommandLine * m_entry;

@@ -39,8 +39,10 @@ StatusWindow::StatusWindow(Eris::Entity * e) : m_entity(e)
   // setOpaque(true);
 
   m_vbox = new gcn::VBox(2);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_vbox));
 
   m_healthBar = new gcn::Bar;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_healthBar));
   m_healthBar->setWidth(100);
   m_healthBar->setHeight(6);
   m_healthBar->setValue(0.3);
@@ -49,6 +51,7 @@ StatusWindow::StatusWindow(Eris::Entity * e) : m_entity(e)
   m_vbox->pack(m_healthBar);
 
   m_staminaBar = new gcn::Bar;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_staminaBar));
   m_staminaBar->setWidth(100);
   m_staminaBar->setHeight(6);
   m_staminaBar->setValue(0.6);
@@ -57,6 +60,7 @@ StatusWindow::StatusWindow(Eris::Entity * e) : m_entity(e)
   m_vbox->pack(m_staminaBar);
 
   m_manaBar = new gcn::Bar;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_manaBar));
   m_manaBar->setWidth(100);
   m_manaBar->setHeight(6);
   m_manaBar->setValue(0.9);

@@ -108,6 +108,7 @@ void Workarea::init()
   try {
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->expandString(font_path);
+
     gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
     gcn::Widget::setGlobalFont(font);
@@ -129,17 +130,17 @@ void Workarea::init()
   // sp->loadImages(std::vector<std::string>());
   // m_top->add(sp, 50, 50);
 
-  ConnectWindow * con_w = new ConnectWindow;
-  m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
+  SPtr<gcn::Window> con_w = SPtr<gcn::Window>(new ConnectWindow);
+  m_top->add(con_w.get(), m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
 
-  m_panel = new Panel(m_top);
+  m_panel = SPtr<gcn::Window>(new Panel(m_top));
   // m_top->add(m_panel, 0, 0);
 
   m_windows["panel"] = m_panel;
-  m_top->setWindowCoords(m_panel, std::make_pair(0,0));
+  m_top->setWindowCoords(m_panel.get(), std::make_pair(0,0));
   m_windows["connect"] = con_w;
-  m_windows["login"] = new LoginWindow;
-  m_windows["character"] = new CharacterWindow;
+  m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
+  m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
@@ -165,12 +166,14 @@ Workarea::~Workarea()
   delete m_imageLoader;
   delete m_hostImageLoader;
   delete m_top;
+
+  
 }
 
 void Workarea::registerCommands(Console * console)
 {
   if (m_panel != 0) {
-    m_panel->registerCommands(console);
+    dynamic_cast<Panel*>(m_panel.get())->registerCommands(console);
   }
 
   console->registerCommand(WORKAREA_OPEN, this);
@@ -184,10 +187,10 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
     if (debug) std::cout << "Got the workarea close command" << std::endl << std::flush;
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      gcn::Window * win = I->second;
+      SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        m_top->closeWindow(win);
+        m_top->closeWindow(win.get());
       }
     } else {
       std::cerr << "Asked to close unknown window " << args
@@ -197,10 +200,10 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
   else if (command == WORKAREA_OPEN) {
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      gcn::Window * win = I->second;
+      SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        m_top->openWindow(win);
+        m_top->openWindow(win.get());
       }
     } else {
       std::cerr << "Asked to open unknown window " << args
@@ -211,6 +214,7 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
     std::cerr << "Asked to open ALERT" << args
               << std::endl << std::flush;
     Alert * al = new Alert(m_top, args);
+    m_widgets.push_back(SPtr<gcn::Widget>(al));
     // m_top->openWindow(al);
   }
 }
@@ -263,7 +267,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
   bool clear_focus = false;
   bool event_eaten = false;
   bool suppress = false;
-
+  Panel * panel = dynamic_cast<Panel*>(m_panel.get());
   switch (event.type) {
     case SDL_MOUSEMOTION:
     case SDL_MOUSEBUTTONDOWN:
@@ -273,20 +277,20 @@ bool Workarea::handleEvent(const SDL_Event & event)
       break;
     case SDL_KEYDOWN:
       if (event.key.keysym.sym == SDLK_RETURN) {
-        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
+        if (panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
             (focus == 0 || focus == m_top)) {
-          suppress = m_panel->requestConsole();
+          suppress = panel->requestConsole();
         }
         event_eaten = true;
       } else if (event.key.keysym.sym == SDLK_SLASH) {
-        if (m_panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
+        if (panel != 0 && System::instance()->checkState(SYS_IN_WORLD) &&
             (focus == 0 || focus == m_top)) {
-          m_panel->requestConsole();
+          panel->requestConsole();
         }
         event_eaten = true;
       } else if (event.key.keysym.sym == SDLK_ESCAPE) {
-        if (m_panel != 0) {
-          suppress = m_panel->dismissConsole();
+        if (panel != 0) {
+          suppress = panel->dismissConsole();
         }
         event_eaten = true;
       } else {

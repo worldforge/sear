@@ -11,6 +11,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 #include <map>
 #include <string>
 
@@ -33,8 +35,8 @@ class Panel : virtual public SigC::Object,
               public ConsoleObject,
               public gcn::Window {
 public:
-  typedef std::map<std::string, gcn::Button *> ButtonDict;
-  typedef std::map<std::string, gcn::Window *> WindowDict;
+  typedef std::map<std::string, SPtr<gcn::Button> > ButtonDict;
+  typedef std::map<std::string, SPtr<gcn::Window> > WindowDict;
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
   gcn::Box * m_hbox;

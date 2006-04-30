@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.46 2006-04-26 14:39:00 simon Exp $
+// $Id: Graphics.cpp,v 1.47 2006-04-30 21:48:13 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -483,12 +483,15 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
   // reject for drawing if object bbox is outside frustum   
 //  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) {
-  if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos())) {
-    obj_we->screenX() = -1;
-    obj_we->screenY() = -1;
-    return;
-  }
-    
+
+  // TODO, Objects without bbox will be rendered regardless.
+  if (obj_we->hasBBox()) {
+    if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos())) {
+      obj_we->screenX() = -1;
+      obj_we->screenY() = -1;
+      return;
+    }
+  }  
   // Get world coord of object
   WFMath::Point<3> p = obj_we->getAbsPos();
   assert(p.isValid());

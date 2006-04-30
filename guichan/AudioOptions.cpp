@@ -23,16 +23,20 @@ AudioOptions::AudioOptions(RootWidget * top) : gcn::Window("Audio"),
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   gcn::Button * b = new gcn::Button("Apply");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("apply");
   b->setFocusable(false);
   b->addActionListener(this);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("close");
   b->setFocusable(false);
   b->addActionListener(this);

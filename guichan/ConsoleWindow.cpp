@@ -32,8 +32,10 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   setBaseColor(base);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   m_textBox = new gcn::TextBox;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_textBox));
   m_textBox->setEditable(false);
   m_textBox->setOpaque(false);
   m_textBox->setFocusable(false);
@@ -42,6 +44,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   m_scrollArea = new gcn::ScrollArea(m_textBox,
                                        gcn::ScrollArea::SHOW_AUTO,
                                        gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_scrollArea));
   m_scrollArea->setWidth(400);
   m_scrollArea->setHeight(100);
   m_scrollArea->setBorderSize(1);
@@ -49,6 +52,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   vbox->pack(m_scrollArea);
 
   m_entry = new CommandLine;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_entry));
   m_entry->setWidth(400);
   m_entry->setTabInEnabled(false);
   m_entry->setTabOutEnabled(false);

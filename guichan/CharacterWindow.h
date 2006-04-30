@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 
 class ListBox;
@@ -25,6 +27,7 @@ class CharacterListModel;
 
 class CharacterWindow : virtual public SigC::Object, public gcn::Window {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::ListBox * m_characters;
   gcn::ListBox * m_types;
 

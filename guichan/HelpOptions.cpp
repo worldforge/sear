@@ -71,26 +71,33 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   m_fileList = new HelpFileList;
+
   m_helpFiles = new gcn::ListBox(m_fileList);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_helpFiles));
   m_helpFiles->setFocusable(false);
   m_filesScroll = new gcn::ScrollArea(m_helpFiles, gcn::ScrollArea::SHOW_AUTO,
                                                    gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_filesScroll));
   m_filesScroll->setWidth(100);
   m_filesScroll->setHeight(300);
   m_filesScroll->setBorderSize(1);
   hbox->pack(m_filesScroll);
 
   m_helpText = new gcn::TextBox;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_helpText));
   m_helpText->setEditable(false);
   m_helpText->setOpaque(false);
   m_helpText->setFocusable(false);
   m_helpText->setEnabled(false);
   m_textScroll = new gcn::ScrollArea(m_helpText, gcn::ScrollArea::SHOW_AUTO,
                                                  gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_textScroll));
   m_textScroll->setWidth(500);
   m_textScroll->setHeight(300);
   m_textScroll->setBorderSize(1);
@@ -99,14 +106,17 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   gcn::Button * b = new gcn::Button("Apply");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("apply");
   b->setFocusable(false);
   b->addActionListener(this);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("close");
   b->setFocusable(false);
   b->addActionListener(this);
@@ -121,6 +131,7 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
 
 HelpOptions::~HelpOptions()
 {
+  delete m_fileList;
 }
 
 void HelpOptions::action(const std::string & event)

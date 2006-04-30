@@ -62,6 +62,11 @@ Panel::Panel(RootWidget * top) : gcn::Window(""), m_top(top)
 
 Panel::~Panel()
 {
+  delete m_hbox;
+
+  // m_console is used as a SPtr from addWindow function
+  // delete m_console;
+  delete m_buttonListener;
 }
 
 void Panel::registerCommands(Console * console)
@@ -77,32 +82,32 @@ void Panel::runCommand(const std::string & command, const std::string & args)
     std::cout << "Got the panel close command" << std::endl << std::flush;
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      gcn::Window * win = I->second;
+      SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        m_top->closeWindow(win);
+        m_top->closeWindow(win.get());
       }
     }
   }
   else if (command == PANEL_OPEN) {
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      gcn::Window * win = I->second;
+      SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        m_top->openWindow(win);
+        m_top->openWindow(win.get());
       }
     }
   }
   else if (command == PANEL_TOGGLE) {
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      gcn::Window * win = I->second;
+      SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        m_top->openWindow(win);
+        m_top->openWindow(win.get());
       } else {
-        m_top->closeWindow(win);
+        m_top->closeWindow(win.get());
       }
     }
   }
@@ -112,12 +117,12 @@ void Panel::actionPressed(std::string event)
 {
   WindowDict::const_iterator I = m_windows.find(event);
   if (I != m_windows.end()) {
-    gcn::Window * win = I->second;
+    SPtr<gcn::Window> win = I->second;
     assert(win != 0);
     if (win->getParent() == 0) {
-      m_top->openWindow(win);
+      m_top->openWindow(win.get());
     } else {
-      m_top->closeWindow(win);
+      m_top->closeWindow(win.get());
     }
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
@@ -132,8 +137,8 @@ void Panel::addWindow(gcn::Window * window)
   button->addActionListener(m_buttonListener);
   m_hbox->pack(button);
 
-  m_buttons[window->getCaption()] = button;
-  m_windows[window->getCaption()] = window;
+  m_buttons[window->getCaption()] = SPtr<gcn::Button>(button);
+  m_windows[window->getCaption()] = SPtr<gcn::Window>(window);
 
   resizeToContent();
 }

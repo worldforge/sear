@@ -28,10 +28,14 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   setBaseColor(base);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l1 = new gcn::Label("UserName");
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
   m_userField = new gcn::TextField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_userField));
   m_userField->setText("");
   hbox->pack(l1);
   hbox->pack(m_userField);
@@ -39,8 +43,11 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l2 = new gcn::Label("Password");
+  m_widgets.push_back(SPtr<gcn::Widget>(l2));
   m_pswdField = new PasswordField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_pswdField));
   m_pswdField->setText("");
   hbox->pack(l2);
   hbox->pack(m_pswdField);
@@ -48,8 +55,11 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l3 = new gcn::Label("        ");
+  m_widgets.push_back(SPtr<gcn::Widget>(l3));
   m_pswdConfirmField = new PasswordField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_pswdConfirmField));
   m_pswdConfirmField->setText("");
   m_pswdConfirmField->setEnabled(false);
   m_pswdConfirmField->setVisible(false);
@@ -59,9 +69,12 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   m_nameLabel = new gcn::Label("Name    ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_nameLabel));
   m_nameLabel->setVisible(false);
   m_nameField = new gcn::TextField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_nameField));
   m_nameField->setText("");
   m_nameField->setEnabled(false);
   m_nameField->setVisible(false);
@@ -71,19 +84,23 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   vbox->pack(hbox);
 
   m_createCheck = new gcn::CheckBox("New Account");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_createCheck));
   vbox->pack(m_createCheck);
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &LoginWindow::actionPressed));
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   m_loginButton = new gcn::Button("Login");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_loginButton));
   m_loginButton->setFocusable(false);
   m_loginButton->setEventId("login");
   m_loginButton->addActionListener(m_buttonListener);
   hbox->pack(m_loginButton);
 
   m_cancelButton = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_cancelButton));
   m_cancelButton->setFocusable(false);
   m_cancelButton->setEventId("close");
   m_cancelButton->addActionListener(m_buttonListener);
@@ -92,9 +109,11 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   vbox->pack(hbox);
 
   hbox = new gcn::HBox();
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   hbox->pack(vbox, 6);
 
   vbox = new gcn::VBox();
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
   vbox->pack(hbox, 6);
 
   setContent(vbox);
@@ -104,6 +123,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
 
 LoginWindow::~LoginWindow()
 {
+  delete m_buttonListener;
 }
 
 void LoginWindow::logic()

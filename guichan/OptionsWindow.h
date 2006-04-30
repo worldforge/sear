@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 #include <map>
 
 namespace gcn {
@@ -26,9 +28,10 @@ class OptionsWindow : virtual public SigC::Object, public gcn::Window {
 public:
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   ActionListenerSigC * m_buttonListener;
 
-  std::map<std::string, gcn::Window *> m_windows;
+  std::map<std::string, SPtr<gcn::Window> > m_windows;
 
   RootWidget * m_top;
 public:

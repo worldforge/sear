@@ -1,3 +1,26 @@
+2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichane/Alert.cpp, guichan/Alert.h, guichan/AudioOptions.cpp,
+	  guichan/AudioOptions.h, guichan/CharacterWindow.cpp,
+	  guichan/CharacterWindow.h, guichan/ConnectWindow.cpp,
+	  guichan/ConnectWindow.h, guichan/ConsoleWindow.cpp,
+	  guichan/ConsoleWindow.h, guichan/ControlsOptions.cpp,
+	  guichan/ConsoleOptions.h, guichan/HelpOptions.cpp, 
+	  guichan/HelpOptions.h, guichan/Inventory.cpp, guichan/Inventory.h,
+	  guichan/LoginWindow.cpp, guichan/LoginWindow.h, 
+	  guichan/OptionsWindow.cpp, guichan/OptionsWindows.h, 
+	  guichan/Overlay.cpp, guichan/Overlay.h, guichan/Panel.cpp,
+	  guichan/Panel.h, guichan/StatusWindow.cpp, guichan/StatusWindow.h,
+	  guichan/TaskWindow.cpp, guichan/TaskWindow.h,
+	  guichan/VideoOptions.cpp, guichab/VideoOptions.h,
+	  guichan/Workarea.cpp, guichan/Workarea.h: Clean up widgets using 
+	  SPtr's in std::lists.
+
+	* loaders/AreaModel.cpp: Clean up mercator area.
+
+	* renderers/Graphics.cpp: Check entity has bbox before testing that it
+	  is in the frustum.
+
 2006-04-30  Al Riddoch  <alriddoch@zepler.org>
 
 	* loaders/ModelHandler.cpp, loaders/ModelHandler.h,

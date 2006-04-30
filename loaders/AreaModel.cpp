@@ -94,8 +94,12 @@ void AreaModel::contextDestroyed(bool check) {}
 int AreaModel::shutdown()
 {
   assert (m_initialised == true);
+
+  delete m_area;
+
   m_initialised = false;
-    return 0;
+
+  return 0;
 }
 
 int AreaModel::getLayer() const

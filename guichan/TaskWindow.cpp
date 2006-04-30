@@ -38,8 +38,10 @@ TaskWindow::TaskWindow(Eris::Entity * e) : m_entity(e)
   // setOpaque(true);
 
   m_vbox = new gcn::VBox(2);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_vbox));
 
   m_progressBar = new gcn::Bar;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_progressBar));
   m_progressBar->setWidth(100);
   m_progressBar->setHeight(6);
   m_progressBar->setValue(0.0);

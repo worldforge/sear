@@ -10,6 +10,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 class CheckBox;
 class ListBox;
@@ -23,12 +25,14 @@ class ResolutionListModel;
 
 class VideoOptions : virtual public SigC::Object, public gcn::Window, virtual public gcn::ActionListener {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   RootWidget * m_top;
 
   gcn::CheckBox * m_fullCheck;
   gcn::ListBox * m_resolutions;
 
   ResolutionListModel * m_resolutionList;
+  ActionListenerSigC * m_buttonListener;
 
   bool m_checkFullChanged;
 public:

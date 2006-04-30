@@ -11,6 +11,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 // #include <map>
 // #include <string>
 
@@ -26,6 +28,7 @@ namespace Sear {
 class TaskWindow : // virtual public SigC::Object,
                      public gcn::Window {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::Box * m_vbox;
   gcn::Bar * m_progressBar;
 

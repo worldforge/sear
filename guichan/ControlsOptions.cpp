@@ -39,8 +39,10 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   m_controlText = new gcn::TextBox;
+  m_widgets.push_back(SPtr<gcn::Widget>(m_controlText));
   m_controlText->setEditable(false);
   m_controlText->setOpaque(false);
   m_controlText->setFocusable(false);
@@ -48,6 +50,7 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
   gcn::ScrollArea * control_scroll = new gcn::ScrollArea(m_controlText,
                                                          gcn::ScrollArea::SHOW_AUTO,
                                                          gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(control_scroll));
   control_scroll->setWidth(500);
   control_scroll->setHeight(300);
   control_scroll->setBorderSize(1);
@@ -56,22 +59,28 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
   readBindings();
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   gcn::Label * l = new gcn::Label("Key");
+  m_widgets.push_back(SPtr<gcn::Widget>(l));
   hbox->pack(l);
 
   m_key = new gcn::TextField("          ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_key));
   m_key->setText("");
   hbox->pack(m_key);
 
   l = new gcn::Label("Action");
+  m_widgets.push_back(SPtr<gcn::Widget>(l));
   hbox->pack(l);
 
   m_action = new gcn::TextField("                                        ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_action));
   m_action->setText("");
   hbox->pack(m_action);
 
   gcn::Button * b = new gcn::Button("Bind");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("bind");
   b->setFocusable(false);
   b->addActionListener(this);
@@ -80,14 +89,17 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   b = new gcn::Button("Apply");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("apply");
   b->setFocusable(false);
   b->addActionListener(this);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("close");
   b->setFocusable(false);
   b->addActionListener(this);

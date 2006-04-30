@@ -35,6 +35,7 @@ class Overlay : virtual public SigC::Object {
 public:
   typedef std::map<WorldEntity *, SpeechBubble *> BubbleMap;
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   Overlay();
   ~Overlay();
 

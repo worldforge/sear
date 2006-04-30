@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 class ListBox;
 class TextBox;
@@ -22,6 +24,7 @@ class HelpFileList;
 
 class HelpOptions : public gcn::Window, public gcn::ActionListener {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   RootWidget * m_top;
 
   HelpFileList * m_fileList;

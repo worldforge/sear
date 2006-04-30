@@ -26,13 +26,18 @@ Alert::Alert(gcn::Container * parent, const std::string & msg)
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
-  vbox->pack(new gcn::Label(msg));
+  gcn::Label *l1 = new gcn::Label(msg);
+  vbox->pack(l1);
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &Alert::actionPressed));
 
   m_okButton = new gcn::Button("Okay");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_okButton));
+
   m_okButton->setFocusable(false);
   m_okButton->setEventId("ok");
   m_okButton->addActionListener(m_buttonListener);
@@ -49,6 +54,7 @@ Alert::Alert(gcn::Container * parent, const std::string & msg)
 
 Alert::~Alert()
 {
+  delete m_buttonListener;
 }
 
 void Alert::actionPressed(std::string event)

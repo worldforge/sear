@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 
 class Button;
@@ -25,6 +27,8 @@ protected:
   gcn::Button * m_okButton;
 
   ActionListenerSigC * m_buttonListener;
+
+  std::list<SPtr<gcn::Widget> > m_widgets;
 public:
   explicit Alert(gcn::Container *, const std::string &);
   virtual ~Alert();

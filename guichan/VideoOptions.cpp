@@ -93,43 +93,53 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
 
   setOpaque(true);
 
-  ActionListenerSigC * buttonListener = new ActionListenerSigC;
-  buttonListener->Action.connect(SigC::slot(*this, &VideoOptions::actionPressed));
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &VideoOptions::actionPressed));
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
-  vbox->pack(new gcn::Label("Video Modes"));
+  gcn::Label *l1 = new gcn::Label("Video Modes");
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
+  vbox->pack(l1);
 
   m_resolutionList = new ResolutionListModel;
 
   m_resolutions = new gcn::ListBox(m_resolutionList);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_resolutions));
+  
   m_resolutions->setWidth(100);
   m_resolutions->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_resolutions,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(100);
   scroll_area->setHeight(100);
   scroll_area->setBorderSize(1);
   vbox->pack(scroll_area);
 
   m_fullCheck = new gcn::CheckBox("Full screen");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_fullCheck));
   m_fullCheck->setFocusable(false);
   m_fullCheck->addActionListener(this);
   vbox->pack(m_fullCheck);
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   gcn::Button * b = new gcn::Button("Apply");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("apply");
   b->setFocusable(false);
-  b->addActionListener(buttonListener);
+  b->addActionListener(m_buttonListener);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("close");
   b->setFocusable(false);
-  b->addActionListener(buttonListener);
+  b->addActionListener(m_buttonListener);
   hbox->pack(b);
 
   vbox->pack(hbox);
@@ -141,6 +151,8 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
 
 VideoOptions::~VideoOptions()
 {
+  delete m_buttonListener;
+  delete m_resolutionList;
 }
 
 void VideoOptions::actionPressed(std::string event)

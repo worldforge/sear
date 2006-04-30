@@ -58,10 +58,12 @@ void Overlay::logic(RootWidget * rw)
     m_top = rw;
 
     m_selfStatus = new StatusWindow(avatar->getEntity());
+    m_widgets.push_back(SPtr<gcn::Widget>(m_selfStatus));
     m_top->setWindowCoords(m_selfStatus, std::make_pair(render->getWindowWidth() - m_selfStatus->getWidth(), 0));
     m_top->openWindow(m_selfStatus);
 
     m_selfTask = new TaskWindow(avatar->getEntity());
+    m_widgets.push_back(SPtr<gcn::Widget>(m_selfTask));
     m_top->setWindowCoords(m_selfTask, std::make_pair(render->getWindowWidth() - m_selfTask->getWidth(), m_selfStatus->getHeight()));
     m_top->openWindow(m_selfTask);
   }

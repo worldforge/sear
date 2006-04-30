@@ -11,6 +11,8 @@
 
 #include <SDL/SDL.h>
 
+#include <common/SPtr.h>
+
 namespace varconf {
   class Config;
 }
@@ -43,10 +45,11 @@ public:
 
 class Workarea : public ConsoleObject {
 public:
-  typedef std::map<std::string, gcn::Button *> ButtonDict;
-  typedef std::map<std::string, gcn::Window *> WindowDict;
+  typedef std::map<std::string, SPtr<gcn::Button> > ButtonDict;
+  typedef std::map<std::string, SPtr<gcn::Window> > WindowDict;
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   System * m_system;
   int m_width, m_height;
   std::string m_fixed_font;
@@ -61,8 +64,8 @@ protected:
   ButtonDict m_buttons;
   WindowDict m_windows;
 
-  Panel * m_panel;
-  ConnectWindow * m_connectWindow;
+  SPtr<gcn::Window> m_panel;
+  SPtr<gcn::Window> m_connectWindow;
 
   RootWidget * m_top;                  // Top level container widget
 public:

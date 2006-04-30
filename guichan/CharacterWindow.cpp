@@ -97,17 +97,22 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   setOpaque(true);
 
   gcn::Box * vbox = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
-  vbox->pack(new gcn::Label("Characters"));
+  gcn::Label *l1 = new gcn::Label("Characters");
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
+  vbox->pack(l1);
 
   m_characterListModel = new CharacterListModel;
 
   m_characters = new gcn::ListBox(m_characterListModel);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_characters));
   m_characters->setWidth(200);
   m_characters->setFocusable(false);
   gcn::ScrollArea * scroll_area = new gcn::ScrollArea(m_characters,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(200);
   scroll_area->setHeight(200);
   scroll_area->setBorderSize(1);
@@ -117,40 +122,55 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
 
   m_refreshButton = new gcn::Button("Refresh");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
   m_refreshButton->setFocusable(false);
   m_refreshButton->setEventId("refresh");
   m_refreshButton->addActionListener(m_buttonListener);
   vbox->pack(m_refreshButton);
 
   gcn::Box * vbox1 = new gcn::VBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(vbox1));
 
   gcn::Box * hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
-  hbox->pack(new gcn::Label("Name"));
+  l1 = new gcn::Label("Name");
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
+  hbox->pack(l1);
   m_nameField = new gcn::TextField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_nameField));
   m_nameField->setText("");
   hbox->pack(m_nameField);
 
   vbox1->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
-  hbox->pack(new gcn::Label("Type"));
+  l1 = new gcn::Label("Type");
+  m_widgets.push_back(SPtr<gcn::Widget>(l1));
+  hbox->pack(l1);
+
   m_typeField = new gcn::TextField("                ");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_typeField));
   m_typeField->setText("");
   hbox->pack(m_typeField);
 
   vbox1->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   hbox->pack(vbox1);
 
   TypeListModel * type_list_model = new TypeListModel;
+  
   m_types = new gcn::ListBox(type_list_model);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_types));
   scroll_area = new gcn::ScrollArea(m_types,
                                       gcn::ScrollArea::SHOW_NEVER,
                                       gcn::ScrollArea::SHOW_ALWAYS);
+  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(100);
   scroll_area->setHeight(vbox1->getHeight());
   scroll_area->setBorderSize(1);
@@ -159,8 +179,10 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   vbox->pack(hbox);
 
   hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   m_charButton = new gcn::Button("Create new character");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_charButton));
   m_charButton->setFocusable(false);
   m_charButton->setEventId("create");
   m_charButton->addActionListener(m_buttonListener);
@@ -169,6 +191,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   vbox->pack(hbox);
 
   m_closeButton = new gcn::Button("Close");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
   m_closeButton->setEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
@@ -183,6 +206,8 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 CharacterWindow::~CharacterWindow()
 {
   delete m_characterListModel;
+  delete m_types->getListModel();
+  delete m_buttonListener;
 }
 
 void CharacterWindow::logic()

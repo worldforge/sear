@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace Sear {
 
 class RootWidget;
@@ -16,6 +18,7 @@ class RootWidget;
 class AudioOptions : public gcn::Window, public gcn::ActionListener {
 protected:
   RootWidget * m_top;
+  std::list<SPtr<gcn::Widget> > m_widgets;
 public:
   explicit AudioOptions(RootWidget * top);
   virtual ~AudioOptions();

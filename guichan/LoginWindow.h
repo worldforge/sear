@@ -9,6 +9,8 @@
 
 #include <sigc++/object.h>
 
+#include "common/SPtr.h"
+
 namespace gcn {
 
 class Label;
@@ -26,6 +28,7 @@ class ActionListenerSigC;
 
 class LoginWindow : virtual public SigC::Object, public gcn::Window {
 protected:
+  std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::Button * m_loginButton;
   gcn::Button * m_cancelButton;
   gcn::TextField * m_userField;
