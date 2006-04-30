@@ -9,8 +9,7 @@
 
 #include <sage/sage.h>
 #include <sage/GL.h>
-
-//#include "src/CacheObject.h"
+#include "common/Matrix.h"
 
 namespace Sear {
 
@@ -161,6 +160,12 @@ void setAmbient(float a[4]) {
  
 //  void setType(GLenum type) { m_type = type; } 
 
+  Matrix &getMatrix() { return m_matrix; }
+  const Matrix &getMatrix() const { return m_matrix; }
+
+  Matrix &getTexMatrix() { return m_tex_matrix; }
+  const Matrix &getTexMatrix() const { return m_tex_matrix; }
+#if 0
   void setMatrix(float m[4][4]) {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
@@ -197,7 +202,7 @@ void setAmbient(float a[4]) {
     m_matrix[1][3] += y;
     m_matrix[2][3] += z;
   }
-
+#endif
 
 //  int getType() { return 1; }
   StaticObject *newInstance() { return new StaticObject(); }
@@ -232,7 +237,8 @@ private:
   GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
   GLuint m_disp_list, m_select_disp_list;
 
-  float m_matrix[4][4];  
+  Matrix m_matrix;
+  Matrix m_tex_matrix;
 };
 
 } // namespace Sear

@@ -45,7 +45,8 @@ int StaticObject::init() {
   setEmission(0.0f, 0.0f, 0.0f, 0.0f);
   setShininess(50.0f);
 
-  identity();
+  m_matrix.identity();
+  m_tex_matrix.identity();
 
   m_initialised = true;
 
@@ -134,7 +135,16 @@ void StaticObject::render(bool select_mode) {
   assert(m_initialised == true);
   glPushMatrix();
   // Set transform
-  glMultMatrixf(&m_matrix[0][0]);
+  float m[4][4];
+  m_matrix.getMatrix(m);
+  glMultMatrixf(&m[0][0]);
+
+  glMatrixMode(GL_TEXTURE);
+  glPushMatrix();
+  m_tex_matrix.getMatrix(m);
+  glMultMatrixf(&m[0][0]);
+  glMatrixMode(GL_MODELVIEW);
+    
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -282,6 +292,11 @@ void StaticObject::render(bool select_mode) {
     }
   }
   glPopMatrix();
+
+  glMatrixMode(GL_TEXTURE);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+ 
 }
 
 int StaticObject::load(const std::string &filename) {

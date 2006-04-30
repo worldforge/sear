@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.57 2006-04-26 13:58:47 simon Exp $
+// $Id: 3ds.cpp,v 1.58 2006-04-30 15:47:15 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -78,9 +78,9 @@ static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z
     assert(so);
     
     float m[4][4];
-    so->getMatrix(m);
+    so->getMatrix().getMatrix(m);
     float *v = so->getVertexDataPtr();
-    for (int i = 0; i < so->getNumPoints(); ++i) {
+    for (unsigned int i = 0; i < so->getNumPoints(); ++i) {
       float x = v[i * 3 + 0];
       float y = v[i * 3 + 1];
       float z = v[i * 3 + 2];
@@ -136,8 +136,8 @@ static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z
     
     float *v = so->getVertexDataPtr();
     float m[4][4];
-    so->getMatrix(m);
-    for (int i = 0; i < so->getNumPoints(); ++i) {
+    so->getMatrix().getMatrix(m);
+    for (unsigned int i = 0; i < so->getNumPoints(); ++i) {
       float x = v[i * 3 + 0];
       float y = v[i * 3 + 1];
       float z = v[i * 3 + 2];
@@ -368,6 +368,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     WFMath::Quaternion q(w,x,y,z);
     QuatToMatrix(q, matrix);
   }
+
   if (m_config.findItem(SECTION_model, KEY_scale)) {
     double s = (double)m_config.getItem(SECTION_model, KEY_scale);
     for (int i = 0; i < 4; ++i) matrix[i][i] *= s;
@@ -440,7 +441,20 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     int texture_id = 0;
     int texture_mask_id = 0;
     // If a material is set get texture map names.
+    Matrix tex_matrix;
+    tex_matrix.identity();
     if (mat) {
+      float s[4];
+      s[0] = mat->texture1_map.scale[0];
+      s[1] = mat->texture1_map.scale[1];
+      s[2] = s[3] = 1.0f;
+      // Is this the correct rotatiom?
+      // Or is our combination correct?
+      // Need to check matrix
+      tex_matrix.rotateZ(deg_to_rad(mat->texture1_map.rotation));
+      tex_matrix.scalev(s);
+      tex_matrix.translate(mat->texture1_map.offset[0], mat->texture1_map.offset[1], 0.0f);
+
       if (m_config.findItem(material_name,KEY_texture_map_0)) {
         std::string name = (std::string)m_config.getItem(material_name,
                                                          KEY_texture_map_0);
@@ -468,7 +482,10 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       ro->init();
       ro->setNumPoints(3 * mesh->faces);
 
-      ro->setMatrix(matrix);
+      ro->getMatrix().setMatrix(matrix);
+      float t[4][4];
+      tex_matrix.getMatrix(t);
+      ro->getTexMatrix().setMatrix(t);
 
       ro->createVertexData(ro->getNumPoints() * 3);
       ro->createNormalData(ro->getNumPoints() * 3);

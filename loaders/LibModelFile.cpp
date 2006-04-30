@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.22 2006-04-29 12:10:29 simon Exp $
+// $Id: LibModelFile.cpp,v 1.23 2006-04-30 15:47:15 simon Exp $
 
 /*
   Debug check list
@@ -70,9 +70,9 @@ static void scale_object(LibModelFile::StaticObjectList &objs, bool isotropic, b
     assert(so);
 
     float m[4][4];
-    so->getMatrix(m);
+    so->getMatrix().getMatrix(m);
     float *v = so->getVertexDataPtr();
-    for (int i = 0; i < so->getNumPoints(); ++i) {
+    for (unsigned int i = 0; i < so->getNumPoints(); ++i) {
       float x = v[i * 3 + 0];
       float y = v[i * 3 + 1];
       float z = v[i * 3 + 2];
@@ -127,8 +127,8 @@ static void scale_object(LibModelFile::StaticObjectList &objs, bool isotropic, b
 
     float *v = so->getVertexDataPtr();
     float m[4][4];
-    so->getMatrix(m);
-    for (int i = 0; i < so->getNumPoints(); ++i) {
+    so->getMatrix().getMatrix(m);
+    for (unsigned int i = 0; i < so->getNumPoints(); ++i) {
       float x = v[i * 3 + 0];
       float y = v[i * 3 + 1];
       float z = v[i * 3 + 2];
@@ -284,7 +284,7 @@ int LibModelFile::init(const std::string &filename) {
       
     }
     // Set the transform
-    so->setMatrix(matrix);
+    so->getMatrix().setMatrix(matrix);
     // Set the textures
     so->setTexture(0, texture_id, texture_mask_id);
     so->setNumPoints(meshp->mesh_header->vertex_count);

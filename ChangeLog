@@ -1,5 +1,21 @@
 2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* common/Matrix.h, common/Makefile.am: Add a basic transform matrix 
+	  class.
+
+	* loaders/StaticObject.cpp, loaders/StaticObject.h: Use new matrix class
+	  to handle geometric and texture transforms. Allow rendertime texture
+	  transforms.
+
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Update for new staticobject
+	  usage.
+
+	* common/Utility.h: Remove some unused code.
+
+	* loaders/ParticleSystem.cpp: Remove invalid status message.
+
+2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/TextureManager.cpp: Set glPixelFormat to PACK when rescaling
 	  to avoid funny shearing effects. Hopefully this doesn't break other
 	  texturing.

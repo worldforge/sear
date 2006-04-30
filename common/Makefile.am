@@ -8,4 +8,5 @@ libCommon_a_SOURCES = \
 	types.h \
 	Mesh.h \
 	compose.hpp \
-	SPtr.h
+	SPtr.h \
+	Matrix.h
