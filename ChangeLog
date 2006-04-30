@@ -1,3 +1,8 @@
+2006-04-30  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/TaskWindow.cpp: Clear the task window once the tasks list
+	  is empty.
+
 2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/FileHandler.cpp: Fix warning from valgrind.
