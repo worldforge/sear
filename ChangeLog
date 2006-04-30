@@ -1,5 +1,13 @@
 2006-04-30  Al Riddoch  <alriddoch@zepler.org>
 
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.h,
+	  src/Editor.cpp, src/Editor.h, src/TerrainEntity.h,
+	  src/client.cpp, src/client.h: Identify a few places where forward
+	  declarations can reduce header dependencies, and speed up
+	  re-builds.
+
+2006-04-30  Al Riddoch  <alriddoch@zepler.org>
+
 	* guichan/TaskWindow.cpp: Clear the task window once the tasks list
 	  is empty.
 

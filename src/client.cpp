@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.79 2006-04-29 13:11:30 alriddoch Exp $
+// $Id: client.cpp,v 1.80 2006-04-30 18:13:41 alriddoch Exp $
 
 #include "System.h"
 
@@ -11,7 +11,7 @@
 #include <Atlas/Objects/Entity.h>
 
 #include <Eris/Avatar.h>
-#include <Eris/Connection.h>
+#include <Eris/Account.h>
 #include <Eris/DeleteLater.h>
 #include <Eris/Log.h>
 #include <Eris/Entity.h>

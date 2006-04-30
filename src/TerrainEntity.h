@@ -2,13 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.h,v 1.2 2006-04-26 14:39:00 simon Exp $
+// $Id: TerrainEntity.h,v 1.3 2006-04-30 18:13:41 alriddoch Exp $
 
 #ifndef SEAR_TERRAINENTITY_H
 #define SEAR_TERRAINENTITY_H 1
 
 //#include <string>
-#include <Eris/Entity.h>
 //#include <Eris/Types.h>
 //#include "common/types.h"
 #include "WorldEntity.h"

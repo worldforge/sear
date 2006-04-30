@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Editor.cpp,v 1.9 2006-02-05 21:09:48 simon Exp $
+// $Id: Editor.cpp,v 1.10 2006-04-30 18:13:41 alriddoch Exp $
 
 #include "Editor.h"
 #include "client.h"
@@ -13,6 +13,7 @@
 #include <Eris/Entity.h>
 #include <Eris/View.h>
 #include <Eris/Connection.h>
+#include <Eris/Avatar.h>
 
 #include <wfmath/atlasconv.h>
 #include <Atlas/Objects/Operation.h>

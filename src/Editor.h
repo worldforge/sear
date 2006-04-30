@@ -2,11 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Editor.h,v 1.3 2006-02-05 21:09:48 simon Exp $
+// $Id: Editor.h,v 1.4 2006-04-30 18:13:41 alriddoch Exp $
 
 #include "Console.h"
 #include <wfmath/vector.h>
-#include <Eris/Avatar.h>
+
+namespace Eris {
+  class Avatar;
+}
 
 namespace Sear {
 

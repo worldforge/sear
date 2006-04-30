@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.24 2006-02-15 12:44:24 simon Exp $
+// $Id: client.h,v 1.25 2006-04-30 18:13:41 alriddoch Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -11,8 +11,6 @@
 
 #include <Eris/Connection.h>
 #include <Eris/Log.h>
-#include <Eris/Account.h>
-#include <Atlas/Message/DecoderBase.h>
 #include "interfaces/ConsoleObject.h"
 
 #include <sigc++/trackable.h>
@@ -62,6 +60,7 @@ typedef enum {
 namespace Eris {
   class Account;
   class Connection;
+  class Avatar;
 }
 
 namespace Sear {

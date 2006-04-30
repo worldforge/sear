@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.9 2006-02-15 09:50:31 simon Exp $
+// $Id: ModelHandler.h,v 1.10 2006-04-30 18:13:41 alriddoch Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 
-#include <Eris/Timeout.h>
 #include <varconf/Config.h>
 
 #include <sigc++/trackable.h>
@@ -21,6 +20,10 @@
 
 namespace varconf  {
   class Config;
+}
+
+namespace Eris {
+  class Timeout;
 }
 
 namespace Sear {

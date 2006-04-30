@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.31 2006-04-26 14:39:00 simon Exp $
+// $Id: ModelHandler.cpp,v 1.32 2006-04-30 18:13:41 alriddoch Exp $
 
 #include <string.h>
 
@@ -11,6 +11,8 @@
 #include <Atlas/Message/Element.h>
 
 #include <varconf/Config.h>
+
+#include <Eris/Timeout.h>
 
 #include "src/Console.h"
 #include "ModelRecord.h"
