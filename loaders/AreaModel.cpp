@@ -95,8 +95,6 @@ int AreaModel::shutdown()
 {
   assert (m_initialised == true);
 
-  delete m_area;
-
   m_initialised = false;
 
   return 0;

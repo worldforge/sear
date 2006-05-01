@@ -1,3 +1,8 @@
+2006-05-01  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/AreaModel.cpp: Remove area clean up as this caused memory 
+	  errors.
+
 2006-04-30  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichane/Alert.cpp, guichan/Alert.h, guichan/AudioOptions.cpp,
