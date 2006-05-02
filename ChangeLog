@@ -1,3 +1,12 @@
+2006-05-02  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/System.cpp: Make call to execDeleteLater after closing the client
+	  class.
+
+	* guichan/Overlay.h, guichan/Overlay.cpp: Use SPtr to handle speech
+	  bubbles and selection widgets. Use EntityRef instead of WorldEntity*
+	  to fix memory problems caused by the entity being deleted.
+
 2006-05-01  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/AreaModel.cpp: Remove area clean up as this caused memory 

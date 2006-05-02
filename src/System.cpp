@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.153 2006-02-21 11:36:33 simon Exp $
+// $Id: System.cpp,v 1.154 2006-05-02 09:27:05 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -239,14 +239,16 @@ bool System::init(int argc, char *argv[]) {
         m_axisBindings[3] = AXIS_ELEVATE;
   }
 
-
+#if 1
   m_sound = SPtrShutdown<Sound>(new Sound());
   if (m_sound->init()) {
     m_sound.release();
   } else { 
     m_sound->registerCommands(m_console.get());
   }
-
+#else
+  #warning Sound Disabled
+#endif
   RenderSystem::getInstance().init();
   RenderSystem::getInstance().registerCommands(m_console.get());
   ModelSystem::getInstance().init();
@@ -326,7 +328,6 @@ void System::shutdown() {
   assert (m_initialised == true);
   printf("[System] Starting Shutdown\n");
 
-  Eris::execDeleteLaters();
 
   // Save config
   writeConfig(m_general);
@@ -369,6 +370,8 @@ void System::shutdown() {
   notify_callbacks();
 
   SDL_Quit();
+
+  Eris::execDeleteLaters();
 
   m_initialised = false;
   printf("[System] Finished Shutdown\n");

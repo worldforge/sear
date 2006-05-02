@@ -40,12 +40,12 @@ void Overlay::logic(RootWidget * rw)
   if (avatar == 0 || avatar->getEntity() == 0) {
     if (m_top != 0) {
       // If this overlay is initialised, clean it up.
-      m_top->remove(m_selfStatus);
-      delete m_selfStatus;
+      m_top->remove(m_selfStatus.get());
+      m_selfStatus.release();
       if (m_selectionStatus != 0) {
-        m_top->remove(m_selectionStatus);
-        delete m_selectionStatus;
-        m_selectionStatus = 0;
+        m_top->remove(m_selectionStatus.get());
+        m_selectionStatus.release();
+        //m_selectionStatus = 0;
       }
       // Clean up any bubbles.
       m_top = 0;
@@ -57,15 +57,13 @@ void Overlay::logic(RootWidget * rw)
     avatar->Hear.connect(SigC::slot(*this, &Overlay::heard));
     m_top = rw;
 
-    m_selfStatus = new StatusWindow(avatar->getEntity());
-    m_widgets.push_back(SPtr<gcn::Widget>(m_selfStatus));
-    m_top->setWindowCoords(m_selfStatus, std::make_pair(render->getWindowWidth() - m_selfStatus->getWidth(), 0));
-    m_top->openWindow(m_selfStatus);
+    m_selfStatus = SPtr<StatusWindow>(new StatusWindow(avatar->getEntity()));
+    m_top->setWindowCoords(m_selfStatus.get(), std::make_pair(render->getWindowWidth() - m_selfStatus->getWidth(), 0));
+    m_top->openWindow(m_selfStatus.get());
 
-    m_selfTask = new TaskWindow(avatar->getEntity());
-    m_widgets.push_back(SPtr<gcn::Widget>(m_selfTask));
-    m_top->setWindowCoords(m_selfTask, std::make_pair(render->getWindowWidth() - m_selfTask->getWidth(), m_selfStatus->getHeight()));
-    m_top->openWindow(m_selfTask);
+    m_selfTask = SPtr<TaskWindow>(new TaskWindow(avatar->getEntity()));
+    m_top->setWindowCoords(m_selfTask.get(), std::make_pair(render->getWindowWidth() - m_selfTask->getWidth(), m_selfStatus->getHeight()));
+    m_top->openWindow(m_selfTask.get());
   }
 
   std::string selection_id = render->getActiveID();
@@ -73,27 +71,29 @@ void Overlay::logic(RootWidget * rw)
 
   if (selection_ent != m_selection.get() || !m_selection) {
     if (m_selectionStatus != 0) {
-      m_top->remove(m_selectionStatus);
-      delete m_selectionStatus;
-      m_selectionStatus = 0;
+      m_top->remove(m_selectionStatus.get());
+      m_selectionStatus.release();
+//      m_selectionStatus = 0;
     }
     m_selection = selection_ent;
     if (selection_ent != 0) {
-      m_selectionStatus = new StatusWindow(selection_ent);
-      m_top->add(m_selectionStatus, render->getWindowWidth() - m_selfStatus->getWidth() - 4 - m_selectionStatus->getWidth(), 0);
+      m_selectionStatus = SPtr<StatusWindow>(new StatusWindow(selection_ent));
+      m_top->add(m_selectionStatus.get(), render->getWindowWidth() - m_selfStatus->getWidth() - 4 - m_selectionStatus->getWidth(), 0);
     }
   }
 
   double elapsed = System::instance()->getTimeElapsed();
 
-  std::set<WorldEntity *> obsoletes;
+  //std::set<WorldEntity *> obsoletes;
 
-  BubbleMap::const_iterator I = m_bubbles.begin();
+  BubbleMap::iterator I = m_bubbles.begin();
   BubbleMap::const_iterator Iend = m_bubbles.end();
-  for (; I != Iend; ++I) {
-    WorldEntity * we = dynamic_cast<WorldEntity *>(I->first);
-    SpeechBubble * sb = I->second;
+  while (I != Iend) {
+    WorldEntity * we = dynamic_cast<WorldEntity *>(I->first.get());
+    SPtr<SpeechBubble> sb = I->second;
     if (we == NULL) {
+      m_top->remove(sb.get());
+      m_bubbles.erase(I++);
       continue;
     }
     int ex = we->screenX();
@@ -101,8 +101,11 @@ void Overlay::logic(RootWidget * rw)
     if (ey < 0 || ey >= m_top->getHeight() ||
         ex < 0 || ex >= m_top->getWidth() ||
         !we->isVisible()) {
-      obsoletes.insert(we);
+//      obsoletes.insert(we);
       // Obsolete speech bubble?
+      we->releaseScreenCoords();
+      m_top->remove(sb.get());
+      m_bubbles.erase(I++);
       continue;
     }
     ex = (ex - sb->getWidth() / 2);
@@ -115,7 +118,7 @@ void Overlay::logic(RootWidget * rw)
     float xoff = sb->m_xoff;
     BubbleMap::const_iterator J = m_bubbles.begin();
     for (; J != Iend; ++J) {
-      if (sb == J->second) { continue; }
+      if (sb.get() == J->second.get()) { continue; }
       const int ox = J->second->getX();
       const int oy = J->second->getY();
       if (abs(y - oy) < sb->getHeight() && abs(x - ox) < sb->getWidth()) {
@@ -137,18 +140,24 @@ void Overlay::logic(RootWidget * rw)
     xoff = std::max(xoff, -(sb->getWidth() / 2.f));
     sb->m_xoff = xoff;
     sb->setX(ex + (int)sb->m_xoff);
+
+    ++I;
   }
+/*
   std::set<WorldEntity *>::const_iterator K = obsoletes.begin();
   std::set<WorldEntity *>::const_iterator Kend = obsoletes.end();
   for (; K != Kend; ++K) {
     BubbleMap::iterator J = m_bubbles.find(*K);
     if (J != m_bubbles.end()) {
-      J->first->releaseScreenCoords();
-      m_top->remove(J->second);
-      delete J->second;
+      WorldEntity * we = dynamic_cast<WorldEntity *>(J->first.get());
+      if (we) we->releaseScreenCoords();
+      SPtr<SpeechBubble> b = J->second;
+      m_top->remove(b.get());
+      b.release();
       m_bubbles.erase(J);
     }
   }
+*/
 }
 
 void Overlay::heard(Eris::Entity * e,
@@ -166,12 +175,12 @@ void Overlay::heard(Eris::Entity * e,
   if (we == NULL) {
     return;
   }
-  SpeechBubble * bubble;
+  SPtr<SpeechBubble> bubble;
   BubbleMap::const_iterator I = m_bubbles.find(we);
   if (I == m_bubbles.end()) {
-    bubble = new SpeechBubble;
+    bubble = SPtr<SpeechBubble>(new SpeechBubble);
     bubble->loadImages(std::vector<std::string>());
-    m_top->add(bubble, 50, 50);
+    m_top->add(bubble.get(), 50, 50);
     m_bubbles[we] = bubble;
     we->requestScreenCoords();
   } else {

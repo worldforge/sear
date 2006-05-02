@@ -33,7 +33,7 @@ class WorldEntity;
 class Overlay : virtual public SigC::Object {
   friend class SPtr<Overlay>;
 public:
-  typedef std::map<WorldEntity *, SpeechBubble *> BubbleMap;
+  typedef std::map<Eris::EntityRef, SPtr<SpeechBubble> > BubbleMap;
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   Overlay();
@@ -43,9 +43,9 @@ protected:
   BubbleMap m_bubbles;
   Eris::EntityRef m_selection;
 
-  StatusWindow * m_selfStatus;
-  StatusWindow * m_selectionStatus;
-  TaskWindow * m_selfTask;
+  SPtr<StatusWindow> m_selfStatus;
+  SPtr<StatusWindow> m_selectionStatus;
+  SPtr<TaskWindow> m_selfTask;
 
   static SPtr<Overlay> m_instance;
 public:
