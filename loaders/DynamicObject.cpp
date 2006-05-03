@@ -68,9 +68,9 @@ void DynamicObject::shutdown()  {
 void DynamicObject::copyVertexData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_vertex_data)) glGenBuffersARB(1, &m_vb_vertex_data);
-    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_vertex_data);
-    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_vertex_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
   } else {
     if (m_vertex_data) delete [] m_vertex_data;
     m_vertex_data = new float[size];
@@ -81,9 +81,9 @@ void DynamicObject::copyVertexData(float *ptr, size_t size) {
 void DynamicObject::copyColourData(unsigned char *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_colour_data)) glGenBuffersARB(1, &m_vb_colour_data);
-    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_colour_data);
-    glBufferDataARB(GL_ARRAY_BUFFER, size  * sizeof(unsigned char), ptr, GL_STREAM_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_colour_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size  * sizeof(unsigned char), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
   } else {
     if (m_colour_data) delete [] m_colour_data;
     m_colour_data = new unsigned char[size];
@@ -94,9 +94,9 @@ void DynamicObject::copyColourData(unsigned char *ptr, size_t size) {
 void DynamicObject::copyNormalData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_normal_data)) glGenBuffersARB(1, &m_vb_normal_data);
-    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_normal_data);
-    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
   } else {
     if (m_normal_data) delete [] m_normal_data;
     m_normal_data = new float[size];
@@ -106,9 +106,9 @@ void DynamicObject::copyNormalData(float *ptr, size_t size) {
 void DynamicObject::copyTextureData(float *ptr, size_t size) {
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_texture_data)) glGenBuffersARB(1, &m_vb_texture_data);
-    glBindBufferARB(GL_ARRAY_BUFFER, m_vb_texture_data);
-    glBufferDataARB(GL_ARRAY_BUFFER, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER, 0);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
+    glBufferDataARB(GL_ARRAY_BUFFER_ARB, size * sizeof(float), ptr, GL_STREAM_DRAW_ARB);
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
   } else {
     if (m_texture_data) delete [] m_texture_data;
     m_texture_data = new float[size];
