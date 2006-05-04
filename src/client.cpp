@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.80 2006-04-30 18:13:41 alriddoch Exp $
+// $Id: client.cpp,v 1.81 2006-05-04 19:46:19 simon Exp $
 
 #include "System.h"
 
@@ -161,6 +161,7 @@ int Client::connect(const std::string &host, int port) {
     fprintf(stderr, "[Client] Error: Connection Error\n");
     m_system->pushMessage("Error: Connection Error", CONSOLE_MESSAGE);
     setStatus( CLIENT_STATUS_DISCONNECTED);
+    Eris::deleteLater(new DelLater<Eris::Connection>(m_connection));
     m_connection.release();
     return 1;
   }
@@ -188,6 +189,7 @@ int Client::disconnect() {
     setStatus(CLIENT_STATUS_CONNECTED);
     fprintf(stderr, "[Client] Error: Disconnect Error\n");
     m_system->pushMessage("Error: Disconnect Error", CONSOLE_MESSAGE);
+    Eris::deleteLater(new DelLater<Eris::Connection>(m_connection));
     m_connection.release();
     setStatus(CLIENT_STATUS_DISCONNECTED);
     return 1;
@@ -349,6 +351,7 @@ void Client::NetFailure(const std::string &msg)  {
   m_system->pushMessage("Network Failure: " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
+  Eris::deleteLater(new DelLater<Eris::Account >(m_account));
   m_account.release();
 
   Eris::deleteLater(new DelLater<Eris::Connection >(m_connection));
@@ -367,6 +370,7 @@ void Client::NetDisconnected() {
   m_system->pushMessage(CLIENT_DISCONNECTED, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
+  Eris::deleteLater(new DelLater<Eris::Account >(m_account));
   m_account.release();
 
   Eris::deleteLater(new DelLater<Eris::Connection>(m_connection));
