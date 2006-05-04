@@ -301,7 +301,7 @@ void ParticleSystem::render(bool select_mode) {
   // Note: This should ideally be done during the update function
   // However, the camera angle is unknown at this time.
   m_do->copyVertexData((float*)m_vertexBuffer, m_activeCount * 6 * 3);
-  m_do->copyColourData((unsigned char*)m_colorBuffer, m_activeCount * 6 * 3);
+  m_do->copyColourData((unsigned char*)m_colorBuffer, m_activeCount * 6 * 4);
   m_do->copyTextureData((float*)m_texCoordBuffer, m_activeCount * 6 * 2);
 
 //  m_do->setNumPoints(m_particles.size() * 6);

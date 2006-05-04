@@ -1,5 +1,10 @@
 2006-05-04  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ParticleSystem.cpp: Fix bug where the colour buffer was copied
+	  assuming 3 and not 4 bytes per pixel. 
+
+2006-05-04  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/client.cpp: Use deleteLater to fix some mem errors caused by
 	  deleting eris objects in callbacks.
 
