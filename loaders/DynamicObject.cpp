@@ -326,7 +326,7 @@ void DynamicObject::render(bool select_mode) {
       glActiveTextureARB(GL_TEXTURE0_ARB);
     }
 
-    if (glIsBufferARB(m_vb_colour_data)) {
+    if (m_colour_data) {
       glEnableClientState(GL_COLOR_ARRAY);
       glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
     }
@@ -339,7 +339,6 @@ void DynamicObject::render(bool select_mode) {
 
     if (m_indices) {
       glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
-      glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     } else  {
       glDrawArrays(GL_TRIANGLES, 0, m_num_points);
     }
@@ -358,7 +357,7 @@ void DynamicObject::render(bool select_mode) {
       glActiveTextureARB(GL_TEXTURE0_ARB);
     }
 
-    if (glIsBufferARB(m_vb_colour_data)) {
+    if (m_colour_data) {
       glDisableClientState(GL_COLOR_ARRAY);
     }
 

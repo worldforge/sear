@@ -266,7 +266,6 @@ void StaticObject::render(bool select_mode) {
 
       if (m_indices) {
         glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
       } else  {
         glDrawArrays(GL_TRIANGLES, 0, m_num_points);
       }

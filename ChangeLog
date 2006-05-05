@@ -1,5 +1,14 @@
 2006-05-05  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/StaticObject, loaders/DynamicObject.cpp: Remove call to
+	  glBindBufferARB in non VBO section. Fix VBO check in non-vbo section
+	  for colour buffer.
+
+	* loaders/cal3d/Cal3dModel.cpp: Fix setting of number of points for 
+	  meshes without indices.
+
+2006-05-05  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Enable GL_NORMALIZE by default to fix scaled 
 	  normals.
 

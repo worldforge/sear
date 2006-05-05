@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.41 2006-04-29 12:10:29 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.42 2006-05-05 16:17:06 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -173,7 +173,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
           dyno->copyIndices(meshFaces, faceCount * 3);
           dyno->setNumFaces(faceCount);
         }
-        dyno->setNumPoints(vertexCount / 3);
+        dyno->setNumPoints(vertexCount);
         // There are several situations that can happen here. 
         // Model with/without texture coordinates
         // Model with/without texture maps
@@ -196,6 +196,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 	}
         if (mapDataFound){
           dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
+          assert(textureCoordinateCount == vertexCount);
         }
       }
     }
