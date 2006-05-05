@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.147 2006-04-26 18:48:59 alriddoch Exp $
+// $Id: GL.cpp,v 1.148 2006-05-05 09:50:51 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -941,6 +941,7 @@ void GL::setupStates() {
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnableClientState(GL_VERTEX_ARRAY);
+  glEnable(GL_NORMALIZE);
 }
 
 inline void GL::translateObject(float x, float y, float z) {

@@ -1,3 +1,8 @@
+2006-05-05  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/GL.cpp: Enable GL_NORMALIZE by default to fix scaled 
+	  normals.
+
 2006-05-04  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/ParticleSystem.cpp: Fix bug where the colour buffer was copied
