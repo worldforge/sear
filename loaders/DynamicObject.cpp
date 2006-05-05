@@ -334,7 +334,7 @@ void DynamicObject::render(bool select_mode) {
 
     // Use the Lock arrays extension if available.
     if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
-      glLockArraysEXT(0, m_num_points  * 3);
+      glLockArraysEXT(0, m_num_points);
     }
 
     if (m_indices) {

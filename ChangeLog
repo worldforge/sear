@@ -1,3 +1,8 @@
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/StaticObject.cpp, loaders/DynamicObject.cpp: Use correct
+	  value for glLockArrays
+
 2006-05-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/StaticObject, loaders/DynamicObject.cpp: Remove call to

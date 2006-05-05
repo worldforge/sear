@@ -222,6 +222,7 @@ void StaticObject::render(bool select_mode) {
 
       disp = glGenLists(1);
       glNewList(disp, GL_COMPILE_AND_EXECUTE);
+
       // Setup client states
       glEnableClientState(GL_NORMAL_ARRAY);
 
@@ -261,7 +262,7 @@ void StaticObject::render(bool select_mode) {
 
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
-        glLockArraysEXT(0, m_num_points  * 3);
+        glLockArraysEXT(0, m_num_points);
       }
 
       if (m_indices) {
