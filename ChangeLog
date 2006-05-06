@@ -1,5 +1,15 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.ac: Add extra tool checks.
+
+	* renderers/GL.cpp, src/System.cpp: Move hide cursor call to
+	  contextCreated as new contexts need the cursor hidden again.
+
+	* renderers/GL.cpp: Fix up resize/toggle fullscreen calls to properly 
+	  re-init opengl stuff.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/SkyDome.cpp, environment/SkyDome.h, 
 	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h: Add
 	  some more context no checks and implement contextCreated and 
