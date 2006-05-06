@@ -7,6 +7,7 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
+#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include  "DynamicObject.h"
@@ -28,7 +29,8 @@ DynamicObject::DynamicObject() :
   m_vb_colour_data(0),
   m_vb_normal_data(0),
   m_vb_texture_data(0),
-  m_vb_indices(0)
+  m_vb_indices(0),
+  m_context_no(-1)
 {
 }
 
@@ -186,8 +188,20 @@ void DynamicObject::createVBOs() {
   }
 }
 */
+
+int DynamicObject::contextCreated() {
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  // We could have contextCreated called several times for a shared mesh
+  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());   m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  return 0;
+}
+
 void DynamicObject::contextDestroyed(bool check) {
   assert(m_initialised == true);
+
+  // We could have contextDestroyed called several times for a shared mesh
+  if (m_context_no == -1) return;
+
   if (check) {
     // Clean up vertex buffer objects
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -213,10 +227,15 @@ void DynamicObject::contextDestroyed(bool check) {
   m_vb_normal_data = 0;
   m_vb_texture_data = 0;
   m_vb_indices = 0;
+
+  m_context_no = -1;
 }
 
 void DynamicObject::render(bool select_mode) {
   assert(m_initialised == true);
+
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
 
   glPushMatrix();
 

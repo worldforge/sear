@@ -38,7 +38,6 @@ namespace Sear {
 
 ModelSystem ModelSystem::m_instance;
 
-static const std::string CMD_LOAD_MODEL_CONFIG = "load_models";
 static const std::string DEFAULT = "default";
 
 int ModelSystem::init() {
@@ -108,16 +107,11 @@ void ModelSystem::registerCommands(Console *console) {
   assert(m_initialised == true);
   assert(console != NULL);
 
-  console->registerCommand(CMD_LOAD_MODEL_CONFIG, this);
-  
   m_model_handler->registerCommands(console);
   m_object_handler->registerCommands(console);
 }
 
 void ModelSystem::runCommand(const std::string &command, const std::string &args) {
-  if (command == CMD_LOAD_MODEL_CONFIG) {
-    loadModels(args);
-  }
 }
 
 void ModelSystem::readConfig(varconf::Config &config) {
@@ -126,11 +120,6 @@ void ModelSystem::readConfig(varconf::Config &config) {
 
 void ModelSystem::writeConfig(varconf::Config &config) {
 
-}
-
-void ModelSystem::loadModels(const std::string &filename) {
-  if (debug) printf("[Debug]ModelSystem: Loading Models config.\n");
-  m_models.readFromFile(filename);
 }
 
 SPtr<ModelRecord> ModelSystem::getModel(const std::string &model_id, WorldEntity *we) {

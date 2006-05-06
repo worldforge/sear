@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.7 2006-02-15 09:50:31 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.8 2006-05-06 13:50:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -38,15 +38,6 @@ SPtr<ModelRecord> LibModelFile_Loader::loadModel(WorldEntity *we, const std::str
   assert(model_record);
 
   std::string file_name = model_record->data_file_path;
-
-  if (file_name.empty()) {
-    // Use old style path finder
-    if (!ModelSystem::getInstance().getModels().findItem(LIBMODELFILE, model_record->data_file_id)) {
-      std::cerr << "Error: No MD3 filename" << std::endl;
-      return SPtr<ModelRecord>();
-    }
-    file_name = (std::string)ModelSystem::getInstance().getModels().getItem(LIBMODELFILE, model_record->data_file_id);
-  }
 
   System::instance()->getFileHandler()->expandString(file_name);
 

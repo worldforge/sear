@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.32 2006-04-30 18:13:41 alriddoch Exp $
+// $Id: ModelHandler.cpp,v 1.33 2006-05-06 13:50:22 simon Exp $
 
 #include <string.h>
 
@@ -39,6 +39,11 @@ static const std::string CMD_LOAD_MODEL_RECORDS = "load_model_records";
 
 static const std::string ATTR_GUISE= "guise";
 static const std::string ATTR_MODE = "mode";
+
+static const std::string KEY_STATE = "state";
+static const std::string KEY_STATE_NUM = "state_num";
+static const std::string KEY_SELECT_STATE = "select_state";
+static const std::string KEY_SELECT_STATE_NUM = "select_state_num";
 
 ModelHandler::ModelHandler() :
   m_initialised(false),
@@ -93,25 +98,28 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   assert(we);
   // Model loaded for this object?
 
+  // Composite object_id + model id (model record name)
   std::string id = we->getId() + model_id;
+
+  // Look in per entity map
   ObjectRecordMap::const_iterator I = m_object_map.find(id);
   if (I != m_object_map.end()) {
     return I->second;
   }
 
+  // Look in type map
   ModelRecordMap::const_iterator J = m_model_records_map.find(model_id);
   if (J != m_model_records_map.end()) {
     m_object_map[id] = J->second;
     return J->second;
   }
-  // No existing model found, load up a new one
-//  if (!render) {
-//    if (debug && we) printf("Entity ID: %s Name: %s Type: %s\n", we->getId().c_str(), we->getName().c_str(), we->type().c_str());
-//    return SPtr<ModelRecord>();
-//  }
+
+  // Need to create a new model
 
   varconf::Config &m_model_records = ModelSystem::getInstance().getModelRecords();
   std::string model_loader = (std::string)m_model_records.getItem(model_id, ModelRecord::MODEL_LOADER);
+
+  // We are assuming that the boundbox loader is always available
 
   if (model_loader.empty()) {
     fprintf(stderr, "Model Loader not defined for %s. Using BoundBox.\n", model_id.c_str());
@@ -125,24 +133,28 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
     model_loader = "boundbox";
     K = m_model_loaders.find(model_loader);
   }
+
   SPtr<ModelRecord> model;
   if (K != Kend) {
     model = K->second->loadModel(we, model_id, m_model_records);
   } else {
     fprintf(stderr, "No loader found (%s) for %s\n ", model_loader.c_str(), model_id.c_str());
-    return model;
+//    return model;
   }
   
-  // Check model was loaded, and fall back to a NullModel
+  // Check model was loaded, and fall back to a NullModel on error
   if (!model) {
     fprintf(stderr, "Error loading model of type %s for %s\n", model_loader.c_str(), model_id.c_str());
     model = SPtr<ModelRecord>(new ModelRecord);
     model->model = SPtrShutdown<Model>(new NullModel());
   }
 
+  // Set initial animation
   if (we->hasAttr(ATTR_MODE)) {
     model->model->animate(we->valueOfAttr(ATTR_MODE).asString());
   }
+
+  // Process initial appearance map
   if (we->hasAttr(ATTR_GUISE)) {
     Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
     model->model->setAppearance(mt);
@@ -150,6 +162,8 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
 
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
+
+  // Store per entity model
   m_object_map[id] = model;
 
   return model; 
@@ -176,6 +190,7 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type) {
 }
 
 void ModelHandler::checkModelTimeouts(bool forceUnload) {
+return;
   assert (m_initialised == true);
 
   // This function checks to see when the last time a model record was rendered.
@@ -230,19 +245,20 @@ void ModelHandler::loadModelRecords(const std::string &filename) {
 
 void ModelHandler::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   // Convert textual state name to the state number
-  if (key == "state") {
-//    printf("Setting State Num: %d\n",  RenderSystem::getInstance().requestState(config.getItem(section, key)));
+  if (key == KEY_STATE) {
     int stn = RenderSystem::getInstance().requestState(config.getItem(section, key));
     assert(stn);
-    config.setItem(section, "state_num", stn);
+    config.setItem(section, KEY_STATE_NUM, stn);
   }
-  else if (key == "select_state") {
-    config.setItem(section, "select_state_num", RenderSystem::getInstance().requestState(config.getItem(section, key)));
+  else if (key == KEY_SELECT_STATE) {
+    int stn = RenderSystem::getInstance().requestState(config.getItem(section, key));
+    assert(stn);
+    config.setItem(section, KEY_SELECT_STATE_NUM, stn);
   }
 }
 
 void ModelHandler::varconf_error_callback(const char *message) {
-  fprintf(stderr, "%s\n", message);
+  fprintf(stderr, "[ModelHandler] %s\n", message);
 }
 
 void ModelHandler::registerCommands(Console *console) {
@@ -261,7 +277,8 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
 }
 void ModelHandler::contextCreated() {
   assert (m_initialised == true);
-  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
+
+  for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
     SPtrShutdown<Model> model = record->model;
@@ -271,10 +288,10 @@ void ModelHandler::contextCreated() {
   }
 }
 
-
 void ModelHandler::contextDestroyed(bool check) {
   assert (m_initialised == true);
-  for (ModelRecordMap::iterator I = m_model_records_map.begin(); I != m_model_records_map.end(); ++I) {
+
+  for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
     SPtrShutdown<Model> model = record->model;

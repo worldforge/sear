@@ -7,6 +7,7 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
+#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include  "StaticObject.h"
@@ -28,7 +29,8 @@ StaticObject::StaticObject() :
   m_vb_texture_data(0),
   m_vb_indices(0),
   m_disp_list(0),
-  m_select_disp_list(0)
+  m_select_disp_list(0),
+  m_context_no(-1)
 {
 }
 
@@ -100,8 +102,20 @@ void StaticObject::createVBOs() {
   }
 }
 
+int StaticObject::contextCreated() {
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  // We could have contextCreated called several times for a shared mesh
+  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  return 0;
+}
+
 void StaticObject::contextDestroyed(bool check) {
   assert(m_initialised == true);
+
+  // We could have contextDestroyed called several times for a shared mesh
+  if (m_context_no == -1) return;
+
   if (check) {
     // Clean up vertex buffer objects
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -129,10 +143,14 @@ void StaticObject::contextDestroyed(bool check) {
   m_vb_indices = 0;
   m_select_disp_list = 0;
   m_disp_list = 0;
+
+  m_context_no = -1;
 }
 
 void StaticObject::render(bool select_mode) {
   assert(m_initialised == true);
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
   glPushMatrix();
   // Set transform
   float m[4][4];

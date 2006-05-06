@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.18 2006-02-15 09:50:31 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.19 2006-05-06 13:50:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -45,12 +45,7 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
 
   assert(model_record);
 
-  if (!ModelSystem::getInstance().getModels().findItem(CAL3D, model_record->data_file_id)) {
-    std::cerr << "Error: No Cal3D filename" << std::endl;
-    return SPtr<ModelRecord>();
-  }
-
-  std::string file_name = ModelSystem::getInstance().getModels().getItem(CAL3D, model_record->data_file_id);
+  std::string file_name = model_record->data_file_path;
   // Expand variable in string
   System::instance()->getFileHandler()->expandString(file_name);
  

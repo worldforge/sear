@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.24 2006-04-24 14:11:38 simon Exp $
+// $Id: 3ds.h,v 1.25 2006-05-06 13:50:22 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -57,7 +57,6 @@ public:
 
   virtual void contextCreated();
   virtual void contextDestroyed(bool check);
-  virtual void setHeight(float height) { m_height = height; }
 
 protected:
   
@@ -78,7 +77,6 @@ protected:
   typedef std::map<std::string, Material*> MaterialMap;
   MaterialMap m_material_map;
   bool m_initialised;
-  float m_height;
   varconf::Config m_config;  
 };
 

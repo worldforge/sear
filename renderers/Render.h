@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.14 2006-02-20 20:36:23 simon Exp $
+// $Id: Render.h,v 1.15 2006-05-06 13:50:22 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -127,6 +127,8 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void selectTerrainColour(WorldEntity * we) = 0;
 
   void incrementContext() { m_context_instantiation++; }
+  int currentContextNo() const { return m_context_instantiation; }
+  bool contextValid() const { return m_context_valid; }
 
 protected:
   int m_context_instantiation ;

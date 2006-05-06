@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.8 2006-02-16 18:08:16 simon Exp $
+// $Id: ModelLoader.cpp,v 1.9 2006-05-06 13:50:22 simon Exp $
 
 #include "ModelLoader.h"
 
@@ -131,9 +131,6 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     else if (rotation_style == "halo") model_record->rotation_style = ROS_HALO;
     if (model_config.findItem(model_id, ModelRecord::DATA_FILE_PATH)) {
       model_record->data_file_path = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_PATH);
-    }
-    if (model_config.findItem(model_id, ModelRecord::DATA_FILE_ID)) {
-      model_record->data_file_id = (std::string)model_config.getItem(model_id, ModelRecord::DATA_FILE_ID);
     }
     if (model_config.findItem(model_id, ModelRecord::SCALE_HEIGHT)) {
       model_record->scaleByHeight = (bool)model_config.getItem(model_id, ModelRecord::SCALE_HEIGHT);

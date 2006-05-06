@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.31 2006-02-15 09:50:31 simon Exp $
+// $Id: BoundBox.cpp,v 1.32 2006-05-06 13:50:22 simon Exp $
 
 #include "renderers/RenderSystem.h"
 
@@ -245,6 +245,8 @@ int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wra
   normalptr[++normal_counter] =  0.0f; normalptr[++normal_counter] = -1.0f; normalptr[++normal_counter] =  0.0f;
   normalptr[++normal_counter] =  0.0f; normalptr[++normal_counter] = -1.0f; normalptr[++normal_counter] =  0.0f;
   normalptr[++normal_counter] =  0.0f; normalptr[++normal_counter] = -1.0f; normalptr[++normal_counter] =  0.0f;
+
+  contextCreated();
 
   m_initialised = true;
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.42 2006-05-05 16:17:06 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.43 2006-05-06 13:50:22 simon Exp $
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"
@@ -113,6 +113,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         if (!dyno.isValid()) {
           dyno = SPtrShutdown<DynamicObject>(new DynamicObject);
           dyno->init();
+          dyno->contextCreated();
           m_dos[counter] = dyno;
         }
 
@@ -440,4 +441,24 @@ void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
     m_calModel->getMixer()->clearCycle(animations[name], 0.2f);
   }
 }
+
+void Cal3dModel::contextCreated() {
+  DOVec::const_iterator I = m_dos.begin();
+  for (; I != m_dos.end(); ++I) {
+    SPtrShutdown<DynamicObject> so = *I;
+    assert(so);
+    so->contextCreated();
+  }
+}
+
+void Cal3dModel::contextDestroyed(bool check) {
+  DOVec::const_iterator I = m_dos.begin();
+  for (; I != m_dos.end(); ++I) {
+    SPtrShutdown<DynamicObject> so = *I;
+    assert(so);
+    so->contextDestroyed(check);
+  }
+}
+
+
 } /* namespace Sear */

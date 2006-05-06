@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.23 2006-04-26 13:58:47 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.24 2006-05-06 13:50:22 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -35,15 +35,6 @@ SPtr<ModelRecord> ThreeDS_Loader::loadModel(WorldEntity *we, const std::string &
 
   std::string file_name = model_record->data_file_path;
 
-  if (file_name.empty()) {
-    // See if a filename has been specified
-    if (!ModelSystem::getInstance().getModels().findItem(THREEDS, model_record->data_file_id)) {
-      std::cerr << "Error: No 3DS filename" << std::endl;
-      return SPtr<ModelRecord>();
-    }
-    // Get 3ds filename
-    file_name = (std::string)ModelSystem::getInstance().getModels().getItem(THREEDS, model_record->data_file_id);
-  }
   System::instance()->getFileHandler()->expandString(file_name);
 
   // Create new ThreeDS model

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.149 2006-05-06 09:57:47 simon Exp $
+// $Id: GL.cpp,v 1.150 2006-05-06 13:50:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -345,6 +345,9 @@ int GL::contextCreated() {
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
 
+  incrementContext();
+  if (debug) printf("New Context Number: %d\n", m_context_instantiation);
+  m_context_valid = true;
   RenderSystem::getInstance().ContextCreated.emit();
 
   return 0;
@@ -518,6 +521,7 @@ void GL::init() {
 }
 
 void GL::contextDestroyed(bool check) {
+  m_context_valid = false;
   // Clear font display list
   shutdownFont(check);
 
@@ -1671,6 +1675,7 @@ void GL::resize(int width, int height) {
     // TODO: What is going on in this situation
     // The window has been resized, however the GL context needs to be
     // re-created. Do we need to destroy the whole window?
+    m_context_valid = false;
     RenderSystem::getInstance().ContextDestroyed.emit(false);
     createWindow(m_width, m_height, m_fullscreen);
     return;

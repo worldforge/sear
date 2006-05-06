@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.25 2006-05-06 11:00:10 simon Exp $
+// $Id: LibModelFile.cpp,v 1.26 2006-05-06 13:50:22 simon Exp $
 
 /*
   Debug check list
@@ -374,6 +374,8 @@ int LibModelFile::init(const std::string &filename) {
     }
   }
 
+  contextCreated();
+
   m_initialised = true;
   return 0;
 }
@@ -388,7 +390,14 @@ int LibModelFile::shutdown() {
   return 0;
 }
 
-void LibModelFile::contextCreated() {}
+void LibModelFile::contextCreated() {
+  StaticObjectList::const_iterator I = m_static_objects.begin();
+  for (; I != m_static_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextCreated();
+  }
+}
 
 void LibModelFile::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();

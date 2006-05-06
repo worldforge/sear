@@ -25,7 +25,7 @@ public:
 
   void render(bool select_mode);
 
-  int contextCreated() { return 0; }
+  int contextCreated();
   void contextDestroyed(bool check);
 
   void setTexture(unsigned int num, int texture, int texture_mask) {
@@ -239,6 +239,8 @@ private:
 
   Matrix m_matrix;
   Matrix m_tex_matrix;
+
+  int m_context_no;
 };
 
 } // namespace Sear

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.29 2006-02-15 09:50:31 simon Exp $
+// $Id: NPlane.cpp,v 1.30 2006-05-06 13:50:22 simon Exp $
 
 #include <iostream>
 
@@ -116,6 +116,9 @@ int NPlane::init(const std::string &texture, unsigned int num_planes, float widt
     texptr[++texture_counter] = 0.0f; texptr[++texture_counter] = 0.0f;
     texptr[++texture_counter] = 0.0f; texptr[++texture_counter] = 1.0f;
   }
+
+  contextCreated();
+
   m_initialised = true;
   return 0;
 }

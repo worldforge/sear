@@ -172,6 +172,7 @@ void ParticleSystem::init()
 
   m_do = SPtrShutdown<DynamicObject>(new DynamicObject());
   m_do->init();
+  m_do->contextCreated();
   m_do->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
   m_do->setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
   m_do->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);

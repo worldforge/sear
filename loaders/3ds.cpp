@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.60 2006-05-06 11:00:10 simon Exp $
+// $Id: 3ds.cpp,v 1.61 2006-05-06 13:50:22 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -208,8 +208,7 @@ static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotro
 }
 
 ThreeDS::ThreeDS() : Model(),
-  m_initialised(false),
-  m_height(1.0f)
+  m_initialised(false)
 {
   m_config.sige.connect(SigC::slot(*this, &ThreeDS::varconf_error_callback));
 }
@@ -319,6 +318,8 @@ int ThreeDS::init(const std::string &file_name) {
     }
   }
 
+  contextCreated();
+
   m_initialised = true;
   return 0;
 }
@@ -342,7 +343,14 @@ int ThreeDS::shutdown() {
   return 0;
 }
 
-void ThreeDS::contextCreated() {}
+void ThreeDS::contextCreated() {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  for (; I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextCreated();
+  }
+}
 
 void ThreeDS::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
@@ -354,10 +362,6 @@ void ThreeDS::contextDestroyed(bool check) {
 }
 
 void ThreeDS::render(bool select_mode) {
-  // TODO Combine this scale into the matrix transform
-  Render *render = RenderSystem::getInstance().getRenderer();
-  render->scaleObject(m_height);
-
   for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);

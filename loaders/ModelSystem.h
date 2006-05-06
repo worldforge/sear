@@ -49,7 +49,6 @@ public:
   ModelHandler  *getModelHandler()  const { return m_model_handler; }
   ObjectHandler *getObjectHandler() const { return m_object_handler; }
 
-  varconf::Config &getModels() { return m_models; }
   varconf::Config &getModelRecords();
  
   /** The getModel method returns a model record for the given object and model
@@ -83,8 +82,6 @@ private:
   static ModelSystem m_instance;
 
   bool m_initialised;
-
-  varconf::Config m_models;
 
   ModelHandler  *m_model_handler;
   ObjectHandler *m_object_handler;

@@ -26,7 +26,7 @@ public:
 
   void render(bool select_mode);
 
-  int contextCreated() { return 0; }
+  int contextCreated();
   void contextDestroyed(bool check);
 
   void setTexture(unsigned int num, int texture, int texture_mask) {
@@ -207,7 +207,8 @@ private:
   
   GLuint m_vb_vertex_data, m_vb_colour_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
 
-  float m_matrix[4][4];  
+  float m_matrix[4][4];
+  int m_context_no;
 };
 
 } // namespace Sear

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.8 2006-02-16 15:59:01 simon Exp $
+// $Id: ModelRecord.h,v 1.9 2006-05-06 13:50:22 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -31,7 +31,6 @@ public:
   int select_state;
   std::string select_state_name;
   std::string model_loader;
-  std::string data_file_id;
   std::string data_file_path;
   std::string default_skin;
   bool model_by_type;

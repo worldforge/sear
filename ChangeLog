@@ -1,5 +1,36 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Render.h: Add accessors for context number and valid status.
+
+	* renderers/GL.cpp: Increment context number on contextCreated. Set
+	  valid flag on create and destroy.
+
+	* loaders/StaticObject.cpp, loaders/StaticObject.h,
+	  loaders/DynamicObject.cpp, loaders/DynamicObject.h: Store current
+	  context number on context created and add asserts to maintain
+	  correctness.
+
+	* loaders/3ds.cpp, loaders/3ds.h: Remove height variable and accessors.
+
+	* loaders/3ds.cpp, loaders/3ds.h, loaders/BoundBox.cpp,
+	  loaders/LibModelFile.cpp, loaders/NPlane.cpp,
+	  loaders/ParticleSystem.cpp, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/Cal3dModel.h: Implement contextCreated/contextDestroyed
+	  methods as required and call contextCreated when Dynamic/Static
+	  objects are created.
+
+	* loaders/ModelHandler.cpp: Make varconf keys static vars. Fix
+	  contextCreated and contextDestoyed method to use correct list of
+	  models.
+
+	* loaders/3ds_Loader.cpp, loaders/LibModelFile_Loader.cpp,
+	  loaders/ModelLoader.cpp, loaders/ModelRecord.h,
+	  loaders/ModelSystem.cpp, loaders/ModelSystem.h,
+	  loader/cal3d/Cal3d_Loader.cpp: Remove models.cfg file loader and
+	  data_file_id entry from ModelRecords.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/cal3d/Cal3dModel.h: Make Cal3dCoreModel a friend.
 
 	* loaders/cal3d/Cal3dCoreMode.cpp: Add scale_isotropic_z option to cal3d
