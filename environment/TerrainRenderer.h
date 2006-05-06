@@ -32,7 +32,8 @@ public:
         vb_harray(0),
         disp(0),
         harray(NULL),
-        narray(NULL)
+        narray(NULL),
+        m_context_no(-1)
       {
       }
       
@@ -45,8 +46,9 @@ public:
       GLuint disp;
       float *harray;
       float *narray;
+      int m_context_no;
 
-      void contextCreated() {}
+      void contextCreated();
       void contextDestroyed(bool check);
 
     };
@@ -71,7 +73,7 @@ public:
 
     std::vector<ShaderEntry> m_shaders;
     
-    void contextCreated() {}
+    void contextCreated();
     void contextDestroyed(bool check);
 
     void reset();
@@ -103,6 +105,8 @@ public:
     friend class Environment;
     
     void registerShader(Mercator::Shader*, const std::string& texId);
+
+  int m_context_no;
 };
 }
 #endif // APOGEE_TERRAIN_RENDERER_H

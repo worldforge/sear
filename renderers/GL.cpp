@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.150 2006-05-06 13:50:22 simon Exp $
+// $Id: GL.cpp,v 1.151 2006-05-06 15:21:48 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -355,10 +355,9 @@ int GL::contextCreated() {
 void GL::destroyWindow() {
   assert(m_screen != NULL);
 
-//  if (m_screen) {
-    SDL_FreeSurface(m_screen);
-    m_screen = NULL;
-//  }
+  SDL_FreeSurface(m_screen);
+  m_screen = NULL;
+
   SDL_QuitSubSystem(SDL_INIT_VIDEO);
 
 }
@@ -368,9 +367,12 @@ void GL::toggleFullscreen() {
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
   if (!SDL_WM_ToggleFullScreen(m_screen)) {
     destroyWindow();
+    m_context_valid = false;
+    RenderSystem::getInstance().ContextDestroyed.emit(false);
     createWindow(m_width, m_height, m_fullscreen);
   }
 }
+
 int GL::checkError() {
   int iserr = 0;
   GLenum err = glGetError();

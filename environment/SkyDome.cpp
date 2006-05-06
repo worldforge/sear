@@ -71,7 +71,8 @@ float SkyDome::m_quad_t[] = QUAD_TEX;
 SkyDome::SkyDome(float radius, int levels, int segments) :
     m_verts(NULL), m_texCoords(NULL),
     m_vb_verts(0), m_vb_texCoords(0),
-    m_radius(radius), m_levels(levels), m_segments(segments)
+    m_radius(radius), m_levels(levels), m_segments(segments),
+    m_context_no(-1)
 {
     m_size = segments * (levels + 1); // extra level for the skirt
     domeInit(radius, levels, segments);
@@ -203,6 +204,9 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
 }
 
 void SkyDome::contextDestroyed(bool check) {
+
+  assert(m_context_no != -1);
+
   if (check) {
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
       if (glIsBufferARB(m_vb_verts)) {
@@ -216,9 +220,15 @@ void SkyDome::contextDestroyed(bool check) {
   }
   m_vb_verts = 0;
   m_vb_texCoords = 0;
+
+  m_context_no = -1;
 }
 
 void SkyDome::contextCreated() {
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+
+  assert(m_context_no == -1);
+  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
   domeInit(m_radius, m_levels, m_segments);
 }
 
@@ -258,6 +268,8 @@ void SkyDome::updateFogColor(float t)
 {
     if (m_horizonColors.empty()) getHorizonColors();
 
+    assert (m_horizonColors.empty() == false);
+
     assert(t >= 0.0f && t <= 1.0f);
        
     if (t == 1.0f) t = 0.0f; // ensure t is in the range [0.0 .. 1.0)
@@ -288,6 +300,10 @@ void SkyDome::updateFogColor(float t)
 }
 
 void SkyDome::render() {
+
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+
   glColor3f(1.0f, 1.0f, 1.0f);
   Calendar *cal = System::instance()->getCalendar();
   assert (cal != NULL);

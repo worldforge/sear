@@ -51,6 +51,8 @@ private:
   float m_radius;
   int m_levels;
   int m_segments;
+
+  int m_context_no;
 };
 
 } // namespace Sear

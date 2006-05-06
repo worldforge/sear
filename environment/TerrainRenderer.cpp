@@ -36,7 +36,15 @@ static GLfloat sx1[] = { 0.015625f, 0.f, 0.f, 0.f };
 static GLfloat ty1[] = { 0.f, 0.015625f, 0.f, 0.f };
 
 
+void TerrainRenderer::DataSeg::contextCreated() {
+  assert(m_context_no == -1);
+  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+}
+
 void TerrainRenderer::DataSeg::contextDestroyed(bool check) {
+
+  assert(m_context_no != -1);
+
   if (check) {
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
       if (glIsBufferARB(vb_narray)) {
@@ -67,6 +75,8 @@ void TerrainRenderer::DataSeg::contextDestroyed(bool check) {
   }
   
   m_alphaTextures.clear();
+
+  m_context_no = -1;
 }
 
 void TerrainRenderer::enableRendererState() {
@@ -295,6 +305,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         }
 
         DataSeg seg;
+        seg.contextCreated();
         
         // Generate normsl
         seg.narray = s->getNormals (); 
@@ -411,7 +422,8 @@ TerrainRenderer::TerrainRenderer ():
   m_numLineIndeces (0),
   m_lineIndeces (new unsigned short[(segSize + 1) * (segSize + 1) * 2]),
   m_landscapeList (0),
-  m_haveTerrain (false)
+  m_haveTerrain (false),
+  m_context_no(-1)
 {
   m_seaTexture    = RenderSystem::getInstance ().requestTexture ("water");
   m_shadowTexture = RenderSystem::getInstance ().requestTexture ("shadow");
@@ -452,6 +464,8 @@ TerrainRenderer::~TerrainRenderer() {
 void TerrainRenderer::reset() {
   // Clear all data
   contextDestroyed(true);
+  // Re-set context counter
+  contextCreated();
 #if(0)
   m_terrain = Mercator::Terrain(Mercator::Terrain::SHADED);
   // TODO set these texture names in a config file
@@ -464,6 +478,9 @@ void TerrainRenderer::reset() {
 }
 
 void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+
   if (!m_haveTerrain) {
     m_haveTerrain = true;
   }
@@ -473,7 +490,27 @@ void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
   }
 }
 
+void TerrainRenderer::contextCreated() {
+  assert(m_context_no == -1);
+
+  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+
+  DisplayListStore::iterator I = m_displayLists.begin();
+  while (I != m_displayLists.end()) {
+    DisplayListColumn &dcol = (I->second);
+    DisplayListColumn::iterator J = dcol.begin();
+    while (J != dcol.end()) {
+      (J->second).contextCreated(); 
+      ++J;
+    }
+    ++I;
+  }
+}
+ 
 void TerrainRenderer::contextDestroyed(bool check) {
+
+  assert(m_context_no != -1);
+
   DisplayListStore::iterator I = m_displayLists.begin();
   while (I != m_displayLists.end()) {
     DisplayListColumn &dcol = (I->second);
@@ -491,6 +528,9 @@ void TerrainRenderer::contextDestroyed(bool check) {
     // done by texture manager?
   //  if (glIsTexture(m_shaders[i].texId)) glIsTexture(1, &m_shaders[i].texId);
 //  }
+
+
+  m_context_no = -1;
 }
 
 void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& texName)

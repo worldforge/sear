@@ -33,6 +33,7 @@ void Environment::init() {
   m_stars = SPtr<Stars>(new Stars());
   m_weather = SPtrShutdown<Weather>(new Weather());
   m_weather->init();
+
  
   RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Environment::contextCreated));
   RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Environment::contextDestroyed));
