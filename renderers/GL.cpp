@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.151 2006-05-06 15:21:48 simon Exp $
+// $Id: GL.cpp,v 1.152 2006-05-06 16:21:40 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -315,6 +315,10 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 }                                                                       
 
 int GL::contextCreated() {
+
+  // Hide cursor
+  SDL_ShowCursor(0);
+
   initLighting();
   // TODO: initialisation need to go into system?
   setupStates();
@@ -367,8 +371,7 @@ void GL::toggleFullscreen() {
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
   if (!SDL_WM_ToggleFullScreen(m_screen)) {
     destroyWindow();
-    m_context_valid = false;
-    RenderSystem::getInstance().ContextDestroyed.emit(false);
+    contextDestroyed(false);
     createWindow(m_width, m_height, m_fullscreen);
   }
 }
@@ -1674,13 +1677,12 @@ void GL::resize(int width, int height) {
   }
   // Have the textures been destroyed?
   if (!glIsTexture(1)) {
+    printf("Warning, context lost after resize!\n");
     // TODO: What is going on in this situation
     // The window has been resized, however the GL context needs to be
     // re-created. Do we need to destroy the whole window?
-    m_context_valid = false;
-    RenderSystem::getInstance().ContextDestroyed.emit(false);
-    createWindow(m_width, m_height, m_fullscreen);
-    return;
+    contextDestroyed(false);
+    contextCreated();
   }
   // Update view port
   setViewMode(PERSPECTIVE);

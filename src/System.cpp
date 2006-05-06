@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.154 2006-05-02 09:27:05 simon Exp $
+// $Id: System.cpp,v 1.155 2006-05-06 16:21:40 simon Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -310,9 +310,6 @@ bool System::init(int argc, char *argv[]) {
 
     return false;
   }
-
-  // Hide cursor
-  SDL_ShowCursor(0);
 
   m_workarea->init();
 

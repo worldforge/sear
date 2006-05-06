@@ -19,8 +19,11 @@ dnl Need libtool
 AM_BINRELOC
 dnl AC_PROG_LIBTOOL
 AC_CHECK_TOOL(DLLTOOL, dlltool)
+AC_CHECK_TOOL(OBJDUMP, objdump)
+AC_CHECK_TOOL(RANLIB, ranlib)
+AC_CHECK_TOOL(STRIP, strip)
+AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(AS, as)
-
 AC_CHECK_TOOL(WINDRES, windres)
 AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
 AC_PROG_LIBTOOL
@@ -317,6 +320,7 @@ AC_OUTPUT([
 	sear-updater.spec
 	Sear.iss
 	src/sear
+	src/sear-res.rc
 	sear.desktop
 	autopackage/default.apspec
 	tools/Makefile
