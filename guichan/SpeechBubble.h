@@ -27,6 +27,9 @@ public:
     void addLine(const std::string &);
 
     int loadImages(const std::vector<std::string> &);
+
+    void contextCreated();
+    void contextDestroyed(bool check);
 private:
     gcn::Image * m_n;
     gcn::Image * m_s;

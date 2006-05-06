@@ -5,6 +5,8 @@
 #ifndef SEAR_GUICHAN_WORKAREA_H
 #define SEAR_GUICHAN_WORKAREA_H
 
+#include <sigc++/trackable.h>
+
 #include "src/ConsoleObject.h"
 
 #include <guichan.hpp>
@@ -43,7 +45,7 @@ public:
   }
 };
 
-class Workarea : public ConsoleObject {
+class Workarea : public ConsoleObject, public sigc::trackable {
 public:
   typedef std::map<std::string, SPtr<gcn::Button> > ButtonDict;
   typedef std::map<std::string, SPtr<gcn::Window> > WindowDict;
@@ -78,6 +80,9 @@ public:
   virtual void runCommand(const std::string &, const std::string &);
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
+
+  void contextCreated();
+  void contextDestroyed(bool check);
 
   void resize();
   bool handleEvent(const SDL_Event &);

@@ -29,6 +29,8 @@ class RootWidget : public gcn::Container
     void closeWindow(gcn::Window *);
 
     virtual void logic();
+    void contextCreated();
+    void contextDestroyed(bool check);
 };
 
 } // namespace Sear

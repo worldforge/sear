@@ -1,5 +1,13 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* guichan/Overlay.cpp, guichan/Overlay.h, guichan/RootWidget.cpp, 
+	  guichan/RootWidget.h, guichan/SpeechBubble.cpp, 
+	  guichan/SpeechBubble.h, guichan/Workarea.cpp, guichan/Workarea.h: Add
+	  hooks to contextCreated and contextDestroyed signals to reload images.
+	  Currently the images and fonts are leaked.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.ac: Add extra tool checks.
 
 	* renderers/GL.cpp, src/System.cpp: Move hide cursor call to

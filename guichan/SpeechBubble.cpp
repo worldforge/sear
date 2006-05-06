@@ -162,5 +162,11 @@ int SpeechBubble::loadImages(const std::vector<std::string> &)
     }
     return 0;
 }
+void SpeechBubble::contextCreated() {
+  loadImages(std::vector<std::string>());
+}
 
+void SpeechBubble::contextDestroyed(bool check) {
+ // TODO: Clean up images
+}
 } // namespace Sear

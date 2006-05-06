@@ -200,4 +200,25 @@ void Overlay::heard(Eris::Entity * e,
   bubble->addLine(msg);
 }
 
+void Overlay::contextCreated() {
+  BubbleMap::iterator I = m_bubbles.begin();
+  BubbleMap::const_iterator Iend = m_bubbles.end();
+  while (I != Iend) {
+    SPtr<SpeechBubble> sb = I->second;
+    sb->contextCreated();
+    ++I;
+  }
+}
+
+void Overlay::contextDestroyed(bool check) {
+  BubbleMap::iterator I = m_bubbles.begin();
+  BubbleMap::const_iterator Iend = m_bubbles.end();
+  while (I != Iend) {
+    SPtr<SpeechBubble> sb = I->second;
+    sb->contextDestroyed(check);
+    ++I;
+  }
+
+}
+
 } // namespace Sear

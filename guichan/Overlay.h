@@ -59,6 +59,10 @@ public:
   void heard(Eris::Entity *, const Atlas::Objects::Operation::RootOperation &);
 
   void logic(RootWidget *);
+
+  void contextCreated();
+  void contextDestroyed(bool check);
+
 };
 
 } // namespace Sear

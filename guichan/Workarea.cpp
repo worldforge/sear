@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
 
+#include <sigc++/object_slot.h>
+
 #include "guichan/Workarea.h"
 
 #include "guichan/RootWidget.h"
@@ -155,6 +157,10 @@ void Workarea::init()
   m_system->getActionHandler()->addHandler("avatar_failed", "/workarea_alert Unable to get character");
 
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle Inventory");
+
+
+  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Workarea::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Workarea::contextDestroyed));
 
 }
 
@@ -330,6 +336,33 @@ void Workarea::draw()
   m_gui->draw();
 
   glLineWidth(4.f);
+}
+
+void Workarea::contextCreated() {
+  try {
+    std::string font_path = m_fixed_font;
+    m_system->getFileHandler()->expandString(font_path);
+
+    gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
+    gcn::Widget::setGlobalFont(font);
+  } catch (...) {
+    std::cerr << "Failed to load font " << m_fixed_font << std::endl << std::flush;
+  }
+  m_top->contextCreated();
+}
+
+void Workarea::contextDestroyed(bool check) {
+  m_top->contextDestroyed(check);
+  /*
+  // Clean up global font
+  m_top->setFont(NULL);
+  gcn::Font * f = m_top->getFont();
+  if (f) {
+    gcn::Widget::setGlobalFont(NULL);
+    delete f;
+  }
+  */
 }
 
 } // namespace Sear

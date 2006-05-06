@@ -100,4 +100,11 @@ void RootWidget::logic()
   gcn::Container::logic();
 }
 
+void RootWidget::contextCreated() {
+  Overlay::instance()->contextCreated();
+}
+void RootWidget::contextDestroyed(bool check) {
+  Overlay::instance()->contextDestroyed(check);
+}
+
 } // namespace Sear
