@@ -1,5 +1,11 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* data/states.cfg: Add a new 3ds_normalise state for use with 3ds object	  that have been anisotropically scaled.
+	
+	* renderers/GL.cpp: Disable normalise be default.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/StateManager.cpp, renderers/StateManager.h: Add option to
 	  control GL_NORMALIZE with a state record. This is different to the
 	  existing option for GL_RESCALE_NORMALS.
