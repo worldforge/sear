@@ -1,5 +1,12 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dModel.h: Make Cal3dCoreModel a friend.
+
+	* loaders/cal3d/Cal3dCoreMode.cpp: Add scale_isotropic_z option to cal3d
+	  models.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Add new ignore_minus_z 
 	  option to ignore negative z values in scaling calculations. This is
 	  for models with parts that are meant to be underground and are

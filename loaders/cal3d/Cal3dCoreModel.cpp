@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.38 2006-02-25 21:51:14 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.39 2006-05-06 11:33:52 simon Exp $
 
 #include <string>
 
@@ -33,6 +33,8 @@ static const std::string SECTION_bone_map = "bone_mapping";
 static const std::string SECTION_bone_rotation = "bone_rotations";
 
 static const std::string KEY_scale = "scale";
+static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
+
 static const std::string KEY_path = "path";
 static const std::string KEY_skeleton = "skeleton";
 static const std::string KEY_mesh = "mesh";
@@ -289,7 +291,34 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   }
   // Scale the object
   m_core_model->scale(m_scale);
-
+  if (config.findItem(SECTION_model, KEY_scale_isotropic_z)) {
+    if ((bool)config.getItem(SECTION_model, KEY_scale_isotropic_z)) {
+      // Instantiate a model to get its scale.
+      Cal3dModel *model = new Cal3dModel();
+      if (model->init(this)) {
+        delete model;
+        model = NULL;
+      } else {    
+        model->update(1);
+        CalBoundingBox bbox = model->m_calModel->getBoundingBox();
+        CalVector p[6];
+        bbox.computePoints(p);
+        float min_z,max_z;
+        min_z = max_z = p[0].z;
+        for (int  i = 1; i < 6; ++i) {
+          if (min_z > p[i].z) min_z = p[i].z;
+          if (max_z < p[i].z) max_z = p[i].z;
+        }
+        // Clean up temporary object
+        model->shutdown();
+        delete model;
+        float s = 1.0f / (max_z - min_z);
+printf("Scale %f, %f -> %f\n", min_z, max_z, s);
+        m_core_model->scale(s);
+      }
+    }
+  }
+ 
   return 0;
 }
 
@@ -347,6 +376,7 @@ Cal3dModel *Cal3dCoreModel::instantiate() {
     delete model;
     model = NULL;
   }
+
   return model;
 }
 
