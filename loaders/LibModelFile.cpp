@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.23 2006-04-30 15:47:15 simon Exp $
+// $Id: LibModelFile.cpp,v 1.24 2006-05-06 10:47:05 simon Exp $
 
 /*
   Debug check list
@@ -50,6 +50,9 @@ static const std::string KEY_filename = "filename";
 static const std::string KEY_rotation = "rotation";
 static const std::string KEY_scale = "scale";
 static const std::string KEY_scale_isotropic = "scale_isotropic";
+static const std::string KEY_scale_isotropic_x = "scale_isotropic_x";
+static const std::string KEY_scale_isotropic_y = "scale_isotropic_y";
+static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
 static const std::string KEY_scale_anisotropic = "scale_anisotropic";
 static const std::string KEY_z_align = "z_align";
 
@@ -60,8 +63,14 @@ static const std::string KEY_specular = "specular";
 static const std::string KEY_emission = "emission";
 static const std::string KEY_shininess = "shininess";
 
+typedef enum {
+  AXIS_ALL = 0,
+  AXIS_X,
+  AXIS_Y,
+  AXIS_Z
+} Axis;
 
-static void scale_object(LibModelFile::StaticObjectList &objs, bool isotropic, bool z_align) {
+static void scale_object(LibModelFile::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
@@ -113,8 +122,21 @@ static void scale_object(LibModelFile::StaticObjectList &objs, bool isotropic, b
   // Scaling in all axis.
   // Otherwise each axis is scaled by a different amount
   if (isotropic) {
-    float f = std::max(diff_x, diff_y);
-    diff_x = diff_y = diff_z = std::max(f, diff_z);
+    switch (axis) {
+      case AXIS_X: // Scale so X axis is 1.0
+        diff_y = diff_z = diff_x;
+        break;
+      case AXIS_Y: // Scale so Y axis is 1.0
+        diff_x = diff_z = diff_y;
+        break;
+      case AXIS_Z: // Scale so Z axis is 1.0
+        diff_x = diff_y = diff_z;
+        break;
+      default:
+      case AXIS_ALL: // Scale so largest axis is 1.0
+        diff_x = diff_y = diff_z = std::max(std::max(diff_x, diff_y), diff_z);
+        break;
+    }
   }
 
   float scale_x = 1.0 / (diff_x);
@@ -315,12 +337,27 @@ int LibModelFile::init(const std::string &filename) {
   }
   if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic)) {
-      scale_object(m_static_objects, true, z_align);
+      scale_object(m_static_objects, AXIS_ALL, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_x)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_x)) {
+      scale_object(m_static_objects, AXIS_X, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_y)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_y)) {
+      scale_object(m_static_objects, AXIS_Y, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_z)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_z)) {
+      scale_object(m_static_objects, AXIS_Z, true, z_align);
     }
   }
   if (m_config.findItem(SECTION_model, KEY_scale_anisotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_anisotropic)) {
-      scale_object(m_static_objects, false, z_align);
+      scale_object(m_static_objects, AXIS_ALL, false, z_align);
     }
   }
 

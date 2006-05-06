@@ -1,5 +1,12 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Add new 
+	  scale_isotropic_x/y/z option specify which axis should be scaled to
+	  unit length in addition to the original which scaless the largest axis
+	  to unit length.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* data/states.cfg: Add a new 3ds_normalise state for use with 3ds object	  that have been anisotropically scaled.
 	
 	* renderers/GL.cpp: Disable normalise be default.

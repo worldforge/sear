@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.58 2006-04-30 15:47:15 simon Exp $
+// $Id: 3ds.cpp,v 1.59 2006-05-06 10:47:05 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -59,6 +59,9 @@ static const std::string KEY_filename = "filename";
 static const std::string KEY_rotation = "rotation";
 static const std::string KEY_scale = "scale";
 static const std::string KEY_scale_isotropic = "scale_isotropic";
+static const std::string KEY_scale_isotropic_x = "scale_isotropic_x";
+static const std::string KEY_scale_isotropic_y = "scale_isotropic_y";
+static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
 static const std::string KEY_scale_anisotropic = "scale_anisotropic";
 static const std::string KEY_z_align = "z_align";
 
@@ -69,7 +72,14 @@ static const std::string KEY_specular = "specular";
 static const std::string KEY_emission = "emission";
 static const std::string KEY_shininess = "shininess";
 
-static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z_align) {
+typedef enum {
+  AXIS_ALL = 0,
+  AXIS_X,
+  AXIS_Y,
+  AXIS_Z
+} Axis;
+
+static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
@@ -122,8 +132,22 @@ static void scale_object(ThreeDS::StaticObjectList &objs, bool isotropic, bool z
   // Scaling in all axis.
   // Otherwise each axis is scaled by a different amount
   if (isotropic) {
-    float f = std::max(diff_x, diff_y);
-    diff_x = diff_y = diff_z = std::max(f, diff_z);
+    switch (axis) {
+      case AXIS_X: // Scale so X axis is 1.0
+        diff_y = diff_z = diff_x;
+        break;
+      case AXIS_Y: // Scale so Y axis is 1.0
+        diff_x = diff_z = diff_y;
+        break;
+      case AXIS_Z: // Scale so Z acis is 1.0
+        diff_x = diff_y = diff_z;
+        break;
+      default:
+        printf("Unknown axis, scaling to largest\n");
+      case AXIS_ALL: // Scale so largest axis is 1.0
+        diff_x = diff_y = diff_z = std::max(std::max(diff_x, diff_y), diff_z);
+        break;
+    }
   }
 
   float scale_x = 1.0 / (diff_x);
@@ -259,12 +283,27 @@ int ThreeDS::init(const std::string &file_name) {
   }
   if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic)) {
-      scale_object(m_render_objects, true, z_align);
+      scale_object(m_render_objects, AXIS_ALL, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_x)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_x)) {
+      scale_object(m_render_objects, AXIS_X, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_y)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_y)) {
+      scale_object(m_render_objects, AXIS_Y, true, z_align);
+    }
+  }
+  else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_z)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_z)) {
+      scale_object(m_render_objects, AXIS_Z, true, z_align);
     }
   }
   if (m_config.findItem(SECTION_model, KEY_scale_anisotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_anisotropic)) {
-      scale_object(m_render_objects, false, z_align);
+      scale_object(m_render_objects, AXIS_ALL, false, z_align);
     }
   }
 
@@ -469,6 +508,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         // Do nothing, use default vals
       }
     }
+
     // Create new render object for change in texture
     if (texture_id != current_texture) {
       current_texture = texture_id;
