@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.45 2006-04-30 12:17:16 simon Exp $
+// $Id: TextureManager.cpp,v 1.46 2006-05-06 09:44:46 simon Exp $
 
 #include <unistd.h>
 
@@ -169,6 +169,9 @@ void TextureManager::init()
   m_texture_counter = 1;
   m_textures.resize(1); // we need to leave texture ID zero free
   m_names.resize(1); // ditto
+  // Set some values to help with debugging!
+  m_names[0] = "null_texture";
+  m_textures[0] = 0;
 
   m_texture_map.clear();
  

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.28 2006-02-18 15:41:12 simon Exp $
+// $Id: StateManager.cpp,v 1.29 2006-05-06 09:44:46 simon Exp $
 
 /*
  * TODO
@@ -52,6 +52,7 @@ static const std::string ALPHA_FUNCTION = "alpha_function";
 static const std::string ALPHA_VALUE = "alpha_value";
 static const std::string BLEND_SRC_FUNCTION = "blend_src_function";
 static const std::string BLEND_DEST_FUNCTION = "blend_dest_function";
+static const std::string NORMALISE = "normalise";
 
 static const std::string ALPHA_greater = "greater";
 static const std::string ALPHA_less = "less";
@@ -121,6 +122,7 @@ int StateManager::init() {
   default_state->stencil = false;
   default_state->fog = false;
   default_state->rescale_normals = false;
+  default_state->normalise = false;
   default_state->alpha_function = GL_GREATER;
   default_state->alpha_value = 0.1f;
   default_state->blend_src_function = GL_SRC_ALPHA;
@@ -148,6 +150,7 @@ int StateManager::init() {
   font_state->stencil = false;
   font_state->fog = false;
   font_state->rescale_normals = false;
+  font_state->normalise = false;
   font_state->alpha_function = GL_GREATER;
   font_state->alpha_value = 0.1f;
   font_state->blend_src_function = GL_SRC_ALPHA;
@@ -173,6 +176,7 @@ int StateManager::init() {
   select_state->stencil = false;
   select_state->fog = false;
   select_state->rescale_normals = false;
+  select_state->normalise = false;
   select_state->alpha_function = GL_GREATER;
   select_state->alpha_value = 0.1f;
   select_state->blend_src_function = GL_SRC_ALPHA;
@@ -199,6 +203,7 @@ int StateManager::init() {
   cursor_state->stencil = false;
   cursor_state->fog = false;
   cursor_state->rescale_normals = false;
+  cursor_state->normalise = false;
   cursor_state->alpha_function = GL_GREATER;
   cursor_state->alpha_value = 0.1f;
   cursor_state->blend_src_function = GL_SRC_ALPHA;
@@ -269,6 +274,7 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
       record->stencil = false;
       record->fog = false;
       record->rescale_normals = false;
+      record->normalise = false;
       record->alpha_function = GL_GREATER;
       record->alpha_value = 0.1f;
       record->blend_src_function = GL_SRC_ALPHA;
@@ -293,6 +299,7 @@ void StateManager::varconf_callback(const std::string &section, const std::strin
   else if (key == STENCIL) record->stencil = (bool)config.getItem(section, key);
   else if (key == FOG) record->fog = (bool)config.getItem(section, key);
   else if (key == RESCALE_NORMALS) record->rescale_normals = (bool)config.getItem(section, key);
+  else if (key == NORMALISE) record->normalise = (bool)config.getItem(section, key);
   else if (key == ALPHA_FUNCTION) record->alpha_function = getAlphaFunction((std::string)config.getItem(section, key));
   else if (key == ALPHA_VALUE) record->alpha_value = (double)config.getItem(section, key);
   else if (key == BLEND_SRC_FUNCTION) record->blend_src_function = getBlendFunction((std::string)config.getItem(section, key));
@@ -417,6 +424,8 @@ void StateManager::stateChange(StateID state) {
     else glDisable(GL_FOG);
     if (sp->rescale_normals) glEnable(GL_RESCALE_NORMAL);
     else glDisable(GL_RESCALE_NORMAL);
+    if (sp->normalise) glEnable(GL_NORMALIZE);
+    else glDisable(GL_NORMALIZE);
     // TODO is this broken? 0 could be a valid state....
 //    if (sp->alpha_function != 0) {
       glAlphaFunc(sp->alpha_function, sp->alpha_value);
@@ -492,6 +501,10 @@ void StateManager::buildStateChange(unsigned int &list, SPtr<StateProperties> pr
   if (previous_state->rescale_normals != next_state->rescale_normals) {
     if (next_state->rescale_normals) glEnable(GL_RESCALE_NORMAL);
     else glDisable(GL_RESCALE_NORMAL);
+  }
+  if (previous_state->normalise != next_state->normalise) {
+    if (next_state->normalise) glEnable(GL_NORMALIZE);
+    else glDisable(GL_NORMALIZE);
   }
 //  if ((next_state->alpha_function != previous_state->alpha_function) || (next_state->alpha_value != previous_state->alpha_value)) 
   glAlphaFunc(next_state->alpha_function, next_state->alpha_value);

@@ -1,5 +1,14 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/StateManager.cpp, renderers/StateManager.h: Add option to
+	  control GL_NORMALIZE with a state record. This is different to the
+	  existing option for GL_RESCALE_NORMALS.
+
+	* renderers/TextureManager.cpp: Assign the name "null_texture" to
+	  texture ID 0 to make error messages more helpful.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.cpp, loaders/DynamicObject.cpp: Use correct
 	  value for glLockArrays
 

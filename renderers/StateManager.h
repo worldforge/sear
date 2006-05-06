@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.13 2006-02-18 15:41:12 simon Exp $
+// $Id: StateManager.h,v 1.14 2006-05-06 09:44:46 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -45,6 +45,7 @@ typedef struct {
   bool stencil;
   bool fog;
   bool rescale_normals;
+  bool normalise;
   float alpha_value;
   int alpha_function;
   int blend_src_function;
