@@ -1,5 +1,12 @@
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Add new ignore_minus_z 
+	  option to ignore negative z values in scaling calculations. This is
+	  for models with parts that are meant to be underground and are
+	  outside the bounding box.
+
+2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp, loaders/LibModelFile.cpp: Add new 
 	  scale_isotropic_x/y/z option specify which axis should be scaled to
 	  unit length in addition to the original which scaless the largest axis

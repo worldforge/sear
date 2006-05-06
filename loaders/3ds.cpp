@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.59 2006-05-06 10:47:05 simon Exp $
+// $Id: 3ds.cpp,v 1.60 2006-05-06 11:00:10 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -64,6 +64,7 @@ static const std::string KEY_scale_isotropic_y = "scale_isotropic_y";
 static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
 static const std::string KEY_scale_anisotropic = "scale_anisotropic";
 static const std::string KEY_z_align = "z_align";
+static const std::string KEY_ignore_minus_z = "ignore_minus_z";
 
 static const std::string KEY_texture_map_0 = "texture_map_0";
 static const std::string KEY_ambient = "ambient";
@@ -79,7 +80,7 @@ typedef enum {
   AXIS_Z
 } Axis;
 
-static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align) {
+static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
@@ -121,6 +122,10 @@ static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotro
         if (z > max[2]) max[2] = z; 
       }
     }
+  }
+
+  if (ignore_minus_z) {
+    min[2] = 0.0f;
   }
 
   // Re-scale all points
@@ -276,6 +281,13 @@ int ThreeDS::init(const std::string &file_name) {
 
   lib3ds_file_free(model);
   bool z_align = false;
+  bool ignore_minus_z = false;
+
+  if (m_config.findItem(SECTION_model, KEY_ignore_minus_z)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_ignore_minus_z)) {
+      ignore_minus_z = true;
+    }
+  }
   if (m_config.findItem(SECTION_model, KEY_z_align)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_z_align)) {
       z_align = true;
@@ -283,27 +295,27 @@ int ThreeDS::init(const std::string &file_name) {
   }
   if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic)) {
-      scale_object(m_render_objects, AXIS_ALL, true, z_align);
+      scale_object(m_render_objects, AXIS_ALL, true, z_align, ignore_minus_z);
     }
   }
   else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_x)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_x)) {
-      scale_object(m_render_objects, AXIS_X, true, z_align);
+      scale_object(m_render_objects, AXIS_X, true, z_align, ignore_minus_z);
     }
   }
   else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_y)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_y)) {
-      scale_object(m_render_objects, AXIS_Y, true, z_align);
+      scale_object(m_render_objects, AXIS_Y, true, z_align, ignore_minus_z);
     }
   }
   else if (m_config.findItem(SECTION_model, KEY_scale_isotropic_z)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_isotropic_z)) {
-      scale_object(m_render_objects, AXIS_Z, true, z_align);
+      scale_object(m_render_objects, AXIS_Z, true, z_align, ignore_minus_z);
     }
   }
   if (m_config.findItem(SECTION_model, KEY_scale_anisotropic)) {
     if ((bool)m_config.getItem(SECTION_model, KEY_scale_anisotropic)) {
-      scale_object(m_render_objects, AXIS_ALL, false, z_align);
+      scale_object(m_render_objects, AXIS_ALL, false, z_align, ignore_minus_z);
     }
   }
 
