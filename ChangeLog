@@ -1,3 +1,8 @@
+2006-05-15  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/client.cpp: Don't set client status to connected on logout
+	  notification if it is already disconnected.
+
 2006-05-06  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/Overlay.cpp, guichan/Overlay.h, guichan/RootWidget.cpp, 

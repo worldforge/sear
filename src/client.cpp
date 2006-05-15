@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.81 2006-05-04 19:46:19 simon Exp $
+// $Id: client.cpp,v 1.82 2006-05-15 12:47:41 alriddoch Exp $
 
 #include "System.h"
 
@@ -577,7 +577,12 @@ void Client::LogoutComplete(bool clean_logout) {
     fprintf(stderr, "[Client] Error during Logout\n");
   }
   m_system->pushMessage(CLIENT_LOGGED_OUT, CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  setStatus(CLIENT_STATUS_CONNECTED);
+
+  // We may have already been disconnected, so its not safe to set status
+  // back to CONNECTED unless we know we still are.
+  if (m_status > CLIENT_STATUS_CONNECTED) {
+    setStatus(CLIENT_STATUS_CONNECTED);
+  }
 
   Eris::deleteLater(new DelLater<Eris::Account>(m_account));
   m_account.release();
