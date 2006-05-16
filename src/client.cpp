@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.82 2006-05-15 12:47:41 alriddoch Exp $
+// $Id: client.cpp,v 1.83 2006-05-16 23:28:38 jmt Exp $
 
 #include "System.h"
 
@@ -69,6 +69,7 @@ static const std::string ACCOUNT_LOGOUT = "logout";
 static const std::string CHARACTER_LIST = "get";
 static const std::string CHARACTER_CREATE = "add";
 static const std::string CHARACTER_TAKE = "take";
+static const std::string LEAVE_WORLD = "leave";
 
 // Config items
 static const std::string SECTION_CONNECTION = "connection";
@@ -515,6 +516,21 @@ int Client::takeCharacter(const std::string &id) {
   return 0;
 }
 
+int Client::leaveWorld()
+{
+    if (m_status != CLIENT_STATUS_IN_WORLD) {
+        m_system->pushMessage("Not in world", 
+            CONSOLE_MESSAGE | SCREEN_MESSAGE);
+        return 1;
+    }
+    
+    assert(m_avatar);
+    m_account->deactivateCharacter(m_avatar);
+    m_account->AvatarDeactivated.connect(SigC::slot(*this, &Client::AvatarDeactivated));
+    
+    return 0;
+}
+
 int Client::logout() {
   assert ((m_initialised == true) && "Client not initialised");
   if (debug) printf("[Client] logout\n");
@@ -616,6 +632,7 @@ void Client::registerCommands(Console *console) {
   console->registerCommand(CHARACTER_LIST, this);
   console->registerCommand(CHARACTER_CREATE, this);
   console->registerCommand(CHARACTER_TAKE, this);
+  console->registerCommand(LEAVE_WORLD, this);
 }
 
 void Client::runCommand(const std::string &command, const std::string &args) {
@@ -662,7 +679,10 @@ void Client::runCommand(const std::string &command, const std::string &args) {
   }
   else if (command == CHARACTER_TAKE) {
     takeCharacter(args);
-  } 
+  }
+  else if (command == LEAVE_WORLD) {
+    leaveWorld();
+  }
 }
 
 void Client::AvatarSuccess(Eris::Avatar *avatar) {
@@ -683,6 +703,12 @@ void Client::AvatarFailure(const std::string &msg) {
   m_system->getCharacter()->setAvatar(NULL);
   m_system->getCalendar()->setAvatar(NULL);
   m_system->getActionHandler()->handleAction("avatar_failed", 0);
+}
+
+void Client::AvatarDeactivated(Eris::Avatar* av)
+{
+    std::cout << "got avatar deactivated" << std::endl;
+    setStatus(CLIENT_STATUS_GOING_OUT_WORLD);
 }
 
 void Client::GotCharacterEntity(Eris::Entity *e) {

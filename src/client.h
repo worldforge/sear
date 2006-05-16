@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.25 2006-04-30 18:13:41 alriddoch Exp $
+// $Id: client.h,v 1.26 2006-05-16 23:28:38 jmt Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -88,7 +88,8 @@ public:
   int getCharacters();	
   int createCharacter(const std::string &, const std::string &, const std::string&, const std::string &);
   int takeCharacter(const std::string &);
- 
+  int leaveWorld();
+
   void poll();
   std::string getStatus();
   
@@ -123,7 +124,7 @@ protected:
   void GotAllCharacters();
   void AvatarSuccess(Eris::Avatar *);
   void AvatarFailure(const std::string &msg);
-
+  void AvatarDeactivated(Eris::Avatar* av);
 
   void GotCharacterEntity(Eris::Entity *e);
 
