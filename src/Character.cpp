@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.84 2006-04-26 20:20:48 alriddoch Exp $
+// $Id: Character.cpp,v 1.85 2006-05-17 11:45:01 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -844,7 +844,7 @@ void Character::onChildRemoved(Eris::Entity *child) {
   if (name.empty()) name = child->getType()->getName();
 
   InventoryMap::iterator I = m_imap.find(name);
-  assert (I != m_imap.end());
+  if (I == m_imap.end()) return;
 
   int count = I->second;
   if (count == 1) {

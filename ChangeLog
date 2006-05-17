@@ -1,3 +1,8 @@
+2006-05-17  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Character.cpp: Replace assert with a return statement as there are
+	  valid situations where the statement could be false.
+
 2006-05-17  James Turner  <james@worldforge.org>
 
 	* src/client.h, src/client.cpp: add a /leave command, to deactivate
