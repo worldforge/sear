@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.84 2006-05-17 11:48:18 simon Exp $
+// $Id: client.cpp,v 1.85 2006-05-17 13:36:45 simon Exp $
 
 #include "System.h"
 
@@ -560,11 +560,8 @@ int Client::getCharacters() {
   return 0;
 }
 
-std::string Client::getStatus() {
-  assert ((m_initialised == true) && "Client not initialised");
-  printf("[Client] getStatus\n");
-  if (m_connection.get() == NULL) return "No Connection object";
-  switch (m_connection->getStatus()) {
+static std::string getStatus(const Eris::Connection::Status &s) {
+  switch (s) {
     case 0: return "INVALID_STATUS";
     case 1: return "NEGOTIATE";
     case 2: return "CONNECTING";
@@ -576,7 +573,7 @@ std::string Client::getStatus() {
 }
 
 void Client::StatusChanged(Eris::Connection::Status s) {
-  if (debug) printf("[Client] Status Changed: %s\n", getStatus().c_str());
+  if (debug) printf("[Client] Status Changed: %s\n", getStatus(s).c_str());
 }
 
 void Client::LoginFailure(const std::string& msg) {

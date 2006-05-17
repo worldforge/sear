@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.26 2006-05-16 23:28:38 jmt Exp $
+// $Id: client.h,v 1.27 2006-05-17 13:36:45 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -91,7 +91,6 @@ public:
   int leaveWorld();
 
   void poll();
-  std::string getStatus();
   
   void registerCommands(Console *);
   void runCommand(const std::string &command, const std::string &args);
