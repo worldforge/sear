@@ -2,14 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: LightManager.h,v 1.4 2006-02-16 17:45:20 simon Exp $
+// $Id: LightManager.h,v 1.5 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_LIGHTMANAGER_H
 #define SEAR_LIGHTMANAGER_H 1
 
-#include "Light.h"
-
 namespace Sear {
+
+class Light;
 
 class LightManager {
 public:

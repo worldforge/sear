@@ -2,14 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.37 2006-02-18 23:09:12 simon Exp $
+// $Id: WorldEntity.h,v 1.38 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
 
 #include <string>
 #include <list>
-#include <Atlas/Objects/Operation.h>
+#include <Atlas/Objects/ObjectsFwd.h>
 
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
@@ -21,6 +21,12 @@
 //#include "ObjectLoader.h"
 namespace Eris {
   class View;
+}
+
+namespace Atlas {
+  namespace Message {
+    class Element;
+  }
 }
 
 namespace Sear {

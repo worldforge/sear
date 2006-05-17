@@ -2,12 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Matrix.h,v 1.1 2006-04-30 15:47:15 simon Exp $
+// $Id: Matrix.h,v 1.2 2006-05-17 23:15:33 alriddoch Exp $
 
 #ifndef SEAR_MATRIX_H
 #define SEAR_MATRIX_H 1
-
-#include <math.h>
 
 namespace Sear {
 

@@ -2,18 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.18 2006-04-30 15:47:15 simon Exp $
+// $Id: Utility.h,v 1.19 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
 
 #include <wfmath/const.h>
-#include <wfmath/quaternion.h>
 #include <wfmath/axisbox.h>
 
 #include <string>
 #include <deque>
 #include <sstream>
+
+namespace WFMath {
+class Quaternion;
+}
 
 namespace Sear {
 

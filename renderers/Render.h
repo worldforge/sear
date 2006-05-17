@@ -2,16 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.15 2006-05-06 13:50:22 simon Exp $
+// $Id: Render.h,v 1.16 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
 
-#include <SDL/SDL.h>
 #include <string>
 #include <list>
 #include <map>
-#include <utility>
 
 #include <wfmath/axisbox.h>
 

@@ -2,14 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Sprite.h,v 1.5 2006-02-05 21:09:48 simon Exp $
+// $Id: Sprite.h,v 1.6 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_RENDER_SPRITE_H
 #define SEAR_RENDER_SPRITE_H 1
 
-#include <varconf/Config.h>
 #include <sage/sage.h>
 #include <sage/GL.h>
+
+#include <string>
+
+namespace varconf {
+class Config;
+}
 
 namespace Sear {
 

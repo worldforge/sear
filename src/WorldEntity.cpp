@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.81 2006-02-23 19:51:59 simon Exp $
+// $Id: WorldEntity.cpp,v 1.82 2006-05-17 23:15:35 alriddoch Exp $
 
 /*
  TODO
@@ -16,7 +16,7 @@
 #include <sigc++/hide.h>
 #include <sigc++/object_slot.h>
 
-#include <Atlas/Message/Element.h>
+#include <Atlas/Objects/Operation.h>
 
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>

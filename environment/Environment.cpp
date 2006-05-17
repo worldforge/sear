@@ -6,6 +6,8 @@
 
 #include <Atlas/Objects/Operation.h>
 
+#include "renderers/RenderSystem.h"
+
 #include "src/System.h"
 
 #include "Weather.h"

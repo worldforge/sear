@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.14 2006-05-06 09:44:46 simon Exp $
+// $Id: StateManager.h,v 1.15 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -16,7 +16,7 @@
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
 
-#include "RenderSystem.h"
+#include "RenderTypes.h"
 
 namespace varconf {
   class Config;

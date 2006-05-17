@@ -2,18 +2,27 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.10 2006-02-07 11:31:03 simon Exp $
+// $Id: ObjectRecord.h,v 1.11 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
 
 #include <string>
 #include <list>
+#include <map>
 #include <Eris/EntityRef.h>
 #include <wfmath/axisbox.h>
 #include <wfmath/point.h>
 #include <wfmath/quaternion.h>
-#include <Atlas/Message/Element.h>
+
+namespace Atlas
+{
+namespace Message
+{
+class Element;
+typedef std::map<std::string, Element> MapType;
+}
+}
 
 namespace Sear {
 

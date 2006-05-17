@@ -5,13 +5,11 @@
 #ifndef SEAR_ENVIRONMENT_H
 #define SEAR_ENVIRONMENT_H 1
 
-#include <stdlib.h>
 #include <map>
 
 #include <sigc++/trackable.h>
 
 #include <wfmath/point.h>
-#include <wfmath/quaternion.h>
 
 #include "common/SPtr.h"
 

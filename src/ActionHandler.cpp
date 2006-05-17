@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.22 2006-02-15 12:44:24 simon Exp $
+// $Id: ActionHandler.cpp,v 1.23 2006-05-17 23:15:35 alriddoch Exp $
 
 #include <unistd.h>
 
@@ -12,6 +12,7 @@
 
 #include "common/Log.h"
 
+#include "src/System.h"
 #include "src/Console.h"
 #include "src/ScriptEngine.h"
 #include "src/WorldEntity.h"

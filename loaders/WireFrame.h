@@ -2,12 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.h,v 1.12 2006-02-20 20:16:21 simon Exp $
+// $Id: WireFrame.h,v 1.13 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_WIREFRAME_H
 #define SEAR_WIREFRAME_H 1
-
-#include <wfmath/axisbox.h>
 
 #include "common/types.h"
 

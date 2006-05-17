@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.47 2006-04-30 21:48:13 simon Exp $
+// $Id: Graphics.cpp,v 1.48 2006-05-17 23:15:35 alriddoch Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -10,6 +10,7 @@
 
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
+#include <Eris/Avatar.h>
 #include <Eris/View.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>

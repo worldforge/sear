@@ -9,10 +9,12 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
-
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
+
+namespace varconf {
+class Config;
+}
 
 namespace Sear {
 

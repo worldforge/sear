@@ -10,7 +10,6 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include <SDL/SDL.h>
 #include <string>
 #include <vector>
 #include <list>
@@ -20,13 +19,13 @@
 #include <sigc++/trackable.h>
 
 #include <wfmath/axisbox.h>
-#include <wfmath/quaternion.h>
 
 #include "Light.h"
 #include "Render.h"
-#include "RenderSystem.h"
 
-
+namespace WFMath {
+class Quaternion;
+}
 
 namespace Sear {
 
@@ -62,7 +61,7 @@ private:
   bool m_fontInitialised;
   unsigned int m_width, m_height;
   bool m_fullscreen;
-  SDL_Surface *m_screen;
+  struct SDL_Surface *m_screen;
 
   /**
    * Checks to see if OpenGL logged an error.

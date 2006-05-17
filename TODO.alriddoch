@@ -1,3 +1,8 @@
+Pass by value in BoundBox::init(1), WireFrame::init(1), Editor::translate(2),
+bboxCheck(1),
+
+Could use forward decls in common/types.h
+
 Fix segfault caused by loc being NULL in WorldEntiyt::getAbsPos()
 
 UI is confusing if active entity is not visible. How can we ensure that an

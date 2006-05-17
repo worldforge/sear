@@ -2,12 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Factory.cpp,v 1.9 2006-02-16 15:59:00 simon Exp $
+// $Id: Factory.cpp,v 1.10 2006-05-17 23:15:35 alriddoch Exp $
 
 #include "Factory.h"
 
 #include <Eris/View.h>
 #include <Eris/Connection.h>
+
+#include <Atlas/Objects/RootEntity.h>
 
 #include "System.h"
 #include "renderers/Graphics.h"

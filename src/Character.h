@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.43 2006-04-26 20:20:48 alriddoch Exp $
+// $Id: Character.h,v 1.44 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -11,13 +11,24 @@
 #include <string>
 
 #include <wfmath/quaternion.h>
-#include <Eris/Entity.h>
+// #include <Eris/Entity.h>
 #include <Eris/EntityRef.h>
-#include <Eris/Timeout.h>
-#include <Eris/Types.h>
-#include <Eris/Avatar.h>
+// #include <Eris/Timeout.h>
+// #include <Eris/Types.h>
+// #include <Eris/Avatar.h>
 #include "interfaces/ConsoleObject.h"
 #include <sigc++/trackable.h>
+
+namespace Atlas {
+namespace Message {
+class Element;
+}
+}
+
+namespace Eris {
+class Avatar;
+class Entity;
+}
 
 namespace varconf {
 class Config;

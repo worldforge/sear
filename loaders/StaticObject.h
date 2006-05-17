@@ -7,7 +7,6 @@
 
 #include <vector>
 
-#include <sage/sage.h>
 #include <sage/GL.h>
 #include "common/Matrix.h"
 

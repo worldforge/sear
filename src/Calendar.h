@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.h,v 1.12 2006-02-16 14:14:15 simon Exp $
+// $Id: Calendar.h,v 1.13 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_CALENDAR_H
 #define SEAR_CALENDAR_H 1
@@ -11,14 +11,16 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
-
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
 
 namespace Eris {
   class Avatar;
   class Calendar;
+}
+
+namespace varconf {
+  class Config;
 }
 
 /**

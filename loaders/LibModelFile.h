@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.10 2006-04-26 13:58:47 simon Exp $
+// $Id: LibModelFile.h,v 1.11 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -14,9 +14,6 @@
 #include <sigc++/trackable.h>
 
 #include <varconf/Config.h>
-
-#include <sage/sage.h>
-#include <sage/GL.h>
 
 #include "Model.h"
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.h,v 1.11 2006-02-15 12:44:24 simon Exp $
+// $Id: ActionHandler.h,v 1.12 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_ACTIONHANDLER_H
 #define SEAR_ACTIONHANDLER_H 1
@@ -14,7 +14,6 @@
 
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
-#include "System.h"
 
 // Forward declaration
 namespace varconf {
@@ -24,6 +23,7 @@ namespace varconf {
 namespace Sear {
 
 //Forward declaration
+class System;
 class Console;
 class WorldEntity;
 

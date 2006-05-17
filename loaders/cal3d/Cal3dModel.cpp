@@ -2,7 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.43 2006-05-06 13:50:22 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.44 2006-05-17 23:15:34 alriddoch Exp $
+
+#include <Atlas/Message/Element.h>
 
 #include <cal3d/cal3d.h>
 #include "Cal3dModel.h"

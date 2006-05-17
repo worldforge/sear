@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.10 2006-04-30 18:13:41 alriddoch Exp $
+// $Id: ModelHandler.h,v 1.11 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -17,10 +17,6 @@
 #include "interfaces/ConsoleObject.h"
 
 #include "common/SPtr.h"
-
-namespace varconf  {
-  class Config;
-}
 
 namespace Eris {
   class Timeout;

@@ -5,12 +5,10 @@
 #ifndef SEAR_SKYDOME_H
 #define SEAR_SKYDOME_H 1
 
-#include <sage/sage.h>
 #include <sage/GL.h>
 
 #include <math.h>
-#include <iostream>
-#include "renderers/RenderSystem.h"
+#include "renderers/RenderTypes.h"
 #include "common/types.h"
 #include <vector>
 

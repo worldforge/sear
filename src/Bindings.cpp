@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.23 2006-02-14 17:55:23 simon Exp $
+// $Id: Bindings.cpp,v 1.24 2006-05-17 23:15:35 alriddoch Exp $
 
 
 #include <SDL/SDL.h>
@@ -12,6 +12,8 @@
 #include "common/Log.h"
 
 #include "Bindings.h"
+
+#include <cassert>
 
 #ifdef DEBUG
   static const bool debug = true;

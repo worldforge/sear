@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: ImageUtils.cpp,v 1.3 2006-02-05 21:09:48 simon Exp $
+// $Id: ImageUtils.cpp,v 1.4 2006-05-17 23:15:35 alriddoch Exp $
 
 #include "ImageUtils.h"
+
+#include <SDL/SDL.h>
 
 #ifdef __APPLE__
     #include <SDL_image/SDL_image.h>

@@ -2,18 +2,19 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.155 2006-05-06 16:21:40 simon Exp $
+// $Id: System.cpp,v 1.156 2006-05-17 23:15:35 alriddoch Exp $
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sigc++/slot.h>
+#include <sigc++/object_slot.h>
 
 #include <varconf/varconf.h>
 #include <Eris/Exceptions.h>
 #include <Eris/DeleteLater.h>
+#include <Eris/Avatar.h>
 #include <Eris/View.h>
 
 #include "common/Log.h"

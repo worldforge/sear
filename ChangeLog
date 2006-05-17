@@ -1,3 +1,21 @@
+2006-05-18  Al Riddoch  <alriddoch@zepler.org>
+
+	* common/Matrix.h, common/Mesh.h, common/Utility.h,
+	  environment/Environment.cpp, environment/Environment.h,
+	  environment/SkyDome.h, environment/TerrainRenderer.cpp,
+	  loaders/DynamicObject.h, loaders/LibModelFile.h, loaders/Model.h,
+	  loaders/ModelHandler.h, loaders/ModelSystem.h, loaders/NPlane.h,
+	  loaders/ObjectRecord.h, loaders/StaticObject.h, loaders/WireFrame.h,
+	  loaders/cal3d/Cal3dModel.cpp, renderers/GL.h, renderers/Graphics.cpp,
+	  renderers/ImageUtils.cpp, renderers/ImageUtils.h,
+	  renderers/LightManager.h, renderers/Render.h, renderers/Sprite.h,
+	  renderers/StateManager.h, renderers/TextureManager.h,
+	  src/ActionHandler.cpp, src/ActionHandler.h, src/Bindings.cpp,
+	  src/Bindings.h, src/CacheManager.h, src/Calendar.h, src/Character.h,
+	  src/Factory.cpp, src/Factory.h, src/FileHandler.h, src/System.cpp,
+	  src/WorldEntity.cpp, src/WorldEntity.h: Remove unnecessary includes
+	  using forward declarations where possible to simplify dependencies.
+
 2006-05-17  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/client.cpp, src/client.h: Make getStatus static and take an 
@@ -21,7 +39,7 @@
 	* src/client.h, src/client.cpp: add a /leave command, to deactivate
 	  the current character and leave the world. Requires CVS eris, and
 	  probably doesn't actually work, yet.
-	  
+
 2006-05-15  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/client.cpp: Don't set client status to connected on logout

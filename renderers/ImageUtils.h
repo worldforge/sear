@@ -2,13 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: ImageUtils.h,v 1.3 2006-02-05 21:09:48 simon Exp $
+// $Id: ImageUtils.h,v 1.4 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_IMAGE_UTILS_H
 #define SEAR_IMAGE_UTILS_H 1
 
-#include <SDL/SDL.h>
 #include <string>
+
+struct SDL_Surface;
 
 namespace Sear
 {
@@ -18,7 +19,7 @@ namespace Sear
     
     If the image file cannot be loaded for any reason, NULL is returned.
     */
-    SDL_Surface* loadImageFromPath(const std::string& filename);
+    struct SDL_Surface* loadImageFromPath(const std::string& filename);
 
     /** create a copy of the input surface, halved in size, with each 2x2 box
     of pixels in the source image averaged to produce a single destination
@@ -27,7 +28,7 @@ namespace Sear
     
     Returns NULL if the mipmap cannot be created for any reason.
     */
-    SDL_Surface* mipmapSurface(SDL_Surface* src);
+    struct SDL_Surface* mipmapSurface(struct SDL_Surface* src);
 }
 
 #endif

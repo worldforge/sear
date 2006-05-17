@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.25 2006-02-18 15:41:12 simon Exp $
+// $Id: TextureManager.h,v 1.26 2006-05-17 23:15:35 alriddoch Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -17,13 +17,13 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include <SDL/SDL.h>
 #include "interfaces/ConsoleObject.h"
 
 #include <varconf/Config.h>
 
 #include "RenderSystem.h"
 
+struct SDL_Surface;
 /*
  TODO
 
@@ -172,7 +172,7 @@ private:
    * @return ID for texture.
    */ 
   GLuint loadTexture(const std::string &texture_name);
-  GLuint loadTexture(const std::string &texture_name, SDL_Surface *surface, bool mask);
+  GLuint loadTexture(const std::string &texture_name, struct SDL_Surface *surface, bool mask);
 
 
 

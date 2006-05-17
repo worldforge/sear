@@ -9,6 +9,7 @@
 
 #include "renderers/Render.h"
 
+#include <sage/sage.h>
 #include <sage/GLU.h>
 #include <sage/GL.h>
 

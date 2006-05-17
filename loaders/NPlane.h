@@ -2,14 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.14 2006-02-16 15:59:01 simon Exp $
+// $Id: NPlane.h,v 1.15 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
 
 #include <string>
 
-#include "common/types.h"
 #include "common/SPtr.h"
 
 #include "Model.h"

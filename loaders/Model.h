@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.12 2006-04-29 13:11:29 alriddoch Exp $
+//$Id: Model.h,v 1.13 2006-05-17 23:15:34 alriddoch Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -10,12 +10,19 @@
 #include <map>
 #include <string>
 
-#include <Atlas/Message/Element.h>
-
 #include <wfmath/vector.h>
 #include <wfmath/quaternion.h>
 
 #include "renderers/RenderTypes.h"
+
+namespace Atlas
+{
+namespace Message
+{
+class Element;
+typedef std::map<std::string, Element> MapType;
+}
+}
 
 namespace Sear {
 
