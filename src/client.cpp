@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.83 2006-05-16 23:28:38 jmt Exp $
+// $Id: client.cpp,v 1.84 2006-05-17 11:48:18 simon Exp $
 
 #include "System.h"
 
@@ -525,6 +525,7 @@ int Client::leaveWorld()
     }
     
     assert(m_avatar);
+    setStatus(CLIENT_STATUS_GOING_OUT_WORLD);
     m_account->deactivateCharacter(m_avatar);
     m_account->AvatarDeactivated.connect(SigC::slot(*this, &Client::AvatarDeactivated));
     
@@ -708,7 +709,7 @@ void Client::AvatarFailure(const std::string &msg) {
 void Client::AvatarDeactivated(Eris::Avatar* av)
 {
     std::cout << "got avatar deactivated" << std::endl;
-    setStatus(CLIENT_STATUS_GOING_OUT_WORLD);
+    setStatus(CLIENT_STATUS_LOGGED_IN);
 }
 
 void Client::GotCharacterEntity(Eris::Entity *e) {
@@ -749,7 +750,6 @@ void Client::setStatus(int status) {
       break;
     case CLIENT_STATUS_LOGGED_IN:
     case CLIENT_STATUS_GOING_IN_WORLD:
-    case CLIENT_STATUS_GOING_OUT_WORLD:
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, true);
       m_system->setState(SYS_IN_WORLD, false);
@@ -757,6 +757,11 @@ void Client::setStatus(int status) {
       m_system->getCharacter()->setAvatar(NULL);
       m_system->getCalendar()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("logged_in", 0);
+      break;
+    case CLIENT_STATUS_GOING_OUT_WORLD:
+      m_system->setState(SYS_CONNECTED, true);
+      m_system->setState(SYS_LOGGED_IN, true);
+      m_system->setState(SYS_IN_WORLD, true);
       break;
     case CLIENT_STATUS_IN_WORLD:
       m_system->setState(SYS_CONNECTED, true);

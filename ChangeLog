@@ -1,5 +1,12 @@
 2006-05-17  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/client.cpp: Set CLIENT_STATUS_LOOGED_IN in AvatarDeactivated and
+	  move CLIENT_STATUS_GOING_OUT_WORLD to leaveWorld. Create separate case
+	  statement for CLIENT_STATUS_GOING_OUT_WORLD to only enforce internal
+	  system states.
+
+2006-05-17  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Character.cpp: Replace assert with a return statement as there are
 	  valid situations where the statement could be false.
 
