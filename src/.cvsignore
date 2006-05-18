@@ -7,4 +7,5 @@ Makefile.in
 .libs
 sear
 sear-bin
+sear-res.rc
 SciTE.properties
