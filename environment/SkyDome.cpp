@@ -270,9 +270,10 @@ void SkyDome::updateFogColor(float t)
 
     assert (m_horizonColors.empty() == false);
 
-    assert(t >= 0.0f && t <= 1.0f);
+    // ensure t is in the range [0.0 .. 1.0)
+    if (t < 0.0f) t = 0.0f;
+    if (t >= 1.0f) t = 0.0f;
        
-    if (t == 1.0f) t = 0.0f; // ensure t is in the range [0.0 .. 1.0)
     t *= m_horizonColors.size(); // t is now in [0.0 ... num_colors)
     
     // offset so integral values map to half way between two pixels
@@ -314,6 +315,7 @@ void SkyDome::render() {
   val += (float)cal->getSeconds();
 
   val /= (float)(cal->getSecondsPerMinute() * cal->getMinutesPerHour() * cal->getHoursPerDay());
+printf("SkyDome Val: %f\n", val);
   updateFogColor(val);
   
  
