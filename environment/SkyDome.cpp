@@ -315,7 +315,7 @@ void SkyDome::render() {
   val += (float)cal->getSeconds();
 
   val /= (float)(cal->getSecondsPerMinute() * cal->getMinutesPerHour() * cal->getHoursPerDay());
-printf("SkyDome Val: %f\n", val);
+
   updateFogColor(val);
   
  

@@ -1,3 +1,7 @@
+2006-05-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/SkyDome.cpp: Remove some debugging output.
+
 2006-05-19  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/SkyDome.cpp: Replace assert with some run-time bounds
