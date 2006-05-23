@@ -2,19 +2,20 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Bindings.h,v 1.15 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: Bindings.h,v 1.16 2006-05-23 10:18:40 simon Exp $
 
 #ifndef SEAR_BINDINGS_H
 #define SEAR_BINDINGS_H 1
 
 /*
- * This class takes care of the bindings between keys and their associated commands
- * This makes use of a Config object to store its data and it acts as an interface
- * between the system and the config object.
+ * This class takes care of the bindings between keys and their associated 
+ * commands. This makes use of a Config object to store its data and it acts as
+ * an interface between the system and the config object.
  */ 
 
 #include <string>
 #include <map>
+#include <SDL/SDL.h>
 
 // Forward Declarations
 namespace varconf {
@@ -75,8 +76,8 @@ public:
    */ 
   static std::string getBinding(const std::string &key_id);
 
-    /** returns the stirng bound to a given SDL keysym */
-  static std::string getBindingForKeysym(const struct SDL_keysym& sym);
+    /** returns the string bound to a given SDL keysym */
+  static std::string getBindingForKeysym(const SDL_keysym& sym);
 
   /*
    * Return the pointer to the varconf object storing all the bindings.

@@ -1,3 +1,7 @@
+2006-05-23  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Bindings.h: Re-add SDL.h include.
+
 2006-05-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/SkyDome.cpp: Remove some debugging output.
