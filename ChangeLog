@@ -1,3 +1,7 @@
+2006-05-25  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Calendar.cpp: Remove unused local variable.
+
 2006-05-23  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Bindings.h: Re-add SDL.h include.

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.23 2006-02-16 14:14:15 simon Exp $
+// $Id: Calendar.cpp,v 1.24 2006-05-25 10:14:18 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -160,10 +160,6 @@ void Calendar::update() {
   else if (m_hours < m_dusk_start) m_time_area = DAY;
   else if (m_hours < m_night_start) m_time_area = DUSK;
   else if (m_hours < m_hours_per_day) m_time_area = NIGHT;
-
-  float cur_seconds = m_hours * m_minutes_per_hour * m_seconds_per_minute;
-  cur_seconds += m_minutes * m_seconds_per_minute;
-  cur_seconds += m_seconds;
 
   if (ta != m_time_area) {
     int time_1 = 0;
