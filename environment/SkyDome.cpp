@@ -205,7 +205,7 @@ void SkyDome::domeInit(float radius, int levels, int segments) {
 
 void SkyDome::contextDestroyed(bool check) {
 
-  assert(m_context_no != -1);
+  if (m_context_no == -1) return;
 
   if (check) {
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {

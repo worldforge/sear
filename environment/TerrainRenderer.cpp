@@ -44,7 +44,7 @@ void TerrainRenderer::DataSeg::contextCreated() {
 
 void TerrainRenderer::DataSeg::contextDestroyed(bool check) {
 
-  assert(m_context_no != -1);
+  if (m_context_no == -1) return;
 
   if (check) {
     if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -510,7 +510,7 @@ void TerrainRenderer::contextCreated() {
  
 void TerrainRenderer::contextDestroyed(bool check) {
 
-  assert(m_context_no != -1);
+  if (m_context_no == -1) return;
 
   DisplayListStore::iterator I = m_displayLists.begin();
   while (I != m_displayLists.end()) {
