@@ -70,6 +70,13 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
+  b = new gcn::Button("Leave World");
+  m_widgets.push_back(SPtr<gcn::Widget>(b));
+  b->setEventId("leave");
+  b->setFocusable(false);
+  b->addActionListener(m_buttonListener);
+  vbox->pack(b);
+
   b = new gcn::Button("Quit game");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
   b->setEventId("quit");
@@ -102,7 +109,9 @@ OptionsWindow::~OptionsWindow()
 
 void OptionsWindow::actionPressed(std::string event)
 {
-  if (event == "quit") {
+  if (event == "leave") {
+    System::instance()->runCommand("/leave");
+  } else if (event == "quit") {
     std::cout << "Quit game" << std::endl << std::flush;
     System::instance()->runCommand("/quit");
   } else if (event == "close") {

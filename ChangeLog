@@ -1,3 +1,8 @@
+2006-06-08  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/OptionsWindow.cpp: Add an option button to leave the
+	  world without logging out.
+
 2006-06-03  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp, environment/SkyDome.cpp: Change 
