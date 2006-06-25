@@ -1,3 +1,8 @@
+2006-06-25  Al Riddoch  <alriddoch@zepler.org>
+
+	* guichan/ConnectWindow.cpp: Add a refresh button to the server list
+	  window.
+
 2006-06-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* guichan/OptionsWindow.cpp: Add an option button to leave the
