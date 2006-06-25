@@ -109,6 +109,13 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_connectButton->addActionListener(m_buttonListener);
   hbox->pack(m_connectButton);
 
+  gcn::Button * refresh_button = new gcn::Button("Refresh");
+  m_widgets.push_back(SPtr<gcn::Widget>(refresh_button));
+  refresh_button->setFocusable(false);
+  refresh_button->setEventId("refresh");
+  refresh_button->addActionListener(m_buttonListener);
+  hbox->pack(refresh_button);
+
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
@@ -175,6 +182,8 @@ void ConnectWindow::actionPressed(std::string event)
       System::instance()->runCommand(cmd);
       close = true;
     }
+  } else if (event == "refresh") {
+    m_serverListModel->m_metaQuery->refresh();
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
     close = true;
