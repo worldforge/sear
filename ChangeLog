@@ -1,5 +1,9 @@
 2006-06-26  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/main.cpp: Re-enable printing of version number.
+
+2006-06-26  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* autopackage/Makefile.am: Add makefile to include default.apsepc.in in
 	  distribution
 
@@ -26,7 +30,7 @@
 
 	* environment/TerrainRenderer.cpp, environment/SkyDome.cpp: Change 
 	  asserts to returns in contextDestroyed as these can be called if
-	  creating the context fails and the system shutsdown.
+	  creating the context fails and the system shuts down.
 
 2006-05-25  Simon Goodall  <sear@simongoodall.co.uk>
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.32 2006-05-25 10:19:24 simon Exp $
+// $Id: main.cpp,v 1.33 2006-06-26 22:47:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
       argv++;
       argc--;
       if (arg == "-v" || arg == "--version") {
-      //  std::cout << "Sear version: " << VERSION << std::endl;
+        std::cout << "Sear version: " << VERSION << std::endl;
 	exit_program = true;
       }
       else if (arg == "-a" || arg == "--add-search-path") {
