@@ -1,6 +1,6 @@
 dnl Initialise autoconf
 
-AC_INIT([sear], [0.6.1])
+AC_INIT([sear], [0.6.2])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
@@ -171,7 +171,7 @@ UNSUSED=0
 
 MERCATOR_VERSION=0.2.4
 VARCONF_VERSION=0.6.3
-ERIS_VERSION=1.3.10
+ERIS_VERSION=1.3.11
 SAGE_VERSION=0.1.1
 
 PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 = $ERIS_VERSION sage >= $SAGE_VERSION,
@@ -322,6 +322,6 @@ AC_OUTPUT([
 	src/sear
 	src/sear-res.rc
 	sear.desktop
+	autopackage/Makefile
 	autopackage/default.apspec
-	tools/Makefile
 ],[chmod +x src/sear])

@@ -21,8 +21,6 @@ $source_dir/README
 $source_dir/COPYING
 $source_dir/AUTHORS
 $source_dir/NEWS
-$source_dir/sear_icon.xpm
-$source_dir/sear.desktop
 EOF
 import bin/ <<EOF
 $source_dir/bin/sear
@@ -36,15 +34,12 @@ EOF
 #require @libsdl.org/sdl 1.2
 #require @gnu.org/libstdc++ 3
 
-
 [Install]
 installExe bin/sear bin/sear-bin
-installIcon sear_icon.xpm
-installDesktop "Games" sear.desktop
-copyFiles README NEWS COPYING AUTHORS "$PREFIX/share/doc/sear"
+installIcon share/sear/sear_icon.xpm
+installDesktop "Games" share/sear/sear.desktop
+copyFiles README NEWS COPYING AUTHORS "$PREFIX/share/docs/sear-$SOFTWAREVERSION"installData share/sear
 installData share/sear
 
 [Uninstall]
 uninstallFromLog
-
-

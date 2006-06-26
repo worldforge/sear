@@ -1,3 +1,6 @@
+26th June 2006
+Sear 0.6.2 is released. In this version "Tasks" are supported allowing tool use for processing raw materials. This forms the basis of the building mechanism being developing in Mason. This release of Sear also has long standing rotation and positioning bugs fixed allowing entering of buildings and of correct placement of wielded objects. There are also many other minor bug fixes and improvements.
+
 6th Feb 2006
 Sear 0.6.1 is released. Major changines include updating to Eris 1.3.10 API, using builtin Eris ops instead of sear custom ones for use, wield, create etc.. New commands have been added. /me for emotes and /eat (added to inventory dialog) to  nourish our character. There are many GUI improvements including the addition of altering video mode, keybindings, basic help system, improved character creation dialog and speech bubbles. There have also been numerous stability and code improvements.
 
