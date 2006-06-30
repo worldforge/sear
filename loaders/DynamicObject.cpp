@@ -257,13 +257,13 @@ void DynamicObject::render(bool select_mode) {
     glVertexPointer(3, GL_FLOAT, 0, 0);
 
     // Bind normal array
-    if (glIsBuffer(m_vb_normal_data)) {
+    if (glIsBufferARB(m_vb_normal_data)) {
       glEnableClientState(GL_NORMAL_ARRAY);
       glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
       glNormalPointer(GL_FLOAT, 0, 0);
     }
     
-    if (glIsBuffer(m_vb_texture_data)) {
+    if (glIsBufferARB(m_vb_texture_data)) {
       for (unsigned int i = 0; i < m_textures.size(); ++i) {
         // Bind texture array
         glActiveTextureARB(GL_TEXTURE0_ARB + i);
@@ -295,7 +295,7 @@ void DynamicObject::render(bool select_mode) {
     }
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 
-    if (glIsBuffer(m_vb_texture_data)) {
+    if (glIsBufferARB(m_vb_texture_data)) {
       for (unsigned int i = 0; i < m_textures.size(); ++i) {
         glActiveTextureARB(GL_TEXTURE0 + i);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -303,7 +303,7 @@ void DynamicObject::render(bool select_mode) {
       glActiveTextureARB(GL_TEXTURE0);
     }
 
-    if (glIsBuffer(m_vb_normal_data)) {
+    if (glIsBufferARB(m_vb_normal_data)) {
       glDisableClientState(GL_NORMAL_ARRAY);
     }
 

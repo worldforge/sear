@@ -1,3 +1,11 @@
+2006-06-27  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/DynamicObject.cpp: Use glIsBufferARB instead of glIsBuffer.
+
+2006-06-27  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* Sear 0.6.2 Released.
+
 2006-06-26  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/main.cpp: Re-enable printing of version number.
