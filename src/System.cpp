@@ -2,7 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.156 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: System.cpp,v 1.157 2006-07-10 16:01:50 simon Exp $
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,7 +158,8 @@ bool System::init(int argc, char *argv[]) {
   m_script_engine = SPtrShutdown<ScriptEngine>(new ScriptEngine());
   m_script_engine->init();
 
-  m_client = SPtrShutdown<Client>(new Client(this, "Sear"));
+  // Pass client name and version when creating a connection
+  m_client = SPtrShutdown<Client>(new Client(this, PACKAGE_VERSION));
   if (!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
 
