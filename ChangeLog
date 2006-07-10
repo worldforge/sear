@@ -1,5 +1,11 @@
 2006-07-10  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp, renderers/Frustum.cpp, renderers/Frustum.h:
+	  Rotate the bounding box for an entity before creating a sphere. This
+	  fixes bbox testing on rotated entities.
+
+2006-07-10  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/System.cpp: Pass in client name and version to connection object.
 
 2006-06-27  Simon Goodall  <sear@simongoodall.co.uk>

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.48 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: Graphics.cpp,v 1.49 2006-07-10 16:53:48 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -487,7 +487,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
   // TODO, Objects without bbox will be rendered regardless.
   if (obj_we->hasBBox()) {
-    if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos())) {
+    if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos(), obj_we->getAbsOrient())) {
       obj_we->screenX() = -1;
       obj_we->screenY() = -1;
       return;

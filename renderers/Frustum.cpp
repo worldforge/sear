@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.5 2006-02-25 16:24:54 simon Exp $
+// $Id: Frustum.cpp,v 1.6 2006-07-10 16:53:48 simon Exp $
 
 #include "common/Utility.h"
 
@@ -156,9 +156,19 @@ float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos) {
-  WFMath::AxisBox<3> b(bbox);
+bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos, const WFMath::Quaternion &orient) {
+
+  // Rotate bbox corners into world coord space.
+  WFMath::Vector<3> lv = WFMath::Vector<3>(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z()).rotate(orient);
+  WFMath::Vector<3> hv = WFMath::Vector<3>(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z()).rotate(orient);
+
+  // Create a new bbox based on rotated corners
+  WFMath::AxisBox<3> b = WFMath::AxisBox<3>(WFMath::Point<3>(lv.x(), lv.y(), lv.z()), WFMath::Point<3>(hv.x(), hv.y(), hv.z()));
+
+  // Shift bbox to entity position
   b.shift(WFMath::Vector<3>(pos.x(), pos.y(),  pos.z()));
+
+  // test based on bounding sphere
   return ballInFrustum(frustum, b.boundingSphere());
 }
 
