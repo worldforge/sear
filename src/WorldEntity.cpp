@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.82 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: WorldEntity.cpp,v 1.83 2006-07-13 11:44:44 simon Exp $
 
 /*
  TODO
@@ -149,6 +149,8 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
         if (mode == "swimming") {
           // Make sure height is > terrain height
           needTerrainHeight = clampHeight = true;
+        } else if (mode == "floating") {
+          // Do nothing at all.
         } else if (mode == "fixed") {
           // Do nothing at all.
         } else {
