@@ -1,5 +1,13 @@
 2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/Calender.cpp: Fix bug in calculation of m_time_in_area that
+	  caused the lighting to be out-of sync to the time of day. E.g objects
+	  were lit as if it was day during the night.
+
+	* src/ParticleSystem.cpp: Add another clamp to an individual particle.
+
+2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/ParticleSystem.cpp: Clamp the max particles for one particle
 	  engine to 1024 to prevent over allocation.
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.24 2006-05-25 10:14:18 simon Exp $
+// $Id: Calendar.cpp,v 1.25 2006-07-15 11:59:22 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -71,7 +71,7 @@ Calendar::Calendar() :
   m_days(0),
   m_months(0),
   m_years(0),
-  m_time_area(DAY),
+  m_time_area(INVALID),
   m_dawn_start(DEFAULT_DAWN_START),
   m_day_start(DEFAULT_DAY_START),
   m_dusk_start(DEFAULT_DUSK_START),
@@ -145,6 +145,7 @@ void Calendar::update() {
   m_hours_per_day      = m_cal->hoursPerDay();
 */
   double time_elapsed = m_seconds - m_server_seconds;
+  if (time_elapsed < 0.0) time_elapsed += m_seconds_per_minute;
 
   if (m_firstUpdate) {
     // initial update
@@ -161,18 +162,16 @@ void Calendar::update() {
   else if (m_hours < m_night_start) m_time_area = DUSK;
   else if (m_hours < m_hours_per_day) m_time_area = NIGHT;
 
-  if (ta != m_time_area) {
-    int time_1 = 0;
-    switch(m_time_area) {
-      case INVALID:
-      case NIGHT: break;
-      case DAWN: time_1 = m_dawn_start; break;
-      case DAY: time_1 = m_day_start; break;
-      case DUSK: time_1 = m_dusk_start; break;
-    }
-    // Assuming that it will be less than a minute between updates
-    m_time_in_area = m_seconds;
+  int time_1 = 0;
+  switch(m_time_area) {
+    case INVALID:
+    case NIGHT: time_1 = m_night_start; break;
+    case DAWN:  time_1 = m_dawn_start;  break;
+    case DAY:   time_1 = m_day_start;   break;
+    case DUSK:  time_1 = m_dusk_start;  break;
+  }
 
+  if (ta != m_time_area) {
     // Emit an action event
     ActionHandler *action_handler = System::instance()->getActionHandler();
     switch(m_time_area) {
@@ -182,10 +181,16 @@ void Calendar::update() {
       case DAY:   action_handler->handleAction(ACTION_DAY,   NULL); break;
       case DUSK:  action_handler->handleAction(ACTION_DUSK,  NULL); break;
     }
-  } else {
-    // Update m_time_in_area
-    m_time_in_area += time_elapsed;
   }
+
+  m_time_in_area = m_hours - time_1;
+  // Check for roll over
+  if (m_time_in_area < 0.0) m_time_in_area += m_hours_per_day;
+  m_time_in_area *= m_minutes_per_hour;
+  m_time_in_area += m_minutes;
+  m_time_in_area *= m_seconds_per_minute;
+  m_time_in_area += m_seconds;
+ 
 }
 
 void Calendar::readConfig(varconf::Config &config) {

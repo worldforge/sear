@@ -116,6 +116,9 @@ public:
     
   void update(double dt)
   {
+   // Add a clamp to dt.
+   if (dt > 0.2) dt = 0.2;
+
     m_timeToLive -= dt;
     if (m_timeToLive < 0) {
       m_active = false; // deactivate!
