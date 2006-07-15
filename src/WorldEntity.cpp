@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.83 2006-07-13 11:44:44 simon Exp $
+// $Id: WorldEntity.cpp,v 1.84 2006-07-15 09:55:48 simon Exp $
 
 /*
  TODO
@@ -103,16 +103,28 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
   if (!loc) return getEntityOrientation(); // nothing below makes sense for the world
   
   WFMath::Quaternion orient = getEntityOrientation();
+  if (!orient.isValid()) {
+    fprintf(stderr, "Warning: invalid orientation detected.\n");
+    orient.identity();
+  }
   while (loc != 0 ) {
     WFMath::Quaternion lorient = loc->getEntityOrientation();
 
     if (!lorient.isValid()) { // TODO: Replace with assert once eris is fixed
+      fprintf(stderr, "Warning: invalid orientation detected for parent object.\n");
       lorient.identity();
     }
+
     orient *= lorient;
 
     loc = dynamic_cast<WorldEntity*>(loc->getLocation());
   }
+
+  if (!orient.isValid()) {
+    fprintf(stderr, "Warning: invalid orientation detected for abs orient.\n");
+    orient.identity();
+  }
+
   return orient;
 }
 
@@ -151,6 +163,8 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
           needTerrainHeight = clampHeight = true;
         } else if (mode == "floating") {
           // Do nothing at all.
+          // Should we do something here?
+          // E.g. set to water height?
         } else if (mode == "fixed") {
           // Do nothing at all.
         } else {
