@@ -1,5 +1,9 @@
 2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/WorldEntity.cpp: Make warning messages more useful.
+
+2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/Overlay.cpp, guichan/SpeechBubble.h: Add a timeout to speech
 	  bubbles of 10 seconds since last update. This should probably be made
 	  configurable.

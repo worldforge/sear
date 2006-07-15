@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.84 2006-07-15 09:55:48 simon Exp $
+// $Id: WorldEntity.cpp,v 1.85 2006-07-15 13:17:48 simon Exp $
 
 /*
  TODO
@@ -104,14 +104,14 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
   
   WFMath::Quaternion orient = getEntityOrientation();
   if (!orient.isValid()) {
-    fprintf(stderr, "Warning: invalid orientation detected.\n");
+    fprintf(stderr, "Warning: invalid orientation detected. (ID: %s Name: %s)\n", getId().c_str(), getName().c_str());
     orient.identity();
   }
   while (loc != 0 ) {
     WFMath::Quaternion lorient = loc->getEntityOrientation();
 
     if (!lorient.isValid()) { // TODO: Replace with assert once eris is fixed
-      fprintf(stderr, "Warning: invalid orientation detected for parent object.\n");
+      fprintf(stderr, "Warning: invalid orientation detected for parent object. (ID: %s Name: %s)\n", getId().c_str(), getName().c_str());
       lorient.identity();
     }
 
@@ -121,7 +121,7 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
   }
 
   if (!orient.isValid()) {
-    fprintf(stderr, "Warning: invalid orientation detected for abs orient.\n");
+    fprintf(stderr, "Warning: invalid orientation detected for abs orient. (ID: %s Name: %s)\n", getId().c_str(), getName().c_str());
     orient.identity();
   }
 
