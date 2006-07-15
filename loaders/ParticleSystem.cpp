@@ -33,6 +33,8 @@ namespace Sear {
 
 WFMath::MTRand twister;
 
+static const int MAX_PARTICLES = 1024;
+
 Vector3 randomVector() {
   return Vector3(twister.rand(2.0) - 1.0,
     twister.rand(2.0) - 1.0,
@@ -240,6 +242,11 @@ void ParticleSystem::update(float elapsed)
     
   int numToCreate = lrintf(m_createPerSec.random() * elapsed * status * 2.f);
 
+  // Clamp the number of particles available
+  if (numToCreate > MAX_PARTICLES) {
+    numToCreate = MAX_PARTICLES;
+  }
+
   for (unsigned int p=0; p < m_particles.size(); ++p) {
     if (m_particles[p]->isActive()) {
       m_particles[p]->update(elapsed);
@@ -256,6 +263,7 @@ void ParticleSystem::update(float elapsed)
     // need to re-allocate things a bit ... bigger
     unsigned int firstNew = m_particles.size(),
                  newSize = m_particles.size() + numToCreate;
+
     m_particles.resize(newSize);
         
     // re-alloc storage

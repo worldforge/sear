@@ -1,5 +1,10 @@
 2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ParticleSystem.cpp: Clamp the max particles for one particle
+	  engine to 1024 to prevent over allocation.
+
+2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/WorldEntity.cpp: Add warnings instead of asserts about invalid
 	  entity orientations.
 
