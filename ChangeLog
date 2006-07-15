@@ -1,5 +1,11 @@
 2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* guichan/Overlay.cpp, guichan/SpeechBubble.h: Add a timeout to speech
+	  bubbles of 10 seconds since last update. This should probably be made
+	  configurable.
+
+2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/Calender.cpp: Fix bug in calculation of m_time_in_area that
 	  caused the lighting to be out-of sync to the time of day. E.g objects
 	  were lit as if it was day during the night.

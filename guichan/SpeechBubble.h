@@ -30,6 +30,10 @@ public:
 
     void contextCreated();
     void contextDestroyed(bool check);
+
+
+    void setLastUpdateTime(float t) { m_last_update_time = t; }
+    float getLastUpdateTime() const { return m_last_update_time; }
 private:
     gcn::Image * m_n;
     gcn::Image * m_s;
@@ -45,6 +49,7 @@ private:
 
     bool m_overflow;
     float m_offset;
+    float m_last_update_time;
 };
 
 } // namespace Sear

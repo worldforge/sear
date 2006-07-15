@@ -85,6 +85,8 @@ void Overlay::logic(RootWidget * rw)
   double elapsed = System::instance()->getTimeElapsed();
 
   //std::set<WorldEntity *> obsoletes;
+  // Get current time
+  float c_time = System::instance()->getTimef();
 
   BubbleMap::iterator I = m_bubbles.begin();
   BubbleMap::const_iterator Iend = m_bubbles.end();
@@ -108,6 +110,16 @@ void Overlay::logic(RootWidget * rw)
       m_bubbles.erase(I++);
       continue;
     }
+
+
+    // Remove speech bubble if they have not been updated for some amount
+    // of time
+    // TODO: Remove hard-codded 10 seconds
+    if (c_time - sb->getLastUpdateTime() > 10.0f) {
+      m_bubbles.erase(I++);
+      continue;
+    }
+
     ex = (ex - sb->getWidth() / 2);
     ey = (m_top->getHeight() - ey) - sb->getHeight();
     // sb->setX(ex + sb->m_xoff);
@@ -186,6 +198,9 @@ void Overlay::heard(Eris::Entity * e,
   } else {
     bubble = I->second;
   }
+
+  bubble->setLastUpdateTime(System::instance()->getTimef());
+
   const std::vector<Atlas::Objects::Root> & talkArgs = talk->getArgs();
   if (talkArgs.empty())
   {
