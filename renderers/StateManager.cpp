@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.29 2006-05-06 09:44:46 simon Exp $
+// $Id: StateManager.cpp,v 1.30 2006-09-17 19:42:42 simon Exp $
 
 /*
  * TODO
@@ -522,7 +522,7 @@ void StateManager::runCommand(const std::string &command, const std::string &arg
   assert(m_initialised);
   if (command == CMD_LOAD_STATE_CONFIG) {
     std::string a = arguments;
-    System::instance()->getFileHandler()->expandString(a);
+    System::instance()->getFileHandler()->getFilePath(a);
     readFiles(a);
   }
 }

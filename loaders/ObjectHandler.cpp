@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.9 2006-04-27 11:09:39 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.10 2006-09-17 19:42:42 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -11,6 +11,8 @@
 #include "common/Log.h"
 
 #include "src/Console.h"
+#include "src/FileHandler.h"
+#include "src/System.h"
 #include "ObjectHandler.h"
 #include "ObjectRecord.h"
 
@@ -116,7 +118,9 @@ void ObjectHandler::registerCommands(Console *console) {
 
 void ObjectHandler::runCommand(const std::string &command, const std::string &args) {
   if (command == CMD_LOAD_OBJECT_RECORDS) {
-    loadObjectRecords(args);
+    std::string args_cpy = args;
+    System::instance()->getFileHandler()->getFilePath(args_cpy);
+    loadObjectRecords(args_cpy);
   }
 }
 

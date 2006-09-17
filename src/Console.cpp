@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.37 2006-02-15 12:44:24 simon Exp $
+// $Id: Console.cpp,v 1.38 2006-09-17 19:42:42 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -400,7 +400,7 @@ void Console::runCommand(const std::string &comd) {
   assert ((m_initialised == true) && "Console not initialised");
   if (comd.empty()) return; // Ignore empty string
   std::string command = comd;
-  System::instance()->getFileHandler()->expandString(command);
+//  System::instance()->getFileHandler()->expandString(command);
   // Grab first character of command string
   char c = command.c_str()[0];
   // Check to see if command is a command, or a speech string

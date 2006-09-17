@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.h,v 1.12 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: FileHandler.h,v 1.13 2006-09-17 19:42:42 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -10,6 +10,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <list>
 
 #include "interfaces/ConsoleObject.h"
 
@@ -69,13 +70,26 @@ public:
   */
   bool mkdir(const std::string &dirname) const;
 
+  void addFileVariable(const std::string &var, const std::string &path);
+
+
+  void insertFilePath(const std::string &var, const std::string &path);
+  void appendFilePath(const std::string &var, const std::string &path);
+  void removeFilePath(const std::string &var, const std::string &path);
+  void clearFilePath(const std::string &var);
+  void getFilePath(std::string &str);
+
+
 protected:
   FileList  m_searchpaths;
 
 private:
-  
+  typedef std::list<std::string> StringList;
+  typedef std::map<std::string, StringList> StringListMap;
+ 
   typedef std::map<std::string, std::string> VarMap; 
   VarMap m_varMap; 
+  StringListMap m_file_map;
 };
 
 } /* namespace Sear */

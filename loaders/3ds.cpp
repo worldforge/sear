@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.61 2006-05-06 13:50:22 simon Exp $
+// $Id: 3ds.cpp,v 1.62 2006-09-17 19:42:41 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -233,7 +233,7 @@ int ThreeDS::init(const std::string &file_name) {
     object = file_name;
   }
 
-  System::instance()->getFileHandler()->expandString(object);
+  System::instance()->getFileHandler()->getFilePath(object);
 
   // Load 3ds file
   if (debug) printf("[3ds] Loading: %s\n", object.c_str());

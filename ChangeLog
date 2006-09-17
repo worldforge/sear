@@ -1,3 +1,15 @@
+2006-09-17  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp,
+	  loaders/LibModelFile_Loader.cpp, loaders/ModelHandler.cpp,
+	  loaders/ObjectHandler.cpp, loaders/cal3d/Cal3dCoreModel.cpp,
+	  loaders/cal3d/Cal3d_Loader.cpp, renderers/Sprite.cpp,
+	  renderers/StateManager.cpp, renderers/TextureManager.cpp,
+	  src/Console.cpp src/FileHandler.cpp, src/FileHandler.h,
+	  src/System.cpp: Move setvar and getvar to FileHandler. Added some
+	  functions so we can find a file from a number of locations. E.g.
+	  media in home dir or a system location otherwise.
+
 2006-07-15  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/WorldEntity.cpp: Make warning messages more useful.

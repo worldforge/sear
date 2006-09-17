@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.26 2006-05-06 13:50:22 simon Exp $
+// $Id: LibModelFile.cpp,v 1.27 2006-09-17 19:42:41 simon Exp $
 
 /*
   Debug check list
@@ -244,7 +244,7 @@ int LibModelFile::init(const std::string &filename) {
     for (int i = 0; i < 4; ++i) matrix[i][i] *= s;
   }
 
-  System::instance()->getFileHandler()->expandString(object);
+  System::instance()->getFileHandler()->getFilePath(object);
 
   // Load md3 file
   if (debug) printf("[LibModelFile] Loading: %s\n", object.c_str());

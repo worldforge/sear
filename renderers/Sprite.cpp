@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Sprite.cpp,v 1.10 2006-02-16 15:59:01 simon Exp $
+// $Id: Sprite.cpp,v 1.11 2006-09-17 19:42:42 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"
@@ -107,7 +107,7 @@ void SpriteData::load()
     
 // read config file
     std::string filename = getSpriteConfig().getItem(m_name, "filename");
-    System::instance()->getFileHandler()->expandString(filename);
+    System::instance()->getFileHandler()->getFilePath(filename);
 
 // read in image data
     SDL_Surface *img = loadImageFromPath(filename);

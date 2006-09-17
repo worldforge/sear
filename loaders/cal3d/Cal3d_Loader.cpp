@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.19 2006-05-06 13:50:22 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.20 2006-09-17 19:42:42 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -47,7 +47,7 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
 
   std::string file_name = model_record->data_file_path;
   // Expand variable in string
-  System::instance()->getFileHandler()->expandString(file_name);
+  System::instance()->getFileHandler()->getFilePath(file_name);
  
   try {
     Cal3dModel *model = m_core_model_handler->instantiateModel(file_name);

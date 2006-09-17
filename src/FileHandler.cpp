@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.20 2006-04-30 15:49:04 simon Exp $
+// $Id: FileHandler.cpp,v 1.21 2006-09-17 19:42:42 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,6 +15,8 @@
 
 #include "FileHandler.h"
 #include "Console.h"
+#include "System.h"
+#include "common/Utility.h"
 
 #include "prefix.h"
 
@@ -82,6 +84,19 @@ namespace Sear {
 
   static const std::string ADD_SEARCH_PATH = "add_search_path";
   static const std::string REMOVE_SEARCH_PATH = "remove_search_path";
+
+  static const std::string INSERT_FILE_PATH = "insert_file_path";
+  static const std::string APPEND_FILE_PATH = "append_file_path";
+  static const std::string REMOVE_FILE_PATH = "remove_file_path";
+  static const std::string CLEAR_FILE_PATH = "clear_file_path";
+  static const std::string GET_FILE_PATH = "get_file_path";
+  // Older var commands
+  static const std::string CMD_GETVAR = "getvar";
+  static const std::string CMD_SETVAR = "setvar";
+  // newer ones
+  static const std::string CMD_GET_VARIABLE = "get_variable";
+  static const std::string CMD_SET_VARIABLE = "set_variable";
+  static const std::string CMD_DELETE_VARIABLE = "delete_variable";
 	
 FileHandler::FileHandler() {
     std::string installBase = getInstallBasePath();
@@ -147,6 +162,57 @@ std::string FileHandler::getUserDataPath() const
 #endif
 }
 
+
+void FileHandler::insertFilePath(const std::string &var, const std::string &path) {
+  m_file_map[var].push_front(path);
+}
+
+void FileHandler::appendFilePath(const std::string &var, const std::string &path) {
+  m_file_map[var].push_back(path);
+}
+
+void FileHandler::removeFilePath(const std::string &var, const std::string &path) {
+  // TODO: implement
+  fprintf(stderr, "FileHandler::removeFilePath is not implemented yet.\n");
+}
+
+void FileHandler::clearFilePath(const std::string &var) {
+  StringListMap::iterator I = m_file_map.find(var);
+  if (I != m_file_map.end()) m_file_map.erase(I);
+}
+
+void FileHandler::getFilePath(std::string &cpy) {
+  // First pass at string expansion
+  expandString(cpy);
+  // Next we loop through each file path var and each path until we find
+  // one that is a real file. Otherwise we just return the expanded string.
+  StringListMap::const_iterator I = m_file_map.begin();
+  while (I != m_file_map.end()) {
+    std::string key = "${" + I->first + "}";
+    std::string::size_type pos = cpy.find(key);
+    if (pos != std::string::npos) {
+      StringList l = I->second;
+      StringList::const_iterator J = l.begin();
+      while (J != l.end()) {
+        std::string value = *J;
+        std::string cpy2 = cpy;
+        cpy2.replace(pos, key.length(), value);
+        // Expand any new variables that may have been passed in.
+        expandString(cpy2);
+        // If we have found a file, then we are finished here
+        if (exists(cpy2)) {
+          cpy = cpy2;
+          return;
+        }
+        ++J;
+      }
+    }
+    ++I;
+  }
+}
+
+
+
 void FileHandler::addSearchPath(const std::string &searchpath) {
   m_searchpaths.insert(searchpath);
 }
@@ -179,14 +245,55 @@ FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filena
 void FileHandler::registerCommands(Console *console) {
   console->registerCommand(ADD_SEARCH_PATH, this);
   console->registerCommand(REMOVE_SEARCH_PATH, this);
+  console->registerCommand(CMD_SETVAR, this);
+  console->registerCommand(CMD_GETVAR, this);
+  console->registerCommand(INSERT_FILE_PATH, this);
+  console->registerCommand(APPEND_FILE_PATH, this);
+  console->registerCommand(REMOVE_FILE_PATH, this);
+  console->registerCommand(CLEAR_FILE_PATH, this);
+  console->registerCommand(GET_FILE_PATH, this);
 }
 
 void FileHandler::runCommand(const std::string &command, const std::string &args) {
+  Tokeniser tokeniser;
+  tokeniser.initTokens(args);
   if (command == ADD_SEARCH_PATH) {
     addSearchPath(args);
   }
   else if (command == REMOVE_SEARCH_PATH) {
     removeSearchPath(args);
+  }
+  else if (command == CMD_SETVAR) {
+    std::string key = tokeniser.nextToken();
+    std::string value = tokeniser.remainingTokens();
+    setVariable(key, value);
+  }
+  else if (command == CMD_GETVAR) {
+    std::string key = tokeniser.nextToken();
+    System::instance()->pushMessage(getVariable(key), CONSOLE_MESSAGE);    
+  }
+  else if (command == INSERT_FILE_PATH) {
+    std::string var = tokeniser.nextToken();
+    std::string path = tokeniser.remainingTokens();
+    insertFilePath(var, path);
+  }
+  else if (command == APPEND_FILE_PATH) {
+    std::string var = tokeniser.nextToken();
+    std::string path = tokeniser.remainingTokens();
+    appendFilePath(var, path);
+  }
+  else if (command == REMOVE_FILE_PATH) {
+    std::string var = tokeniser.nextToken();
+    std::string path = tokeniser.remainingTokens();
+    removeFilePath(var, path);
+  }
+  else if (command == CLEAR_FILE_PATH) {
+    clearFilePath(args);
+  }
+   else if (command == GET_FILE_PATH) {    
+    std::string f = args;
+    getFilePath(f);
+    System::instance()->pushMessage(f, CONSOLE_MESSAGE);    
   }
 }
 

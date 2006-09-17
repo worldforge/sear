@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.39 2006-05-06 11:33:52 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.40 2006-09-17 19:42:42 simon Exp $
 
 #include <string>
 
@@ -125,7 +125,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   
   if (config.findItem(SECTION_model, KEY_path)) {
     path = (std::string)config.getItem(SECTION_model, KEY_path);
-    System::instance()->getFileHandler()->expandString(path);
+    System::instance()->getFileHandler()->getFilePath(path);
   }
 
   // Load skeleton

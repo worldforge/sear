@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.157 2006-07-10 16:01:50 simon Exp $
+// $Id: System.cpp,v 1.158 2006-09-17 19:42:42 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -78,8 +78,6 @@ namespace Sear {
   static const std::string CMD_TOGGLE_MLOOK = "toggle_mlook";
   static const std::string CMD_ADD_EVENT = "event";
   static const std::string CMD_IDENTIFY_ENTITY = "identify";
-  static const std::string CMD_GETVAR = "getvar";
-  static const std::string CMD_SETVAR = "setvar";
 
   // Config key values  
   static const std::string KEY_mouse_move_select = "mouse_move_select";
@@ -813,8 +811,6 @@ void System::registerCommands(Console *console) {
   console->registerCommand(CMD_TOGGLE_MLOOK, this);
   console->registerCommand(CMD_ADD_EVENT, this);
   console->registerCommand(CMD_IDENTIFY_ENTITY, this);
-  console->registerCommand(CMD_SETVAR, this);
-  console->registerCommand(CMD_GETVAR, this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -876,16 +872,6 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     if (!m_client->getAvatar()) return;
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
-  }
-
-  else if (command == CMD_SETVAR) {
-    std::string key = tokeniser.nextToken();
-    std::string value = tokeniser.remainingTokens();
-    m_file_handler->setVariable(key, value);
-  }
-  else if (command == CMD_GETVAR) {
-    std::string key = tokeniser.nextToken();
-    pushMessage(m_file_handler->getVariable(key), CONSOLE_MESSAGE);
   }
   
   else fprintf(stderr, "[System] Command not found: %s\n", command.c_str());

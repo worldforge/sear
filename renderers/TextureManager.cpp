@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.46 2006-05-06 09:44:46 simon Exp $
+// $Id: TextureManager.cpp,v 1.47 2006-09-17 19:42:42 simon Exp $
 
 #include <unistd.h>
 
@@ -262,7 +262,7 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
     filename = path + "/" + filename;
   }
   
-  System::instance()->getFileHandler()->expandString(filename);
+  System::instance()->getFileHandler()->getFilePath(filename);
   SDL_Surface* image = loadImageFromPath(filename);
   if (!image) return 0;
   
@@ -708,13 +708,13 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
   assert((m_initialised == true) && "TextureManager not initialised");
   if (command == CMD_LOAD_TEXTURE_CONFIG) {
     std::string a = arguments;
-    System::instance()->getFileHandler()->expandString(a);
+    System::instance()->getFileHandler()->getFilePath(a);
     readTextureConfig(a);
   }
   
   if (command == CMD_LOAD_SPRITE_CONFIG) {
     std::string a = arguments;
-    System::instance()->getFileHandler()->expandString(a);
+    System::instance()->getFileHandler()->getFilePath(a);
     std::cout << "reading sprite config at " << a << std::endl;
     m_spriteConfig.readFromFile(a);
   }

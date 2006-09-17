@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.33 2006-05-06 13:50:22 simon Exp $
+// $Id: ModelHandler.cpp,v 1.34 2006-09-17 19:42:41 simon Exp $
 
 #include <string.h>
 
@@ -18,6 +18,7 @@
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
 #include "renderers/RenderSystem.h"
+#include "src/FileHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
@@ -271,7 +272,9 @@ void ModelHandler::registerCommands(Console *console) {
 void ModelHandler::runCommand(const std::string &command, const std::string &args) {
   assert (m_initialised == true);
   if (command == CMD_LOAD_MODEL_RECORDS) {
-    loadModelRecords(args);
+    std::string args_cpy = args;
+    System::instance()->getFileHandler()->getFilePath(args_cpy);
+    loadModelRecords(args_cpy);
   }
 
 }

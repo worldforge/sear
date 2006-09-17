@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.8 2006-05-06 13:50:22 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.9 2006-09-17 19:42:41 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -39,7 +39,7 @@ SPtr<ModelRecord> LibModelFile_Loader::loadModel(WorldEntity *we, const std::str
 
   std::string file_name = model_record->data_file_path;
 
-  System::instance()->getFileHandler()->expandString(file_name);
+  System::instance()->getFileHandler()->getFilePath(file_name);
 
   if (debug) printf("LibModelFile_Loader: Loading %s\n", file_name.c_str());
 
