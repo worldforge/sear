@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.21 2006-09-17 19:42:42 simon Exp $
+// $Id: FileHandler.cpp,v 1.22 2006-10-01 12:52:44 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -107,8 +107,9 @@ FileHandler::FileHandler() {
     addSearchPath(installBase + "/scripts");
     
     setVariable("SEAR_INSTALL", installBase);
-    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
-    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+//    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+//    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+    insertFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
     setVariable("SEAR_HOME", getUserDataPath());
     
     if (!exists(getUserDataPath())) {
@@ -181,33 +182,51 @@ void FileHandler::clearFilePath(const std::string &var) {
   if (I != m_file_map.end()) m_file_map.erase(I);
 }
 
-void FileHandler::getFilePath(std::string &cpy) {
+FileHandler::FileList FileHandler::getFilePaths(const std::string &str) {
+  FileList fl;
   // First pass at string expansion
+  std::string cpy = str;
   expandString(cpy);
+  // No point doing any further expansion if the string is already a real path.
+  if (exists(cpy)) {
+    fl.push_back(cpy);
+    return fl;
+  }
+
   // Next we loop through each file path var and each path until we find
   // one that is a real file. Otherwise we just return the expanded string.
   StringListMap::const_iterator I = m_file_map.begin();
   while (I != m_file_map.end()) {
     std::string key = "${" + I->first + "}";
     std::string::size_type pos = cpy.find(key);
+
     if (pos != std::string::npos) {
       StringList l = I->second;
       StringList::const_iterator J = l.begin();
       while (J != l.end()) {
-        std::string value = *J;
         std::string cpy2 = cpy;
+        std::string value = *J;
         cpy2.replace(pos, key.length(), value);
         // Expand any new variables that may have been passed in.
         expandString(cpy2);
         // If we have found a file, then we are finished here
         if (exists(cpy2)) {
-          cpy = cpy2;
-          return;
+          fl.push_back(cpy2);
+          break;
         }
         ++J;
       }
     }
     ++I;
+  }
+  return fl;
+}
+
+void FileHandler::getFilePath(std::string &cpy) {
+  FileList l = getFilePaths(cpy);
+
+  if (l.size() > 0) {
+    cpy = *l.begin();
   }
 }
 
@@ -217,14 +236,14 @@ void FileHandler::addSearchPath(const std::string &searchpath) {
   m_searchpaths.insert(searchpath);
 }
 void FileHandler::removeSearchPath(const std::string &searchpath) {
-  FileList::iterator I = m_searchpaths.find(searchpath);
+  FileSet::iterator I = m_searchpaths.find(searchpath);
   if (I != m_searchpaths.end()) {
     m_searchpaths.erase(I);
   }
 }
 
 std::string FileHandler::findFile(const std::string &filename) {
-  for (FileList::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
+  for (FileSet::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
         return filepath;
@@ -232,9 +251,9 @@ std::string FileHandler::findFile(const std::string &filename) {
   return "";
 }
 
-FileHandler::FileList FileHandler::getAllinSearchPaths(const std::string &filename) {
-  FileList l;
-  for (FileList::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
+FileHandler::FileSet FileHandler::getAllinSearchPaths(const std::string &filename) {
+  FileSet l;
+  for (FileSet::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
       l.insert(filepath);

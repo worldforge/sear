@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.h,v 1.13 2006-09-17 19:42:42 simon Exp $
+// $Id: FileHandler.h,v 1.14 2006-10-01 12:52:44 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -33,13 +33,14 @@ public:
   FileHandler();
   ~FileHandler();
 
-  typedef std::set<std::string> FileList;
+  typedef std::set<std::string> FileSet;
+  typedef std::list<std::string> FileList;
   
   void addSearchPath(const std::string &searchpath);
   void removeSearchPath(const std::string &searchpath);
 
   std::string findFile(const std::string &filename);
-  FileList getAllinSearchPaths(const std::string &filename);
+  FileSet getAllinSearchPaths(const std::string &filename);
   
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
@@ -77,11 +78,14 @@ public:
   void appendFilePath(const std::string &var, const std::string &path);
   void removeFilePath(const std::string &var, const std::string &path);
   void clearFilePath(const std::string &var);
+  // Get list of paths this file exists in
+  FileList getFilePaths(const std::string &str);
+  // expand string into the first path that this file exists in
   void getFilePath(std::string &str);
 
 
 protected:
-  FileList  m_searchpaths;
+  FileSet  m_searchpaths;
 
 private:
   typedef std::list<std::string> StringList;

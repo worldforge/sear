@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.14 2006-04-26 14:39:00 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.15 2006-10-01 12:52:44 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -50,7 +50,7 @@ void ScriptEngine::shutdown() {
 void ScriptEngine::runScript(const std::string &file_name) {
   assert (m_initialised == true);
   std::string newFN = file_name;
-  System::instance()->getFileHandler()->expandString(newFN);
+  System::instance()->getFileHandler()->getFilePath(newFN);
   if (debug) printf("ScriptEngine: Running script: %s\n", newFN.c_str());
 
   std::ifstream script_file(newFN.c_str());
@@ -90,8 +90,8 @@ void ScriptEngine::registerCommands(Console *console) {
 void ScriptEngine::runCommand(const std::string &command, const std::string &args) {
   if (command == RUN_SCRIPT) runScript(args);
   else if (command == SEARCH_RUN_SCRIPT) {
-    FileHandler::FileList l = System::instance()->getFileHandler()->getAllinSearchPaths(args);
-    for (FileHandler::FileList::const_iterator I = l.begin(); I != l.end(); ++I) {
+    FileHandler::FileSet l = System::instance()->getFileHandler()->getAllinSearchPaths(args);
+    for (FileHandler::FileSet::const_iterator I = l.begin(); I != l.end(); ++I) {
       runScript(*I);
     }
   }

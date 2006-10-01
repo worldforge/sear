@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.158 2006-09-17 19:42:42 simon Exp $
+// $Id: System.cpp,v 1.159 2006-10-01 12:52:44 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -268,8 +268,9 @@ bool System::init(int argc, char *argv[]) {
   Environment::getInstance().init();
 
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
-  FileHandler::FileList startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
-  for (FileHandler::FileList::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
+
+  FileHandler::FileSet startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
+  for (FileHandler::FileSet::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
     m_script_engine->runScript(*I);
   }
 
@@ -352,8 +353,8 @@ void System::shutdown() {
   m_calendar.release();
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
-  FileHandler::FileList shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
-  for (FileHandler::FileList::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
+  FileHandler::FileSet shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
+  for (FileHandler::FileSet::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
     m_script_engine->runScript(*I);
   }
 

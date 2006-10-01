@@ -1,3 +1,21 @@
+2006-10-01  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/3ds_Loader.cpp: Use getFilePath instead of expandString.
+
+	* src/FileHandler.cpp, src/FileHandler.h: Add function to return all
+	  filepaths for a given location. Set SEAR_MEDIA to a multi-location
+	  var instead of a single valued var. Rename FileList to FileSet and 
+	  create a FileList that is really a list.
+
+	* src/ScriptEngine.cpp: Use FileSet instead of FileList. Call 
+	  getFilePath instead of expandString.
+
+	* src/System.cpp: Use FileSet instead of FileList.
+
+	* src/sear.in: Use install_file_path instead of setvar for SEAR_MEDIA.
+	  Added some missing UPDATED flags. Added ref command to WFUT to support
+	  read-only media locations and download update into home dir.
+
 2006-09-17  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/3ds.cpp, loaders/LibModelFile.cpp,

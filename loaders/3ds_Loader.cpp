@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.24 2006-05-06 13:50:22 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.25 2006-10-01 12:52:44 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -35,7 +35,7 @@ SPtr<ModelRecord> ThreeDS_Loader::loadModel(WorldEntity *we, const std::string &
 
   std::string file_name = model_record->data_file_path;
 
-  System::instance()->getFileHandler()->expandString(file_name);
+  System::instance()->getFileHandler()->getFilePath(file_name);
 
   // Create new ThreeDS model
   ThreeDS *model = new ThreeDS();

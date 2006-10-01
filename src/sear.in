@@ -17,8 +17,8 @@ if [ ! -d $homedata ] ; then
   mkdir $homedata
 
   # Create startup.script
-  echo "/setvar SEAR_MEDIA $homedata/$MEDIA_CHANNEL/" > $homedata/startup.script
-  echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
+  echo "/insert_file_path SEAR_MEDIA $homedata/$MEDIA_CHANNEL/" > $homedata/startup.script
+#//  echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
 fi
 
 
@@ -40,7 +40,7 @@ if [ "$UPDATED" -eq "0" ] ; then
     # We need to change here so updater knows where to find / store data
     pushd $homedata
     # Update
-    $WFUT_BIN update $MEDIA_CHANNEL
+    $WFUT_BIN ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
     # Restore dir
     popd
     UPDATED=1
@@ -51,15 +51,16 @@ fi
 if [ "$UPDATED" -eq "0" ] ; then
   # Check to see if WFUT.jar is in the install dir
   if [ -e $datadir/sear/$WFUT_JAR ] ; then
-  WFUT_JAR_CP=$datadir/sear/$WFUT_JAR;
+    WFUT_JAR_CP=$datadir/sear/$WFUT_JAR;
   fi
 
   # See if Updater exists in home dir
-  if [ ! -e $homedata/$WFUT_JAR ] ; then
-  WFUT_JAR_CP=$homedata/$WFUT_JAR;
+  if [ -e $homedata/$WFUT_JAR ] ; then
+    WFUT_JAR_CP=$homedata/$WFUT_JAR;
   fi
 
   # Determine if java executable exists in path
+  ## TODO Could also examine JAVA_HOME
   JAVA=`which java`
   GIJ=`which gij`
 
@@ -69,7 +70,8 @@ if [ "$UPDATED" -eq "0" ] ; then
       # We need to change here so updater knows where to find / store data
       pushd $homedata
       # Update
-      $JAVA -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
+      $JAVA -jar $WFUT_JAR_CP ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
+      UPDATED=1
       # Restore dir
       popd
     else
@@ -84,7 +86,8 @@ if [ "$UPDATED" -eq "0" ] ; then
       # We need to change here so updater knows where to find / store data
       pushd $homedata
       # Update
-      $GIJ -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
+      $GIJ -jar $WFUT_JAR_CP ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
+      UPDATED=1
       # Restore dir
       popd
     else
