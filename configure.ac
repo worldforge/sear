@@ -116,7 +116,7 @@ if test $cross_compiling == no; then
   AC_CHECK_LIB(SDL_mixer,Mix_OpenAudio, [
     SEAR_LIBS="$SEAR_LIBS -lSDL_mixer"
   ], [
-    AC_MSG_ERROR(Couldn't find SDL_sound. Please goto http://www.libsdl.org/projects/SDL_mixer/)
+    AC_MSG_ERROR(Couldn't find SDL_mixer. Please goto http://www.libsdl.org/projects/SDL_mixer/)
 ])
 else
    AC_CHECK_HEADER(SDL/SDL_image.h,

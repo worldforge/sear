@@ -1,5 +1,10 @@
 2006-10-01  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.ac: Fix SDL_mixer error message which was asking for 
+	  SDL_sound.
+
+2006-10-01  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds_Loader.cpp: Use getFilePath instead of expandString.
 
 	* src/FileHandler.cpp, src/FileHandler.h: Add function to return all
