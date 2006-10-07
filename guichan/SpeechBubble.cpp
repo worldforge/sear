@@ -2,6 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
 
+#include <guichan/graphics.hpp>
+
 #include "guichan/SpeechBubble.h"
 
 #include "src/System.h"
@@ -142,23 +144,24 @@ int SpeechBubble::loadImages(const std::vector<std::string> &)
 #endif
 
     for (int i = 0; i < 9; ++i) {
-      System::instance()->getFileHandler()->expandString(filenames[i]);
+      System::instance()->getFileHandler()->getFilePath(filenames[i]);
     }
     std::cout << "Loading images" << std::endl << std::flush;
 
     try {
-      m_n = new gcn::Image(filenames[0]);
-      m_s = new gcn::Image(filenames[1]);
-      m_e = new gcn::Image(filenames[2]);
-      m_w = new gcn::Image(filenames[3]);
-      m_ne = new gcn::Image(filenames[4]);
-      m_se = new gcn::Image(filenames[5]);
-      m_sw = new gcn::Image(filenames[6]);
-      m_nw = new gcn::Image(filenames[7]);
-      m_mid = new gcn::Image(filenames[8]);
+      m_n = gcn::Image::load(filenames[0]);
+      m_s = gcn::Image::load(filenames[1]);
+      m_e = gcn::Image::load(filenames[2]);
+      m_w = gcn::Image::load(filenames[3]);
+      m_ne = gcn::Image::load(filenames[4]);
+      m_se = gcn::Image::load(filenames[5]);
+      m_sw = gcn::Image::load(filenames[6]);
+      m_nw = gcn::Image::load(filenames[7]);
+      m_mid = gcn::Image::load(filenames[8]);
     }
     catch (...) {
       m_n = 0;
+std::cout<< "Error loading images" << std::endl << std::flush;
     }
     return 0;
 }

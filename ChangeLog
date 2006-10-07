@@ -10,15 +10,14 @@
 	  guichan/CharacterWindow.cpp, guichan/ConnectWindow.cpp,
 	  guichan/ConsoleWindow.cpp, guichan/ControlsOptions.cpp,
 	  guichan/ControlsOptions.h, guichan/HelpOptions.cpp,
-	  guichan/HelpOptions.h, guichan/Inventory.cpp, guichan/LoginWindow.cpp,
-	  guichan/OptionsTemplate.cpp, guichan/OptionsTemplate.h,
+	  guichan/HelpOptions.h, guichan/Inventory.cpp, guichan/LoginWindow.cpp,          guichan/OptionsTemplate.cpp, guichan/OptionsTemplate.h,
 	  guichan/OptionsWindow.cpp, guichan/Panel.cpp, guichan/RootWidget.cpp,
-	  guichan/RootWidget.cpp, guichan/SpeechBubble.h,
-	  guichan/StatusWindow.cpp, guichan/TaskWindow.cpp,
-	  guichan/VideoOptions.cpp, guichan/VideoOptions.h,
-	  guichan/Workarea.cpp, guichan/Workarea.h, guichan/bar.cpp,
-	  guichan/passwordfield.cpp: Updated to guichan 0.5.0 API. Use
-	  getFilePath to load images instead of expandString.
+	  guichan/RootWidget.cpp, guichan/SpeechBubble.cpp,
+	  guichan/SpeechBubble.h, guichan/StatusWindow.cpp,
+	  guichan/TaskWindow.cpp, guichan/VideoOptions.cpp,
+	  guichan/VideoOptions.h, guichan/Workarea.cpp, guichan/Workarea.h,
+	  guichan/bar.cpp, guichan/passwordfield.cpp: Updated to guichan 0.5.0
+	  API. Use getFilePath to load images instead of expandString.
 
 2006-10-01  Simon Goodall  <sear@simongoodall.co.uk>
 
