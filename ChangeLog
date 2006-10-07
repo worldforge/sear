@@ -1,5 +1,11 @@
 2006-10-07  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Sprite.cpp: Remove sprite loading error message.
+
+	* src/sear-res.rc.in: Use correct version number in win32 metadata.
+
+2006-10-07  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.ac: Bump guichan version to 0.5.0 and sage to 0.2.0.
 
 	* environment/TerrainRenderer.cpp: Added some checks incase of missing

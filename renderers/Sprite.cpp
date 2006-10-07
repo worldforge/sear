@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 - 2006 Simon Goodall
 
-// $Id: Sprite.cpp,v 1.11 2006-09-17 19:42:42 simon Exp $
+// $Id: Sprite.cpp,v 1.12 2006-10-07 13:40:24 simon Exp $
 
 #include "Sprite.h"
 #include "TextureManager.h"
@@ -65,9 +65,8 @@ SpriteData::SpriteData(const std::string& spriteName) :
     m_name = spriteName;
     // Check if the texture has a filename specified
     if (!getSpriteConfig().findItem(spriteName, "filename")) {
-      // cerr causes an error in valgrind.
-      fprintf(stderr, "Sprite %s has no filename defined\n", spriteName.c_str());
-//        std::cerr << "Sprite " << spriteName << " has no filename defined" << std::endl;
+      // Suppress this message as it leads to bogus error reports.
+      // fprintf(stderr, "Sprite %s has no filename defined\n", spriteName.c_str());
     }
 }
 
