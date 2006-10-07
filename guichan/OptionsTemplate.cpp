@@ -40,7 +40,7 @@ OptionsTemplate::OptionsTemplate(RootWidget * top) : gcn::Window("opt"),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -49,7 +49,7 @@ OptionsTemplate::~OptionsTemplate()
 {
 }
 
-void OptionsTemplate::action(const std::string & event)
+void OptionsTemplate::action(const std::string & event, gcn::Widget *widget)
 {
   if (event == "apply") {
     std::cout << "Apply changes" << std::endl << std::flush;

@@ -107,7 +107,7 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -116,7 +116,7 @@ ControlsOptions::~ControlsOptions()
 {
 }
 
-void ControlsOptions::action(const std::string & event)
+void ControlsOptions::action(const std::string & event, gcn::Widget *widget)
 {
   if (event == "apply") {
     std::cout << "Apply changes" << std::endl << std::flush;

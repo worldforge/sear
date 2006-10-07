@@ -49,7 +49,7 @@ TaskWindow::TaskWindow(Eris::Entity * e) : m_entity(e)
   m_progressBar->setBaseColor(gcn::Color(0,0,0,25));
   m_vbox->pack(m_progressBar);
 
-  setContent(m_vbox);
+  add(m_vbox);
   resizeToContent();
 }
 

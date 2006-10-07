@@ -126,7 +126,7 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }

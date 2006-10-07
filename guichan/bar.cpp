@@ -56,6 +56,7 @@
  * For comments regarding functions please see the header file. 
  */
 
+#include "guichan/graphics.hpp"
 #include "guichan/bar.hpp"
 
 namespace gcn
@@ -164,7 +165,7 @@ namespace gcn
             graphics->drawLine(0 + getPosition() - 1, 1, getPosition() - 1, getHeight() - 1);
             graphics->drawLine(1, getHeight() - 1, getPosition() - 1, getHeight() - 1);
 
-            if (hasFocus())
+            if (isFocused())
             {
                 graphics->setColor(getForegroundColor());
                 graphics->drawRectangle(Rectangle(2, 2, getPosition() - 4, getHeight() - 4));
@@ -180,7 +181,7 @@ namespace gcn
             graphics->drawLine(1, getPosition() - 1, getWidth() - 1, getPosition() - 1);
             graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getPosition() - 1);
 
-            if (hasFocus())
+            if (isFocused())
             {
                 graphics->setColor(getForegroundColor());
                 graphics->drawRectangle(Rectangle(2, 2, getWidth() - 4, getPosition() - 4));

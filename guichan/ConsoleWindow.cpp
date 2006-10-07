@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
 
+#include "guichan/key.hpp"
 #include "guichan/ConsoleWindow.h"
 #include "guichan/CommandLine.h"
 #include "guichan/box.hpp"
@@ -60,7 +61,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 
   vbox->pack(m_entry);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 
@@ -84,7 +85,7 @@ void ConsoleWindow::lineEntered()
 
 bool ConsoleWindow::requestConsoleFocus()
 {
-  if (!m_entry->hasFocus()) {
+  if (!m_entry->isFocused()) {
     std::cout << "Request Focus" << std::endl << std::flush;
     m_entry->requestFocus();
     return true;
@@ -94,7 +95,7 @@ bool ConsoleWindow::requestConsoleFocus()
 
 bool ConsoleWindow::dismissConsoleFocus()
 {
-  if (m_entry->hasFocus()) {
+  if (m_entry->isFocused()) {
     _getFocusHandler()->focusNone();
     return true;
   }
@@ -103,7 +104,7 @@ bool ConsoleWindow::dismissConsoleFocus()
 
 void ConsoleWindow::logic()
 {
-  if (m_entry->hasFocus()) {
+  if (m_entry->isFocused()) {
     gcn::Color base = getBaseColor();
     base.a = 128;
     setBaseColor(base);

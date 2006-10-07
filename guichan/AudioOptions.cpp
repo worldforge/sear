@@ -44,7 +44,7 @@ AudioOptions::AudioOptions(RootWidget * top) : gcn::Window("Audio"),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -53,7 +53,7 @@ AudioOptions::~AudioOptions()
 {
 }
 
-void AudioOptions::action(const std::string & event)
+void AudioOptions::action(const std::string & event, gcn::Widget *widget)
 {
   if (event == "apply") {
     std::cout << "Apply changes" << std::endl << std::flush;

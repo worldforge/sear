@@ -254,20 +254,24 @@ using Mercator::Terrain;
 
 void TerrainRenderer::drawMap(Mercator::Terrain & t,
                              const PosType & camPos, bool select_mode) {
-  long lowXBound = lrintf (camPos[0] / segSize) - 2,
-       upXBound = lrintf (camPos[0] / segSize) + 2,
-       lowYBound = lrintf (camPos[1] / segSize) - 2,
-       upYBound = lrintf (camPos[1] / segSize) + 2;
 
-  if (!select_mode) enableRendererState ();
+  long lowXBound = lrintf (camPos[0]) / (long)segSize - 2,
+       upXBound = lrintf (camPos[0]) / (long)segSize + 2,
+       lowYBound = lrintf (camPos[1]) / (long)segSize - 2,
+       upYBound = lrintf (camPos[1]) / (long)segSize + 2;
 
   Render *r = RenderSystem::getInstance ().getRenderer ();
+  assert (r != 0);
   float frustum[6][4];
   r->getFrustum (frustum);
 
   const Terrain::Segmentstore & segs = t.getTerrain ();
   Terrain::Segmentstore::const_iterator I = segs.lower_bound (lowXBound);
   Terrain::Segmentstore::const_iterator K = segs.upper_bound (upXBound);
+
+  if (I == segs.end()) return;
+
+  if (!select_mode) enableRendererState ();
 
   for (; I != K; ++I) {
     const Terrain::Segmentcolumn & col = I->second;
@@ -276,8 +280,13 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
     Terrain::Segmentcolumn::const_iterator J = col.lower_bound (lowYBound);
     Terrain::Segmentcolumn::const_iterator L = col.upper_bound (upYBound);
+
+  if (J == col.end()) continue;
     for (; J != L; ++J) {
       Mercator::Segment * s = J->second;
+
+      if (s == NULL) continue;
+
       float min, max;
       // FIXME This test can go, once the Mercator change is in.
       if (s->isValid ()) {
@@ -298,7 +307,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
       // Do the Frustum test.
       DisplayListColumn & dcol = (M == m_displayLists.end ())? m_displayLists[I->first] : M->second;
       DisplayListColumn::iterator N = dcol.find (J->first);
-//            GLuint display_list;
+
       if (N == dcol.end ()) {
 
         if (!s->isValid ()) {
@@ -311,7 +320,6 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         // Generate normsl
         seg.narray = s->getNormals (); 
         if (seg.narray == 0) {
-//          std::cout << "Populating normals" << std::endl << std::flush;
           s->populateNormals ();
           seg.narray = s->getNormals ();
         }
@@ -326,7 +334,6 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         }
 
         // Fill in the vertex Z coord, which varies
-//        std::cout << "Populating vertex cache" << std::endl << std::flush;
         seg.harray = new float[(segSize + 1) * (segSize + 1) * 3];
         int idx = -1;
         for (int j = 0; j < (segSize + 1); ++j) {
@@ -350,7 +357,6 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
         dcol[J->first] = seg;
         N = dcol.find(J->first);
-//        s->invalidate (false);
       }
       
       DataSeg & seg = N->second;
@@ -400,6 +406,8 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
     const Terrain::Segmentcolumn & col = I->second;
     Terrain::Segmentcolumn::const_iterator J = col.begin ();
     for (; J != col.end (); ++J) {
+      Mercator::Segment * s = J->second;
+if (s == NULL) continue;
       glPushMatrix ();
       glTranslatef (I->first * segSize, J->first * segSize, seaLevel);
       GLfloat vertices[] = { 0.f, 0.f, 0.f,

@@ -198,7 +198,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 
   vbox->pack(m_closeButton);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }

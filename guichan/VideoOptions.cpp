@@ -144,7 +144,7 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -192,7 +192,7 @@ void VideoOptions::logic()
   gcn::Window::logic();
 }
 
-void VideoOptions::action(const std::string &)
+void VideoOptions::action(const std::string &, gcn::Widget *widget)
 {
   m_checkFullChanged = true;
 }

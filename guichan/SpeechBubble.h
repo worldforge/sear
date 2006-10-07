@@ -5,6 +5,8 @@
 #ifndef SEAR_GUICHAN_SPEECH_BUBBLE_H
 #define SEAR_GUICHAN_SPEECH_BUBBLE_H
 
+#include <guichan/font.hpp>
+#include <guichan/image.hpp>
 #include <guichan/widget.hpp>
 
 #include <vector>

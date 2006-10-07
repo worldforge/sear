@@ -116,7 +116,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));
   vbox->pack(hbox, 6);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -140,7 +140,7 @@ void LoginWindow::logic()
 void LoginWindow::actionPressed(std::string event)
 {
   bool close = false;
-  bool password_error = false;
+//  bool password_error = false;
 
   gcn::BasicContainer * parent_widget = getParent();
   if (parent_widget == 0) {

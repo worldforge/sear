@@ -18,7 +18,7 @@
  *  along with The Mana World; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: passwordfield.cpp,v 1.1 2005-12-05 16:22:02 alriddoch Exp $
+ *  $Id: passwordfield.cpp,v 1.2 2006-10-07 13:23:33 simon Exp $
  */
 
 #include "passwordfield.h"
@@ -41,7 +41,7 @@ void PasswordField::draw(gcn::Graphics *graphics)
     std::string stars;
     stars.assign(mText.length(), '*');
 
-    if (hasFocus()) {
+    if (isFocused()) {
         drawCaret(graphics,
                 getFont()->getWidth(stars.substr(0, mCaretPosition)) -
                 mXScroll);

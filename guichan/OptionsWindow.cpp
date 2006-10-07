@@ -91,7 +91,7 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 

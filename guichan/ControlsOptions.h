@@ -6,6 +6,7 @@
 #define SEAR_GUICHAN_CONTROLS_OPTIONS_H
 
 #include <guichan/widgets/window.hpp>
+#include <guichan/actionlistener.hpp>
 
 #include <sigc++/object.h>
 
@@ -34,7 +35,7 @@ public:
   explicit ControlsOptions(RootWidget * top);
   virtual ~ControlsOptions();
 
-  void action(const std::string &);
+  void action(const std::string &, gcn::Widget *widget);
 };
 
 } // namespace Sear

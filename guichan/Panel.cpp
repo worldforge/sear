@@ -47,7 +47,7 @@ Panel::Panel(RootWidget * top) : gcn::Window(""), m_top(top)
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &Panel::actionPressed));
 
-  setContent(m_hbox);
+  add(m_hbox);
 
   Render * render = RenderSystem::getInstance().getRenderer();
   int height = render->getWindowHeight();

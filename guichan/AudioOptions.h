@@ -6,6 +6,7 @@
 #define SEAR_GUICHAN_AUDIO_OPTIONS_H
 
 #include <guichan/widgets/window.hpp>
+#include <guichan/actionlistener.hpp>
 
 #include <sigc++/object.h>
 
@@ -23,7 +24,7 @@ public:
   explicit AudioOptions(RootWidget * top);
   virtual ~AudioOptions();
 
-  void action(const std::string &);
+  void action(const std::string &, gcn::Widget *widget);
 };
 
 } // namespace Sear

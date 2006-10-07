@@ -42,7 +42,7 @@ public:
   void actionPressed(std::string);
 
   virtual void logic();
-  virtual void action(const std::string &);
+  virtual void action(const std::string &, gcn::Widget *widget);
 };
 
 } // namespace Sear

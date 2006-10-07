@@ -124,7 +124,7 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
@@ -134,7 +134,7 @@ HelpOptions::~HelpOptions()
   delete m_fileList;
 }
 
-void HelpOptions::action(const std::string & event)
+void HelpOptions::action(const std::string & event, gcn::Widget *widget)
 {
   if (event == "apply") {
     std::cout << "Apply changes" << std::endl << std::flush;

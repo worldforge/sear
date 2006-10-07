@@ -28,6 +28,8 @@
 
 #include <guichan/sdl.hpp>
 #include <guichan/opengl.hpp>
+#include <guichan/opengl/openglimage.hpp>
+#include <guichan/opengl/openglsdlimageloader.hpp>
 
 #include <sage/GL.h>
 
@@ -66,7 +68,7 @@ Workarea::Workarea(System * s) :
   m_input(0),
   m_graphics(0),
   m_imageLoader(0),
-  m_hostImageLoader(0),
+//  m_hostImageLoader(0),
   m_gui(0),
   m_panel(0),
   m_connectWindow(0),
@@ -76,13 +78,13 @@ Workarea::Workarea(System * s) :
 
 void Workarea::init()
 {
-  m_imageLoader = new gcn::OpenGLImageLoader();
-  m_hostImageLoader = new gcn::SDLImageLoader();
+  m_imageLoader = new gcn::OpenGLSDLImageLoader();
+//  m_hostImageLoader = new gcn::SDLImageLoader();
 
   // Set the loader that the OpenGLImageLoader should use to load images from
   // disk, as it can't do it itself, and then install the image loader into
   // guichan.
-  m_imageLoader->setHostImageLoader(m_hostImageLoader);
+//  m_imageLoader->setHostImageLoader(m_hostImageLoader);
   gcn::Image::setImageLoader(m_imageLoader);
 
   // Create the handler for OpenGL graphics.
@@ -109,7 +111,8 @@ void Workarea::init()
 
   try {
     std::string font_path = m_fixed_font;
-    m_system->getFileHandler()->expandString(font_path);
+    m_system->getFileHandler()->getFilePath(font_path);
+std::cout << font_path << std::endl;
 
     gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
@@ -170,7 +173,7 @@ Workarea::~Workarea()
   delete m_input;
   delete m_graphics;
   delete m_imageLoader;
-  delete m_hostImageLoader;
+//  delete m_hostImageLoader;
   delete m_top;
 
   
@@ -341,7 +344,8 @@ void Workarea::draw()
 void Workarea::contextCreated() {
   try {
     std::string font_path = m_fixed_font;
-    m_system->getFileHandler()->expandString(font_path);
+    m_system->getFileHandler()->getFilePath(font_path);
+std::cout << font_path << std::endl;
 
     gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");

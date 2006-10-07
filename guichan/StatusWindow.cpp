@@ -68,7 +68,7 @@ StatusWindow::StatusWindow(Eris::Entity * e) : m_entity(e)
   m_manaBar->setBaseColor(gcn::Color(0,0,0,25));
   m_vbox->pack(m_manaBar);
 
-  setContent(m_vbox);
+  add(m_vbox);
   resizeToContent();
 }
 

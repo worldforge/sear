@@ -44,7 +44,7 @@ Alert::Alert(gcn::Container * parent, const std::string & msg)
 
   vbox->pack(m_okButton);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 

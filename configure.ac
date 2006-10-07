@@ -172,7 +172,7 @@ UNSUSED=0
 MERCATOR_VERSION=0.2.4
 VARCONF_VERSION=0.6.3
 ERIS_VERSION=1.3.11
-SAGE_VERSION=0.1.1
+SAGE_VERSION=0.2.0
 
 PKG_CHECK_MODULES(PKGCHECKS, mercator-0.2 >= $MERCATOR_VERSION varconf-1.0 >= $VARCONF_VERSION eris-1.3 = $ERIS_VERSION sage >= $SAGE_VERSION,
 	[
@@ -193,7 +193,7 @@ PKG_CHECK_MODULES(PKGCHECKS2, libmd3-0.2 >= $LIBMODELFILE_VERSION,
 		CPPFLAGS="$CPPFLAGS $PKGCHECKS2_CFLAGS"
 		SEAR_LIBS="$SEAR_LIBS $PKGCHECKS2_LIBS"
 	],
-	AC_MSG_ERROR(Couldn't find libModelFile  ($PKGCHECKS_PKG_ERRORS). Please goto http://sourceforge.net/projects/worldforge)
+	AC_MSG_ERROR(Couldn't find libModelFile  ($PKGCHECKS2_PKG_ERRORS). Please goto http://sourceforge.net/projects/worldforge)
 )
 AC_SUBST(LIBMODELFILE_VERSION)
 
@@ -239,7 +239,7 @@ if test $cross_compiling == no; then
     AC_MSG_ERROR(Couldn't find GLU)
   ], "-lGL")
 
-  AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.]))
+  AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.5.0.]))
 
   AC_LANG_RESTORE
  else

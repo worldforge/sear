@@ -6,6 +6,7 @@
 #define SEAR_GUICHAN_HELP_OPTIONS_H
 
 #include <guichan/widgets/window.hpp>
+#include <guichan/actionlistener.hpp>
 
 #include <sigc++/object.h>
 
@@ -39,7 +40,7 @@ public:
   explicit HelpOptions(RootWidget * top);
   virtual ~HelpOptions();
 
-  void action(const std::string &);
+  void action(const std::string &, gcn::Widget *widget);
   virtual void logic();
 };
 

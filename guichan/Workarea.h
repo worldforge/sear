@@ -22,7 +22,7 @@ namespace varconf {
 namespace gcn {
   class SDLInput;
   class OpenGLGraphics;
-  class OpenGLImageLoader;
+  class OpenGLSDLImageLoader;
   class SDLImageLoader;
 }
 
@@ -59,8 +59,8 @@ protected:
 
   gcn::SDLInput * m_input;                 // Input driver
   gcn::OpenGLGraphics * m_graphics;        // Graphics driver
-  gcn::OpenGLImageLoader * m_imageLoader;  // For loading images
-  gcn::SDLImageLoader * m_hostImageLoader; // For loading images
+  gcn::OpenGLSDLImageLoader * m_imageLoader;  // For loading images
+//  gcn::SDLImageLoader * m_hostImageLoader; // For loading images
   Gui * m_gui;                             // A Gui object - binds it together
 
   ButtonDict m_buttons;

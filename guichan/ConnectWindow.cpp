@@ -125,7 +125,7 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
 
   vbox->pack(hbox);
 
-  setContent(vbox);
+  add(vbox);
 
   resizeToContent();
 }
