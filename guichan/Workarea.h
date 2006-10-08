@@ -52,6 +52,8 @@ public:
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
+
+  std::list<gcn::Widget*> m_remove_widgets;
   System * m_system;
   int m_width, m_height;
   std::string m_fixed_font;
@@ -60,7 +62,6 @@ protected:
   gcn::SDLInput * m_input;                 // Input driver
   gcn::OpenGLGraphics * m_graphics;        // Graphics driver
   gcn::OpenGLSDLImageLoader * m_imageLoader;  // For loading images
-//  gcn::SDLImageLoader * m_hostImageLoader; // For loading images
   Gui * m_gui;                             // A Gui object - binds it together
 
   ButtonDict m_buttons;
@@ -88,6 +89,8 @@ public:
   bool handleEvent(const SDL_Event &);
   void draw();
 
+  void removeLater(gcn::Widget* w) { m_remove_widgets.push_back(w); }
+  void removeLaters();
 };
 
 } // namespace Sear

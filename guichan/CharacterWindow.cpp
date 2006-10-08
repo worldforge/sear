@@ -10,6 +10,7 @@
 #include "guichan/ActionListenerSigC.h"
 
 #include "guichan/box.hpp"
+#include "guichan/Workarea.h"
 
 #include <guichan/widgets/label.hpp>
 
@@ -352,7 +353,8 @@ void CharacterWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  parent->remove(this);
+//  parent->remove(this);
+  System::instance()->getWorkarea()->removeLater(this);
 }
 
 } // namespace Sear

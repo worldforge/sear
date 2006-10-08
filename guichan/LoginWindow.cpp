@@ -8,6 +8,7 @@
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 #include "guichan/passwordfield.h"
+#include "guichan/Workarea.h"
 
 #include "src/System.h"
 
@@ -189,7 +190,8 @@ void LoginWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  parent->remove(this);
+  //parent->remove(this);
+  System::instance()->getWorkarea()->removeLater(this);
 }
 
 } // namespace Sear

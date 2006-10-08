@@ -29,14 +29,14 @@ AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
 AC_PROG_LIBTOOL
 
 SEAR_LIBS=
+CXXFLAGS="$CXXFLAGS -Wall"
 
 if test $cross_compiling == no; then
   AC_PATH_X
-  if test x"$x_includes" != x; then
+  if test x"$x_includes" != xNONE; then
     CPPFLAGS="$CPPFLAGS -I $x_includes"
   fi
-  CXXFLAGS="$CXXFLAGS -Wall"
-  if test x"$x_libraries" != x; then
+  if test x"$x_libraries" != xNONE; then
     SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
   fi
 fi

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.16 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: Render.h,v 1.17 2006-10-08 14:51:48 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -130,7 +130,7 @@ typedef std::list<WorldEntity*> MessageList;
 
 protected:
   int m_context_instantiation ;
-  bool m_context_valid;;
+  bool m_context_valid;
 };
   
 } /* namespace Sear */

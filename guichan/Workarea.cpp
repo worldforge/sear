@@ -68,7 +68,6 @@ Workarea::Workarea(System * s) :
   m_input(0),
   m_graphics(0),
   m_imageLoader(0),
-//  m_hostImageLoader(0),
   m_gui(0),
   m_panel(0),
   m_connectWindow(0),
@@ -79,12 +78,10 @@ Workarea::Workarea(System * s) :
 void Workarea::init()
 {
   m_imageLoader = new gcn::OpenGLSDLImageLoader();
-//  m_hostImageLoader = new gcn::SDLImageLoader();
 
   // Set the loader that the OpenGLImageLoader should use to load images from
   // disk, as it can't do it itself, and then install the image loader into
   // guichan.
-//  m_imageLoader->setHostImageLoader(m_hostImageLoader);
   gcn::Image::setImageLoader(m_imageLoader);
 
   // Create the handler for OpenGL graphics.
@@ -173,7 +170,6 @@ Workarea::~Workarea()
   delete m_input;
   delete m_graphics;
   delete m_imageLoader;
-//  delete m_hostImageLoader;
   delete m_top;
 
   
@@ -332,9 +328,10 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
 void Workarea::draw()
 {
+  removeLaters();
+
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(WORKSPACE));
   glLineWidth(1.f);
-
   m_gui->logic();
   m_gui->draw();
 
@@ -345,7 +342,6 @@ void Workarea::contextCreated() {
   try {
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->getFilePath(font_path);
-std::cout << font_path << std::endl;
 
     gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
@@ -367,6 +363,19 @@ void Workarea::contextDestroyed(bool check) {
     delete f;
   }
   */
+}
+
+void Workarea::removeLaters() {
+  std::list<gcn::Widget*>::iterator I = m_remove_widgets.begin();
+  while (I != m_remove_widgets.end()) {
+    gcn::Widget *w = *I;
+    gcn::BasicContainer *p = w->getParent();
+    gcn::Container *p2 = dynamic_cast<gcn::Container*>(p);
+    if (p2) p2->remove(w);
+
+    m_remove_widgets.erase(I); 
+    I = m_remove_widgets.begin();
+  }
 }
 
 } // namespace Sear

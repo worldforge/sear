@@ -34,6 +34,7 @@ protected:
 
   gcn::Button * m_connectButton;
   gcn::Button * m_closeButton;
+  gcn::Button * m_refreshButton;
 
   ServerListModel * m_serverListModel;
   ActionListenerSigC * m_buttonListener;

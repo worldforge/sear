@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.h,v 1.14 2006-10-01 12:52:44 simon Exp $
+// $Id: FileHandler.h,v 1.15 2006-10-08 14:51:49 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -51,6 +51,11 @@ public:
 
   std::string getVariable(const std::string &var) {
     return m_varMap[var];
+  }
+
+  void deleteVariable(const std::string &var) {
+    VarMap::iterator I = m_varMap.find(var);
+    if (I != m_varMap.end()) m_varMap.erase(I);
   }
 
   void expandString(std::string &str);

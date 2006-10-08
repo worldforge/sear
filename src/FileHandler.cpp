@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.22 2006-10-01 12:52:44 simon Exp $
+// $Id: FileHandler.cpp,v 1.23 2006-10-08 14:51:49 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -106,11 +106,14 @@ FileHandler::FileHandler() {
     addSearchPath(installBase);
     addSearchPath(installBase + "/scripts");
     
+    // This is the prefix 
     setVariable("SEAR_INSTALL", installBase);
-//    setVariable("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
-//    setVariable("DEFAULT_SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
-    insertFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+    // This is the user's home dir
     setVariable("SEAR_HOME", getUserDataPath());
+    // Search $HOME/.sear for media first
+    insertFilePath("SEAR_MEDIA", "${SEAR_HOME}/sear-media-0.6/");
+    // Check prefix location second
+    appendFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
     
     if (!exists(getUserDataPath())) {
       std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
@@ -266,6 +269,9 @@ void FileHandler::registerCommands(Console *console) {
   console->registerCommand(REMOVE_SEARCH_PATH, this);
   console->registerCommand(CMD_SETVAR, this);
   console->registerCommand(CMD_GETVAR, this);
+  console->registerCommand(CMD_SET_VARIABLE, this);
+  console->registerCommand(CMD_GET_VARIABLE, this);
+  console->registerCommand(CMD_DELETE_VARIABLE, this);
   console->registerCommand(INSERT_FILE_PATH, this);
   console->registerCommand(APPEND_FILE_PATH, this);
   console->registerCommand(REMOVE_FILE_PATH, this);
@@ -282,14 +288,17 @@ void FileHandler::runCommand(const std::string &command, const std::string &args
   else if (command == REMOVE_SEARCH_PATH) {
     removeSearchPath(args);
   }
-  else if (command == CMD_SETVAR) {
+  else if (command == CMD_SETVAR || command == CMD_SET_VARIABLE) {
     std::string key = tokeniser.nextToken();
     std::string value = tokeniser.remainingTokens();
     setVariable(key, value);
   }
-  else if (command == CMD_GETVAR) {
+  else if (command == CMD_GETVAR || command == CMD_GET_VARIABLE) {
     std::string key = tokeniser.nextToken();
     System::instance()->pushMessage(getVariable(key), CONSOLE_MESSAGE);    
+  }
+  else if (command == CMD_DELETE_VARIABLE) {
+    deleteVariable(args);
   }
   else if (command == INSERT_FILE_PATH) {
     std::string var = tokeniser.nextToken();

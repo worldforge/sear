@@ -7,6 +7,7 @@
 
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/Alert.h"
+#include "guichan/Workarea.h"
 #include "guichan/box.hpp"
 
 #include "src/System.h"
@@ -102,7 +103,6 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   gcn::Box * hbox = new gcn::HBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
-
   m_connectButton = new gcn::Button("Connect");
   m_widgets.push_back(SPtr<gcn::Widget>(m_connectButton));
   m_connectButton->setFocusable(false);
@@ -110,12 +110,12 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_connectButton->addActionListener(m_buttonListener);
   hbox->pack(m_connectButton);
 
-  gcn::Button * refresh_button = new gcn::Button("Refresh");
-  m_widgets.push_back(SPtr<gcn::Widget>(refresh_button));
-  refresh_button->setFocusable(false);
-  refresh_button->setEventId("refresh");
-  refresh_button->addActionListener(m_buttonListener);
-  hbox->pack(refresh_button);
+  m_refreshButton = new gcn::Button("Refresh");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
+  m_refreshButton->setFocusable(false);
+  m_refreshButton->setEventId("refresh");
+  m_refreshButton->addActionListener(m_buttonListener);
+  hbox->pack(m_refreshButton);
 
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
@@ -194,7 +194,8 @@ void ConnectWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  parent->remove(this);
+  // parent->remove(this);
+  System::instance()->getWorkarea()->removeLater(this);
 }
 
 } // namespace Sear

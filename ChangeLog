@@ -1,5 +1,32 @@
 2006-10-08  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.ac: Make sure -Wall is always added to CXXFLAGS. In the
+	  AC_PATH_X check, look for NONE rather than empty string. Might break 
+	  older versions of this macro. Feedback welcome.
+
+	* guichan/CharacterWindow.cpp, guichan/ConnectWindow.cpp,
+	  guichan/ConnectWindow.h, guichan/Workarea.cppm guichan/Workarea.h: Add
+	  a removeLater function to add a widget to a list of widgets to be
+	  removed from their parent container when a button callback is hit.
+	  This avoids a guichan exception being thrown for removing a widget
+	  from the GUI while processing an input event. A call to removeLaters
+	  performs the actual removal. Made the ConnectWindow refresh button a
+	  class member.
+
+	* renderers/Render.h: Remove extra ;
+
+	* src/FileHandler.cpp, src/FileHandler.h: Added SEAR_HOME/sear-media-0.6
+	  by default to the SEAR_MEDIA search path rather than attempt to add it
+	  in the sear script. Added a function to delete a variable such as
+	  SEAR_HOME and added get/set_variable console commands to eventually
+	  replace getvar and setvar.
+
+	* src/sear.in: Removed the creation of the startup.script file as the
+	  changes implemented here are built into sear. Check that the reference
+	  path for WFUT media exists before attempting to use it.
+
+2006-10-08  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/DblClkListBox.h: Added a list box subclass that listens for
 	  double clicks and fires a given event.
 
