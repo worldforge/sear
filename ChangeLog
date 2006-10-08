@@ -1,3 +1,12 @@
+2006-10-08  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/DblClkListBox.h: Added a list box subclass that listens for
+	  double clicks and fires a given event.
+
+	* guichan/ConnectWindow.cpp, guichan/CharacterWindow.cpp: Use the new
+	  DblClkListBox class to allow double clicking of a server to connect to
+	  it, or on an existing character to take it.
+
 2006-10-07  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Sprite.cpp: Remove sprite loading error message.

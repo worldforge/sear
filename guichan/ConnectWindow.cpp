@@ -3,6 +3,7 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "guichan/ConnectWindow.h"
+#include "guichan/DblClkListBox.h"
 
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/Alert.h"
@@ -63,7 +64,6 @@ public:
   }
 };
 
-
 ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
                                  m_selected(-1)
 {
@@ -78,7 +78,10 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
 
   m_serverListModel = new ServerListModel;
 
-  m_servers = new gcn::ListBox(m_serverListModel);
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
+
+  m_servers = new DblClkListBox(m_serverListModel, m_buttonListener, "connect");
   m_widgets.push_back(SPtr<gcn::Widget>(m_servers));
   m_servers->setWidth(200);
   m_servers->setFocusable(false);
@@ -99,8 +102,6 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   gcn::Box * hbox = new gcn::HBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
-  m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
 
   m_connectButton = new gcn::Button("Connect");
   m_widgets.push_back(SPtr<gcn::Widget>(m_connectButton));

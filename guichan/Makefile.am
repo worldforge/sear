@@ -25,5 +25,5 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        Overlay.cpp Overlay.h \
                        ActionListenerCommand.h ActionListenerSigC.h \
                        SpeechBubble.cpp SpeechBubble.h \
-                       CommandLine.h
+                       CommandLine.h DblClkListBox.h
 

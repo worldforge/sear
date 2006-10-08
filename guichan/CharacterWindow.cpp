@@ -3,6 +3,7 @@
 // Copyright (C) 2005 Alistair Riddoch
 
 #include "guichan/CharacterWindow.h"
+#include "guichan/DblClkListBox.h"
 
 #include "guichan/Alert.h"
 #include "guichan/LoginWindow.h"
@@ -103,9 +104,12 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
   vbox->pack(l1);
 
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
+
   m_characterListModel = new CharacterListModel;
 
-  m_characters = new gcn::ListBox(m_characterListModel);
+  m_characters = new DblClkListBox(m_characterListModel, m_buttonListener, "take");
   m_widgets.push_back(SPtr<gcn::Widget>(m_characters));
   m_characters->setWidth(200);
   m_characters->setFocusable(false);
@@ -117,9 +121,6 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   scroll_area->setHeight(200);
   scroll_area->setBorderSize(1);
   vbox->pack(scroll_area);
-
-  m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
 
   m_refreshButton = new gcn::Button("Refresh");
   m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
