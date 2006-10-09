@@ -33,11 +33,15 @@ CXXFLAGS="$CXXFLAGS -Wall"
 
 if test $cross_compiling == no; then
   AC_PATH_X
-  if test x"$x_includes" != xNONE; then
-    CPPFLAGS="$CPPFLAGS -I $x_includes"
+  if test x"$x_includes" != x; then
+    if test x"$x_includes" != xNONE; then
+      CPPFLAGS="$CPPFLAGS -I $x_includes"
+    fi
   fi
-  if test x"$x_libraries" != xNONE; then
-    SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
+  if test x"$x_libraries" != x; then
+    if test x"$x_libraries" != xNONE; then
+      SEAR_LIBS="$SEAR_LIBS -L$x_libraries"
+    fi
   fi
 fi
 
