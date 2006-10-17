@@ -1,3 +1,8 @@
+2006-10-17  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/System.cpp: Change default window size to 800x600 instead of
+	  640x480.
+
 2006-10-09  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac: Check for both empty string and for NONE in configure

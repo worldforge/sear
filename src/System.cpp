@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.159 2006-10-01 12:52:44 simon Exp $
+// $Id: System.cpp,v 1.160 2006-10-17 10:25:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,8 +98,8 @@ namespace Sear {
   static const std::string KEY_fullscreen = "start_fullscreen";
   
   //Config default values
-  static const int DEFAULT_window_width = 640;
-  static const int DEFAULT_window_height = 480;  
+  static const int DEFAULT_window_width = 800;
+  static const int DEFAULT_window_height = 600;  
   static const bool DEFAULT_mouse_move_select = false;
   static const double DEFAULT_max_click_time = 0.3;
   static const int DEFAULT_joystick_touch_button = 1;
