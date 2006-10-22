@@ -372,7 +372,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         } else {
           seg.disp = glGenLists(1);
           dcol[J->first] = seg; // Need to re-copy updated data
-          glNewList(seg.disp, GL_COMPILE_AND_EXECUTE);
+          glNewList(seg.disp, GL_COMPILE);
           end = true;
         }
       }
@@ -384,6 +384,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
       if (end) {
         glEndList();
+          glCallList(seg.disp);
       }
     }
   }

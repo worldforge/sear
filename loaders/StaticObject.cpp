@@ -239,7 +239,7 @@ void StaticObject::render(bool select_mode) {
       glActiveTextureARB(GL_TEXTURE0_ARB);
 
       disp = glGenLists(1);
-      glNewList(disp, GL_COMPILE_AND_EXECUTE);
+      glNewList(disp, GL_COMPILE);
 
       // Setup client states
       glEnableClientState(GL_NORMAL_ARRAY);
@@ -307,6 +307,7 @@ void StaticObject::render(bool select_mode) {
         glDisableClientState(GL_NORMAL_ARRAY);
       }
       glEndList();
+      glCallList(disp);
     }
   }
   glPopMatrix();

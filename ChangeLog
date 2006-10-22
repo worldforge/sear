@@ -1,3 +1,9 @@
+2006-10-22  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/StaticObject.cpp, environment/TerrainRenderer.cpp: Replace
+	  GL_COMPILE_AND_EXECUTE with just GL_COMPILE and a later glCallList to
+	  work around a problem with Intel graphics cards.
+
 2006-10-17  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/System.cpp: Change default window size to 800x600 instead of
