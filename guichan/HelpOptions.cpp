@@ -28,7 +28,7 @@ public:
   HelpFileList()
   {
     std::string help_dir = "${SEAR_INSTALL}/data/help";
-    System::instance()->getFileHandler()->expandString(help_dir);
+    System::instance()->getFileHandler()->getFilePath(help_dir);
     DIR * help_list = opendir(help_dir.c_str());
     if (help_list == NULL) {
       std::cout << "Unable to open help file directory" << std::endl << std::flush;
