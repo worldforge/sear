@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.30 2006-09-17 19:42:42 simon Exp $
+// $Id: StateManager.cpp,v 1.31 2006-10-25 16:32:00 simon Exp $
 
 /*
  * TODO
@@ -372,9 +372,9 @@ void StateManager::stateChange(StateID state) {
   assert (state < (int)m_states.size());
   SPtr<StateProperties> sp = m_states[state];
   // If state doesn't exist, take first one
-  assert(sp.isValid());
+
   if (!sp) {
-    std::cout << "bad state found - " << state <<  std::endl;
+    std::cerr << "bad state found - " << state <<  std::endl;
     sp = m_states[1];
     state = 1;
   }
