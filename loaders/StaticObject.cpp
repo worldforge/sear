@@ -30,6 +30,7 @@ StaticObject::StaticObject() :
   m_vb_indices(0),
   m_disp_list(0),
   m_select_disp_list(0),
+  m_list_count(0),
   m_context_no(-1)
 {
 }
@@ -134,9 +135,10 @@ void StaticObject::contextDestroyed(bool check) {
     }
 
     // Clean up display lists 
-    if (glIsList(m_select_disp_list)) glDeleteLists(1, m_select_disp_list);
-    if (glIsList(m_disp_list)) glDeleteLists(1, m_disp_list);
+    if (glIsList(m_select_disp_list)) glDeleteLists(m_list_count, m_select_disp_list);
+    if (glIsList(m_disp_list)) glDeleteLists(m_list_count, m_disp_list);
   }
+  m_list_count = 0;
   m_vb_vertex_data = 0;
   m_vb_normal_data = 0;
   m_vb_texture_data = 0;
@@ -238,7 +240,8 @@ void StaticObject::render(bool select_mode) {
       // Reset current texture unit
       glActiveTextureARB(GL_TEXTURE0_ARB);
 
-      disp = glGenLists(1);
+      m_list_count = 1;
+      disp = glGenLists(m_list_count);
       glNewList(disp, GL_COMPILE);
 
       // Setup client states
@@ -409,6 +412,224 @@ error:
 int StaticObject::save(const std::string &filename) {
   assert(m_initialised == true);
   return 0;
+}
+
+void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) {
+  assert(m_initialised == true);
+  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+
+  // Setup texture transform
+  float m[4][4];
+  glMatrixMode(GL_TEXTURE);
+  glPushMatrix();
+  m_tex_matrix.getMatrix(m);
+  glMultMatrixf(&m[0][0]);
+  glMatrixMode(GL_MODELVIEW);
+    
+
+   // If VBO's are enabled
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
+
+    // Set material properties
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  m_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  m_emission);
+    glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
+
+    // Bind vertex array
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_vertex_data);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    // Bind normal array
+    if (glIsBufferARB(m_vb_normal_data)) {
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_normal_data);
+      glNormalPointer(GL_FLOAT, 0, 0);
+    }
+
+    if (glIsBufferARB(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        // Bind texture array
+        glActiveTextureARB(GL_TEXTURE0_ARB + i);
+        if (select_mode) {
+          RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+        } else {
+          RenderSystem::getInstance().switchTexture(m_textures[i]); 
+        }
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_texture_data);
+        glTexCoordPointer(2, GL_FLOAT, 0, 0);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
+
+    if (m_indices) {
+      glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
+    }
+
+    /// Loop through each matrix here and do the render
+    std::list<Matrix>::const_iterator I = positions.begin();
+    while (I != positions.end()) {
+      glPushMatrix();
+      // Set transform
+      // Apply position transform 
+      (*I).getMatrix(m);
+      glMultMatrixf(&m[0][0]);
+      // Apply mesh transform
+      m_matrix.getMatrix(m);
+      glMultMatrixf(&m[0][0]);
+
+      if (m_indices) {
+        glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+      } else  {
+        glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+      }
+
+      glPopMatrix();
+      ++I;
+    }
+    /// end of loop
+
+    if (m_indices) {
+      glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+    }
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+
+
+    if (glIsBufferARB(m_vb_texture_data)) {
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        glActiveTextureARB(GL_TEXTURE0 + i);
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
+    if (glIsBufferARB(m_vb_normal_data)) {
+      glDisableClientState(GL_NORMAL_ARRAY);
+    }
+  } else {
+
+    GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
+    if (!glIsList(disp)) {
+      // Need to reset textures otherwise the display list may not record a
+      // texture change if the previous object has the same texture. This is 
+      // fine until the order of objects changes and the wrong texture is in 
+      // place.
+      for (unsigned int i = 0; i < m_textures.size(); ++i) {
+        RenderSystem::getInstance().switchTexture(i, 0);
+      }
+      // Reset current texture unit
+      glActiveTextureARB(GL_TEXTURE0_ARB);
+
+      m_list_count = 3;
+      disp = glGenLists(m_list_count);
+      glNewList(disp, GL_COMPILE);
+
+      // Setup client states
+      glEnableClientState(GL_NORMAL_ARRAY);
+
+      // Set material properties
+      glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
+      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
+      glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  m_specular);
+      glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  m_emission);
+      glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, m_shininess);
+
+      // Bind vertex array
+      glVertexPointer(3, GL_FLOAT, 0, m_vertex_data);
+
+      // Bind normal array
+      if (m_normal_data) {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, m_normal_data);
+      }
+
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          // Bind texture array
+          glActiveTextureARB(GL_TEXTURE0_ARB + i);
+          if (select_mode) {
+            RenderSystem::getInstance().switchTexture(m_texture_masks[i]);
+          } else {
+            RenderSystem::getInstance().switchTexture(m_textures[i]); 
+          }
+          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+          glTexCoordPointer(2, GL_FLOAT, 0, m_texture_data);
+        }
+
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
+
+      // Use the Lock arrays extension if available.
+      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+        glLockArraysEXT(0, m_num_points);
+      }
+      glEndList();
+
+      glNewList(disp + 1, GL_COMPILE);
+      if (m_indices) {
+        glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
+      } else  {
+        glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+      }
+      glEndList();
+     
+      glNewList(disp + 2, GL_COMPILE);
+      if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
+        glUnlockArraysEXT();
+      }
+
+      if (m_texture_data) {
+        for (unsigned int i = 0; i < m_textures.size(); ++i) {
+          glActiveTextureARB(GL_TEXTURE0 + i);
+          glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        }
+
+        // Reset current texture unit
+        glActiveTextureARB(GL_TEXTURE0_ARB);
+      }
+
+      if (m_normal_data) {
+        glDisableClientState(GL_NORMAL_ARRAY);
+      }
+      glEndList();
+    }
+
+    // Setup initial state
+    glCallList(disp);
+
+    /// Loop through each matrix here and do the render
+    std::list<Matrix>::const_iterator I = positions.begin();
+    while (I != positions.end()) {
+      glPushMatrix();
+      // Set transform
+      // Apply position transform 
+      (*I).getMatrix(m);
+      glMultMatrixf(&m[0][0]);
+      // Apply mesh transform
+      m_matrix.getMatrix(m);
+      glMultMatrixf(&m[0][0]);
+
+      // Render stuff
+      glCallList(disp + 1);
+
+      glPopMatrix();
+      ++I;
+    }
+    // Reset state
+    glCallList(disp + 2);
+  }
+
+  glMatrixMode(GL_TEXTURE);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+ 
 }
 
 } // namespace Sear

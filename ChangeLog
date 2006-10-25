@@ -1,5 +1,16 @@
 2006-10-25  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* common/Matrix.h: Fix translate method. Make getMatrix const.
+
+	* loaders/StaticLoader.h, loaders/StaticLoader.cpp: Added new render
+	  method that takes a list of Matrix objects representing entity
+	  position/orientation in the world. The matrices are looped around the
+	  final glDrawArrays/Elements call rather than the whole vertex buffer
+	  setup. This will speed up the rendering of the same model multiple 
+	  times once the render queue is modified.
+
+2006-10-25  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/StateManager.cpp: Remove assert on missing state definitions
 
 2006-10-25  Simon Goodall  <sear@simongoodall.co.uk>

@@ -23,6 +23,7 @@ public:
   bool isInitialised() const { return m_initialised; }
 
   void render(bool select_mode);
+  void render(bool select_mode, const std::list<Matrix> &positions);
 
   int contextCreated();
   void contextDestroyed(bool check);
@@ -164,44 +165,6 @@ void setAmbient(float a[4]) {
 
   Matrix &getTexMatrix() { return m_tex_matrix; }
   const Matrix &getTexMatrix() const { return m_tex_matrix; }
-#if 0
-  void setMatrix(float m[4][4]) {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        m_matrix[i][j] = m[i][j];
-      }
-    }
-  }
-
-  void getMatrix(float m[4][4]) {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        m[i][j] = m_matrix[i][j];
-      }
-    }
-  }
-
-  void identity() {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        if (i == j)  m_matrix[i][j] = 1.0f;
-        else  m_matrix[i][j] = 0.0f;
-      }
-    }
-  }
-
-  void scale(float s) {
-    for (int i = 0; i < 4; ++i) {
-      m_matrix[i][i] *= s;
-    }
-  }
-
-  void translate(float x, float y, float z) {
-    m_matrix[0][3] += x;
-    m_matrix[1][3] += y;
-    m_matrix[2][3] += z;
-  }
-#endif
 
 //  int getType() { return 1; }
   StaticObject *newInstance() { return new StaticObject(); }
@@ -235,6 +198,7 @@ private:
   
   GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
   GLuint m_disp_list, m_select_disp_list;
+  int m_list_count;
 
   Matrix m_matrix;
   Matrix m_tex_matrix;

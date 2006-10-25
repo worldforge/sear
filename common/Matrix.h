@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Matrix.h,v 1.2 2006-05-17 23:15:33 alriddoch Exp $
+// $Id: Matrix.h,v 1.3 2006-10-25 17:28:39 simon Exp $
 
 #ifndef SEAR_MATRIX_H
 #define SEAR_MATRIX_H 1
@@ -19,7 +19,7 @@ public:
     }
   }
 
-  void getMatrix(float m[4][4]) {
+  void getMatrix(float m[4][4]) const {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
         m[i][j] = m_matrix[i][j];
@@ -49,9 +49,12 @@ public:
   }
 
   void translate(float x, float y, float z) {
-    m_matrix[0][3] += x;
-    m_matrix[1][3] += y;
-    m_matrix[2][3] += z;
+    m_matrix[3][0] += x;
+    m_matrix[3][1] += y;
+    m_matrix[3][2] += z;
+//    m_matrix[0][3] += x;
+//    m_matrix[1][3] += y;
+//    m_matrix[2][3] += z;
   }
 
   void rotateX(float angle) {
