@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.49 2006-07-10 16:53:48 simon Exp $
+// $Id: Graphics.cpp,v 1.50 2006-11-02 16:41:24 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -63,8 +63,6 @@ static const std::string DEFAULT = "default";
 static const std::string FONT = "font";
 static const std::string STATE = "state";
 static const std::string SELECT = "select_state";
-  // Consts
-  static const int sleep_time = 5000;
   
   // Config key strings
   static const std::string KEY_use_textures = "render_use_textures";
@@ -184,7 +182,6 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   m_renderer->resetSelection();
 
   // Update camera position
-//  if(RenderSystem::getInstance().getCameraSystem()->getCurrentCamera());
   RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
   // Do necessary GL initialisation for the frame
   m_renderer->beginFrame();

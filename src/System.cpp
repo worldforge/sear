@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.160 2006-10-17 10:25:19 simon Exp $
+// $Id: System.cpp,v 1.161 2006-11-02 16:41:24 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -96,7 +96,8 @@ namespace Sear {
   static const std::string KEY_key_repeat_rate = "key_repeat_rate";
  
   static const std::string KEY_fullscreen = "start_fullscreen";
-  
+  static const std::string KEY_delay = "render_delay";
+ 
   //Config default values
   static const int DEFAULT_window_width = 800;
   static const int DEFAULT_window_height = 600;  
@@ -106,8 +107,8 @@ namespace Sear {
   static const int DEFAULT_joystick_pickup_button = 2;
   static const int DEFAULT_key_repeat_delay = 1000;
   static const int DEFAULT_key_repeat_rate = 500;
- 
   static const bool DEFAULT_fullscreen = false;
+  static const unsigned int DEFAULT_delay = 0;
  
 System *System::m_instance = NULL;
 
@@ -128,7 +129,8 @@ System::System() :
   m_elapsed(0.0),
   m_system_running(false),
   m_initialised(false),
-  m_startFullscreen(DEFAULT_fullscreen)
+  m_startFullscreen(DEFAULT_fullscreen),
+  m_delay(0)
 {
   m_instance = this;
   // Initialise system states
@@ -400,6 +402,9 @@ void System::mainLoop() {
   m_action_handler->handleAction("system_start", NULL);
   while (m_system_running) {
     try {
+
+      SDL_Delay(m_delay);
+
       m_seconds = (double)SDL_GetTicks() / 1000.0f;
       m_elapsed = m_seconds - last_time;
       last_time = m_seconds;
@@ -749,6 +754,16 @@ void System::readConfig(varconf::Config &config) {
     m_startFullscreen = DEFAULT_fullscreen;
   }
 
+  if (config.findItem(SYSTEM, KEY_delay)) {
+    temp = config.getItem(SYSTEM, KEY_delay);
+    m_delay = (!temp.is_int()) ? (DEFAULT_delay) : ((int)(temp));
+  } else {
+    m_delay = DEFAULT_delay;
+  }
+
+
+
+
   m_client->readConfig(config);
   RenderSystem::getInstance().readConfig(config);
   ModelSystem::getInstance().readConfig(config);
@@ -763,6 +778,7 @@ void System::writeConfig(varconf::Config &config) {
   config.setItem(SYSTEM, KEY_window_height, m_height);
   config.setItem(SECTION_INPUT, KEY_key_repeat_delay, m_KeyRepeatDelay);
   config.setItem(SECTION_INPUT, KEY_key_repeat_rate, m_KeyRepeatRate);
+  config.setItem(SYSTEM, KEY_delay, (int)m_delay);
 
   // Write Other config objects
   m_client->writeConfig(config);

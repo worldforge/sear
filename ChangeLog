@@ -1,3 +1,11 @@
+2006-11-02  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Graphics.cpp: Remove unused const sleep_time;
+
+	* src/System.cpp, src/System.h: Add call to SDL_Delay in main loop. Add
+	  config option, render_delay, with a default value of 0 to allow people
+	  to force a pause between each frame.
+
 2006-10-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* common/Matrix.h: Fix translate method. Make getMatrix const.
