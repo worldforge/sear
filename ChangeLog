@@ -1,3 +1,9 @@
+2006-11-25  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/GL.cpp, renderers/GL.h: Up number of objects from 512 to 24
+	  bits worth -- 8 bits per colour plane (RGB). Call SDL_Delay instead of
+	  usleep to reduce CPU usage on the splash screen.
+
 2006-11-02  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Remove unused const sleep_time;

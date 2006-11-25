@@ -160,12 +160,10 @@ protected:
 
   float m_frustum[6][4];
   
-//  std::string activeID;
   std::string m_active_name;
   Eris::EntityRef m_activeEntity;
   int m_x_pos;
   int m_y_pos;
-  
   
   void buildQueues(WorldEntity*, int, bool);
 
@@ -185,9 +183,9 @@ protected:
   float m_fog_end;
   float m_light_level;
 
-  static const unsigned int NUM_COLOURS = 512;
-  GLubyte m_colourArray[NUM_COLOURS][3];
-  WorldEntity *m_entityArray[NUM_COLOURS];
+  GLubyte *m_colourArray;
+  std::vector<WorldEntity*> m_entityArray;
+
   unsigned int m_colour_index;
   std::map<unsigned int, std::string> m_colour_mapped;
   
@@ -201,7 +199,7 @@ protected:
   }
   void resetColours() { m_colour_index = 1; }
   WorldEntity *getSelectedID(unsigned int i) const  {
-    return (i >= NUM_COLOURS) ? (NULL) : (m_entityArray[i]);
+    return (i >= m_entityArray.size()) ? (NULL) : (m_entityArray[i]);
   }
   void nextColour(WorldEntity*);
 

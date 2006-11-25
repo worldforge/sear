@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.152 2006-05-06 16:21:40 simon Exp $
+// $Id: GL.cpp,v 1.153 2006-11-25 13:24:29 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -50,14 +50,13 @@
 
 #include "GL.h"
 
-//#include "StaticObject.h"
-
 #include "common/Mesh.h"
 
 #include "src/sear_icon.xpm"
 
+
   // Consts
-  static const int sleep_time = 5000;
+  static const int sleep_time = 100;
 
   static const std::string font_texture = "ui_font";
   static const std::string TEXTURE_splash_texture = "ui_splash_screen";
@@ -415,9 +414,15 @@ int GL::setupExtensions() {
 }
                                                                                 
 void GL::nextColour(WorldEntity *we) {
+  // Dynamically grow array as needed.
+  if (m_colour_index >= m_entityArray.size()) {
+    m_entityArray.reserve((m_colour_index + 1) * 2);
+  }
+
   m_entityArray[m_colour_index] = we; // Store entity in array slot
-  glColor3ubv(m_colourArray[m_colour_index]); // Set colour from appropriate index
+  glColor3ubv(&m_colourArray[m_colour_index * 3]); // Set colour from appropriate index
   ++m_colour_index; // Increment counter for next pass
+//  assert(m_colour_index < NUM_COLOURS);
 }
 
 void GL::selectTerrainColour(WorldEntity * we) {
@@ -430,7 +435,8 @@ void GL::buildColourSet() {
   glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
   glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
 
-  m_redBits = m_greenBits = m_blueBits = 3;
+  assert(m_colourArray == 0);
+  m_colourArray = new GLubyte[m_redBits * m_greenBits * m_blueBits * 3];
 
   // Create masks
   m_redMask = makeMask(m_redBits);
@@ -443,7 +449,7 @@ void GL::buildColourSet() {
   
   // Pre-Calculate each colour and store in array
   unsigned int shift;
-  for (unsigned int indx = 0; indx < NUM_COLOURS; ++indx) {
+  for (unsigned int indx = 0; indx < m_redBits * m_greenBits * m_blueBits; ++indx) {
     // Get value from 0 -> 2^num_bits
     GLubyte red = (indx & (m_redMask << m_redShift)) >> (m_redShift);
     GLubyte green = (indx & (m_greenMask << m_greenShift)) >> (m_greenShift);
@@ -463,9 +469,9 @@ void GL::buildColourSet() {
 //    GLubyte red = (indx & (m_redMask << m_redShift)) << (8 - m_redShift - m_redBits);
 //    GLubyte green = (indx & (m_greenMask << m_greenShift)) << (8 - m_greenShift-m_greenBits);
 //    GLubyte blue = (indx & (m_blueMask << m_blueShift)) << (8 - m_blueShift - m_blueBits);
-    m_colourArray[indx][0] = red;
-    m_colourArray[indx][1] = green;
-    m_colourArray[indx][2] = blue;
+    m_colourArray[indx * 3 + 0] = red;
+    m_colourArray[indx * 3 + 1] = green;
+    m_colourArray[indx * 3 + 2] = blue;
   }
 }
 
@@ -489,6 +495,7 @@ GL::GL() :
   m_fog_start(100.0f),
   m_fog_end(150.0f),
   m_light_level(1.0f),
+  m_colourArray(0),
   m_colour_index(0),
   m_redBits(0), m_greenBits(0), m_blueBits(0),
   m_redMask(0), m_greenMask(0), m_blueMask(0),
@@ -496,13 +503,11 @@ GL::GL() :
   m_use_fsaa(DEFAULT_use_fsaa),
   m_initialised(false)
 {
-  memset(m_entityArray, 0, NUM_COLOURS * sizeof(WorldEntity*));
 }
 
 
 GL::~GL() {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
 }
 
 void GL::shutdown() {
@@ -511,6 +516,10 @@ void GL::shutdown() {
   if (debug) std::cout << "GL: Shutdown" << std::endl;
 
   assert(m_screen == NULL);
+  if (m_colourArray) {
+    delete [] m_colourArray;
+    m_colourArray = NULL;
+  }
 
   m_initialised = false;
 }
@@ -1203,7 +1212,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
           model->render(false);
         }
       }
-      
+
       glPopMatrix();
     }
   }
@@ -1307,10 +1316,7 @@ inline void GL::endFrame(bool select_mode) {
   
 void GL::drawSplashScreen() {
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(SPLASH));
-  #ifndef _WIN32
-    // TODO Need to find a win32 version
-    usleep(sleep_time);
-  #endif
+  SDL_Delay(sleep_time);
   setViewMode(ORTHOGRAPHIC);
   
   glColor4fv(white);
