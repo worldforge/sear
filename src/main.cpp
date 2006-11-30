@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.33 2006-06-26 22:47:03 simon Exp $
+// $Id: main.cpp,v 1.34 2006-11-30 20:32:29 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,6 +15,8 @@
 #include "error.h"
 
 #include <signal.h>
+
+#include "common/SPtr.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -34,9 +36,9 @@ int main(int argc, char** argv) {
 #endif
 
   bool exit_program = false;
-  Sear::System *sys = NULL;
+  Sear::SPtrShutdown<Sear::System> sys;
   std::list<std::string> path_list;
-  sys = NULL;
+
   char **p_argv  = argv;
   int p_argc = argc;
   if (argc > 1) {
@@ -81,13 +83,13 @@ This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 */
   
-  sys = new Sear::System();
+  sys = Sear::SPtrShutdown<Sear::System>(new Sear::System());
   sys->addSearchPaths(path_list);
 
   if (!sys->init(p_argc, p_argv)) {
     fprintf(stderr, "Error initialising Sear!\n");
     Sear::ErrorDialog("Error initialising Sear. See log files or stdout/stderr for more details");
-    delete sys;
+    sys.release();
     exit (1);
   }
   try {
@@ -95,10 +97,10 @@ under certain conditions; type `show c' for details.
     sys->setCaption("Sear", "Sear");
     sys->mainLoop();
   } catch (...) {
-    std::cerr << "Unknown Exception" << std::endl;
+    std::cerr << "Caught Unhandled Exception" << std::endl;
   }
   sys->shutdown();
-  delete sys;
+  sys.release();
   exit(0);
 }
 
