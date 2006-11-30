@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.23 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: ActionHandler.cpp,v 1.24 2006-11-30 20:30:46 simon Exp $
 
 #include <unistd.h>
 
@@ -65,9 +65,9 @@ void ActionHandler::loadConfiguration(const std::string &file_name) {
   assert ((m_initialised == true) && "ActionHandler not initialised");
   varconf::Config config;
   // Connect callback to process records
-  config.sigsv.connect(SigC::slot(*this, &ActionHandler::varconf_callback));
+  config.sigsv.connect(sigc::mem_fun(this, &ActionHandler::varconf_callback));
   // Connect callback to catch errors
-  config.sige.connect(SigC::slot(*this, &ActionHandler::varconf_error_callback));
+  config.sige.connect(sigc::mem_fun(this, &ActionHandler::varconf_error_callback));
   // Read the file
   config.readFromFile(file_name);
 }

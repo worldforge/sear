@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.71 2006-11-02 16:41:24 simon Exp $
+// $Id: System.h,v 1.72 2006-11-30 20:30:49 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -264,6 +264,9 @@ public:
 
   sigc::signal<void> EnteredWorld;
   sigc::signal<void> LeftWorld;
+
+  bool isInitialised() const { return m_initialised; }
+
 private:
   bool m_systemState[SYS_LAST_STATE]; ///< Array storing various system states
   bool m_system_running; ///< Flag determining when mainLoop terminates (setting to false terminates)

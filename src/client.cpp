@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.85 2006-05-17 13:36:45 simon Exp $
+// $Id: client.cpp,v 1.86 2006-11-30 20:30:49 simon Exp $
 
 #include "System.h"
 
@@ -35,7 +35,7 @@
   static const bool debug = false;
 #endif
 #ifdef DEBUG
-  #define DEBUG_ERIS 0
+  #define DEBUG_ERIS 1
 #elif defined(NDEBUG)
   #define DEBUG_ERIS 0
 #else
@@ -100,7 +100,7 @@ bool Client::init() {
 
   // Setup logging
   Eris::setLogLevel(m_loglevel);
-  Eris::Logged.connect(SigC::slot(*this, &Client::Log));
+  Eris::Logged.connect(sigc::mem_fun(this, &Client::Log));
 
   m_initialised = true;
 
@@ -149,11 +149,11 @@ int Client::connect(const std::string &host, int port) {
   m_connection = SPtr<Eris::Connection>(new Eris::Connection(m_client_name, host, port, DEBUG_ERIS));
 
   // Set up connection callbacks
-  m_connection->Failure.connect(SigC::slot(*this, &Client::NetFailure));
-  m_connection->Connected.connect(SigC::slot(*this, &Client::NetConnected));
-  m_connection->Disconnected.connect(SigC::slot(*this, &Client::NetDisconnected));
-  m_connection->Disconnecting.connect(SigC::slot(*this, &Client::NetDisconnecting));
-  m_connection->StatusChanged.connect(SigC::slot(*this, &Client::StatusChanged));
+  m_connection->Failure.connect(sigc::mem_fun(this, &Client::NetFailure));
+  m_connection->Connected.connect(sigc::mem_fun(this, &Client::NetConnected));
+  m_connection->Disconnected.connect(sigc::mem_fun(this, &Client::NetDisconnected));
+  m_connection->Disconnecting.connect(sigc::mem_fun(this, &Client::NetDisconnecting));
+  m_connection->StatusChanged.connect(sigc::mem_fun(this, &Client::StatusChanged));
   
   m_system->pushMessage(CLIENT_CONNECTING, CONSOLE_MESSAGE);
 
@@ -235,13 +235,13 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
     // Setup callbacks
-    m_account->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
-    m_account->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
-    m_account->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
-    m_account->GotAllCharacters.connect(SigC::slot(*this, &Client::GotAllCharacters));
-    m_account->GotCharacterInfo.connect(SigC::slot(*this, &Client::GotCharacterInfo));
-    m_account->AvatarSuccess.connect(SigC::slot(*this, &Client::AvatarSuccess));
-    m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
+    m_account->LoginFailure.connect(sigc::mem_fun(this, &Client::LoginFailure));
+    m_account->LoginSuccess.connect(sigc::mem_fun(this, &Client::LoginSuccess));
+    m_account->LogoutComplete.connect(sigc::mem_fun(this, &Client::LogoutComplete));
+    m_account->GotAllCharacters.connect(sigc::mem_fun(this, &Client::GotAllCharacters));
+    m_account->GotCharacterInfo.connect(sigc::mem_fun(this, &Client::GotCharacterInfo));
+    m_account->AvatarSuccess.connect(sigc::mem_fun(this, &Client::AvatarSuccess));
+    m_account->AvatarFailure.connect(sigc::mem_fun(this, &Client::AvatarFailure));
   }
 
   setStatus(CLIENT_STATUS_LOGGING_IN);
@@ -300,13 +300,13 @@ int Client::login(const std::string &username, const std::string &password) {
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
     // setup player callbacks
-    m_account->LoginFailure.connect(SigC::slot(*this, &Client::LoginFailure));
-    m_account->LoginSuccess.connect(SigC::slot(*this, &Client::LoginSuccess));
-    m_account->LogoutComplete.connect(SigC::slot(*this, &Client::LogoutComplete));
-    m_account->GotAllCharacters.connect(SigC::slot(*this, &Client::GotAllCharacters));
-    m_account->GotCharacterInfo.connect(SigC::slot(*this, &Client::GotCharacterInfo));
-    m_account->AvatarSuccess.connect(SigC::slot(*this, &Client::AvatarSuccess));
-    m_account->AvatarFailure.connect(SigC::slot(*this, &Client::AvatarFailure));
+    m_account->LoginFailure.connect(sigc::mem_fun(this, &Client::LoginFailure));
+    m_account->LoginSuccess.connect(sigc::mem_fun(this, &Client::LoginSuccess));
+    m_account->LogoutComplete.connect(sigc::mem_fun(this, &Client::LogoutComplete));
+    m_account->GotAllCharacters.connect(sigc::mem_fun(this, &Client::GotAllCharacters));
+    m_account->GotCharacterInfo.connect(sigc::mem_fun(this, &Client::GotCharacterInfo));
+    m_account->AvatarSuccess.connect(sigc::mem_fun(this, &Client::AvatarSuccess));
+    m_account->AvatarFailure.connect(sigc::mem_fun(this, &Client::AvatarFailure));
   }
 
   setStatus(CLIENT_STATUS_LOGGING_IN);
@@ -335,7 +335,7 @@ int Client::login(const std::string &username, const std::string &password) {
 void Client::poll() {
   assert ((m_initialised == true) && "Client not initialised");
   try {
-    Eris::PollDefault::poll();   
+    Eris::PollDefault::poll();
   } catch (Eris::InvalidOperation io) {
     fprintf(stderr,"[Client] Eris Exception: %s\n", io._msg.c_str());
   } catch (Eris::BaseException be) {
@@ -527,7 +527,7 @@ int Client::leaveWorld()
     assert(m_avatar);
     setStatus(CLIENT_STATUS_GOING_OUT_WORLD);
     m_account->deactivateCharacter(m_avatar);
-    m_account->AvatarDeactivated.connect(SigC::slot(*this, &Client::AvatarDeactivated));
+    m_account->AvatarDeactivated.connect(sigc::mem_fun(this, &Client::AvatarDeactivated));
     
     return 0;
 }
@@ -691,7 +691,7 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
   Factory* f = new Factory(*m_connection->getTypeService());
   m_avatar->getView()->registerFactory(f);
 
-  m_avatar->GotCharacterEntity.connect(SigC::slot(*this, &Client::GotCharacterEntity));
+  m_avatar->GotCharacterEntity.connect(sigc::mem_fun(this, &Client::GotCharacterEntity));
 }
 
 void Client::AvatarFailure(const std::string &msg) {
@@ -790,6 +790,7 @@ void Client::setErisLogLevel(const std::string &level) {
   else {
     fprintf(stderr, "[Client] Unknown eris log level %s\n", level.c_str());
   }
+std::cout << "Setting log level " << level << std::endl;
   Eris::setLogLevel(m_loglevel);
 }
 

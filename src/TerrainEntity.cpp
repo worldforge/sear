@@ -3,7 +3,7 @@
 // Copyright (C) 2002 - 2003 Alistair Riddoch
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.cpp,v 1.4 2006-04-26 14:39:00 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.5 2006-11-30 20:30:49 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -18,7 +18,7 @@
 namespace Sear {
 
 TerrainEntity::TerrainEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view) : WorldEntity(id, ty, view) {
-  Changed.connect(SigC::slot(*this, &TerrainEntity::changed));
+  Changed.connect(sigc::mem_fun(this, &TerrainEntity::changed));
 }
   
 void TerrainEntity::changed(const Eris::StringSet &s) {

@@ -1,3 +1,11 @@
+2006-11-30  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/ActionHandler.cpp, src/Calendar.cpp, src/Character.cpp,
+	  src/System.cpp, src/TerrainEntity.cpp, src/WorldEntity.cpp,
+	  src/client.cpp: Update sigc::mem_fun instead of SigC::slot.
+
+	* src/System.h, src/main.cpp: Use auto_ptr to hold System object.
+
 2006-11-25  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp: Add initialiser for m_seconds.

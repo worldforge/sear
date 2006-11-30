@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.85 2006-07-15 13:17:48 simon Exp $
+// $Id: WorldEntity.cpp,v 1.86 2006-11-30 20:30:49 simon Exp $
 
 /*
  TODO
@@ -58,7 +58,7 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    m_has_local_orient(false),
    m_has_local_pos(false)
 {
-  Acted.connect(SigC::slot(*this, &WorldEntity::onAction));
+  Acted.connect(sigc::mem_fun(this, &WorldEntity::onAction));
   LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));
 }
 
@@ -298,7 +298,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
         m_attached["right_hand_wield"] = attach;
       } else {
         Eris::View::EntitySightSlot ess(sigc::bind( 
-          SigC::slot(*this, &WorldEntity::onSightAttached),
+          sigc::mem_fun(this, &WorldEntity::onSightAttached),
           str));
         getView()->notifyWhenEntitySeen(id, ess);
       }

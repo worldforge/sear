@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.85 2006-05-17 11:45:01 simon Exp $
+// $Id: Character.cpp,v 1.86 2006-11-30 20:30:48 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -150,7 +150,7 @@ Character::~Character() {
 bool Character::init() {
   assert (m_initialised == false);
 
-  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Character::varconf_callback));
+  System::instance()->getGeneral().sigsv.connect(sigc::mem_fun(this, &Character::varconf_callback));
 
   m_pred_orient.identity();
 

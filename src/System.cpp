@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.161 2006-11-02 16:41:24 simon Exp $
+// $Id: System.cpp,v 1.162 2006-11-30 20:30:48 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -176,10 +176,10 @@ bool System::init(int argc, char *argv[]) {
   m_calendar->init();
  
   // Connect signals for record processing 
-  m_general.sigsv.connect(SigC::slot(*this, &System::varconf_callback));
+  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
   
   // Connect signals for error messages
-  m_general.sige.connect(SigC::slot(*this, &System::varconf_error_callback));
+  m_general.sige.connect(sigc::mem_fun(this, &System::varconf_error_callback));
   
   Bindings::init();
 
@@ -280,7 +280,7 @@ bool System::init(int argc, char *argv[]) {
   m_general.getCmdline(argc, argv);
   readConfig(m_general);
   RenderSystem::getInstance().readConfig(m_general);
-  m_general.sigsv.connect(SigC::slot(*this, &System::varconf_general_callback));
+  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_general_callback));
 
   // Try and create the window
   bool success;
