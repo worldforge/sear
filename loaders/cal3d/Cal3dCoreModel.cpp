@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.40 2006-09-17 19:42:42 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.41 2006-11-30 20:39:47 simon Exp $
 
 #include <string>
 
@@ -69,17 +69,16 @@ Cal3dCoreModel::~Cal3dCoreModel() {
 int Cal3dCoreModel::init(const std::string &filename) {
   assert(m_initialised == false);
   // open the model configuration file
-  m_core_model = new CalCoreModel("dummy");
+  m_core_model = std::auto_ptr<CalCoreModel>(new CalCoreModel("dummy"));
   // create a core model instance
-  if(!m_core_model) {
+  if (m_core_model.get() == 0) {
     CalError::printLastError();
     return 1;
   }
 
   if (readConfig(filename)) {
     printf("Error while loading %s\n", filename.c_str());
-    delete m_core_model;
-    m_core_model = NULL;
+    m_core_model.release();
 
     return 1;
   }
@@ -101,8 +100,8 @@ int Cal3dCoreModel::shutdown() {
       if (md) delete md;
     }
   }
-  delete m_core_model;
-  m_core_model = NULL;
+
+  m_core_model.release();
 
   m_initialised = false;
   return 0;
@@ -110,8 +109,8 @@ int Cal3dCoreModel::shutdown() {
 
 int Cal3dCoreModel::readConfig(const std::string &filename) {
   varconf::Config config;
-  config.sigsv.connect(SigC::slot(*this, &Cal3dCoreModel::varconf_callback));
-  config.sige.connect(SigC::slot(*this, &Cal3dCoreModel::varconf_error_callback));
+  config.sigsv.connect(sigc::mem_fun(this, &Cal3dCoreModel::varconf_callback));
+  config.sige.connect(sigc::mem_fun(this, &Cal3dCoreModel::varconf_error_callback));
   config.readFromFile(filename);
   unsigned int part_counter = 1;
   unsigned int set_counter = 1;

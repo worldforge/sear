@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.20 2006-09-17 19:42:42 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.21 2006-11-30 20:39:47 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -29,13 +29,12 @@ namespace Sear {
 const std::string Cal3d_Loader::CAL3D = "cal3d";
 	
 Cal3d_Loader::Cal3d_Loader() {
-  m_core_model_handler = new CoreModelHandler();
+  m_core_model_handler = SPtrShutdown<CoreModelHandler>(new CoreModelHandler());
   m_core_model_handler->init();
 }
 
 Cal3d_Loader::~Cal3d_Loader() {
-  m_core_model_handler->shutdown();
-  delete m_core_model_handler;
+  m_core_model_handler.release();
 }
 
 SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
@@ -57,6 +56,8 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
       return SPtr<ModelRecord>();
     }
 
+    model_record->model = SPtrShutdown<Model>(model);
+
     // Set model default texture set
     if (model_config.findItem(model_id, "default_set")) {
       varconf::Variable v = model_config.getItem(model_id, "default_set");
@@ -66,6 +67,7 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
         model->setMaterialSet((std::string)v);
       }
     }
+
     // Check for individual part assignments
     std::list<std::string> materials = model->getMeshNames();
     for (std::list<std::string>::const_iterator I = materials.begin();
@@ -75,7 +77,6 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
         model->setMaterialPartSet(*I, (std::string)v);
       }
     }
-    model_record->model = SPtrShutdown<Model>(model);
   } catch (...) {
     std::cerr << "Cal3d_Loader: Unknown Exception" << std::endl;
     return SPtr<ModelRecord>();

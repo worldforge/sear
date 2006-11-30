@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.11 2006-05-17 23:15:34 alriddoch Exp $
+// $Id: ModelHandler.h,v 1.12 2006-11-30 20:39:45 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -38,6 +38,7 @@ public:
 
   void init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
  
   void contextCreated();
   void contextDestroyed(bool check);

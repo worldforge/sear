@@ -22,8 +22,8 @@ public:
 
   bool isInitialised() const { return m_initialised; }
 
-  void render(bool select_mode);
-  void render(bool select_mode, const std::list<Matrix> &positions);
+  void render(bool select_mode) const;
+  void render(bool select_mode, const std::list<Matrix> &positions) const;
 
   int contextCreated();
   void contextDestroyed(bool check);
@@ -172,7 +172,7 @@ void setAmbient(float a[4]) {
   int save(const std::string &filename);
  
 private:
-  void createVBOs();
+  void createVBOs() const;
 
   bool m_initialised;
 
@@ -195,10 +195,15 @@ private:
   // I.e. GL_TRIANGLES, GL_QUADS etc..
 //  GLenum m_type;
 //  int m_state; 
-  
-  GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
-  GLuint m_disp_list, m_select_disp_list;
-  int m_list_count;
+ 
+
+  // Making this stuff mutable may well be bad practise. They are lazily 
+  // assigned during the first pass of the render function after a
+  // contextCreated call. Perhaps the contextCreated call should really do the
+  // allocation.....
+  mutable GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
+  mutable GLuint m_disp_list, m_select_disp_list;
+  mutable int m_list_count;
 
   Matrix m_matrix;
   Matrix m_tex_matrix;

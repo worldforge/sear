@@ -2,18 +2,21 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.13 2006-05-17 23:15:34 alriddoch Exp $
+//$Id: Model.h,v 1.14 2006-11-30 20:39:45 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
 
 #include <map>
 #include <string>
+#include <list>
 
 #include <wfmath/vector.h>
 #include <wfmath/quaternion.h>
+#include "common/SPtr.h"
 
 #include "renderers/RenderTypes.h"
+#include "loaders/StaticObject.h"
 
 namespace Atlas
 {
@@ -25,6 +28,9 @@ typedef std::map<std::string, Element> MapType;
 }
 
 namespace Sear {
+
+typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
+
 
 typedef struct {
     WFMath::Vector<3> pos;
@@ -130,7 +136,10 @@ public:
    * @return A struct containing position and orientation.
    */
   virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
-  
+ 
+  virtual bool hasStaticObjects() const { return false; }
+  virtual StaticObjectList getStaticObjects() { return StaticObjectList(); }
+ 
 protected: 
   float m_last_time;
   

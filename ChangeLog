@@ -1,5 +1,25 @@
 2006-11-30  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/Model.h: Added a method to get a list of StaticObjects, with 
+	  a default implementation returning an empty list.
+
+	* loaders/3ds.cpp, loaders/3ds.h: Implements the StaticObject list
+	  function.
+
+	* loaders/ModelHandler.h, loaders/ModelSystem.cpp, 
+	  loaders/ModelSystem.h, loaders/cal3d/Cal3dCoreModel.cpp, 
+	  loaders/cal3d/Cal3dCoreModel.h, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/Cal3dModel.h, loaders/cal3d/Cal3d_Loader.cpp,
+	  loaders/cal3d/Cal3d_Loader.cpp, loaders/cal3d/CoreModelHandler.cpp,
+	  loaders/cal3d/CoreModelHandler.h: Make greater use of smart pointers
+	  to managed objects.
+
+	* loaders/StaticObject.cpp, loaders/StaticObject.h: Make some methods
+	  const and some members mutable. Probably a terrible misuse of this
+	  feature.
+
+2006-11-30  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* src/ActionHandler.cpp, src/Calendar.cpp, src/Character.cpp,
 	  src/System.cpp, src/TerrainEntity.cpp, src/WorldEntity.cpp,
 	  src/client.cpp: Update sigc::mem_fun instead of SigC::slot.

@@ -68,7 +68,7 @@ void StaticObject::shutdown()  {
   m_initialised = false;
 
 }
-void StaticObject::createVBOs() {
+void StaticObject::createVBOs() const {
   assert(m_initialised == true);
   assert(sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] == true);
 
@@ -149,7 +149,7 @@ void StaticObject::contextDestroyed(bool check) {
   m_context_no = -1;
 }
 
-void StaticObject::render(bool select_mode) {
+void StaticObject::render(bool select_mode) const {
   assert(m_initialised == true);
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
@@ -414,7 +414,7 @@ int StaticObject::save(const std::string &filename) {
   return 0;
 }
 
-void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) {
+void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) const {
   assert(m_initialised == true);
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());

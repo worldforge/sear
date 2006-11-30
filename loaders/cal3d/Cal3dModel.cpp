@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.44 2006-05-17 23:15:34 alriddoch Exp $
+// $Id: Cal3dModel.cpp,v 1.45 2006-11-30 20:39:47 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -59,7 +59,9 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
   assert(core_model && "Core model is NULL");
   m_core_model = core_model;
   // create the model instance from the loaded core model
-  if(!(m_calModel = new CalModel(m_core_model->getCalCoreModel()))) {
+  m_calModel = std::auto_ptr<CalModel>(new CalModel(m_core_model->getCalCoreModel()));
+
+  if (m_calModel.get() == 0) {
     CalError::printLastError();
     return false;
   }
@@ -228,10 +230,8 @@ void Cal3dModel::update(float time_elapsed) {
 int Cal3dModel::shutdown() {
   assert (m_initialised == true);
   // destroy the model instance
-  if (m_calModel) {
-    delete m_calModel;
-    m_calModel = NULL;
-  }
+  m_calModel.release();
+
   m_initialised = false;
   return 0;
 }
@@ -365,11 +365,11 @@ void Cal3dModel::setMaterialPartSet(unsigned int msh, unsigned int set) {
   }
 }
 
-std::list<std::string> Cal3dModel::getMaterialNames() {
+std::list<std::string> &Cal3dModel::getMaterialNames() const {
   return m_core_model->m_material_list;
 }
 
-std::list<std::string> Cal3dModel::getMeshNames() {
+std::list<std::string> Cal3dModel::getMeshNames() const {
   std::list<std::string> l;
   for (Cal3dCoreModel::MeshMap::const_iterator I = m_core_model->m_meshes.begin(); I != m_core_model->m_meshes.end(); ++I) {
     l.push_back(I->first);
@@ -377,7 +377,7 @@ std::list<std::string> Cal3dModel::getMeshNames() {
   return l;
 }
 
-PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) {
+PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) const {
   PosAndOrient po;
   po.orient.identity();
   po.pos = WFMath::Vector<3>(0, 0, 0);

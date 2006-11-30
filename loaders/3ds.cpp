@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.62 2006-09-17 19:42:41 simon Exp $
+// $Id: 3ds.cpp,v 1.63 2006-11-30 20:39:44 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -80,11 +80,11 @@ typedef enum {
   AXIS_Z
 } Axis;
 
-static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
+static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
-  for (ThreeDS::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -159,7 +159,7 @@ static void scale_object(ThreeDS::StaticObjectList &objs, Axis axis, bool isotro
   float scale_y = 1.0 / (diff_y);
   float scale_z = 1.0 / (diff_z);
 
-  for (ThreeDS::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -362,10 +362,17 @@ void ThreeDS::contextDestroyed(bool check) {
 }
 
 void ThreeDS::render(bool select_mode) {
+  Matrix m;
+  m.identity();
+
+  std::list<Matrix> l;
+  l.push_back(m);
+//  m.translate(0.0f,0.0f,2.0f);
+//  l.push_back(m);
   for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
-    so->render(select_mode);
+    so->render(select_mode, l);
   }
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.14 2006-02-25 21:51:14 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.15 2006-11-30 20:39:47 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <memory>
 
 #include <sigc++/trackable.h>
 #include <varconf/Config.h>
@@ -71,7 +72,7 @@ public:
    * Returns pointer to the Cal3d core model
    * @return Pointer to cal3d core model
    */
-  CalCoreModel *getCalCoreModel() const { return m_core_model; }
+  CalCoreModel *getCalCoreModel() const { return m_core_model.get(); }
 
   /**
    * Crate a Cal3d model based upon this core model
@@ -89,6 +90,8 @@ public:
   
   std::string mapBoneName(const std::string &bone) const;
   WFMath::Quaternion getBoneRotation(const std::string &name) const;
+
+  bool isInitialised() const { return m_initialised; }
 
 private:
   /**
@@ -123,7 +126,7 @@ private:
   unsigned int loadTexture(const std::string &strFilename, bool mask);
   
   bool m_initialised; ///< Flag indicating whether object has been initialised
-  CalCoreModel *m_core_model; ///< Pointer to the cal3d core model we represent
+  std::auto_ptr<CalCoreModel> m_core_model; ///< Pointer to the cal3d core model we represent
 
   float m_scale; ///< The scale the model should be rendered at
   MeshMap m_meshes; ///< Mapping between mesh name and id

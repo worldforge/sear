@@ -12,6 +12,9 @@
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
 
+#include "ModelHandler.h"
+#include "ObjectHandler.h"
+
 namespace varconf {
 class Config;
 }
@@ -39,6 +42,8 @@ public:
   int init();
   int shutdown();
 
+  bool isInitialised() const { return m_initialised; }
+
   void contextCreated();
   void contextDestroyed(bool check);
 
@@ -48,8 +53,8 @@ public:
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
 
-  ModelHandler  *getModelHandler()  const { return m_model_handler; }
-  ObjectHandler *getObjectHandler() const { return m_object_handler; }
+  ModelHandler  *getModelHandler()  { return m_model_handler.get(); }
+  ObjectHandler *getObjectHandler() { return m_object_handler.get(); }
 
   varconf::Config &getModelRecords();
  
@@ -85,8 +90,8 @@ private:
 
   bool m_initialised;
 
-  ModelHandler  *m_model_handler;
-  ObjectHandler *m_object_handler;
+  SPtrShutdown<ModelHandler> m_model_handler;
+  SPtrShutdown<ObjectHandler> m_object_handler;
 
 };
 

@@ -43,7 +43,7 @@ static const std::string DEFAULT = "default";
 int ModelSystem::init() {
   assert(m_initialised == false);
 
-  m_model_handler = new ModelHandler();
+  m_model_handler = SPtrShutdown<ModelHandler>(new ModelHandler());
   m_model_handler->init();
 
   // Register ModelLoaders
@@ -59,13 +59,13 @@ int ModelSystem::init() {
   // does not get linked in correctly DynamicObject
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
   
-  m_object_handler = new ObjectHandler();
+  m_object_handler = SPtrShutdown<ObjectHandler>(new ObjectHandler());
   m_object_handler->init();
 
-  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &ModelSystem::contextCreated));
-  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &ModelSystem::contextDestroyed));
+  RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(this, &ModelSystem::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(this, &ModelSystem::contextDestroyed));
 
-  System::instance()->LeftWorld.connect(SigC::slot(*this, &ModelSystem::resetModels));
+  System::instance()->LeftWorld.connect(sigc::mem_fun(this, &ModelSystem::resetModels));
 
   m_initialised = true;
   return 0;
@@ -74,13 +74,9 @@ int ModelSystem::init() {
 int ModelSystem::shutdown() {
   assert(m_initialised == true);
 
-  m_object_handler->shutdown();
-  delete m_object_handler;
-  m_object_handler = NULL;
+  m_object_handler.release();
 
-  m_model_handler->shutdown();
-  delete m_model_handler;
-  m_model_handler = NULL;
+  m_model_handler.release();
 
   // Cleanp signals
   notify_callbacks();

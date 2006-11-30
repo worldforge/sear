@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.25 2006-05-06 13:50:22 simon Exp $
+// $Id: Cal3dModel.h,v 1.26 2006-11-30 20:39:47 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <cal3d/cal3d.h>
 #include "Cal3dCoreModel.h"
@@ -28,6 +29,7 @@ public:
 
   int init(Cal3dCoreModel *);
   virtual int shutdown();
+
   virtual bool isInitialised() const { return m_initialised; }
 
   virtual void contextCreated();
@@ -43,7 +45,7 @@ public:
   virtual void action(const std::string &action);
   virtual void animate(const std::string &action);
   virtual void setAppearance(const Atlas::Message::MapType &map);
-  virtual RotationStyle rotationStyle() { return ROS_NORMAL; }
+  virtual RotationStyle rotationStyle() const { return ROS_NORMAL; }
  
   unsigned int getPartID(const std::string &part) { return m_core_model->m_parts[part]; }
   unsigned int getSetID(const std::string &set) { return m_core_model->m_sets[set]; }
@@ -59,12 +61,12 @@ public:
   }
   void setMaterialPartSet(unsigned int part, unsigned int set);
  
-  std::list<std::string> getMeshNames();
-  std::list<std::string> getMaterialNames();
+  std::list<std::string> getMeshNames() const;
+  std::list<std::string> &getMaterialNames() const;
 
   void setRotate(float r) { m_rotate = r; }
   
-  virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
+  virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName) const;
 
   void addAnimation(const Cal3dCoreModel::WeightList &list);
   void removeAnimation(const Cal3dCoreModel::WeightList &list);
@@ -75,11 +77,10 @@ private:
   bool m_initialised;
 
   Cal3dCoreModel *m_core_model;
-  CalModel *m_calModel;
+  std::auto_ptr<CalModel> m_calModel;
   float m_lodLevel;
 
   float m_rotate;
-  //std::string current_head;
   std::string m_cur_anim;
   typedef std::vector<SPtrShutdown<DynamicObject> > DOVec;
   DOVec m_dos;

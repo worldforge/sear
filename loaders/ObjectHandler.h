@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.6 2006-02-15 09:50:31 simon Exp $
+// $Id: ObjectHandler.h,v 1.7 2006-11-30 20:39:46 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -33,6 +33,7 @@ public:
 
   int init();
   void shutdown();
+  bool isInitialised() const { return m_initialised; }
 
   SPtr<ObjectRecord> getObjectRecord(const std::string &id);
   SPtr<ObjectRecord> instantiateRecord(const std::string &type, const std::string &id);

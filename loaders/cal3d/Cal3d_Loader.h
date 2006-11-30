@@ -1,13 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.h,v 1.5 2006-02-15 09:50:31 simon Exp $
+// $Id: Cal3d_Loader.h,v 1.6 2006-11-30 20:39:47 simon Exp $
 
 #ifndef SEAR_CAL3D_LOADER_H
 #define SEAR_CAL3D_LOADER_H 1
 
 #include "ModelLoader.h"
+#include "common/SPtr.h"
 
 namespace Sear {
 // Forward Declarations
@@ -24,7 +25,7 @@ public:
 
 private:
   static const std::string CAL3D;
-  CoreModelHandler *m_core_model_handler;
+  SPtrShutdown<CoreModelHandler> m_core_model_handler;
   
 };
 
