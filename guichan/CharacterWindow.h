@@ -29,7 +29,7 @@ class CharacterWindow : virtual public SigC::Object, public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::ListBox * m_characters;
-  gcn::ListBox * m_types;
+  gcn::DropDown * m_types;
 
   gcn::TextField * m_nameField;
   gcn::TextField * m_typeField;
