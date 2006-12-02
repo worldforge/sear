@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.153 2006-11-25 13:24:29 simon Exp $
+// $Id: GL.cpp,v 1.154 2006-12-02 13:46:39 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -56,7 +56,7 @@
 
 
   // Consts
-  static const int sleep_time = 100;
+  static const int sleep_time = 10;
 
   static const std::string font_texture = "ui_font";
   static const std::string TEXTURE_splash_texture = "ui_splash_screen";
@@ -1293,6 +1293,11 @@ void GL::drawOutline(SPtr<ModelRecord> model_record) {
 }
 
 inline void GL::beginFrame() {
+  #ifndef _WIN32
+    // TODO Need to find a win32 version
+    usleep(sleep_time);
+  #endif
+ 
   // TODO into display list
   m_active_name = "";
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {

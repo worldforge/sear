@@ -90,7 +90,7 @@ public:
 };
 
 CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
-                                     m_charSelected(-1), m_typeSelected(-1)
+                                     m_charSelected(-1), m_typeSelected(0)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -167,16 +167,17 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 
   TypeListModel * type_list_model = new TypeListModel;
   
-  m_types = new gcn::ListBox(type_list_model);
+  //m_types = new gcn::ListBox(type_list_model);
+  m_types = new gcn::DropDown(type_list_model);
   m_widgets.push_back(SPtr<gcn::Widget>(m_types));
-  scroll_area = new gcn::ScrollArea(m_types,
-                                      gcn::ScrollArea::SHOW_NEVER,
-                                      gcn::ScrollArea::SHOW_ALWAYS);
-  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
-  scroll_area->setWidth(100);
-  scroll_area->setHeight(vbox1->getHeight());
-  scroll_area->setBorderSize(1);
-  hbox->pack(scroll_area);
+//  scroll_area = new gcn::ScrollArea(m_types,
+//                                      gcn::ScrollArea::SHOW_NEVER,
+//                                      gcn::ScrollArea::SHOW_ALWAYS);
+//  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
+//  scroll_area->setWidth(100);
+//  scroll_area->setHeight(vbox1->getHeight());
+//  scroll_area->setBorderSize(1);
+  hbox->pack(m_types);
 
   vbox->pack(hbox);
 
@@ -235,7 +236,7 @@ void CharacterWindow::logic()
           }
         }
       }
-      m_types->setSelected(-1);
+      m_types->setSelected(0);
     }
   }
   if (new_char_sel >= 0) {
@@ -249,7 +250,7 @@ void CharacterWindow::logic()
           if (m_charSelected == j) {
             if (m_nameField->getText() != I->second->getName() ||
                 m_typeField->getText() != I->second->getParents().front()) {
-              m_characters->setSelected(-1);
+              m_characters->setSelected(0);
               m_charButton->setCaption("Create new character");
               m_charButton->setEventId("create");
             }
@@ -270,7 +271,7 @@ void CharacterWindow::logic()
           m_typeField->setText(types[m_typeSelected]);
         }
       }
-      m_characters->setSelected(-1);
+      m_characters->setSelected(0);
       m_charButton->setCaption("Create new character");
       m_charButton->setEventId("create");
     }
@@ -281,7 +282,7 @@ void CharacterWindow::logic()
       const std::vector<std::string> & types = account->getCharacterTypes();
       if (new_type_sel >= 0 && m_typeSelected < types.size()) {
         if (m_typeField->getText() != types[m_typeSelected]) {
-          m_types->setSelected(-1);
+          m_types->setSelected(0);
         }
       }
     }
