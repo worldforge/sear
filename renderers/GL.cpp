@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.154 2006-12-02 13:46:39 simon Exp $
+// $Id: GL.cpp,v 1.155 2006-12-02 18:34:41 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -416,7 +416,7 @@ int GL::setupExtensions() {
 void GL::nextColour(WorldEntity *we) {
   // Dynamically grow array as needed.
   if (m_colour_index >= m_entityArray.size()) {
-    m_entityArray.reserve((m_colour_index + 1) * 2);
+    m_entityArray.resize((m_entityArray.size() + 1) * 2);
   }
 
   m_entityArray[m_colour_index] = we; // Store entity in array slot
