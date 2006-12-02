@@ -18,18 +18,24 @@
  *  along with The Mana World; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- *  $Id: passwordfield.cpp,v 1.2 2006-10-07 13:23:33 simon Exp $
+ *  $Id: passwordfield.cpp,v 1.3 2006-12-02 15:18:03 simon Exp $
  */
 
 #include "passwordfield.h"
 
 #include <guichan/font.hpp>
 #include <guichan/graphics.hpp>
+#include <guichan/key.hpp>
+#include <guichan/actionlistener.hpp>
+
+#include <iostream>
 
 namespace Sear {
 
-PasswordField::PasswordField(const std::string& text):
-    TextField(text)
+PasswordField::PasswordField(const std::string& text, gcn::ActionListener *a, const std::string &e):
+    TextField(text),
+    m_action(a),
+    m_event(e)
 {
 }
 
@@ -51,5 +57,14 @@ void PasswordField::draw(gcn::Graphics *graphics)
     graphics->setFont(getFont());
     graphics->drawText(stars, 1 - mXScroll, 1);
 }
+
+void PasswordField::keyPress(const gcn::Key& key) {
+  if (key.getValue() == gcn::Key::ENTER && m_action != 0) {
+    m_action->action(m_event, this);
+  } else {
+    TextField::keyPress(key);
+  }
+}
+
 
 }
