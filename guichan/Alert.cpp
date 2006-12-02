@@ -6,6 +6,9 @@
 
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
+#include "guichan/Workarea.h"
+
+#include "src/System.h"
 
 #include <guichan.hpp>
 
@@ -69,7 +72,8 @@ void Alert::actionPressed(std::string event)
     std::cout << "WEIRD PARENT" << std::endl << std::flush;
     return;
   }
-  parent->remove(this);
+  System::instance()->getWorkarea()->removeLater(this);
+  //parent->remove(this);
 }
 
 void Alert::logic()

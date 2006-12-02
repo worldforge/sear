@@ -1,5 +1,11 @@
 2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* guichan/Alert.cpp: Use remove later to get clean up the alert box.
+
+	* guichan/WorkArea.h: Added an assert.
+
+2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/passwordfield.h, guichan/passwordfield.cpp: Allow enter to be
 	  pressed to login when the focus is on the password field.
 

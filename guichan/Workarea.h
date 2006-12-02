@@ -89,7 +89,7 @@ public:
   bool handleEvent(const SDL_Event &);
   void draw();
 
-  void removeLater(gcn::Widget* w) { m_remove_widgets.push_back(w); }
+  void removeLater(gcn::Widget* w) { assert(w != 0); m_remove_widgets.push_back(w); }
   void removeLaters();
 };
 
