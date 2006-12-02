@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.41 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.42 2006-12-02 18:54:37 simon Exp $
 
 #include <string>
 
@@ -36,6 +36,7 @@ static const std::string KEY_scale = "scale";
 static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
 
 static const std::string KEY_path = "path";
+static const std::string KEY_appearance = "appearance";
 static const std::string KEY_skeleton = "skeleton";
 static const std::string KEY_mesh = "mesh";
 static const std::string KEY_material = "material";
@@ -126,6 +127,14 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     path = (std::string)config.getItem(SECTION_model, KEY_path);
     System::instance()->getFileHandler()->getFilePath(path);
   }
+
+  if (config.findItem(SECTION_model, KEY_appearance)) {
+    std::string app = path + (std::string)config.getItem(SECTION_model, KEY_appearance);
+    System::instance()->getFileHandler()->getFilePath(app);
+    m_appearance_config.sige.connect(sigc::mem_fun(this, &Cal3dCoreModel::varconf_error_callback));
+    m_appearance_config.readFromFile(app);
+  }
+
 
   // Load skeleton
   if (m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)) == 0)  {

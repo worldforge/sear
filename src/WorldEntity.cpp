@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.86 2006-11-30 20:30:49 simon Exp $
+// $Id: WorldEntity.cpp,v 1.87 2006-12-02 18:54:36 simon Exp $
 
 /*
  TODO
@@ -60,6 +60,9 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
 {
   Acted.connect(sigc::mem_fun(this, &WorldEntity::onAction));
   LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));
+  ChildAdded.connect(sigc::mem_fun(this, &WorldEntity::onChildEntityAdded));
+  ChildRemoved.connect(sigc::mem_fun(this, &WorldEntity::onChildEntityRemoved));
+  BeingDeleted.connect(sigc::mem_fun(this, &WorldEntity::onBeingDeleted));
 }
 
 void WorldEntity::onMove() {
@@ -310,6 +313,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
+  printf("Slot is %s\n", slot.c_str());
     m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
 }
 
@@ -336,6 +340,23 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
 
 void WorldEntity::locationChanged(Eris::Entity *loc) {
   resetLocalPO();
+}
+
+void WorldEntity::onChildEntityAdded(Eris::Entity *e) {
+  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
+  if (record) record->entityWorn(dynamic_cast<WorldEntity*>(e));
+}
+
+void WorldEntity::onChildEntityRemoved(Eris::Entity *e) {
+  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
+  if (record) record->entityRemoved(dynamic_cast<WorldEntity*>(e));
+}
+
+void WorldEntity::onBeingDeleted() {
+  // Detach callbacks..
+  // This may detach more than we really want. E.g. other onDeleted callback
+  // handlers.
+  notify_callbacks();
 }
 
 } /* namespace Sear */

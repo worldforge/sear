@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.26 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3dModel.h,v 1.27 2006-12-02 18:54:37 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -21,6 +21,7 @@
 namespace Sear {
 
 class DynamicObject;
+class WorldEntity;
 
 class Cal3dModel : public Sear::Model {
 public:
@@ -70,6 +71,9 @@ public:
 
   void addAnimation(const Cal3dCoreModel::WeightList &list);
   void removeAnimation(const Cal3dCoreModel::WeightList &list);
+
+  void entityWorn(WorldEntity *we);
+  void entityRemoved(WorldEntity *we);
 
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);

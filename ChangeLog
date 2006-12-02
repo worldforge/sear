@@ -1,5 +1,28 @@
 2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/Model.h, loaders/ModelHandler.h, loaders/ModelHandler.cpp:
+	  Make getPositionForSubmodel const. This fixes wielded entity positions
+	  which stopped working when caldmodel methods were const'd.
+
+	* loaders/Model.h, loaders/ObjectRecord.h, loaders/ObjectRecord.cpp:
+	  Added methods to handle entities being "worn" and "removed".
+
+	* loaders/cal3d/Cal3dCoreModel.h, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/Cal3dModel.h, loaders/cal3d/Cal3d_Loader.cpp:
+	  Implemented methods to handle entities being "worn" and "removed".
+	  Added a field in the config file specifying a further config file
+	  containing a mapping between an entity name and meshes and materials.
+	  This config also contains a default section specifying the meshes and
+	  materials to use by default. All meshes are added if this section does
+	  not exist.
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: Hook up ChildAdded and
+	  ChildRemoved to entities being worn/removed until a better method is
+	  implemented. Entities need to be defined in the cal3d appearance map
+	  if they are to do anything.
+
+2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/GL.cpp: Fix item selection.
 
 2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>

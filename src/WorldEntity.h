@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.38 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: WorldEntity.h,v 1.39 2006-12-02 18:54:36 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -117,6 +117,9 @@ protected:
   void locationChanged(Eris::Entity *loc);
   void onSightAttached(Eris::Entity* ent, const std::string slot);
   void onAction(const Atlas::Objects::Operation::RootOperation &action);
+  void onChildEntityAdded(Eris::Entity*);
+  void onChildEntityRemoved(Eris::Entity*);
+  void onBeingDeleted();
   
   friend class Character;
 

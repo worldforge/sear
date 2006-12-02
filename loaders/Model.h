@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.14 2006-11-30 20:39:45 simon Exp $
+//$Id: Model.h,v 1.15 2006-12-02 18:54:35 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -36,6 +36,8 @@ typedef struct {
     WFMath::Vector<3> pos;
     WFMath::Quaternion orient;
 } PosAndOrient;
+
+class WorldEntity;
 
 class Model {
 public:
@@ -135,10 +137,13 @@ public:
    * @param submodelName Name of the sub section to get position of.
    * @return A struct containing position and orientation.
    */
-  virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName);
+  virtual PosAndOrient getPositionForSubmodel(const std::string& submodelName) const;
  
   virtual bool hasStaticObjects() const { return false; }
   virtual StaticObjectList getStaticObjects() { return StaticObjectList(); }
+
+  virtual void entityWorn(WorldEntity *we) {}
+  virtual void entityRemoved(WorldEntity *we) {}
  
 protected: 
   float m_last_time;

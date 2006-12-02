@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.34 2006-09-17 19:42:41 simon Exp $
+// $Id: ModelHandler.cpp,v 1.35 2006-12-02 18:54:36 simon Exp $
 
 #include <string.h>
 
@@ -310,7 +310,7 @@ void ModelHandler::reset() {
 }
 
 
-PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName) {
+PosAndOrient Model::getPositionForSubmodel(const std::string& submodelName) const {
   PosAndOrient po;
   po.pos = WFMath::Vector<3>(0.0f,0.0f,0.0f);
   po.orient = WFMath::Quaternion(1.0f, 0.0f,0.0f,0.0f);

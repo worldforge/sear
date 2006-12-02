@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.15 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3dCoreModel.h,v 1.16 2006-12-02 18:54:37 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
@@ -139,6 +139,8 @@ private:
   Animations m_anims;
   BoneMap m_bone_map;
   BoneRotation m_bone_rotation;
+
+  varconf::Config m_appearance_config;
 };
 
 } /* namespace Sear */

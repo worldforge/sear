@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.45 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.46 2006-12-02 18:54:37 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -14,6 +14,7 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 #include "src/System.h"
+#include "src/WorldEntity.h"
 
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
@@ -66,9 +67,46 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
     return false;
   }
 
-  // attach all meshes to the model
-  for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
-    m_calModel->attachMesh(meshId);
+  std::string type = "default";
+  if (m_core_model->m_appearance_config.findSection(type)) {
+    const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
+    varconf::sec_map::const_iterator I = sec.begin();
+    while (I != sec.end()) {
+      const std::string &key = I->first;
+
+      if (key.find("mesh",0) == 0) {
+        const varconf::Variable &v = I->second;
+        // Get mesh number, if it exists
+        Cal3dCoreModel::MeshMap::const_iterator MM =
+                                      m_core_model->m_meshes.find((std::string)v);
+        if (MM != m_core_model->m_meshes.end()) {
+          unsigned int mesh_num = MM->second;
+          // Attach the mesh;
+          m_calModel->attachMesh(mesh_num);
+          // Setup the material
+          setMaterialPartSet(mesh_num, 1);
+  
+          std::string mat_key = "material" + key.substr(4); // sizeof("mesh")
+
+          varconf::sec_map::const_iterator J = sec.find(mat_key);
+         if (J != sec.end()) {
+           const varconf::Variable &v2 = J->second;
+              Cal3dCoreModel::SetMap::const_iterator SM =
+                                     m_core_model->m_sets.find((std::string)v2);
+
+            if (SM != m_core_model->m_sets.end()) {
+              setMaterialPartSet(mesh_num, SM->second);
+            }
+          }
+        }
+      }
+      ++I;
+    }
+  } else {
+    // attach all meshes to the model
+    for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
+      m_calModel->attachMesh(meshId);
+    }
   }
 
   // Set default material set
@@ -292,6 +330,7 @@ void Cal3dModel::action(const std::string &action) {
 }
 
 void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
+return;
 //  if (debug) std::cout << "------" << std::endl;
   Atlas::Message::MapType map(appearanceMap);
   
@@ -383,7 +422,6 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) const {
   po.pos = WFMath::Vector<3>(0, 0, 0);
 
   std::string mapped_bone = m_core_model->mapBoneName(bone);
-
   if (mapped_bone.empty()) return po;
 
   // Get a pointer to the bone we need from cal3d
@@ -462,5 +500,76 @@ void Cal3dModel::contextDestroyed(bool check) {
   }
 }
 
+
+void Cal3dModel::entityWorn(WorldEntity *we) {
+  assert(we != 0);
+
+  // Get entity type.
+  const std::string &type = we->type();
+
+
+  // Get meshes and materials
+  const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
+  varconf::sec_map::const_iterator I = sec.begin();
+  while (I != sec.end()) {
+    const std::string &key = I->first;
+
+    if (key.find("mesh",0) == 0) {
+      const varconf::Variable &v = I->second;
+      // Get mesh number, if it exists
+      Cal3dCoreModel::MeshMap::const_iterator MM =
+                                    m_core_model->m_meshes.find((std::string)v);
+      if (MM != m_core_model->m_meshes.end()) {
+        unsigned int mesh_num = MM->second;
+        // Attach the mesh;
+        m_calModel->attachMesh(mesh_num);
+        // Set a default material;
+        setMaterialPartSet(mesh_num, 1);
+        // See if a proper one has been specified
+        std::string mat_key = "material" + key.substr(4); // sizeof("mesh")
+
+        varconf::sec_map::const_iterator J = sec.find(mat_key);
+        if (J != sec.end()) {
+          const varconf::Variable &v2 = J->second;
+          Cal3dCoreModel::SetMap::const_iterator SM =
+                                     m_core_model->m_sets.find((std::string)v2);
+
+          if (SM != m_core_model->m_sets.end()) {
+            setMaterialPartSet(mesh_num, SM->second);
+          }
+        }
+      }
+    }
+    ++I;
+  }
+}
+
+void Cal3dModel::entityRemoved(WorldEntity *we) {
+  assert(we != 0);
+
+  // Get entity type.
+  const std::string &type = we->type();
+
+  // Get meshes and materials
+  const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
+  varconf::sec_map::const_iterator I = sec.begin();
+  while (I != sec.end()) {
+    const std::string &key = I->first;
+
+    if (key.find("mesh",0) == 0) {
+      const varconf::Variable &v = I->second;
+      // Get mesh number, if it exists
+      Cal3dCoreModel::MeshMap::const_iterator MM =
+                                    m_core_model->m_meshes.find((std::string)v);
+      if (MM != m_core_model->m_meshes.end()) {
+        unsigned int mesh_num = MM->second;
+        // Attach the mesh;
+        m_calModel->detachMesh(mesh_num);
+      }
+    }
+    ++I;
+  }
+
+}
 
 } /* namespace Sear */

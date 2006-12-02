@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.21 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.22 2006-12-02 18:54:37 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -57,7 +57,7 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
     }
 
     model_record->model = SPtrShutdown<Model>(model);
-
+/*
     // Set model default texture set
     if (model_config.findItem(model_id, "default_set")) {
       varconf::Variable v = model_config.getItem(model_id, "default_set");
@@ -77,6 +77,8 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
         model->setMaterialPartSet(*I, (std::string)v);
       }
     }
+
+*/
   } catch (...) {
     std::cerr << "Cal3d_Loader: Unknown Exception" << std::endl;
     return SPtr<ModelRecord>();
