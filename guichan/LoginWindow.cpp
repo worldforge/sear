@@ -28,6 +28,9 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   base.a = 128;
   setBaseColor(base);
 
+  m_buttonListener = new ActionListenerSigC;
+  m_buttonListener->Action.connect(SigC::slot(*this, &LoginWindow::actionPressed));
+
   gcn::Box * vbox = new gcn::VBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
@@ -47,7 +50,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l2 = new gcn::Label("Password");
   m_widgets.push_back(SPtr<gcn::Widget>(l2));
-  m_pswdField = new PasswordField("                ");
+  m_pswdField = new PasswordField("                ", m_buttonListener, "login");
   m_widgets.push_back(SPtr<gcn::Widget>(m_pswdField));
   m_pswdField->setText("");
   hbox->pack(l2);
@@ -87,9 +90,6 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_createCheck = new gcn::CheckBox("New Account");
   m_widgets.push_back(SPtr<gcn::Widget>(m_createCheck));
   vbox->pack(m_createCheck);
-
-  m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &LoginWindow::actionPressed));
 
   hbox = new gcn::HBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
@@ -160,9 +160,13 @@ void LoginWindow::actionPressed(std::string event)
   if (event == "login") {
     if (username.empty()) {
         new Alert(parent, "No username specified");
+    } else if (password.empty()) {
+        new Alert(parent, "No password specified");
     } else {
       if (m_createCheck->isMarked()) {
-        if (password == m_pswdConfirmField->getText()) {
+        if (m_nameField->getText().empty()) {
+          new Alert(parent, "No name specified");
+        } else if (password == m_pswdConfirmField->getText()) {
           cmd = "/create ";
           cmd += username;
           cmd += " ";

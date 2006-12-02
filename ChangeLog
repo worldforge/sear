@@ -1,3 +1,7 @@
+2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/LoginWindow.cpp: Add check for an empty password field.
+
 2006-11-30  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/Model.h: Added a method to get a list of StaticObjects, with 
