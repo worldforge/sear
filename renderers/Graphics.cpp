@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.50 2006-11-02 16:41:24 simon Exp $
+// $Id: Graphics.cpp,v 1.51 2006-12-02 21:56:55 simon Exp $
 
 #include <sigc++/object_slot.h>
 
 #include <sage/sage.h>
+#include <sage/GL.h>
 
 #include <varconf/Config.h>
 #include <Eris/Entity.h>
@@ -368,6 +369,10 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     m_message_list.clear();
     m_name_list.clear();
 
+    m_object_map.clear();
+    m_matrix_map.clear();
+    m_state_map.clear();
+
     buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list, time_elapsed);
 
 
@@ -388,6 +393,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     glPopMatrix();
 
     m_renderer->drawQueue(m_render_queue, select_mode);
+    m_renderer->drawQueue(m_object_map, m_matrix_map, m_state_map, select_mode);
+
     if (!select_mode) {
       m_renderer->drawMessageQueue(m_message_list);
       if (m_show_names) {
@@ -430,7 +437,6 @@ void Graphics::buildQueues(WorldEntity *we,
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
-  WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
 
   assert(we->getType());
     
@@ -443,6 +449,7 @@ void Graphics::buildQueues(WorldEntity *we,
       
   // Loop through all models in list
   if (obj->draw_self) {
+    WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
     if ((cam->getType() == Camera::CAMERA_FIRST) && (we == self)) { 
       /* first person, don't draw self */
     } else {
@@ -527,23 +534,98 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     Iend = obj->low_quality.end();
   }
 
+
   for (I = Ibegin; I != Iend; ++I) {
     // retrive or create the model and modelRecord as necessary
     SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(*I, obj_we);
     assert(modelRec);
-    
+ 
+  SPtrShutdown<Model> model = modelRec->model;
+  assert(model);
+
+  WorldEntity *we = dynamic_cast<WorldEntity*>(obj->entity.get());
+
+   
     int state = select_mode ? modelRec->select_state : modelRec->state;
     
     if (state <= 0) continue; // bad state
 
-    // Add to queue by state, then model record
-    render_queue[state].push_back(Render::QueueItem(obj, modelRec));
+
+// Calculate Transform Matrix /////////////////////////////////////////////////////////////
+  // Cheat and use the opengl matrix.
+  glPushMatrix();
+  glLoadIdentity();
+  
+  // 1) Apply Object transforms
+  WFMath::Point<3> pos = we->getAbsPos();
+  assert(pos.isValid());
+  glTranslatef(pos.x(), pos.y(), pos.z() );
+    
+  m_renderer->rotateObject(obj, modelRec);
+    
+  // 2) Apply Model Transforms 
+    
+  // Scale Object
+  float scale = modelRec->scale;
+  // Do not perform scaling if it is to zero or has no effect
+  if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+  
+  glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
+ 
+  glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+
+  // 3) Apply final scaling once model is in place
+
+  // Scale model by all bounding box axis
+  if (modelRec->scale_bbox && we->hasBBox()) { 
+    WFMath::AxisBox<3> bbox = we->getBBox();
+    float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+    float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+    float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+
+    glScalef(x_scale, y_scale, z_scale);
+  }
+  // Scale model by bounding box height
+  else if (modelRec->scaleByHeight && we->hasBBox()) {
+    WFMath::AxisBox<3> bbox = we->getBBox();
+    float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+    glScalef(z_scale, z_scale, z_scale);
+  }
+
+  float m[4][4];
+  glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
+
+   // Restore matrix
+  glPopMatrix();
+
+  Matrix mx;
+  mx.setMatrix(m);
+
+//  std::string key = "some kind of key"; // Model ID??
+
+  // Need to add for every model.
+
+  // Only need to add the first time this model is added.
+//  if (m_state_map.find(key) == m_state_map.end()) {
+//  }
+///////////////////////////////////////////////////////////////////////////////////////
     
     // Update Model
     if (!select_mode) { // Only needs to be done once a frame
         modelRec->model->update(time_elapsed);
         modelRec->model->setLastTime(System::instance()->getTimef());
     } 
+std::string key = modelRec->id;
+if (model->hasStaticObjects()) {
+  m_matrix_map[key].push_back(mx);
+    m_state_map[key] = state;
+    m_object_map[key] = model->getStaticObjects();
+}else{
+    // Add to queue by state, then model record
+    render_queue[state].push_back(Render::QueueItem(obj, modelRec));
+//  m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
+}
+
     // Add attached objects to the render queues.
     if (obj->draw_attached || !obj_we->getAttachments().empty()) {
       WorldEntity::AttachmentMap::const_iterator it,
@@ -560,7 +642,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
         we->setLocalOrient(po.orient);
 
-       if (modelRec->scale_bbox && obj_we->hasBBox()) {
+        if (modelRec->scale_bbox && obj_we->hasBBox()) {
           WFMath::AxisBox<3> bbox = obj_we->getBBox();
           float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
           float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();

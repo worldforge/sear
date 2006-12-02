@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.27 2006-09-17 19:42:41 simon Exp $
+// $Id: LibModelFile.cpp,v 1.28 2006-12-02 21:56:54 simon Exp $
 
 /*
   Debug check list
@@ -71,11 +71,11 @@ typedef enum {
   AXIS_Z
 } Axis;
 
-static void scale_object(LibModelFile::StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
+static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
   float min[3], max[3];
   bool firstPoint = true;
   // Find bounds of object
-  for (LibModelFile::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
 
@@ -149,7 +149,7 @@ static void scale_object(LibModelFile::StaticObjectList &objs, Axis axis, bool i
   float scale_y = 1.0 / (diff_y);
   float scale_z = 1.0 / (diff_z);
 
-  for (LibModelFile::StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
 

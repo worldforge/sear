@@ -121,6 +121,13 @@ public:
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
   void drawOutline(SPtr<ModelRecord>);
+
+
+  void drawQueue(const QueueObjectMap &object_map,
+                   const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode);
+
  
   void store() { glPushMatrix(); }
   void restore() { glPopMatrix(); }

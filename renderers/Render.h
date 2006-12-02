@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.17 2006-10-08 14:51:48 simon Exp $
+// $Id: Render.h,v 1.18 2006-12-02 21:56:55 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -13,8 +13,12 @@
 
 #include <wfmath/axisbox.h>
 
+#include "common/Matrix.h"
 #include "common/types.h"
 #include "common/SPtr.h"
+
+#include "loaders/StaticObject.h"
+#include "StateManager.h"
 
 #define RENDER_FOV (45.0f)
 #define RENDER_FAR_CLIP (1000.0f)
@@ -43,6 +47,11 @@ typedef std::pair<SPtr<ObjectRecord>, SPtr<ModelRecord> > QueueItem;
 typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
+// New render queue types
+typedef std::map<std::string, std::list<Matrix> > QueueMatrixMap;
+typedef std::map<std::string, std::list<SPtrShutdown<StaticObject> > > QueueObjectMap;
+typedef std::map<std::string, StateID> QueueStateMap;
+typedef std::map<std::string, Queue> QueueOldMap;
 
   Render() :
     m_context_instantiation(-1),
@@ -109,6 +118,13 @@ typedef std::list<WorldEntity*> MessageList;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode) =0;
+
+virtual void drawQueue(const QueueObjectMap &object_map,
+                   const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode) =0;
+
+
   virtual void drawMessageQueue(MessageList &list) =0;
   virtual void drawNameQueue(MessageList &list) =0;
 

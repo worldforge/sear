@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.26 2006-11-30 20:39:45 simon Exp $
+// $Id: 3ds.h,v 1.27 2006-12-02 21:56:54 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -31,7 +31,7 @@ class StaticObject;
 
 class ThreeDS : public Model, public sigc::trackable {
 public:
-//  typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
+
   /*
    * Defualt constructor
    */ 

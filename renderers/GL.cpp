@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.155 2006-12-02 18:34:41 simon Exp $
+// $Id: GL.cpp,v 1.156 2006-12-02 21:56:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -414,11 +414,11 @@ int GL::setupExtensions() {
 }
                                                                                 
 void GL::nextColour(WorldEntity *we) {
+  assert(we != 0);
   // Dynamically grow array as needed.
   if (m_colour_index >= m_entityArray.size()) {
     m_entityArray.resize((m_entityArray.size() + 1) * 2);
   }
-
   m_entityArray[m_colour_index] = we; // Store entity in array slot
   glColor3ubv(&m_colourArray[m_colour_index * 3]); // Set colour from appropriate index
   ++m_colour_index; // Increment counter for next pass
@@ -697,8 +697,10 @@ void GL::procEvent(int x, int y) {
   ic += green;
   ic <<= m_greenBits;
   ic += blue;
+
   //selected_id = getSelectedID(ic);
   WorldEntity *selected_entity = getSelectedID(ic);
+
   if (selected_entity != m_activeEntity.get()) {
     if (selected_entity != NULL ) {
       m_activeEntity = Eris::EntityRef(selected_entity);
@@ -1148,7 +1150,6 @@ void GL::renderElements(unsigned int type, unsigned int number_of_points, int *f
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode) {
-//  static MoelHandler *model_handler = m_system->getModelHandler();
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
     // Change state for this queue
     RenderSystem::getInstance().switchState(I->first);
@@ -1321,7 +1322,10 @@ inline void GL::endFrame(bool select_mode) {
   
 void GL::drawSplashScreen() {
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(SPLASH));
+
+  // We don't need super fast rendering for the splash screen
   SDL_Delay(sleep_time);
+
   setViewMode(ORTHOGRAPHIC);
   
   glColor4fv(white);
@@ -1730,5 +1734,59 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   return true;
 }
 
+void GL::drawQueue(const QueueObjectMap &object_map,
+	           const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode) {
+
+  QueueObjectMap::const_iterator I = object_map.begin();
+  while (I != object_map.end()) {
+    // Get object id 
+    const std::string &key = I->first;
+
+    // Store ref to object list
+    const std::list<SPtrShutdown<StaticObject> > &objects = I->second;
+
+    // Get ref to matrix list
+    assert(matrix_map.find(key) != matrix_map.end());
+    const std::list<Matrix> &matrices = matrix_map.find(key)->second;
+
+    // Switch to the appropriate render list.
+    assert(state_map.find(key) != state_map.end());
+    RenderSystem::getInstance().switchState(state_map.find(key)->second);
+
+    std::list<SPtrShutdown<StaticObject> >::const_iterator J = objects.begin();
+    if (J == objects.end()) {
+      glPushMatrix();
+/*
+
+  SPtrShutdown<Model> model = model_record->model;
+  assert(model);
+
+
+
+      // Draw Model
+      if (select_mode) {
+        nextColour(we);
+        model->render(true);
+      } else {
+        if (m_activeEntity && (object_record->entity.get()->getId() == m_activeEntity.get()->getId())) {
+          m_active_name = object_record->entity->getName();
+          drawOutline(model_record);
+        } else {
+          model->render(false);
+        }
+      }
+      glPopMatrix();
+*/
+    } else {
+      while (J != objects.end()) {
+        (*J)->render(select_mode, matrices);
+        ++J;
+      }
+      ++I;
+    }
+  }
+}
 
 } // namespace Sear

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.12 2006-11-30 20:39:45 simon Exp $
+// $Id: ModelHandler.h,v 1.13 2006-12-02 21:56:55 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -24,7 +24,7 @@ namespace Eris {
 
 namespace Sear {
 
-// Forward Declarationa
+// Forward Declarations
 class Console;
 class ModelLoader;
 class ModelRecord;
