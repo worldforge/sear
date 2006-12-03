@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.31 2006-12-03 13:38:47 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.32 2006-12-03 16:12:58 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -14,6 +14,8 @@
 
 #include "BoundBox_Loader.h"
 #include "BoundBox.h"
+
+#include "renderers/RenderSystem.h"
 
 #include "src/WorldEntity.h"
 
@@ -63,11 +65,15 @@ SPtr<ModelRecord> BoundBox_Loader::loadModel(WorldEntity *we, const std::string 
     return SPtr<ModelRecord>();
   }
 
+  bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
+
   StaticObjectList &sol = model->getStaticObjects();
   StaticObjectList::iterator I = sol.begin();
   while (I != sol.end()) {
     (*I)->setState(model_record->state);
     (*I)->setSelectState(model_record->select_state);
+    (*I)->setUseStencil(use_stencil);
+
     ++I;
   }
 

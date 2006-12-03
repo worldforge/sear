@@ -496,34 +496,50 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       m_matrix.getMatrix(m);
       glMultMatrixf(&m[0][0]);
 
+      // Do we need to highlight this mesh?
       if (!select_mode && we->isSelectedEntity()) {
-        glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_ALWAYS, -1, 1);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-      }
+        if (m_use_stencil) { // Can we use the stencil buffer?
+          glEnable(GL_STENCIL_TEST);
+          glStencilFunc(GL_ALWAYS, -1, 1);
+          glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-      if (m_indices) {
-        glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
-      } else  {
-        glDrawArrays(GL_TRIANGLES, 0, m_num_points);
-      }
+          if (m_indices) {
+            glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+          } else  {
+            glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+          }
 
-      if (!select_mode && we->isSelectedEntity()) {
-        RenderSystem::getInstance().switchState(m_select_state);
-        glStencilFunc(GL_NOTEQUAL, -1, 1);
-        glColor4fv(halo_colour);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+          RenderSystem::getInstance().switchState(m_select_state);
+          glStencilFunc(GL_NOTEQUAL, -1, 1);
+          glColor4fv(halo_colour);
+          glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+          if (m_indices) {
+             glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+          } else  {
+            glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+          }
+
+          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+          glDisable(GL_STENCIL_TEST);
+        } else { // Just render object solid highligh colour
+          RenderSystem::getInstance().switchState(m_select_state);
+          glColor4fv(halo_colour);
+  
+          if (m_indices) {
+            glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+          } else  {
+            glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+          }
+        }
+        glColor4fv(white);
+        RenderSystem::getInstance().switchState(m_state);
+      } else { // Render object normally
         if (m_indices) {
-           glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+          glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
         } else  {
           glDrawArrays(GL_TRIANGLES, 0, m_num_points);
         }
-
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDisable(GL_STENCIL_TEST);
-        glColor4fv(white);
-        RenderSystem::getInstance().switchState(m_state);
       }
 
       glPopMatrix();
@@ -611,13 +627,7 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       }
       glEndList();
 
-      // Second display list,  setup stencil op for outlines
-      glNewList(disp + 1, GL_COMPILE);
-      glEnable(GL_STENCIL_TEST);
-      glStencilFunc(GL_ALWAYS, -1, 1);
-      glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-      glEndList();
-
+ 
       // Third disp list, render the object
       glNewList(disp + 2, GL_COMPILE);
       if (m_indices) {
@@ -626,7 +636,15 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
         glDrawArrays(GL_TRIANGLES, 0, m_num_points);
       }
       glEndList();
-    
+
+      if (m_use_stencil) {      
+      // Second display list, setup stencil op for outlines
+      glNewList(disp + 1, GL_COMPILE);
+      glEnable(GL_STENCIL_TEST);
+      glStencilFunc(GL_ALWAYS, -1, 1);
+      glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      glEndList();
+   
       // Fourth list, render the outline
       glNewList(disp + 3, GL_COMPILE);
       RenderSystem::getInstance().forceState(m_select_state);
@@ -643,7 +661,22 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       glColor4fv(white);
       RenderSystem::getInstance().forceState(m_state);
       glEndList();
+      } else {
+      // Fourth list, render the outline
+      glNewList(disp + 3, GL_COMPILE);
+      RenderSystem::getInstance().forceState(m_select_state);
+      glColor4fv(halo_colour);
+      glEndList();
 
+
+      //Fifth list, finish outline
+      glNewList(disp + 4, GL_COMPILE);
+      glColor4fv(white);
+      RenderSystem::getInstance().forceState(m_state);
+      glEndList();
+ 
+
+      }
       // sixth disp list, clean up state 
       glNewList(disp + 5, GL_COMPILE);
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
@@ -692,11 +725,17 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
 
       // Render stuff
       if (!select_mode && we->isSelectedEntity()) {
-        glCallList(disp + 1);
-        glCallList(disp + 2);
-        glCallList(disp + 3);
-        glCallList(disp + 2);
-        glCallList(disp + 4);
+        if (m_use_stencil) {
+          glCallList(disp + 1);
+          glCallList(disp + 2);
+          glCallList(disp + 3);
+          glCallList(disp + 2);
+          glCallList(disp + 4);
+        } else {
+          glCallList(disp + 3);
+          glCallList(disp + 2);
+          glCallList(disp + 4);
+        }
       } else {
         glCallList(disp + 2);
       }

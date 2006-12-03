@@ -1,5 +1,17 @@
 2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/StaticObject.h, loaders/StaticObject.cpp: Implement fallback
+	  outlining method when stencil buffers are not available/required.
+	  Added a useStencil flag to indicate whether or not to use a stencil
+	  buffer.
+
+	* loaders/3ds_Loader.cpp, loaders/BoundBox_Loader.cpp,
+	  loaders/LibModelFile_Loader.cpp, loaders/NPlane_Loader.cpp: Determine
+	  whether or not to use the stencil buffer for outlining based on 
+	  whether one is available and whether the outlining method requires it.
+
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/3ds.cpp: Clean up render function.
 
 	* loaders/3ds.h, loaders/BoundBox.h, loaders/LibModelFile.h,

@@ -175,6 +175,8 @@ void setAmbient(float a[4]) {
   StaticObject *newInstance() { return new StaticObject(); }
   int load(const std::string &filename);
   int save(const std::string &filename);
+
+  void setUseStencil(bool b) { m_use_stencil = b; }
  
 private:
   void createVBOs() const;
@@ -214,6 +216,8 @@ private:
   Matrix m_tex_matrix;
 
   int m_context_no;
+
+  bool m_use_stencil;
 };
 
 } // namespace Sear

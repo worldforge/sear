@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.24 2006-12-03 13:38:47 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.25 2006-12-03 16:12:59 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -11,6 +11,8 @@
 
 #include "ModelRecord.h"
 #include "src/WorldEntity.h"
+
+#include "renderers/RenderSystem.h"
 
 #include "NPlane_Loader.h"
 #include "NPlane.h"
@@ -63,11 +65,15 @@ SPtr<ModelRecord> NPlane_Loader::loadModel(WorldEntity *we, const std::string &m
     return SPtr<ModelRecord>();
   }
 
+
+  bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
+
   StaticObjectList &sol = model->getStaticObjects();
   StaticObjectList::iterator I = sol.begin();
   while (I != sol.end()) {
     (*I)->setState(model_record->state);
     (*I)->setSelectState(model_record->select_state);
+    (*I)->setUseStencil(use_stencil);
     ++I;
   }
 
