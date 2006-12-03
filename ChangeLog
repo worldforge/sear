@@ -1,5 +1,10 @@
 2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* renderers/Graphics.cpp: Only calculate transform matrix for static
+	  objects.
+
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/NPlane.cpp,
 	  loaders/NPlane.h: Added StaticObjectList functions to these model 
 	  types to move them into the new render queue.

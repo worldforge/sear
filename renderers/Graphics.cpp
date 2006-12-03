@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.51 2006-12-02 21:56:55 simon Exp $
+// $Id: Graphics.cpp,v 1.52 2006-12-03 11:43:00 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -496,7 +496,8 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
       obj_we->screenY() = -1;
       return;
     }
-  }  
+  }
+
   // Get world coord of object
   WFMath::Point<3> p = obj_we->getAbsPos();
   assert(p.isValid());
@@ -536,95 +537,94 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
 
   for (I = Ibegin; I != Iend; ++I) {
-    // retrive or create the model and modelRecord as necessary
+    // retrieve or create the model and modelRecord as necessary
     SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(*I, obj_we);
     assert(modelRec);
  
-  SPtrShutdown<Model> model = modelRec->model;
-  assert(model);
+    SPtrShutdown<Model> model = modelRec->model;
+    assert(model);
 
-  WorldEntity *we = dynamic_cast<WorldEntity*>(obj->entity.get());
-
+    WorldEntity *we = dynamic_cast<WorldEntity*>(obj->entity.get());
    
     int state = select_mode ? modelRec->select_state : modelRec->state;
     
     if (state <= 0) continue; // bad state
 
-
-// Calculate Transform Matrix /////////////////////////////////////////////////////////////
-  // Cheat and use the opengl matrix.
-  glPushMatrix();
-  glLoadIdentity();
-  
-  // 1) Apply Object transforms
-  WFMath::Point<3> pos = we->getAbsPos();
-  assert(pos.isValid());
-  glTranslatef(pos.x(), pos.y(), pos.z() );
-    
-  m_renderer->rotateObject(obj, modelRec);
-    
-  // 2) Apply Model Transforms 
-    
-  // Scale Object
-  float scale = modelRec->scale;
-  // Do not perform scaling if it is to zero or has no effect
-  if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
-  
-  glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
- 
-  glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
-
-  // 3) Apply final scaling once model is in place
-
-  // Scale model by all bounding box axis
-  if (modelRec->scale_bbox && we->hasBBox()) { 
-    WFMath::AxisBox<3> bbox = we->getBBox();
-    float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
-    float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
-    float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
-
-    glScalef(x_scale, y_scale, z_scale);
-  }
-  // Scale model by bounding box height
-  else if (modelRec->scaleByHeight && we->hasBBox()) {
-    WFMath::AxisBox<3> bbox = we->getBBox();
-    float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
-    glScalef(z_scale, z_scale, z_scale);
-  }
-
-  float m[4][4];
-  glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
-
-   // Restore matrix
-  glPopMatrix();
-
-  Matrix mx;
-  mx.setMatrix(m);
-
-//  std::string key = "some kind of key"; // Model ID??
-
-  // Need to add for every model.
-
-  // Only need to add the first time this model is added.
-//  if (m_state_map.find(key) == m_state_map.end()) {
-//  }
-///////////////////////////////////////////////////////////////////////////////////////
-    
     // Update Model
     if (!select_mode) { // Only needs to be done once a frame
-        modelRec->model->update(time_elapsed);
-        modelRec->model->setLastTime(System::instance()->getTimef());
+      modelRec->model->update(time_elapsed);
+      modelRec->model->setLastTime(System::instance()->getTimef());
     } 
-std::string key = modelRec->id;
-if (model->hasStaticObjects()) {
-  m_matrix_map[key].push_back(mx);
-    m_state_map[key] = state;
-    m_object_map[key] = model->getStaticObjects();
-}else{
-    // Add to queue by state, then model record
-    render_queue[state].push_back(Render::QueueItem(obj, modelRec));
-//  m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
-}
+
+    std::string key = modelRec->id;
+
+    if (model->hasStaticObjects()) {
+ 
+// Calculate Transform Matrix //////////////////////////////////////////////////
+
+  // Cheat and use the opengl matrix.
+    glPushMatrix();
+    glLoadIdentity();
+  
+    // 1) Apply Object transforms
+    WFMath::Point<3> pos = we->getAbsPos();
+    assert(pos.isValid());
+    glTranslatef(pos.x(), pos.y(), pos.z() );
+    
+    m_renderer->rotateObject(obj, modelRec);
+    
+    // 2) Apply Model Transforms 
+     
+    // Scale Object
+    float scale = modelRec->scale;
+
+    // Do not perform scaling if it is to zero or has no effect
+    if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+  
+    glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
+ 
+    glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+
+    // 3) Apply final scaling once model is in place
+
+    // Scale model by all bounding box axis
+    if (modelRec->scale_bbox && we->hasBBox()) { 
+      WFMath::AxisBox<3> bbox = we->getBBox();
+      float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+      float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+      float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+
+      glScalef(x_scale, y_scale, z_scale);
+    }
+
+    // Scale model by bounding box height
+    else if (modelRec->scaleByHeight && we->hasBBox()) {
+      WFMath::AxisBox<3> bbox = we->getBBox();
+      float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+      glScalef(z_scale, z_scale, z_scale);
+    }
+
+    float m[4][4];
+    glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
+
+     // Restore matrix
+    glPopMatrix();
+
+    Matrix mx;
+    mx.setMatrix(m);
+
+////////////////////////////////////////////////////////////////////////////////
+    
+     m_matrix_map[key].push_back(mx);
+      if (m_state_map.find(key) == m_state_map.end()) {
+        m_state_map[key] = state;
+        m_object_map[key] = model->getStaticObjects();
+      }
+    } else {
+      // Add to queue by state, then model record
+      render_queue[state].push_back(Render::QueueItem(obj, modelRec));
+      // m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
+    }
 
     // Add attached objects to the render queues.
     if (obj->draw_attached || !obj_we->getAttachments().empty()) {
