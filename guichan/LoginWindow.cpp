@@ -29,7 +29,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   setBaseColor(base);
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &LoginWindow::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(this, &LoginWindow::actionPressed));
 
   gcn::Box * vbox = new gcn::VBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));

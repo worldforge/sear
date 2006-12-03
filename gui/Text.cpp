@@ -2,14 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2004 Alistair Riddoch
 
+#include <sage/sage.h>
+#include <sage/GL.h>
+
 #include "gui/Text.h"
 
 #include "renderers/RenderSystem.h"
 
 #include "renderers/Render.h"
 
-#include <sage/sage.h>
-#include <sage/GL.h>
 
 #include <iostream>
 

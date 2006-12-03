@@ -109,7 +109,6 @@ void Workarea::init()
   try {
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->getFilePath(font_path);
-std::cout << font_path << std::endl;
 
     gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
