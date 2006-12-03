@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.63 2006-11-30 20:39:44 simon Exp $
+// $Id: 3ds.cpp,v 1.64 2006-12-03 11:31:59 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -367,8 +367,7 @@ void ThreeDS::render(bool select_mode) {
 
   std::list<Matrix> l;
   l.push_back(m);
-//  m.translate(0.0f,0.0f,2.0f);
-//  l.push_back(m);
+
   for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);

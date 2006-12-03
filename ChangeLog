@@ -1,3 +1,20 @@
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/BoundBox.cpp, loaders/BoundBox.h, loaders/NPlane.cpp,
+	  loaders/NPlane.h: Added StaticObjectList functions to these model 
+	  types to move them into the new render queue.
+
+	* loaders/3ds.cpp, loaders/ModelLoader.cpp: Removed some commented bits.
+
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* gui/Caret.cpp, gui/Frame.cpp, gui/Text.cpp, gui/Workspace.cpp: Fix 
+	  include ordering due to other header file changes.
+
+	* guichan/LoginWindow.cpp: use sigc::mem_fun instead of SigC::slot.
+
+	* guichan/Workarea.cpp: Removed some debugging output.
+
 2006-12-02  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/LibModelFile.cpp, loaders/LibModelFile.h: Add methods to get

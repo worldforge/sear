@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.32 2006-05-06 13:50:22 simon Exp $
+// $Id: BoundBox.cpp,v 1.33 2006-12-03 11:32:11 simon Exp $
 
 #include "renderers/RenderSystem.h"
 
@@ -29,24 +29,24 @@ BoundBox::~BoundBox() {
 int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wrap) {
   assert(m_initialised == false);
 
-  m_so = SPtrShutdown<StaticObject>(new StaticObject());
-  m_so->init();
+  SPtrShutdown<StaticObject> so = SPtrShutdown<StaticObject>(new StaticObject());
+  so->init();
   // Set material properties
-  m_so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setEmission(0.0f, 0.0f, 0.0f, 0.0f);
-  m_so->setShininess(50.0f);
+  so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setEmission(0.0f, 0.0f, 0.0f, 0.0f);
+  so->setShininess(50.0f);
 
-  m_so->setTexture(0,
+  so->setTexture(0,
     RenderSystem::getInstance().requestTexture(texture),
     RenderSystem::getInstance().requestTexture(texture, true));
 
-  m_so->setNumPoints(36);
+  so->setNumPoints(36);
   // Allocate mem for data
-  float *vertexptr = m_so->createVertexData(36 * 3);
-  float *normalptr = m_so->createNormalData(36 * 3);
-  float *texptr    = m_so->createTextureData(36 * 2);
+  float *vertexptr = so->createVertexData(36 * 3);
+  float *normalptr = so->createNormalData(36 * 3);
+  float *texptr    = so->createTextureData(36 * 2);
 
   // TODO: Convert Quads into triangles.
   int vertex_counter = -1;
@@ -246,6 +246,8 @@ int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wra
   normalptr[++normal_counter] =  0.0f; normalptr[++normal_counter] = -1.0f; normalptr[++normal_counter] =  0.0f;
   normalptr[++normal_counter] =  0.0f; normalptr[++normal_counter] = -1.0f; normalptr[++normal_counter] =  0.0f;
 
+  m_render_objects.push_back(so);
+
   contextCreated();
 
   m_initialised = true;
@@ -263,16 +265,27 @@ int BoundBox::shutdown() {
 }
 
 void BoundBox::contextCreated() {
-  if (m_so) m_so->contextCreated();
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextCreated();
+  }
 }
 
 void BoundBox::contextDestroyed(bool check) {
-  if (m_so) m_so->contextDestroyed(check);
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextDestroyed(check);
+  }
 }
 
 void BoundBox::render(bool select_mode) {
-  assert(m_so);
-  m_so->render(select_mode);
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->render(select_mode);
+  }
 }
 
 } /* namespace Sear */

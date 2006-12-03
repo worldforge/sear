@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.h,v 1.16 2006-02-15 09:50:31 simon Exp $
+// $Id: BoundBox.h,v 1.17 2006-12-03 11:32:13 simon Exp $
 
 #ifndef SEAR_BOUNDBOX_H
 #define SEAR_BOUNDBOX_H 1
@@ -53,9 +53,12 @@ public:
   virtual void contextCreated();
   virtual void contextDestroyed(bool check);
 
+  virtual bool hasStaticObjects() const { return true; }
+  virtual StaticObjectList getStaticObjects() { return m_render_objects; }
+
 private:
   bool m_initialised;
-  SPtrShutdown<StaticObject> m_so;
+  StaticObjectList m_render_objects;
 };
 
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.9 2006-05-06 13:50:22 simon Exp $
+// $Id: ModelLoader.cpp,v 1.10 2006-12-03 11:32:15 simon Exp $
 
 #include "ModelLoader.h"
 
@@ -32,7 +32,6 @@ SPtr<ModelRecord> ModelLoader::loadModel(WorldEntity *we,
     } else {
       model_record->scale_bbox = false;
     }
-   // Get model offset (x)
    // Get model offset (x)
     if (model_config.findItem(model_id, ModelRecord::OFFSET_X)) {
       model_record->offset_x = (double)model_config.getItem(model_id, ModelRecord::OFFSET_X);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.h,v 1.15 2006-05-17 23:15:34 alriddoch Exp $
+// $Id: NPlane.h,v 1.16 2006-12-03 11:32:24 simon Exp $
 
 #ifndef SEAR_NPLANE_H
 #define SEAR_NPLANE_H 1
@@ -33,10 +33,13 @@ public:
   virtual void render(bool); 
 
   virtual RotationStyle rotationStyle() { return ROS_POSITION; }
-  
+ 
+  virtual bool hasStaticObjects() const { return true; }
+  virtual StaticObjectList getStaticObjects() { return m_render_objects; }
+ 
 private:
   bool m_initialised;
-  SPtrShutdown<StaticObject> m_so; 
+  StaticObjectList m_render_objects; 
 };
 
 } /* namespace Sear */ 

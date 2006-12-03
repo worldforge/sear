@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.30 2006-05-06 13:50:22 simon Exp $
+// $Id: NPlane.cpp,v 1.31 2006-12-03 11:32:19 simon Exp $
 
 #include <iostream>
 
@@ -33,24 +33,24 @@ int NPlane::init(const std::string &texture, unsigned int num_planes, float widt
   assert(m_initialised == false);
 
   // Store texture name and get ID numbers
-  m_so = SPtrShutdown<StaticObject>(new StaticObject());
-  m_so->init();
+  SPtrShutdown<StaticObject> so = SPtrShutdown<StaticObject>(new StaticObject());
+  so->init();
   // Set material properties
-  m_so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
-  m_so->setEmission(0.0f, 0.0f, 0.0f, 0.0f);
-  m_so->setShininess(50.0f);
+  so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setDiffuse(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
+  so->setEmission(0.0f, 0.0f, 0.0f, 0.0f);
+  so->setShininess(50.0f);
 
-  m_so->setTexture(0,
+  so->setTexture(0,
     RenderSystem::getInstance().requestTexture(texture),
     RenderSystem::getInstance().requestTexture(texture, true));
 
-  m_so->setNumPoints(num_planes * 12);
+  so->setNumPoints(num_planes * 12);
   // Allocate mem
-  float *vertexptr = m_so->createVertexData(3 * 12 * num_planes);
-  float *normalptr = m_so->createNormalData(3 * 12 * num_planes);
-  float *texptr = m_so->createTextureData(2 * 12  * num_planes);
+  float *vertexptr = so->createVertexData(3 * 12 * num_planes);
+  float *normalptr = so->createNormalData(3 * 12 * num_planes);
+  float *texptr = so->createTextureData(2 * 12  * num_planes);
 
   float rads_per_segment = WFMath::Pi / (float)num_planes;
 
@@ -117,6 +117,8 @@ int NPlane::init(const std::string &texture, unsigned int num_planes, float widt
     texptr[++texture_counter] = 0.0f; texptr[++texture_counter] = 1.0f;
   }
 
+  m_render_objects.push_back(so);
+
   contextCreated();
 
   m_initialised = true;
@@ -133,15 +135,27 @@ int NPlane::shutdown() {
 }
 
 void NPlane::contextCreated() {
-  m_so->contextCreated();
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextCreated();
+  }
 }
 
 void NPlane::contextDestroyed(bool check) {
-  m_so->contextDestroyed(check);
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->contextDestroyed(check);
+  }
 }
 
 void NPlane::render(bool select_mode) {
-  m_so->render(select_mode);
+  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    so->render(select_mode);
+  }
 }
 
 } /* namespace Sear */
