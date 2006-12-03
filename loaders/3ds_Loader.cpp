@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.25 2006-10-01 12:52:44 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.26 2006-12-03 13:38:47 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -46,6 +46,14 @@ SPtr<ModelRecord> ThreeDS_Loader::loadModel(WorldEntity *we, const std::string &
     std::cerr << "Error: Failed to load \"" << file_name << "\"" << std::endl;
     delete model;
     return SPtr<ModelRecord>();
+  }
+
+  StaticObjectList &sol = model->getStaticObjects();
+  StaticObjectList::iterator I = sol.begin();
+  while (I != sol.end()) {
+    (*I)->setState(model_record->state);
+    (*I)->setSelectState(model_record->select_state);
+    ++I;
   }
 
   // Set height

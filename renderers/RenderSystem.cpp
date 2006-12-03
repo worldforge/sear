@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.18 2006-02-18 15:41:12 simon Exp $
+// $Id: RenderSystem.cpp,v 1.19 2006-12-03 13:38:48 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -144,6 +144,11 @@ StateID RenderSystem::requestState(const std::string &state) {
 void RenderSystem::switchState(StateID state) {
   assert (m_initialised);
   m_stateManager->stateChange(state);
+}
+
+void RenderSystem::forceState(StateID state) {
+  assert (m_initialised);
+  m_stateManager->forceStateChange(state);
 }
 
 void RenderSystem::contextCreated() {

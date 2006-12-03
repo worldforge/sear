@@ -12,6 +12,8 @@
 
 namespace Sear {
 
+class WorldEntity;
+
 class StaticObject {//: public CacheObject {
 public:
   StaticObject();
@@ -23,7 +25,7 @@ public:
   bool isInitialised() const { return m_initialised; }
 
   void render(bool select_mode) const;
-  void render(bool select_mode, const std::list<Matrix> &positions) const;
+  void render(bool select_mode, const std::list<std::pair<Matrix, WorldEntity*> > &positions) const;
 
   int contextCreated();
   void contextDestroyed(bool check);
@@ -155,9 +157,12 @@ void setAmbient(float a[4]) {
 
   void setShininess(float s) { m_shininess = s; }
 
-//  void setState(int s) { m_state = s; }
-//  int getState() const { return m_state; }
+  void setState(int s) { m_state = s; }
+  int getState() const { return m_state; }
  
+  void setSelectState(int s) { m_select_state = s; }
+  int getSelectState() const { return m_select_state; }
+
 //  void setType(GLenum type) { m_type = type; } 
 
   Matrix &getMatrix() { return m_matrix; }
@@ -194,7 +199,7 @@ private:
 
   // I.e. GL_TRIANGLES, GL_QUADS etc..
 //  GLenum m_type;
-//  int m_state; 
+  int m_state, m_select_state; 
  
 
   // Making this stuff mutable may well be bad practise. They are lazily 

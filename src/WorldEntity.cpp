@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.87 2006-12-02 18:54:36 simon Exp $
+// $Id: WorldEntity.cpp,v 1.88 2006-12-03 13:38:48 simon Exp $
 
 /*
  TODO
@@ -56,7 +56,8 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    m_status(1.0),
    m_screenCoordRequest(0),
    m_has_local_orient(false),
-   m_has_local_pos(false)
+   m_has_local_pos(false),
+   m_selected(false)
 {
   Acted.connect(sigc::mem_fun(this, &WorldEntity::onAction));
   LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));
@@ -287,10 +288,12 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
       if (record) record->animate(mode);
       last_mode = mode;
     }
+/*
   } else if (str == GUISE) {
     const Atlas::Message::MapType& mt(v.asMap());
     SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
     if (record) record->setAppearance(mt);
+*/
   } else if (str == "right_hand_wield") {
     std::string id = v.asString();
     if (id.empty()) {

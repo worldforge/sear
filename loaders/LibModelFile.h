@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.h,v 1.12 2006-12-02 21:56:55 simon Exp $
+// $Id: LibModelFile.h,v 1.13 2006-12-03 13:38:47 simon Exp $
 
 #ifndef SEAR_LOADERS_LIBMODELFILE_H
 #define SEAR_LOADERS_LIBMODELFILE_H 1
@@ -54,7 +54,7 @@ public:
   virtual void contextDestroyed(bool check);
 
   virtual bool hasStaticObjects() const { return true; }
-  virtual StaticObjectList getStaticObjects() { return m_static_objects; }
+  virtual StaticObjectList &getStaticObjects() { return m_static_objects; }
 
 private:
   void varconf_error_callback(const char *message);

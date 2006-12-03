@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: StateManager.h,v 1.15 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: StateManager.h,v 1.16 2006-12-03 13:38:48 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -72,6 +72,10 @@ public:
   StateID requestState(const std::string &state_name);
 
   void stateChange(StateID state);
+  void forceStateChange(StateID state) {
+    m_current_state = -1;
+    stateChange(state);
+  }
 //  std::map<std::string, StateProperties*> getMap() const { return _state_properties; }
 
 //  StateProperties *getStateProperties(const std::string &state) {

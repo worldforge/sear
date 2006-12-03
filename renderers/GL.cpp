@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.156 2006-12-02 21:56:55 simon Exp $
+// $Id: GL.cpp,v 1.157 2006-12-03 13:38:48 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -400,6 +400,8 @@ int GL::checkError() {
 int GL::setupExtensions() {
   sage_init();
 
+  //sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;  
+
   if (sage_ext[GL_ARB_MULTITEXTURE]) {
     if (debug) std::cout << "Found arb_multitexture" << std::endl;
   } else {
@@ -526,9 +528,9 @@ void GL::shutdown() {
 
 void GL::init() {
   assert(m_initialised == false);
-//  if (m_initialised) shutdown();
+
   if (debug) std::cout << "GL: Initialise" << std::endl;
-  // Most of this should be elsewhere
+
   System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
 
   m_initialised = true;
@@ -678,6 +680,13 @@ void GL::drawTextRect(int x, int y, int width, int height, int texture) {
 void GL::procEvent(int x, int y) {
   // No need to perform checks until we are in the game world
   if (!m_system->checkState(SYS_IN_WORLD)) return;
+
+  // Reset last selected entity isSelected flag
+  if (m_activeEntity) {
+    dynamic_cast<WorldEntity*>(m_activeEntity.get())->setIsSelected(false);
+  }
+
+
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
   RenderSystem::getInstance().drawScene(true, 0);
@@ -701,6 +710,7 @@ void GL::procEvent(int x, int y) {
   //selected_id = getSelectedID(ic);
   WorldEntity *selected_entity = getSelectedID(ic);
 
+  if (selected_entity) selected_entity->setIsSelected(true);
   if (selected_entity != m_activeEntity.get()) {
     if (selected_entity != NULL ) {
       m_activeEntity = Eris::EntityRef(selected_entity);
@@ -1097,58 +1107,6 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
   }
 }
 
-void GL::renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
-  if (!vertex_data) return; 
-  // TODO: Reduce ClientState switches
-  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
-  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
- 
-  glVertexPointer(3, GL_FLOAT, 0, (float*)vertex_data);
-
-  if (textures && texture_data) {
-     if (multitexture) {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)texture_data);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)texture_data);
-    } else {	    
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)texture_data);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-  }
-  if (lighting && normal_data) {
-    glNormalPointer(GL_FLOAT, 0, (float*)normal_data);
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-  if (use_ext_compiled_vertex_array) glLockArraysEXT(0, number_of_points);
-  switch (type) {
-    case (RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (RES_POINT): glDrawElements(GL_POINT, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_LINES): glDrawElements(GL_LINES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_TRIANGLES): glDrawElements(GL_TRIANGLES, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_QUADS): glDrawElements(GL_QUADS, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_TRIANGLE_FAN): glDrawElements(GL_TRIANGLE_FAN, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_TRIANGLE_STRIP): glDrawElements(GL_TRIANGLE_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    case (RES_QUAD_STRIP): glDrawElements(GL_QUAD_STRIP, number_of_points, GL_UNSIGNED_INT, faces_data); break;
-    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
-  }
-  if (use_ext_compiled_vertex_array) glUnlockArraysEXT();
-
-  if (lighting && normal_data) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures && texture_data) {
-    if (multitexture) {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    } else {
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-  }
-}
-
 void GL::drawQueue(QueueMap &queue, bool select_mode) {
   for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
     // Change state for this queue
@@ -1199,14 +1157,13 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
         float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
         glScalef(z_scale, z_scale, z_scale);
       }
- 
 
       // Draw Model
       if (select_mode) {
         nextColour(we);
         model->render(true);
       } else {
-        if (m_activeEntity && (object_record->entity.get()->getId() == m_activeEntity.get()->getId())) {
+        if (we->isSelectedEntity()) {
           m_active_name = object_record->entity->getName();
           drawOutline(model_record);
         } else {
@@ -1294,11 +1251,6 @@ void GL::drawOutline(SPtr<ModelRecord> model_record) {
 }
 
 inline void GL::beginFrame() {
-  #ifndef _WIN32
-    // TODO Need to find a win32 version
-    usleep(sleep_time);
-  #endif
- 
   // TODO into display list
   m_active_name = "";
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
@@ -1565,111 +1517,6 @@ WorldEntity *GL::getActiveEntity() const {
   return dynamic_cast<WorldEntity*>(m_activeEntity.get());
 } 
 
-void GL::renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture) {
-  // TODO: Reduce ClientState switches
-  bool textures = RenderSystem::getInstance().getState(RenderSystem::RENDER_TEXTURES);
-  bool lighting = RenderSystem::getInstance().getState(RenderSystem::RENDER_LIGHTING);
- 
-  if (!mesh.vertex_array) {
-    Log::writeLog("No Vertex Data", Log::LOG_ERROR);
-    return; 
-  }
-
-  if (mesh.vertex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);
-  glVertexPointer(3, GL_FLOAT, 0, (float*)mesh.vertex_array);
-  if (textures && mesh.tex_coord_array) {
-    if (multitexture) {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
-    } else {	    
-      if (mesh.tex_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
-      glTexCoordPointer(2, GL_FLOAT, 0, (float*)mesh.tex_coord_array);
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-  }
-  if (lighting && mesh.normal_array) {
-    if (mesh.normal_vbo) glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.normal_vbo);
-    glNormalPointer(GL_FLOAT, 0, (float*)mesh.normal_array);
-    glEnableClientState(GL_NORMAL_ARRAY);
-  }
-
-  switch (mesh.data_type) {
-    case (RES_INVALID): Log::writeLog("Trying to render INVALID type", Log::LOG_ERROR); break;
-    case (RES_POINT): glDrawArrays(GL_POINT, offset, mesh.number_of_points); break;
-    case (RES_LINES): glDrawArrays(GL_LINES, offset, mesh.number_of_points); break;
-    case (RES_TRIANGLES): glDrawArrays(GL_TRIANGLES, offset, mesh.number_of_points); break;
-    case (RES_QUADS): glDrawArrays(GL_QUADS, offset, mesh.number_of_points); break;
-    case (RES_TRIANGLE_FAN): glDrawArrays(GL_TRIANGLE_FAN, offset, mesh.number_of_points); break;
-    case (RES_TRIANGLE_STRIP): glDrawArrays(GL_TRIANGLE_STRIP, offset, mesh.number_of_points); break;
-    case (RES_QUAD_STRIP): glDrawArrays(GL_QUAD_STRIP, offset, mesh.number_of_points); break;
-    default: Log::writeLog("Unknown type", Log::LOG_ERROR); break;
-  }
- 
-  if (lighting && mesh.normal_array) glDisableClientState(GL_NORMAL_ARRAY);
-  if (textures && mesh.tex_coord_array) {
-    if (multitexture)  {
-      glClientActiveTextureARB(GL_TEXTURE1_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-      glClientActiveTextureARB(GL_TEXTURE0_ARB);
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    } else {
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    }
-  }
-}
-
-void GL::vboMesh(Mesh &mesh) {
-  if (sage_ext[GL_ARB_vertex_buffer_object]) {
-    if (mesh.vertex_array) {
-      glGenBuffersARB(1, &mesh.vertex_vbo);
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.vertex_vbo);
-      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 3 * sizeof(float), mesh.vertex_array, GL_STATIC_DRAW_ARB);
-      //delete [] mesh.vertex_array;
-      mesh.vertex_array = NULL;
-    }
-    if (mesh.tex_coord_array) {
-      glGenBuffersARB(1, &mesh.tex_vbo);
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.tex_vbo);
-      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 2 * sizeof(float), mesh.tex_coord_array, GL_STATIC_DRAW_ARB);
-//      delete [] mesh.tex_coord_array;
-      mesh.tex_coord_array = NULL;
-    }
-    if (mesh.normal_array) {
-      glGenBuffersARB(1, &mesh.normal_vbo);
-      glBindBufferARB(GL_ARRAY_BUFFER_ARB, mesh.normal_vbo);
-      glBufferDataARB(GL_ARRAY_BUFFER_ARB, mesh.number_of_points * 3 * sizeof(float), mesh.normal_array, GL_STATIC_DRAW_ARB);
-//      delete [] mesh.normal_array;
-      mesh.normal_array = NULL;
-    }
-  } else {
-    mesh.vertex_vbo = 0;
-    mesh.tex_vbo = 0;
-    mesh.normal_vbo = 0;
-  }
-}
-
-void GL::cleanVBOMesh(Mesh &mesh) {
-
-  if (mesh.vertex_vbo) {
-    glDeleteBuffersARB(1, &mesh.vertex_vbo);
-    mesh.vertex_vbo = 0;
-  }
-  if (mesh.tex_vbo) {
-    glDeleteBuffersARB(1, &mesh.tex_vbo);
-    mesh.tex_vbo = 0;
-  }
-  if (mesh.normal_vbo) {
-    glDeleteBuffersARB(1, &mesh.normal_vbo);
-    mesh.normal_vbo = 0;
-  }
-}
-
 void GL::resize(int width, int height) {
   m_width = width;
   m_height = height;
@@ -1749,43 +1596,17 @@ void GL::drawQueue(const QueueObjectMap &object_map,
 
     // Get ref to matrix list
     assert(matrix_map.find(key) != matrix_map.end());
-    const std::list<Matrix> &matrices = matrix_map.find(key)->second;
+    const std::list<MatrixEntityItem> &matrices = matrix_map.find(key)->second;
 
     // Switch to the appropriate render list.
     assert(state_map.find(key) != state_map.end());
     RenderSystem::getInstance().switchState(state_map.find(key)->second);
 
     std::list<SPtrShutdown<StaticObject> >::const_iterator J = objects.begin();
-    if (J == objects.end()) {
-      glPushMatrix();
-/*
-
-  SPtrShutdown<Model> model = model_record->model;
-  assert(model);
-
-
-
-      // Draw Model
-      if (select_mode) {
-        nextColour(we);
-        model->render(true);
-      } else {
-        if (m_activeEntity && (object_record->entity.get()->getId() == m_activeEntity.get()->getId())) {
-          m_active_name = object_record->entity->getName();
-          drawOutline(model_record);
-        } else {
-          model->render(false);
-        }
-      }
-      glPopMatrix();
-*/
-    } else {
-      while (J != objects.end()) {
-        (*J)->render(select_mode, matrices);
-        ++J;
-      }
-      ++I;
+    while (J != objects.end()) {
+      (*J++)->render(select_mode, matrices);
     }
+    ++I;
   }
 }
 

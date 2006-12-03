@@ -66,6 +66,7 @@ public:
   // State Manager functions
   StateID requestState(const std::string &state);
   void switchState(StateID state);
+  void forceState(StateID state);
   StateID getCurrentState();
 
   void contextCreated();

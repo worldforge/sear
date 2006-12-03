@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.39 2006-12-02 18:54:36 simon Exp $
+// $Id: WorldEntity.h,v 1.40 2006-12-03 13:38:48 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -102,6 +102,10 @@ public:
     if (m_has_local_orient) return m_local_orient;
     else return getOrientation();
   }
+
+  bool isSelectedEntity() const { return m_selected; }
+  void setIsSelected(bool b) {  m_selected = b; }
+
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -133,7 +137,7 @@ protected:
   bool m_has_local_orient, m_has_local_pos;
   WFMath::Quaternion m_local_orient;
   WFMath::Point<3> m_local_pos;
-
+  bool m_selected;
 };
 
 } /* namespace Sear */

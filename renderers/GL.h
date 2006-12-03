@@ -71,9 +71,9 @@ private:
 
 
 public:
-  void renderMeshArrays( Mesh &mesh, unsigned int offset, bool multitexture);
-  void vboMesh( Mesh &mesh);
-  void cleanVBOMesh(Mesh &mesh);
+//  void renderMeshArrays( Mesh &mesh, unsigned int offset, bool multitexture);
+//  void vboMesh( Mesh &mesh);
+//  void cleanVBOMesh(Mesh &mesh);
   
 
   void initLighting();
@@ -99,8 +99,8 @@ public:
 
   std::string getActiveID() const;// { return activeID; }
   WorldEntity *getActiveEntity() const;// { return activeID; }
-  void checkModelStatus(const std::string &) {}
-  void setModelInUse(const std::string &, bool) {}
+//  void checkModelStatus(const std::string &) {}
+//  void setModelInUse(const std::string &, bool) {}
 
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
@@ -116,7 +116,7 @@ public:
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
-  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
+//  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
@@ -142,11 +142,11 @@ public:
   inline void getFrustum(float [6][4]);
   virtual void getModelviewMatrix(float m[4][4]);
  
-  void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
-  void endRecordList() { glEndList(); }
-  void playList(unsigned int list) { glCallList(list); }
-  GLuint getNewList() { return glGenLists(1); }
-  void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
+//  void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
+//  void endRecordList() { glEndList(); }
+//  void playList(unsigned int list) { glCallList(list); }
+//  GLuint getNewList() { return glGenLists(1); }
+//  void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
   void selectTerrainColour(WorldEntity * we);
   void resize(int width, int height);
 

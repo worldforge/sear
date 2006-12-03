@@ -1,5 +1,31 @@
 2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/3ds.cpp: Clean up render function.
+
+	* loaders/3ds.h, loaders/BoundBox.h, loaders/LibModelFile.h,
+	  loaders/Model.h, loaders/NPlane.h: Return StaticObjectList by
+	  reference.
+
+	* loaders/3ds_Loader.cpp, loaders/BoundBox_Loader.cpp,
+	  loaders/LibModelFile_Loader.cpp, loaders/NPlane_Loader.cpp: Store
+	  normal and render states in the StaticObjects on creation time.
+
+	* loaders/StaticObject.cpp, loaders/StaticObject.h: Implemented
+	  outlining (stencil buffer method only) and select mode for the meshes.
+
+	* renderers/GL.cpp, renders/GL.h, renders/Render.h: Removed lots of
+	  unused functions. Use new flag on WorldEntity to check selected status
+	  rather than by ID comparisons.
+
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h,
+	  renderers/StateManager.h: Added a method to force a full state change
+	  for use within display lists.
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: Added an isSelected flag and
+	  accessors to store whether a entity is currently selected or not.
+
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/Graphics.cpp: Only calculate transform matrix for static
 	  objects.
 

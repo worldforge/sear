@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.9 2006-09-17 19:42:41 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.10 2006-12-03 13:38:47 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -48,6 +48,15 @@ SPtr<ModelRecord> LibModelFile_Loader::loadModel(WorldEntity *we, const std::str
 //    model->shutdown();
     delete model;
     return SPtr<ModelRecord>();
+  }
+
+
+  StaticObjectList &sol = model->getStaticObjects();
+  StaticObjectList::iterator I = sol.begin();
+  while (I != sol.end()) {
+    (*I)->setState(model_record->state);
+    (*I)->setSelectState(model_record->select_state);
+    ++I;
   }
  
   model_record->model = SPtrShutdown<Model>(model);

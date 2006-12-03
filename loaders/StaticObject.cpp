@@ -10,7 +10,13 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
+#include "src/WorldEntity.h"
+
 #include  "StaticObject.h"
+
+
+static GLfloat halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 namespace Sear {
 
@@ -23,7 +29,8 @@ StaticObject::StaticObject() :
   m_num_points(0),
   m_num_faces(0),
 //  m_type(0),
-//  m_state(0),
+  m_state(0),
+  m_select_state(0),
   m_vb_vertex_data(0),
   m_vb_normal_data(0),
   m_vb_texture_data(0),
@@ -414,7 +421,7 @@ int StaticObject::save(const std::string &filename) {
   return 0;
 }
 
-void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) const {
+void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, WorldEntity*> > &positions) const {
   assert(m_initialised == true);
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
@@ -426,7 +433,6 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
   m_tex_matrix.getMatrix(m);
   glMultMatrixf(&m[0][0]);
   glMatrixMode(GL_MODELVIEW);
-    
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
@@ -472,22 +478,52 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
     }
 
     /// Loop through each matrix here and do the render
-    std::list<Matrix>::const_iterator I = positions.begin();
+    std::list<std::pair<Matrix,WorldEntity*> >::const_iterator I = positions.begin();
     while (I != positions.end()) {
+      const Matrix &mx = (*I).first;
+      WorldEntity *we = (*I).second;
+
+      if (select_mode) {
+        RenderSystem::getInstance().getRenderer()->nextColour(we);
+      }
+
       glPushMatrix();
       // Set transform
       // Apply position transform 
-      (*I).getMatrix(m);
+      mx.getMatrix(m);
       glMultMatrixf(&m[0][0]);
       // Apply mesh transform
       m_matrix.getMatrix(m);
       glMultMatrixf(&m[0][0]);
 
+      if (!select_mode && we->isSelectedEntity()) {
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_ALWAYS, -1, 1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      }
+
       if (m_indices) {
         glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
       } else  {
         glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+      }
+
+      if (!select_mode && we->isSelectedEntity()) {
+        RenderSystem::getInstance().switchState(m_select_state);
+        glStencilFunc(GL_NOTEQUAL, -1, 1);
+        glColor4fv(halo_colour);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        if (m_indices) {
+           glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+        } else  {
+          glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+        }
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_STENCIL_TEST);
+        glColor4fv(white);
+        RenderSystem::getInstance().switchState(m_state);
       }
 
       glPopMatrix();
@@ -495,6 +531,7 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
     }
     /// end of loop
 
+    // Reset opengl state
     if (m_indices) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
     }
@@ -512,7 +549,7 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
     if (glIsBufferARB(m_vb_normal_data)) {
       glDisableClientState(GL_NORMAL_ARRAY);
     }
-  } else {
+  } else { // Fall back to vertex arrays and display lists
 
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
     if (!glIsList(disp)) {
@@ -526,8 +563,10 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
       // Reset current texture unit
       glActiveTextureARB(GL_TEXTURE0_ARB);
 
-      m_list_count = 3;
+      m_list_count = 6;
       disp = glGenLists(m_list_count);
+
+      // First display list, set up state
       glNewList(disp, GL_COMPILE);
 
       // Setup client states
@@ -572,15 +611,41 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
       }
       glEndList();
 
+      // Second display list,  setup stencil op for outlines
       glNewList(disp + 1, GL_COMPILE);
+      glEnable(GL_STENCIL_TEST);
+      glStencilFunc(GL_ALWAYS, -1, 1);
+      glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      glEndList();
+
+      // Third disp list, render the object
+      glNewList(disp + 2, GL_COMPILE);
       if (m_indices) {
         glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, m_indices);
       } else  {
         glDrawArrays(GL_TRIANGLES, 0, m_num_points);
       }
       glEndList();
-     
-      glNewList(disp + 2, GL_COMPILE);
+    
+      // Fourth list, render the outline
+      glNewList(disp + 3, GL_COMPILE);
+      RenderSystem::getInstance().forceState(m_select_state);
+      glStencilFunc(GL_NOTEQUAL, -1, 1);
+      glColor4fv(halo_colour);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glEndList();
+
+
+      //Fifth list, finish outline
+      glNewList(disp + 4, GL_COMPILE);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      glDisable(GL_STENCIL_TEST);
+      glColor4fv(white);
+      RenderSystem::getInstance().forceState(m_state);
+      glEndList();
+
+      // sixth disp list, clean up state 
+      glNewList(disp + 5, GL_COMPILE);
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
         glUnlockArraysEXT();
       }
@@ -605,25 +670,42 @@ void StaticObject::render(bool select_mode, const std::list<Matrix> &positions) 
     glCallList(disp);
 
     /// Loop through each matrix here and do the render
-    std::list<Matrix>::const_iterator I = positions.begin();
+    std::list<std::pair<Matrix, WorldEntity*> >::const_iterator I = positions.begin();
     while (I != positions.end()) {
+      const Matrix &mx = (*I).first;
+      WorldEntity *we = (*I).second;
+
+      assert(we != 0);
+
+      if (select_mode) {
+        RenderSystem::getInstance().getRenderer()->nextColour(we);
+      }
+
       glPushMatrix();
       // Set transform
       // Apply position transform 
-      (*I).getMatrix(m);
+      mx.getMatrix(m);
       glMultMatrixf(&m[0][0]);
       // Apply mesh transform
       m_matrix.getMatrix(m);
       glMultMatrixf(&m[0][0]);
 
       // Render stuff
-      glCallList(disp + 1);
+      if (!select_mode && we->isSelectedEntity()) {
+        glCallList(disp + 1);
+        glCallList(disp + 2);
+        glCallList(disp + 3);
+        glCallList(disp + 2);
+        glCallList(disp + 4);
+      } else {
+        glCallList(disp + 2);
+      }
 
       glPopMatrix();
       ++I;
     }
     // Reset state
-    glCallList(disp + 2);
+    glCallList(disp + 5);
   }
 
   glMatrixMode(GL_TEXTURE);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.52 2006-12-03 11:43:00 simon Exp $
+// $Id: Graphics.cpp,v 1.53 2006-12-03 13:38:48 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -614,8 +614,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     mx.setMatrix(m);
 
 ////////////////////////////////////////////////////////////////////////////////
-    
-     m_matrix_map[key].push_back(mx);
+     m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, we));
       if (m_state_map.find(key) == m_state_map.end()) {
         m_state_map[key] = state;
         m_object_map[key] = model->getStaticObjects();

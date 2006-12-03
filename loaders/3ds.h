@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.27 2006-12-02 21:56:54 simon Exp $
+// $Id: 3ds.h,v 1.28 2006-12-03 13:38:47 simon Exp $
 
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
@@ -59,7 +59,7 @@ public:
   virtual void contextDestroyed(bool check);
 
   virtual bool hasStaticObjects() const { return true; }
-  virtual StaticObjectList getStaticObjects() { return m_render_objects; }
+  virtual StaticObjectList &getStaticObjects() { return m_render_objects; }
   
 
 protected:

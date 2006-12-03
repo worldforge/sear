@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.18 2006-12-02 21:56:55 simon Exp $
+// $Id: Render.h,v 1.19 2006-12-03 13:38:48 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -48,7 +48,8 @@ typedef std::list<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::list<WorldEntity*> MessageList;
 // New render queue types
-typedef std::map<std::string, std::list<Matrix> > QueueMatrixMap;
+typedef std::pair<Matrix, WorldEntity*> MatrixEntityItem;
+typedef std::map<std::string, std::list<MatrixEntityItem> > QueueMatrixMap;
 typedef std::map<std::string, std::list<SPtrShutdown<StaticObject> > > QueueObjectMap;
 typedef std::map<std::string, StateID> QueueStateMap;
 typedef std::map<std::string, Queue> QueueOldMap;
@@ -60,9 +61,9 @@ typedef std::map<std::string, Queue> QueueOldMap;
   }
   virtual ~Render() {}
    
-  virtual void renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture)=0;
-  virtual void vboMesh(Mesh &mesh)=0;
-  virtual void cleanVBOMesh(Mesh &mesh) =0;
+//  virtual void renderMeshArrays(Mesh &mesh, unsigned int offset, bool multitexture)=0;
+//  virtual void vboMesh(Mesh &mesh)=0;
+//  virtual void cleanVBOMesh(Mesh &mesh) =0;
 
   virtual void init() =0;
   virtual void shutdown() =0;
@@ -116,7 +117,7 @@ typedef std::map<std::string, Queue> QueueOldMap;
   virtual void setViewMode(int type) =0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
   virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
-  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
+//  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode) =0;
 
 virtual void drawQueue(const QueueObjectMap &object_map,
@@ -143,6 +144,8 @@ virtual void drawQueue(const QueueObjectMap &object_map,
   void incrementContext() { m_context_instantiation++; }
   int currentContextNo() const { return m_context_instantiation; }
   bool contextValid() const { return m_context_valid; }
+
+  virtual void nextColour(WorldEntity*) = 0;
 
 protected:
   int m_context_instantiation ;
