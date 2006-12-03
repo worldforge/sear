@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.46 2006-12-02 18:54:37 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.47 2006-12-03 16:33:01 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -87,11 +87,10 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
           setMaterialPartSet(mesh_num, 1);
   
           std::string mat_key = "material" + key.substr(4); // sizeof("mesh")
-
           varconf::sec_map::const_iterator J = sec.find(mat_key);
-         if (J != sec.end()) {
-           const varconf::Variable &v2 = J->second;
-              Cal3dCoreModel::SetMap::const_iterator SM =
+          if (J != sec.end()) {
+            const varconf::Variable &v2 = J->second;
+            Cal3dCoreModel::SetMap::const_iterator SM =
                                      m_core_model->m_sets.find((std::string)v2);
 
             if (SM != m_core_model->m_sets.end()) {
@@ -107,10 +106,8 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
     for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
       m_calModel->attachMesh(meshId);
     }
+    m_calModel->setMaterialSet(0);
   }
-
-  // Set default material set
-  m_calModel->setMaterialSet(0);
 
   // set initial animation state
   m_calModel->getMixer()->blendCycle(m_core_model->m_animations[STANDING], 1.0f, 0.0f);

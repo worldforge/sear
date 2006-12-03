@@ -1,5 +1,10 @@
 2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/cal3d/Cal3dModel.cpp: Fix bug where the default materials
+	  in the appearance map were not being set correctly.
+
+2006-12-03  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.h, loaders/StaticObject.cpp: Implement fallback
 	  outlining method when stencil buffers are not available/required.
 	  Added a useStencil flag to indicate whether or not to use a stencil
