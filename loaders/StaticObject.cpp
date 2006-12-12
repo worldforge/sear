@@ -423,6 +423,8 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
 
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
   // Setup texture transform
   float m[4][4];
   glMatrixMode(GL_TEXTURE);
