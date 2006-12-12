@@ -423,8 +423,6 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
 
-  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-
   // Setup texture transform
   float m[4][4];
   glMatrixMode(GL_TEXTURE);
@@ -534,10 +532,22 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
         glColor4fv(white);
         RenderSystem::getInstance().switchState(m_state);
       } else { // Render object normally
+        GLboolean blend_enabled;
+        glGetBooleanv(GL_BLEND, &blend_enabled);
+        if (we->isFading()) {
+          if (!blend_enabled) glEnable(GL_BLEND);
+          glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+        } else {
+          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+
         if (m_indices) {
           glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
         } else  {
           glDrawArrays(GL_TRIANGLES, 0, m_num_points);
+        }
+        if (!blend_enabled) {
+          glDisable(GL_BLEND);
         }
       }
 
@@ -729,7 +739,22 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
           glCallList(disp + 4);
         } else {
           glCallList(disp + 3);
+
+        GLboolean blend_enabled;
+        glGetBooleanv(GL_BLEND, &blend_enabled);
+        if (we->isFading()) {
+          if (!blend_enabled) glEnable(GL_BLEND);
+          glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+        } else {
+          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+
           glCallList(disp + 2);
+
+        if (!blend_enabled) {
+          glDisable(GL_BLEND);
+        }
+
           glCallList(disp + 4);
         }
       } else {

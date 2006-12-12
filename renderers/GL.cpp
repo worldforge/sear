@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.157 2006-12-03 13:38:48 simon Exp $
+// $Id: GL.cpp,v 1.158 2006-12-12 22:31:13 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -218,6 +218,8 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 );
   }
 #endif
+
+  //RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL,false);
   // Only request stencil if specified
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
@@ -417,6 +419,10 @@ int GL::setupExtensions() {
                                                                                 
 void GL::nextColour(WorldEntity *we) {
   assert(we != 0);
+  // TODO, we are now passing the same we to this function several times per
+  // frame. We might want to return the same colour each time, rather than 
+  // allocate a new one.
+
   // Dynamically grow array as needed.
   if (m_colour_index >= m_entityArray.size()) {
     m_entityArray.resize((m_entityArray.size() + 1) * 2);
@@ -1167,7 +1173,25 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
           m_active_name = object_record->entity->getName();
           drawOutline(model_record);
         } else {
+
+
+    GLboolean blend_enabled;
+    glGetBooleanv(GL_BLEND, &blend_enabled);
+    if (true) {//we->isFading()) {
+      if (!blend_enabled) glEnable(GL_BLEND);
+      glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+    } else {
+      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+
           model->render(false);
+
+    if (!blend_enabled) {
+      glDisable(GL_BLEND);
+    }
+
+
         }
       }
 

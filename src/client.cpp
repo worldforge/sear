@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.86 2006-11-30 20:30:49 simon Exp $
+// $Id: client.cpp,v 1.87 2006-12-12 22:31:15 simon Exp $
 
 #include "System.h"
 
@@ -28,6 +28,7 @@
 #include "Factory.h"
 #include "Character.h"
 #include "Calendar.h"
+#include "WorldEntity.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -692,6 +693,10 @@ void Client::AvatarSuccess(Eris::Avatar *avatar) {
   m_avatar->getView()->registerFactory(f);
 
   m_avatar->GotCharacterEntity.connect(sigc::mem_fun(this, &Client::GotCharacterEntity));
+
+  m_avatar->getView()->Appearance.connect(sigc::mem_fun(this, &Client::onEntityAppearance));
+  m_avatar->getView()->Disappearance.connect(sigc::mem_fun(this, &Client::onEntityDisappearance));
+
 }
 
 void Client::AvatarFailure(const std::string &msg) {
@@ -790,8 +795,18 @@ void Client::setErisLogLevel(const std::string &level) {
   else {
     fprintf(stderr, "[Client] Unknown eris log level %s\n", level.c_str());
   }
-std::cout << "Setting log level " << level << std::endl;
+  std::cout << "[Client] Setting log level " << level << std::endl;
   Eris::setLogLevel(m_loglevel);
+}
+
+void Client::onEntityAppearance(Eris::Entity *e) {
+  WorldEntity *we = dynamic_cast<WorldEntity *>(e);
+  we->startFadeIn();
+}
+
+void Client::onEntityDisappearance(Eris::Entity *e) {
+  WorldEntity *we = dynamic_cast<WorldEntity *>(e);
+  we->startFadeOut();
 }
 
 } /* namespace Sear */

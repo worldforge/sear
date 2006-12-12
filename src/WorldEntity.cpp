@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.88 2006-12-03 13:38:48 simon Exp $
+// $Id: WorldEntity.cpp,v 1.89 2006-12-12 22:31:15 simon Exp $
 
 /*
  TODO
@@ -57,7 +57,10 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    m_screenCoordRequest(0),
    m_has_local_orient(false),
    m_has_local_pos(false),
-   m_selected(false)
+   m_selected(false),
+   m_fading(false),
+   m_fade_in(false),
+   m_fade(1.0f)
 {
   Acted.connect(sigc::mem_fun(this, &WorldEntity::onAction));
   LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));
@@ -361,5 +364,22 @@ void WorldEntity::onBeingDeleted() {
   // handlers.
   notify_callbacks();
 }
+
+void WorldEntity::updateFade(float f) {
+  if (!m_fading) return;
+  if (m_fade_in) {
+    m_fade += f;
+  } else {
+    m_fade -= f;
+  }
+  if (m_fade < 0.0f) {
+    m_fade = 0.0;
+    m_fading = false;
+  } else if (m_fade > 1.0f) {
+    m_fade = 1.0f;
+    m_fading = false;
+  }
+}
+
 
 } /* namespace Sear */

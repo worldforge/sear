@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.h,v 1.27 2006-05-17 13:36:45 simon Exp $
+// $Id: client.h,v 1.28 2006-12-12 22:31:15 simon Exp $
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -126,6 +126,9 @@ protected:
   void AvatarDeactivated(Eris::Avatar* av);
 
   void GotCharacterEntity(Eris::Entity *e);
+
+  void onEntityAppearance(Eris::Entity *e);
+  void onEntityDisappearance(Eris::Entity *e);
 
   System *m_system;
 

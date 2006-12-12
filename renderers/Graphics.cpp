@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.53 2006-12-03 13:38:48 simon Exp $
+// $Id: Graphics.cpp,v 1.54 2006-12-12 22:31:14 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -433,7 +433,7 @@ void Graphics::buildQueues(WorldEntity *we,
     Render::MessageList &name_list,
     float time_elapsed)
 {
-  if (!we->isVisible()) return;
+  if (!we->isVisible() && !we->isFading()) return;
 
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
@@ -552,6 +552,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 
     // Update Model
     if (!select_mode) { // Only needs to be done once a frame
+      we->updateFade(time_elapsed);
       modelRec->model->update(time_elapsed);
       modelRec->model->setLastTime(System::instance()->getTimef());
     } 
@@ -614,7 +615,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     mx.setMatrix(m);
 
 ////////////////////////////////////////////////////////////////////////////////
-     m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, we));
+      m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, we));
       if (m_state_map.find(key) == m_state_map.end()) {
         m_state_map[key] = state;
         m_object_map[key] = model->getStaticObjects();

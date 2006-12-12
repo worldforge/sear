@@ -1,5 +1,11 @@
 2006-12-12  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/StaticObject.cpp, renderers/GL.cpp, renderers/Graphics.cpp,
+	  src/WorldEntity.cpp, src/WorldEntity.h, src/client.cpp, src/client.h:
+	  Fade models in and out on entity appearance and disappearance.
+
+2006-12-12  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/StaticObject.cpp: Make sure we set the glColor to white in
 	  case a previous object has changed it.
 

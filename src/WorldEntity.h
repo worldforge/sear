@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.40 2006-12-03 13:38:48 simon Exp $
+// $Id: WorldEntity.h,v 1.41 2006-12-12 22:31:15 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -106,6 +106,23 @@ public:
   bool isSelectedEntity() const { return m_selected; }
   void setIsSelected(bool b) {  m_selected = b; }
 
+  bool isFading() const { return m_fading; }
+  float getFade() const { return m_fade; }
+
+  void updateFade(float f);
+
+  void startFadeIn() {
+    m_fading = true;
+    m_fade = 0.0f;
+    m_fade_in = true;
+  }
+
+  void startFadeOut() {
+    m_fading = true;
+    m_fade = 1.0f;
+    m_fade_in = false;
+  }
+
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -138,6 +155,9 @@ protected:
   WFMath::Quaternion m_local_orient;
   WFMath::Point<3> m_local_pos;
   bool m_selected;
+
+  bool m_fading, m_fade_in;
+  float m_fade;
 };
 
 } /* namespace Sear */
