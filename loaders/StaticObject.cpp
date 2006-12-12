@@ -251,9 +251,6 @@ void StaticObject::render(bool select_mode) const {
       disp = glGenLists(m_list_count);
       glNewList(disp, GL_COMPILE);
 
-      // Setup client states
-      glEnableClientState(GL_NORMAL_ARRAY);
-
       // Set material properties
       glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
       glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   m_diffuse);
@@ -584,9 +581,6 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
 
       // First display list, set up state
       glNewList(disp, GL_COMPILE);
-
-      // Setup client states
-      glEnableClientState(GL_NORMAL_ARRAY);
 
       // Set material properties
       glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
