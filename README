@@ -1,4 +1,19 @@
-Sear
+ Sear
+-====-
+
+Sear is a 3-D client for use with the WorldForge project. It requires a 3-D accelerated graphics card supporting Open GL.
+
+Please visit website for full instructions. 
+
+Website: http://www.worldforge.org/dev/eng/clients/sear
+
+Please report bugs on the Sear forum at http://forums.worldforgedev.org/
+
+Simon Goodall
+
+Email: sear@simongoodall.co.uk
+IRC irc.worldforge.org NICK simon
+
 
 Dependancies
 ------------
@@ -10,7 +25,7 @@ WFmath: 0.3.2
 Skstream2: 0.3.1
 Mercator: 0.2.4
 LibModelFile: 0.1.92
-Sage: 0.1.2
+Sage: 0.2.0
 
 http://sourceforge.net/projects/worldforge
 
@@ -31,21 +46,15 @@ http://sourceforge.net/projects/lib3ds/
 
 OpenGL 1.3
 
-Cal3D 0.10.0
+Cal3D 0.11.0
 http://sourceforge.net/projects/cal3d/
 
-Guichan 0.4.0
+Guichan 0.5.0
 http://guichan.sourceforge.net/
+
 
 
 Sky Dome based on;
 http://www.geocities.com/ngdash/whitepapers/skydomecolor.html
 
-Please visit website for full instructions. 
 
-Website: http://www.worldforge.org/dev/eng/clients/sear
-
-Simon Goodall
-
-Email: sear@simongoodall.co.uk
-IRC irc.worldforge.org NICK simon

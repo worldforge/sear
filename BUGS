@@ -1,10 +1,21 @@
- * The local object rotation/translation is not applied to the child entities of wielded objects. Somehow we need to rotate the bbox and not the model.
+BUGS
+
+ * Crashes if connected to a server when cyclient is run. Long standing eris issue?
+
+
+Demitar Issues:
+	* Dropping items (e.g. merchant) broken. He has *lots* of stuff
+	* Lighting probs. Wolf vs torch -- The torches/other fires still
+ 	  need working on
+ 	* Suspend/resume sear eats up memory
+	* dropping rotating stake crashes sear
+ 
+
+* GUI transitions need more work. Close should ideally go back a step if required. 
 
  * The StaticObject stores indices as an int, but tells GL they are unsigned ints. Might cause a problem somewhere along the line. 
 
  * Entity bounding box is not the same as the visual bounding box. Objects are clipped when their entity bbox is no longer in the frustum. We need to calculate the visual bbox and clip to that instead.
-
- * Error msgs such as missing extenions / bad colour depth get lost in all the other output making it difficult to see why sear did not start. Need some method of highlighting these. Popup maybe?
 
  * The settler animation for walking goes funny sometimes when starting up. Could be a malebuiler animation problem, or could be some bad interaction in the mixer.
 
@@ -12,11 +23,6 @@
 
 Need to check init functions. They do not always clean up in event of failure (e.g. System::init();
 
-BUGS
  * Text box sometimes  repeatslast 3/4 chars across lines
 
  * some problems with multi texturing on cal3d when model doesn't have any second texture (or even first!) breaks alpha-mapping
- * segfaults with fullscreen - win32 on call, linux when quitting
-
- * Fix font length problems
-   - The font in many cases will not clip to the screen and go onto the next line. This is a problem on the console fonts, but no so much for the floating character speech

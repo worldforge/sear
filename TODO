@@ -1,7 +1,46 @@
  TODO
 ======
 
- -- allow multiple terrain entities
+UI
+---
+ * Need a method to select spot to create/drop entities.
+ * Pop-up menu showing possible interactions with an entity
+ * Entity information dialog.
+ * Make use of the stacking attribute. -- Eris stuff required?
+
+Threading
+---------
+  * Lots of multi-core machines now.
+  * Main problem areas: Open GL and Eris
+  * Could thread model loading (easy ?) load in background and notify when its available. What do we do in the mean time -- PlaceHolder nullmodel?
+  * Could thread eris polling (hard!) -- lots of accesses to Entity objects.
+
+Entity Scripting
+----------------
+
+ * Embed LUA into Sear
+  - Can eventually replace action handler and even current scripting interface?
+ * We will probably want some way of handling time driven proccesses. Ie. each frame we will need to call some update/tick functions to advance a script further. We will probably want to be able to dynamically register/unregister particular scripts so as to not bog down performance too much.
+
+ * Create some event handlers for specific events to control specific behaviour.
+  - E.g. creation event could randomise head texture.
+ * Possible events?
+  - Change of appearance
+  - Change of mode/action
+  - Change of status
+ * Might want to change default model/textures depending on attributes
+  - Tree texture for seasons
+  - Tree model depending on age/height
+ * Might want to control certain behaviour, e.g. how fire is rendered on a burning entity.
+ * Equipping an item might require triggering of certain animations and model selection.
+ * We can also have scripts for certain events.
+  - Explosions requiring mutliple artifacts to be rendered temporarily
+  - "magically" create object could require a "poof of smoke"
+
+General
+-------
+
+ * allow multiple terrain entities
 
 Render Queue
 ------------
@@ -13,18 +52,14 @@ Render Queue
   - Add to a priority queue and sort by texture, states, transparency etc..
  * Render the queue
 
-
 TextureManager
  * Implement reference counting for textures so they can be unloaded when no 
    longer required
- * Automatically resize to 2^N x 2^M
- * Automatically reduce textures to allowed range in OpenGL
 
 CameraSystem
  * Create new camera types (e.g. top down, orthographic etc..)
  * Create smooth transitions between camera's
 
-RenderSystem
  * Finish moving graphics code into appropriate places
  * Make greater use of vertex buffer objects
  * Support more OpenGL extensions.
@@ -35,10 +70,6 @@ RenderSystem
  * Add foot prints
  * Add weather effects
   - Query weather entity
- * Create a particle engine for special effects
-  - Smoke
-  - Flames
-  - Fog
  
 ModelHandler
  * Needs to be able to instatiate objects independant of entity (e.g. for mercator forest)
@@ -56,16 +87,9 @@ General
   - Can link nodes to an "indoor" engine
   - Use to provide distance info for rendering options
 
- * Add support to create custom font textures from say freetype
-
  * Improve Sound/Music System
   - SDL_mixer (or maybe SDL sound subsystem) doesn't clean up properly
   - Currently using SDL_mixer. It is adequate for now, but a much better alternative would be to use openAL, www.openal.org
-
-
- * Create a texture handling class.
-  - Loads and unloads textures as required
-  - Can perform transformations on textures
 
  * Create a file handling class
   - Allows memory mapping if appropriate
