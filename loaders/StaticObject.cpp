@@ -531,14 +531,15 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
         }
         glColor4fv(white);
         RenderSystem::getInstance().switchState(m_state);
-      } else { // Render object normally
-        GLboolean blend_enabled;
-        glGetBooleanv(GL_BLEND, &blend_enabled);
-        if (we->isFading()) {
+      } else { // Render object normaly
+        GLboolean blend_enabled = true;
+        GLboolean cmat_enabled = true;
+        if (!select_mode && we->getFade() < 1.0f) {
+          glGetBooleanv(GL_BLEND, &blend_enabled);
+          glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
           if (!blend_enabled) glEnable(GL_BLEND);
+          if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
           glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
-        } else {
-          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         }
 
         if (m_indices) {
@@ -546,9 +547,9 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
         } else  {
           glDrawArrays(GL_TRIANGLES, 0, m_num_points);
         }
-        if (!blend_enabled) {
-          glDisable(GL_BLEND);
-        }
+
+        if (!blend_enabled) glDisable(GL_BLEND);
+        if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
       }
 
       glPopMatrix();
@@ -731,6 +732,7 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
 
       // Render stuff
       if (!select_mode && we->isSelectedEntity()) {
+        // Outlining
         if (m_use_stencil) {
           glCallList(disp + 1);
           glCallList(disp + 2);
@@ -739,26 +741,25 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
           glCallList(disp + 4);
         } else {
           glCallList(disp + 3);
-
-        GLboolean blend_enabled;
-        glGetBooleanv(GL_BLEND, &blend_enabled);
-        if (we->isFading()) {
-          if (!blend_enabled) glEnable(GL_BLEND);
-          glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
-        } else {
-          glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        }
-
           glCallList(disp + 2);
-
-        if (!blend_enabled) {
-          glDisable(GL_BLEND);
-        }
-
           glCallList(disp + 4);
         }
-      } else {
+      } else { // No outlining
+        GLboolean blend_enabled = true;
+        GLboolean cmat_enabled = true;
+        if (!select_mode && we->getFade() < 1.0f) {
+          glGetBooleanv(GL_BLEND, &blend_enabled);
+          glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
+          if (!blend_enabled) glEnable(GL_BLEND);
+          if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
+          glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+        }
+
         glCallList(disp + 2);
+
+        if (!blend_enabled) glDisable(GL_BLEND);
+        if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
+
       }
 
       glPopMatrix();

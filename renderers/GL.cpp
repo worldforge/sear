@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.158 2006-12-12 22:31:13 simon Exp $
+// $Id: GL.cpp,v 1.159 2006-12-13 15:26:08 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1173,25 +1173,20 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
           m_active_name = object_record->entity->getName();
           drawOutline(model_record);
         } else {
-
-
-    GLboolean blend_enabled;
-    glGetBooleanv(GL_BLEND, &blend_enabled);
-    if (true) {//we->isFading()) {
-      if (!blend_enabled) glEnable(GL_BLEND);
-      glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
-    } else {
-      glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-
+          GLboolean blend_enabled = true;
+          GLboolean cmat_enabled = true;
+          if (we->getFade() < 1.0f) {
+            glGetBooleanv(GL_BLEND, &blend_enabled);
+            glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
+            if (!blend_enabled) glEnable(GL_BLEND);
+            if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
+          }
+          glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
 
           model->render(false);
 
-    if (!blend_enabled) {
-      glDisable(GL_BLEND);
-    }
-
-
+          if (!blend_enabled) glDisable(GL_BLEND);
+          if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
         }
       }
 
