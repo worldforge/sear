@@ -90,7 +90,7 @@ public:
 };
 
 CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
-                                     m_charSelected(-1), m_typeSelected(0)
+                                     m_charSelected(-1), m_typeSelected(-1)
 {
   gcn::Color base = getBaseColor();
   base.a = 128;
@@ -219,6 +219,7 @@ void CharacterWindow::logic()
   if (new_char_sel != m_charSelected) {
     m_charSelected = new_char_sel;
     if (new_char_sel >= 0) {
+      m_types->setSelected(-1);
       m_nameField->setText("");
       Eris::Account * account = System::instance()->getClient()->getAccount();
       if (account != 0) {
@@ -228,15 +229,23 @@ void CharacterWindow::logic()
           Eris::CharacterMap::const_iterator Iend = ci.end();
           for (int j = 0; I != Iend; ++I, ++j) {
             if (m_charSelected == j) {
+              const std::string &type_name = I->second->getParents().front();
               m_nameField->setText(I->second->getName());
-              m_typeField->setText(I->second->getParents().front());
+              m_typeField->setText(type_name);
               m_charButton->setCaption("Take character");
               m_charButton->setEventId("take");
+              // Updates the type list box
+              gcn::ListModel *lm =  m_types->getListModel();
+              for (int i = 0; i < lm->getNumberOfElements(); ++i) {
+                if (lm->getElementAt(i) == type_name) {
+                  m_types->setSelected(i);
+                  break;
+                }
+              }
             }
           }
         }
       }
-      m_types->setSelected(0);
     }
   }
   if (new_char_sel >= 0) {
@@ -250,7 +259,7 @@ void CharacterWindow::logic()
           if (m_charSelected == j) {
             if (m_nameField->getText() != I->second->getName() ||
                 m_typeField->getText() != I->second->getParents().front()) {
-              m_characters->setSelected(0);
+              m_characters->setSelected(-1);
               m_charButton->setCaption("Create new character");
               m_charButton->setEventId("create");
             }
@@ -271,7 +280,7 @@ void CharacterWindow::logic()
           m_typeField->setText(types[m_typeSelected]);
         }
       }
-      m_characters->setSelected(0);
+      m_characters->setSelected(-1);
       m_charButton->setCaption("Create new character");
       m_charButton->setEventId("create");
     }
@@ -282,7 +291,7 @@ void CharacterWindow::logic()
       const std::vector<std::string> & types = account->getCharacterTypes();
       if (new_type_sel >= 0 && m_typeSelected < types.size()) {
         if (m_typeField->getText() != types[m_typeSelected]) {
-          m_types->setSelected(0);
+          m_types->setSelected(-1);
         }
       }
     }
