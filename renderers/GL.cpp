@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.159 2006-12-13 15:26:08 simon Exp $
+// $Id: GL.cpp,v 1.160 2006-12-20 11:06:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -443,7 +443,8 @@ void GL::buildColourSet() {
   glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
   glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
 
-  assert(m_colourArray == 0);
+//  assert(m_colourArray == 0);
+  if (m_colourArray != 0) delete [] m_colourArray;
   m_colourArray = new GLubyte[m_redBits * m_greenBits * m_blueBits * 3];
 
   // Create masks
