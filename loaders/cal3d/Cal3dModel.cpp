@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.47 2006-12-03 16:33:01 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.48 2006-12-21 19:43:29 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -67,6 +67,10 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
     return false;
   }
 
+  // Initialises the attached mesh vector
+  m_attached_meshes.clear();
+  m_attached_meshes.resize(m_core_model->getCalCoreModel()->getCoreMeshCount());
+
   std::string type = "default";
   if (m_core_model->m_appearance_config.findSection(type)) {
     const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
@@ -83,6 +87,7 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
           unsigned int mesh_num = MM->second;
           // Attach the mesh;
           m_calModel->attachMesh(mesh_num);
+          m_attached_meshes[mesh_num]++;
           // Setup the material
           setMaterialPartSet(mesh_num, 1);
   
@@ -105,6 +110,7 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
     // attach all meshes to the model
     for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
       m_calModel->attachMesh(meshId);
+      m_attached_meshes[meshId]++;
     }
     m_calModel->setMaterialSet(0);
   }
@@ -497,6 +503,9 @@ void Cal3dModel::contextDestroyed(bool check) {
   }
 }
 
+// TODO: We need to be able to switch off some meshes when others are being 
+// rendered, e.g. body parts. Perhaps we need a "replaces" list which says mesh
+// X is not rendered if mesh Y is visible. Must be careful about circular deps.
 
 void Cal3dModel::entityWorn(WorldEntity *we) {
   assert(we != 0);
@@ -518,8 +527,13 @@ void Cal3dModel::entityWorn(WorldEntity *we) {
                                     m_core_model->m_meshes.find((std::string)v);
       if (MM != m_core_model->m_meshes.end()) {
         unsigned int mesh_num = MM->second;
-        // Attach the mesh;
+        // Attach the mesh if it has not already been attached
+        if (m_attached_meshes[mesh_num]++ > 0) {
+          ++I;
+          continue;
+        }
         m_calModel->attachMesh(mesh_num);
+
         // Set a default material;
         setMaterialPartSet(mesh_num, 1);
         // See if a proper one has been specified
@@ -542,6 +556,8 @@ void Cal3dModel::entityWorn(WorldEntity *we) {
 }
 
 void Cal3dModel::entityRemoved(WorldEntity *we) {
+  // Stops throwing the assert when eating an entity
+  // Need to check if eris should really be passing a null pointer
   assert(we != 0);
 
   // Get entity type.
@@ -560,8 +576,10 @@ void Cal3dModel::entityRemoved(WorldEntity *we) {
                                     m_core_model->m_meshes.find((std::string)v);
       if (MM != m_core_model->m_meshes.end()) {
         unsigned int mesh_num = MM->second;
-        // Attach the mesh;
-        m_calModel->detachMesh(mesh_num);
+        if (--m_attached_meshes[mesh_num] == 0) {
+          // Remove mesh when count hits zero
+          m_calModel->detachMesh(mesh_num);
+        }
       }
     }
     ++I;

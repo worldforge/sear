@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.27 2006-11-30 20:30:47 simon Exp $
+// $Id: Calendar.cpp,v 1.28 2006-12-21 19:43:28 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -28,11 +28,6 @@
 static const std::string CALENDER = "calendar";
 
 // Config Key names
-static const std::string KEY_SECONDS_PER_MINUTE = "seconds_per_minute";
-static const std::string KEY_MINUTES_PER_HOUR = "minutes_per_hour";
-static const std::string KEY_HOURS_PER_DAY = "hours_per_day";
-static const std::string KEY_MONTHS_PER_YEAR = "months_per_year";
-
 static const std::string KEY_DAWN_START = "dawn_starts";
 static const std::string KEY_DAY_START = "day_starts";
 static const std::string KEY_DUSK_START = "dusk_starts";

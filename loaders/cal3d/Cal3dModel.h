@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.27 2006-12-02 18:54:37 simon Exp $
+// $Id: Cal3dModel.h,v 1.28 2006-12-21 19:43:29 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -88,6 +88,8 @@ private:
   std::string m_cur_anim;
   typedef std::vector<SPtrShutdown<DynamicObject> > DOVec;
   DOVec m_dos;
+
+  std::vector<int> m_attached_meshes;
 
   friend class Cal3dCoreModel;
 };

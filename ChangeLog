@@ -1,3 +1,11 @@
+2006-12-21  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h: Count number
+	  of times a mesh is "attached" and only remove the mesh when the count
+	  goes back down to 0.
+
+	* src/Calendar.cpp:  Removed some old config keys.
+
 2006-12-20  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/GL.cpp: Fix assert on context re-creation when building 
