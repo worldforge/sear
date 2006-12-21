@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.54 2006-12-12 22:31:14 simon Exp $
+// $Id: Graphics.cpp,v 1.55 2006-12-21 20:28:07 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -128,6 +128,7 @@ Graphics::Graphics(System *system) :
   m_initialised(false),
   m_compass(NULL),
   m_show_names(false),
+  m_show_bbox(false),
   m_medium_dist(DEFAULT_medium_dist),
   m_high_dist(DEFAULT_high_dist)
 {
@@ -535,144 +536,20 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     Iend = obj->low_quality.end();
   }
 
-
-  for (I = Ibegin; I != Iend; ++I) {
-    // retrieve or create the model and modelRecord as necessary
-    SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(*I, obj_we);
-    assert(modelRec);
- 
-    SPtrShutdown<Model> model = modelRec->model;
-    assert(model);
-
-    WorldEntity *we = dynamic_cast<WorldEntity*>(obj->entity.get());
-   
-    int state = select_mode ? modelRec->select_state : modelRec->state;
-    
-    if (state <= 0) continue; // bad state
-
-    // Update Model
-    if (!select_mode) { // Only needs to be done once a frame
-      we->updateFade(time_elapsed);
-      modelRec->model->update(time_elapsed);
-      modelRec->model->setLastTime(System::instance()->getTimef());
-    } 
-
-    std::string key = modelRec->id;
-
-    if (model->hasStaticObjects()) {
- 
-// Calculate Transform Matrix //////////////////////////////////////////////////
-
-  // Cheat and use the opengl matrix.
-    glPushMatrix();
-    glLoadIdentity();
-  
-    // 1) Apply Object transforms
-    WFMath::Point<3> pos = we->getAbsPos();
-    assert(pos.isValid());
-    glTranslatef(pos.x(), pos.y(), pos.z() );
-    
-    m_renderer->rotateObject(obj, modelRec);
-    
-    // 2) Apply Model Transforms 
-     
-    // Scale Object
-    float scale = modelRec->scale;
-
-    // Do not perform scaling if it is to zero or has no effect
-    if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
-  
-    glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
- 
-    glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
-
-    // 3) Apply final scaling once model is in place
-
-    // Scale model by all bounding box axis
-    if (modelRec->scale_bbox && we->hasBBox()) { 
-      WFMath::AxisBox<3> bbox = we->getBBox();
-      float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
-      float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
-      float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
-
-      glScalef(x_scale, y_scale, z_scale);
-    }
-
-    // Scale model by bounding box height
-    else if (modelRec->scaleByHeight && we->hasBBox()) {
-      WFMath::AxisBox<3> bbox = we->getBBox();
-      float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
-      glScalef(z_scale, z_scale, z_scale);
-    }
-
-    float m[4][4];
-    glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
-
-     // Restore matrix
-    glPopMatrix();
-
-    Matrix mx;
-    mx.setMatrix(m);
-
-////////////////////////////////////////////////////////////////////////////////
-      m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, we));
-      if (m_state_map.find(key) == m_state_map.end()) {
-        m_state_map[key] = state;
-        m_object_map[key] = model->getStaticObjects();
-      }
-    } else {
-      // Add to queue by state, then model record
-      render_queue[state].push_back(Render::QueueItem(obj, modelRec));
-      // m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
-    }
-
-    // Add attached objects to the render queues.
-    if (obj->draw_attached || !obj_we->getAttachments().empty()) {
-      WorldEntity::AttachmentMap::const_iterator it,
-                                      end = obj_we->getAttachments().end();
-
-      for (it = obj_we->getAttachments().begin(); it != end; ++it) {
-        // retrieving the objectRecord also syncs it's pos with the WorldEntity
-        if (!it->second) { continue; }
-        Eris::Entity *ee = it->second.get();
-        WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
-        assert(we != 0);
-
-        PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
-
-        we->setLocalOrient(po.orient);
-
-        if (modelRec->scale_bbox && obj_we->hasBBox()) {
-          WFMath::AxisBox<3> bbox = obj_we->getBBox();
-          float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
-          float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
-          float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
-          po.pos.x() *= x_scale;
-          po.pos.y() *= y_scale;
-          po.pos.z() *= z_scale;
-        }
-        // Scale model by bounding box height
-        else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
-          WFMath::AxisBox<3> bbox = obj_we->getBBox();
-          float scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
-          po.pos *= scale;
-        }
-
-        // Convert Vector<3> to a Point<3>
-        we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
-
-        buildQueues(we,
-                      2, // depth is not used, so no need to give a real value.
-                      select_mode,
-                      render_queue,
-                      message_list,
-                      name_list,
-                      time_elapsed);
-
-      }
-    }
+  if (!select_mode) { // Only needs to be done once a frame
+    obj_we->updateFade(time_elapsed);
   }
-  
+
+ /// TODO: Here we can insert a wireframe model to show the bounding box
+ ///       of an entity ideally via some kind of +show_boundbox command.
+ ///       Ideally we could pop it into the interators. But thats probably
+ ///       not too easily.
+
+  if (m_show_bbox) drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+  for (I = Ibegin; I != Iend; ++I) {
+    drawObjectExt(*I, obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+  }
+ 
   // if rendering, add any messages
   if (!select_mode) {
     name_list.push_back(obj_we);
@@ -681,6 +558,150 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     }
   } // of object models loop
 }
+
+void Graphics::drawObjectExt(const std::string &model_id,
+                        SPtr<ObjectRecord> obj,
+                        WorldEntity *obj_we,
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list,
+                        float time_elapsed) {
+
+  // retrieve or create the model and modelRecord as necessary
+  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(model_id, obj_we);
+  assert(modelRec);
+ 
+  SPtrShutdown<Model> model = modelRec->model;
+  assert(model);
+
+  int state = select_mode ? modelRec->select_state : modelRec->state;
+    
+  if (state <= 0) return; // bad state
+
+  // Update Model
+  if (!select_mode) { // Only needs to be done once a frame
+    obj_we->updateFade(time_elapsed);
+    modelRec->model->update(time_elapsed);
+    modelRec->model->setLastTime(System::instance()->getTimef());
+  } 
+
+  std::string key = modelRec->id;
+
+  if (model->hasStaticObjects()) {
+ 
+// Calculate Transform Matrix //////////////////////////////////////////////////
+
+  // Cheat and use the opengl matrix.
+  glPushMatrix();
+  glLoadIdentity();
+  
+  // 1) Apply Object transforms
+  WFMath::Point<3> pos = obj_we->getAbsPos();
+  assert(pos.isValid());
+  glTranslatef(pos.x(), pos.y(), pos.z() );
+  
+  m_renderer->rotateObject(obj, modelRec);
+    
+  // 2) Apply Model Transforms 
+     
+  // Scale Object
+  float scale = modelRec->scale;
+
+  // Do not perform scaling if it is to zero or has no effect
+  if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+  
+  glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
+ 
+  glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+
+  // 3) Apply final scaling once model is in place
+
+  // Scale model by all bounding box axis
+  if (modelRec->scale_bbox && obj_we->hasBBox()) { 
+    WFMath::AxisBox<3> bbox = obj_we->getBBox();
+    float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+    float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+    float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+
+    glScalef(x_scale, y_scale, z_scale);
+  }
+
+  // Scale model by bounding box height
+  else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
+    WFMath::AxisBox<3> bbox = obj_we->getBBox();
+    float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+    glScalef(z_scale, z_scale, z_scale);
+  }
+
+  float m[4][4];
+  glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
+
+     // Restore matrix
+  glPopMatrix();
+
+  Matrix mx;
+  mx.setMatrix(m);
+
+////////////////////////////////////////////////////////////////////////////////
+    m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, obj_we));
+    if (m_state_map.find(key) == m_state_map.end()) {
+      m_state_map[key] = state;
+      m_object_map[key] = model->getStaticObjects();
+    }
+  } else {
+    // Add to queue by state, then model record
+    render_queue[state].push_back(Render::QueueItem(obj, modelRec));
+    // m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
+  }
+
+  // Add attached objects to the render queues.
+  if (obj->draw_attached || !obj_we->getAttachments().empty()) {
+    WorldEntity::AttachmentMap::const_iterator it,
+                                      end = obj_we->getAttachments().end();
+
+    for (it = obj_we->getAttachments().begin(); it != end; ++it) {
+      // retrieving the objectRecord also syncs it's pos with the WorldEntity
+      if (!it->second) { continue; }
+      Eris::Entity *ee = it->second.get();
+      WorldEntity *we = dynamic_cast<WorldEntity*>(ee);
+      assert(we != 0);
+
+      PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
+
+      we->setLocalOrient(po.orient);
+
+      if (modelRec->scale_bbox && obj_we->hasBBox()) {
+        WFMath::AxisBox<3> bbox = obj_we->getBBox();
+        float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+        float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+        float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+        po.pos.x() *= x_scale;
+        po.pos.y() *= y_scale;
+        po.pos.z() *= z_scale;
+      }
+      // Scale model by bounding box height
+      else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
+        WFMath::AxisBox<3> bbox = obj_we->getBBox();
+        float scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+        po.pos *= scale;
+      }
+
+      // Convert Vector<3> to a Point<3>
+      we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
+
+      buildQueues(we,
+                    2, // depth is not used, so no need to give a real value.
+                    select_mode,
+                    render_queue,
+                    message_list,
+                    name_list,
+                    time_elapsed);
+
+    }
+  }
+}
+
 
 void Graphics::drawFire(WorldEntity* we) {
   // Turn on light source
@@ -862,6 +883,8 @@ void Graphics::registerCommands(Console * console) {
   assert(console);
 
   console->registerCommand("invalidate", this);
+  console->registerCommand("+show_bbox", this);
+  console->registerCommand("-show_bbox", this);
   console->registerCommand("+show_names", this);
   console->registerCommand("-show_names", this);
   console->registerCommand("+select_mode", this);
@@ -875,6 +898,10 @@ void Graphics::runCommand(const std::string &command, const std::string &args) {
   if (command == "invalidate") {
     m_renderer->contextDestroyed(true);
     m_renderer->contextCreated();
+  } else if (command == "+show_bbox") {
+    m_show_bbox = true;
+  } else if (command == "-show_bbox") {
+    m_show_bbox = false;
   } else if (command == "+show_names") {
     m_show_names = true;
   } else if (command == "-show_names") {

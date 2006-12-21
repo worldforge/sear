@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.16 2006-12-02 21:56:55 simon Exp $
+// $Id: Graphics.h,v 1.17 2006-12-21 20:28:07 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -108,7 +108,7 @@ private:
   LightManager *m_lm;
 
   Light m_fire;
-  bool m_show_names;
+  bool m_show_names, m_show_bbox;
   float m_modelview_matrix[4][4];
   float m_medium_dist, m_high_dist;
 
@@ -118,6 +118,15 @@ private:
     Helper to qeueue the models for a single object record
     */
     void drawObject(SPtr<ObjectRecord> obj, 
+                        bool select_mode,
+                        Render::QueueMap &render_queue,
+                        Render::MessageList &message_list,
+                        Render::MessageList &name_list,
+                        float time_elapsed);
+
+     void drawObjectExt(const std::string &model_id,
+                        SPtr<ObjectRecord> obj, 
+                        WorldEntity *obj_we,
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
