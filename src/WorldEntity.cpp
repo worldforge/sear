@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.90 2007-01-09 17:11:21 simon Exp $
+// $Id: WorldEntity.cpp,v 1.91 2007-01-09 17:20:11 simon Exp $
 
 /*
  TODO
@@ -415,28 +415,30 @@ void WorldEntity::updateFade(float f) {
 }
 
 
-static void dumpElement(const std::string &name, const Atlas::Message::Element &e) {
+static void dumpElement(const std::string &prefix, const std::string &name, const Atlas::Message::Element &e) {
+
   if (e.isMap()) {
-    printf("%s: Dumping Map\n", name.c_str());
+    printf("%s%s: Dumping Map\n", prefix.c_str(), name.c_str());
     Atlas::Message::MapType::const_iterator itr = e.asMap().begin();
     Atlas::Message::MapType::const_iterator end = e.asMap().end();
     for (; itr != end; ++itr) {
-      dumpElement(itr->first, itr->second);
+      dumpElement(prefix + "  ", itr->first, itr->second);
     }
-    printf("Finished Dumping Map\n");
+    printf("%sFinished Dumping Map\n", prefix.c_str());
   } else {
-    if (e.isString()) printf("%s: %s\n", name.c_str(), e.asString().c_str());
-    if (e.isNum()) printf("%s: %f\n", name.c_str(), e.asNum());
+    if (e.isString()) printf("%s%s: %s\n", prefix.c_str(), name.c_str(), e.asString().c_str());
+    if (e.isNum()) printf("%s%s: %f\n", prefix.c_str(), name.c_str(), e.asNum());
   }
 }
 
 void WorldEntity::dumpAttributes() const {
+  printf("Dumping attributes for entity %s (%s)\n", getId().c_str(), getName().c_str());
   const Eris::Entity::AttrMap &attribs = getAttributes();
 
   Eris::Entity::AttrMap::const_iterator itr = attribs.begin();
   Eris::Entity::AttrMap::const_iterator end = attribs.end();
   for (; itr != end; ++itr) {
-    dumpElement(itr->first, itr->second);
+    dumpElement("  ",itr->first, itr->second);
   }
 
 }

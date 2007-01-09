@@ -1,5 +1,9 @@
 2007-01-09  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/WorldEntity.cpp: Indent attribute output.
+
+2007-01-09  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/Model.h: Added new methods to interface for outfit stuff.
 
 	* loaders/ObjectRecord.cpp, loaders/ObjectRecord.h: Added hooks to pass
