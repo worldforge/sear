@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.22 2006-10-25 16:25:10 simon Exp $
+// $Id: WireFrame.cpp,v 1.23 2007-01-09 17:44:50 simon Exp $
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -124,6 +124,9 @@ void WireFrame::render(bool) {
   static float specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
   static float diffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
+  // Backup line attribs such as width
+  glPushAttrib(GL_LINE_BIT);
+  glLineWidth(1.0f);
   if (glIsList(m_disp)) {
     glCallList(m_disp);
   } else {
@@ -134,6 +137,7 @@ void WireFrame::render(bool) {
     glEndList();
     glCallList(m_disp);
   }
+  glPopAttrib();
 }
 
 } /* namespace Sear */
