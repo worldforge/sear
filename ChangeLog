@@ -1,3 +1,23 @@
+2007-01-09  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/Model.h: Added new methods to interface for outfit stuff.
+
+	* loaders/ObjectRecord.cpp, loaders/ObjectRecord.h: Added hooks to pass
+	  outfit information to models.
+
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h: Implemented
+	  new outfit related methods.
+
+	* renderers/GL.cpp, renderers/Graphics.cpp: Get const refs rather than
+	  copies of various objects.
+
+	* src/System.cpp: Added a new command to call dumpAttributes for the
+	  currently selected entity.
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: Added a dumpAttributes
+	  function to print all attributes on the stdout. Also hook into the
+	  new outfit map attribute.
+
 2006-12-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp, renderers/Graphics.h: Added a command called

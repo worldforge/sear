@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.160 2006-12-20 11:06:32 simon Exp $
+// $Id: GL.cpp,v 1.161 2007-01-09 17:11:25 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -443,7 +443,6 @@ void GL::buildColourSet() {
   glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
   glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
 
-//  assert(m_colourArray == 0);
   if (m_colourArray != 0) delete [] m_colourArray;
   m_colourArray = new GLubyte[m_redBits * m_greenBits * m_blueBits * 3];
 
@@ -1130,7 +1129,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       glPushMatrix();
 
       // 1) Apply Object transforms
-      WFMath::Point<3> pos = we->getAbsPos();
+      const WFMath::Point<3> &pos = we->getAbsPos();
       assert(pos.isValid());
       glTranslatef(pos.x(), pos.y(), pos.z() );
 
@@ -1151,7 +1150,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       // Scale model by all bounding box axis
       if (model_record->scale_bbox && we->hasBBox()) {
-        WFMath::AxisBox<3> bbox = we->getBBox();
+        const WFMath::AxisBox<3> &bbox = we->getBBox();
         float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
         float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
@@ -1160,7 +1159,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
       }
       // Scale model by bounding box height
       else if (model_record->scaleByHeight && we->hasBBox()) {
-        WFMath::AxisBox<3> bbox = we->getBBox();
+        const WFMath::AxisBox<3> &bbox = we->getBBox();
         float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
         glScalef(z_scale, z_scale, z_scale);
       }
@@ -1202,7 +1201,7 @@ void GL::drawNameQueue(MessageList &list) {
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
     WorldEntity *we = *I;
     glPushMatrix();
-    WFMath::Point<3> pos = we->getAbsPos();
+    const WFMath::Point<3> &pos = we->getAbsPos();
     assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
     WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
@@ -1221,7 +1220,7 @@ void GL::drawMessageQueue(MessageList &list) {
   for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
     WorldEntity *we = *I;
     glPushMatrix();
-    WFMath::Point<3> pos = we->getAbsPos();
+    const WFMath::Point<3> &pos = we->getAbsPos();
     assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
     if (we->screenCoordsRequest() > 0) {

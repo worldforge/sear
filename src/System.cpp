@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.162 2006-11-30 20:30:48 simon Exp $
+// $Id: System.cpp,v 1.163 2007-01-09 17:11:19 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -78,6 +78,7 @@ namespace Sear {
   static const std::string CMD_TOGGLE_MLOOK = "toggle_mlook";
   static const std::string CMD_ADD_EVENT = "event";
   static const std::string CMD_IDENTIFY_ENTITY = "identify";
+  static const std::string CMD_DUMP_ATTRIBUTES = "dump_attributes";
 
   // Config key values  
   static const std::string KEY_mouse_move_select = "mouse_move_select";
@@ -828,6 +829,7 @@ void System::registerCommands(Console *console) {
   console->registerCommand(CMD_TOGGLE_MLOOK, this);
   console->registerCommand(CMD_ADD_EVENT, this);
   console->registerCommand(CMD_IDENTIFY_ENTITY, this);
+  console->registerCommand(CMD_DUMP_ATTRIBUTES, this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -890,7 +892,12 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
   }
-  
+   else if (command == CMD_DUMP_ATTRIBUTES) {
+    if (!m_client->getAvatar()) return;
+    WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
+    if (we) we->dumpAttributes();  
+  }
+ 
   else fprintf(stderr, "[System] Command not found: %s\n", command.c_str());
 }
 

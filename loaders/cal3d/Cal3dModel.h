@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.28 2006-12-21 19:43:29 simon Exp $
+// $Id: Cal3dModel.h,v 1.29 2007-01-09 17:11:25 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -72,6 +72,8 @@ public:
   void addAnimation(const Cal3dCoreModel::WeightList &list);
   void removeAnimation(const Cal3dCoreModel::WeightList &list);
 
+  void clearOutfit();
+  void entityWorn(const std::string &where, WorldEntity *we);
   void entityWorn(WorldEntity *we);
   void entityRemoved(WorldEntity *we);
 

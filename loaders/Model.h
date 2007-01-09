@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.16 2006-12-03 13:38:47 simon Exp $
+//$Id: Model.h,v 1.17 2007-01-09 17:11:25 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -142,6 +142,8 @@ public:
   virtual bool hasStaticObjects() const { return false; }
   virtual StaticObjectList &getStaticObjects() { return m_static_objects; }
 
+  virtual void clearOutfit() {} 
+  virtual void entityWorn(const std::string &where, WorldEntity *we) {}
   virtual void entityWorn(WorldEntity *we) {}
   virtual void entityRemoved(WorldEntity *we) {}
  

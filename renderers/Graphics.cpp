@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.55 2006-12-21 20:28:07 simon Exp $
+// $Id: Graphics.cpp,v 1.56 2007-01-09 17:11:27 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -500,7 +500,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   }
 
   // Get world coord of object
-  WFMath::Point<3> p = obj_we->getAbsPos();
+  const WFMath::Point<3> &p = obj_we->getAbsPos();
   assert(p.isValid());
   // Transform world coord into camera coord
   WFMath::Vector<3> cam_pos(
@@ -586,7 +586,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
     modelRec->model->setLastTime(System::instance()->getTimef());
   } 
 
-  std::string key = modelRec->id;
+  const std::string &key = modelRec->id;
 
   if (model->hasStaticObjects()) {
  
@@ -597,7 +597,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
   glLoadIdentity();
   
   // 1) Apply Object transforms
-  WFMath::Point<3> pos = obj_we->getAbsPos();
+  const WFMath::Point<3> &pos = obj_we->getAbsPos();
   assert(pos.isValid());
   glTranslatef(pos.x(), pos.y(), pos.z() );
   
@@ -672,7 +672,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
       we->setLocalOrient(po.orient);
 
       if (modelRec->scale_bbox && obj_we->hasBBox()) {
-        WFMath::AxisBox<3> bbox = obj_we->getBBox();
+        const WFMath::AxisBox<3> &bbox = obj_we->getBBox();
         float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
         float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
         float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
@@ -741,13 +741,13 @@ void Graphics::readConfig(varconf::Config &config) {
 //    m_low_dist = DEFAULT_low_dist;
 //  } 
   if (config.findItem(GRAPHICS, KEY_medium_dist)) {
-    temp =  config.getItem(GRAPHICS, KEY_medium_dist);
+    temp = config.getItem(GRAPHICS, KEY_medium_dist);
     m_medium_dist = (!temp.is_double()) ? (DEFAULT_medium_dist) : ((double)(temp));
   } else {
     m_medium_dist = DEFAULT_medium_dist;
   } 
   if (config.findItem(GRAPHICS, KEY_high_dist)) {
-    temp =  config.getItem(GRAPHICS, KEY_high_dist);
+    temp = config.getItem(GRAPHICS, KEY_high_dist);
     m_high_dist = (!temp.is_double()) ? (DEFAULT_high_dist) : ((double)(temp));
   } else {
     m_high_dist = DEFAULT_high_dist;

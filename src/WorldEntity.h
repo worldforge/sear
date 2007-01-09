@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.41 2006-12-12 22:31:15 simon Exp $
+// $Id: WorldEntity.h,v 1.42 2007-01-09 17:11:22 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -123,6 +123,8 @@ public:
     m_fade_in = false;
   }
 
+  void dumpAttributes() const;
+
 protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
@@ -137,6 +139,7 @@ protected:
   void onAttrChanged(const std::string& attr, const Atlas::Message::Element& v);
   void locationChanged(Eris::Entity *loc);
   void onSightAttached(Eris::Entity* ent, const std::string slot);
+  void onSightOutfit(Eris::Entity* ent, const std::string where);
   void onAction(const Atlas::Objects::Operation::RootOperation &action);
   void onChildEntityAdded(Eris::Entity*);
   void onChildEntityRemoved(Eris::Entity*);

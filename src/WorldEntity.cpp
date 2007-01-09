@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.89 2006-12-12 22:31:15 simon Exp $
+// $Id: WorldEntity.cpp,v 1.90 2007-01-09 17:11:21 simon Exp $
 
 /*
  TODO
@@ -314,13 +314,46 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
     }
   } else if (str == "status") {
     m_status = v.asNum();
+  } else if (str == "outfit") {
+    printf("Changed: Outfit\n");
+  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
+    if (!record) return;
+    record->clearOutfit();
+
+    if (v.isMap() == true) {
+      Atlas::Message::MapType mt = v.asMap();
+      Atlas::Message::MapType::iterator I = mt.begin();
+      while (I != mt.end()) {
+        if (I->second.isString()) {
+          std::string where = I->first;
+          std::string id = I->second.asString();
+          printf("%s -> %s\n", I->first.c_str(), I->second.asString().c_str());
+          WorldEntity *we = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
+          if (we) record->entityWorn(where, we);
+else {
+        Eris::View::EntitySightSlot ess(sigc::bind( 
+          sigc::mem_fun(this, &WorldEntity::onSightOutfit),
+          where));
+        getView()->notifyWhenEntitySeen(id, ess);
+
+}
+        }
+        ++I;
+      }
+    }    
   }
+}
+
+void WorldEntity::onSightOutfit(Eris::Entity *ent, std::string where) {
+  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
+          WorldEntity *we = dynamic_cast<WorldEntity*>(ent);
+          if (we) record->entityWorn(where, we);
 }
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
   printf("Slot is %s\n", slot.c_str());
-    m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
+  m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
 }
 
 void WorldEntity::rotateBBox(const WFMath::Quaternion &q)
@@ -349,13 +382,13 @@ void WorldEntity::locationChanged(Eris::Entity *loc) {
 }
 
 void WorldEntity::onChildEntityAdded(Eris::Entity *e) {
-  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
-  if (record) record->entityWorn(dynamic_cast<WorldEntity*>(e));
+//  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
+//  if (record) record->entityWorn(dynamic_cast<WorldEntity*>(e));
 }
 
 void WorldEntity::onChildEntityRemoved(Eris::Entity *e) {
-  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
-  if (record) record->entityRemoved(dynamic_cast<WorldEntity*>(e));
+//  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
+//  if (record) record->entityRemoved(dynamic_cast<WorldEntity*>(e));
 }
 
 void WorldEntity::onBeingDeleted() {
@@ -379,6 +412,33 @@ void WorldEntity::updateFade(float f) {
     m_fade = 1.0f;
     m_fading = false;
   }
+}
+
+
+static void dumpElement(const std::string &name, const Atlas::Message::Element &e) {
+  if (e.isMap()) {
+    printf("%s: Dumping Map\n", name.c_str());
+    Atlas::Message::MapType::const_iterator itr = e.asMap().begin();
+    Atlas::Message::MapType::const_iterator end = e.asMap().end();
+    for (; itr != end; ++itr) {
+      dumpElement(itr->first, itr->second);
+    }
+    printf("Finished Dumping Map\n");
+  } else {
+    if (e.isString()) printf("%s: %s\n", name.c_str(), e.asString().c_str());
+    if (e.isNum()) printf("%s: %f\n", name.c_str(), e.asNum());
+  }
+}
+
+void WorldEntity::dumpAttributes() const {
+  const Eris::Entity::AttrMap &attribs = getAttributes();
+
+  Eris::Entity::AttrMap::const_iterator itr = attribs.begin();
+  Eris::Entity::AttrMap::const_iterator end = attribs.end();
+  for (; itr != end; ++itr) {
+    dumpElement(itr->first, itr->second);
+  }
+
 }
 
 

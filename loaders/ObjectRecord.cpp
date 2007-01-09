@@ -71,6 +71,38 @@ void ObjectRecord::setAppearance(const Atlas::Message::MapType &map) {
   }
 }
 
+void ObjectRecord::clearOutfit() {
+  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->clearOutfit();
+  }
+  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->clearOutfit();
+  }
+  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->clearOutfit();
+  }  
+}
+
+
+void ObjectRecord::entityWorn(const std::string &where, WorldEntity *we) {
+  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->entityWorn(where, we);
+  }
+  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->entityWorn(where, we);
+  }
+  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
+    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+    if (rec && rec->model) rec->model->entityWorn(where, we);
+  }  
+}
+
+
 void ObjectRecord::entityWorn(WorldEntity *we) {
   for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
     SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
