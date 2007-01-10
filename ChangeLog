@@ -1,3 +1,10 @@
+2007-01-10  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Camera.cpp, renderers/Camera.h, renderers/GL.cpp,
+	  renderers/Graphics.cpp, renderers/Render.h, 
+	  renderers/RenderSystem.cpp: Added an isometric camera type, accessible
+	  with the "/switch_camera 2" command.
+
 2007-01-09  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/WireFrame.cpp: Make lines thinner and backup previous state.

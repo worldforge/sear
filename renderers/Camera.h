@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006
 
-// $Id: Camera.h,v 1.8 2006-02-27 17:52:36 simon Exp $
+// $Id: Camera.h,v 1.9 2007-01-10 17:36:22 simon Exp $
 
 #ifndef SEAR_CAMERA_H
 #define SEAR_CAMERA_H 1
@@ -35,6 +35,7 @@ public:
   typedef enum {
     CAMERA_CHASE = 0,
     CAMERA_FIRST,
+    CAMERA_ISOMETRIC,
     CAMERA_LAST
   } CameraType;
 

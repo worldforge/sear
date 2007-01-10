@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.19 2006-12-03 13:38:48 simon Exp $
+// $Id: RenderSystem.cpp,v 1.20 2007-01-10 17:36:23 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -73,6 +73,13 @@ void RenderSystem::init() {
   cam->init();
   cam->setType(Camera::CAMERA_FIRST);
   m_cameraSystem->addCamera(cam);
+
+  cam = new Camera();
+  cam->init();
+  cam->setType(Camera::CAMERA_ISOMETRIC);
+  m_cameraSystem->addCamera(cam);
+  // Set default to chase cam
+
   // Set default to chase cam
   m_cameraSystem->setCurrentCamera(pos);
 

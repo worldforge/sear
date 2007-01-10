@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.56 2007-01-09 17:11:27 simon Exp $
+// $Id: Graphics.cpp,v 1.57 2007-01-10 17:36:23 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -337,7 +337,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     // Draw Sky box, requires the rotation to be done before any translation to
     // keep the camera centered
-    if (!select_mode) {
+    if (!select_mode && cam->getType() != Camera::CAMERA_ISOMETRIC) {
       glPushMatrix();
       m_renderer->applyQuaternion(m_orient.inverse());
       Environment::getInstance().renderSky();

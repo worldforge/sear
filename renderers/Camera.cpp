@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.9 2006-04-26 14:39:00 simon Exp $
+// $Id: Camera.cpp,v 1.10 2007-01-10 17:36:22 simon Exp $
 
 #include <string>
 
@@ -22,6 +22,10 @@
 #else
   static const bool debug = false;
 #endif
+
+
+
+static const WFMath::Quaternion QUAT_elevation_45(0, WFMath::Pi / 4.0f);
 
 namespace Sear {
 	
@@ -121,7 +125,11 @@ void Camera::updateCameraPos(float time_elapsed) {
 
 void Camera::updateValues() {
   m_orient.rotation(2, m_rotation);
-  m_orient.rotate(WFMath::Quaternion(0, m_elevation));
+  if (m_type == CAMERA_ISOMETRIC) {
+    m_orient.rotate(QUAT_elevation_45);
+  } else {
+    m_orient.rotate(WFMath::Quaternion(0, m_elevation));
+  }
 
   WFMath::Vector<3> v(0.0f, -m_distance, 0.0f);
   v.rotate(m_orient.inverse());

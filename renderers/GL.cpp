@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.161 2007-01-09 17:11:25 simon Exp $
+// $Id: GL.cpp,v 1.162 2007-01-10 17:36:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -37,6 +37,7 @@
 
 #include "src/Calendar.h"
 #include "Camera.h"
+#include "CameraSystem.h"
 #include "src/Console.h"
 #include "Frustum.h"
 #include "Graphics.h"
@@ -1020,9 +1021,26 @@ inline void GL::scaleObject(float scale) {
 }
 
 void GL::setViewMode(int type) {
+  if (type == CAMERA) {
+    if (RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->getType() == Camera::CAMERA_ISOMETRIC) 
+      type = ISOMETRIC;
+    else type = PERSPECTIVE;
+  }
 //  Perspective
   glViewport(0, 0, m_width, m_height);
   switch (type) {
+    case ISOMETRIC: {
+      if (m_height == 0) m_height = 1;
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity(); // Reset The Projection Matrix
+  
+      // Calculate The Aspect Ratio Of The Window
+      //gluPerspective(m_fov,(GLfloat)m_width/(GLfloat)m_height, m_near_clip, m_far_clip_dist);
+      glOrtho(-10,10,-10,10,-10,m_far_clip_dist);
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      break;
+    }
     case PERSPECTIVE: {
       if (m_height == 0) m_height = 1;
       glMatrixMode(GL_PROJECTION);
@@ -1040,9 +1058,6 @@ void GL::setViewMode(int type) {
       glOrtho(0, m_width, 0 , m_height, -1, 1); // Set Up An Ortho Screen
       glMatrixMode(GL_MODELVIEW); // Select The Modelview Matrix
       glLoadIdentity();
-      break;
-    }			    
-    case ISOMETRIC: {
       break;
     }			    
   }	
@@ -1280,7 +1295,8 @@ inline void GL::beginFrame() {
   }
 // TODO remove -- can't! it is required for the skybox
   glClear(GL_COLOR_BUFFER_BIT);
-  glLoadIdentity(); // Reset The View
+  setViewMode(CAMERA);
+//  glLoadIdentity(); // Reset The View
   //Rotate Coordinate System so Z points upwards and Y points into the screen. 
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
 }
@@ -1582,7 +1598,8 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
       return false;
   }
 
-  setViewMode(PERSPECTIVE);
+  setViewMode(CAMERA);
+//  setViewMode(PERSPECTIVE);
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
   m_graphics->setCameraTransform();
   if (debug) printf("Screen Coord: %d %d %f\n", x, y, z);

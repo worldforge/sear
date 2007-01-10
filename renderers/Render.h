@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.19 2006-12-03 13:38:48 simon Exp $
+// $Id: Render.h,v 1.20 2007-01-10 17:36:23 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -38,6 +38,7 @@ class Mesh;
 #define PERSPECTIVE (0)
 #define ORTHOGRAPHIC (1)
 #define ISOMETRIC (2)
+#define CAMERA (2)
 
 class Render {
 
