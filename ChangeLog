@@ -1,5 +1,10 @@
 2007-01-11  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* guichan/CharacterWindo.cpp: Fix bug where double clicking on a
+	  character could fail with a message saying to select a character.
+
+2007-01-11  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/CharacterWindow.cpp: Move widgets about to allow for a much
 	  larger drop down list box.
 
