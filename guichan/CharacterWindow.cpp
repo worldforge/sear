@@ -163,35 +163,28 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   hbox = new gcn::HBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
-  hbox->pack(vbox1);
-
-  TypeListModel * type_list_model = new TypeListModel;
-  
-  //m_types = new gcn::ListBox(type_list_model);
-  m_types = new gcn::DropDown(type_list_model);
-  m_widgets.push_back(SPtr<gcn::Widget>(m_types));
-//  scroll_area = new gcn::ScrollArea(m_types,
-//                                      gcn::ScrollArea::SHOW_NEVER,
-//                                      gcn::ScrollArea::SHOW_ALWAYS);
-//  m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
-//  scroll_area->setWidth(100);
-//  scroll_area->setHeight(vbox1->getHeight());
-//  scroll_area->setBorderSize(1);
-  hbox->pack(m_types);
-
-  vbox->pack(hbox);
-
-  hbox = new gcn::HBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+    vbox->pack(hbox);
 
   m_charButton = new gcn::Button("Create new character");
   m_widgets.push_back(SPtr<gcn::Widget>(m_charButton));
   m_charButton->setFocusable(false);
   m_charButton->setEventId("create");
   m_charButton->addActionListener(m_buttonListener);
-  hbox->pack(m_charButton);
+  vbox1->pack(m_charButton);
 
+  hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+
+
+  hbox->pack(vbox1);
+
+  TypeListModel * type_list_model = new TypeListModel;
+  m_types = new gcn::DropDown(type_list_model);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_types));
   vbox->pack(hbox);
+  hbox->pack(m_types);
+
+
 
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));

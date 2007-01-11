@@ -1,3 +1,8 @@
+2007-01-11  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/CharacterWindow.cpp: Move widgets about to allow for a much
+	  larger drop down list box.
+
 2007-01-10  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Camera.cpp, renderers/Camera.h, renderers/GL.cpp,
