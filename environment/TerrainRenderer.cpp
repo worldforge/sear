@@ -275,8 +275,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
   for (; I != K; ++I) {
     const Terrain::Segmentcolumn & col = I->second;
-    TerrainRenderer::DisplayListStore::iterator M =
-    m_displayLists.find (I->first);
+    TerrainRenderer::DisplayListStore::iterator M = m_displayLists.find (I->first);
 
     Terrain::Segmentcolumn::const_iterator J = col.lower_bound (lowYBound);
     Terrain::Segmentcolumn::const_iterator L = col.upper_bound (upYBound);
@@ -308,6 +307,12 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
       DisplayListColumn & dcol = (M == m_displayLists.end ())? m_displayLists[I->first] : M->second;
       DisplayListColumn::iterator N = dcol.find (J->first);
 
+      // TerrainSegment invalidated -- lets get rid of it.
+      if (!s->isValid () && N != dcol.end()) {
+        N->second.contextDestroyed(true);
+        dcol.erase(N);
+        N  = dcol.end();
+      }
       if (N == dcol.end ()) {
 
         if (!s->isValid ()) {
