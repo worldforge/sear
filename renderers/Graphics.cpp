@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.59 2007-01-12 17:33:45 simon Exp $
+// $Id: Graphics.cpp,v 1.60 2007-01-12 19:21:24 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -541,11 +541,19 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     obj_we->updateFade(time_elapsed);
   }
 
- /// Here we can insert a wireframe model to show the bounding box
- /// of an entity using the +show_bbox command.
+  // Here we can insert a wireframe model to show the bounding box
+  // of an entity using the +show_bbox command.
+  if (m_show_bbox && obj_we->hasBBox()) {
+    // Make sure we don't redraw the attached objects
+    bool da = obj->draw_attached;
+    obj->draw_attached = false;
+    drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+    obj->draw_attached = da;
+  }
 
-  if (m_show_bbox && obj_we->hasBBox()) drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
-
+  // BUG: If there is more than one model to render, then each model will 
+  //      try to add any attached meshes to the render queue. This means the 
+  //      same entity can be rendered multiple times!
   for (I = Ibegin; I != Iend; ++I) {
     drawObjectExt(*I, obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
   }
@@ -656,7 +664,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
   }
 
   // Add attached objects to the render queues.
-  if (obj->draw_attached || !obj_we->getAttachments().empty()) {
+  if (obj->draw_attached && !obj_we->getAttachments().empty()) {
     WorldEntity::AttachmentMap::const_iterator it,
                                       end = obj_we->getAttachments().end();
 
