@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.164 2007-01-12 10:26:33 simon Exp $
+// $Id: System.cpp,v 1.165 2007-01-12 12:04:06 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -774,10 +774,10 @@ void System::readConfig(varconf::Config &config) {
   if (config.findItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK)) {
     temp = config.getItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK);
     if (!temp.is_bool()) {
-      config.setItem(SECTION_INPUT, DEFAULT_disable_joystick);
+      config.setItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK, DEFAULT_disable_joystick);
     }
   } else {
-    config.setItem(SECTION_INPUT, DEFAULT_disable_joystick);
+    config.setItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK, DEFAULT_disable_joystick);
   }
 
   m_client->readConfig(config);
