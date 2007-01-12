@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.58 2007-01-12 10:26:31 simon Exp $
+// $Id: Graphics.cpp,v 1.59 2007-01-12 17:33:45 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -541,12 +541,11 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     obj_we->updateFade(time_elapsed);
   }
 
- /// TODO: Here we can insert a wireframe model to show the bounding box
- ///       of an entity ideally via some kind of +show_boundbox command.
- ///       Ideally we could pop it into the interators. But thats probably
- ///       not too easily.
+ /// Here we can insert a wireframe model to show the bounding box
+ /// of an entity using the +show_bbox command.
 
-  if (m_show_bbox) drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+  if (m_show_bbox && obj_we->hasBBox()) drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+
   for (I = Ibegin; I != Iend; ++I) {
     drawObjectExt(*I, obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
   }
