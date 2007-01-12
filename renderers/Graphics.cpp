@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.57 2007-01-10 17:36:23 simon Exp $
+// $Id: Graphics.cpp,v 1.58 2007-01-12 10:26:31 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -459,15 +459,16 @@ void Graphics::buildQueues(WorldEntity *we,
   }
   
   // Draw any contained objects
-  if (obj->draw_members) {
-    for (unsigned int i = 0; i < we->numContained(); ++i) {
-          buildQueues(static_cast<WorldEntity*>(we->getContained(i)),
-                      depth + 1,
-                      select_mode,
-                      render_queue,
-                      message_list,
-                      name_list,
-                      time_elapsed);
+  for (unsigned int i = 0; i < we->numContained(); ++i) {
+    WorldEntity *wec = static_cast<WorldEntity*>(we->getContained(i));
+    if (obj->draw_members || wec->type() == "fire") {
+      buildQueues(wec,
+                  depth + 1,
+                  select_mode,
+                  render_queue,
+                  message_list,
+                  name_list,
+                  time_elapsed);
     }
   } // of draw_members case
 }

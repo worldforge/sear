@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.163 2007-01-09 17:11:19 simon Exp $
+// $Id: System.cpp,v 1.164 2007-01-12 10:26:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,6 +110,7 @@ namespace Sear {
   static const int DEFAULT_key_repeat_rate = 500;
   static const bool DEFAULT_fullscreen = false;
   static const unsigned int DEFAULT_delay = 0;
+  static const bool DEFAULT_disable_joystick = true;
  
 System *System::m_instance = NULL;
 
@@ -206,9 +207,49 @@ bool System::init(int argc, char *argv[]) {
 
   m_workarea = SPtr<Workarea>(new Workarea(this));
 
+#if 1
+  m_sound = SPtrShutdown<Sound>(new Sound());
+  if (m_sound->init()) {
+    m_sound.release();
+  } else { 
+    m_sound->registerCommands(m_console.get());
+  }
+#else
+  #warning Sound Disabled
+#endif
+  RenderSystem::getInstance().init();
+  RenderSystem::getInstance().registerCommands(m_console.get());
+  ModelSystem::getInstance().init();
+  ModelSystem::getInstance().registerCommands(m_console.get());
+//  CacheManager::getInstance().init();
+
+  // Register StaticObject with CacheManager
+//  StaticObject *so = new StaticObject();
+//  CacheManager::getInstance().addType(so);
+//  delete so;
+  
+ 
+  Environment::getInstance().init();
+
+  if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
+
+  FileHandler::FileSet startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
+  FileHandler::FileSet::const_iterator I = startup_scripts.begin();
+  FileHandler::FileSet::const_iterator Iend = startup_scripts.end();
+  for (; I != Iend; ++I) {
+    m_script_engine->runScript(*I);
+  }
+
+  // Pass command line into general varconf object for processing
+  m_general.getCmdline(argc, argv);
+  readConfig(m_general);
+  RenderSystem::getInstance().readConfig(m_general);
+  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_general_callback));
+
+  // Enable Joysticks if requested
   int sticks = SDL_NumJoysticks();
 
-  if (m_general.findItem(SECTION_INPUT, KEY_MOVE_AXIS))  {
+  if (m_general.findItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK))  {
     if ((bool)m_general.getItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK)) {
       sticks = 0;
     }
@@ -246,42 +287,8 @@ bool System::init(int argc, char *argv[]) {
         m_axisBindings[3] = AXIS_ELEVATE;
   }
 
-#if 1
-  m_sound = SPtrShutdown<Sound>(new Sound());
-  if (m_sound->init()) {
-    m_sound.release();
-  } else { 
-    m_sound->registerCommands(m_console.get());
-  }
-#else
-  #warning Sound Disabled
-#endif
-  RenderSystem::getInstance().init();
-  RenderSystem::getInstance().registerCommands(m_console.get());
-  ModelSystem::getInstance().init();
-  ModelSystem::getInstance().registerCommands(m_console.get());
-//  CacheManager::getInstance().init();
 
-  // Register StaticObject with CacheManager
-//  StaticObject *so = new StaticObject();
-//  CacheManager::getInstance().addType(so);
-//  delete so;
-  
- 
-  Environment::getInstance().init();
 
-  if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
-
-  FileHandler::FileSet startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
-  for (FileHandler::FileSet::const_iterator I = startup_scripts.begin(); I != startup_scripts.end(); ++I) {
-    m_script_engine->runScript(*I);
-  }
-
-  // Pass command line into general varconf object for processing
-  m_general.getCmdline(argc, argv);
-  readConfig(m_general);
-  RenderSystem::getInstance().readConfig(m_general);
-  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_general_callback));
 
   // Try and create the window
   bool success;
@@ -762,8 +769,16 @@ void System::readConfig(varconf::Config &config) {
     m_delay = DEFAULT_delay;
   }
 
-
-
+  // This parameter is read during init, so we are just making sure
+  // a value is set
+  if (config.findItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK)) {
+    temp = config.getItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK);
+    if (!temp.is_bool()) {
+      config.setItem(SECTION_INPUT, DEFAULT_disable_joystick);
+    }
+  } else {
+    config.setItem(SECTION_INPUT, DEFAULT_disable_joystick);
+  }
 
   m_client->readConfig(config);
   RenderSystem::getInstance().readConfig(config);

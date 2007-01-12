@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.23 2006-10-08 14:51:49 simon Exp $
+// $Id: FileHandler.cpp,v 1.24 2007-01-12 10:26:33 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -199,14 +199,16 @@ FileHandler::FileList FileHandler::getFilePaths(const std::string &str) {
   // Next we loop through each file path var and each path until we find
   // one that is a real file. Otherwise we just return the expanded string.
   StringListMap::const_iterator I = m_file_map.begin();
-  while (I != m_file_map.end()) {
+  StringListMap::const_iterator Iend = m_file_map.end();
+  while (I != Iend) {
     std::string key = "${" + I->first + "}";
     std::string::size_type pos = cpy.find(key);
 
     if (pos != std::string::npos) {
       StringList l = I->second;
       StringList::const_iterator J = l.begin();
-      while (J != l.end()) {
+      StringList::const_iterator Jend = l.end();
+      while (J != Jend) {
         std::string cpy2 = cpy;
         std::string value = *J;
         cpy2.replace(pos, key.length(), value);
@@ -246,7 +248,9 @@ void FileHandler::removeSearchPath(const std::string &searchpath) {
 }
 
 std::string FileHandler::findFile(const std::string &filename) {
-  for (FileSet::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
+  FileSet::const_iterator I = m_searchpaths.begin();
+  FileSet::const_iterator Iend = m_searchpaths.end();
+  for (;I != Iend; ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
         return filepath;
@@ -256,7 +260,9 @@ std::string FileHandler::findFile(const std::string &filename) {
 
 FileHandler::FileSet FileHandler::getAllinSearchPaths(const std::string &filename) {
   FileSet l;
-  for (FileSet::const_iterator I = m_searchpaths.begin(); I != m_searchpaths.end(); ++I) {
+  FileSet::const_iterator I = m_searchpaths.begin();
+  FileSet::const_iterator Iend = m_searchpaths.end();
+  for (;I != Iend; ++I) {
     std::string filepath = *I + "/" + filename;
     if (exists(filepath))
       l.insert(filepath);
@@ -329,7 +335,9 @@ void FileHandler::expandString(std::string &str) {
   bool changed = true;
   while (changed) {
     changed = false;
-    for (VarMap::const_iterator I = m_varMap.begin(); I != m_varMap.end(); ++I) {
+    VarMap::const_iterator I = m_varMap.begin();
+    VarMap::const_iterator Iend = m_varMap.end();
+    for (; I != Iend; ++I) {
       std::string var = I->first;
       std::string value = I->second;
       std::string new_var = "${" + var + "}";
@@ -339,8 +347,6 @@ void FileHandler::expandString(std::string &str) {
         p += value.length();
         changed = true;
      }
-  
-  //    replace(str.begin(), str.end(), "${" + var + "}", value);
     }
   }
 }

@@ -1,6 +1,19 @@
+2007-01-12  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Graphics.cpp: Always render fire entities contained within
+	  another entity.
+
+	* src/FileHandler.cpp, src/TerrainEntity.cpp: Cache many uses of
+	  const_iterator.end() outside a loop declaration.
+
+	* src/System.cpp: Cache many uses of const_iterator.end() outside a loop
+	  declaration. Disable joysticks by default. Move joystick 
+	  initialisation after startup scripts have been processed so custom
+	  enabling will work.
+
 2007-01-11  Simon Goodall  <sear@simongoodall.co.uk>
 
-	* guichan/CharacterWindo.cpp: Fix bug where double clicking on a
+	* guichan/CharacterWindow.cpp: Fix bug where double clicking on a
 	  character could fail with a message saying to select a character.
 
 2007-01-11  Simon Goodall  <sear@simongoodall.co.uk>

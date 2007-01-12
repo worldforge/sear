@@ -3,7 +3,7 @@
 // Copyright (C) 2002 - 2003 Alistair Riddoch
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.cpp,v 1.5 2006-11-30 20:30:49 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.6 2007-01-12 10:26:33 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -23,7 +23,8 @@ TerrainEntity::TerrainEntity(const std::string &id, Eris::TypeInfo *ty, Eris::Vi
   
 void TerrainEntity::changed(const Eris::StringSet &s) {
   Eris::StringSet::const_iterator I = s.begin();
-  while (I != s.end()) {
+  Eris::StringSet::const_iterator Iend = s.end();
+  while (I != Iend) {
     if (*I == "terrain") updateTerrain();
     ++I;
   }
@@ -50,7 +51,8 @@ void TerrainEntity::updateTerrain() {
     // Legacy support for old list format.
     const Atlas::Message::ListType & plist = I->second.asList();
     Atlas::Message::ListType::const_iterator J = plist.begin();
-    for(; J != plist.end(); ++J) {
+    Atlas::Message::ListType::const_iterator Jend = plist.end();
+    for(; J != Jend; ++J) {
       if (!J->isList()) {
         std::cout << "Non list in points" << std::endl << std::flush;
         continue;
@@ -71,7 +73,8 @@ void TerrainEntity::updateTerrain() {
   } else if (I->second.isMap()) {
     const Atlas::Message::MapType & plist = I->second.asMap();
     Atlas::Message::MapType::const_iterator J = plist.begin();
-    for(; J != plist.end(); ++J) {
+    Atlas::Message::MapType::const_iterator Jend = plist.end();
+    for(; J != Jend; ++J) {
       if (!J->second.isList()) {
         std::cout << "Non list in points" << std::endl << std::flush;
         continue;
