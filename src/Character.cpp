@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.86 2006-11-30 20:30:48 simon Exp $
+// $Id: Character.cpp,v 1.87 2007-01-15 20:50:39 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -49,7 +49,7 @@ using Atlas::Objects::Entity::Anonymous;
 #endif
 
 //  Wrap angle around it required.
-float limitAngle(float a) {
+static float limitAngle(float a) {
   static float p2 = M_PI * 2.0;
   while (a > M_PI) a -= p2;
   while (a < -M_PI) a += p2;
@@ -97,11 +97,10 @@ namespace Sear {
   static const std::string CMD_ATTACK = "attack";
   static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
   
-  static const std::string CMD_SET_APPEARANCE = "set_app";
-  static const std::string CMD_RESET_APPEARANCE = "clear_app";
-  static const std::string CMD_READ_APPEARANCE = "read_app";
+//  static const std::string CMD_SET_APPEARANCE = "set_app";
+//  static const std::string CMD_RESET_APPEARANCE = "clear_app";
+//  static const std::string CMD_READ_APPEARANCE = "read_app";
   static const std::string CMD_SET_HEIGHT = "set_height";
-  static const std::string CMD_SET_ACTION = "set_action";
 
   static const int server_update_interval = 500;
 
@@ -332,7 +331,6 @@ void Character::getEntity(const std::string &id) {
   Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
   if (!e) return;
   m_avatar->take(e);
-  setAction("pickup");
 }
 
 void Character::dropEntity(const std::string &name, int quantity) {
@@ -351,7 +349,6 @@ void Character::dropEntity(const std::string &name, int quantity) {
       --quantity;
     }
   }
-  setAction("drop");
 }
 
 void Character::touchEntity(const std::string &id) {
@@ -360,7 +357,6 @@ void Character::touchEntity(const std::string &id) {
   Eris::EntityPtr e = m_avatar->getView()->getEntity(id);
   if (!e) return;
   m_avatar->touch(e);
-  setAction("touch");
 }
 
 void Character::wieldEntity(const std::string &name) {
@@ -413,7 +409,6 @@ void Character::useToolOnEntity(const std::string & id,
   if (!e) return;
 
   m_avatar->useOn(e, pos, std::string());
-  setAction("use");
 }
 
 void Character::attackEntity(const std::string& id) {
@@ -424,7 +419,6 @@ void Character::attackEntity(const std::string& id) {
   if (!e) return;
 
   m_avatar->attack(e);
-  setAction("attack");
 }
 
 void Character::becomeIdle() {
@@ -537,7 +531,6 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
       quantity--;
     }
   }
-  setAction("give");
 }
 
 void Character::registerCommands(Console *console) {
@@ -578,11 +571,11 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_IDLE, this);
   console->registerCommand(CMD_WIELD, this);
   console->registerCommand(CMD_ATTACK, this);
-  console->registerCommand(CMD_SET_APPEARANCE, this);
-  console->registerCommand(CMD_RESET_APPEARANCE, this);
-  console->registerCommand(CMD_READ_APPEARANCE, this);
+//  console->registerCommand(CMD_SET_APPEARANCE, this);
+  //console->registerCommand(CMD_RESET_APPEARANCE, this);
+//  console->registerCommand(CMD_READ_APPEARANCE, this);
   console->registerCommand(CMD_SET_HEIGHT, this);
-  console->registerCommand(CMD_SET_ACTION, this);
+//  console->registerCommand(CMD_SET_ACTION, this);
   console->registerCommand(CMD_DISPLAY_USE_OPS, this);
 }
 
@@ -666,13 +659,14 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_ATTACK) {
     System::instance()->setAction(ACTION_ATTACK);
   }
-  else if (command == CMD_RESET_APPEARANCE) clearApp();
+//  else if (command == CMD_RESET_APPEARANCE) clearApp();
   else if (command == CMD_SET_HEIGHT) {
     std::string hStr = tokeniser.nextToken();
     float h;
     cast_stream(hStr, h);
     setHeight(h);
   }
+/*
   else if (command == CMD_SET_APPEARANCE) {
     std::string map = tokeniser.nextToken();
     std::string name = tokeniser.nextToken();
@@ -692,9 +686,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
       if (record) record->setAppearance(mt); // mt is empty, i.e defaults
     }
   }
-  else if (command == CMD_SET_ACTION) {
-    setAction(args);
-  }
+*/
 }
 
 void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
@@ -774,21 +766,6 @@ void Character::setHeight(float height) {
   msg->setId(m_self->getId());
   msg->setObjtype("obj");
   msg->setAttr(HEIGHT, height);
-
-  set->setArgs1(msg);
-  m_avatar->getConnection()->send(set);
-}
-
-void Character::setAction(const std::string &action) {
-  assert ((m_initialised == true) && "Character not initialised");
-
-  Atlas::Objects::Operation::Set set;
-  set->setFrom(m_self->getId());
-
-  Anonymous msg;
-  msg->setId(m_self->getId());
-  msg->setObjtype("obj");
-  msg->setAttr("action", action);
 
   set->setArgs1(msg);
   m_avatar->getConnection()->send(set);

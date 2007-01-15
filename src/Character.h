@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.44 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: Character.h,v 1.45 2007-01-15 20:50:40 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -122,7 +122,6 @@ public:
   void sendGuise(const Atlas::Message::Element& guise);
   void clearApp();
   void setHeight(float);
-  void setAction(const std::string &action);
 
   void setAvatar(Eris::Avatar *avatar);
   const InventoryMap &getInventoryMap() const { return m_imap; }

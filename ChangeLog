@@ -1,3 +1,11 @@
+2007-01-15 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/Calendar.cpp: Get a const ref to the DateTime object.
+
+	* src/Character.cpp, src/Character.h: Remove the obsolete setAction
+	  method as it sends an update the server. Disabled the guise related
+	  code as it has been replaced.
+
 2007-01-12  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Fix bug where +show_bbox would cause an 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.28 2006-12-21 19:43:28 simon Exp $
+// $Id: Calendar.cpp,v 1.29 2007-01-15 20:50:40 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -122,7 +122,7 @@ void Calendar::update() {
 
 //  if (!m_cal) return;
 
-  Eris::DateTime dt = m_cal->now();
+  const Eris::DateTime &dt = m_cal->now();
 
 //  assert(dt.valid());
   if (dt.valid() == false) return;
