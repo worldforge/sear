@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.45 2007-01-15 20:50:40 simon Exp $
+// $Id: Character.h,v 1.46 2007-01-21 17:46:34 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -141,6 +141,7 @@ private:
   WorldEntity* findInInventory(const std::string& name);
   void onChildAdded(Eris::Entity*);
   void onChildRemoved(Eris::Entity*);
+  void renameEntity(Eris::Entity *e, const std::string &name);
  
   Eris::Avatar *m_avatar;
   Eris::EntityRef m_self;

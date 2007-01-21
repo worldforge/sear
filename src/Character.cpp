@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.87 2007-01-15 20:50:39 simon Exp $
+// $Id: Character.cpp,v 1.88 2007-01-21 17:46:34 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -49,12 +49,23 @@ using Atlas::Objects::Entity::Anonymous;
 #endif
 
 //  Wrap angle around it required.
+/*
 static float limitAngle(float a) {
   static float p2 = M_PI * 2.0;
   while (a > M_PI) a -= p2;
   while (a < -M_PI) a += p2;
   return a;
 }
+*/
+static std::string getNameOrType(Sear::WorldEntity *we) {
+  std::string str = we->getName();
+  if (str.empty()) {
+    str = we->type();
+  }
+  return str;
+
+}
+
 
 namespace Sear {
   // Console commands
@@ -101,8 +112,11 @@ namespace Sear {
 //  static const std::string CMD_RESET_APPEARANCE = "clear_app";
 //  static const std::string CMD_READ_APPEARANCE = "read_app";
   static const std::string CMD_SET_HEIGHT = "set_height";
+  static const std::string CMD_RENAME_ENTITY = "rename_entity";
 
-  static const int server_update_interval = 500;
+  static const std::string CMD_MOVE_TO_ORIGIN = "return_to_origin";
+
+  static const unsigned int server_update_interval = 500;
 
 
   // Config section  names
@@ -265,7 +279,6 @@ void Character::updateLocals(bool send_to_server) {
   static float old_strafe_speed = m_strafe_speed;
   static bool old_run = m_run_modifier;
   static WFMath::Quaternion oldOrient = m_pred_orient;
-  std::string type = dynamic_cast<WorldEntity*>(m_self.get())->type();
 
   if (old_speed != m_speed || old_run != m_run_modifier || old_strafe_speed != m_strafe_speed) {
     changed = true;
@@ -287,7 +300,7 @@ void Character::updateLocals(bool send_to_server) {
 
   // If there is anything to rotate, do so
   if (fabs(a) > 0.000001f) {
-    WFMath::Quaternion angle = WFMath::Quaternion(2, a);
+    const WFMath::Quaternion angle = WFMath::Quaternion(2, a);
 
     m_pred_orient *= angle;
     changed = true;
@@ -340,14 +353,18 @@ void Character::dropEntity(const std::string &name, int quantity) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
   }
-  Log::writeLog(std::string("Dropping ") + string_fmt(quantity) + std::string(" items of ") + name, Log::LOG_DEFAULT);
-  std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < m_self->numContained()); ++i) {
-    WorldEntity *we = static_cast<WorldEntity*>(m_avatar->getEntity()->getContained(i));
-    if (we->getName() == name) {
-      m_avatar->drop(we,WFMath::Vector<3>(1.0f, 0.0f, 0.0f));
-      --quantity;
-    }
+  printf("Dropping %d items of %s\n", quantity, name.c_str());
+  // Randomize drop position
+  WFMath::Vector<3> pos(
+    (float)rand() / (float)RAND_MAX * 2.0f - 1.0f,
+    (float)rand() / (float)RAND_MAX * 2.0f - 1.0f,
+    0.0f);
+
+  WorldEntity* we = findInInventory(name);
+  while (we != 0 && quantity > 0) {
+    m_avatar->drop(we, pos);
+    --quantity;
+    we = findInInventory(name);
   }
 }
 
@@ -392,7 +409,9 @@ WorldEntity* Character::findInInventory(const std::string& name) {
     
     for (unsigned int i = 0; i < m_self->numContained(); ++i) {
         Eris::Entity* e = m_self->getContained(i);
-        if ((e->getName() == name) || (e->getType()->getName() == name)) {
+        if ((e->getId() == name)
+         || (e->getName() == name) 
+         || (e->getType()->getName() == name)) {
             return static_cast<WorldEntity*>(e);
         }
     } // of inventory iteration
@@ -442,7 +461,8 @@ void Character::displayInventory() {
   if (!m_avatar) return;
   std::map<std::string, int> inventory;
   for (unsigned int i = 0; i < m_self->numContained(); ++i) {
-    inventory[m_self->getContained(i)->getName()]++;
+    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self->getContained(i));
+    inventory[getNameOrType(we)]++;
   }
   for (std::map<std::string, int>::const_iterator I = inventory.begin(); 
                                                   I != inventory.end(); ++I) {
@@ -522,14 +542,14 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     return;
   }
 
-  Log::writeLog(std::string("Giving ") + string_fmt(quantity) + std::string(" items of ") + name + std::string(" to ") + target, Log::LOG_DEFAULT);
-  std::map<std::string, int> inventory;
-  for (unsigned int i = 0; (quantity) && (i < m_self->numContained()); ++i) {
-    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self->getContained(i));
-    if (we->getName() == name) {
-      m_avatar->place(we, te, WFMath::Point<3>(0,0,0));
-      quantity--;
-    }
+  if (debug) printf("Giving %d items of %s to %s\n", quantity, name.c_str(), target.c_str());
+
+  WFMath::Point<3> pos(0,0,0);
+  WorldEntity* we = findInInventory(name);
+  while (we != 0 && quantity > 0) {
+    m_avatar->place(we, te, pos);
+    --quantity;
+    we = findInInventory(name);
   }
 }
 
@@ -577,6 +597,8 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_SET_HEIGHT, this);
 //  console->registerCommand(CMD_SET_ACTION, this);
   console->registerCommand(CMD_DISPLAY_USE_OPS, this);
+  console->registerCommand(CMD_RENAME_ENTITY, this);
+  console->registerCommand(CMD_MOVE_TO_ORIGIN, this);
 }
 
 void Character::runCommand(const std::string &command, const std::string &args) {
@@ -611,15 +633,15 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_SAY) say(args);
   else if (command == CMD_ME) emote(args);
   else if (command == CMD_GIVE) {
-    std::string quantity_str = tokeniser.nextToken();
-    std::string item = tokeniser.remainingTokens();
+    const std::string &quantity_str = tokeniser.nextToken();
+    const std::string &item = tokeniser.remainingTokens();
     int quantity = 0;
     cast_stream(quantity_str, quantity);
     giveEntity(item, quantity, RenderSystem::getInstance().getRenderer()->getActiveID());
   }
   else if (command == CMD_DROP) {
-    std::string quantity_str = tokeniser.nextToken();
-    std::string item = tokeniser.remainingTokens();
+    const std::string &quantity_str = tokeniser.nextToken();
+    const std::string &item = tokeniser.remainingTokens();
     int quantity = 0;
     cast_stream(quantity_str, quantity);
     dropEntity(item, quantity);
@@ -627,11 +649,11 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_PICKUP) System::instance()->setAction(ACTION_PICKUP);
   else if (command == CMD_TOUCH) System::instance()->setAction(ACTION_TOUCH);
   else if (command == CMD_DISPLAY_INVENTORY) {
-//    displayInventory();
+    displayInventory();
     System::instance()->getActionHandler()->handleAction("inventory_open", NULL);
   }
   else if (command == CMD_MAKE) {
-    std::string type = tokeniser.nextToken();
+    const std::string &type = tokeniser.nextToken();
     std::string name = tokeniser.remainingTokens();
     if (name.empty()) {
         name = type;
@@ -649,11 +671,11 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     displayUseOperations();
   }
   else if (command == CMD_WIELD) {
-    std::string name = tokeniser.nextToken();
+    const std::string &name = tokeniser.nextToken();
     wieldEntity(name);
   }
   else if (command == CMD_EAT) {
-    std::string name = tokeniser.nextToken();
+    const std::string &name = tokeniser.nextToken();
     eatEntity(name);
   }
   else if (command == CMD_ATTACK) {
@@ -661,10 +683,19 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   }
 //  else if (command == CMD_RESET_APPEARANCE) clearApp();
   else if (command == CMD_SET_HEIGHT) {
-    std::string hStr = tokeniser.nextToken();
+    const std::string &hStr = tokeniser.nextToken();
     float h;
     cast_stream(hStr, h);
     setHeight(h);
+  }
+  else if (command ==  CMD_RENAME_ENTITY) {
+    const std::string &id = tokeniser.nextToken();
+    const std::string &name = tokeniser.remainingTokens();
+    WorldEntity *we = findInInventory(id);
+    if (we) renameEntity(we, name);
+  }
+  else if (command == CMD_MOVE_TO_ORIGIN) {
+    m_avatar->moveToPoint(WFMath::Point<3>(0,0,0));
   }
 /*
   else if (command == CMD_SET_APPEARANCE) {
@@ -845,6 +876,23 @@ void Character::onMoved() {
     
     m_refresh_orient = false;
   }
+}
+
+void Character::renameEntity(Eris::Entity *e, const std::string &name) {
+  if (m_avatar == 0) return;
+  assert(e != 0);
+
+  Atlas::Objects::Operation::Set set;
+  set->setFrom(System::instance()->getClient()->getAccount()->getId());
+
+  Anonymous msg;
+  msg->setId(e->getId());
+  msg->setObjtype("obj");
+  msg->setAttr("name", name);
+
+  set->setArgs1(msg);
+  m_avatar->getConnection()->send(set);
+
 }
 
 } /* namespace Sear */
