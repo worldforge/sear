@@ -1,3 +1,7 @@
+2007-01-21 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* configure.ac: Bump required eris version number.
+
 2007-01-15 Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp: Get a const ref to the DateTime object.
