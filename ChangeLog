@@ -1,3 +1,8 @@
+2007-01-21  Al Riddoch  <alriddoch@zepler.org>
+
+	* src/Character.cpp: Inventory item rename op needs to come from
+	  avatar.
+
 2007-01-21 Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Character.cpp, src/Character.h: Modify the findInInventory

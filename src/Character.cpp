@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.88 2007-01-21 17:46:34 simon Exp $
+// $Id: Character.cpp,v 1.89 2007-01-21 20:53:09 alriddoch Exp $
 
 #include <math.h>
 #include <string>
@@ -883,7 +883,7 @@ void Character::renameEntity(Eris::Entity *e, const std::string &name) {
   assert(e != 0);
 
   Atlas::Objects::Operation::Set set;
-  set->setFrom(System::instance()->getClient()->getAccount()->getId());
+  set->setFrom(m_self->getId());
 
   Anonymous msg;
   msg->setId(e->getId());
