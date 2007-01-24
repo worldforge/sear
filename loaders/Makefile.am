@@ -27,6 +27,8 @@ libModelLoader_a_SOURCES = \
 	ParticleSystem.cpp ParticleSystem.h \
 	ParticleSystemLoader.cpp ParticleSystemLoader.h \
 	StaticObject.cpp StaticObject.h \
-	DynamicObject.cpp DynamicObject.h
+	DynamicObject.cpp DynamicObject.h \
+	SearObject.cpp SearObject.h SearObjectTypes.h \
+	SearObject_Loader.cpp SearObject_Loader.h
 	
 	

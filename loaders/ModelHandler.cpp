@@ -2,9 +2,10 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.35 2006-12-02 18:54:36 simon Exp $
+// $Id: ModelHandler.cpp,v 1.36 2007-01-24 09:52:55 simon Exp $
 
 #include <string.h>
+#include <inttypes.h>
 
 #include <sigc++/object_slot.h>
 
@@ -14,10 +15,13 @@
 
 #include <Eris/Timeout.h>
 
+#include "common/Utility.h"
+
+#include "renderers/RenderSystem.h"
+#include "renderers/TextureManager.h"
 #include "src/Console.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
-#include "renderers/RenderSystem.h"
 #include "src/FileHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
@@ -27,6 +31,8 @@
 #include "Model.h"
 #include "ModelSystem.h"
 #include "NullModel.h"
+
+#include "SearObjectTypes.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -156,10 +162,10 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   }
 
   // Process initial appearance map
-  if (we->hasAttr(ATTR_GUISE)) {
-    Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
-    model->model->setAppearance(mt);
-  }                                                                          
+//  if (we->hasAttr(ATTR_GUISE)) {
+//    Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
+//    model->model->setAppearance(mt);
+//  }                                                                          
 
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
@@ -267,6 +273,7 @@ void ModelHandler::registerCommands(Console *console) {
   assert(console != NULL);
   
   console->registerCommand(CMD_LOAD_MODEL_RECORDS, this);
+  console->registerCommand("dump_object", this);
 }
 
 void ModelHandler::runCommand(const std::string &command, const std::string &args) {
@@ -275,6 +282,76 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
     std::string args_cpy = args;
     System::instance()->getFileHandler()->getFilePath(args_cpy);
     loadModelRecords(args_cpy);
+  } else if (command == "dump_object") {
+    // Quick hack to save some SearObject files.
+    // It should really have its own function somewhere, and even
+    // be in another utility.
+    Tokeniser tok;
+    tok.initTokens(args);
+    const std::string &id = tok.nextToken();
+    const std::string &filename = tok.remainingTokens();
+
+    ModelRecordMap::iterator I = m_model_records_map.find(id);
+    if (I == m_model_records_map.end()) return;
+
+    SPtrShutdown<Model> model = I->second->model;
+    if (model->hasStaticObjects() == false) return;
+    StaticObjectList sol = model->getStaticObjects();
+    FILE *fp = fopen(filename.c_str(), "wb");
+    if (!fp) {
+      fprintf(stderr, "[ModelHandler] Error opening %s for writing\n", filename.c_str());
+      return;
+    }
+    SearObjectHeader soh;
+
+    strncpy(soh.magic, "SEARSTAT", 8);
+    soh.byte_order = 0xFF00;
+    soh.version = 1;
+    soh.num_meshes = sol.size();
+    fwrite(&soh, sizeof(SearObjectHeader), 1, fp);
+
+    StaticObjectList::const_iterator J = sol.begin();
+    StaticObjectList::const_iterator Jend = sol.end();
+    SearObjectMesh som;
+    TextureManager *tm = RenderSystem::getInstance().getTextureManager();
+    assert (tm != 0);
+    for (; J != Jend; ++J) {
+      SPtrShutdown<StaticObject> so = *J;
+      so->getMatrix().getMatrix(som.mesh_transform);
+      so->getTexMatrix().getMatrix(som.texture_transform);
+
+      int t_id, tm_id;
+      so->getTexture(0, t_id, tm_id);
+      std::string tex_name = tm->getTextureName(t_id);
+
+      memset(som.texture_map, '\0', 256); 
+      strncpy(som.texture_map, tex_name.c_str(), tex_name.size());
+      som.num_vertices = so->getNumPoints();
+      som.num_faces = so->getNumFaces();
+
+      so->getAmbient(som.ambient);
+      so->getDiffuse(som.diffuse);
+      so->getSpecular(som.specular);
+      so->getEmission(som.emissive);
+
+      som.shininess = so->getShininess();
+
+      fwrite(&som, sizeof(SearObjectMesh), 1, fp);
+
+      float *fptr = so->getVertexDataPtr();
+      fwrite(fptr, sizeof(float), so->getNumPoints() * 3, fp);
+
+      fptr = so->getNormalDataPtr();
+      fwrite(fptr, sizeof(float), so->getNumPoints() * 3, fp);
+
+      fptr = so->getTextureDataPtr();
+      fwrite(fptr, sizeof(float), so->getNumPoints() * 2, fp);
+
+      int *iptr = so->getIndicesPtr();
+      fwrite(iptr, sizeof(uint32_t), so->getNumFaces() * 3, fp);
+    }
+
+    fclose(fp);
   }
 
 }

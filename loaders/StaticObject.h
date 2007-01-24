@@ -39,6 +39,11 @@ public:
     m_texture_masks[num] = texture_mask;
   }
 
+  void getTexture(unsigned int num, int &texture, int &texture_mask) {
+    texture      = m_textures[num];
+    texture_mask = m_texture_masks[num];
+  }
+
   void copyVertexData(float *ptr, size_t size) {
     if (m_vertex_data) delete [] m_vertex_data;
     m_vertex_data = new float[size];
@@ -156,6 +161,32 @@ void setAmbient(float a[4]) {
   }
 
   void setShininess(float s) { m_shininess = s; }
+  void getAmbient(float f[4]) {
+    f[0] = m_ambient[0];
+    f[1] = m_ambient[1];
+    f[2] = m_ambient[2];
+    f[3] = m_ambient[3];
+  }
+  void getDiffuse(float f[4]) {
+    f[0] = m_diffuse[0];
+    f[1] = m_diffuse[1];
+    f[2] = m_diffuse[2];
+    f[3] = m_diffuse[3];
+  }
+  void getSpecular(float f[4]) {
+    f[0] = m_specular[0];
+    f[1] = m_specular[1];
+    f[2] = m_specular[2];
+    f[3] = m_specular[3];
+  }
+ 
+  void getEmission(float f[4]) {
+    f[0] = m_emission[0];
+    f[1] = m_emission[1];
+    f[2] = m_emission[2];
+    f[3] = m_emission[3];
+  }
+  float getShininess() const { return m_shininess; }
 
   void setState(int s) { m_state = s; }
   int getState() const { return m_state; }

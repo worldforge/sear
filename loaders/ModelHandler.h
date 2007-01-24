@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.13 2006-12-02 21:56:55 simon Exp $
+// $Id: ModelHandler.h,v 1.14 2007-01-24 09:52:55 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -46,7 +46,7 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
  
-  SPtr<ModelRecord> getModel(const std::string &model_id, WorldEntity *we = NULL);
+  SPtr<ModelRecord> getModel(const std::string &model_id, WorldEntity *we);
 
   void registerModelLoader(SPtr<ModelLoader> model_loader);
   void unregisterModelLoader(const std::string &model_type);

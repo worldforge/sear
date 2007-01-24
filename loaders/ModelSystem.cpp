@@ -27,6 +27,7 @@
 #include "LibModelFile_Loader.h"
 #include "AreaModelLoader.h"
 #include "ParticleSystemLoader.h"
+#include "SearObject_Loader.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -51,6 +52,7 @@ int ModelSystem::init() {
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new BoundBox_Loader())); // This is the default loader
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new WireFrame_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new NPlane_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new SearObject_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ThreeDS_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new LibModelFile_Loader()));
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new AreaModelLoader()));

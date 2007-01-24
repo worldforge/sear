@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.26 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: TextureManager.h,v 1.27 2007-01-24 09:52:54 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -108,6 +108,16 @@ public:
     
     return texId;
   }
+
+  std::string getTextureName(TextureID id) const {
+    if ((size_t)id < m_names.size() && id >= 0) {
+      return m_names[id];
+    }
+    return "";
+  }
+
+  
+
   /**
    * Unloads the specified texture from the OpenGL system
    * @param texture_name Name of texture to unload

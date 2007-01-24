@@ -1,3 +1,23 @@
+2007-01-24 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/SearObject.cpp, loaders/SearObject.h, 
+	  loaders/SearObjectTypes.h, loaders/SearObject_Loader.cpp,
+	  loaders/SearObject_Loader.h, loaders/Makefile.am, 
+	  loaders/ModelSystem.cpp: Created a new model loader based on a format
+	  design to load quickly into a list StaticObjects. 
+
+	* loaders/ModelHandler.cpp: Added a /dump_object to save sample
+	  SearObject files. It takes a model_record id and saves the
+	  StaticObjects list (if there is one) to the specified file.
+
+	* loaders/ModelHandler.h: Removed default parameter specification on
+	  getModel as we==NULL now hits an assert.
+
+	* loaders/StaticObject.h: Added some accessors to the data.
+
+	* renderers/TextureManager.h: Added function to get a texture name from
+	  a TextureId.
+
 2007-01-21  Al Riddoch  <alriddoch@zepler.org>
 
 	* src/Character.cpp: Inventory item rename op needs to come from
