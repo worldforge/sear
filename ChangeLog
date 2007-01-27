@@ -1,5 +1,9 @@
 2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/Weather.cpp: Make rain drops a bit bigger.
+
+2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
+
 	* guichan/Invevntory.cpp, guichan/Makefile.am, guichan/RenameDialog.cpp,
 	  guichan/RenameDialog.h, guichan/actiontextfield.cpp,
 	  guichan/actiontextfield.h: Added a renaming dialog to rename an entity

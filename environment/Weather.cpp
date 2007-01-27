@@ -84,7 +84,7 @@ void Weather::weatherChanged(const Eris::StringSet &s, Sear::WorldEntity *we) {
 }
    
 void Weather::render() {
-if (m_rain==0.0f) return;
+  if (m_rain==0.0f) return;
   // Render Rain effects.
   // TODO, check possible values for m_rain.
   // Make buf permanent.
@@ -110,7 +110,7 @@ if (m_rain==0.0f) return;
   glGetIntegerv(GL_POINT_SIZE,  &pSize);
   if (sage_ext[GL_ARB_POINT_SPRITE]) {
     glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
-    if (maxSize > 5.0f) maxSize = 5.0f;
+    if (maxSize > 10.0f) maxSize = 10.0f;
     glEnable( GL_POINT_SPRITE_ARB );
     // Tell OpenGL to  generate its own texture coords for the point sprite
     glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
