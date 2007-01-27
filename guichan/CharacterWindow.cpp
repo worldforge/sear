@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2006 - 2007 Simon Goodall
 
 #include "guichan/CharacterWindow.h"
 #include "guichan/DblClkListBox.h"
@@ -98,12 +99,15 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 
   setOpaque(true);
 
-  gcn::Box * vbox = new gcn::VBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
-
+//  gcn::Box * vbox = new gcn::VBox(6);
+//  m_widgets.push_back(SPtr<gcn::Widget>(vbox));
+  int y_pos = 0;
   gcn::Label *l1 = new gcn::Label("Characters");
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
-  vbox->pack(l1);
+  l1->setPosition(0,y_pos);
+  add(l1);
+  y_pos += l1->getHeight() + 4;
+//  vbox->pack(l1);
 
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
@@ -121,80 +125,60 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   scroll_area->setWidth(200);
   scroll_area->setHeight(200);
   scroll_area->setBorderSize(1);
-  vbox->pack(scroll_area);
+  scroll_area->setPosition(0,y_pos);
+  add(scroll_area);
+  y_pos += scroll_area->getHeight() + 4;
 
   m_refreshButton = new gcn::Button("Refresh");
   m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
   m_refreshButton->setFocusable(false);
   m_refreshButton->setEventId("refresh");
   m_refreshButton->addActionListener(m_buttonListener);
-  vbox->pack(m_refreshButton);
-
-  gcn::Box * vbox1 = new gcn::VBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(vbox1));
-
-  gcn::Box * hbox = new gcn::HBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+  m_refreshButton->setPosition(0,y_pos);
+  add(m_refreshButton);
+  y_pos += m_refreshButton->getHeight() + 4;
 
   l1 = new gcn::Label("Name");
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
-  hbox->pack(l1);
+  l1->setPosition(0, y_pos);
+  add(l1);
+
   m_nameField = new gcn::TextField("                ");
   m_widgets.push_back(SPtr<gcn::Widget>(m_nameField));
   m_nameField->setText("");
-  hbox->pack(m_nameField);
-
-  vbox1->pack(hbox);
-
-  hbox = new gcn::HBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+  m_nameField->setPosition(l1->getWidth() + 2,y_pos);
+  add(m_nameField);
+  y_pos += m_nameField->getHeight() + 4;
 
   l1 = new gcn::Label("Type");
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
-  hbox->pack(l1);
+  l1->setPosition(0, y_pos);
+  add(l1);
 
-  m_typeField = new gcn::TextField("                ");
-  m_widgets.push_back(SPtr<gcn::Widget>(m_typeField));
-  m_typeField->setText("");
-  hbox->pack(m_typeField);
-
-  vbox1->pack(hbox);
-
-  hbox = new gcn::HBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
-
-    vbox->pack(hbox);
+  TypeListModel * type_list_model = new TypeListModel;
+  m_types = new gcn::DropDown(type_list_model);
+  m_widgets.push_back(SPtr<gcn::Widget>(m_types));
+ 
+  m_types->setPosition(l1->getWidth() + 4, y_pos);
+  add(m_types);
+  y_pos += m_types->getHeight() + 4;
 
   m_charButton = new gcn::Button("Create new character");
   m_widgets.push_back(SPtr<gcn::Widget>(m_charButton));
   m_charButton->setFocusable(false);
   m_charButton->setEventId("create");
   m_charButton->addActionListener(m_buttonListener);
-  vbox1->pack(m_charButton);
-
-  hbox = new gcn::HBox(6);
-  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
-
-
-  hbox->pack(vbox1);
-
-  TypeListModel * type_list_model = new TypeListModel;
-  m_types = new gcn::DropDown(type_list_model);
-  m_widgets.push_back(SPtr<gcn::Widget>(m_types));
-  vbox->pack(hbox);
-  hbox->pack(m_types);
-
-
+  m_charButton->setPosition(0, y_pos);
+  add(m_charButton);
+  y_pos += m_charButton->getHeight() + 4;
 
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
   m_closeButton->setEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
-
-  vbox->pack(m_closeButton);
-
-  add(vbox);
+  m_closeButton->setPosition(0, y_pos);
+  add(m_closeButton);
 
   resizeToContent();
 }
@@ -224,7 +208,7 @@ void CharacterWindow::logic()
             if (m_charSelected == j) {
               const std::string &type_name = I->second->getParents().front();
               m_nameField->setText(I->second->getName());
-              m_typeField->setText(type_name);
+              m_typeField = type_name;
               m_charButton->setCaption("Take character");
               m_charButton->setEventId("take");
               // Updates the type list box
@@ -252,7 +236,7 @@ void CharacterWindow::logic()
         for (int j = 0; I != Iend; ++I, ++j) {
           if (m_charSelected == j) {
             if (m_nameField->getText() != I->second->getName() ||
-                m_typeField->getText() != I->second->getParents().front()) {
+                m_typeField != I->second->getParents().front()) {
               m_characters->setSelected(-1);
               m_charButton->setCaption("Create new character");
               m_charButton->setEventId("create");
@@ -266,12 +250,12 @@ void CharacterWindow::logic()
   if (new_type_sel != m_typeSelected) {
     m_typeSelected = new_type_sel;
     if (new_type_sel >= 0) {
-      m_typeField->setText("");
+      m_typeField = "";
       Eris::Account * account = System::instance()->getClient()->getAccount();
       if (account != 0) {
         const std::vector<std::string> & types = account->getCharacterTypes();
         if (m_typeSelected < types.size()) {
-          m_typeField->setText(types[m_typeSelected]);
+          m_typeField = types[m_typeSelected];
         }
       }
       m_characters->setSelected(-1);
@@ -284,7 +268,7 @@ void CharacterWindow::logic()
     if (account != 0) {
       const std::vector<std::string> & types = account->getCharacterTypes();
       if (new_type_sel >= 0 && m_typeSelected < types.size()) {
-        if (m_typeField->getText() != types[m_typeSelected]) {
+        if (m_typeField != types[m_typeSelected]) {
           m_types->setSelected(-1);
         }
       }
@@ -332,13 +316,13 @@ printf("%d -- %d\n", m_charSelected, ci.size());
       new Alert(parent, "Not currently logged in.");
     }
   } else if (event == "create") {
-    if (m_nameField->getText().empty() || m_typeField->getText().empty()) {
+    if (m_nameField->getText().empty() || m_typeField.empty()) {
       new Alert(parent, "Please specify a name and type for the character to be created.");
     } else {
       std::string cmd("/add ");
       cmd += m_nameField->getText();
       cmd += " ";
-      cmd += m_typeField->getText();
+      cmd += m_typeField;
       cmd += " ";
       cmd += "male"; // FIXME add a widget for this
       cmd += " A settler"; // FIXME Could add a widget for this too.

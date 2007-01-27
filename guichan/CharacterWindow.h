@@ -32,7 +32,7 @@ protected:
   gcn::DropDown * m_types;
 
   gcn::TextField * m_nameField;
-  gcn::TextField * m_typeField;
+  std::string m_typeField;
 
   gcn::Button * m_refreshButton;
   gcn::Button * m_charButton;
