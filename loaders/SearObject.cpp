@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.1 2007-01-24 09:52:55 simon Exp $
+// $Id: SearObject.cpp,v 1.2 2007-01-27 11:38:47 simon Exp $
 
 #include  <stdio.h>
 
@@ -88,8 +88,10 @@ typedef enum {
 } Axis;
 
 static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
-  float min[3], max[3];
-  bool firstPoint = true;
+
+  float min[3] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
+  float max[3] = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
+
   // Find bounds of object
   for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
@@ -114,20 +116,13 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
       y = ny / nw;
       z = nz / nw;
 
-      if (firstPoint) {
-        firstPoint = false;
-        min[0] = max[0] = x;
-        min[1] = max[1] = y;
-        min[2] = max[2] = z;
-      } else {
-        if (x < min[0]) min[0] = x; 
-        if (y < min[1]) min[1] = y; 
-        if (z < min[2]) min[2] = z; 
+      if (x < min[0]) min[0] = x; 
+      if (y < min[1]) min[1] = y; 
+      if (z < min[2]) min[2] = z; 
 
-        if (x > max[0]) max[0] = x; 
-        if (y > max[1]) max[1] = y; 
-        if (z > max[2]) max[2] = z; 
-      }
+      if (x > max[0]) max[0] = x; 
+      if (y > max[1]) max[1] = y; 
+      if (z > max[2]) max[2] = z; 
     }
   }
 
@@ -245,9 +240,9 @@ int SearObject::init(const std::string &file_name) {
   // Load SearObject file
   if (debug) printf("[SearObject] Loading: %s\n", object.c_str());
 
-  // TODO: Load file format here
   if (load(object)) {
     //  Error loading object
+    fprintf(stderr, "[SearObject] Error loading SearObject %s\n", object.c_str());
     m_static_objects.clear();
     return 1;
   }
@@ -371,22 +366,21 @@ int SearObject::load(const std::string &filename) {
   }
 
   // Check Endianess
-  // TODO: Is this sane?
-// Should we instead write a constant e.g. 1234 and compare bytes instead
-// Then we know whether we need to swap bytes or not?
+  // Does this check actually work? Or should we convert into a chars and
+  // compare char order instead?
   if (soh.byte_order == 0x00FF) {
     big_endian = true;
     printf("[SearObject] Swapping byte order\n");
     swap_bytes_uint32_t(soh.num_meshes);
   }
+
   // Check Version
   if (soh.version != 1) {
     fprintf(stderr, "[SearObject] SearObject Version %d is unsupported. Version %d expected.\n", soh.version, 1);
     fclose(fp);
     return 1;
   } 
-printf("[SearObject] File Version %d\n", soh.version);
-printf("[SearObject] There are %d meshes\n", soh.num_meshes);
+
   SearObjectMesh som;
   int tex_id, tex_mask_id;
   uint32_t *uptr;
@@ -421,8 +415,6 @@ printf("[SearObject] There are %d meshes\n", soh.num_meshes);
     SPtrShutdown<StaticObject> so(new StaticObject());
     so->init();
    
-printf("[SearObject] There are %d vertices\n", som.num_vertices); 
-printf("[SearObject] There are %d faces\n", som.num_faces); 
     so->setNumPoints(som.num_vertices);
     so->setNumFaces(som.num_faces);
 

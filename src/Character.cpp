@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.89 2007-01-21 20:53:09 alriddoch Exp $
+// $Id: Character.cpp,v 1.90 2007-01-27 11:38:49 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -114,6 +114,7 @@ namespace Sear {
   static const std::string CMD_SET_HEIGHT = "set_height";
   static const std::string CMD_RENAME_ENTITY = "rename_entity";
 
+  static const std::string CMD_MOVE_TO = "move_to";
   static const std::string CMD_MOVE_TO_ORIGIN = "return_to_origin";
 
   static const unsigned int server_update_interval = 500;
@@ -598,6 +599,7 @@ void Character::registerCommands(Console *console) {
 //  console->registerCommand(CMD_SET_ACTION, this);
   console->registerCommand(CMD_DISPLAY_USE_OPS, this);
   console->registerCommand(CMD_RENAME_ENTITY, this);
+  console->registerCommand(CMD_MOVE_TO, this);
   console->registerCommand(CMD_MOVE_TO_ORIGIN, this);
 }
 
@@ -696,6 +698,17 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   }
   else if (command == CMD_MOVE_TO_ORIGIN) {
     m_avatar->moveToPoint(WFMath::Point<3>(0,0,0));
+  }
+  else if (command == CMD_MOVE_TO) {
+
+    const std::string &str_x = tokeniser.nextToken();
+    const std::string &str_y = tokeniser.nextToken();
+    const std::string &str_z = tokeniser.nextToken();
+    float x,y,z;
+    cast_stream(str_x, x);
+    cast_stream(str_y, y);
+    cast_stream(str_z, z);
+    m_avatar->moveToPoint(WFMath::Point<3>(x,y,z));
   }
 /*
   else if (command == CMD_SET_APPEARANCE) {
@@ -879,6 +892,12 @@ void Character::onMoved() {
 }
 
 void Character::renameEntity(Eris::Entity *e, const std::string &name) {
+  // This function requests a rename op. The inventory is not updated
+  // with the new name until the entity is dropped and picked up again
+  // as the mapping is only updated on a childadded/removed event.
+  // We could perhaps setup a observer here and remove it when it fires,
+  // or after a timeout event. (e.g. nothing is returned if the rename fails)
+
   if (m_avatar == 0) return;
   assert(e != 0);
 

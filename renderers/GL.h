@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
 #ifndef SEAR_GL_RENDER_H
 #define SEAR_GL_RENDER_H 1
@@ -71,11 +71,6 @@ private:
 
 
 public:
-//  void renderMeshArrays( Mesh &mesh, unsigned int offset, bool multitexture);
-//  void vboMesh( Mesh &mesh);
-//  void cleanVBOMesh(Mesh &mesh);
-  
-
   void initLighting();
   void initFont();
   void shutdownFont(bool check);
@@ -97,10 +92,8 @@ public:
   int getWindowHeight() const { return m_height; }
   bool isFullScreen() const { return m_fullscreen; }
 
-  std::string getActiveID() const;// { return activeID; }
-  WorldEntity *getActiveEntity() const;// { return activeID; }
-//  void checkModelStatus(const std::string &) {}
-//  void setModelInUse(const std::string &, bool) {}
+  std::string getActiveID() const;
+  WorldEntity *getActiveEntity() const;
 
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
@@ -110,13 +103,11 @@ public:
 
   void translateObject(float x, float y, float z);
   void rotate(float angle, float x, float y, float z);
-//  void rotateObject(WorldEntity *we, int type);
   inline void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>);
   inline void scaleObject(float scale);
   void setViewMode(int type);
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
   void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
-//  void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
   void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
@@ -141,12 +132,7 @@ public:
   inline void applyCharacterLighting(float x, float y, float z);
   inline void getFrustum(float [6][4]);
   virtual void getModelviewMatrix(float m[4][4]);
- 
-//  void beginRecordList(unsigned int list) { glNewList(list, GL_COMPILE_AND_EXECUTE); }
-//  void endRecordList() { glEndList(); }
-//  void playList(unsigned int list) { glCallList(list); }
-//  GLuint getNewList() { return glGenLists(1); }
-//  void freeList(unsigned int list) { if (glIsList(list)) glDeleteLists(list, 1); };
+
   void selectTerrainColour(WorldEntity * we);
   void resize(int width, int height);
 

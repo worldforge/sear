@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.28 2006-12-02 21:56:54 simon Exp $
+// $Id: LibModelFile.cpp,v 1.29 2007-01-27 11:38:47 simon Exp $
 
 /*
   Debug check list
@@ -72,8 +72,11 @@ typedef enum {
 } Axis;
 
 static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool z_align, bool ignore_minus_z) {
-  float min[3], max[3];
-  bool firstPoint = true;
+
+  float min[3] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
+  float max[3] = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
+
+
   // Find bounds of object
   for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
     SPtrShutdown<StaticObject> so = *I;
@@ -98,20 +101,13 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
       y = ny / nw;
       z = nz / nw;
 
-      if (firstPoint) {
-        firstPoint = false;
-        min[0] = max[0] = x;
-        min[1] = max[1] = y;
-        min[2] = max[2] = z;
-      } else {
-        if (x < min[0]) min[0] = x;
-        if (y < min[1]) min[1] = y;
-        if (z < min[2]) min[2] = z;
+      if (x < min[0]) min[0] = x;
+      if (y < min[1]) min[1] = y;
+      if (z < min[2]) min[2] = z;
 
-        if (x > max[0]) max[0] = x;
-        if (y > max[1]) max[1] = y;
-        if (z > max[2]) max[2] = z;
-      }
+      if (x > max[0]) max[0] = x;
+      if (y > max[1]) max[1] = y;
+      if (z > max[2]) max[2] = z;
     }
   }
 

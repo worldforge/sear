@@ -5,6 +5,7 @@
 #include "common/Utility.h"
 
 #include "guichan/Inventory.h"
+#include "guichan/RenameDialog.h"
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 
@@ -52,7 +53,7 @@ public:
     Character * chr = System::instance()->getCharacter();
     if (chr == 0) { return ""; }
     const Character::InventoryMap &imap = chr->getInventoryMap();
-    if (i >= imap.size()) return  "";
+    if (i >= (int)imap.size()) return  "";
     Character::InventoryMap::const_iterator  I = imap.begin();
     for (int n = 0; n < i; ++n, ++I);
     return I->first;
@@ -126,6 +127,26 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   vbox->pack(hbox);
 
+  hbox = new gcn::HBox(6);
+  m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+
+  button = new gcn::Button("Rename");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
+  button->setEventId("rename");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
+/*
+  button = new gcn::Button("Eat");
+  m_widgets.push_back(SPtr<gcn::Widget>(button));
+  button->setEventId("eat");
+  button->setFocusable(false);
+  button->addActionListener(m_buttonListener);
+  hbox->pack(button);
+
+*/
+  vbox->pack(hbox);
+
   add(vbox);
 
   resizeToContent();
@@ -163,6 +184,12 @@ void Inventory::actionPressed(std::string event)
     std::string cmd("/eat ");
     cmd += name;
     System::instance()->runCommand(cmd);
+  } else if (event == "rename") {
+    RenameDialog *rd = new RenameDialog(name, name);
+    gcn::Container *parent =  dynamic_cast<gcn::Container *>(this->getParent());
+    parent->add(rd, parent->getWidth() / 2 - getWidth() / 2,
+                      parent->getHeight() / 2 - getHeight() / 2);
+    
   } else {
     std::cout << "Say what?" << std::endl << std::flush;
   }

@@ -16,6 +16,7 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        Inventory.cpp Inventory.h \
                        Panel.cpp Panel.h \
                        passwordfield.cpp passwordfield.h \
+                       actiontextfield.cpp actiontextfield.h \
                        StatusWindow.cpp StatusWindow.h \
                        TaskWindow.cpp TaskWindow.h \
                        LoginWindow.cpp LoginWindow.h \
@@ -25,5 +26,6 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        Overlay.cpp Overlay.h \
                        ActionListenerCommand.h ActionListenerSigC.h \
                        SpeechBubble.cpp SpeechBubble.h \
-                       CommandLine.h DblClkListBox.h
+                       CommandLine.h DblClkListBox.h \
+                       RenameDialog.cpp RenameDialog.h 
 

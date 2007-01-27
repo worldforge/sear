@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.162 2007-01-10 17:36:22 simon Exp $
+// $Id: GL.cpp,v 1.163 2007-01-27 11:38:48 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -458,7 +458,7 @@ void GL::buildColourSet() {
   
   // Pre-Calculate each colour and store in array
   unsigned int shift;
-  for (unsigned int indx = 0; indx < m_redBits * m_greenBits * m_blueBits; ++indx) {
+  for (int indx = 0; indx < m_redBits * m_greenBits * m_blueBits; ++indx) {
     // Get value from 0 -> 2^num_bits
     GLubyte red = (indx & (m_redMask << m_redShift)) >> (m_redShift);
     GLubyte green = (indx & (m_greenMask << m_greenShift)) >> (m_greenShift);
@@ -1599,7 +1599,7 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   }
 
   setViewMode(CAMERA);
-//  setViewMode(PERSPECTIVE);
+
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
   m_graphics->setCameraTransform();
   if (debug) printf("Screen Coord: %d %d %f\n", x, y, z);
