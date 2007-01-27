@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.90 2007-01-27 11:38:49 simon Exp $
+// $Id: Character.cpp,v 1.91 2007-01-27 18:33:45 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -491,11 +491,16 @@ void Character::make(const std::string &type, const std::string &name) {
   Atlas::Objects::Operation::Create c;
   c->setFrom(m_self->getId());
   Anonymous msg;
-  
+
+  WFMath::Vector<3> displacement(
+    (float)rand() / (float)RAND_MAX * 4.0f - 2.0f,
+    (float)rand() / (float)RAND_MAX * 4.0f - 2.0f,
+    0.0f);
+
   Eris::Entity *e = m_self->getLocation();
   assert(e);
   msg->setLoc(e->getId());
-  WFMath::Point<3> pos = m_self->getPosition() + WFMath::Vector<3>(2,0,0);
+  WFMath::Point<3> pos = m_self->getPosition() + displacement;
   msg->setAttr("pos", pos.toAtlas());
   msg->setName(name);
   msg->setParents(std::list<std::string>(1, type));

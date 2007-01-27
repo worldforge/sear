@@ -293,8 +293,17 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         max = s->getMax ();
       } else {
         // Hack. Get this data from control points
-        min = 0;
-        max = 1;
+        const Mercator::Matrix<2,2, Mercator::BasePoint> &m = s->getControlPoints();
+	min = std::numeric_limits<float>::max();
+	max = std::numeric_limits<float>::min();
+	for (int xx = 0; xx < 2; ++xx) {
+	for (int yy = 0; yy < 2; ++yy) {
+          min = std::min(min, m(xx,yy).height());
+          max = std::max(max, m(xx,yy).height());
+        }
+        }
+////        min = 0;
+  //      max = 1;
       }
 
       WFMath::AxisBox<3> box (WFMath::Point <3> (I->first * segSize, J->first * segSize, min), WFMath::Point < 3 > ((I->first + 1) * segSize, (J->first + 1) * segSize, max));
@@ -322,11 +331,11 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
         DataSeg seg;
         seg.contextCreated();
         
-        // Generate normsl
-        seg.narray = s->getNormals (); 
+        // Generate normals
+        seg.narray = s->getNormals(); 
         if (seg.narray == 0) {
           s->populateNormals ();
-          seg.narray = s->getNormals ();
+          seg.narray = s->getNormals();
         }
 
         // Generate normal VBO
