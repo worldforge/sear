@@ -1,3 +1,7 @@
+2007-01-28 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/TerrainRenderer.cpp: Clean up some formatting.
+
 2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/Character.cpp, guichan/Character.h: Re-worked GUI component so

@@ -297,13 +297,11 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 	min = std::numeric_limits<float>::max();
 	max = std::numeric_limits<float>::min();
 	for (int xx = 0; xx < 2; ++xx) {
-	for (int yy = 0; yy < 2; ++yy) {
-          min = std::min(min, m(xx,yy).height());
-          max = std::max(max, m(xx,yy).height());
+          for (int yy = 0; yy < 2; ++yy) {
+            min = std::min(min, m(xx,yy).height());
+            max = std::max(max, m(xx,yy).height());
+          }
         }
-        }
-////        min = 0;
-  //      max = 1;
       }
 
       WFMath::AxisBox<3> box (WFMath::Point <3> (I->first * segSize, J->first * segSize, min), WFMath::Point < 3 > ((I->first + 1) * segSize, (J->first + 1) * segSize, max));
