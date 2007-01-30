@@ -130,4 +130,9 @@ void Environment::setWeatherEntity(WorldEntity *we) {
   m_weather->setWeatherEntity(we);
 }
 
+void Environment::registerCommands(Console *con) {
+  assert(m_initialised == true);
+  m_weather->registerCommands(con);
+}
+
 } // namespace Sear

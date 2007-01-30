@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2006 Simon Goodall
+// Copyright (C) 2006 - 2007  Simon Goodall
 
 /*
  * This class is meant to model weather in Sear.
@@ -17,7 +17,10 @@
 #include <sage/GL.h>
 #include <sage/GLU.h>
 
+#include "common/Utility.h"
+
 #include "src/WorldEntity.h"
+#include "src/Console.h"
 
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
@@ -28,6 +31,9 @@ static const bool debug = false;
 
 static const std::string ATTR_RAIN = "rain";
 static const std::string ATTR_SNOW = "snow";
+
+static const std::string CMD_SET_RAIN = "set_rain";
+static const std::string CMD_SET_SNOW = "set_snow";
 
 namespace Sear {
 
@@ -91,8 +97,14 @@ void Weather::render() {
 
   glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
   const int max_points = 1000;
-  int num_points = (int)(500.0 * m_rain); // This should also be proportional to screen area, otherwise small windows will have lots of rain, larger ones will have less.
+
+  // Use this value as a weighting for the number of rain drops to show
+  int area = RenderSystem::getInstance().getWindowWidth() * RenderSystem::getInstance().getWindowHeight() / 1000;
+
+  int num_points = (int)((float)area * m_rain); // This should also be proportional to screen area, otherwise small windows will have lots of rain, larger ones will have less.
+
   if (num_points > max_points) num_points = max_points;
+
   float w = RenderSystem::getInstance().getRenderer()->getWindowWidth();
   float h = RenderSystem::getInstance().getRenderer()->getWindowHeight();
 
@@ -110,7 +122,7 @@ void Weather::render() {
   glGetIntegerv(GL_POINT_SIZE,  &pSize);
   if (sage_ext[GL_ARB_POINT_SPRITE]) {
     glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
-    if (maxSize > 10.0f) maxSize = 10.0f;
+    if (maxSize > 15.0f) maxSize = 15.0f;
     glEnable( GL_POINT_SPRITE_ARB );
     // Tell OpenGL to  generate its own texture coords for the point sprite
     glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
@@ -134,6 +146,31 @@ void Weather::render() {
     if (texEnabled) glEnable(GL_TEXTURE_2D);
   }
   glPointSize(pSize);
+}
+
+void Weather::registerCommands(Console *con) {
+  con->registerCommand(CMD_SET_RAIN, this);
+//  con->registerCommand(CMD_SET_SNOW, this);
+}
+
+void Weather::runCommand(const std::string &cmd, const std::string &args) {
+  if (cmd == CMD_SET_RAIN) {
+    float f;
+    cast_stream(args, f);
+    if (f < 0.0f) f = 0.0f;
+    if (f > 1.0f) f = 1.0f;
+    m_rain = f;
+  }
+  else
+  if (cmd == CMD_SET_SNOW) {
+    float f;
+    cast_stream(args, f);
+    if (f < 0.0f) f = 0.0f;
+    if (f > 1.0f) f = 1.0f;
+    m_snow = f;
+  }
+
+
 }
 
 } // namespace Sear

@@ -1,3 +1,18 @@
+2007-01-30 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/Environment.cpp, environment/Environment.h,
+	  src/System.cpp: Added functions for registerCommands for the Weather
+	  class.
+
+	* environment/Weather.cpp, environment/Weather.h: Added a /set_rain
+	  command to override the server set rain level. Modified the rain so
+	  that the number of drops is relative the to size of the window.
+
+	* loaders/ModelHandler.cpp, src/WorldEntity.cpp: Added some const refs.
+
+	* renderers/RenderSystem.h, renderers/RenderSystem.cpp: Added accessors
+	  to get window width and height.
+
 2007-01-28 Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp: Clean up some formatting.

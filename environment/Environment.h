@@ -20,6 +20,7 @@ namespace Mercator {
 
 namespace Sear {
 
+class Console;
 class TerrainRenderer;
 class SkyDome;
 class Stars;
@@ -54,6 +55,8 @@ public:
   
   void resetWorld();
   void setWeatherEntity(WorldEntity *we);
+
+  void registerCommands(Console *con);
 
 private:
   bool m_initialised;

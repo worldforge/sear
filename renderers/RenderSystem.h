@@ -114,6 +114,9 @@ public:
   sigc::signal<void> ContextCreated;
   sigc::signal<void, bool> ContextDestroyed;
 
+  int getWindowWidth() const;
+  int getWindowHeight() const;
+
 private:
   static RenderSystem m_instance;
 

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.36 2007-01-24 09:52:55 simon Exp $
+// $Id: ModelHandler.cpp,v 1.37 2007-01-30 23:20:37 simon Exp $
 
 #include <string.h>
 #include <inttypes.h>
@@ -106,7 +106,7 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   // Model loaded for this object?
 
   // Composite object_id + model id (model record name)
-  std::string id = we->getId() + model_id;
+  const std::string &id = we->getId() + model_id;
 
   // Look in per entity map
   ObjectRecordMap::const_iterator I = m_object_map.find(id);
@@ -291,12 +291,12 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
     const std::string &id = tok.nextToken();
     const std::string &filename = tok.remainingTokens();
 
-    ModelRecordMap::iterator I = m_model_records_map.find(id);
+    ModelRecordMap::const_iterator I = m_model_records_map.find(id);
     if (I == m_model_records_map.end()) return;
 
     SPtrShutdown<Model> model = I->second->model;
     if (model->hasStaticObjects() == false) return;
-    StaticObjectList sol = model->getStaticObjects();
+    const StaticObjectList &sol = model->getStaticObjects();
     FILE *fp = fopen(filename.c_str(), "wb");
     if (!fp) {
       fprintf(stderr, "[ModelHandler] Error opening %s for writing\n", filename.c_str());

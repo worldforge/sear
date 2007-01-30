@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.165 2007-01-12 12:04:06 simon Exp $
+// $Id: System.cpp,v 1.166 2007-01-30 23:20:38 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -230,6 +230,7 @@ bool System::init(int argc, char *argv[]) {
   
  
   Environment::getInstance().init();
+  Environment::getInstance().registerCommands(m_console.get());
 
   if (debug) Log::writeLog("Running startup scripts", Log::LOG_INFO);
 

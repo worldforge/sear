@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.91 2007-01-09 17:20:11 simon Exp $
+// $Id: WorldEntity.cpp,v 1.92 2007-01-30 23:20:38 simon Exp $
 
 /*
  TODO
@@ -85,7 +85,7 @@ void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
     printf("Error: Talk but no 'say'\n");
     return;
   }
-  std::string msg = talkArg->getAttr("say").asString();
+  const std::string &msg = talkArg->getAttr("say").asString();
 
   Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);
   System::instance()->pushMessage(getName()+ ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
@@ -164,7 +164,7 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
       // Get the terrain height for x,y pos, but don't set it yet as the mode
       // needs to have a say first.
       if (loc->hasAttr(MODE)) {
-        std::string mode = loc->valueOfAttr(MODE).asString();
+        const std::string &mode = loc->valueOfAttr(MODE).asString();
         if (mode == "swimming") {
           // Make sure height is > terrain height
           needTerrainHeight = clampHeight = true;
@@ -200,9 +200,9 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
         // This is assuming that the jetty object is directly in the world.
 
         // Getty jetty position
-        WFMath::Point<3> p = loc_loc->getAbsPos();
+        const WFMath::Point<3> &p = loc_loc->getAbsPos();
         // Calculate the position of the current entity in terms of the jetty.
-        WFMath::Point<3> p2 = p + (lpos - point_zero).rotate(loc_loc->getEntityOrientation());
+        const WFMath::Point<3> &p2 = p + (lpos - point_zero).rotate(loc_loc->getEntityOrientation());
         // Get the predicted height for the current entity. This is assuming
         // that the jetty is contained by an entity with a terrain attribute.
         // Perhaps we could recurse through parents until we find the terrain 
@@ -225,41 +225,46 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
 }
 
 void WorldEntity::displayInfo() {
-  Log::writeLog(std::string("Entity ID: ") + getId(), Log::LOG_DEFAULT);
-  System::instance()->pushMessage(std::string(getName()) + std::string(" - id: ") + std::string(getId()), CONSOLE_MESSAGE | SCREEN_MESSAGE);
-  Log::writeLog(std::string("Entity Name: ") + getName(), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Type: ") + type(), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Parent Type: ") + parent(), Log::LOG_DEFAULT);
+  std::string msg_name = getName() + " - id: " + getId();
+  System::instance()->pushMessage(msg_name, CONSOLE_MESSAGE | SCREEN_MESSAGE);
+  if (debug) {
+    printf("Entity ID: %s\n", getId().c_str());
+    printf("Entity Name: %s\n", getName().c_str());
+    printf("Type: %s\n", type().c_str());
+    printf("Parent Type: %s\n", parent().c_str());
   
-  WFMath::Point<3> pos = getEntityPosition();
-  Log::writeLog(std::string("Pos - X: ") + string_fmt(pos.x()) + std::string(" Y: ") + string_fmt(pos.y()) + std::string(" Z: ") + string_fmt(pos.z()), Log::LOG_DEFAULT);
-  WFMath::Point<3> abspos = getAbsPos();
-  Log::writeLog(std::string("ABS - X: ") + string_fmt(abspos.x()) + std::string(" Y: ") + string_fmt(abspos.y()) + std::string(" Z: ") + string_fmt(abspos.z()), Log::LOG_DEFAULT);
-  Eris::Entity *e = getLocation();
-  Log::writeLog(std::string("Parent: ") + ((e == NULL) ? ("NULL") : (e->getId())), Log::LOG_DEFAULT);
+    const WFMath::Point<3> &pos = getEntityPosition();
+    printf("Pos - (%f, %f, %f)\n", pos.x(), pos.y(), pos.z());
+    const WFMath::Point<3> &abspos = getAbsPos();
+
+    printf("ABS Pos (%f, %f, %f)\n", abspos.x(), abspos.y(), abspos.z());
+    Eris::Entity *e = getLocation();
+    printf("Parent: %s\n", (e == NULL) ? ("NULL") : (e->getId().c_str()));
 
     WorldEntity *loc =  dynamic_cast<WorldEntity*>(getLocation());
-if (loc) {
-  WFMath::Point<3> labspos = loc->getAbsPos();
-  Log::writeLog(std::string("LABS - X: ") + string_fmt(labspos.x()) + std::string(" Y: ") + string_fmt(labspos.y()) + std::string(" Z: ") + string_fmt(labspos.z()), Log::LOG_DEFAULT);
-}
+    if (loc) {
+      const WFMath::Point<3> &labspos = loc->getAbsPos();
+      printf("LABS - (%f, %f, %f)\n", labspos.x(), labspos.y(), labspos.z());
+    }
 
-  Log::writeLog(std::string("Num Children: ") + string_fmt(numContained()), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Has Bounding Box: ") + string_fmt(hasBBox()), Log::LOG_DEFAULT);
-  WFMath::AxisBox<3> bbox = getBBox();
-  Log::writeLog(std::string("Ux: ") + string_fmt(bbox.lowCorner().x()) + std::string(" Uy: ") + string_fmt(bbox.lowCorner().y()) + std::string(" Uz: ") + string_fmt(bbox.lowCorner().z()), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Vx: ") + string_fmt(bbox.highCorner().x()) + std::string(" Vy: ") + string_fmt(bbox.highCorner().y()) + std::string(" Vz: ") + string_fmt(bbox.highCorner().z()), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Visibility: ") + ((isVisible()) ? ("true") : ("false")), Log::LOG_DEFAULT);
-  Log::writeLog(std::string("Stamp: ") + string_fmt(getStamp()), Log::LOG_DEFAULT);
-  if (hasAttr("mass")) {
+    printf("Num Children: %d\n", numContained());
+    printf("Has Bounding Box: %d\n", hasBBox());
+    const WFMath::AxisBox<3> &bbox = getBBox();
 
-    double mass = valueOfAttr("mass").asNum();
-    Log::writeLog(std::string("Mass: ") + string_fmt(mass), Log::LOG_DEFAULT);
-    System::instance()->pushMessage(std::string(getName()) + std::string(" - Mass: ") + std::string(string_fmt(mass)), CONSOLE_MESSAGE | SCREEN_MESSAGE);
+    printf("U (%f, %f, %f)\n", bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z());
+    printf("V (%f, %f, %f)\n", bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
+    printf("Visibility: %d\n", isVisible());
+    printf("Stamp: %f\n", getStamp());
+    if (hasAttr(MODE)) {
+      const std::string &mode = valueOfAttr(MODE).asString();
+      printf("Mode: %s\n", mode.c_str());
+    }
   }
-  if (hasAttr(MODE)) {
-    std::string mode = valueOfAttr(MODE).asString();
-    if (debug) Log::writeLog(std::string("Mode: ") + mode, Log::LOG_DEFAULT);
+  if (hasAttr("mass")) {
+    double mass = valueOfAttr("mass").asNum();
+    if (debug) printf("Mass: %f\n", mass);
+    std::string msg_mass = getName() + " - Mass: " + string_fmt(mass);
+    System::instance()->pushMessage(msg_mass, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   }
 }
 
@@ -282,7 +287,7 @@ std::string WorldEntity::parent() {
 
 void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
   if (str == MODE) {
-    const std::string mode = v.asString();
+    const std::string &mode = v.asString();
     static ActionHandler *ac = System::instance()->getActionHandler();
     assert(ac);
     ac->handleAction(mode + "_" + type(), NULL);
@@ -298,7 +303,7 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
     if (record) record->setAppearance(mt);
 */
   } else if (str == "right_hand_wield") {
-    std::string id = v.asString();
+    const std::string &id = v.asString();
     if (id.empty()) {
      m_attached.erase("right_hand_wield");
     } else {
@@ -315,18 +320,17 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
   } else if (str == "status") {
     m_status = v.asNum();
   } else if (str == "outfit") {
-    printf("Changed: Outfit\n");
-  SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
+    SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
     if (!record) return;
     record->clearOutfit();
 
     if (v.isMap() == true) {
-      Atlas::Message::MapType mt = v.asMap();
-      Atlas::Message::MapType::iterator I = mt.begin();
+      const Atlas::Message::MapType &mt = v.asMap();
+      Atlas::Message::MapType::const_iterator I = mt.begin();
       while (I != mt.end()) {
         if (I->second.isString()) {
-          std::string where = I->first;
-          std::string id = I->second.asString();
+          const std::string &where = I->first;
+          const std::string &id = I->second.asString();
           printf("%s -> %s\n", I->first.c_str(), I->second.asString().c_str());
           WorldEntity *we = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
           if (we) record->entityWorn(where, we);
@@ -352,7 +356,7 @@ void WorldEntity::onSightOutfit(Eris::Entity *ent, std::string where) {
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
-  printf("Slot is %s\n", slot.c_str());
+  if (debug) printf("Slot is %s\n", slot.c_str());
   m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
 }
 
@@ -368,7 +372,7 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
 
   if (I == p.end()) return;
 
-  std::string a = *I;
+  const std::string &a = *I;
 
   static ActionHandler *ac = System::instance()->getActionHandler();
   ac->handleAction(a + "_" + type(), NULL);

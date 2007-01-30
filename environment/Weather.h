@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2006 Simon Goodall
 
-// $Id: Weather.h,v 1.2 2006-02-16 21:23:30 simon Exp $
+// $Id: Weather.h,v 1.3 2007-01-30 23:20:37 simon Exp $
 
 #ifndef SEAR_ENVIRONMENT_WEATHER_H
 #define SEAR_ENVIRONMENT_WEATHER_H 1
@@ -10,11 +10,14 @@
 #include <sigc++/trackable.h>
 #include <Eris/Types.h>
 
+#include "interfaces/ConsoleObject.h"
+
 namespace Sear {
 
+class Console;
 class WorldEntity;
 
-class Weather : public sigc::trackable {
+class Weather : public sigc::trackable, public ConsoleObject {
 public:
 
   Weather();
@@ -26,6 +29,9 @@ public:
 
   void setWeatherEntity(WorldEntity *we);
   void render();
+
+  void registerCommands(Console *con);
+  void runCommand(const std::string &cmd, const std::string &args);  
 
 private:
   void weatherChanged(const Eris::StringSet &s, Sear::WorldEntity *we);

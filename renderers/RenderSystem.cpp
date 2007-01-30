@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.20 2007-01-10 17:36:23 simon Exp $
+// $Id: RenderSystem.cpp,v 1.21 2007-01-30 23:20:37 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -235,6 +235,16 @@ WorldEntity *RenderSystem::getActiveEntity() const {
 std::string RenderSystem::getActiveEntityID() const {
   assert(m_initialised);
   return m_renderer->getActiveID();
+}
+
+int RenderSystem::getWindowWidth() const {
+  assert (m_initialised);
+  return m_renderer->getWindowWidth();
+}
+
+int RenderSystem::getWindowHeight() const {
+  assert (m_initialised);
+  return m_renderer->getWindowHeight();
 }
 
 } // namespace Sear
