@@ -12,10 +12,23 @@ Please report bugs on the Sear forum at http://forums.worldforgedev.org/
 Simon Goodall
 
 Email: sear@simongoodall.co.uk
-IRC irc.worldforge.org NICK simon
+IRC: irc.worldforge.org NICK simon
+
+Known Issues
+------------
+
+ On Ubuntu systems, Sear can fail to start due to the following error:
+
+Creating link /home/sg/.kde/socket-echo.
+can't create mcop directory.
+
+  This can be worked around by setting the SDL_AUDIODRIVER environment variable
+  before starting Sear. E.g.
+
+  $> SDL_AUDIODRIVER=alsa /opt/worldforge/bin/sear
 
 
-Dependancies
+Dependencies
 ------------
 
 Atlas: 0.6.0
@@ -44,14 +57,13 @@ http://sourceforge.net/projects/libsigc/
 Lib3ds 1.2.0
 http://sourceforge.net/projects/lib3ds/
 
-OpenGL 1.3
+OpenGL 1.3 or greater
 
 Cal3D 0.11.0
 http://sourceforge.net/projects/cal3d/
 
 Guichan 0.5.0
 http://guichan.sourceforge.net/
-
 
 
 Sky Dome based on;
