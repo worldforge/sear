@@ -95,7 +95,7 @@ void Weather::render() {
   // TODO, check possible values for m_rain.
   // Make buf permanent.
 
-  glColor4f(1.0f, 1.0f, 1.0f, 0.0f);
+  glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
   const int max_points = 1000;
 
   // Use this value as a weighting for the number of rain drops to show
@@ -122,7 +122,7 @@ void Weather::render() {
   glGetIntegerv(GL_POINT_SIZE,  &pSize);
   if (sage_ext[GL_ARB_POINT_SPRITE]) {
     glGetFloatv(GL_POINT_SIZE_MAX_ARB, &maxSize);
-    if (maxSize > 15.0f) maxSize = 15.0f;
+    if (maxSize > 20.0f) maxSize = 20.0f;
     glEnable( GL_POINT_SPRITE_ARB );
     // Tell OpenGL to  generate its own texture coords for the point sprite
     glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
