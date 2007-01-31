@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2006 Simon Goodall
+// Copyright (C) 2006 - 2007 Simon Goodall
 
-// $Id: Weather.h,v 1.3 2007-01-30 23:20:37 simon Exp $
+// $Id: Weather.h,v 1.4 2007-01-31 21:19:37 simon Exp $
 
 #ifndef SEAR_ENVIRONMENT_WEATHER_H
 #define SEAR_ENVIRONMENT_WEATHER_H 1
@@ -33,12 +33,15 @@ public:
   void registerCommands(Console *con);
   void runCommand(const std::string &cmd, const std::string &args);  
 
+  float getVisibility() const { return m_visibility; }
+
 private:
   void weatherChanged(const Eris::StringSet &s, Sear::WorldEntity *we);
   bool m_initialised;
 
   float m_rain;
   float m_snow;
+  float m_visibility;
 };
 
 } // namespace Sear

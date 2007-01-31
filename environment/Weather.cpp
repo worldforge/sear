@@ -31,16 +31,19 @@ static const bool debug = false;
 
 static const std::string ATTR_RAIN = "rain";
 static const std::string ATTR_SNOW = "snow";
+static const std::string ATTR_VISIBILITY = "visibility";
 
 static const std::string CMD_SET_RAIN = "set_rain";
 static const std::string CMD_SET_SNOW = "set_snow";
+static const std::string CMD_SET_VISIBILITY = "set_visibility";
 
 namespace Sear {
 
 Weather::Weather() :
   m_initialised(false),
   m_rain(0.0f),
-  m_snow(0.0f)
+  m_snow(0.0f),
+  m_visibility(0.0f)
 {}
 
 Weather::~Weather() {
@@ -70,6 +73,9 @@ void Weather::setWeatherEntity(WorldEntity *we) {
   if (we->hasAttr(ATTR_SNOW)) {
     m_snow = we->valueOfAttr(ATTR_SNOW).asNum();
   }
+  if (we->hasAttr(ATTR_VISIBILITY)) {
+    m_visibility = we->valueOfAttr(ATTR_VISIBILITY).asNum();
+  }
   // Link to callback in case it ever changes.
   we->Changed.connect(sigc::bind(sigc::mem_fun(this, &Weather::weatherChanged), we));
 }
@@ -84,6 +90,9 @@ void Weather::weatherChanged(const Eris::StringSet &s, Sear::WorldEntity *we) {
     }  
     else if (attr_name == ATTR_SNOW) {
       m_snow = we->valueOfAttr(ATTR_SNOW).asNum();
+    }
+    else if (attr_name == ATTR_VISIBILITY) {
+      m_visibility = we->valueOfAttr(ATTR_VISIBILITY).asNum();
     }
     ++I;
   }
@@ -151,6 +160,7 @@ void Weather::render() {
 void Weather::registerCommands(Console *con) {
   con->registerCommand(CMD_SET_RAIN, this);
 //  con->registerCommand(CMD_SET_SNOW, this);
+  con->registerCommand(CMD_SET_VISIBILITY, this);
 }
 
 void Weather::runCommand(const std::string &cmd, const std::string &args) {
@@ -169,6 +179,13 @@ void Weather::runCommand(const std::string &cmd, const std::string &args) {
     if (f > 1.0f) f = 1.0f;
     m_snow = f;
   }
+  else
+  if (cmd == CMD_SET_VISIBILITY) {
+    float f;
+    cast_stream(args, f);
+    m_visibility = f;
+  }
+
 
 
 }

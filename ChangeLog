@@ -1,5 +1,14 @@
 2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
 
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/Weather.cpp, environment/Weather.h,
+	  renderers/Graphics.cpp: Read the visibility attribute from the weather
+	  object. Use this to define the fog end distance, with the fog start
+	  distance half the visibility. Add a /set_visibility command to
+	  override the current server set visibility.
+
+2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
+
 	* environment/Weather.cpp: Change alpha in colour. Make drops bigger.
 
 2007-01-31  Al Riddoch  <alriddoch@zepler.org>

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
 #ifndef SEAR_ENVIRONMENT_H
 #define SEAR_ENVIRONMENT_H 1
@@ -57,6 +57,8 @@ public:
   void setWeatherEntity(WorldEntity *we);
 
   void registerCommands(Console *con);
+
+  float getVisibility() const;
 
 private:
   bool m_initialised;

@@ -135,4 +135,8 @@ void Environment::registerCommands(Console *con) {
   m_weather->registerCommands(con);
 }
 
+float Environment::getVisibility() const {
+  assert(m_initialised == true);
+  return m_weather->getVisibility();
+}
 } // namespace Sear

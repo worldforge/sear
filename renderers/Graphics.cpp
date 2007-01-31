@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.60 2007-01-12 19:21:24 simon Exp $
+// $Id: Graphics.cpp,v 1.61 2007-01-31 21:19:37 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -313,6 +313,12 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   m_lm->reset();
   // Can we render the world yet?
   if (m_system->checkState(SYS_IN_WORLD)) {
+
+    // TODO we could set this only when the server updates the values...
+    float visibility = Environment::getInstance().getVisibility();
+    glFogf(GL_FOG_START, visibility / 2.0f);
+    glFogf(GL_FOG_END, visibility);
+
     Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
     assert(cam != NULL);
 
