@@ -21,6 +21,8 @@ RootWidget::RootWidget()
     setOpaque(false);
 }
 
+/// Determine if the mouse is over the root widget, and is thus not
+/// over any of the other widgets.
 bool RootWidget::childHasMouse()
 {
     return (mWidgetWithMouse != 0);
