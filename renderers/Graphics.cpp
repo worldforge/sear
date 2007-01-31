@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.61 2007-01-31 21:19:37 simon Exp $
+// $Id: Graphics.cpp,v 1.62 2007-01-31 21:35:37 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -185,6 +185,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   // Update camera position
   RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
+  Environment::getInstance().update(time_elapsed);
   // Do necessary GL initialisation for the frame
   m_renderer->beginFrame();
 

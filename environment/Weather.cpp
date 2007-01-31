@@ -43,7 +43,8 @@ Weather::Weather() :
   m_initialised(false),
   m_rain(0.0f),
   m_snow(0.0f),
-  m_visibility(0.0f)
+  m_visibility(10.0f),
+  m_current_visibility(10.0f)
 {}
 
 Weather::~Weather() {

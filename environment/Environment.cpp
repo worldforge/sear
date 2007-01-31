@@ -139,4 +139,10 @@ float Environment::getVisibility() const {
   assert(m_initialised == true);
   return m_weather->getVisibility();
 }
+
+void Environment::update(float time_elapsed) {
+  assert(m_initialised == true);
+  m_weather->update(time_elapsed);
+
+}
 } // namespace Sear
