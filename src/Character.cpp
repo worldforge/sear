@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.91 2007-01-27 18:33:45 simon Exp $
+// $Id: Character.cpp,v 1.92 2007-02-05 21:25:13 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -656,7 +656,7 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_PICKUP) System::instance()->setAction(ACTION_PICKUP);
   else if (command == CMD_TOUCH) System::instance()->setAction(ACTION_TOUCH);
   else if (command == CMD_DISPLAY_INVENTORY) {
-    displayInventory();
+//    displayInventory();
     System::instance()->getActionHandler()->handleAction("inventory_open", NULL);
   }
   else if (command == CMD_MAKE) {

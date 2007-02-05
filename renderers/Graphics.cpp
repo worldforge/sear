@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.62 2007-01-31 21:35:37 simon Exp $
+// $Id: Graphics.cpp,v 1.63 2007-02-05 21:25:12 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -276,7 +276,9 @@ void Graphics::setCameraTransform() {
   float terrain_z = Environment::getInstance().getHeight(p2.x(), p2.y());
   // Adjust height by distance below ground so camera does not go below ground
   if (p2.z() < terrain_z) {
-    height += (terrain_z - p2.z());
+    //height += (terrain_z - p2.z());
+    // Clamp height to just above the terrain
+    height = (terrain_z - p2.z()) + 0.5f;
   }
 
   if (cam->getType() == Camera::CAMERA_CHASE) {
