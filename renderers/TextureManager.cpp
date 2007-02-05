@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.47 2006-09-17 19:42:42 simon Exp $
+// $Id: TextureManager.cpp,v 1.48 2007-02-05 17:33:01 simon Exp $
 
 #include <unistd.h>
 
@@ -715,7 +715,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
   if (command == CMD_LOAD_SPRITE_CONFIG) {
     std::string a = arguments;
     System::instance()->getFileHandler()->getFilePath(a);
-    std::cout << "reading sprite config at " << a << std::endl;
+    if (debug) std::cout << "reading sprite config at " << a << std::endl;
     m_spriteConfig.readFromFile(a);
   }
   

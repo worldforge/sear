@@ -1,3 +1,9 @@
+2007-02-05 Simon Goodall  <sear@simongoodall.co.uk>
+
+	* guichan/CharacterWindow.cpp: Removed some debugging output.
+
+	* renderers/TextureManager.cpp: Changed some output to debug only.
+
 2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Environment.cpp, environment/Environment.h, 

@@ -298,7 +298,6 @@ void CharacterWindow::actionPressed(std::string event)
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const Eris::CharacterMap & ci = account->getCharacters();
-printf("%d -- %d\n", m_charSelected, ci.size());
       if (m_charSelected >= 0 && (unsigned int)m_charSelected < ci.size()) {
         Eris::CharacterMap::const_iterator I = ci.begin();
         Eris::CharacterMap::const_iterator Iend = ci.end();
