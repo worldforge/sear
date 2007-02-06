@@ -1,4 +1,9 @@
-2007-02-05 Simon Goodall  <sear@simongoodall.co.uk>
+2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* renderers/Graphics.cpp: Fix camera so that the height doesn't suddenly
+	  drop when you go below a certain elevation.
+
+2007-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Weather.cpp: Increase default fog dist to 500m.
 
