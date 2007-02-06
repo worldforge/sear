@@ -1,5 +1,10 @@
 2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* configure.ac, NEWS: Bump version to 0.6.3 for release. Updated NEWS
+	  entry.
+
+2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* renderers/Graphics.cpp: Fix camera so that the height doesn't suddenly
 	  drop when you go below a certain elevation.
 
@@ -7,27 +12,27 @@
 
 	* environment/Weather.cpp: Increase default fog dist to 500m.
 
-2007-02-05 Simon Goodall  <sear@simongoodall.co.uk>
+2007-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* renderers/Graphics.cpp: Lower camera height clamp to 0.5m above
 	  terrain surface.
 
 	* src/Character.cpp: Remove old inventory output.
 
-2007-02-05 Simon Goodall  <sear@simongoodall.co.uk>
+2007-02-05  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/CharacterWindow.cpp: Removed some debugging output.
 
 	* renderers/TextureManager.cpp: Changed some output to debug only.
 
-2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-31  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Environment.cpp, environment/Environment.h, 
 	  environment/Weather.cpp, environment/Weather.h,
 	  renderers/Graphics.cpp: Change visibility gradually so the fog
 	  doesn't suddenly "jump" to a new position.
 
-2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-31  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Environment.cpp, environment/Environment.h,
 	  environment/Weather.cpp, environment/Weather.h,
@@ -36,7 +41,7 @@
 	  distance half the visibility. Add a /set_visibility command to
 	  override the current server set visibility.
 
-2007-01-31 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-31  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Weather.cpp: Change alpha in colour. Make drops bigger.
 
@@ -45,7 +50,7 @@
 	* guichan/RootWidget.cpp: Add a comment which should be useful when
 	  working out how to port this code to newer versions of guichan.
 
-2007-01-30 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-30  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Environment.cpp, environment/Environment.h,
 	  src/System.cpp: Added functions for registerCommands for the Weather
@@ -60,28 +65,28 @@
 	* renderers/RenderSystem.h, renderers/RenderSystem.cpp: Added accessors
 	  to get window width and height.
 
-2007-01-28 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-28  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp: Clean up some formatting.
 
-2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/Character.cpp, guichan/Character.h: Re-worked GUI component so
 	  that the type text box is no longer there. Use the drop down box
 	  instead.
 
-2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp: Get control points for invalid 
 	  segments for bounding box checks.
 
 	* src/Character.cpp: Randomise the /make command position.
 
-2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/Weather.cpp: Make rain drops a bit bigger.
 
-2007-01-27 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-27  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* guichan/Invevntory.cpp, guichan/Makefile.am, guichan/RenameDialog.cpp,
 	  guichan/RenameDialog.h, guichan/actiontextfield.cpp,
@@ -100,7 +105,7 @@
 	  position to specify the coordinates to move to within the current
 	  container.
 
-2007-01-24 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-24  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/SearObject.cpp, loaders/SearObject.h, 
 	  loaders/SearObjectTypes.h, loaders/SearObject_Loader.cpp,
@@ -125,7 +130,7 @@
 	* src/Character.cpp: Inventory item rename op needs to come from
 	  avatar.
 
-2007-01-21 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Character.cpp, src/Character.h: Modify the findInInventory
 	  function to search for ID first, then name, then type. Modify
@@ -135,11 +140,11 @@
 	  server. Randomized the drop position to anywhere within +-1.0f in the
 	  x or y direction.
 
-2007-01-21 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-21  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* configure.ac: Bump required eris version number.
 
-2007-01-15 Simon Goodall  <sear@simongoodall.co.uk>
+2007-01-15  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/Calendar.cpp: Get a const ref to the DateTime object.
 
