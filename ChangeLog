@@ -1,5 +1,9 @@
 2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* src/sear-res.rc.in: Bump version numbers.
+
+2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* configure.ac, NEWS: Bump version to 0.6.3 for release. Updated NEWS
 	  entry.
 

@@ -2,8 +2,8 @@
 AppIcon ICON "../data/sear_icon.ico"
 
 1 VERSIONINFO
-FILEVERSION 0,6,2,0
-PRODUCTVERSION 0,6,2,0
+FILEVERSION 0,6,3,0
+PRODUCTVERSION 0,6,3,0
 FILEOS VOS_NT
 FILETYPE VFT_APP
 
@@ -17,7 +17,7 @@ FILETYPE VFT_APP
         VALUE "FileDescription", "Sear, a 3-D client for WorldForge"
         VALUE "FileVersion", "@VERSION@"
         VALUE "InteralName", "sear-bin.exe"
-        VALUE "LegalCopyright", "Copyright (C) 2002-2006 Simon Goodall, GPL"
+        VALUE "LegalCopyright", "Copyright (C) 2002-2007 Simon Goodall, GPL"
         VALUE "OriginalFilename", "sear-bin.exe"
         VALUE "ProductName", "Sear"
         VALUE "ProductVersion", "@VERSION@"
