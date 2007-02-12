@@ -162,14 +162,16 @@ void StaticObject::render(bool select_mode) const {
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
   glPushMatrix();
   // Set transform
-  float m[4][4];
-  m_matrix.getMatrix(m);
-  glMultMatrixf(&m[0][0]);
+//  float m[4][4];
+//  m_matrix.getMatrix(m);
+//  glMultMatrixf(&m[0][0]);
+  glMultMatrixf(m_matrix.getMatrix());
 
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();
-  m_tex_matrix.getMatrix(m);
-  glMultMatrixf(&m[0][0]);
+//  m_tex_matrix.getMatrix(m);
+//  glMultMatrixf(&m[0][0]);
+  glMultMatrixf(m_tex_matrix.getMatrix());
   glMatrixMode(GL_MODELVIEW);
     
 
@@ -424,11 +426,12 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
 
   // Setup texture transform
-  float m[4][4];
+//  float m[4][4];
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();
-  m_tex_matrix.getMatrix(m);
-  glMultMatrixf(&m[0][0]);
+//  m_tex_matrix.getMatrix(m);
+//  glMultMatrixf(&m[0][0]);
+  glMultMatrixf(m_tex_matrix.getMatrix());
   glMatrixMode(GL_MODELVIEW);
 
    // If VBO's are enabled
@@ -487,11 +490,13 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       glPushMatrix();
       // Set transform
       // Apply position transform 
-      mx.getMatrix(m);
-      glMultMatrixf(&m[0][0]);
+  //    mx.getMatrix(m);
+//      glMultMatrixf(&m[0][0]);
+      glMultMatrixf(mx.getMatrix());
       // Apply mesh transform
-      m_matrix.getMatrix(m);
-      glMultMatrixf(&m[0][0]);
+//      m_matrix.getMatrix(m);
+//      glMultMatrixf(&m[0][0]);
+      glMultMatrixf(m_matrix.getMatrix());
 
       // Do we need to highlight this mesh?
       if (!select_mode && we->isSelectedEntity()) {
@@ -724,11 +729,13 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       glPushMatrix();
       // Set transform
       // Apply position transform 
-      mx.getMatrix(m);
-      glMultMatrixf(&m[0][0]);
+//      mx.getMatrix(m);
+//      glMultMatrixf(&m[0][0]);
+      glMultMatrixf(mx.getMatrix());
       // Apply mesh transform
-      m_matrix.getMatrix(m);
-      glMultMatrixf(&m[0][0]);
+//      m_matrix.getMatrix(m);
+//      glMultMatrixf(&m[0][0]);
+      glMultMatrixf(m_matrix.getMatrix());
 
       // Render stuff
       if (!select_mode && we->isSelectedEntity()) {
