@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Console.h,v 1.15 2006-02-15 12:44:24 simon Exp $
+// $Id: Console.h,v 1.16 2007-02-12 21:44:00 simon Exp $
 
 #ifndef SEAR_CONSOLE_H
 #define SEAR_CONSOLE_H 1
@@ -111,6 +111,8 @@ protected:
   std::list<std::string> m_console_messages; // Current console messages
   std::list<screenMessage> m_screen_messages; // Current screen messages
   int m_panel_id; // The texture id of the console's panel texture
+  int m_panel_state;
+  int m_font_state;
   System *m_system;
 
   // Mapping of registered commands to assoicated object

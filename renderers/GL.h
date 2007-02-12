@@ -151,6 +151,8 @@ protected:
   int m_font_id;
   int m_splash_id;
 
+  StateID m_state_font, m_state_splash;
+
   float m_frustum[6][4];
   
   std::string m_active_name;

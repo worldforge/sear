@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.93 2007-02-12 18:21:53 simon Exp $
+// $Id: WorldEntity.cpp,v 1.94 2007-02-12 21:44:00 simon Exp $
 
 /*
  TODO
@@ -333,7 +333,8 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
     if (v.isMap() == true) {
       const Atlas::Message::MapType &mt = v.asMap();
       Atlas::Message::MapType::const_iterator I = mt.begin();
-      while (I != mt.end()) {
+      Atlas::Message::MapType::const_iterator Iend = mt.end();
+      while (I != Iend) {
         if (I->second.isString()) {
           const std::string &where = I->first;
           const std::string &id = I->second.asString();

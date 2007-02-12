@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.38 2006-09-17 19:42:42 simon Exp $
+// $Id: Console.cpp,v 1.39 2007-02-12 21:44:00 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -28,7 +28,6 @@ namespace Sear {
 static const std::string TOGGLE_CONSOLE = "toggle_console";
 static const std::string LIST_CONSOLE_COMMANDS = "list_commands";
 
-static const std::string UI = "ui";
 static const std::string PANEL = "panel";
 static const std::string FONT = "font";
 
@@ -85,7 +84,9 @@ Console::Console(System *system) :
   m_consoleHeight(0),
   m_console_messages(std::list<std::string>()),
   m_screen_messages(std::list<screenMessage>()),
-  m_panel_id(0),
+  m_panel_id(-1),
+  m_panel_state(-1),
+  m_font_state(-1),
   m_system(system),
   m_CaretPosition(0),
   m_bTabOnce(false),
@@ -190,12 +191,20 @@ void Console::renderConsoleMessages(void) {
   int i;
   //Render console panel
   int consoleOffset = CONSOLE_HEIGHT - m_consoleHeight;
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(PANEL));
   //Make panel slightly transparent
   renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  if (m_panel_id == 0) m_panel_id = RenderSystem::getInstance().requestTexture(PANEL);
+  if (m_panel_id == -1) {
+    m_panel_id = RenderSystem::getInstance().requestTexture(PANEL);
+    m_panel_state = RenderSystem::getInstance().requestState(PANEL);
+  }
+  RenderSystem::getInstance().switchState(m_panel_state);
+
   renderer->drawTextRect(0, 0, renderer->getWindowWidth(), m_consoleHeight, m_panel_id);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
+  
+  if (m_font_state == -1) {
+    m_font_state = RenderSystem::getInstance().requestState(FONT);
+  }
+  RenderSystem::getInstance().switchState(m_font_state);
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   //Render console messges
   for (I = m_console_messages.begin(), i = 0; I != m_console_messages.end(); ++I, ++i) {
@@ -217,19 +226,24 @@ void Console::renderConsoleMessages(void) {
 
 void Console::renderScreenMessages() {
   assert ((m_initialised == true) && "Console not initialised");
-  Render *renderer = RenderSystem::getInstance().getRenderer();
   if (m_screen_messages.empty()) return;	
-  std::list<screenMessage>::const_iterator I;
   int i;
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
+
+  if (m_font_state == -1) {
+    m_font_state = RenderSystem::getInstance().requestState(FONT);
+  }
+  RenderSystem::getInstance().switchState(m_font_state);
+  Render *renderer = RenderSystem::getInstance().getRenderer();
   renderer->setColour(1.0f, 1.0f, 0.0f, 1.0f);
   // Get screen height so we can calculate offset correctly
   int height = renderer->getWindowHeight();
   //Get time so we can remove expired messages
   unsigned int current_time = m_system->getTime();
   //Render messges
-  for (I = m_screen_messages.begin(), i = 0; I != m_screen_messages.end(); ++I, ++i) {
-    const std::string str = (const std::string)((*I).first);
+  std::list<screenMessage>::const_iterator I = m_screen_messages.begin();
+  std::list<screenMessage>::const_iterator Iend = m_screen_messages.end();
+  for (i = 0; I != Iend; ++I, ++i) {
+    const std::string &str = I->first;
     renderer->print(CONSOLE_TEXT_OFFSET_X, height - ((i + 1) * FONT_HEIGHT ), const_cast<char*>(str.c_str()), 0);
   }
   //Remove expired messages
@@ -400,7 +414,6 @@ void Console::runCommand(const std::string &comd) {
   assert ((m_initialised == true) && "Console not initialised");
   if (comd.empty()) return; // Ignore empty string
   std::string command = comd;
-//  System::instance()->getFileHandler()->expandString(command);
   // Grab first character of command string
   char c = command.c_str()[0];
   // Check to see if command is a command, or a speech string
@@ -421,7 +434,7 @@ void Console::runCommand(const std::string &comd) {
   Tokeniser tokeniser = Tokeniser();
   tokeniser.initTokens(command_string);
   std::string cmd = tokeniser.nextToken();
-  std::string args = tokeniser.remainingTokens();
+  const std::string &args = tokeniser.remainingTokens();
   
   // This allows command abbreviation
   std::multimap< std::string, std::string >::size_type Count = m_CommandStarts.count(cmd);

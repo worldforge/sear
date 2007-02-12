@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.163 2007-01-27 11:38:48 simon Exp $
+// $Id: GL.cpp,v 1.164 2007-02-12 21:44:00 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -161,13 +161,15 @@
   static const float DEFAULT_texture_scale = 10.0f;
 
 static bool use_ext_compiled_vertex_array = false;
-static std::string FONT = "font";
-static std::string UI = "ui";
-static std::string SPLASH = "splash";
-static std::string DEFAULT = "default";
+
+static std::string STATE_font = "font";
+static std::string STATE_splash = "splash";
+static std::string STATE_halo = "halo";
+static std::string STATE_default = "default";
+
 static std::string DEFAULT_TEXTURE = "default_texture";
 static std::string DEFAULT_FONT = "default_font";
-static std::string HALO = "halo";
+
 static std::string MASK = "_mask";
 static std::string RENDER = "render";
 	
@@ -192,8 +194,6 @@ namespace Sear {
 bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
   assert(m_screen == NULL);
   m_graphics = RenderSystem::getInstance().getGraphics();
-  // Destroy the existing window
-//  if (m_screen != NULL) destroyWindow();
   
   if (debug) printf("GL: Creating Window\n");
   // Set new window size etc..
@@ -303,7 +303,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     return false;
   }
 
-  // TODO: Check that the OpenGL version is at least 1.2
+  // TODO: Check that the OpenGL version is at least 1.3
 
   if (contextCreated()) {
     fprintf(stderr, "Error initialising context.\n");
@@ -330,7 +330,7 @@ int GL::contextCreated() {
   //TODO: this needs to go into the set viewport method
   //Check for divide by 0
   if (m_height == 0) m_height = 1;
-//  glLineWidth(2.0f);
+
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // Colour used to clear window
   glClearDepth(1.0); // Enables Clearing Of The Depth Buffer
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -338,15 +338,12 @@ int GL::contextCreated() {
   if (m_use_fsaa) {
     glEnable(GL_MULTISAMPLE_ARB);
   }
- // glDisable(GL_DITHER);
                                                                                 
   setViewMode(PERSPECTIVE);
   if (setupExtensions()) {
     fprintf(stderr, "Error finding required extensions.\n");
     return 1;
   }
-
-//  initFont();
 
   buildColourSet();
   if (debug) std::cout << "Window created" << std::endl << std::flush;
@@ -420,7 +417,7 @@ int GL::setupExtensions() {
                                                                                 
 void GL::nextColour(WorldEntity *we) {
   assert(we != 0);
-  // TODO, we are now passing the same we to this function several times per
+  // TODO: we are now passing the same we to this function several times per
   // frame. We might want to return the same colour each time, rather than 
   // allocate a new one.
 
@@ -465,7 +462,7 @@ void GL::buildColourSet() {
     GLubyte blue = (indx & (m_blueMask << m_blueShift)) >> (m_blueShift);
     // Bit shift to MSB format
     // Warning, there is an overflow here if shift is negative
-    //  Should only happen if num bits > num bits in glubyte
+    // Should only happen if num bits > num bits in glubyte
     shift = 8 - m_redBits;
     if (shift > 0) red <<= shift;
     else if (shift < 0) red >>= shift;
@@ -475,9 +472,7 @@ void GL::buildColourSet() {
     shift = 8 - m_blueBits;
     if (shift > 0) blue <<= shift;
     else if (shift < 0) blue >>= shift;
-//    GLubyte red = (indx & (m_redMask << m_redShift)) << (8 - m_redShift - m_redBits);
-//    GLubyte green = (indx & (m_greenMask << m_greenShift)) << (8 - m_greenShift-m_greenBits);
-//    GLubyte blue = (indx & (m_blueMask << m_blueShift)) << (8 - m_blueShift - m_blueBits);
+
     m_colourArray[indx * 3 + 0] = red;
     m_colourArray[indx * 3 + 1] = green;
     m_colourArray[indx * 3 + 2] = blue;
@@ -497,6 +492,8 @@ GL::GL() :
   m_base(0),
   m_font_id(-1),
   m_splash_id(-1),
+  m_state_font(-1),
+  m_state_splash(-1),
   m_x_pos(0), m_y_pos(0),
   m_speech_offset_x(0.0f),
   m_speech_offset_y(0.0f),
@@ -577,11 +574,14 @@ void GL::initLighting() {
 }
 
 void GL::initFont() {
+  if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
   float cx; // Holds Our X Character Coord
   float cy; // Holds Our Y Character Coord
-  if (debug) Log::writeLog("Render: Initailising Fonts", Log::LOG_DEFAULT);
-  m_base=glGenLists(256); // Creating 256 Display Lists
+  m_base = glGenLists(256); // Creating 256 Display Lists
+
   m_font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
+  m_state_font = RenderSystem::getInstance().requestState(STATE_font);
+
   RenderSystem::getInstance().switchTexture(m_font_id);
   for (int loop=0; loop<256; ++loop) {
     cx=(float)(loop%16)/16.0f; // X Position Of Current Character
@@ -724,7 +724,7 @@ void GL::procEvent(int x, int y) {
     } else {
       m_activeEntity = Eris::EntityRef();
     }
-//    m_activeEntity = selected_entity;
+
     if (debug && m_activeEntity) Log::writeLog(std::string("ActiveID: ") + m_activeEntity->getId(), Log::LOG_DEFAULT);
   }
 }
@@ -990,11 +990,12 @@ inline void GL::rotate(float angle, float x, float y, float z) {
 
 void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) {
   WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
-//  if (!we) return; // THROW ERROR;
+  assert(we != 0);
+
   switch (model_record->rotation_style) {
     case ROS_NONE: return; break;
     case ROS_POSITION: {
-       WFMath::Point<3> pos = object_record->position;
+       const WFMath::Point<3> &pos = object_record->position;
        assert(pos.isValid());
        glRotatef(pos.x() + pos.y() + pos.z(), 0.0f, 0.0f, 1.0f);
        break;
@@ -1003,14 +1004,13 @@ void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_
       applyQuaternion(we->getAbsOrient().inverse());
       break;
     }
-    case ROS_BILLBOARD: // Same as HALO, but does not rotate with camera elevation
+    case ROS_BILLBOARD: // Same as STATE_halo, but does not rotate with camera elevation
     case ROS_HALO: {
       float rotation_matrix[4][4];
-      WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+      WFMath::Quaternion orient2(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
       orient2 *= m_graphics->getCameraOrientation();
       QuatToMatrix(orient2, rotation_matrix); //Get the rotation matrix for base rotation
       glMultMatrixf(&rotation_matrix[0][0]); //Apply rotation matrix
-//      glMultMatrixf(rotation_matrix); //Apply rotation matrix
       break;
     }
   }
@@ -1129,10 +1129,16 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode) {
-  for (QueueMap::const_iterator I = queue.begin(); I != queue.end(); ++I) {
+
+
+  QueueMap::const_iterator I = queue.begin();
+  QueueMap::const_iterator Iend = queue.end();
+  for (; I != Iend; ++I) {
     // Change state for this queue
     RenderSystem::getInstance().switchState(I->first);
-    for (Queue::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
+    Queue::const_iterator J = I->second.begin();
+    Queue::const_iterator Jend = I->second.end();
+    for (;J != Jend; ++J) {
 
       SPtr<ObjectRecord> object_record = J->first;
       SPtr<ModelRecord> model_record = J->second;
@@ -1212,14 +1218,16 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
 void GL::drawNameQueue(MessageList &list) {
   glColor4fv(blue);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
-  for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
+  RenderSystem::getInstance().switchState(m_state_font);
+  MessageList::const_iterator I = list.begin();
+  MessageList::const_iterator Iend = list.end();
+  for (; I != Iend; ++I) {
     WorldEntity *we = *I;
     glPushMatrix();
     const WFMath::Point<3> &pos = we->getAbsPos();
     assert(pos.isValid());
     glTranslatef(pos.x(), pos.y(), pos.z());
-    WFMath::Quaternion  orient2 = WFMath::Quaternion(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
+    WFMath::Quaternion orient2(1.0f, 0.0f, 0.0f, 0.0f); // Initial Camera rotation
     orient2 *= m_graphics->getCameraOrientation(); 
     applyQuaternion(orient2);
     glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
@@ -1231,8 +1239,10 @@ void GL::drawNameQueue(MessageList &list) {
 }
 void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
-  for (MessageList::const_iterator I = list.begin(); I != list.end(); ++I) {
+  RenderSystem::getInstance().switchState(m_state_font);
+  MessageList::const_iterator I = list.begin();
+  MessageList::const_iterator Iend = list.end();
+  for (; I != Iend; ++I) {
     WorldEntity *we = *I;
     glPushMatrix();
     const WFMath::Point<3> &pos = we->getAbsPos();
@@ -1308,7 +1318,13 @@ inline void GL::endFrame(bool select_mode) {
 }
   
 void GL::drawSplashScreen() {
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(SPLASH));
+
+  if (m_splash_id == -1) {
+    m_state_splash = RenderSystem::getInstance().requestState(STATE_splash);
+    m_splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
+  }
+
+  RenderSystem::getInstance().switchState(m_state_splash);
 
   // We don't need super fast rendering for the splash screen
   SDL_Delay(sleep_time);
@@ -1317,7 +1333,6 @@ void GL::drawSplashScreen() {
   
   glColor4fv(white);
 
-  if (m_splash_id == -1) m_splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
   RenderSystem::getInstance().switchTexture(m_splash_id);
 
   // TODO into vertex array?
@@ -1399,13 +1414,13 @@ inline void GL::renderActiveName() {
   if (m_active_name.empty()) return;
 
   glColor4fv(activeNameColour);
-  RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(FONT));
+  RenderSystem::getInstance().switchState(m_state_font);
   print(m_x_pos, m_y_pos, m_active_name.c_str(), 1);
 }
 
 inline void GL::getFrustum(float frust[6][4]) {
-  float  proj[16];
-  float  modl[16];
+  static float  proj[16];
+  static float  modl[16];
   /* Get the current PROJECTION matrix from OpenGraphics */
   glGetFloatv(GL_PROJECTION_MATRIX, proj );
   /* Get the current MODELVIEW matrix from OpenGraphics */
@@ -1623,7 +1638,8 @@ void GL::drawQueue(const QueueObjectMap &object_map,
                    bool select_mode) {
 
   QueueObjectMap::const_iterator I = object_map.begin();
-  while (I != object_map.end()) {
+  QueueObjectMap::const_iterator Iend = object_map.end();
+  while (I != Iend) {
     // Get object id 
     const std::string &key = I->first;
 
@@ -1639,7 +1655,8 @@ void GL::drawQueue(const QueueObjectMap &object_map,
     RenderSystem::getInstance().switchState(state_map.find(key)->second);
 
     std::list<SPtrShutdown<StaticObject> >::const_iterator J = objects.begin();
-    while (J != objects.end()) {
+    std::list<SPtrShutdown<StaticObject> >::const_iterator Jend = objects.end();
+    while (J != Jend) {
       (*J++)->render(select_mode, matrices);
     }
     ++I;

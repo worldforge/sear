@@ -1,37 +1,32 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Character.h,v 1.46 2007-01-21 17:46:34 simon Exp $
+// $Id: Character.h,v 1.47 2007-02-12 21:44:00 simon Exp $
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
 
-
 #include <string>
 
 #include <wfmath/quaternion.h>
-// #include <Eris/Entity.h>
 #include <Eris/EntityRef.h>
-// #include <Eris/Timeout.h>
-// #include <Eris/Types.h>
-// #include <Eris/Avatar.h>
-#include "interfaces/ConsoleObject.h"
 #include <sigc++/trackable.h>
+#include "interfaces/ConsoleObject.h"
 
 namespace Atlas {
-namespace Message {
-class Element;
-}
+  namespace Message {
+    class Element;
+  }
 }
 
 namespace Eris {
-class Avatar;
-class Entity;
+  class Avatar;
+  class Entity;
 }
 
 namespace varconf {
-class Config;
+  class Config;
 }
 
 namespace Sear {
@@ -118,9 +113,6 @@ public:
   void registerCommands(Console*);
   void runCommand(const std::string &, const std::string &);
 	
-  void setAppearance(const std::string &, const std::string &, const std::string &);
-  void sendGuise(const Atlas::Message::Element& guise);
-  void clearApp();
   void setHeight(float);
 
   void setAvatar(Eris::Avatar *avatar);

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.92 2007-02-05 21:25:13 simon Exp $
+// $Id: Character.cpp,v 1.93 2007-02-12 21:44:00 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -48,89 +48,73 @@ using Atlas::Objects::Entity::Anonymous;
   static const bool debug = false;
 #endif
 
-//  Wrap angle around it required.
-/*
-static float limitAngle(float a) {
-  static float p2 = M_PI * 2.0;
-  while (a > M_PI) a -= p2;
-  while (a < -M_PI) a += p2;
-  return a;
-}
-*/
 static std::string getNameOrType(Sear::WorldEntity *we) {
   std::string str = we->getName();
   if (str.empty()) {
     str = we->type();
   }
   return str;
-
 }
 
+// Console commands
+static const std::string CMD_MOVE_FORWARD = "+character_move_forward";
+static const std::string CMD_MOVE_BACKWARD = "+character_move_backward";
+static const std::string CMD_MOVE_STOP_FORWARD = "-character_move_forward";
+static const std::string CMD_MOVE_STOP_BACKWARD = "-character_move_backward";
 
-namespace Sear {
-  // Console commands
-  static const std::string CMD_MOVE_FORWARD = "+character_move_forward";
-  static const std::string CMD_MOVE_BACKWARD = "+character_move_backward";
-  static const std::string CMD_MOVE_STOP_FORWARD = "-character_move_forward";
-  static const std::string CMD_MOVE_STOP_BACKWARD = "-character_move_backward";
+static const std::string CMD_MOVE_UPWARD = "+character_move_upwards";
+static const std::string CMD_MOVE_DOWNWARD = "+character_move_downwards";
+static const std::string CMD_MOVE_STOP_UPWARD = "-character_move_upwards";
+static const std::string CMD_MOVE_STOP_DOWNWARD = "-character_move_downwards";
 
-  static const std::string CMD_MOVE_UPWARD = "+character_move_upwards";
-  static const std::string CMD_MOVE_DOWNWARD = "+character_move_downwards";
-  static const std::string CMD_MOVE_STOP_UPWARD = "-character_move_upwards";
-  static const std::string CMD_MOVE_STOP_DOWNWARD = "-character_move_downwards";
+static const std::string CMD_ROTATE_LEFT = "+character_rotate_left";
+static const std::string CMD_ROTATE_RIGHT = "+character_rotate_right";
+static const std::string CMD_ROTATE_STOP_LEFT = "-character_rotate_left";
+static const std::string CMD_ROTATE_STOP_RIGHT = "-character_rotate_right";
 
-  static const std::string CMD_ROTATE_LEFT = "+character_rotate_left";
-  static const std::string CMD_ROTATE_RIGHT = "+character_rotate_right";
-  static const std::string CMD_ROTATE_STOP_LEFT = "-character_rotate_left";
-  static const std::string CMD_ROTATE_STOP_RIGHT = "-character_rotate_right";
+static const std::string CMD_STRAFE_LEFT = "+character_strafe_left";
+static const std::string CMD_STRAFE_RIGHT = "+character_strafe_right";
+static const std::string CMD_STRAFE_STOP_LEFT = "-character_strafe_left";
+static const std::string CMD_STRAFE_STOP_RIGHT = "-character_strafe_right";
 
-  static const std::string CMD_STRAFE_LEFT = "+character_strafe_left";
-  static const std::string CMD_STRAFE_RIGHT = "+character_strafe_right";
-  static const std::string CMD_STRAFE_STOP_LEFT = "-character_strafe_left";
-  static const std::string CMD_STRAFE_STOP_RIGHT = "-character_strafe_right";
+static const std::string CMD_RUN = "+run";
+static const std::string CMD_STOP_RUN = "-run";
+static const std::string CMD_TOGGLE_RUN = "toggle_run";
 
-  static const std::string CMD_RUN = "+run";
-  static const std::string CMD_STOP_RUN = "-run";
-  static const std::string CMD_TOGGLE_RUN = "toggle_run";
-
-  static const std::string CMD_SAY = "say";
-  static const std::string CMD_ME = "me";
-  static const std::string CMD_PICKUP = "pickup";
-  static const std::string CMD_TOUCH = "touch";
-  static const std::string CMD_DROP = "drop";
-  static const std::string CMD_EAT = "eat";
-  static const std::string CMD_GIVE = "give";
-  static const std::string CMD_DISPLAY_INVENTORY = "inventory";
-  static const std::string CMD_MAKE = "make";
-  static const std::string CMD_USE = "use";
-  static const std::string CMD_IDLE = "idle";
-  static const std::string CMD_WIELD = "wield";
-  static const std::string CMD_ATTACK = "attack";
-  static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
+static const std::string CMD_SAY = "say";
+static const std::string CMD_ME = "me";
+static const std::string CMD_PICKUP = "pickup";
+static const std::string CMD_TOUCH = "touch";
+static const std::string CMD_DROP = "drop";
+static const std::string CMD_EAT = "eat";
+static const std::string CMD_GIVE = "give";
+static const std::string CMD_DISPLAY_INVENTORY = "inventory";
+static const std::string CMD_MAKE = "make";
+static const std::string CMD_USE = "use";
+static const std::string CMD_IDLE = "idle";
+static const std::string CMD_WIELD = "wield";
+static const std::string CMD_ATTACK = "attack";
+static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
   
-//  static const std::string CMD_SET_APPEARANCE = "set_app";
-//  static const std::string CMD_RESET_APPEARANCE = "clear_app";
-//  static const std::string CMD_READ_APPEARANCE = "read_app";
-  static const std::string CMD_SET_HEIGHT = "set_height";
-  static const std::string CMD_RENAME_ENTITY = "rename_entity";
+static const std::string CMD_SET_HEIGHT = "set_height";
+static const std::string CMD_RENAME_ENTITY = "rename_entity";
 
-  static const std::string CMD_MOVE_TO = "move_to";
-  static const std::string CMD_MOVE_TO_ORIGIN = "return_to_origin";
+static const std::string CMD_MOVE_TO = "move_to";
+static const std::string CMD_MOVE_TO_ORIGIN = "return_to_origin";
 
-  static const unsigned int server_update_interval = 500;
+static const unsigned int server_update_interval = 500;
 
+// Config section  names
+static const std::string SECTION_character = "character";
+// Config key names
+static const std::string KEY_character_walk_speed = "character_walk_speed";
+static const std::string KEY_character_run_speed = "character_run_speed";
+static const std::string KEY_character_rotate_speed = "character_rotate_speed";
 
-  // Config section  names
-  static const std::string SECTION_character = "character";
-  // Config key names
-  static const std::string KEY_character_walk_speed = "character_walk_speed";
-  static const std::string KEY_character_run_speed = "character_run_speed";
-  static const std::string KEY_character_rotate_speed = "character_rotate_speed";
-
-  // Config default values
-  static const float DEFAULT_character_walk_speed = 2.0f;
-  static const float DEFAULT_character_run_speed = 3.0f;
-  static const float DEFAULT_character_rotate_speed = 20.0f;
+// Config default values
+static const float DEFAULT_character_walk_speed = 2.0f;
+static const float DEFAULT_character_run_speed = 3.0f;
+static const float DEFAULT_character_rotate_speed = 20.0f;
 
 //actions
 static const std::string STOPPED = "ch_stopped_";
@@ -139,6 +123,8 @@ static const std::string RUNNING = "ch_running_";
 
 static const std::string GUISE = "guise";
 static const std::string HEIGHT = "height";
+
+namespace Sear {
 
 Character::Character() :
   m_avatar(NULL),
@@ -275,7 +261,7 @@ void Character::updateLocals(bool send_to_server) {
 
   unsigned int ticks;
   bool changed = false;
-
+  // TODO: Make into member variables
   static float old_speed = m_speed;
   static float old_strafe_speed = m_strafe_speed;
   static bool old_run = m_run_modifier;
@@ -301,7 +287,7 @@ void Character::updateLocals(bool send_to_server) {
 
   // If there is anything to rotate, do so
   if (fabs(a) > 0.000001f) {
-    const WFMath::Quaternion angle = WFMath::Quaternion(2, a);
+    const WFMath::Quaternion angle(2, a);
 
     m_pred_orient *= angle;
     changed = true;
@@ -354,7 +340,7 @@ void Character::dropEntity(const std::string &name, int quantity) {
     Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
     return;
   }
-  printf("Dropping %d items of %s\n", quantity, name.c_str());
+  if (debug) printf("Dropping %d items of %s\n", quantity, name.c_str());
   // Randomize drop position
   WFMath::Vector<3> pos(
     (float)rand() / (float)RAND_MAX * 2.0f - 1.0f,
@@ -538,7 +524,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
   assert ((m_initialised == true) && "Character not initialised");
   if (!m_avatar) return;
   if (quantity == 0) {
-    Log::writeLog( "Quantity is 0! Dropping nothing.", Log::LOG_DEFAULT);
+    Log::writeLog( "Quantity is 0! Giving nothing.", Log::LOG_DEFAULT);
     return;
   }
 
@@ -597,11 +583,7 @@ void Character::registerCommands(Console *console) {
   console->registerCommand(CMD_IDLE, this);
   console->registerCommand(CMD_WIELD, this);
   console->registerCommand(CMD_ATTACK, this);
-//  console->registerCommand(CMD_SET_APPEARANCE, this);
-  //console->registerCommand(CMD_RESET_APPEARANCE, this);
-//  console->registerCommand(CMD_READ_APPEARANCE, this);
   console->registerCommand(CMD_SET_HEIGHT, this);
-//  console->registerCommand(CMD_SET_ACTION, this);
   console->registerCommand(CMD_DISPLAY_USE_OPS, this);
   console->registerCommand(CMD_RENAME_ENTITY, this);
   console->registerCommand(CMD_MOVE_TO, this);
@@ -688,7 +670,6 @@ void Character::runCommand(const std::string &command, const std::string &args) 
   else if (command == CMD_ATTACK) {
     System::instance()->setAction(ACTION_ATTACK);
   }
-//  else if (command == CMD_RESET_APPEARANCE) clearApp();
   else if (command == CMD_SET_HEIGHT) {
     const std::string &hStr = tokeniser.nextToken();
     float h;
@@ -715,27 +696,6 @@ void Character::runCommand(const std::string &command, const std::string &args) 
     cast_stream(str_z, z);
     m_avatar->moveToPoint(WFMath::Point<3>(x,y,z));
   }
-/*
-  else if (command == CMD_SET_APPEARANCE) {
-    std::string map = tokeniser.nextToken();
-    std::string name = tokeniser.nextToken();
-    std::string value = tokeniser.remainingTokens();
-    setAppearance(map, name, value);
-  }
-  else if (command == CMD_READ_APPEARANCE) {
-    ObjectHandler *object_handler = ModelSystem::getInstance().getObjectHandler();
-    assert(object_handler);
-
-    Atlas::Message::MapType mt;
-    SPtr<ObjectRecord> record = object_handler->getObjectRecord(m_self->getId());
-    if (m_self->hasAttr(GUISE)) { // Read existing values
-      mt = m_self->valueOfAttr(GUISE).asMap();
-      if (record) record->setAppearance(mt);
-    } else { // Set defaults
-      if (record) record->setAppearance(mt); // mt is empty, i.e defaults
-    }
-  }
-*/
 }
 
 void Character::varconf_callback(const std::string &key, const std::string &section, varconf::Config &config) {
@@ -755,54 +715,6 @@ void Character::varconf_callback(const std::string &key, const std::string &sect
       m_rotate_speed = (!temp.is_double()) ? (DEFAULT_character_rotate_speed) : ((double)(temp));
     }
   }
-}
-
-void Character::setAppearance(const std::string &map, const std::string &name, const std::string &value) {
-  if (!m_avatar) return;
-  if (name.empty()) return;
-      
-  Atlas::Message::MapType guiseMap;
-  if (m_self->hasAttr(GUISE)) guiseMap = m_self->valueOfAttr(GUISE).asMap();
-
-    Atlas::Message::MapType::iterator I = guiseMap.find(map);
-    if (I != guiseMap.end()) {
-      I->second.asMap()[name] = value;
-    } else {
-      Atlas::Message::MapType m;
-      m[name] = value;
-      guiseMap[map] = m;
-    }
-  
-  sendGuise(guiseMap);
-}
-
-
-void Character::clearApp() {
-  assert ((m_initialised == true) && "Character not initialised");
-  Atlas::Objects::Operation::Set set;
-  set->setFrom(System::instance()->getClient()->getAccount()->getId());
-
-  Anonymous msg;
-  msg->setId(m_self->getId());
-  const Atlas::Message::MapType mt;
-  msg->setAttr(GUISE, mt);
-
-  set->setArgs1(msg);
-  m_avatar->getConnection()->send(set);
-}
-
-void Character::sendGuise(const Atlas::Message::Element& guise) {
-  assert ((m_initialised == true) && "Character not initialised");
-  if (!m_avatar) return;
-  Atlas::Objects::Operation::Set set;
-  set->setFrom(System::instance()->getClient()->getAccount()->getId());
-
-  Anonymous msg;
-  msg->setId(m_self->getId());
-  msg->setAttr(GUISE, guise);
-
-  set->setArgs1(msg);
-  m_avatar->getConnection()->send(set);
 }
 
 void Character::setHeight(float height) {
