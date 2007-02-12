@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.12 2005-08-18 10:56:36 simon Exp $
+// $Id: Utility.cpp,v 1.13 2007-02-12 18:21:53 simon Exp $
 
 #include "Utility.h"
 
@@ -71,19 +71,26 @@ void calcNormal(float v[3][3], float out[3]) {
 
 void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]) {
   float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+
+  const WFMath::Vector<3> &vec = quat.vector();
+  float vec_x = vec.x();
+  float vec_y = vec.y();
+  float vec_z = vec.z();
+  float scalar = quat.scalar();
+
   // calculate coefficients
-  x2 = quat.vector().x() + quat.vector().x();
-  y2 = quat.vector().y() + quat.vector().y();
-  z2 = quat.vector().z() + quat.vector().z();
-  xx = quat.vector().x() * x2;
-  xy = quat.vector().x() * y2;
-  xz = quat.vector().x() * z2;
-  yy = quat.vector().y() * y2;
-  yz = quat.vector().y() * z2;
-  zz = quat.vector().z() * z2;
-  wx = quat.scalar() * x2;
-  wy = quat.scalar() * y2;
-  wz = quat.scalar() * z2;
+  x2 = vec_x + vec_x;
+  y2 = vec_y + vec_y;
+  z2 = vec_z + vec_z;
+  xx = vec_x * x2;
+  xy = vec_x * y2;
+  xz = vec_x * z2;
+  yy = vec_y * y2;
+  yz = vec_y * z2;
+  zz = vec_z * z2;
+  wx = scalar * x2;
+  wy = scalar * y2;
+  wz = scalar * z2;
 
   m[0][0] = 1.0f - (yy + zz);
   m[0][1] = xy - wz;
@@ -109,9 +116,9 @@ void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]) {
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
   int count = 0;
   if (bbox.lowCorner().x() + bbox.lowCorner().y() + bbox.lowCorner().z() + bbox.highCorner().x() + bbox.highCorner().y() + bbox.highCorner().z()  == 0.0f) {
-    // BBOX has no size!! or is equidistant sround origin!!!!!
-    WFMath::Point<3> lc = WFMath::Point<3>(0.0f, 0.0f, 0.0f);
-    WFMath::Point<3> hc = WFMath::Point<3>(1.0f, 1.0f, 1.0f);
+    // BBOX has no size!! or is equidistant around origin!!!!!
+    WFMath::Point<3> lc(0.0f, 0.0f, 0.0f);
+    WFMath::Point<3> hc(1.0f, 1.0f, 1.0f);
     bbox = WFMath::AxisBox<3>(lc, hc);
  }
  if (bbox.highCorner().x() > bbox.lowCorner().x()) count++;
@@ -206,8 +213,8 @@ OrientBBox::OrientBBox()
 
 OrientBBox::OrientBBox(const WFMath::AxisBox<3>& ab)
 {
-  WFMath::Point<3> high = ab.highCorner();
-  WFMath::Point<3> low = ab.lowCorner();
+  const WFMath::Point<3> &high = ab.highCorner();
+  const WFMath::Point<3> &low = ab.lowCorner();
 
   points[UPPER_LEFT_FRONT]  = WFMath::Vector<3>(high.x(), high.y(), high.z());
   points[UPPER_RIGHT_FRONT] = WFMath::Vector<3>(low.x(), high.y(), high.z());

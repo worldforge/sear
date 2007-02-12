@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.42 2007-01-09 17:11:22 simon Exp $
+// $Id: WorldEntity.h,v 1.43 2007-02-12 18:21:53 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -42,42 +42,33 @@ public:
   void onTalk(const Atlas::Objects::Operation::RootOperation &talk);
   void onImaginary(const Atlas::Objects::Root &imaginaryArg);
 
-  const WFMath::Quaternion getAbsOrient();
-  const WFMath::Point<3> getAbsPos();
+  const WFMath::Quaternion &getAbsOrient() const { return m_abs_orient; }
+  const WFMath::Point<3> &getAbsPos() const { return m_abs_position; }
 
   const OrientBBox &getOrientBBox() const { return m_orientBBox; }
-  bool hasMessages() const { return !messages.empty(); }
-//  void renderMessages();
+
+  bool hasMessages() const { return !m_messages.empty(); }
+
   void displayInfo();
 
-  std::string type();
-  std::string parent();
+  const std::string &type() const { return m_type; }
+  const std::string &parent() const { return m_parent_type; }
 
   void rotateBBox(const WFMath::Quaternion &q);  
 
   // make this a map of vectors in the future
   typedef std::map<std::string, Eris::EntityRef> AttachmentMap;
   
-  const AttachmentMap& getAttachments() const
-  { return m_attached; }
+  const AttachmentMap& getAttachments() const { return m_attached; }
   
-  double getStatus() const
-  { return m_status; }
+  double getStatus() const { return m_status; }
 
-  void requestScreenCoords()
-  { ++m_screenCoordRequest; }
-  
-  void releaseScreenCoords()
-  { --m_screenCoordRequest; }
+  void requestScreenCoords() { ++m_screenCoordRequest; }  
+  void releaseScreenCoords()  { --m_screenCoordRequest; }
+  int screenCoordsRequest() const { return m_screenCoordRequest; }
 
-  int screenCoordsRequest() const
-  { return m_screenCoordRequest; }
-  
-  int & screenX()
-  { return m_screenX; }
-
-  int & screenY()
-  { return m_screenY; }
+  int & screenX() { return m_screenX; }
+  int & screenY() { return m_screenY; }
 
   void setLocalPos(const WFMath::Point<3> &pos) {
     m_local_pos = pos;
@@ -92,15 +83,6 @@ public:
   void resetLocalPO() {
     m_has_local_orient = false;
     m_has_local_pos = false;
-  }
-
-  WFMath::Point<3> getEntityPosition() const {
-    if (m_has_local_pos) return m_local_pos;
-    else return getPredictedPos();
-  }
-  const WFMath::Quaternion &getEntityOrientation() const {
-    if (m_has_local_orient) return m_local_orient;
-    else return getOrientation();
   }
 
   bool isSelectedEntity() const { return m_selected; }
@@ -125,16 +107,33 @@ public:
 
   void dumpAttributes() const;
 
+  // Call these functions to update the position and orientation
+  // These must be called once per frame, and whenever the local overrides
+  // change.
+  void updateAbsPosition();
+  void updateAbsOrient();
+
 protected:
+  WFMath::Point<3> getEntityPosition() const {
+    if (m_has_local_pos) return m_local_pos;
+    else return getPredictedPos();
+  }
+
+  const WFMath::Quaternion &getEntityOrientation() const {
+    if (m_has_local_orient) return m_local_orient;
+    else return getOrientation();
+  }
+
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
-  std::list<message> messages;
+  std::list<message> m_messages;
 
   static const int message_life = 5000;
   static const int string_size = 40;
-  std::string last_action;
-  std::string last_mode;
+  std::string m_last_action;
+  std::string m_last_mode;
+  std::string m_type, m_parent_type;
   
   void onAttrChanged(const std::string& attr, const Atlas::Message::Element& v);
   void locationChanged(Eris::Entity *loc);
@@ -155,8 +154,11 @@ protected:
   int m_screenX, m_screenY;
 
   bool m_has_local_orient, m_has_local_pos;
-  WFMath::Quaternion m_local_orient;
-  WFMath::Point<3> m_local_pos;
+  WFMath::Quaternion m_local_orient, m_abs_orient;
+  WFMath::Point<3> m_local_pos, m_abs_position;
+
+
+
   bool m_selected;
 
   bool m_fading, m_fade_in;

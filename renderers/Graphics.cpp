@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.64 2007-02-06 09:45:24 simon Exp $
+// $Id: Graphics.cpp,v 1.65 2007-02-12 18:21:53 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -49,7 +49,6 @@
   static const bool debug = false;
 #endif
 
-namespace Sear {
 
 static const WFMath::Vector<3> x_vector = WFMath::Vector<3>(1.0f, 0.0f, 0.0f);
 static const WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
@@ -58,13 +57,8 @@ static const WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, 
 
 static bool c_select = false;
 
-static const std::string GRAPHICS = "graphics";
+static const std::string SECTION_graphics = "graphics";
 
-static const std::string DEFAULT = "default";
-static const std::string FONT = "font";
-static const std::string STATE = "state";
-static const std::string SELECT = "select_state";
-  
   // Config key strings
   static const std::string KEY_use_textures = "render_use_textures";
   static const std::string KEY_use_lighting = "render_use_lighting";
@@ -119,6 +113,20 @@ static const std::string SELECT = "select_state";
 //  static const float DEFAULT_low_dist    = 1000.0f;
   static const float DEFAULT_medium_dist = 9000.0f;
   static const float DEFAULT_high_dist   = 4500.0f; 
+
+static const std::string TYPE_fire = "fire";
+
+static const std::string CMD_invalidate = "invalidate";
+static const std::string CMD_show_bbox_on = "+show_bbox";
+static const std::string CMD_show_bbox_off = "-show_bbox";
+static const std::string CMD_show_names_on = "+show_names";
+static const std::string CMD_show_names_off = "-show_names";
+static const std::string CMD_select_mode_on = "+select_mode";
+static const std::string CMD_select_mode_off = "-select_mode";
+static const std::string CMD_normalise_on = "normalise_on";
+static const std::string CMD_normalise_off = "normalise_off";
+
+namespace Sear {
 
 Graphics::Graphics(System *system) :
   m_system(system),
@@ -208,7 +216,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     m_frame_time += time_elapsed;
     m_frame_rate = (float)m_num_frames++ / m_frame_time;
     if (m_frame_time > 1.0f) {
-      std::string fr = "Sear: " + string_fmt(m_frame_rate);
+      const std::string &fr = "Sear: " + string_fmt(m_frame_rate);
       SDL_WM_SetCaption(fr.c_str(), fr.c_str());
       m_num_frames = 0;
       m_frame_time = 0.0f;
@@ -255,14 +263,14 @@ void Graphics::setCameraTransform() {
 
   height += 0.5f; // Make the camera be just above focus height.
 
-  WFMath::Point<3> pos = focus->getAbsPos();
+  const WFMath::Point<3> &pos = focus->getAbsPos();
 
   // Adjust height so camera doesn't go underneath the terrain
   // Find terrain height at camera position, and adjust as if camera is at
   // entity feet. (the - height part)
 
   // Create camera vector
-  WFMath::Vector<3>cam_vec(0.0f, -cam->getDistance(), 0.0f);
+  WFMath::Vector<3> cam_vec(0.0f, -cam->getDistance(), 0.0f);
 
   // Rotate vec by camera orientation
   cam_vec.rotate(cam->getOrientation().inverse());
@@ -271,7 +279,7 @@ void Graphics::setCameraTransform() {
   // Rotate by 90 degrees -- So 0 deg is east
   cam_vec.rotate(quaternion_by_90.inverse());
   // Calculate new camera position
-  WFMath::Point<3> p2 =  pos + cam_vec;
+  WFMath::Point<3> p2 = pos + cam_vec;
   // Get height for camera
   float terrain_z = Environment::getInstance().getHeight(p2.x(), p2.y());
   // Adjust height by distance below ground so camera does not go below ground
@@ -337,7 +345,23 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     //Get the player character entity
     WorldEntity *focus = dynamic_cast<WorldEntity *>(avatar->getEntity());
     assert(focus != NULL);
-    
+   
+    // Make sure position and orientation is up-to-date
+    // This will get called later on anyway, but we need this information
+    // now to calculate the correct camera position.
+    std::list<WorldEntity*> entity_list;
+    WorldEntity *we_update = focus;
+    while (we_update != 0) {
+      entity_list.push_front(we_update);
+      we_update = dynamic_cast<WorldEntity*>(we_update->getLocation());
+    }
+    while (entity_list.empty() == false) {
+      WorldEntity *we = entity_list.front();
+      we->updateAbsOrient();
+      we->updateAbsPosition();
+      entity_list.pop_front();
+    }
+ 
     // Apply character orientation 
     m_orient *= focus->getAbsOrient().inverse();
 
@@ -355,8 +379,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     setCameraTransform();
 
-    WFMath::Point<3> pos(0,0,0); // Initial camera positiona
-    pos = focus->getAbsPos();
+   // Initial camera positiona
+    WFMath::Point<3> pos = focus->getAbsPos();
     assert (pos.isValid());
 
     m_renderer->getFrustum(m_frustum);
@@ -445,6 +469,10 @@ void Graphics::buildQueues(WorldEntity *we,
 {
   if (!we->isVisible() && !we->isFading()) return;
 
+  // Is this a good place to do the update?
+  we->updateAbsOrient();
+  we->updateAbsPosition();
+
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
 
@@ -455,7 +483,7 @@ void Graphics::buildQueues(WorldEntity *we,
 
   // Setup lights as we go
   // TODO: This should be changed so that only the closest objects have light.
-  if (we->type() == "fire") drawFire(we);
+  if (we->type() == TYPE_fire) drawFire(we);
       
   // Loop through all models in list
   if (obj->draw_self) {
@@ -470,7 +498,7 @@ void Graphics::buildQueues(WorldEntity *we,
   // Draw any contained objects
   for (unsigned int i = 0; i < we->numContained(); ++i) {
     WorldEntity *wec = static_cast<WorldEntity*>(we->getContained(i));
-    if (obj->draw_members || wec->type() == "fire") {
+    if (obj->draw_members || wec->type() == TYPE_fire) {
       buildQueues(wec,
                   depth + 1,
                   select_mode,
@@ -687,6 +715,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
       PosAndOrient po = modelRec->model->getPositionForSubmodel(it->first);
 
       we->setLocalOrient(po.orient);
+      we->updateAbsOrient();
 
       if (modelRec->scale_bbox && obj_we->hasBBox()) {
         const WFMath::AxisBox<3> &bbox = obj_we->getBBox();
@@ -706,6 +735,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
 
       // Convert Vector<3> to a Point<3>
       we->setLocalPos(WFMath::Point<3>(po.pos.x(), po.pos.y(), po.pos.z()));
+      we->updateAbsPosition();
 
       buildQueues(we,
                     2, // depth is not used, so no need to give a real value.
@@ -751,90 +781,90 @@ void Graphics::readConfig(varconf::Config &config) {
   varconf::Variable temp;
 
   // Read Distances for quality queues
-//  if (config.findItem(GRAPHICS, KEY_low_dist)) {
-//    temp =  config.getItem(GRAPHICS, KEY_low_dist);
+//  if (config.findItem(SECTION_graphics, KEY_low_dist)) {
+//    temp =  config.getItem(SECTION_graphics, KEY_low_dist);
 //    m_low_dist = (!temp.is_double()) ? (DEFAULT_low_dist) : ((double)(temp));
 //  } else {
 //    m_low_dist = DEFAULT_low_dist;
 //  } 
-  if (config.findItem(GRAPHICS, KEY_medium_dist)) {
-    temp = config.getItem(GRAPHICS, KEY_medium_dist);
+  if (config.findItem(SECTION_graphics, KEY_medium_dist)) {
+    temp = config.getItem(SECTION_graphics, KEY_medium_dist);
     m_medium_dist = (!temp.is_double()) ? (DEFAULT_medium_dist) : ((double)(temp));
   } else {
     m_medium_dist = DEFAULT_medium_dist;
   } 
-  if (config.findItem(GRAPHICS, KEY_high_dist)) {
-    temp = config.getItem(GRAPHICS, KEY_high_dist);
+  if (config.findItem(SECTION_graphics, KEY_high_dist)) {
+    temp = config.getItem(SECTION_graphics, KEY_high_dist);
     m_high_dist = (!temp.is_double()) ? (DEFAULT_high_dist) : ((double)(temp));
   } else {
     m_high_dist = DEFAULT_high_dist;
   } 
   // Read Fire properties 
-  if (config.findItem(GRAPHICS, KEY_fire_ac)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_ac);
+  if (config.findItem(SECTION_graphics, KEY_fire_ac)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_ac);
     m_fire.attenuation_constant = (!temp.is_double()) ? (DEFAULT_fire_ac) : ((double)(temp));
   } else {
     m_fire.attenuation_constant = DEFAULT_fire_ac;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_al)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_al);
+  if (config.findItem(SECTION_graphics, KEY_fire_al)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_al);
     m_fire.attenuation_linear = (!temp.is_double()) ? (DEFAULT_fire_al) : ((double)(temp));
   } else {
     m_fire.attenuation_linear = DEFAULT_fire_al;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_aq)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_aq);
+  if (config.findItem(SECTION_graphics, KEY_fire_aq)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_aq);
     m_fire.attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_fire_aq) : ((double)(temp));
   } else {
     m_fire.attenuation_quadratic = DEFAULT_fire_aq;
   }
 
-  if (config.findItem(GRAPHICS, KEY_fire_amb_red)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_amb_red);
+  if (config.findItem(SECTION_graphics, KEY_fire_amb_red)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_amb_red);
     m_fire.ambient[0] = (!temp.is_double()) ? (DEFAULT_fire_amb_red) : ((double)(temp));
   } else {
     m_fire.ambient[0] = DEFAULT_fire_amb_red;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_amb_green)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_amb_green);
+  if (config.findItem(SECTION_graphics, KEY_fire_amb_green)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_amb_green);
     m_fire.ambient[1] = (!temp.is_double()) ? (DEFAULT_fire_amb_green) : ((double)(temp));
   } else {
     m_fire.ambient[1] = DEFAULT_fire_amb_green;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_amb_blue)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_amb_blue);
+  if (config.findItem(SECTION_graphics, KEY_fire_amb_blue)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_amb_blue);
     m_fire.ambient[2] = (!temp.is_double()) ? (DEFAULT_fire_amb_blue) : ((double)(temp));
   } else {
     m_fire.ambient[3] = DEFAULT_fire_amb_blue;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_amb_alpha)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_amb_alpha);
+  if (config.findItem(SECTION_graphics, KEY_fire_amb_alpha)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_amb_alpha);
     m_fire.ambient[3] = (!temp.is_double()) ? (DEFAULT_fire_amb_alpha) : ((double)(temp));
   } else {
     m_fire.ambient[4] = DEFAULT_fire_amb_alpha;
   }
 
 
-  if (config.findItem(GRAPHICS, KEY_fire_diff_red)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_diff_red);
+  if (config.findItem(SECTION_graphics, KEY_fire_diff_red)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_diff_red);
     m_fire.diffuse[0] = (!temp.is_double()) ? (DEFAULT_fire_diff_red) : ((double)(temp));
   } else {
     m_fire.diffuse[0] = DEFAULT_fire_diff_red;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_diff_green)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_diff_green);
+  if (config.findItem(SECTION_graphics, KEY_fire_diff_green)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_diff_green);
     m_fire.diffuse[1] = (!temp.is_double()) ? (DEFAULT_fire_diff_green) : ((double)(temp));
   } else {
     m_fire.diffuse[1] = DEFAULT_fire_diff_green;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_diff_blue)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_diff_blue);
+  if (config.findItem(SECTION_graphics, KEY_fire_diff_blue)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_diff_blue);
     m_fire.diffuse[2] = (!temp.is_double()) ? (DEFAULT_fire_diff_blue) : ((double)(temp));
   } else {
     m_fire.diffuse[2] =  DEFAULT_fire_diff_blue;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_diff_alpha)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_diff_alpha);
+  if (config.findItem(SECTION_graphics, KEY_fire_diff_alpha)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_diff_alpha);
     m_fire.diffuse[3] = (!temp.is_double()) ? (DEFAULT_fire_diff_alpha) : ((double)(temp));
   } else {
     m_fire.diffuse[3] = DEFAULT_fire_diff_alpha;
@@ -842,26 +872,26 @@ void Graphics::readConfig(varconf::Config &config) {
 
 
 
-  if (config.findItem(GRAPHICS, KEY_fire_spec_red)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_spec_red);
+  if (config.findItem(SECTION_graphics, KEY_fire_spec_red)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_spec_red);
     m_fire.specular[0] = (!temp.is_double()) ? (DEFAULT_fire_spec_red) : ((double)(temp));
   } else {
     m_fire.specular[0] = DEFAULT_fire_spec_red;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_spec_green)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_spec_green);
+  if (config.findItem(SECTION_graphics, KEY_fire_spec_green)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_spec_green);
     m_fire.specular[1] = (!temp.is_double()) ? (DEFAULT_fire_spec_green) : ((double)(temp));
   } else {
     m_fire.specular[1] = DEFAULT_fire_spec_green;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_spec_blue)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_spec_blue);
+  if (config.findItem(SECTION_graphics, KEY_fire_spec_blue)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_spec_blue);
     m_fire.specular[2] = (!temp.is_double()) ? (DEFAULT_fire_spec_blue) : ((double)(temp));
   } else {
     m_fire.specular[2] = DEFAULT_fire_spec_blue;
   }
-  if (config.findItem(GRAPHICS, KEY_fire_spec_alpha)) {
-    temp = config.getItem(GRAPHICS, KEY_fire_spec_alpha);
+  if (config.findItem(SECTION_graphics, KEY_fire_spec_alpha)) {
+    temp = config.getItem(SECTION_graphics, KEY_fire_spec_alpha);
     m_fire.specular[3] = (!temp.is_double()) ? (DEFAULT_fire_spec_alpha) : ((double)(temp));
   } else {
     m_fire.specular[3] = DEFAULT_fire_spec_alpha;
@@ -871,85 +901,85 @@ void Graphics::readConfig(varconf::Config &config) {
 
 void Graphics::writeConfig(varconf::Config &config) {
   // Save queue quality settings 
-//  config.setItem(GRAPHICS, KEY_low_dist, m_low_dist);
-  config.setItem(GRAPHICS, KEY_medium_dist, m_medium_dist);
-  config.setItem(GRAPHICS, KEY_high_dist, m_high_dist);
+//  config.setItem(SECTION_graphics, KEY_low_dist, m_low_dist);
+  config.setItem(SECTION_graphics, KEY_medium_dist, m_medium_dist);
+  config.setItem(SECTION_graphics, KEY_high_dist, m_high_dist);
   // Save frame rate detail boundaries
-  config.setItem(GRAPHICS, KEY_fire_ac, m_fire.attenuation_constant);
-  config.setItem(GRAPHICS, KEY_fire_al, m_fire.attenuation_linear);
-  config.setItem(GRAPHICS, KEY_fire_aq, m_fire.attenuation_quadratic);
+  config.setItem(SECTION_graphics, KEY_fire_ac, m_fire.attenuation_constant);
+  config.setItem(SECTION_graphics, KEY_fire_al, m_fire.attenuation_linear);
+  config.setItem(SECTION_graphics, KEY_fire_aq, m_fire.attenuation_quadratic);
   
-  config.setItem(GRAPHICS, KEY_fire_amb_red, m_fire.ambient[Light::RED]);
-  config.setItem(GRAPHICS, KEY_fire_amb_green, m_fire.ambient[Light::GREEN]);
-  config.setItem(GRAPHICS, KEY_fire_amb_blue, m_fire.ambient[Light::BLUE]);
-  config.setItem(GRAPHICS, KEY_fire_amb_alpha, m_fire.ambient[Light::ALPHA]);
+  config.setItem(SECTION_graphics, KEY_fire_amb_red, m_fire.ambient[Light::RED]);
+  config.setItem(SECTION_graphics, KEY_fire_amb_green, m_fire.ambient[Light::GREEN]);
+  config.setItem(SECTION_graphics, KEY_fire_amb_blue, m_fire.ambient[Light::BLUE]);
+  config.setItem(SECTION_graphics, KEY_fire_amb_alpha, m_fire.ambient[Light::ALPHA]);
 
-  config.setItem(GRAPHICS, KEY_fire_diff_red, m_fire.diffuse[Light::RED]);
-  config.setItem(GRAPHICS, KEY_fire_diff_green, m_fire.diffuse[Light::GREEN]);
-  config.setItem(GRAPHICS, KEY_fire_diff_blue, m_fire.diffuse[Light::BLUE]);
-  config.setItem(GRAPHICS, KEY_fire_diff_alpha, m_fire.diffuse[Light::ALPHA]);
+  config.setItem(SECTION_graphics, KEY_fire_diff_red, m_fire.diffuse[Light::RED]);
+  config.setItem(SECTION_graphics, KEY_fire_diff_green, m_fire.diffuse[Light::GREEN]);
+  config.setItem(SECTION_graphics, KEY_fire_diff_blue, m_fire.diffuse[Light::BLUE]);
+  config.setItem(SECTION_graphics, KEY_fire_diff_alpha, m_fire.diffuse[Light::ALPHA]);
 
-  config.setItem(GRAPHICS, KEY_fire_spec_red, m_fire.specular[Light::RED]);
-  config.setItem(GRAPHICS, KEY_fire_spec_green, m_fire.specular[Light::GREEN]);
-  config.setItem(GRAPHICS, KEY_fire_spec_blue, m_fire.specular[Light::BLUE]);
-  config.setItem(GRAPHICS, KEY_fire_spec_alpha, m_fire.specular[Light::ALPHA]);
+  config.setItem(SECTION_graphics, KEY_fire_spec_red, m_fire.specular[Light::RED]);
+  config.setItem(SECTION_graphics, KEY_fire_spec_green, m_fire.specular[Light::GREEN]);
+  config.setItem(SECTION_graphics, KEY_fire_spec_blue, m_fire.specular[Light::BLUE]);
+  config.setItem(SECTION_graphics, KEY_fire_spec_alpha, m_fire.specular[Light::ALPHA]);
 
 }  
 
 void Graphics::registerCommands(Console * console) {
   assert(console);
 
-  console->registerCommand("invalidate", this);
-  console->registerCommand("+show_bbox", this);
-  console->registerCommand("-show_bbox", this);
-  console->registerCommand("+show_names", this);
-  console->registerCommand("-show_names", this);
-  console->registerCommand("+select_mode", this);
-  console->registerCommand("-select_mode", this);
-  console->registerCommand("normalise_on", this);
-  console->registerCommand("normalise_off", this);
+  console->registerCommand(CMD_invalidate, this);
+  console->registerCommand(CMD_show_bbox_on, this);
+  console->registerCommand(CMD_show_bbox_off, this);
+  console->registerCommand(CMD_show_names_on, this);
+  console->registerCommand(CMD_show_names_off, this);
+  console->registerCommand(CMD_select_mode_on, this);
+  console->registerCommand(CMD_select_mode_off, this);
+  console->registerCommand(CMD_normalise_on, this);
+  console->registerCommand(CMD_normalise_off, this);
 
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {
-  if (command == "invalidate") {
+  if (command == CMD_invalidate) {
     m_renderer->contextDestroyed(true);
     m_renderer->contextCreated();
-  } else if (command == "+show_bbox") {
+  } else if (command == CMD_show_bbox_on) {
     m_show_bbox = true;
-  } else if (command == "-show_bbox") {
+  } else if (command == CMD_show_bbox_off) {
     m_show_bbox = false;
-  } else if (command == "+show_names") {
+  } else if (command == CMD_show_names_on) {
     m_show_names = true;
-  } else if (command == "-show_names") {
+  } else if (command == CMD_show_names_off) {
     m_show_names = false;
-  } else if (command == "+select_mode") {
+  } else if (command == CMD_select_mode_on) {
     c_select = true;
-  } else if (command == "-select_mode") {
+  } else if (command == CMD_select_mode_off) {
     c_select = false;
   }
-  else if (command == "normalise_on") glEnable(GL_NORMALIZE);
-  else if (command == "normalise_off") glDisable(GL_NORMALIZE);
+  else if (command == CMD_normalise_on) glEnable(GL_NORMALIZE);
+  else if (command == CMD_normalise_off) glDisable(GL_NORMALIZE);
 
 }
 
 void Graphics::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   varconf::Variable temp;
-  if (section != GRAPHICS) return;
+  if (section != SECTION_graphics) return;
 
 //  if (key == KEY_low_dist) {
-//    temp =  config.getItem(GRAPHICS, KEY_low_dist);
+//    temp =  config.getItem(SECTION_graphics, KEY_low_dist);
 //    m_low_dist = ((double)(temp));
 //  } 
 
 //  else
  if (key == KEY_medium_dist) {
-    temp =  config.getItem(GRAPHICS, KEY_medium_dist);
+    temp =  config.getItem(SECTION_graphics, KEY_medium_dist);
     m_medium_dist = ((double)(temp));
   } 
 
   else if (key == KEY_high_dist) {
-    temp =  config.getItem(GRAPHICS, KEY_high_dist);
+    temp =  config.getItem(SECTION_graphics, KEY_high_dist);
     m_high_dist = ((double)(temp));
   } 
 }

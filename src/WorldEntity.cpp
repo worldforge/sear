@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.92 2007-01-30 23:20:38 simon Exp $
+// $Id: WorldEntity.cpp,v 1.93 2007-02-12 18:21:53 simon Exp $
 
 /*
  TODO
@@ -43,13 +43,27 @@
 #else
   static const bool debug = false;
 #endif
-namespace Sear {
 
-static const std::string ACTION = "action";
-static const std::string MODE = "mode";
-static const std::string GUISE = "guise";
+static const std::string ATTR_action = "action";
+static const std::string ATTR_description = "description";
+static const std::string ATTR_guide = "guise";
+static const std::string ATTR_mass = "mass";
+static const std::string ATTR_mode = "mode";
+static const std::string ATTR_outfit = "outfit";
+static const std::string ATTR_right_hand_wield = "right_hand_wield";
+static const std::string ATTR_say = "say";
+static const std::string ATTR_status = "status";
+static const std::string ATTR_terrain = "terrain";
+
+static const std::string MODE_floating = "floating";
+static const std::string MODE_fixed = "fixed";
+static const std::string MODE_swimming = "swimming";
+
+static const std::string TYPE_jetty = "jetty";
 
 static const WFMath::Point<3> point_zero = WFMath::Point<3>(0.0f,0.0f,0.0f);
+
+namespace Sear {
 
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
    Eris::Entity(id, ty, view),
@@ -67,6 +81,16 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
   ChildAdded.connect(sigc::mem_fun(this, &WorldEntity::onChildEntityAdded));
   ChildRemoved.connect(sigc::mem_fun(this, &WorldEntity::onChildEntityRemoved));
   BeingDeleted.connect(sigc::mem_fun(this, &WorldEntity::onBeingDeleted));
+
+  // Get type and parent type name
+  Eris::TypeInfo *ti = getType();
+  if (ti) { 
+    m_type = ti->getName();
+    if (ti->getParents().size() > 0) {
+      ti = *ti->getParents().begin();
+      m_parent_type = ti->getName();
+    }
+  }
 }
 
 void WorldEntity::onMove() {
@@ -81,33 +105,37 @@ void WorldEntity::onTalk(const Atlas::Objects::Operation::RootOperation &talk)
     return;
   }
   const Atlas::Objects::Root & talkArg = talkArgs.front();
-  if (!talkArg->hasAttr("say")) {
+  if (!talkArg->hasAttr(ATTR_say)) {
     printf("Error: Talk but no 'say'\n");
     return;
   }
-  const std::string &msg = talkArg->getAttr("say").asString();
+  const std::string &msg = talkArg->getAttr(ATTR_say).asString();
 
   Log::writeLog(getId() + std::string(": ") + msg, Log::LOG_DEFAULT);
   System::instance()->pushMessage(getName()+ ": " + msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
 
-  if (messages.size() >= MAX_MESSAGES) messages.erase(messages.begin());
-  messages.push_back(message(msg, System::instance()->getTime() + message_life));  
+  if (m_messages.size() >= MAX_MESSAGES) m_messages.erase(m_messages.begin());
+  m_messages.push_back(message(msg, System::instance()->getTime() + message_life));  
   Eris::Entity::onTalk(talk);
 }
 
 void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)
 {
     Atlas::Message::Element attr;
-    if (imaginaryArg->copyAttr("description", attr) != 0 || !attr.isString()) {
+    if (imaginaryArg->copyAttr(ATTR_description, attr) != 0 || !attr.isString()) {
         return;
     }
     System::instance()->pushMessage(getName()+" " + attr.String(), CONSOLE_MESSAGE | SCREEN_MESSAGE);
 }
 
-const WFMath::Quaternion WorldEntity::getAbsOrient() {
+//const WFMath::Quaternion &WorldEntity::getAbsOrient() {
+void WorldEntity::updateAbsOrient() {
 
   WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
-  if (!loc) return getEntityOrientation(); // nothing below makes sense for the world
+  if (!loc) {
+    m_abs_orient = getEntityOrientation(); // nothing below makes sense for the world
+    return;
+  }
   
   WFMath::Quaternion orient = getEntityOrientation();
   if (!orient.isValid()) {
@@ -132,10 +160,11 @@ const WFMath::Quaternion WorldEntity::getAbsOrient() {
     orient.identity();
   }
 
-  return orient;
+  m_abs_orient = orient;
 }
 
-const WFMath::Point<3> WorldEntity::getAbsPos() {
+//const WFMath::Point<3> &WorldEntity::getAbsPos() {
+void WorldEntity::updateAbsPosition() {
   WFMath::Point<3> absPos(point_zero);
   WorldEntity *loc = this;
   
@@ -163,16 +192,16 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
       bool clampHeight = false;
       // Get the terrain height for x,y pos, but don't set it yet as the mode
       // needs to have a say first.
-      if (loc->hasAttr(MODE)) {
-        const std::string &mode = loc->valueOfAttr(MODE).asString();
-        if (mode == "swimming") {
+      if (loc->hasAttr(ATTR_mode)) {
+        const std::string &mode = loc->valueOfAttr(ATTR_mode).asString();
+        if (mode == MODE_swimming) {
           // Make sure height is > terrain height
           needTerrainHeight = clampHeight = true;
-        } else if (mode == "floating") {
+        } else if (mode == MODE_floating) {
           // Do nothing at all.
           // Should we do something here?
           // E.g. set to water height?
-        } else if (mode == "fixed") {
+        } else if (mode == MODE_fixed) {
           // Do nothing at all.
         } else {
           needTerrainHeight = setHeight = true;
@@ -180,7 +209,7 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
       } else {
         needTerrainHeight = setHeight = true;
       }
-      if (!loc_loc->hasAttr("terrain")) {
+      if (!loc_loc->hasAttr(ATTR_terrain)) {
         needTerrainHeight = false;
       }
       if (needTerrainHeight) {
@@ -194,7 +223,7 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
 
       // Hack for clamping entity height to jetty objects.
       // This should be handled better, perhaps by checking an attribute.
-      if (loc_loc->type() == "jetty") {
+      if (loc_loc->type() == TYPE_jetty) {
         // We want to make sure the height is jetty height, unless the terrain 
         // is poking through, then we want to use terrain height
         // This is assuming that the jetty object is directly in the world.
@@ -221,7 +250,7 @@ const WFMath::Point<3> WorldEntity::getAbsPos() {
     loc = loc_loc;
   }
 
-  return absPos;
+  m_abs_position = absPos;
 }
 
 void WorldEntity::displayInfo() {
@@ -255,61 +284,38 @@ void WorldEntity::displayInfo() {
     printf("V (%f, %f, %f)\n", bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z());
     printf("Visibility: %d\n", isVisible());
     printf("Stamp: %f\n", getStamp());
-    if (hasAttr(MODE)) {
-      const std::string &mode = valueOfAttr(MODE).asString();
+    if (hasAttr(ATTR_mode)) {
+      const std::string &mode = valueOfAttr(ATTR_mode).asString();
       printf("Mode: %s\n", mode.c_str());
     }
   }
-  if (hasAttr("mass")) {
-    double mass = valueOfAttr("mass").asNum();
+  if (hasAttr(ATTR_mass)) {
+    double mass = valueOfAttr(ATTR_mass).asNum();
     if (debug) printf("Mass: %f\n", mass);
-    std::string msg_mass = getName() + " - Mass: " + string_fmt(mass);
+    const std::string &msg_mass = getName() + " - Mass: " + string_fmt(mass);
     System::instance()->pushMessage(msg_mass, CONSOLE_MESSAGE | SCREEN_MESSAGE);
   }
 }
 
-std::string WorldEntity::type() {
-  Eris::TypeInfo *ti = getType();
-  if (ti) return ti->getName();
-  else return "";
-}
-
-std::string WorldEntity::parent() {
-  Eris::TypeInfo *ti = getType();
-  if (ti) {
-    if (ti->getParents().size() > 0) {
-      ti = *ti->getParents().begin();
-      return ti->getName();
-    }
-  }
-  return "";
-}
-
 void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
-  if (str == MODE) {
+  if (str == ATTR_mode) {
     const std::string &mode = v.asString();
     static ActionHandler *ac = System::instance()->getActionHandler();
     assert(ac);
     ac->handleAction(mode + "_" + type(), NULL);
-    if (mode != last_mode) {
+    if (mode != m_last_mode) {
       SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
       if (record) record->animate(mode);
-      last_mode = mode;
+      m_last_mode = mode;
     }
-/*
-  } else if (str == GUISE) {
-    const Atlas::Message::MapType& mt(v.asMap());
-    SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
-    if (record) record->setAppearance(mt);
-*/
-  } else if (str == "right_hand_wield") {
+  } else if (str == ATTR_right_hand_wield) {
     const std::string &id = v.asString();
     if (id.empty()) {
-     m_attached.erase("right_hand_wield");
+     m_attached.erase(ATTR_right_hand_wield);
     } else {
       WorldEntity* attach = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
       if (attach) {
-        m_attached["right_hand_wield"] = attach;
+        m_attached[ATTR_right_hand_wield] = attach;
       } else {
         Eris::View::EntitySightSlot ess(sigc::bind( 
           sigc::mem_fun(this, &WorldEntity::onSightAttached),
@@ -317,9 +323,9 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
         getView()->notifyWhenEntitySeen(id, ess);
       }
     }
-  } else if (str == "status") {
+  } else if (str == ATTR_status) {
     m_status = v.asNum();
-  } else if (str == "outfit") {
+  } else if (str == ATTR_outfit) {
     SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
     if (!record) return;
     record->clearOutfit();
@@ -331,16 +337,15 @@ void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::El
         if (I->second.isString()) {
           const std::string &where = I->first;
           const std::string &id = I->second.asString();
-          printf("%s -> %s\n", I->first.c_str(), I->second.asString().c_str());
           WorldEntity *we = dynamic_cast<WorldEntity*>(getView()->getEntity(id));
-          if (we) record->entityWorn(where, we);
-else {
-        Eris::View::EntitySightSlot ess(sigc::bind( 
-          sigc::mem_fun(this, &WorldEntity::onSightOutfit),
-          where));
-        getView()->notifyWhenEntitySeen(id, ess);
-
-}
+          if (we) {
+            record->entityWorn(where, we); 
+          } else {
+            Eris::View::EntitySightSlot ess(sigc::bind( 
+            sigc::mem_fun(this, &WorldEntity::onSightOutfit),
+            where));
+            getView()->notifyWhenEntitySeen(id, ess);
+          }
         }
         ++I;
       }
@@ -350,8 +355,8 @@ else {
 
 void WorldEntity::onSightOutfit(Eris::Entity *ent, std::string where) {
   SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this); 
-          WorldEntity *we = dynamic_cast<WorldEntity*>(ent);
-          if (we) record->entityWorn(where, we);
+  WorldEntity *we = dynamic_cast<WorldEntity*>(ent);
+  if (we) record->entityWorn(where, we);
 }
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
@@ -383,6 +388,8 @@ void WorldEntity::onAction(const Atlas::Objects::Operation::RootOperation &actio
 
 void WorldEntity::locationChanged(Eris::Entity *loc) {
   resetLocalPO();
+  updateAbsOrient();
+  updateAbsPosition();
 }
 
 void WorldEntity::onChildEntityAdded(Eris::Entity *e) {

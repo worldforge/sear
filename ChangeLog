@@ -1,3 +1,21 @@
+2007-02-12  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* common/Utility.cpp: Cache quaternion components in QuatToMatrix 
+	  function. Use refs when getting bounding box corners.
+
+	* src/WorldEntity.cpp, src/WorldEntity.h: Turn attribute and mode 
+	  strings into static strings. Calculate type() and parent() values in
+	  constructor rather than in every call to type() and parent(). This
+	  assumes the type and parent type will never change. Only update abs
+	  pos and orientation when updateAbsPosition and updateAbsOrient are
+	  called, rather than every time the abs position and orientation is
+	  requested. This should be done once per frame.
+
+	* renderers/Graphics.cpp: Put console commands into static strings.
+	  Update ABS position and orientation during the build queues call to
+	  all visible entities, and for the avatar entity (and containing
+	  entities) during initial camera setup.
+
 2007-02-06  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/sear-res.rc.in: Bump version numbers.
