@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.24 2007-01-12 10:26:33 simon Exp $
+// $Id: FileHandler.cpp,v 1.25 2007-02-14 11:38:50 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -201,16 +201,15 @@ FileHandler::FileList FileHandler::getFilePaths(const std::string &str) {
   StringListMap::const_iterator I = m_file_map.begin();
   StringListMap::const_iterator Iend = m_file_map.end();
   while (I != Iend) {
-    std::string key = "${" + I->first + "}";
+    const std::string &key = "${" + I->first + "}";
     std::string::size_type pos = cpy.find(key);
-
     if (pos != std::string::npos) {
-      StringList l = I->second;
+      const StringList &l = I->second;
       StringList::const_iterator J = l.begin();
       StringList::const_iterator Jend = l.end();
       while (J != Jend) {
         std::string cpy2 = cpy;
-        std::string value = *J;
+        const std::string &value = *J;
         cpy2.replace(pos, key.length(), value);
         // Expand any new variables that may have been passed in.
         expandString(cpy2);
@@ -228,7 +227,7 @@ FileHandler::FileList FileHandler::getFilePaths(const std::string &str) {
 }
 
 void FileHandler::getFilePath(std::string &cpy) {
-  FileList l = getFilePaths(cpy);
+  const FileList &l = getFilePaths(cpy);
 
   if (l.size() > 0) {
     cpy = *l.begin();
@@ -251,7 +250,7 @@ std::string FileHandler::findFile(const std::string &filename) {
   FileSet::const_iterator I = m_searchpaths.begin();
   FileSet::const_iterator Iend = m_searchpaths.end();
   for (;I != Iend; ++I) {
-    std::string filepath = *I + "/" + filename;
+    const std::string &filepath = *I + "/" + filename;
     if (exists(filepath))
         return filepath;
   }
@@ -263,7 +262,7 @@ FileHandler::FileSet FileHandler::getAllinSearchPaths(const std::string &filenam
   FileSet::const_iterator I = m_searchpaths.begin();
   FileSet::const_iterator Iend = m_searchpaths.end();
   for (;I != Iend; ++I) {
-    std::string filepath = *I + "/" + filename;
+    const std::string &filepath = *I + "/" + filename;
     if (exists(filepath))
       l.insert(filepath);
   }
@@ -295,8 +294,8 @@ void FileHandler::runCommand(const std::string &command, const std::string &args
     removeSearchPath(args);
   }
   else if (command == CMD_SETVAR || command == CMD_SET_VARIABLE) {
-    std::string key = tokeniser.nextToken();
-    std::string value = tokeniser.remainingTokens();
+    const std::string &key = tokeniser.nextToken();
+    const std::string &value = tokeniser.remainingTokens();
     setVariable(key, value);
   }
   else if (command == CMD_GETVAR || command == CMD_GET_VARIABLE) {
@@ -307,18 +306,18 @@ void FileHandler::runCommand(const std::string &command, const std::string &args
     deleteVariable(args);
   }
   else if (command == INSERT_FILE_PATH) {
-    std::string var = tokeniser.nextToken();
-    std::string path = tokeniser.remainingTokens();
+    const std::string &var = tokeniser.nextToken();
+    const std::string &path = tokeniser.remainingTokens();
     insertFilePath(var, path);
   }
   else if (command == APPEND_FILE_PATH) {
-    std::string var = tokeniser.nextToken();
-    std::string path = tokeniser.remainingTokens();
+    const std::string &var = tokeniser.nextToken();
+    const std::string &path = tokeniser.remainingTokens();
     appendFilePath(var, path);
   }
   else if (command == REMOVE_FILE_PATH) {
-    std::string var = tokeniser.nextToken();
-    std::string path = tokeniser.remainingTokens();
+    const std::string &var = tokeniser.nextToken();
+    const std::string &path = tokeniser.remainingTokens();
     removeFilePath(var, path);
   }
   else if (command == CLEAR_FILE_PATH) {
@@ -338,9 +337,9 @@ void FileHandler::expandString(std::string &str) {
     VarMap::const_iterator I = m_varMap.begin();
     VarMap::const_iterator Iend = m_varMap.end();
     for (; I != Iend; ++I) {
-      std::string var = I->first;
-      std::string value = I->second;
-      std::string new_var = "${" + var + "}";
+      const std::string &var = I->first;
+      const std::string &value = I->second;
+      const std::string &new_var = "${" + var + "}";
       for (std::string::size_type p=str.find(new_var); p != str.npos; p=str.find(new_var, p))
      {
         str.replace(p, new_var.length(), value);
