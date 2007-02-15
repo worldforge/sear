@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.166 2007-01-30 23:20:38 simon Exp $
+// $Id: System.cpp,v 1.167 2007-02-15 20:20:22 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,6 +41,7 @@
 #include "FileHandler.h"
 #include "Sound.h"
 #include "ScriptEngine.h"
+#include "MediaManager.h"
 #include "System.h"
 #include "WorldEntity.h"
 #include "Editor.h"
@@ -129,6 +130,7 @@ System::System() :
   m_mouse_move_select(false),
   m_seconds(0.0),
   m_elapsed(0.0),
+  m_current_ticks(0),
   m_system_running(false),
   m_initialised(false),
   m_startFullscreen(DEFAULT_fullscreen),
@@ -176,6 +178,9 @@ bool System::init(int argc, char *argv[]) {
 
   m_calendar = SPtrShutdown<Calendar>(new Calendar());
   m_calendar->init();
+
+  m_media_manager = SPtrShutdown<MediaManager>(new MediaManager());
+  m_media_manager->init();
  
   // Connect signals for record processing 
   m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
@@ -197,6 +202,7 @@ bool System::init(int argc, char *argv[]) {
   m_action_handler->registerCommands(m_console.get());
   m_file_handler->registerCommands(m_console.get());
   m_calendar->registerCommands(m_console.get());
+  m_media_manager->registerCommands(m_console.get());
 
   m_character = SPtrShutdown<Character>(new Character());
   m_character->init();
@@ -312,6 +318,7 @@ bool System::init(int argc, char *argv[]) {
     m_console.release();
     m_workarea.release();
     m_character.release();
+    m_media_manager.release();
     m_sound.release();
 
     Bindings::shutdown();
@@ -350,6 +357,8 @@ void System::shutdown() {
   m_character.release();
 
   m_action_handler.release();
+
+  m_media_manager.release();
 
 //  CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();
@@ -413,8 +422,9 @@ void System::mainLoop() {
     try {
 
       SDL_Delay(m_delay);
-
-      m_seconds = (double)SDL_GetTicks() / 1000.0f;
+      // Store GetTicks so we only call it once per framee
+      m_current_ticks = SDL_GetTicks();
+      m_seconds = (double)m_current_ticks / 1000.0;
       m_elapsed = m_seconds - last_time;
       last_time = m_seconds;
       while (SDL_PollEvent(&event)  ) {
@@ -426,6 +436,9 @@ void System::mainLoop() {
       handleAnalogueControllers();
       // poll network
       m_client->poll();
+
+      m_media_manager->poll();
+
       if (m_client->getAvatar() && m_client->getAvatar()->getView()) {
         m_client->getAvatar()->getView()->update();
       }
@@ -781,6 +794,7 @@ void System::readConfig(varconf::Config &config) {
     config.setItem(SECTION_INPUT, KEY_DISABLE_JOYSTICK, DEFAULT_disable_joystick);
   }
 
+  m_media_manager->readConfig(m_general);
   m_client->readConfig(config);
   RenderSystem::getInstance().readConfig(config);
   ModelSystem::getInstance().readConfig(config);
@@ -804,6 +818,7 @@ void System::writeConfig(varconf::Config &config) {
   m_character->writeConfig(config);
   m_calendar->writeConfig(config);
   m_workarea->writeConfig(m_general);
+  m_media_manager->writeConfig(m_general);
 }
 
 void System::vEnableKeyRepeat(bool bEnable) {

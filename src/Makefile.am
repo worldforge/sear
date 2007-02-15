@@ -119,7 +119,8 @@ libSear_a_SOURCES = \
 	Editor.h \
 	TerrainEntity.cpp TerrainEntity.h \
 	prefix.c prefix.h \
-	error.cpp error.h
+	error.cpp error.h \
+	MediaManager.cpp MediaManager.h
 
 icondir = $(datadir)/icons/worldforge
 icon_DATA = sear_icon.xpm

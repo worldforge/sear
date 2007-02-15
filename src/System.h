@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.72 2006-11-30 20:30:49 simon Exp $
+// $Id: System.h,v 1.73 2007-02-15 20:20:23 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -25,6 +25,7 @@ class ActionHandler;
 class Calendar;
 class Client;
 class FileHandler;
+class MediaManager;
 class ScriptEngine;
 class Console;
 class Workarea;
@@ -134,14 +135,14 @@ public:
    * Gets the time in milliseconds since SDL was initialised
    * @return Time in milliseconds
    */ 
-  unsigned int getTime() const { return SDL_GetTicks(); }
+  unsigned int getTime() const { return m_current_ticks; }
 
   /**
    * Gets the time in seconds since SDL was initialised
    * @return Time in seconds
    */ 
-  float getTimef() const { return (float)SDL_GetTicks() / 1000.0f; }
-  double getTimeD() const { return (double)SDL_GetTicks() / 1000.0; }
+  float getTimef() const { return (float)m_seconds; }
+  double getTimeD() const { return m_seconds; }
 
   /**
    * Gets the time in seconds from the last frame start to the current
@@ -155,8 +156,7 @@ public:
    * @param ss Sytem state to set
    * @param state Value of state
    */ 
-  void setState(SystemState ss, bool state);// { m_systemState[ss] = state; }
-  
+  void setState(SystemState ss, bool state);// { m_systemState[ss] = seconds
   /**
    * Get value of a system state
    * @param ss System state to query
@@ -184,6 +184,7 @@ public:
   Workarea *getWorkarea() { return m_workarea.get(); }
   Character *getCharacter() { return m_character.get(); }
   Client *getClient() { return m_client.get(); }
+  MediaManager *getMediaManager() { return m_media_manager.get(); }
   
   static System *instance() { return m_instance; }
 
@@ -230,6 +231,7 @@ protected:
   SPtrShutdown<Console> m_console;
   SPtr<Workarea> m_workarea;
   SPtrShutdown<Character> m_character;
+  SPtrShutdown<MediaManager> m_media_manager;
    
   varconf::Config m_general;
 
@@ -242,6 +244,7 @@ protected:
 
   double m_seconds;
   double m_elapsed;
+  unsigned int m_current_ticks;
 
   SPtrShutdown<Sound> m_sound;
   

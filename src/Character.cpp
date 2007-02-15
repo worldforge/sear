@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.93 2007-02-12 21:44:00 simon Exp $
+// $Id: Character.cpp,v 1.94 2007-02-15 20:20:21 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -121,7 +121,6 @@ static const std::string STOPPED = "ch_stopped_";
 static const std::string WALKING = "ch_walking_";
 static const std::string RUNNING = "ch_running_";
 
-static const std::string GUISE = "guise";
 static const std::string HEIGHT = "height";
 
 namespace Sear {
@@ -259,7 +258,6 @@ void Character::updateLocals(bool send_to_server) {
   if (!m_avatar) return;
   assert(m_self.get() != NULL);
 
-  unsigned int ticks;
   bool changed = false;
   // TODO: Make into member variables
   static float old_speed = m_speed;
@@ -270,7 +268,7 @@ void Character::updateLocals(bool send_to_server) {
   if (old_speed != m_speed || old_run != m_run_modifier || old_strafe_speed != m_strafe_speed) {
     changed = true;
   }
-  ticks = SDL_GetTicks();
+  unsigned int ticks = System::instance()->getTime();
   float a = deg_to_rad(m_rate * m_rotate_speed * ((ticks - m_time) / 1000.0f));
 
   // Forward/Backward Speed
@@ -301,7 +299,7 @@ void Character::updateLocals(bool send_to_server) {
    // Only send update on a change
   if (changed) {
     // See how long its been since the last server update
-    bool send = ((SDL_GetTicks() - m_lastUpdate) > server_update_interval);
+    bool send = ((ticks - m_lastUpdate) > server_update_interval);
     // Update if interval has passed, or the force flag is set.
     if (send || send_to_server) {
 //      printf("MoveOp: %f, %f, %f\n", vel.x(), vel.y(), vel.z());
