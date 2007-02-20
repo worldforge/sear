@@ -14,6 +14,18 @@ Simon Goodall
 Email: sear@simongoodall.co.uk
 IRC: irc.worldforge.org NICK simon
 
+Windows Information
+-------------------
+
+Run sear.bat to check for updates to Sear itself (nighly build versions) and then look for media updates. Sear-bin.exe can be run directly to avoid launching the updater.
+If "SYS_DRIVE:\Documents and Settings\username\Application Data\Sear" is available (e.g. Win 2K and above) then Sear will download media updates and local coniguation files in this directory. If this directory does not exist (e.g. Win 98) then updates and local configuation files will be stored in the current working directory.
+Sear does *not* require administrator privileges to install or run. Administrator privileges may be required during installation if installing into Program Files.
+
+Linux Information
+-----------------
+On Linux systems, a shell script called "sear" is used in fire the updater for Sear itself (nightly build versions only) and for media updates. The binary sear-bin can be run directly to avoid running the updater.
+Local configuration files and updates will be stored in $HOME/.sear
+
 Known Issues
 ------------
 
@@ -32,7 +44,7 @@ Dependencies
 ------------
 
 Atlas: 0.6.0
-Eris: 1.3.10
+Eris: 1.3.12
 Varconf: 0.6.4
 WFmath: 0.3.2
 Skstream2: 0.3.1
