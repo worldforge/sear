@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.167 2007-02-15 20:20:22 simon Exp $
+// $Id: System.cpp,v 1.168 2007-03-04 14:28:40 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -360,18 +360,6 @@ void System::shutdown() {
 
   m_media_manager.release();
 
-//  CacheManager::getInstance().shutdown();
-  Environment::getInstance().shutdown();
-  ModelSystem::getInstance().shutdown(); 
-  RenderSystem::getInstance().destroyWindow();
-  RenderSystem::getInstance().shutdown();
-
-  m_editor.release();
-
-  m_workarea.release();
-
-  m_calendar.release();
-
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileSet shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
   for (FileHandler::FileSet::const_iterator I = shutdown_scripts.begin(); I != shutdown_scripts.end(); ++I) {
@@ -387,6 +375,18 @@ void System::shutdown() {
   m_console.release();
  
   m_sound.release();
+
+//  CacheManager::getInstance().shutdown();
+  Environment::getInstance().shutdown();
+  ModelSystem::getInstance().shutdown(); 
+  RenderSystem::getInstance().destroyWindow();
+  RenderSystem::getInstance().shutdown();
+
+  m_editor.release();
+
+  m_workarea.release();
+
+  m_calendar.release();
 
   // Explicity Tell sigc to disconnect signals
   notify_callbacks();

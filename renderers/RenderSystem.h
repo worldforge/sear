@@ -1,9 +1,9 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-#ifndef RENDERSYSTEM_H
-#define RENDERSYSTEM_H 1
+#ifndef SEAR_RENDERSYSTEM_H
+#define SEAR_RENDERSYSTEM_H 1
 
 #include <string>
 
@@ -60,6 +60,7 @@ public:
 
   // Texture Manager Functions
   TextureID requestTexture(const std::string &textureName, bool mask = false);
+  void releaseTexture(TextureID id);
   void switchTexture(TextureID to);
   void switchTexture(unsigned int texUnit, TextureID to);
 
@@ -137,4 +138,4 @@ private:
 
 } // namespace Sear
 
-#endif
+#endif /* SEAR_RENDER_SYSTEM_H */

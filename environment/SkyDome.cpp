@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -78,10 +78,14 @@ SkyDome::SkyDome(float radius, int levels, int segments) :
     domeInit(radius, levels, segments);
 }
 
-SkyDome::~SkyDome()
-{
-    delete [] m_verts;
-    delete [] m_texCoords;
+SkyDome::~SkyDome() {
+
+  RenderSystem::getInstance().releaseTexture(m_textures[0]);
+  RenderSystem::getInstance().releaseTexture(m_textures[1]);
+  RenderSystem::getInstance().releaseTexture(m_textures[2]);
+
+  delete [] m_verts;
+  delete [] m_texCoords;
 }
 
 float* SkyDome::genLevelVerts(float a2, float a22, float radius, int segments, float* verts)
@@ -175,10 +179,12 @@ float *SkyDome::genTexCoords(float radius, int levels, int segments)
 }
 
 void SkyDome::domeInit(float radius, int levels, int segments) {
-  // Get texture handles
-  m_textures[0] = RenderSystem::getInstance().requestTexture("atmosphere");
-  m_textures[1] = RenderSystem::getInstance().requestTexture("cloud_layer_1");
-  m_textures[2] = RenderSystem::getInstance().requestTexture("cloud_layer_2");
+  // Get texture handles -- only need to do this once
+  if (m_verts == 0) {
+    m_textures[0] = RenderSystem::getInstance().requestTexture("atmosphere");
+    m_textures[1] = RenderSystem::getInstance().requestTexture("cloud_layer_1");
+    m_textures[2] = RenderSystem::getInstance().requestTexture("cloud_layer_2");
+  }
 
   if (m_verts) delete [] m_verts;
   if (m_texCoords) delete [] m_texCoords;

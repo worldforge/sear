@@ -53,12 +53,17 @@ Weather::~Weather() {
 
 int Weather::init() {
   assert(m_initialised == false);
+
+  m_rain_drop_id = RenderSystem::getInstance().requestTexture("rain_drop");
+
   m_initialised = true;
   return 0;
 }
 
 void Weather::shutdown() {
   assert(m_initialised == true);
+
+  RenderSystem::getInstance().releaseTexture(m_rain_drop_id);
 
   notify_callbacks();
 
@@ -140,8 +145,7 @@ void Weather::render() {
 //    glPointParameterfARB( GL_POINT_SIZE_MIN_ARB, 1.0f );
 //    glPointParameterfARB( GL_POINT_SIZE_MAX_ARB, maxSize );
 
-    RenderSystem::getInstance().switchTexture(
-      RenderSystem::getInstance().requestTexture("rain_drop"));
+    RenderSystem::getInstance().switchTexture(m_rain_drop_id);
   } else {
     if (texEnabled) glDisable(GL_TEXTURE_2D);
   }

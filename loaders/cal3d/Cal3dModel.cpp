@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.49 2007-01-09 17:11:25 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.50 2007-03-04 14:28:40 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -270,6 +270,7 @@ void Cal3dModel::update(float time_elapsed) {
 
 int Cal3dModel::shutdown() {
   assert (m_initialised == true);
+
   // destroy the model instance
   m_calModel.release();
 

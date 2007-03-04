@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.42 2006-12-02 18:54:37 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.43 2007-03-04 14:28:40 simon Exp $
 
 #include <string>
 
@@ -98,7 +98,11 @@ int Cal3dCoreModel::shutdown() {
     // Loop through each map
     for (int j = 0; j < m->getMapCount(); ++j) {
       md = reinterpret_cast<MapData*>(m->getMapUserData(j));
-      if (md) delete md;
+      if (md) {
+        RenderSystem::getInstance().releaseTexture(md->textureID);
+        RenderSystem::getInstance().releaseTexture(md->textureMaskID);
+        delete md;
+      }
     }
   }
 

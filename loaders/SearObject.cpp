@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.2 2007-01-27 11:38:47 simon Exp $
+// $Id: SearObject.cpp,v 1.3 2007-03-04 14:28:40 simon Exp $
 
 #include  <stdio.h>
 
@@ -300,6 +300,19 @@ int SearObject::shutdown() {
   // Clean up OpenGL bits
   contextDestroyed(true);
 
+  StaticObjectList::const_iterator I = m_static_objects.begin();
+  StaticObjectList::const_iterator Iend = m_static_objects.end();
+  for (; I != Iend; ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    int id, mask_id;
+    // Clean up textures
+    if (so->getTexture(0, id, mask_id) == 0) {
+      RenderSystem::getInstance().releaseTexture(id);
+      RenderSystem::getInstance().releaseTexture(mask_id);
+    }
+  }
+
   m_static_objects.clear();
 
   m_initialised = false;
@@ -386,6 +399,7 @@ int SearObject::load(const std::string &filename) {
   uint32_t *uptr;
   float *fptr;
   int c,x,y;
+
   for (uint32_t i = 0; i < soh.num_meshes; ++i) {
     if (fread(&som, sizeof(SearObjectMesh), 1, fp) != 1) {
       fprintf(stderr, "[SearObject] Error reading SearObject Mesh in %s\n", filename.c_str());
@@ -396,13 +410,13 @@ int SearObject::load(const std::string &filename) {
     if (big_endian) {
       swap_bytes_uint32_t(som.num_vertices);
       swap_bytes_uint32_t(som.num_faces);
-
       for (x = 0; x < 4; ++x) {
         for (y = 0; y < 4; ++y) {
           swap_bytes_float(som.mesh_transform[x][y]);
           swap_bytes_float(som.texture_transform[x][y]);
         }
       }
+
       for (x = 0; x < 4; ++x) {
         swap_bytes_float(som.ambient[x]);
         swap_bytes_float(som.diffuse[x]);

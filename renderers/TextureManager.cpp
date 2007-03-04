@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.48 2007-02-05 17:33:01 simon Exp $
+// $Id: TextureManager.cpp,v 1.49 2007-03-04 14:28:40 simon Exp $
 
 #include <unistd.h>
 
@@ -99,6 +99,7 @@ static const std::string FILTER_LINEAR_MIPMAP_LINEAR = "linear_mipmap_linear";
 static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";
 static const std::string CMD_LOAD_SPRITE_CONFIG = "load_sprites";
 static const std::string CMD_SET_TEXTURE_BASE_LEVEL = "set_texture_detail";
+static const std::string CMD_dump_reference_count = "dump_reference_count";
 
 // Format strings
 static const std::string ALPHA = "alpha";
@@ -163,7 +164,7 @@ TextureManager::TextureManager() :
 
 void TextureManager::init()
 {
-  if (m_initialised) shutdown();
+  assert(m_initialised == false);
   if (debug) std::cout << "Initialising TextureManager" << std::endl;
 
   m_texture_counter = 1;
@@ -197,12 +198,12 @@ void TextureManager::contextCreated() {
   // create default font
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
-
-  createCursor("cursor_default", arrow);
-  createCursor("cursor_pickup", pickup);
-  createCursor("cursor_touch", touch);
-  createCursor("cursor_use", use);
-  createCursor("cursor_attack", attack);
+printf("%d -- %d\n", m_default_texture, m_default_font);
+  m_cursor_ids.push_back(createCursor("cursor_default", arrow));
+  m_cursor_ids.push_back(createCursor("cursor_pickup", pickup));
+  m_cursor_ids.push_back(createCursor("cursor_touch", touch));
+  m_cursor_ids.push_back(createCursor("cursor_use", use));
+  m_cursor_ids.push_back(createCursor("cursor_attack", attack));
 
   m_initGL = true;
 }
@@ -211,6 +212,23 @@ void TextureManager::shutdown()
 {
   if (!m_initialised) return;
   if (debug) std::cout << "TextureManager: Shutdown" << std::endl;
+
+  releaseTextureID(m_default_texture);
+  releaseTextureID(m_default_font);
+
+  for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
+    releaseTextureID(m_cursor_ids[i]);
+  }
+
+  ReferenceCounter::const_iterator I = m_ref_counter.begin();
+  ReferenceCounter::const_iterator Iend = m_ref_counter.end();
+  while (I != Iend) {
+    printf("%s\n", getTextureName(I->first).c_str());
+    ++I;
+  }
+
+  assert(m_ref_counter.empty());
+
 
   // Unload all textures
   for (unsigned int i = 1; i < m_textures.size(); ++i) {
@@ -222,6 +240,7 @@ void TextureManager::shutdown()
    delete m_sprites.begin()->second;
     m_sprites.erase(m_sprites.begin());
   }
+
 
   m_last_textures.clear();
   m_initialised = false;
@@ -235,7 +254,8 @@ void TextureManager::readTextureConfig(const std::string &filename) {
 
 GLuint TextureManager::loadTexture(const std::string &texture_name) {
   assert((m_initialised == true) && "TextureManager not initialised");
-  std::string clean_name = std::string(texture_name);
+  // TODO: names should be cleaned by this point already!
+  std::string clean_name(texture_name);
   
   bool mask = false;
   if (clean_name.substr(0, 5) == "mask_") {
@@ -256,12 +276,39 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   }
 
   std::string filename = (std::string)m_texture_config.getItem(clean_name, KEY_filename);
-  // Get path to prefix to filename 
-  if (m_texture_config.findItem(clean_name, KEY_path)) {
-    std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
-    filename = path + "/" + filename;
+//  // Get path to prefix to filename 
+//  if (m_texture_config.findItem(clean_name, KEY_path)) {
+//    std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
+//    filename = path + "/" + filename;
+//  }
+#if(0)
+// Perhaps should be in the media manager...
+ // Add a new status type
+if (m_pending_updates.find(filename) == m_pending_updates.end()) {
+    m_pending_updates[filename] = texture_id;
+} else {
+ // need to return previous option..
+}
+    // Return default texture
+  //  Maybe this needs to be moved earlier.....
+  int status = System::instance()->getMediaManager()->checkFile(filename);
+  if (status == STATUS_FILE_MISSING) {
+    // Hook up some call backs
+    // Need to create a list of pending updates which indicate how to update the
+    // media handle.
+    // E.G. texture handle XX needs replacing
+    // TODO: What about multiple/similtaneuos requests?
+  } else if (status == STATUS_FILE_UPDATING) {
+    // Hook up some call backs
+    // Return handle to existing file
+  } else if (status == STATUS_OK) {
+    // Then carry on
+  } else if (status == STATUS_FILE_UNKNOWN) {
+    // Return default texture    
   }
-  
+
+// Perhaps this stage should be in a different function?
+ #endif 
   System::instance()->getFileHandler()->getFilePath(filename);
   SDL_Surface* image = loadImageFromPath(filename);
   if (!image) return 0;
@@ -275,6 +322,7 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
 {
   assert((m_initialised == true) && "TextureManager not initialised");
   // Copy name so we can change it
+  // TODO: SHould already be cleaned!
   std::string texture_name(name);
   m_texture_config.clean(texture_name);
   // If we have requested a mask, filter pixels
@@ -493,8 +541,8 @@ void TextureManager::switchTexture(TextureID texture_id) {
   if (texture_id == m_last_textures[0]) return;
   GLuint to = m_textures[texture_id];
   if (to == 0) {
-    m_texture_config.clean(m_names[texture_id]);
-    to = loadTexture(m_names[texture_id]);
+    const std::string &tex_name = m_names[texture_id];
+    to = loadTexture(tex_name);
     if (to == 0) {
       std::cerr << "Cannot find " << m_names[texture_id] << " ID " << texture_id <<  std::endl;
       to = m_textures[m_default_texture];
@@ -690,7 +738,7 @@ TextureID TextureManager::createCursor(const std::string &texture_name, const ch
 
   TextureID texId = requestTextureID(texture_name, false);
   m_textures[texId] = texture;
-
+printf("Texture ID dor %s is %d\n", texture_name.c_str(), texId);
   return texId;
 }
 
@@ -702,6 +750,7 @@ void TextureManager::registerCommands(Console *console) {
   console->registerCommand(CMD_LOAD_TEXTURE_CONFIG, this);
   console->registerCommand(CMD_LOAD_SPRITE_CONFIG, this);
   console->registerCommand(CMD_SET_TEXTURE_BASE_LEVEL, this);
+  console->registerCommand(CMD_dump_reference_count, this);
 }
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
@@ -711,7 +760,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     System::instance()->getFileHandler()->getFilePath(a);
     readTextureConfig(a);
   }
-  
+  else 
   if (command == CMD_LOAD_SPRITE_CONFIG) {
     std::string a = arguments;
     System::instance()->getFileHandler()->getFilePath(a);
@@ -719,6 +768,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     m_spriteConfig.readFromFile(a);
   }
   
+  else 
   if (command == CMD_SET_TEXTURE_BASE_LEVEL) {
     int level = strtol(arguments.c_str(), NULL, 0);
     if ((level < 0) || (level > 10)) {
@@ -729,6 +779,15 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
     varconf::Config& cfg(System::instance()->getGeneral());
     cfg.setItem("graphics", KEY_base_texture_level, level);
   }
+  else 
+  if (command == CMD_dump_reference_count) {
+    ReferenceCounter::const_iterator I = m_ref_counter.begin();
+    ReferenceCounter::const_iterator Iend = m_ref_counter.end();
+    while (I != Iend) {
+      printf("Texture: %s Count: %d\n", getTextureName(I->first).c_str(), I->second);
+      ++I;
+    }
+  }
 
 }
 
@@ -736,6 +795,10 @@ void TextureManager::contextDestroyed(bool check)
 {
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL);
+
+  for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
+    releaseTextureID(m_cursor_ids[i]);
+  }
   
   // unload textures first.
   for (unsigned int i = 0; i < m_textures.size(); ++i) {
@@ -746,7 +809,10 @@ void TextureManager::contextDestroyed(bool check)
     m_textures[i] = 0;
   }
 
-  for (SpriteInstanceMap::iterator S=m_sprites.begin(); S != m_sprites.end(); ++S) {
+  SpriteInstanceMap::iterator S = m_sprites.begin();
+  SpriteInstanceMap::const_iterator Send = m_sprites.end();
+
+  for (; S != Send; ++S) {
     S->second->contextDestroyed(check);
   }
   m_initGL = false;

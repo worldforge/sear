@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.66 2007-01-27 11:38:46 simon Exp $
+// $Id: 3ds.cpp,v 1.67 2007-03-04 14:28:40 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -324,6 +324,19 @@ int ThreeDS::shutdown() {
   // Clean up OpenGL bits
   contextDestroyed(true);
 
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    int id, mask_id;
+    // Clean up textures
+    if (so->getTexture(0, id, mask_id) == 0) {
+      RenderSystem::getInstance().releaseTexture(id);
+      RenderSystem::getInstance().releaseTexture(mask_id);
+    }
+  }
+
   m_render_objects.clear();
 
   while (!m_material_map.empty()) {
@@ -356,7 +369,9 @@ void ThreeDS::contextDestroyed(bool check) {
 }
 
 void ThreeDS::render(bool select_mode) {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
@@ -399,8 +414,8 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   unsigned int t_counter = 0;
 
   SPtrShutdown<StaticObject> ro;
-  int current_texture = -2;
   std::string material_name = "sear:noname";
+  std::string current_material_name = "sear:bogus_name";
 
   // Initialise transform matrix
   float matrix[4][4];
@@ -504,24 +519,31 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       tex_matrix.scalev(s);
       tex_matrix.translate(mat->texture1_map.offset[0], mat->texture1_map.offset[1], 0.0f);
 
-      if (m_config.findItem(material_name,KEY_texture_map_0)) {
-        std::string name = (std::string)m_config.getItem(material_name,
-                                                         KEY_texture_map_0);
-        texture_id = RenderSystem::getInstance().requestTexture(name);
-        texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
-      } else if ( mat->texture1_map.name[0]) {
-        texture_id = RenderSystem::getInstance().requestTexture(
-                                                        mat->texture1_map.name);
-        texture_mask_id = RenderSystem::getInstance().requestTexture(
-                                                  mat->texture1_map.name, true);
-      } else {
-        // Do nothing, use default vals
-      }
     }
 
-    // Create new render object for change in texture
-    if (texture_id != current_texture) {
-      current_texture = texture_id;
+    if (current_material_name != material_name) {
+      if (mesh->texels) {
+        if (m_config.findItem(material_name,KEY_texture_map_0)) {
+          std::string name = (std::string)m_config.getItem(material_name,
+                                                         KEY_texture_map_0);
+          texture_id = RenderSystem::getInstance().requestTexture(name);
+          texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
+        } else if ( mat->texture1_map.name[0]) {
+          texture_id = RenderSystem::getInstance().requestTexture(
+                                                          mat->texture1_map.name);
+          texture_mask_id = RenderSystem::getInstance().requestTexture(
+                                                  mat->texture1_map.name, true);
+        } else { 
+          // Do nothing, use default vals
+        }
+      }
+      // Request default texture to keep the reference counting happy.
+      if (texture_id == 0) {
+        texture_id = RenderSystem::getInstance().requestTexture("default_texture");
+        texture_mask_id = RenderSystem::getInstance().requestTexture("default_texture", true);
+      }
+      current_material_name = material_name;
+      // Create new render object for change in texture
       // Set correct num of points in old render object
       if (ro) ro->setNumPoints(v_counter);
 

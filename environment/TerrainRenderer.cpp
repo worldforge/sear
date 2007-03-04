@@ -476,7 +476,12 @@ TerrainRenderer::TerrainRenderer ():
 }
 
 TerrainRenderer::~TerrainRenderer() {
+
+  RenderSystem::getInstance ().releaseTexture(m_seaTexture);
+  RenderSystem::getInstance ().releaseTexture(m_shadowTexture);
+
   for (unsigned int i = 0; i < m_shaders.size();  ++i) {
+    RenderSystem::getInstance().releaseTexture(m_shaders[i].texId);
     delete m_shaders[i].shader;
   }
   delete [] m_lineIndeces;

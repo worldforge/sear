@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.31 2006-12-03 11:32:19 simon Exp $
+// $Id: NPlane.cpp,v 1.32 2007-03-04 14:28:40 simon Exp $
 
 #include <iostream>
 
@@ -130,12 +130,25 @@ int NPlane::shutdown() {
 
   contextDestroyed(true);
 
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    int id, mask_id;
+    so->getTexture(0, id, mask_id);
+    RenderSystem::getInstance().releaseTexture(id);
+    RenderSystem::getInstance().releaseTexture(mask_id);
+  }
+
   m_initialised = false;
   return 0;
 }
 
 void NPlane::contextCreated() {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
@@ -143,7 +156,9 @@ void NPlane::contextCreated() {
 }
 
 void NPlane::contextDestroyed(bool check) {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
@@ -151,7 +166,9 @@ void NPlane::contextDestroyed(bool check) {
 }
 
 void NPlane::render(bool select_mode) {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);

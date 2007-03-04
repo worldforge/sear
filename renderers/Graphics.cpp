@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.65 2007-02-12 18:21:53 simon Exp $
+// $Id: Graphics.cpp,v 1.66 2007-03-04 14:28:40 simon Exp $
 
 #include <sigc++/object_slot.h>
 

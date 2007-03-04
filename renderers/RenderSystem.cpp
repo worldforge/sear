@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.21 2007-01-30 23:20:37 simon Exp $
+// $Id: RenderSystem.cpp,v 1.22 2007-03-04 14:28:40 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -119,6 +119,14 @@ void RenderSystem::shutdown() {
   
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
 
+  releaseTexture(m_mouseState[CURSOR_DEFAULT]);
+  releaseTexture(m_mouseState[CURSOR_TOUCH]);
+  releaseTexture(m_mouseState[CURSOR_PICKUP]);
+  releaseTexture(m_mouseState[CURSOR_USE]);
+  releaseTexture(m_mouseState[CURSOR_ATTACK]);
+
+  m_renderer->shutdown();
+
   m_cameraSystem.release();
   m_graphics.release();
   m_textureManager.release();
@@ -131,6 +139,11 @@ void RenderSystem::shutdown() {
 TextureID RenderSystem::requestTexture(const std::string &textureName, bool mask) {
   assert (m_initialised);
   return m_textureManager->requestTextureID(textureName, mask);
+}
+
+void RenderSystem::releaseTexture(TextureID id) {
+  assert (m_initialised);
+  m_textureManager->releaseTextureID(id);
 }
 
 void RenderSystem::switchTexture(TextureID to) {

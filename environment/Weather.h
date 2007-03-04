@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2006 - 2007 Simon Goodall
 
-// $Id: Weather.h,v 1.5 2007-01-31 21:35:37 simon Exp $
+// $Id: Weather.h,v 1.6 2007-03-04 14:28:40 simon Exp $
 
 #ifndef SEAR_ENVIRONMENT_WEATHER_H
 #define SEAR_ENVIRONMENT_WEATHER_H 1
@@ -54,6 +54,8 @@ private:
   float m_rain;
   float m_snow;
   float m_visibility, m_current_visibility;
+
+  int m_rain_drop_id;
 };
 
 } // namespace Sear

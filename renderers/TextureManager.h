@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.27 2007-01-24 09:52:54 simon Exp $
+// $Id: TextureManager.h,v 1.28 2007-03-04 14:28:40 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -31,7 +31,7 @@ struct SDL_Surface;
  - determine max_texture_units from gl query
  - read/write config values
  - add ability to resample image to 2^N by 2^M
- - allow more formats thanb just RGB and RGBA
+ - allow more formats than just RGB and RGBA
  - work in image loaders
  - create default textures
 
@@ -56,6 +56,7 @@ public:
   typedef std::map<std::string, TextureID> TextureMap;
   typedef std::vector<GLuint> TextureVector;
   typedef std::vector<std::string> NameVector;
+  typedef std::map<TextureID, int> ReferenceCounter;
  
   /**
    * Default constructor
@@ -92,6 +93,7 @@ public:
     assert(m_initialised);
     // Convert to internal name
     std::string name = (mask) ? ("mask_" + texture_name) : (texture_name);
+    m_texture_config.clean(name);
     // Find existing ID if any
     TextureMap::const_iterator I = m_texture_map.find(name);
     TextureID texId; 
@@ -105,8 +107,22 @@ public:
       // Return existing id
       texId = I->second;
     }
-    
+
+    // Increment Texture counter.
+    ++m_ref_counter[texId];
+printf("Requested: %s . ID: %d Count: %d\n", name.c_str(), texId, m_ref_counter[texId]);
     return texId;
+  }
+
+  void releaseTextureID(TextureID id) {
+    ReferenceCounter::iterator I = m_ref_counter.find(id);
+    assert(I != m_ref_counter.end());
+
+printf("Released: %s ID: %d count: %d\n", getTextureName(id).c_str(), id, m_ref_counter[id]);
+    if (--(I->second) == 0) {
+      unloadTexture(getTextureName(id));
+      m_ref_counter.erase(I);
+    }
   }
 
   std::string getTextureName(TextureID id) const {
@@ -184,13 +200,12 @@ private:
   GLuint loadTexture(const std::string &texture_name);
   GLuint loadTexture(const std::string &texture_name, struct SDL_Surface *surface, bool mask);
 
-
-
   bool m_initialised; ///< Flag indicating whether object has had init called
   bool m_initGL; ///< flag indicating if initGL has been done or not
   int m_texture_counter;
   
   varconf::Config m_texture_config; ///< Config object for all texture
+  ReferenceCounter m_ref_counter;
   TextureMap m_texture_map; ///< Mapping between texture name and its TextureID
   TextureVector m_textures; ///< Used to translate a TextureID to a TextureObject
   NameVector m_names; 
@@ -198,6 +213,7 @@ private:
   int m_texture_units;
   TextureID m_default_texture;
   TextureID m_default_font;
+  std::vector<TextureID> m_cursor_ids;
 
   int m_baseMipmapLevel;
   

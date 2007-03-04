@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.39 2007-02-12 21:44:00 simon Exp $
+// $Id: Console.cpp,v 1.40 2007-03-04 14:28:40 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -122,6 +122,12 @@ void Console::shutdown() {
   
   std::ofstream HistoryFile((m_system->getFileHandler()->getUserDataPath() + "history").c_str());
   
+  if (m_panel_id != -1) {
+    RenderSystem::getInstance().releaseTexture(m_panel_id);
+    m_panel_id = -1;
+  }
+
+  // TODO: Sometimes this can stall for a long time
   HistoryFile << m_CommandHistory;
   m_CommandHistory.clear();
   m_CommandHistoryIterator = m_CommandHistory.end();

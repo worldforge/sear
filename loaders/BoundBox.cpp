@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.33 2006-12-03 11:32:11 simon Exp $
+// $Id: BoundBox.cpp,v 1.34 2007-03-04 14:28:40 simon Exp $
 
 #include "renderers/RenderSystem.h"
 
@@ -260,12 +260,26 @@ int BoundBox::shutdown() {
 
   contextDestroyed(true);
 
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    int id, mask_id;
+    so->getTexture(0, id, mask_id);
+    RenderSystem::getInstance().releaseTexture(id);
+    RenderSystem::getInstance().releaseTexture(mask_id);
+     
+  }
+
   m_initialised = false;
   return 0;
 }
 
 void BoundBox::contextCreated() {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
@@ -273,7 +287,9 @@ void BoundBox::contextCreated() {
 }
 
 void BoundBox::contextDestroyed(bool check) {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
@@ -281,7 +297,9 @@ void BoundBox::contextDestroyed(bool check) {
 }
 
 void BoundBox::render(bool select_mode) {
-  for (StaticObjectList::const_iterator I = m_render_objects.begin(); I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_render_objects.begin();
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);

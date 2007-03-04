@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.164 2007-02-12 21:44:00 simon Exp $
+// $Id: GL.cpp,v 1.165 2007-03-04 14:28:40 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -162,25 +162,24 @@
 
 static bool use_ext_compiled_vertex_array = false;
 
-static std::string STATE_font = "font";
-static std::string STATE_splash = "splash";
-static std::string STATE_halo = "halo";
-static std::string STATE_default = "default";
+static const std::string STATE_font = "font";
+static const std::string STATE_splash = "splash";
+static const std::string STATE_halo = "halo";
+static const std::string STATE_default = "default";
 
-static std::string DEFAULT_TEXTURE = "default_texture";
-static std::string DEFAULT_FONT = "default_font";
+static const std::string DEFAULT_FONT = "default_font";
 
-static std::string MASK = "_mask";
-static std::string RENDER = "render";
+static const std::string MASK = "_mask";
+static const std::string RENDER = "render";
 	
-static GLfloat halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
-static GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
-static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-static GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+static const GLfloat halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static const GLfloat activeNameColour[] = { 1.0f, 0.75f, 0.2f, 1.0f};
+static const GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+static const GLfloat black[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 //static GLfloat red[] =   { 1.0f, 0.0f, 0.0f, 1.0f };
-static GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
-static GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
-static GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
+static const GLfloat yellow[] =  { 0.0f, 1.0f, 1.0f, 1.0f };
+static const GLfloat blue[] =  { 0.0f, 0.0f, 1.0f, 1.0f };
+static const GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 
 
 #ifdef DEBUG
@@ -527,6 +526,10 @@ void GL::shutdown() {
     m_colourArray = NULL;
   }
 
+  // TODO: This is too late
+  if (m_font_id != -1) RenderSystem::getInstance().releaseTexture(m_font_id);
+  if (m_splash_id != -1) RenderSystem::getInstance().releaseTexture(m_splash_id);
+
   m_initialised = false;
 }
 
@@ -610,6 +613,8 @@ void GL::shutdownFont(bool check) {
       glDeleteLists(m_base, 256); // Delete All 256 Display Lists
     }
   }
+  RenderSystem::getInstance().releaseTexture(m_font_id);
+
   m_fontInitialised = false;
 }
 

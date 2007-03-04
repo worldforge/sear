@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.29 2007-01-27 11:38:47 simon Exp $
+// $Id: LibModelFile.cpp,v 1.30 2007-03-04 14:28:40 simon Exp $
 
 /*
   Debug check list
@@ -379,6 +379,20 @@ int LibModelFile::init(const std::string &filename) {
 int LibModelFile::shutdown() {
   assert(m_initialised);
   m_initialised = false;
+
+  StaticObjectList::const_iterator I = m_static_objects.begin();
+  StaticObjectList::const_iterator Iend = m_static_objects.end();
+  for (; I != Iend; ++I) {
+    SPtrShutdown<StaticObject> so = *I;
+    assert(so);
+    int id, mask_id;
+    // Clean up textures
+    if (so->getTexture(0, id, mask_id) == 0) {
+      RenderSystem::getInstance().releaseTexture(id);
+      RenderSystem::getInstance().releaseTexture(mask_id);
+    }
+  }
+
 
   //  Clean up OpenGL data
   contextDestroyed(true);
