@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000 - 2003 Alistair Riddoch
-// Copyright (C) 2004 - 2006 Simon Goodall
+// Copyright (C) 2004 - 2007 Simon Goodall
 
 #include "TerrainRenderer.h"
 
@@ -93,6 +93,7 @@ void TerrainRenderer::enableRendererState() {
   glMaterialfv (GL_FRONT, GL_EMISSION, emission);
   glMaterialfv (GL_FRONT, GL_SHININESS, shininess);
   glEnableClientState (GL_NORMAL_ARRAY);
+
   // Setting for texture Unit 1
   glActiveTexture (GL_TEXTURE1);
   glEnable (GL_TEXTURE_GEN_S);
@@ -131,8 +132,9 @@ void TerrainRenderer::disableRendererState() {
 void TerrainRenderer::generateAlphaTextures (Mercator::Segment * map, DataSeg &seg) {
   const Mercator::Segment::Surfacestore & surfaces = map->getSurfaces ();
   Mercator::Segment::Surfacestore::const_iterator I = surfaces.begin ();
+  Mercator::Segment::Surfacestore::const_iterator Iend = surfaces.end ();
 
-  for (; I != surfaces.end(); ++I) {
+  for (; I != Iend; ++I) {
     if (I == surfaces.begin()) continue; // shader 0 never has alpha
     
     std::map<int, GLuint>::const_iterator J = seg.m_alphaTextures.find(I->first);
@@ -222,8 +224,13 @@ void TerrainRenderer::drawRegion (Mercator::Segment * map,
     }
 
     // Draw this segment
-    glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
-                   GL_UNSIGNED_SHORT, m_lineIndeces);
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
+                     GL_UNSIGNED_SHORT, 0);
+    } else {
+      glDrawElements(GL_TRIANGLE_STRIP, m_numLineIndeces,
+                     GL_UNSIGNED_SHORT, m_lineIndeces);
+    }
 
     if (I == surfaces.begin()) {
       // After the first pass, which we assume is a fill, enable
@@ -262,8 +269,8 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
   Render *r = RenderSystem::getInstance ().getRenderer ();
   assert (r != 0);
-  float frustum[6][4];
-  r->getFrustum (frustum);
+//  float frustum[6][4];
+//  r->getFrustum (frustum);
 
   const Terrain::Segmentstore & segs = t.getTerrain ();
   Terrain::Segmentstore::const_iterator I = segs.lower_bound (lowXBound);
@@ -272,6 +279,18 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
   if (I == segs.end()) return;
 
   if (!select_mode) enableRendererState ();
+
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+
+    if (glIsBufferARB(m_lineIndeces_vbo) == false) {
+      glGenBuffersARB(1, &m_lineIndeces_vbo);
+      glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, m_lineIndeces_vbo);
+      glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_numLineIndeces * sizeof(unsigned short), m_lineIndeces, GL_STATIC_DRAW_ARB); 
+    } else {
+      glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, m_lineIndeces_vbo);
+    }
+  }
+
 
   for (; I != K; ++I) {
     const Terrain::Segmentcolumn & col = I->second;
@@ -400,6 +419,9 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
       }
     }
   }
+  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+    glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+  }
 
   if (!select_mode) disableRendererState ();
 }
@@ -443,6 +465,7 @@ TerrainRenderer::TerrainRenderer ():
   m_terrain (Terrain::SHADED),
   m_numLineIndeces (0),
   m_lineIndeces (new unsigned short[(segSize + 1) * (segSize + 1) * 2]),
+  m_lineIndeces_vbo(0),
   m_landscapeList (0),
   m_haveTerrain (false),
   m_context_no(-1)
@@ -550,7 +573,14 @@ void TerrainRenderer::contextDestroyed(bool check) {
   }
  
   m_displayLists.clear();
-  
+ 
+  if (check) {
+    if (glIsBufferARB(m_lineIndeces_vbo)) {
+       glDeleteBuffersARB(1, &m_lineIndeces_vbo);
+     }
+  }
+  m_lineIndeces_vbo = 0;
+ 
 //  for (unsigned int i = 0; i < m_shaders.size();  ++i) {
     // done by texture manager?
   //  if (glIsTexture(m_shaders[i].texId)) glIsTexture(1, &m_shaders[i].texId);

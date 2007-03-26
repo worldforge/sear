@@ -81,6 +81,7 @@ public:
     DisplayListStore m_displayLists;
     int m_numLineIndeces;
     unsigned short * const m_lineIndeces;
+    GLuint m_lineIndeces_vbo;
    
     int m_seaTexture;
     int m_shadowTexture;

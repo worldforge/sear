@@ -1,3 +1,8 @@
+2007-03-26  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h: Add a
+	  VBO for the indices rather than a vertex array.
+
 2007-03-04  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/SkyDome.cpp, environment/TerrainRenderer.cpp, 
