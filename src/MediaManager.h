@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.h,v 1.1 2007-02-15 20:20:22 simon Exp $
+// $Id: MediaManager.h,v 1.2 2007-03-28 11:09:43 simon Exp $
 
 #ifndef SEAR_MEDIA_MANAGER_H
 #define SEAR_MEDIA_MANAGER_H 1
@@ -70,7 +70,7 @@ public:
   //  STATUS_FILE_OK       -- The local version is the latest version
   //  This function will then schedule an update if required.
   // TODO: We could return an int identifier for faster matching to requestor
-  int checkFile(const std::string &filename, MediaType type);
+  MediaStatus checkFile(const std::string &filename, MediaType type);
 
   // Look for updated files on the server.
   int checkForUpdates();

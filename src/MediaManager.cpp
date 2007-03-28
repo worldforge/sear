@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.1 2007-02-15 20:20:22 simon Exp $
+// $Id: MediaManager.cpp,v 1.2 2007-03-28 11:09:43 simon Exp $
 
 #include  <libwfut/WFUT.h>
 
@@ -36,6 +36,7 @@ static const std::string CMD_check_for_updates = "check_for_updates";
 static const std::string CMD_enable_updates = "enable_updates";
 static const std::string CMD_disable_updates = "disable_updates";
 static const std::string CMD_download_file = "download_file";
+static const std::string CMD_download_updates = "download_updates";
 
 namespace Sear {
 
@@ -93,6 +94,7 @@ void MediaManager::registerCommands(Console *console) {
   console->registerCommand(CMD_enable_updates, this);
   console->registerCommand(CMD_disable_updates, this);
   console->registerCommand(CMD_download_file, this);
+  console->registerCommand(CMD_download_updates, this);
 }
 
 void MediaManager::runCommand(const std::string &command, const std::string &args) {
@@ -104,6 +106,12 @@ void MediaManager::runCommand(const std::string &command, const std::string &arg
     m_updates_enabled = false;
   } else if (command == CMD_download_file) {
     checkFile(args, MEDIA_UNKNOWN); 
+  } else if (command == CMD_download_updates) {
+    if (m_updates_enabled) {
+      std::string path = m_local_root + "/" + m_channel_name;
+      System::instance()->getFileHandler()->expandString(path);
+      m_wfut.updateChannel(m_updates_list, m_server_root + "/" + m_channel_name, path);
+    }
   }
 }
 
@@ -112,7 +120,7 @@ int MediaManager::poll() {
   return m_wfut.poll();
 }
 
-int MediaManager::checkFile(const std::string &filename, MediaType type) {
+MediaManager::MediaStatus MediaManager::checkFile(const std::string &filename, MediaType type) {
   assert(m_initialised == true);
 
   /* TODO:  convert filename string into a wfut.xml filename
@@ -145,19 +153,24 @@ int MediaManager::checkFile(const std::string &filename, MediaType type) {
   bool has_update = update_itr != update_itr_end;
 
   if (!has_local && !has_update) {
-  if (debug) printf("[MediaManager] File unknown\n");
+    if (debug) printf("[MediaManager] File unknown\n");
     return STATUS_UNKNOWN_FILE;
   }
 
   if (!has_update) {
-  if (debug) printf("[MediaManager] File OK\n");
+    if (debug) printf("[MediaManager] File OK\n");
     return STATUS_OK;
   }
 
   // Queue the file
   const WFUT::FileObject &fo = update_itr->second;
   const std::string &url = m_server_root + "/" + m_channel_name + "/" + fo.filename;
-  const std::string &path = m_local_root + "/" + m_channel_name + "/" + fo.filename;
+  std::string path = m_local_root + "/" + m_channel_name + "/" + fo.filename;
+
+
+  System::instance()->getFileHandler()->expandString(path);
+printf("%s -- %s\n", url.c_str(), path.c_str());
+
   m_wfut.updateFile(fo, url, path);
 
   // TODO: Store fileobject and type somewhere.
@@ -176,7 +189,7 @@ int MediaManager::checkForUpdates() {
   // We don't mind if the file is correctly parsed or if it does not exist.
   // We do mind if the file exists but is corrupt.
 //  if (
-m_wfut.getLocalList(local_wfut, m_local_list);
+  m_wfut.getLocalList(local_wfut, m_local_list);
 /// == WFUT::WFUT_PARSE_ERROR) {
 //    // Print a warning message?
 //    return 1;
@@ -188,7 +201,7 @@ m_wfut.getLocalList(local_wfut, m_local_list);
   // We don't mind if the file is correctly parsed or if it does not exist.
   // We do mind if the file exists but is corrupt.
 //  if (
-m_wfut.getLocalList(system_wfut, m_system_list) ;
+  m_wfut.getLocalList(system_wfut, m_system_list) ;
 //== WFUT::WFUT_PARSE_ERROR) {
 //    // Warnings!
 //    return 1;
@@ -208,6 +221,7 @@ m_wfut.getLocalList(system_wfut, m_system_list) ;
   if (debug) printf("[MediaManager] Calculating Updates\n");
   if (m_wfut.calculateUpdates(m_server_list, m_system_list, m_local_list, m_updates_list, m_local_root + "/" + m_channel_name)) {
     // Error!
+    fprintf(stderr, "[MediaManager] Error Calculating Updates\n");
     return 1;
   }
  

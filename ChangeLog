@@ -1,3 +1,9 @@
+2007-03-28  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* src/MediaManager.cpp, src/MediaManager.h: Added a command to allow all
+	  updates to be downloaded. Sear will need to be restarted to reload 
+	  updated configuration files.
+
 2007-03-26  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h: Add a
