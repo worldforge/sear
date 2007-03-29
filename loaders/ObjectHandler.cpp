@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.10 2006-09-17 19:42:42 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.11 2007-03-29 20:11:51 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -25,6 +25,7 @@
 namespace Sear {
 	
 static const std::string CMD_LOAD_OBJECT_RECORDS = "load_object_records";
+static const std::string CMD_reload_config_objects = "reload_config_objects";
 
 static const std::string KEY_DRAW_SELF = "draw_self";
 static const std::string KEY_DRAW_MEMBERS = "draw_members";
@@ -50,9 +51,9 @@ int ObjectHandler::init() {
   r->name = "default";
   r->draw_self = true;
   r->draw_members = true;
-  r->low_quality.push_back("default");
-  r->medium_quality.push_back("default");
-  r->high_quality.push_back("default");
+  for (int i = 0; i < ObjectRecord::QUEUE_LAST; ++i) {
+    r->quality_queue[i].push_back("default");
+  }
 
   m_type_map["default"] = r;
 
@@ -101,10 +102,10 @@ SPtr<ObjectRecord> ObjectHandler::instantiateRecord(const std::string &type, con
   record->draw_members = type_record->draw_members;
   record->draw_attached = type_record->draw_attached;
   
-  // hopefully this will copy the lists. Need to check tho
-  record->low_quality = type_record->low_quality;
-  record->medium_quality = type_record->medium_quality;
-  record->high_quality = type_record->high_quality;
+  // Copy the queues too
+  for (int i = 0; i < ObjectRecord::QUEUE_LAST; ++i) {
+    record->quality_queue[i] = type_record->quality_queue[i];
+  }
 
   m_id_map[id] = record;
 
@@ -114,13 +115,39 @@ SPtr<ObjectRecord> ObjectHandler::instantiateRecord(const std::string &type, con
 void ObjectHandler::registerCommands(Console *console) {
   assert(console);
   console->registerCommand(CMD_LOAD_OBJECT_RECORDS, this);
+  console->registerCommand(CMD_reload_config_objects, this);
 }
 
 void ObjectHandler::runCommand(const std::string &command, const std::string &args) {
   if (command == CMD_LOAD_OBJECT_RECORDS) {
     std::string args_cpy = args;
+    m_object_configs.push_back(args);
     System::instance()->getFileHandler()->getFilePath(args_cpy);
     loadObjectRecords(args_cpy);
+  }
+  else if (command == CMD_reload_config_objects) {
+    m_id_map.clear();
+    m_type_map.clear();
+
+    // Create default record
+    SPtr<ObjectRecord> r(new ObjectRecord());
+    r->name = "default";
+    r->draw_self = true;
+    r->draw_members = true;
+
+    for (int i = 0; i < ObjectRecord::QUEUE_LAST; ++i) {
+      r->quality_queue[i].push_back("default");
+    }
+
+    m_type_map["default"] = r;
+
+    std::list<std::string>::const_iterator I = m_object_configs.begin();
+    std::list<std::string>::const_iterator Iend = m_object_configs.end();
+    while (I != Iend) {
+      std::string args_cpy = *I++;
+      System::instance()->getFileHandler()->getFilePath(args_cpy);
+      loadObjectRecords(args_cpy);
+    }
   }
 }
 
@@ -148,13 +175,13 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
     record->draw_attached = (bool)config.getItem(section, key);
   }
   else if (key == KEY_LOW_QUALITY) {
-    record->low_quality.push_back((std::string)config.getItem(section, key));
+    record->quality_queue[ObjectRecord::QUEUE_low].push_back((std::string)config.getItem(section, key));
   }
   else if (key == KEY_MEDIUM_QUALITY) { 
-    record->medium_quality.push_back((std::string)config.getItem(section, key));
+    record->quality_queue[ObjectRecord::QUEUE_medium].push_back((std::string)config.getItem(section, key));
   }
   else if (key == KEY_HIGH_QUALITY) {
-    record->high_quality.push_back((std::string)config.getItem(section, key));
+    record->quality_queue[ObjectRecord::QUEUE_high].push_back((std::string)config.getItem(section, key));
   }
 }
 

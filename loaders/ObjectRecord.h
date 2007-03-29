@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.13 2007-01-09 17:11:25 simon Exp $
+// $Id: ObjectRecord.h,v 1.14 2007-03-29 20:11:51 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -48,9 +48,14 @@ public:
   std::string id;
   std::string type;
 
-  ModelList low_quality;
-  ModelList medium_quality;
-  ModelList high_quality;
+  typedef enum {
+    QUEUE_low = 0,
+    QUEUE_medium,
+    QUEUE_high,
+    QUEUE_LAST
+  } QueueType;
+
+  ModelList quality_queue[QUEUE_LAST];
 
   bool draw_self;
   bool draw_members;

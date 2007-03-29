@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.28 2007-03-04 14:28:40 simon Exp $
+// $Id: TextureManager.h,v 1.29 2007-03-29 20:11:51 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -110,7 +110,6 @@ public:
 
     // Increment Texture counter.
     ++m_ref_counter[texId];
-printf("Requested: %s . ID: %d Count: %d\n", name.c_str(), texId, m_ref_counter[texId]);
     return texId;
   }
 
@@ -118,7 +117,6 @@ printf("Requested: %s . ID: %d Count: %d\n", name.c_str(), texId, m_ref_counter[
     ReferenceCounter::iterator I = m_ref_counter.find(id);
     assert(I != m_ref_counter.end());
 
-printf("Released: %s ID: %d count: %d\n", getTextureName(id).c_str(), id, m_ref_counter[id]);
     if (--(I->second) == 0) {
       unloadTexture(getTextureName(id));
       m_ref_counter.erase(I);
@@ -237,6 +235,12 @@ private:
     
   /** sprite configuration file */
   varconf::Config m_spriteConfig;
+
+  typedef std::map<std::string, TextureID> UpdatesMap;
+  UpdatesMap m_pending_updates;
+
+  std::list<std::string> m_texture_configs;
+  std::list<std::string> m_sprite_configs;
 };
   
 } /* namespace Sear */

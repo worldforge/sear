@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: StateManager.h,v 1.16 2006-12-03 13:38:48 simon Exp $
+// $Id: StateManager.h,v 1.17 2007-03-29 20:11:51 simon Exp $
 
 #ifndef SEAR_RENDER_STATEMANAGER_H
 #define SEAR_RENDER_STATEMANAGER_H 1
@@ -95,6 +95,8 @@ private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
   void varconf_error_callback(const char *message);
 
+  void createDefaultStates();
+
   static int getAlphaFunction(const std::string &alpha_function);
   static int getBlendFunction(const std::string &blend_function);
  
@@ -108,7 +110,7 @@ private:
 
   StateID m_current_state;
   unsigned int m_state_counter;
-
+  std::list<std::string> m_state_configs;
 };
 
 } /* namespace Sear */

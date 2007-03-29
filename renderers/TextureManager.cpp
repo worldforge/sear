@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.49 2007-03-04 14:28:40 simon Exp $
+// $Id: TextureManager.cpp,v 1.50 2007-03-29 20:11:51 simon Exp $
 
 #include <unistd.h>
 
@@ -22,6 +22,8 @@
 
 #include "TextureManager.h"
 
+#include "src/MediaManager.h"
+
 #ifdef WINDOWS
     
 int ilogb(double x)
@@ -30,6 +32,8 @@ int ilogb(double x)
 }
     
 #endif
+
+//#define WFUT_TEST
 
 // Default texture maps
 #include "default_image.xpm"
@@ -100,6 +104,8 @@ static const std::string CMD_LOAD_TEXTURE_CONFIG = "load_textures";
 static const std::string CMD_LOAD_SPRITE_CONFIG = "load_sprites";
 static const std::string CMD_SET_TEXTURE_BASE_LEVEL = "set_texture_detail";
 static const std::string CMD_dump_reference_count = "dump_reference_count";
+static const std::string CMD_reload_config_textures = "reload_config_textures";
+static const std::string CMD_reload_config_sprites = "reload_config_sprites";
 
 // Format strings
 static const std::string ALPHA = "alpha";
@@ -158,8 +164,8 @@ TextureManager::TextureManager() :
   m_texture_units(1),
   m_baseMipmapLevel(0)
 {  
-    varconf::Config& cfg(System::instance()->getGeneral());
-    cfg.sigsv.connect(SigC::slot(*this, &TextureManager::generalConfigChanged));
+  varconf::Config &cfg = System::instance()->getGeneral();
+  cfg.sigsv.connect(sigc::mem_fun(this, &TextureManager::generalConfigChanged));
 }
 
 void TextureManager::init()
@@ -176,7 +182,7 @@ void TextureManager::init()
 
   m_texture_map.clear();
  
-  m_texture_config.sige.connect(SigC::slot(*this, &TextureManager::varconf_error_callback));
+  m_texture_config.sige.connect(sigc::mem_fun(this, &TextureManager::varconf_error_callback));
  
   m_initialised = true;
 }
@@ -190,7 +196,8 @@ void TextureManager::contextCreated() {
   
   // Initialise our current texture cache
   m_last_textures.resize(m_texture_units);
-  for (unsigned int i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
+  for (size_t i = 0; i < m_last_textures.size(); m_last_textures[i++] = -1);
+
   // Setup default texture properties
   m_default_texture = createDefaultTexture();
   if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
@@ -198,7 +205,7 @@ void TextureManager::contextCreated() {
   // create default font
   m_default_font = createDefaultFont();
   if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
-printf("%d -- %d\n", m_default_texture, m_default_font);
+
   m_cursor_ids.push_back(createCursor("cursor_default", arrow));
   m_cursor_ids.push_back(createCursor("cursor_pickup", pickup));
   m_cursor_ids.push_back(createCursor("cursor_touch", touch));
@@ -229,18 +236,16 @@ void TextureManager::shutdown()
 
   assert(m_ref_counter.empty());
 
-
   // Unload all textures
-  for (unsigned int i = 1; i < m_textures.size(); ++i) {
+  for (size_t i = 1; i < m_textures.size(); ++i) {
     unloadTexture(m_textures[i]);
   }
 
   // Clean up sprites
   while (!m_sprites.empty()) {
-   delete m_sprites.begin()->second;
+    delete m_sprites.begin()->second;
     m_sprites.erase(m_sprites.begin());
   }
-
 
   m_last_textures.clear();
   m_initialised = false;
@@ -276,39 +281,37 @@ GLuint TextureManager::loadTexture(const std::string &texture_name) {
   }
 
   std::string filename = (std::string)m_texture_config.getItem(clean_name, KEY_filename);
-//  // Get path to prefix to filename 
-//  if (m_texture_config.findItem(clean_name, KEY_path)) {
-//    std::string path = (std::string)m_texture_config.getItem(clean_name, KEY_path);
-//    filename = path + "/" + filename;
-//  }
-#if(0)
-// Perhaps should be in the media manager...
- // Add a new status type
-if (m_pending_updates.find(filename) == m_pending_updates.end()) {
-    m_pending_updates[filename] = texture_id;
-} else {
- // need to return previous option..
-}
-    // Return default texture
-  //  Maybe this needs to be moved earlier.....
-  int status = System::instance()->getMediaManager()->checkFile(filename);
-  if (status == STATUS_FILE_MISSING) {
-    // Hook up some call backs
-    // Need to create a list of pending updates which indicate how to update the
-    // media handle.
-    // E.G. texture handle XX needs replacing
-    // TODO: What about multiple/similtaneuos requests?
-  } else if (status == STATUS_FILE_UPDATING) {
-    // Hook up some call backs
-    // Return handle to existing file
-  } else if (status == STATUS_OK) {
-    // Then carry on
-  } else if (status == STATUS_FILE_UNKNOWN) {
-    // Return default texture    
-  }
+#ifdef WFUT_TEST
+  std::string fname = filename.substr(16);
+  MediaManager::MediaStatus status = System::instance()->getMediaManager()->checkFile(fname, MediaManager::MEDIA_TEXTURE);
 
-// Perhaps this stage should be in a different function?
- #endif 
+  switch (status) {
+    case MediaManager::STATUS_OK:
+    {
+      printf("Local file is up-to-date: %s\n", filename.c_str());
+      break;
+    }
+    case MediaManager::STATUS_USE_OLD:
+    case MediaManager::STATUS_USE_DEFAULT:
+    {
+      printf("File is being updated, using existing version for now\n");
+      if (m_pending_updates.find(filename) == m_pending_updates.end()) {
+        printf("Adding to pending update: %s\n", fname.c_str());
+        m_pending_updates[filename] = 0;
+      }
+      // Return default texture
+      return 0;
+      break;
+    }
+    case MediaManager::STATUS_UNKNOWN_FILE:    
+    default:
+    {
+      printf("Status default or unknown file\n");
+    }
+  }
+  printf(">>>>>>>>> %s\n", texture_name.c_str());
+#endif
+  // Perhaps this stage should be in a different function?
   System::instance()->getFileHandler()->getFilePath(filename);
   SDL_Surface* image = loadImageFromPath(filename);
   if (!image) return 0;
@@ -542,12 +545,21 @@ void TextureManager::switchTexture(TextureID texture_id) {
   GLuint to = m_textures[texture_id];
   if (to == 0) {
     const std::string &tex_name = m_names[texture_id];
-    to = loadTexture(tex_name);
-    if (to == 0) {
-      std::cerr << "Cannot find " << m_names[texture_id] << " ID " << texture_id <<  std::endl;
-      to = m_textures[m_default_texture];
+#ifdef WFUT_TEST
+    UpdatesMap::const_iterator I = m_pending_updates.find(tex_name);
+    if (I != m_pending_updates.end()) {
+      to = I->second;
+    } else {
+#endif
+      to = loadTexture(tex_name);
+      if (to == 0) {
+        fprintf(stderr,"Cannot find %s ID %d\n", tex_name.c_str(), texture_id);
+        to = m_textures[m_default_texture];
+      }
+      m_textures[texture_id] = to;
+#ifdef WFUT_TEST
     }
-    m_textures[texture_id] = to;
+#endif
   }
   glBindTexture(GL_TEXTURE_2D, to);
   m_last_textures[0] = texture_id;  
@@ -559,6 +571,10 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
 //  if (texture_id == -1) texture_id = m_default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
   if ((int)texture_unit >= m_texture_units) return; // Check we have enough texture units
+  glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
+
+  switchTexture(texture_id);
+/*
   GLuint to = (texture_id == -1) ? (m_textures[m_default_texture]) : (m_textures[texture_id]);
   if (to == 0) {
     to = loadTexture(m_names[texture_id]);
@@ -568,9 +584,10 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
     }
     m_textures[texture_id] = to;
   }
-  glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
   glBindTexture(GL_TEXTURE_2D, to);
   m_last_textures[texture_unit] = to;
+
+*/
   // Make sure we are at texture unit 0
   glActiveTextureARB(GL_TEXTURE0_ARB);
 }
@@ -738,7 +755,7 @@ TextureID TextureManager::createCursor(const std::string &texture_name, const ch
 
   TextureID texId = requestTextureID(texture_name, false);
   m_textures[texId] = texture;
-printf("Texture ID dor %s is %d\n", texture_name.c_str(), texId);
+
   return texId;
 }
 
@@ -751,18 +768,22 @@ void TextureManager::registerCommands(Console *console) {
   console->registerCommand(CMD_LOAD_SPRITE_CONFIG, this);
   console->registerCommand(CMD_SET_TEXTURE_BASE_LEVEL, this);
   console->registerCommand(CMD_dump_reference_count, this);
+  console->registerCommand(CMD_reload_config_textures, this);
+  console->registerCommand(CMD_reload_config_sprites, this);
 }
 
 void TextureManager::runCommand(const std::string &command, const std::string &arguments) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (command == CMD_LOAD_TEXTURE_CONFIG) {
     std::string a = arguments;
+    m_texture_configs.push_back(a);
     System::instance()->getFileHandler()->getFilePath(a);
     readTextureConfig(a);
   }
   else 
   if (command == CMD_LOAD_SPRITE_CONFIG) {
     std::string a = arguments;
+    m_sprite_configs.push_back(a);
     System::instance()->getFileHandler()->getFilePath(a);
     if (debug) std::cout << "reading sprite config at " << a << std::endl;
     m_spriteConfig.readFromFile(a);
@@ -788,7 +809,29 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
       ++I;
     }
   }
-
+  else 
+  if (command == CMD_reload_config_textures) {
+    m_texture_config = varconf::Config();
+    m_texture_config.sige.connect(sigc::mem_fun(this, &TextureManager::varconf_error_callback));
+    std::list<std::string>::const_iterator I = m_texture_configs.begin();
+    std::list<std::string>::const_iterator Iend = m_texture_configs.end();
+    while (I != Iend) {
+      std::string a = *I++;
+      System::instance()->getFileHandler()->getFilePath(a);
+      m_texture_config.readFromFile(a);
+    }
+  }
+  else 
+  if (command == CMD_reload_config_sprites) {
+    m_spriteConfig = varconf::Config();
+    std::list<std::string>::const_iterator I = m_sprite_configs.begin();
+    std::list<std::string>::const_iterator Iend = m_sprite_configs.end();
+    while (I != Iend) {
+      std::string a = *I++;
+      System::instance()->getFileHandler()->getFilePath(a);
+      m_spriteConfig.readFromFile(a);
+    }
+  }
 }
 
 void TextureManager::contextDestroyed(bool check)
@@ -867,22 +910,22 @@ GLint TextureManager::getFormat(const std::string &fmt) {
 
 SpriteData* TextureManager::getSpriteData(const std::string& name)
 {
-    assert(m_initialised);
-    assert(!name.empty());
+  assert(m_initialised);
+  assert(!name.empty());
     
-    SpriteInstanceMap::iterator S = m_sprites.find(name);
-    if (S == m_sprites.end())
-    {
-        SpriteData* sd = new SpriteData(name);
-        S = m_sprites.insert(S, SpriteInstanceMap::value_type(name, sd));
-    }
+  SpriteInstanceMap::iterator S = m_sprites.find(name);
+  if (S == m_sprites.end())
+  {
+    SpriteData* sd = new SpriteData(name);
+    S = m_sprites.insert(S, SpriteInstanceMap::value_type(name, sd));
+  }
     
-    return S->second;
+  return S->second;
 }
 
 void TextureManager::clearLastTexture(unsigned int index)
 {
-    m_last_textures[index] = -1;
+  m_last_textures[index] = -1;
 }
 
 void TextureManager::varconf_error_callback(const char *error) {

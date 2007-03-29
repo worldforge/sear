@@ -127,7 +127,7 @@ SPtr<ModelRecord> ModelSystem::getModel(const std::string &model_id, WorldEntity
 SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
   assert (we != NULL);
   // Find object record from entity id
-  std::string id = we->getId();
+  const std::string &id = we->getId();
   SPtr<ObjectRecord> object_record = m_object_handler->getObjectRecord(id);
 
   std::string type = DEFAULT;

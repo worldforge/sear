@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.38 2007-03-04 14:28:40 simon Exp $
+// $Id: ModelHandler.cpp,v 1.39 2007-03-29 20:11:51 simon Exp $
 
 #include <string.h>
 #include <inttypes.h>
@@ -43,6 +43,8 @@
 namespace Sear {
 
 static const std::string CMD_LOAD_MODEL_RECORDS = "load_model_records";
+static const std::string CMD_dump_object = "dump_object";
+static const std::string CMD_reload_config_models = "reload_config_models";
 
 static const std::string ATTR_GUISE= "guise";
 static const std::string ATTR_MODE = "mode";
@@ -65,14 +67,13 @@ ModelHandler::~ModelHandler() {
 void ModelHandler::init() {
   assert (m_initialised == false);
 
-  m_model_records.sigsv.connect(SigC::slot(*this, &ModelHandler::varconf_callback));
-  m_model_records.sige.connect(SigC::slot(*this, &ModelHandler::varconf_error_callback));
+  m_model_records.sigsv.connect(sigc::mem_fun(this, &ModelHandler::varconf_callback));
+  m_model_records.sige.connect(sigc::mem_fun(this, &ModelHandler::varconf_error_callback));
 
   m_timeout = new Eris::Timeout(60000);
-  m_timeout->Expired.connect(SigC::slot(*this, &ModelHandler::TimeoutExpired));
+  m_timeout->Expired.connect(sigc::mem_fun(this, &ModelHandler::TimeoutExpired));
 
   // Add default record
-  varconf::Config &m_model_records = ModelSystem::getInstance().getModelRecords();
   m_model_records.setItem("default", ModelRecord::MODEL_LOADER, "wireframe");
   m_model_records.setItem("default", ModelRecord::STATE, "default");
   m_model_records.setItem("default", ModelRecord::SELECT_STATE, "select");
@@ -122,8 +123,6 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   }
 
   // Need to create a new model
-
-  varconf::Config &m_model_records = ModelSystem::getInstance().getModelRecords();
   std::string model_loader = (std::string)m_model_records.getItem(model_id, ModelRecord::MODEL_LOADER);
 
   // We are assuming that the boundbox loader is always available
@@ -161,12 +160,6 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
     model->model->animate(we->valueOfAttr(ATTR_MODE).asString());
   }
 
-  // Process initial appearance map
-//  if (we->hasAttr(ATTR_GUISE)) {
-//    Atlas::Message::MapType mt = we->valueOfAttr(ATTR_GUISE).asMap();
-//    model->model->setAppearance(mt);
-//  }                                                                          
-
   // If model is a generic one, add it to the generic list
   if (model->model_by_type) m_model_records_map[model_id] = model;
 
@@ -178,7 +171,7 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
 
 void ModelHandler::registerModelLoader(SPtr<ModelLoader> model_loader) {
   assert (m_initialised == true);
-  std::string model_type = model_loader->getType();
+  const std::string &model_type = model_loader->getType();
 
   // Throw error if we already have a loader for this type
   assert(m_model_loaders.find(model_type) == m_model_loaders.end());
@@ -197,7 +190,6 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type) {
 }
 
 void ModelHandler::checkModelTimeouts(bool forceUnload) {
-//return;
   assert (m_initialised == true);
 
   // This function checks to see when the last time a model record was rendered.
@@ -273,16 +265,18 @@ void ModelHandler::registerCommands(Console *console) {
   assert(console != NULL);
   
   console->registerCommand(CMD_LOAD_MODEL_RECORDS, this);
-  console->registerCommand("dump_object", this);
+  console->registerCommand(CMD_dump_object, this);
+  console->registerCommand(CMD_reload_config_models, this);
 }
 
 void ModelHandler::runCommand(const std::string &command, const std::string &args) {
   assert (m_initialised == true);
   if (command == CMD_LOAD_MODEL_RECORDS) {
     std::string args_cpy = args;
+    m_model_configs.push_back(args);
     System::instance()->getFileHandler()->getFilePath(args_cpy);
     loadModelRecords(args_cpy);
-  } else if (command == "dump_object") {
+  } else if (command == CMD_dump_object) {
     // Quick hack to save some SearObject files.
     // It should really have its own function somewhere, and even
     // be in another utility.
@@ -353,7 +347,33 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
 
     fclose(fp);
   }
+  else
+  if (command == CMD_reload_config_models) {
+    // Force model unloading
+    checkModelTimeouts(true);
+    // Force a context cleanup
+    contextDestroyed(true);
+    // We need to completely re-load this information
+    m_model_records = varconf::Config();
 
+    m_model_records.sige.connect(sigc::mem_fun(this, &ModelHandler::varconf_error_callback));
+    m_model_records.sigsv.connect(sigc::mem_fun(this, &ModelHandler::varconf_callback));
+
+    // Add default record
+    m_model_records.setItem("default", ModelRecord::MODEL_LOADER, "wireframe");
+    m_model_records.setItem("default", ModelRecord::STATE, "default");
+    m_model_records.setItem("default", ModelRecord::SELECT_STATE, "select");
+    m_model_records.setItem("default", ModelRecord::OUTLINE, false);
+
+    std::list<std::string>::const_iterator I = m_model_configs.begin();
+    std::list<std::string>::const_iterator Iend = m_model_configs.end();
+    while (I != Iend) {
+      std::string args_cpy = *I++;
+      System::instance()->getFileHandler()->getFilePath(args_cpy);
+      loadModelRecords(args_cpy);
+    }
+    contextCreated();
+  }
 }
 void ModelHandler::contextCreated() {
   assert (m_initialised == true);

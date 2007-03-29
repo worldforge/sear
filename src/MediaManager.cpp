@@ -2,9 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.2 2007-03-28 11:09:43 simon Exp $
+// $Id: MediaManager.cpp,v 1.3 2007-03-29 20:11:51 simon Exp $
+
+#include <sigc++/connection.h>
+#include <sigc++/bind.h>
 
 #include  <libwfut/WFUT.h>
+#include  <libwfut/platform.h>
+#include  <libwfut/Encoder.h>
 
 #include "src/Console.h"
 #include "src/FileHandler.h"
@@ -13,6 +18,25 @@
 #include "MediaManager.h"
 
 
+
+/*
+  We need to record the updates files we have downloaded. If we assume there is only one channel, then we can 
+  hook up a signal to fire when poll returns 0 -- but we need to store the previous poll value so it only fires on 
+  the change.
+
+  This can then be used to save the data file and fire off a /reload_configs command.
+
+  We also need to hook up the temporary file list too.
+ 
+  Is there a GUI we can use too? -- progress bars?
+ 
+  Doing an update and reload is not very good if there were no files to begin with as
+  the configs list will still be empty. Perhaps we need to;
+   A) Provide a default empty media structure to load the configs, but require an update.
+   B) Have a single file listing all the config files which can be re-read first.
+   C) Standard file structure for media (bad!!)
+
+*/
 static const bool debug = true;
 
 static const std::string WFUT_XML = "wfut.xml";
@@ -38,19 +62,63 @@ static const std::string CMD_disable_updates = "disable_updates";
 static const std::string CMD_download_file = "download_file";
 static const std::string CMD_download_updates = "download_updates";
 
+static void recordUpdate(const WFUT::FileObject &fo, const std::string &tmpfile) {
+  FILE *fp = 0;
+  if (!WFUT::os_exists(tmpfile)) {
+    // Write header 
+    fp = fopen(tmpfile.c_str(), "wt");
+    if (!fp) {
+      //error
+      return;
+    }
+    fprintf(fp, "<?xml version=\"1.0\"?>\n");
+    fprintf(fp, "<fileList dir=\"\">\n");
+  } else {
+    fp = fopen(tmpfile.c_str(), "at");
+    if (!fp) {
+      //error
+      return;
+    }
+  }
+  fprintf(fp, "<file filename=\"%s\" version=\"%d\" crc32=\"%lu\" size=\"%ld\" execute=\"%s\"/>\n", WFUT::Encoder::encodeString(fo.filename).c_str(), fo.version, fo.crc32, fo.size, (fo.execute) ? ("true") : ("false"));
+  fclose(fp);
+}
+
+// We use this to update the local file list with the updated details
+void onDownloadComplete(const std::string &u, const std::string &f, const WFUT::ChannelFileList &updates, WFUT::ChannelFileList *local, const std::string &tmpfile)  {
+  printf("Downloaded: %s\n", f.c_str());
+
+  const WFUT::FileMap &ulist = updates.getFiles();
+  WFUT::FileMap::const_iterator I = ulist.find(f);
+  // The fileobject should exist, otherwise how did we get here?
+  assert (I != ulist.end());
+
+  // Add the updated file record to the local list.
+  // addFile will overwrite any existing fileobject with the same
+  // filename
+  local->addFile(I->second);
+
+  // We store in a tmp file the fact that we sucessfully downloaded
+  // this file, incase of a crash.
+  recordUpdate(I->second, tmpfile);
+}
+
+// Signal handler called when a download fails.
+//static void onDownloadFailed(const std::string &u, const std::string &f, const std::string &r)  {
+//  fprintf(stderr, "Error downloading: %s\n", u.c_str());
+//}
+
 namespace Sear {
 
 MediaManager::MediaManager() :
   m_initialised(false),
-  m_updates_enabled(DEFAULT_enable_updates)
+  m_updates_enabled(DEFAULT_enable_updates),
+  m_server_root(DEFAULT_server_root),
+  m_system_root(DEFAULT_system_root),
+  m_local_root(DEFAULT_local_root),
+  m_channel_name(DEFAULT_channel_name)
 {
-  // NASTY hardcoded values.
-  m_channel_name = DEFAULT_channel_name;
-  m_local_root = DEFAULT_local_root;
-  m_system_root = DEFAULT_system_root;
-  m_server_root = DEFAULT_server_root;
 }
-
 
 MediaManager::~MediaManager() {
   assert(m_initialised == false);
@@ -110,6 +178,10 @@ void MediaManager::runCommand(const std::string &command, const std::string &arg
     if (m_updates_enabled) {
       std::string path = m_local_root + "/" + m_channel_name;
       System::instance()->getFileHandler()->expandString(path);
+
+      // Connect up the signal handlers
+      m_wfut.DownloadComplete.connect(sigc::bind(sigc::ptr_fun(::onDownloadComplete), m_updates_list, &m_local_list, path + "/tempwfut.xml"));
+//      m_wfut.DownloadComplete.connect(sigc::ptr_fun(::onDownloadComplete));
       m_wfut.updateChannel(m_updates_list, m_server_root + "/" + m_channel_name, path);
     }
   }
@@ -143,7 +215,6 @@ MediaManager::MediaStatus MediaManager::checkFile(const std::string &filename, M
   WFUT::FileMap::const_iterator local_itr_end = local_files.end();
 
   bool has_local = local_itr != local_itr_end;
-  
 
   // Is it on the updates list?
   const WFUT::FileMap &updates_files = m_updates_list.getFiles();
@@ -167,18 +238,14 @@ MediaManager::MediaStatus MediaManager::checkFile(const std::string &filename, M
   const std::string &url = m_server_root + "/" + m_channel_name + "/" + fo.filename;
   std::string path = m_local_root + "/" + m_channel_name + "/" + fo.filename;
 
-
   System::instance()->getFileHandler()->expandString(path);
-printf("%s -- %s\n", url.c_str(), path.c_str());
 
   m_wfut.updateFile(fo, url, path);
 
   // TODO: Store fileobject and type somewhere.
 
-
   return (has_local) ? STATUS_USE_OLD : STATUS_USE_DEFAULT;
 }
-
 
 int MediaManager::checkForUpdates() {
   assert(m_initialised == true);
@@ -186,27 +253,14 @@ int MediaManager::checkForUpdates() {
   std::string local_wfut = m_local_root + "/" + m_channel_name + "/" + WFUT_XML; 
   System::instance()->getFileHandler()->getFilePath(local_wfut);
   if (debug) printf("[MediaManager] Local WFUT: %s\n", local_wfut.c_str());
-  // We don't mind if the file is correctly parsed or if it does not exist.
-  // We do mind if the file exists but is corrupt.
-//  if (
+  
   m_wfut.getLocalList(local_wfut, m_local_list);
-/// == WFUT::WFUT_PARSE_ERROR) {
-//    // Print a warning message?
-//    return 1;
-//  }
 
   std::string system_wfut = m_system_root + "/" + m_channel_name + "/" + WFUT_XML; 
   System::instance()->getFileHandler()->getFilePath(system_wfut);
   if (debug) printf("[MediaManager] System WFUT: %s\n", system_wfut.c_str());
-  // We don't mind if the file is correctly parsed or if it does not exist.
-  // We do mind if the file exists but is corrupt.
-//  if (
+  
   m_wfut.getLocalList(system_wfut, m_system_list) ;
-//== WFUT::WFUT_PARSE_ERROR) {
-//    // Warnings!
-//    return 1;
-//  }
-
 
   // No need to download server list, or calculate updates if we do not want any
   if (!m_updates_enabled) return 0;
@@ -231,6 +285,7 @@ int MediaManager::checkForUpdates() {
 void MediaManager::onDownloadComplete(const std::string &url, const std::string &filename) {
   printf("DownloadComplete: %s\n", filename.c_str());
 }
+
 void MediaManager::onDownloadFailed(const std::string &url, const std::string &filename, const std::string &reason) {
   printf("DownloadFailed: %s\n", filename.c_str());
 }

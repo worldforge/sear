@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.7 2006-11-30 20:39:46 simon Exp $
+// $Id: ObjectHandler.h,v 1.8 2007-03-29 20:11:51 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -59,6 +59,8 @@ protected:
   ObjectRecordMap m_type_map;
   ObjectRecordMap m_id_map;
   varconf::Config m_object_records;
+
+  std::list<std::string> m_object_configs;
 };
 	
 } /* namespace Sear */

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.66 2007-03-04 14:28:40 simon Exp $
+// $Id: Graphics.cpp,v 1.67 2007-03-29 20:11:51 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -279,7 +279,7 @@ void Graphics::setCameraTransform() {
   // Rotate by 90 degrees -- So 0 deg is east
   cam_vec.rotate(quaternion_by_90.inverse());
   // Calculate new camera position
-  WFMath::Point<3> p2 = pos + cam_vec;
+  const WFMath::Point<3> &p2 = pos + cam_vec;
   // Get height for camera
   float terrain_z = Environment::getInstance().getHeight(p2.x(), p2.y());
   // Adjust height by distance below ground so camera does not go below ground
@@ -380,7 +380,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     setCameraTransform();
 
    // Initial camera positiona
-    WFMath::Point<3> pos = focus->getAbsPos();
+    const WFMath::Point<3> &pos = focus->getAbsPos();
     assert (pos.isValid());
 
     m_renderer->getFrustum(m_frustum);
@@ -559,20 +559,19 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   // Calculate distance squared from camera
   float dist = cam_pos.sqrMag();
 
-  ObjectRecord::ModelList::const_iterator I;
-  ObjectRecord::ModelList::const_iterator Ibegin;
-  ObjectRecord::ModelList::const_iterator Iend;
   // Choose low/medium/high quality queue based on distance from camera
+  ObjectRecord::QueueType qt;
   if (dist < m_high_dist) {
-    Ibegin = obj->high_quality.begin();
-    Iend = obj->high_quality.end();
+    qt = ObjectRecord::QUEUE_high;
   } else if (dist < m_medium_dist) {
-    Ibegin = obj->medium_quality.begin();
-    Iend = obj->medium_quality.end();
+    qt = ObjectRecord::QUEUE_medium;
   } else {
-    Ibegin = obj->low_quality.begin();
-    Iend = obj->low_quality.end();
+    qt = ObjectRecord::QUEUE_low;
   }
+
+  ObjectRecord::ModelList::const_iterator I;
+  ObjectRecord::ModelList::const_iterator Ibegin = obj->quality_queue[qt].begin();
+  ObjectRecord::ModelList::const_iterator Iend = obj->quality_queue[qt].end();
 
   if (!select_mode) { // Only needs to be done once a frame
     obj_we->updateFade(time_elapsed);
@@ -637,56 +636,56 @@ void Graphics::drawObjectExt(const std::string &model_id,
  
 // Calculate Transform Matrix //////////////////////////////////////////////////
 
-  // Cheat and use the opengl matrix.
-  glPushMatrix();
-  glLoadIdentity();
+    // Cheat and use the opengl matrix.
+    glPushMatrix();
+    glLoadIdentity();
   
-  // 1) Apply Object transforms
-  const WFMath::Point<3> &pos = obj_we->getAbsPos();
-  assert(pos.isValid());
-  glTranslatef(pos.x(), pos.y(), pos.z() );
+    // 1) Apply Object transforms
+    const WFMath::Point<3> &pos = obj_we->getAbsPos();
+    assert(pos.isValid());
+    glTranslatef(pos.x(), pos.y(), pos.z() );
   
-  m_renderer->rotateObject(obj, modelRec);
+    m_renderer->rotateObject(obj, modelRec);
     
-  // 2) Apply Model Transforms 
+    // 2) Apply Model Transforms 
      
-  // Scale Object
-  float scale = modelRec->scale;
+    // Scale Object
+    float scale = modelRec->scale;
 
-  // Do not perform scaling if it is to zero or has no effect
-  if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
+    // Do not perform scaling if it is to zero or has no effect
+    if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
   
-  glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
+    glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
  
-  glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+    glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
 
-  // 3) Apply final scaling once model is in place
+    // 3) Apply final scaling once model is in place
 
-  // Scale model by all bounding box axis
-  if (modelRec->scale_bbox && obj_we->hasBBox()) { 
-    WFMath::AxisBox<3> bbox = obj_we->getBBox();
-    float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
-    float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
-    float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
+    // Scale model by all bounding box axis
+    if (modelRec->scale_bbox && obj_we->hasBBox()) { 
+      const WFMath::AxisBox<3> &bbox = obj_we->getBBox();
+      float x_scale = bbox.highCorner().x() - bbox.lowCorner().x();
+      float y_scale = bbox.highCorner().y() - bbox.lowCorner().y();
+      float z_scale = bbox.highCorner().z() - bbox.lowCorner().z();
 
-    glScalef(x_scale, y_scale, z_scale);
-  }
+      glScalef(x_scale, y_scale, z_scale);
+    }
 
-  // Scale model by bounding box height
-  else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
-    WFMath::AxisBox<3> bbox = obj_we->getBBox();
-    float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
-    glScalef(z_scale, z_scale, z_scale);
-  }
+    // Scale model by bounding box height
+    else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
+      const WFMath::AxisBox<3> &bbox = obj_we->getBBox();
+      float z_scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
+      glScalef(z_scale, z_scale, z_scale);
+    }
 
-  float m[4][4];
-  glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
+    float m[4][4];
+    glGetFloatv(GL_MODELVIEW_MATRIX, &m[0][0]);
 
      // Restore matrix
-  glPopMatrix();
+    glPopMatrix();
 
-  Matrix mx;
-  mx.setMatrix(m);
+    Matrix mx;
+    mx.setMatrix(m);
 
 ////////////////////////////////////////////////////////////////////////////////
     m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, obj_we));
@@ -728,7 +727,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
       }
       // Scale model by bounding box height
       else if (modelRec->scaleByHeight && obj_we->hasBBox()) {
-        WFMath::AxisBox<3> bbox = obj_we->getBBox();
+        const WFMath::AxisBox<3> &bbox = obj_we->getBBox();
         float scale = fabs(bbox.highCorner().z() - bbox.lowCorner().z());
         po.pos *= scale;
       }
@@ -870,8 +869,6 @@ void Graphics::readConfig(varconf::Config &config) {
     m_fire.diffuse[3] = DEFAULT_fire_diff_alpha;
   }
 
-
-
   if (config.findItem(SECTION_graphics, KEY_fire_spec_red)) {
     temp = config.getItem(SECTION_graphics, KEY_fire_spec_red);
     m_fire.specular[0] = (!temp.is_double()) ? (DEFAULT_fire_spec_red) : ((double)(temp));
@@ -938,7 +935,6 @@ void Graphics::registerCommands(Console * console) {
   console->registerCommand(CMD_select_mode_off, this);
   console->registerCommand(CMD_normalise_on, this);
   console->registerCommand(CMD_normalise_off, this);
-
 }
 
 void Graphics::runCommand(const std::string &command, const std::string &args) {

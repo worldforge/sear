@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.31 2006-10-25 16:32:00 simon Exp $
+// $Id: StateManager.cpp,v 1.32 2007-03-29 20:11:51 simon Exp $
 
 /*
  * TODO
@@ -77,6 +77,7 @@ static const std::string BLEND_one_minus_constant_alpha_ext = "one_minus_constan
 static const std::string BLEND_src_alpha_saturate = "src_alpha_saturate";
 
 static const std::string CMD_LOAD_STATE_CONFIG = "load_state_file";
+static const std::string CMD_reload_config_states = "reload_config_states";
 
 StateManager::StateManager() :
   m_initialised(false),
@@ -101,6 +102,13 @@ int StateManager::init() {
   m_state_change_vector.resize(256);
   for (unsigned int i = 0; i < 256; m_state_change_vector[i++].resize(256));
   
+  createDefaultStates(); 
+
+  m_initialised = true;
+  return 0;
+}
+
+void StateManager::createDefaultStates() {
   SPtr<StateProperties> default_state = SPtr<StateProperties> (new StateProperties);
   SPtr<StateProperties> font_state = SPtr<StateProperties> (new StateProperties);
   SPtr<StateProperties> select_state = SPtr<StateProperties> (new StateProperties);
@@ -212,9 +220,6 @@ int StateManager::init() {
   m_state_name_map[cursor_state->state] = m_state_counter;
   m_name_state_vector[m_state_counter] = cursor_state->state;
   ++m_state_counter;
-
-  m_initialised = true;
-  return 0;
 }
 
 int StateManager::shutdown() {
@@ -516,17 +521,33 @@ void StateManager::registerCommands(Console *console) {
   assert(m_initialised);
   assert(console != NULL);
   console->registerCommand(CMD_LOAD_STATE_CONFIG, this);
+  console->registerCommand(CMD_reload_config_states, this);
 }
 
 void StateManager::runCommand(const std::string &command, const std::string &arguments) {
   assert(m_initialised);
   if (command == CMD_LOAD_STATE_CONFIG) {
     std::string a = arguments;
+    m_state_configs.push_back(a);
     System::instance()->getFileHandler()->getFilePath(a);
     readFiles(a);
   }
-}
+  else if (command == CMD_reload_config_states) {
+    // Destroy current display lists
+    contextDestroyed(true);
+    // We can safely re-read the config files to overwrite existing data
+    // This only breaks if the config file does no specify all fields
+    std::list<std::string>::const_iterator I = m_state_configs.begin();
+    std::list<std::string>::const_iterator Iend = m_state_configs.end();
+    while (I != Iend) {
+      std::string args_cpy = *I++;
+      System::instance()->getFileHandler()->getFilePath(args_cpy);
+      readFiles(args_cpy);
+    }
 
+    contextCreated();
+  }
+}
 
 void StateManager::contextCreated() {
   assert(m_initialised);

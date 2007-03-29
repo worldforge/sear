@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.14 2007-01-24 09:52:55 simon Exp $
+// $Id: ModelHandler.h,v 1.15 2007-03-29 20:11:51 simon Exp $
 
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
@@ -74,6 +74,8 @@ protected:
   bool m_initialised;
   Eris::Timeout *m_timeout;
   varconf::Config m_model_records;
+
+  std::list<std::string> m_model_configs;
 };
 
 } /* namespace Sear */

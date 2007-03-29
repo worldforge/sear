@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.168 2007-03-04 14:28:40 simon Exp $
+// $Id: System.cpp,v 1.169 2007-03-29 20:11:51 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,6 +80,7 @@ namespace Sear {
   static const std::string CMD_ADD_EVENT = "event";
   static const std::string CMD_IDENTIFY_ENTITY = "identify";
   static const std::string CMD_DUMP_ATTRIBUTES = "dump_attributes";
+  static const std::string CMD_reload_configs = "reload_configs";
 
   // Config key values  
   static const std::string KEY_mouse_move_select = "mouse_move_select";
@@ -183,7 +184,7 @@ bool System::init(int argc, char *argv[]) {
   m_media_manager->init();
  
   // Connect signals for record processing 
-  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
+//  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
   
   // Connect signals for error messages
   m_general.sige.connect(sigc::mem_fun(this, &System::varconf_error_callback));
@@ -213,7 +214,7 @@ bool System::init(int argc, char *argv[]) {
 
   m_workarea = SPtr<Workarea>(new Workarea(this));
 
-#if 1
+#if 0
   m_sound = SPtrShutdown<Sound>(new Sound());
   if (m_sound->init()) {
     m_sound.release();
@@ -861,6 +862,7 @@ void System::registerCommands(Console *console) {
   console->registerCommand(CMD_ADD_EVENT, this);
   console->registerCommand(CMD_IDENTIFY_ENTITY, this);
   console->registerCommand(CMD_DUMP_ATTRIBUTES, this);
+  console->registerCommand(CMD_reload_configs, this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -928,7 +930,13 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->dumpAttributes();  
   }
- 
+  else if (command == CMD_reload_configs) {
+    runCommand("/reload_config_textures");
+    runCommand("/reload_config_sprites");
+    runCommand("/reload_config_objects");
+    runCommand("/reload_config_models");
+    runCommand("/reload_config_states");
+  } 
   else fprintf(stderr, "[System] Command not found: %s\n", command.c_str());
 }
 
@@ -941,7 +949,9 @@ void System::varconf_callback(const std::string &section, const std::string &key
 }
 
 void System::addSearchPaths(std::list<std::string> l) {
-  for (std::list<std::string>::const_iterator I = l.begin(); I != l.end(); ++I) {        
+  std::list<std::string>::const_iterator I = l.begin();
+  std::list<std::string>::const_iterator Iend = l.end();
+  for (; I != Iend; ++I) {        
     m_file_handler->addSearchPath(*I);
   }
 }

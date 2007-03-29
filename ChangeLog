@@ -1,3 +1,37 @@
+2007-03-29  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Added a command
+	  /reload_config_models which will clear out the ModelRecords and reload
+	  the configs previously loaded. Removed some odd code which got a
+	  reference to a member object via another class.
+
+	* loaders/ModelSystem.cpp: Const ref a string.
+
+	* loaders/ObjectRecord.cpp, loaders/ObjectRecord.h: Replaced the three
+	  quality queues (low,medium,high) with an array and some enums to allow
+	  iterating over them instead of duplicating code for each queue.
+
+	* loaders/ObjectHandler.cpp, loaders/ObjectHandler.h: Added a command
+	  /reload_config_objects which will clear out the ObjectRecords and
+	  reload the configs previously loaded. Update for ObjectRecords change.
+
+	* renderers/Graphics.cpp: Update for ObjectRecords change. Const ref
+	  some variables.
+
+	* renderers/StateManager.cpp, renderers/StateManager.h: Added a command
+	  /reload_config_states which will clear out the StatesManager and
+	  reload the configs previously loaded.
+
+	* renderers/TextureManager.cpp, renderers/TextureManager.h: Added a 
+	  command /reload_config_textures and /reload_config-sprites which will
+	  clear out the textures and spritesand reload the previously loaded
+	  configs. Some update-on-demand related changes, (not enabled).
+
+	* src/MediaManager.cpp, src/MediaManager.h: Some code clean ups.
+
+	* src/System.cpp: Add a /reload_configs command that calls the other
+	  reload_configs related commands.
+
 2007-03-28  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* src/MediaManager.cpp, src/MediaManager.h: Added a command to allow all

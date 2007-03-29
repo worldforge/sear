@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
 #include "ObjectRecord.h"
 
@@ -25,112 +25,87 @@ ObjectRecord::ObjectRecord() :
 ObjectRecord::~ObjectRecord() {}
 
 void ObjectRecord::action(const std::string &action) {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->action(action);
-  }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->action(action);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->action(action);
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->action(action);
+    }
   }
 }
 
-
-void ObjectRecord::animate(const std::string &action)
-{
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->animate(action);
-  }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->animate(action);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->animate(action);
+void ObjectRecord::animate(const std::string &action) {
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->animate(action);
+    }
   }
 }
 
 void ObjectRecord::setAppearance(const Atlas::Message::MapType &map) {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->setAppearance(map);
-  }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->setAppearance(map);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->setAppearance(map);
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->setAppearance(map);
+    }
   }
 }
 
 void ObjectRecord::clearOutfit() {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->clearOutfit();
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->clearOutfit();
+    }
   }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->clearOutfit();
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->clearOutfit();
-  }  
 }
-
 
 void ObjectRecord::entityWorn(const std::string &where, WorldEntity *we) {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(where, we);
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->entityWorn(where, we);
+    }
   }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(where, we);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(where, we);
-  }  
 }
 
-
 void ObjectRecord::entityWorn(WorldEntity *we) {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(we);
+    ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->entityWorn(we);
+    }
   }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(we);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityWorn(we);
-  }  
 }
 
 void ObjectRecord::entityRemoved(WorldEntity *we) {
-  for (ModelList::const_iterator I = low_quality.begin(); I != low_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityRemoved(we);
+  ModelSystem &ms = ModelSystem::getInstance();
+  for (int i = 0; i < QUEUE_LAST; ++i) {
+    ModelList::const_iterator I = quality_queue[i].begin();
+    ModelList::const_iterator Iend = quality_queue[i].end();
+    for (; I != Iend; ++I) {
+      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
+      if (rec && rec->model) rec->model->entityRemoved(we);
+    }
   }
-  for (ModelList::const_iterator I = medium_quality.begin(); I != medium_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityRemoved(we);
-  }
-  for (ModelList::const_iterator I = high_quality.begin(); I != high_quality.end(); ++I) {
-    SPtr<ModelRecord> rec = ModelSystem::getInstance().getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-    if (rec && rec->model) rec->model->entityRemoved(we);
-  }  
 }
     
 } // of namespace Seae
