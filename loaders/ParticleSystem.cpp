@@ -168,12 +168,18 @@ ParticleSystem::~ParticleSystem() {
   assert(m_initialised == false);
   // should be empty if we got shutdown ok.
   assert(m_particles.empty());
+
+  int id, mask_id;
+  // Clean up textures
+  if (m_do->getTexture(0, id, mask_id) == 0) {
+    RenderSystem::getInstance().releaseTexture(id);
+    RenderSystem::getInstance().releaseTexture(mask_id);
+  }
 }
 
 void ParticleSystem::init()
 {
   assert(m_initialised == false);
-//sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;
 
   m_do = SPtrShutdown<DynamicObject>(new DynamicObject());
   m_do->init();
@@ -188,7 +194,7 @@ void ParticleSystem::init()
   int numParticles = 100;
     
   m_particles.resize(numParticles);
-  for (unsigned int p=0; p < m_particles.size(); ++p) {
+  for (size_t p = 0; p < m_particles.size(); ++p) {
     m_particles[p] = new Particle(this);
   }
     
@@ -238,11 +244,9 @@ int ParticleSystem::shutdown()
 void ParticleSystem::update(float elapsed)
 {
   double status = m_entity->getStatus();
-  if ((status < 0.0) || (status > 1.0)) {
-//    std::cout << "invalid status " << status << " for particle system" << std::endl;
-    return;
-  }
-    
+  if (status < 0.0) return;
+  if (status > 1.0) status = 1.0;
+
   int numToCreate = lrintf(m_createPerSec.random() * elapsed * status * 2.f);
 
   // Clamp the number of particles available
@@ -250,7 +254,7 @@ void ParticleSystem::update(float elapsed)
     numToCreate = MAX_PARTICLES;
   }
 
-  for (unsigned int p=0; p < m_particles.size(); ++p) {
+  for (size_t p=0; p < m_particles.size(); ++p) {
     if (m_particles[p]->isActive()) {
       m_particles[p]->update(elapsed);
     } else if (numToCreate > 0) {

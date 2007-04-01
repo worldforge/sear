@@ -1,5 +1,24 @@
 2007-04-01  Simon Goodall  <sear@simongoodall.co.uk>
 
+	* loaders/ParticleSystem.cpp: Release texture handles.
+
+	* loaders/DynamicObject.cpp: Fixed incorrect usage of indices array in
+	  vertex buffer object code.
+
+	* loaders/DynamicObject.h: Return 1 if getTexture fails.
+
+	* loaders/Model.h, loaders/ObjectRecord.cpp, loaders/ObjectRecord.h:
+	  Remove unused method, setAppearance.
+
+	* loaders/cal3d/Cal3dModel.cpp, loaders/cal3d/Cal3dModel.h,
+	  loaders/cal3d/Cal3d_Loader.cpp: Removed setAppearance and some other
+	  code cleanups.
+
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp, loaders/SearObject.cpp:
+	  Some code clean ups.
+
+2007-04-01  Simon Goodall  <sear@simongoodall.co.uk>
+
 	* loaders/DynamicObject.cpp, loaders/DynamicObject.h,
 	  loaders/cal3d/Cal3dModel.cpp: Remove an extra copy for each vertex
 	  array by directly copying data into a VBO buffer (or normal array in

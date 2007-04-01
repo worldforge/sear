@@ -37,9 +37,11 @@ public:
     m_texture_masks[num] = texture_mask;
   }
 
-  void getTexture(unsigned int num, int &texture, int &texture_mask) {
+  int getTexture(unsigned int num, int &texture, int &texture_mask) {
+    if (num >= m_textures.size()) return 1;
     texture      = m_textures[num];
     texture_mask = m_texture_masks[num];
+    return 0;
   }
 
   void copyVertexData(float *ptr, size_t size);

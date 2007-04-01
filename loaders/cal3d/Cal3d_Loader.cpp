@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.22 2006-12-02 18:54:37 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.23 2007-04-01 19:00:21 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -39,8 +39,7 @@ Cal3d_Loader::~Cal3d_Loader() {
 
 SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
 
-  SPtr<ModelRecord> model_record =
-                ModelLoader::loadModel(we, model_id, model_config);
+  SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
 
   assert(model_record);
 
@@ -57,28 +56,6 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
     }
 
     model_record->model = SPtrShutdown<Model>(model);
-/*
-    // Set model default texture set
-    if (model_config.findItem(model_id, "default_set")) {
-      varconf::Variable v = model_config.getItem(model_id, "default_set");
-      if (v.is_int()) {
-        model->setMaterialSet((int)v);
-      } else { // Assume we have a string
-        model->setMaterialSet((std::string)v);
-      }
-    }
-
-    // Check for individual part assignments
-    std::list<std::string> materials = model->getMeshNames();
-    for (std::list<std::string>::const_iterator I = materials.begin();
-                                                I != materials.end(); ++I) {
-      if (model_config.findItem(model_id, *I)) {
-        varconf::Variable v = model_config.getItem(model_id, *I);
-        model->setMaterialPartSet(*I, (std::string)v);
-      }
-    }
-
-*/
   } catch (...) {
     std::cerr << "Cal3d_Loader: Unknown Exception" << std::endl;
     return SPtr<ModelRecord>();

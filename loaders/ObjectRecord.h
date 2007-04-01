@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectRecord.h,v 1.14 2007-03-29 20:11:51 simon Exp $
+// $Id: ObjectRecord.h,v 1.15 2007-04-01 19:00:21 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTRECORD_H
 #define SEAR_LOADERS_OBJECTRECORD_H 1
@@ -37,7 +37,6 @@ public:
 
   void action(const std::string &action); 
   void animate(const std::string &action); 
-  void setAppearance(const Atlas::Message::MapType &map);
  
   void clearOutfit();
   void entityWorn(const std::string &where, WorldEntity *we);

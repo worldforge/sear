@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: CoreModelHandler.cpp,v 1.13 2006-11-30 20:39:48 simon Exp $
+// $Id: CoreModelHandler.cpp,v 1.14 2007-04-01 19:00:21 simon Exp $
 
 #include "CoreModelHandler.h"
 #include "Cal3dCoreModel.h"

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.43 2007-03-04 14:28:40 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.44 2007-04-01 19:00:21 simon Exp $
 
 #include <string>
 
@@ -153,15 +153,13 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     m_scale = 1.0f;
   }
 
-
   if (config.findItem(SECTION_model, KEY_rotate)) {
     m_rotate = (double)config.getItem(SECTION_model, KEY_rotate);
-//    if (debug) printf("Rotate %f\n", m_rotate);
   }
 
   // Load all meshes 
   for (MeshMap::const_iterator I = m_meshes.begin(); I != m_meshes.end(); ++I) {
-    std::string mesh_name = I->first;
+    const std::string &mesh_name = I->first;
     int mesh = m_core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
     if (mesh == -1) {
       std::cerr << "Error loading mesh - " << path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name) << std::endl;
@@ -173,7 +171,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
 
   // Load all animations
   for (AnimationMap::const_iterator I = m_animations.begin(); I != m_animations.end(); ++I) {
-    std::string animation_name = I->first;
+    const std::string &animation_name = I->first;
     int animation = m_core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
     if (animation == -1) {
       std::cerr << "Error loading animation - " << path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name) << std::endl;
@@ -186,11 +184,11 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   // Load all materials
   for (MaterialList::const_iterator I = m_material_list.begin();
                                     I != m_material_list.end(); ++I) {
-    std::string material_name = *I;
+    const std::string &material_name = *I;
     int length =  material_name.find_first_of("_");
-    std::string set = material_name.substr(0,length);
-    std::string part = material_name.substr(length + 1);
-//    if (debug) std::cout << "Set: " << set << " - Part: " << part << std::endl;
+    const std::string &set = material_name.substr(0,length);
+    const std::string &part = material_name.substr(length + 1);
+
     int material = m_core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
     if (material == -1) {
       std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
@@ -201,41 +199,34 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     // Create material thread and assign material to a set;
     if (m_sets[set] == 0) {
       m_sets[set] = set_counter++;
-//      if (debug) std::cout << "Creating set " << set << " with id  " << m_sets[set] << std::endl;
     }
     if (m_parts[part] == 0) {
       m_parts[part] = part_counter++;
-//      if (debug) std::cout << "Creating part " << part << " with id  " << m_parts[part] << std::endl;
     }
     m_core_model->createCoreMaterialThread(m_parts[part] - 1);
-//     _core_model->createCoreMaterialThread(material);
     // initialize the material thread
     m_core_model->setCoreMaterialId(m_parts[part] - 1, m_sets[set] - 1, material);
   }
   // Check for custom material settings
   for (MaterialsMap::const_iterator I = m_materials.begin(); I != m_materials.end(); ++I) {
-    std::string set = I->first;
+    const std::string &set = I->first;
     for (MaterialMap::const_iterator J = I->second.begin(); J != I->second.end(); ++J) {
-      std::string part = J->first;
-      std::string section = SECTION_material + "_" + set + "_" + part;
+      const std::string &part = J->first;
+      const std::string &section = SECTION_material + "_" + set + "_" + part;
       CalCoreMaterial *material = m_core_model->getCoreMaterial(J->second);
       if (!material) continue;
       // Check all keys
       if (config.findItem(section, KEY_ambient_red)) {
         material->getAmbientColor().red = (int)config.getItem(section, KEY_ambient_red);
-//	std::cout << "Setting ambient red to " << (int)material->getAmbientColor().red << std::endl;
       }
       if (config.findItem(section, KEY_ambient_green)) {
         material->getAmbientColor().green = (int)config.getItem(section, KEY_ambient_green);
-//	std::cout << "Setting ambient green to " << (int)material->getAmbientColor().green << std::endl;
       }
       if (config.findItem(section, KEY_ambient_blue)) {
         material->getAmbientColor().blue = (int)config.getItem(section, KEY_ambient_blue);
-//	std::cout << "Setting ambient blue to " << (int)material->getAmbientColor().blue << std::endl;
       }
       if (config.findItem(section, KEY_ambient_alpha)) {
         material->getAmbientColor().alpha = (int)config.getItem(section, KEY_ambient_alpha);
-//	std::cout << "Setting ambient alpha to " << (int)material->getAmbientColor().alpha << std::endl;
       } 
       if (config.findItem(section, KEY_diffuse_red)) {
         material->getDiffuseColor().red = (int)config.getItem(section, KEY_diffuse_red);
@@ -268,9 +259,9 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
       // TODO this limit should not be hardcoded!
       // Need to query object
       for (int i = 0; i < 2; ++i) {
-	std::string key = KEY_texture_map + "_" + string_fmt(i);
+	const std::string &key = KEY_texture_map + "_" + string_fmt(i);
         if (config.findItem(section, key)) { // Is texture name over-ridden?
-          std::string texture = (std::string)config.getItem(section, key);
+          const std::string &texture = (std::string)config.getItem(section, key);
           unsigned int textureId = loadTexture(texture, false);
           unsigned int textureMaskId = loadTexture(texture, true);
 	  if (material->getMapCount() <= i) {
@@ -287,7 +278,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
             std::cerr << "Error setting map user data" << std::endl;
 	  }
         } else { // Use default texture
-          std::string texture = material->getMapFilename(i);
+          const std::string &texture = material->getMapFilename(i);
 	  if (texture.empty()) continue;
           unsigned int textureId = loadTexture(texture, false);
           unsigned int textureMaskId = loadTexture(texture, true);
@@ -325,7 +316,6 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
         model->shutdown();
         delete model;
         float s = 1.0f / (max_z - min_z);
-printf("Scale %f, %f -> %f\n", min_z, max_z, s);
         m_core_model->scale(s);
       }
     }
@@ -351,7 +341,7 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
   } else if (section == SECTION_bone_map) {
     m_bone_map[key] = (std::string)config.getItem(section, key);
   } else if (section == SECTION_bone_rotation) {
-    std::string rot = (std::string)config.getItem(section, key);
+    const std::string &rot = (std::string)config.getItem(section, key);
     float w,x,y,z;
     sscanf(rot.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
     m_bone_rotation[key] = WFMath::Quaternion(w,x,y,z);
@@ -359,11 +349,11 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
     // Add animations weights to map
     // Get weight value
     varconf::Variable temp = config.getItem(section, key);
-    std::string sec = section.substr(KEY_animation.size() + 1);
+    const std::string &sec = section.substr(KEY_animation.size() + 1);
     if (section.size() >= KEY_animation.size() && section.substr(0, KEY_animation.size()) == KEY_animation) {
       if (temp.is_double()) {
         // Get animation name
-        std::string k = key.substr(KEY_animation.size() + 1);
+        const std::string &k = key.substr(KEY_animation.size() + 1);
         // Add pair to map.
         if (debug) printf("[Debug:Cal3d]Adding animation: %s %s %f\n", section.c_str() , k.c_str(), (double)temp);
         m_anims[sec].push_back(AnimWeight(k, (double)temp));

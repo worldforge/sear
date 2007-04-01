@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.3 2007-03-04 14:28:40 simon Exp $
+// $Id: SearObject.cpp,v 1.4 2007-04-01 19:00:21 simon Exp $
 
 #include  <stdio.h>
 
@@ -93,7 +93,9 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
   float max[3] = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
 
   // Find bounds of object
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  StaticObjectList::const_iterator I = objs.begin();
+  StaticObjectList::const_iterator Iend = objs.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -161,7 +163,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
   float scale_y = 1.0 / (diff_y);
   float scale_z = 1.0 / (diff_z);
 
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (I = objs.begin(); I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -500,7 +502,5 @@ int SearObject::load(const std::string &filename) {
 
   return 0;
 }
-
-
 
 } /* namespace Sear */

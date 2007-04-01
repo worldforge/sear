@@ -475,7 +475,7 @@ void DynamicObject::releaseTextureDataPtr() {
 void DynamicObject::releaseIndicesPtr() {
  if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
   }
 }
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.51 2007-04-01 14:51:09 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.52 2007-04-01 19:00:21 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -35,6 +35,10 @@ static const std::string WALKING  = "walking";
 static const std::string RUNNING  = "running";
 
 static const std::string ANIM_default = "default";
+
+static const std::string KEY_mesh = "mesh";
+static const std::string KEY_material = "material";
+
 
 //----------------------------------------------------------------------------//
 // Constructors                                                               //
@@ -129,6 +133,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
   CalRenderer *pCalRenderer = m_calModel->getRenderer();
   assert(pCalRenderer !=  NULL);
 
+  // We let open gl do this, so no need to do it twice
+  pCalRenderer->setNormalization(false);
+
   // begin the rendering loop
   if (!pCalRenderer->beginRendering()) {
     // Some kind of error here!
@@ -160,8 +167,8 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
           dyno->init();
           dyno->contextCreated();
           m_dos[counter] = dyno;
-        }
 
+// Lets assume this doesn't change
         static unsigned char meshColor[4];
         static float ambient[4];
         static float diffuse[4];
@@ -195,6 +202,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
         shininess = pCalRenderer->getShininess();
         dyno->setShininess(shininess);
+        }
 
         // get the transformed vertices of the submesh
         int vertexCount = pCalRenderer->getVertexCount();
@@ -363,69 +371,6 @@ void Cal3dModel::action(const std::string &action) {
   }
 }
 
-void Cal3dModel::setAppearance(const Atlas::Message::MapType &appearanceMap) {
-return;
-//  if (debug) std::cout << "------" << std::endl;
-  Atlas::Message::MapType map(appearanceMap);
-  
-  // Get mesh atrributes
-  Atlas::Message::MapType::const_iterator I = map.find("mesh");
-  if (I == map.end()) {
-    std::cout << "No 'mesh' found -- using defaults" << std::endl;
-    // instantiate defaults
-    Atlas::Message::MapType meshes;
-    for (Cal3dCoreModel::MeshMap::const_iterator J = m_core_model->m_meshes.begin(); J != m_core_model->m_meshes.end(); ++J) {
-      std::string name = J->first;
-      if (name.find("_") != std::string::npos)
-        meshes[name.substr(0, name.find("_"))] = "1";
-    }
-    map["mesh"] = meshes;
-    I = map.find("mesh");   
-  }
-  const Atlas::Message::MapType meshes = I->second.asMap();
-  I = map.find("material");
-  if (I == map.end()) {
-    // instantiate defaults
-    map["material"] = Atlas::Message::MapType();
-    I = map.find("material");
-  }
-  const Atlas::Message::MapType materials = I->second.asMap();
-
-
-  // Make sure only single val meshes are attached
-  for (Cal3dCoreModel::MeshMap::const_iterator J = m_core_model->m_meshes.begin(); J != m_core_model->m_meshes.end(); ++J) {
-    std::string name = J->first;
-    if (name.find("_") != std::string::npos)
-      m_calModel->detachMesh(m_core_model->m_meshes[name]);
-  }
-
-  // Attach meshes and set materials 
-  for (I = meshes.begin(); I != meshes.end(); ++I) {
-    std::string name = I->first;
-    std::string value = I->second.asString();
-
-    // Attach mesh
-    if (m_core_model->m_meshes.find(name + "_" + value) 
-      != m_core_model->m_meshes.end()) {
-      m_calModel->attachMesh(m_core_model->m_meshes[name + "_" + value]);
-      // Set material set
-    
-      Atlas::Message::MapType::const_iterator K = materials.find(name);
-      if (K != materials.end()) {
-        setMaterialPartSet(name + "_" + value, K->second.asString());
-      } else {
-        // set default material
-        setMaterialPartSet(name + "_" + value, "default");
-      }
-    }
-  }
-  for (I = materials.begin(); I != materials.end(); ++I) {
-    std::string name = I->first;
-    std::string value = I->second.asString();
-    setMaterialPartSet(name, value);
-  }
-}
-
 void Cal3dModel::setMaterialSet(unsigned int set) {
   m_calModel->setMaterialSet(set);
 }
@@ -455,7 +400,7 @@ PosAndOrient Cal3dModel::getPositionForSubmodel(const std::string &bone) const {
   po.orient.identity();
   po.pos = WFMath::Vector<3>(0, 0, 0);
 
-  std::string mapped_bone = m_core_model->mapBoneName(bone);
+  const std::string &mapped_bone = m_core_model->mapBoneName(bone);
   if (mapped_bone.empty()) return po;
 
   // Get a pointer to the bone we need from cal3d
@@ -500,7 +445,7 @@ void Cal3dModel::addAnimation(const Cal3dCoreModel::WeightList &list) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
-    std::string name = I->first;
+    const std::string &name = I->first;
     double weight = I->second;
     m_calModel->getMixer()->blendCycle(animations[name], weight, 0.2f);
     ++I;
@@ -511,14 +456,15 @@ void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
   Cal3dCoreModel::AnimationMap animations = m_core_model->m_animations;
   Cal3dCoreModel::WeightList::const_iterator I = list.begin();
   while (I != list.end()) {
-    std::string name = (*I++).first;
+    const std::string &name = (*I++).first;
     m_calModel->getMixer()->clearCycle(animations[name], 0.2f);
   }
 }
 
 void Cal3dModel::contextCreated() {
   DOVec::const_iterator I = m_dos.begin();
-  for (; I != m_dos.end(); ++I) {
+  DOVec::const_iterator Iend = m_dos.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<DynamicObject> so = *I;
     assert(so);
     so->contextCreated();
@@ -527,7 +473,8 @@ void Cal3dModel::contextCreated() {
 
 void Cal3dModel::contextDestroyed(bool check) {
   DOVec::const_iterator I = m_dos.begin();
-  for (; I != m_dos.end(); ++I) {
+  DOVec::const_iterator Iend = m_dos.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<DynamicObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
@@ -555,7 +502,8 @@ void Cal3dModel::entityWorn(const std::string &where, WorldEntity *we) {
   // Get meshes and materials
   const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(key);
   varconf::sec_map::const_iterator I = sec.begin();
-  while (I != sec.end()) {
+  varconf::sec_map::const_iterator Iend = sec.end();
+  while (I != Iend) {
     const std::string &key = I->first;
 
     if (key.find("mesh",0) == 0) {
@@ -575,7 +523,7 @@ void Cal3dModel::entityWorn(const std::string &where, WorldEntity *we) {
         // Set a default material;
         setMaterialPartSet(mesh_num, 1);
         // See if a proper one has been specified
-        std::string mat_key = "material" + key.substr(4); // sizeof("mesh")
+        const std::string &mat_key = "material" + key.substr(4); // sizeof("mesh")
 
         varconf::sec_map::const_iterator J = sec.find(mat_key);
         if (J != sec.end()) {
@@ -607,7 +555,8 @@ void Cal3dModel::entityWorn(WorldEntity *we) {
   // Get meshes and materials
   const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
   varconf::sec_map::const_iterator I = sec.begin();
-  while (I != sec.end()) {
+  varconf::sec_map::const_iterator Iend = sec.end();
+  while (I != Iend) {
     const std::string &key = I->first;
 
     if (key.find("mesh",0) == 0) {
@@ -627,7 +576,7 @@ void Cal3dModel::entityWorn(WorldEntity *we) {
         // Set a default material;
         setMaterialPartSet(mesh_num, 1);
         // See if a proper one has been specified
-        std::string mat_key = "material" + key.substr(4); // sizeof("mesh")
+        const std::string &mat_key = KEY_material + key.substr(4); // sizeof("mesh")
 
         varconf::sec_map::const_iterator J = sec.find(mat_key);
         if (J != sec.end()) {
@@ -656,7 +605,8 @@ void Cal3dModel::entityRemoved(WorldEntity *we) {
   // Get meshes and materials
   const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
   varconf::sec_map::const_iterator I = sec.begin();
-  while (I != sec.end()) {
+  varconf::sec_map::const_iterator Iend = sec.end();
+  while (I != Iend) {
     const std::string &key = I->first;
 
     if (key.find("mesh",0) == 0) {

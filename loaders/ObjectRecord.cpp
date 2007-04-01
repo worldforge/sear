@@ -48,18 +48,6 @@ void ObjectRecord::animate(const std::string &action) {
   }
 }
 
-void ObjectRecord::setAppearance(const Atlas::Message::MapType &map) {
-  ModelSystem &ms = ModelSystem::getInstance();
-  for (int i = 0; i < QUEUE_LAST; ++i) {
-    ModelList::const_iterator I = quality_queue[i].begin();
-    ModelList::const_iterator Iend = quality_queue[i].end();
-    for (; I != Iend; ++I) {
-      SPtr<ModelRecord> rec = ms.getModel(*I, dynamic_cast<WorldEntity*>(entity.get()));
-      if (rec && rec->model) rec->model->setAppearance(map);
-    }
-  }
-}
-
 void ObjectRecord::clearOutfit() {
   ModelSystem &ms = ModelSystem::getInstance();
   for (int i = 0; i < QUEUE_LAST; ++i) {

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.67 2007-03-04 14:28:40 simon Exp $
+// $Id: 3ds.cpp,v 1.68 2007-04-01 19:00:21 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -85,7 +85,9 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
   float max[3] = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };
 
   // Find bounds of object
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  StaticObjectList::const_iterator I = objs.begin();
+  StaticObjectList::const_iterator Iend = objs.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -138,7 +140,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
       case AXIS_Y: // Scale so Y axis is 1.0
         diff_x = diff_z = diff_y;
         break;
-      case AXIS_Z: // Scale so Z acis is 1.0
+      case AXIS_Z: // Scale so Z axis is 1.0
         diff_x = diff_y = diff_z;
         break;
       default:
@@ -153,7 +155,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
   float scale_y = 1.0 / (diff_y);
   float scale_z = 1.0 / (diff_z);
 
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (I = objs.begin(); I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     
@@ -204,7 +206,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
 ThreeDS::ThreeDS() : Model(),
   m_initialised(false)
 {
-  m_config.sige.connect(SigC::slot(*this, &ThreeDS::varconf_error_callback));
+  m_config.sige.connect(sigc::mem_fun(this, &ThreeDS::varconf_error_callback));
 }
 
 ThreeDS::~ThreeDS() {
@@ -352,7 +354,8 @@ int ThreeDS::shutdown() {
 
 void ThreeDS::contextCreated() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
-  for (; I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
@@ -361,7 +364,8 @@ void ThreeDS::contextCreated() {
 
 void ThreeDS::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
-  for (; I != m_render_objects.end(); ++I) {
+  StaticObjectList::const_iterator Iend = m_render_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
@@ -426,7 +430,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     }
   }
   if (m_config.findItem(SECTION_model, KEY_rotation)) {
-    std::string str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
+    const std::string &str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
     float w,x,y,z;
     sscanf(str.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
     WFMath::Quaternion q(w,x,y,z);
@@ -453,7 +457,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       if (I == m_material_map.end()) {
         Material *m = new Material;
         if (m_config.findItem(material_name, KEY_ambient)) {
-          std::string str = (std::string)m_config.getItem(material_name, KEY_ambient);
+          const std::string &str = (std::string)m_config.getItem(material_name, KEY_ambient);
           sscanf(str.c_str(), "%f;%f;%f;%f", &m->ambient[0], &m->ambient[1], &m->ambient[2], &m->ambient[3]);
         } else {
           m->ambient[0] = 0.0f;
@@ -463,7 +467,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
         }
 
         if (m_config.findItem(material_name, KEY_diffuse)) {
-          std::string str = (std::string)m_config.getItem(material_name, KEY_diffuse);
+          const std::string &str = (std::string)m_config.getItem(material_name, KEY_diffuse);
           sscanf(str.c_str(), "%f;%f;%f;%f", &m->diffuse[0], &m->diffuse[1], &m->diffuse[2], &m->diffuse[3]);
         } else {
           m->diffuse[0] = mat->diffuse[0];
@@ -524,7 +528,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     if (current_material_name != material_name) {
       if (mesh->texels) {
         if (m_config.findItem(material_name,KEY_texture_map_0)) {
-          std::string name = (std::string)m_config.getItem(material_name,
+          const std::string &name = (std::string)m_config.getItem(material_name,
                                                          KEY_texture_map_0);
           texture_id = RenderSystem::getInstance().requestTexture(name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);

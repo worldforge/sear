@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.30 2007-03-04 14:28:40 simon Exp $
+// $Id: LibModelFile.cpp,v 1.31 2007-04-01 19:00:21 simon Exp $
 
 /*
   Debug check list
@@ -78,7 +78,9 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
 
 
   // Find bounds of object
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  StaticObjectList::const_iterator I = objs.begin();
+  StaticObjectList::const_iterator Iend = objs.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
 
@@ -145,7 +147,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
   float scale_y = 1.0 / (diff_y);
   float scale_z = 1.0 / (diff_z);
 
-  for (StaticObjectList::const_iterator I = objs.begin(); I != objs.end(); ++I) {
+  for (I = objs.begin(); I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
 
@@ -197,7 +199,7 @@ static void scale_object(StaticObjectList &objs, Axis axis, bool isotropic, bool
 LibModelFile::LibModelFile() : Model(), 
   m_initialised(false)
 {
-  m_config.sige.connect(SigC::slot(*this, &LibModelFile::varconf_error_callback));
+  m_config.sige.connect(sigc::mem_fun(this, &LibModelFile::varconf_error_callback));
 }
 
 LibModelFile::~LibModelFile() {
@@ -229,7 +231,7 @@ int LibModelFile::init(const std::string &filename) {
     }
   }
   if (m_config.findItem(SECTION_model, KEY_rotation)) {
-    std::string str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
+    const std::string &str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
     float w,x,y,z;
     sscanf(str.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
     WFMath::Quaternion q(w,x,y,z);
@@ -283,22 +285,22 @@ int LibModelFile::init(const std::string &filename) {
 
       float m[4];
       if (m_config.findItem(name, KEY_ambient)) {
-        std::string str = (std::string)m_config.getItem(name, KEY_ambient);
+        const std::string &str = (std::string)m_config.getItem(name, KEY_ambient);
         sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
         so->setAmbient(m); 
       }
       if (m_config.findItem(name, KEY_diffuse)) {
-        std::string str = (std::string)m_config.getItem(name, KEY_diffuse);
+        const std::string &str = (std::string)m_config.getItem(name, KEY_diffuse);
         sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
         so->setDiffuse(m); 
       }
       if (m_config.findItem(name, KEY_specular)) {
-        std::string str = (std::string)m_config.getItem(name, KEY_specular);
+        const std::string &str = (std::string)m_config.getItem(name, KEY_specular);
         sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
         so->setSpecular(m); 
       }
       if (m_config.findItem(name, KEY_emission)) {
-        std::string str = (std::string)m_config.getItem(name, KEY_emission);
+        const std::string &str = (std::string)m_config.getItem(name, KEY_emission);
         sscanf(str.c_str(), "%f;%f;%f;%f", &m[0], &m[1], &m[2], &m[3]);
         so->setEmission(m); 
       }
@@ -393,7 +395,6 @@ int LibModelFile::shutdown() {
     }
   }
 
-
   //  Clean up OpenGL data
   contextDestroyed(true);
 
@@ -402,7 +403,8 @@ int LibModelFile::shutdown() {
 
 void LibModelFile::contextCreated() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
-  for (; I != m_static_objects.end(); ++I) {
+  StaticObjectList::const_iterator Iend = m_static_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
@@ -411,7 +413,8 @@ void LibModelFile::contextCreated() {
 
 void LibModelFile::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
-  for (; I != m_static_objects.end(); ++I) {
+  StaticObjectList::const_iterator Iend = m_static_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
@@ -419,7 +422,9 @@ void LibModelFile::contextDestroyed(bool check) {
 }
 
 void LibModelFile::render(bool select_mode) {
-  for (StaticObjectList::const_iterator I = m_static_objects.begin(); I != m_static_objects.end(); ++I) {
+  StaticObjectList::const_iterator I = m_static_objects.begin();
+  StaticObjectList::const_iterator Iend = m_static_objects.end();
+  for (; I != Iend; ++I) {
     SPtrShutdown<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);

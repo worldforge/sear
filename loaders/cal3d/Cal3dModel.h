@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.29 2007-01-09 17:11:25 simon Exp $
+// $Id: Cal3dModel.h,v 1.30 2007-04-01 19:00:21 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -45,7 +45,6 @@ public:
 
   virtual void action(const std::string &action);
   virtual void animate(const std::string &action);
-  virtual void setAppearance(const Atlas::Message::MapType &map);
   virtual RotationStyle rotationStyle() const { return ROS_NORMAL; }
  
   unsigned int getPartID(const std::string &part) { return m_core_model->m_parts[part]; }

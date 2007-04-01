@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.17 2007-01-09 17:11:25 simon Exp $
+//$Id: Model.h,v 1.18 2007-04-01 19:00:21 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -101,13 +101,6 @@ public:
    * @param action The name of the animation to perform.
    */
   virtual void animate(const std::string &action) {}
-
-  /** The setAppearance method is used to pass an Atlas Map object containing
-   * data about the appearance of the object. This should be used to select
-   * appropriate meshes and textures for the model.
-   * @param mt The map containing appearance data.
-   */
-  virtual void setAppearance(const Atlas::Message::MapType &mt) {}
 
   /** This function returns a value to tell the renderer how the model should
    * be rotated. The main point of this function is for billboard style models
