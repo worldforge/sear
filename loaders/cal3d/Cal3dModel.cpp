@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.50 2007-03-04 14:28:40 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.51 2007-04-01 14:51:09 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -197,29 +197,49 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         dyno->setShininess(shininess);
 
         // get the transformed vertices of the submesh
-        static Vertex_3 meshVertices[30000];
-        int vertexCount;
-        vertexCount = pCalRenderer->getVertices((float*)&meshVertices[0]);
-        dyno->copyVertexData((float*)meshVertices, vertexCount * 3);
+        int vertexCount = pCalRenderer->getVertexCount();
+        bool realloc = false;
+        float *vertex_ptr, *normal_ptr, *texture_ptr;
+        int textureCoordinateCount;
 
-        // get the transformed normals of the submesh
-        static Normal meshNormals[30000];
-        pCalRenderer->getNormals((float*)&meshNormals[0]);
-        dyno->copyNormalData((float*)meshNormals, vertexCount * 3);
+        if (vertexCount > dyno->getNumPoints()) {
+          realloc = true;
+          vertex_ptr = dyno->createVertexData(vertexCount * 3);  
+          pCalRenderer->getVertices(vertex_ptr);
+          dyno->releaseVertexDataPtr();
 
-        // get the texture coordinates of the submesh
-        static Texel meshTextureCoordinates[30000];
-        int textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, (float*)&meshTextureCoordinates[0]);
-        //Copy data later
+          normal_ptr = dyno->createNormalData(vertexCount * 3);  
+          pCalRenderer->getNormals(normal_ptr);
+          dyno->releaseNormalDataPtr();
+        } else {
+          vertex_ptr = dyno->getVertexDataPtr();
+          pCalRenderer->getVertices(vertex_ptr);
+          dyno->releaseVertexDataPtr();
 
-        // get the faces of the submesh
-        static int meshFaces[50000 * 3];
-        int faceCount = pCalRenderer->getFaces(&meshFaces[0]);
+          normal_ptr = dyno->getNormalDataPtr();
+          pCalRenderer->getNormals(normal_ptr);
+          dyno->releaseNormalDataPtr();
+        }
+
+        int faceCount = pCalRenderer->getFaceCount();
+
         if (faceCount > 0) {
-          dyno->copyIndices(meshFaces, faceCount * 3);
+          int *face_ptr;
+          if (faceCount > dyno->getNumFaces()) {
+            face_ptr = dyno->createIndices(faceCount * 3);
+            pCalRenderer->getFaces(face_ptr);
+            dyno->releaseIndicesPtr();
+          } else {
+            face_ptr = dyno->getIndicesPtr();
+            pCalRenderer->getFaces(face_ptr);
+            dyno->releaseIndicesPtr();
+          }
+
           dyno->setNumFaces(faceCount);
         }
+
         dyno->setNumPoints(vertexCount);
+
         // There are several situations that can happen here. 
         // Model with/without texture coordinates
         // Model with/without texture maps
@@ -232,7 +252,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             MapData *md = reinterpret_cast<MapData*>
                                           (pCalRenderer->getMapUserData(0));
             if (md) {
-              dyno->setTexture(0, md->textureID, md->textureMaskID);
+              dyno->setTexture(i, md->textureID, md->textureMaskID);
               mapDataFound = true;
             } else {
               // Can't have a missing texture map between units.
@@ -240,8 +260,17 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             }
 	  }
 	}
+
         if (mapDataFound){
-          dyno->copyTextureData((float*)meshTextureCoordinates, textureCoordinateCount * 2);
+          if (realloc) {
+            texture_ptr = dyno->createTextureData(vertexCount * 2);
+            textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, texture_ptr);
+            dyno->releaseTextureDataPtr();
+          } else {
+            texture_ptr = dyno->getTextureDataPtr();
+            textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, texture_ptr);
+            dyno->releaseTextureDataPtr();
+          }
           assert(textureCoordinateCount == vertexCount);
         }
       }
@@ -256,7 +285,8 @@ void Cal3dModel::render(bool select_mode) {
   render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
 
   DOVec::iterator I = m_dos.begin();
-  while (I != m_dos.end()) {
+  DOVec::const_iterator Iend = m_dos.end();
+  while (I != Iend) {
     SPtrShutdown<DynamicObject> dyno = *I++;
     dyno->render(select_mode);
   }

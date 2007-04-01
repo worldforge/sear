@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #ifndef SEAR_RENDERERS_DYNAMICOBJECT_H
 #define SEAR_RENDERERS_DYNAMICOBJECT_H 1
@@ -47,44 +47,32 @@ public:
   void copyNormalData(float *ptr, size_t size);
   void copyTextureData(float *ptr, size_t size);
   void copyIndices(int *ptr, size_t size);
-/*
-  float *createVertexData(int size) {
-    if (m_vertex_data) delete [] m_vertex_data;
-    m_vertex_data = new float[size];
-    return m_vertex_data;
-  }
 
-  float *createNormalData(int size) {
-    if (m_normal_data) delete [] m_normal_data;
-    m_normal_data = new float[size];
-    return m_normal_data;
-  }
+  float *createVertexData(int size);
+  unsigned char *createColourData(int size);
+  float *createNormalData(int size);
+  float *createTextureData(int size);
+  int *createIndices(int size);
 
-  float *createTextureData(int size) {
-    if (m_texture_data) delete [] m_texture_data;
-    m_texture_data = new float[size];
-    return m_texture_data;
-  }
-
-  int *createIndices(int size) {
-    if (m_indices) delete [] m_indices;
-    m_indices = new int[size];
-    return m_indices;
-  }
-*/
   void setNumPoints(int n) { m_num_points = n; }
   int getNumPoints() const { return m_num_points; }
 
   void setNumFaces(unsigned int n) { m_num_faces = n; }
   unsigned int getNumFaces() const { return m_num_faces; }
-/*
-  float *getVertexDataPtr() { return m_vertex_data; }
-  float *getColourDataPtr() { return m_colour_data; }
-  float *getNormalDataPtr() { return m_normal_data; }
-  float *getTextureDataPtr() { return m_texture_data; }
-  int *getIndicesPtr() { return m_indices; }
-*/
-void setAmbient(float a[4]) {
+
+  float *getVertexDataPtr();
+  unsigned char *getColourDataPtr();
+  float *getNormalDataPtr();
+  float *getTextureDataPtr();
+  int *getIndicesPtr();
+
+  void releaseVertexDataPtr();
+  void releaseColourDataPtr();
+  void releaseNormalDataPtr();
+  void releaseTextureDataPtr();
+  void releaseIndicesPtr();
+
+  void setAmbient(float a[4]) {
     m_ambient[0] = a[0];
     m_ambient[1] = a[1];
     m_ambient[2] = a[2];
@@ -180,8 +168,6 @@ void setAmbient(float a[4]) {
 
 //  int getType() { return 1; }
   DynamicObject *newInstance() { return new DynamicObject(); }
-  int load(const std::string &filename);
-  int save(const std::string &filename);
  
 private:
   void createVBOs();

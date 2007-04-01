@@ -1,3 +1,10 @@
+2007-04-01  Simon Goodall  <sear@simongoodall.co.uk>
+
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h,
+	  loaders/cal3d/Cal3dModel.cpp: Remove an extra copy for each vertex
+	  array by directly copying data into a VBO buffer (or normal array in
+	  fallback mode).
+
 2007-03-29  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/ModelHandler.cpp, loaders/ModelHandler.h: Added a command
