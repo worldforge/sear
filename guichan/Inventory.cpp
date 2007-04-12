@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2006 - 2007 Simon Goodall
 
 #include "common/Utility.h"
 
@@ -94,14 +95,14 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   gcn::Button * button = new gcn::Button("Wield");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("wield");
+  button->setActionEventId("wield");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
 
   button = new gcn::Button("Give");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("give");
+  button->setActionEventId("give");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
@@ -113,14 +114,14 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   button = new gcn::Button("Drop");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("drop");
+  button->setActionEventId("drop");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
 
   button = new gcn::Button("Eat");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("eat");
+  button->setActionEventId("eat");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
@@ -132,14 +133,14 @@ Inventory::Inventory() : gcn::Window("Inventory")
 
   button = new gcn::Button("Rename");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("rename");
+  button->setActionEventId("rename");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);
 /*
   button = new gcn::Button("Eat");
   m_widgets.push_back(SPtr<gcn::Widget>(button));
-  button->setEventId("eat");
+  button->setActionEventId("eat");
   button->setFocusable(false);
   button->addActionListener(m_buttonListener);
   hbox->pack(button);

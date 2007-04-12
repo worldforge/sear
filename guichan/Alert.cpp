@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/Alert.h"
 
@@ -42,7 +43,7 @@ Alert::Alert(gcn::Container * parent, const std::string & msg)
   m_widgets.push_back(SPtr<gcn::Widget>(m_okButton));
 
   m_okButton->setFocusable(false);
-  m_okButton->setEventId("ok");
+  m_okButton->setActionEventId("ok");
   m_okButton->addActionListener(m_buttonListener);
 
   vbox->pack(m_okButton);
@@ -62,7 +63,7 @@ Alert::~Alert()
 
 void Alert::actionPressed(std::string event)
 {
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
     return;
@@ -78,7 +79,7 @@ void Alert::actionPressed(std::string event)
 
 void Alert::logic()
 {
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget != 0) {
     gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
     if (parent != 0) {

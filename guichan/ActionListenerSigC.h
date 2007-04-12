@@ -14,8 +14,8 @@ namespace Sear {
 class ActionListenerSigC : public gcn::ActionListener
 {
   protected:
-    void action(const std::string & eventId, gcn::Widget *widget) {
-      Action.emit(eventId);
+    virtual void action(const gcn::ActionEvent& actionEvent) {
+      Action.emit(actionEvent.getId());
     }
 
   public:

@@ -28,6 +28,7 @@
 #define SEAR_GUICHAN_ACTIONTEXTFIELD_H
 
 #include <guichan/widgets/textfield.hpp>
+#include <guichan/actionevent.hpp>
 
 namespace Sear {
 
@@ -41,12 +42,12 @@ class ActionTextField : public gcn::TextField {
         /**
          * Constructor, initializes the password field with the given string.
          */
-        ActionTextField(const std::string& text = "",  gcn::ActionListener *a = 0, const std::string &event = "");
+        ActionTextField(const std::string& text,  gcn::ActionListener *a, const gcn::ActionEvent &event);
 
-         virtual void keyPress(const gcn::Key& key);
+         virtual void keyPressed(gcn::KeyEvent& key);
   private:
     gcn::ActionListener *m_action;
-    std::string m_event;
+    gcn::ActionEvent m_event;
 
 };
 

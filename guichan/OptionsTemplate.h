@@ -21,7 +21,7 @@ public:
   explicit OptionsTemplate(RootWidget * top);
   virtual ~OptionsTemplate();
 
-  void action(const std::string &, gcn::Widget *widget);
+  void action(const gcn::ActionEvent&);
 };
 
 } // namespace Sear

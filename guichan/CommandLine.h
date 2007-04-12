@@ -14,11 +14,11 @@ namespace Sear {
 class CommandLine : public gcn::TextField
 {
 protected:
-  virtual void keyPress(const gcn::Key& key) {
-    if (key.getValue() == gcn::Key::ENTER) {
+  virtual void keyPressed(gcn::KeyEvent& key) {
+    if (key.getKey().getValue() == gcn::Key::ENTER) {
       ReturnPressed.emit();
     }
-    gcn::TextField::keyPress(key);
+    gcn::TextField::keyPressed(key);
   }
 public:
   SigC::Signal0<void> ReturnPressed;

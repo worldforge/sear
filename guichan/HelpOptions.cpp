@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/HelpOptions.h"
 
@@ -110,14 +111,14 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
 
   gcn::Button * b = new gcn::Button("Apply");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("apply");
+  b->setActionEventId("apply");
   b->setFocusable(false);
   b->addActionListener(this);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("close");
+  b->setActionEventId("close");
   b->setFocusable(false);
   b->addActionListener(this);
   hbox->pack(b);
@@ -134,8 +135,9 @@ HelpOptions::~HelpOptions()
   delete m_fileList;
 }
 
-void HelpOptions::action(const std::string & event, gcn::Widget *widget)
+void HelpOptions::action(const gcn::ActionEvent &actionEvent)
 {
+  const std::string &event = actionEvent.getId();
   if (event == "apply") {
     std::cout << "Apply changes" << std::endl << std::flush;
   } else if (event == "close") {

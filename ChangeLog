@@ -1,5 +1,18 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* configure.ac, README: Update required Guichan version text.
+
+	* guichan/imagefontxpm.cpp, guichan/imagefontxpm.h: Created a copy of
+	  guichan's imagefont class that can load a XPM array into an OpenGL
+	  Image and returns a font.
+
+	* guichan/rpgfont.h, guichan/Workarea.cpp: Added default guichan font.
+	  Use new font instead of loading from a file.
+
+	* guichan/*: Update for Guichan 0.6 API.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/TextureManager.cpp: Fix bug in the unload function where the
 	  TextureId was lost.
 

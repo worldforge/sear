@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #ifndef SEAR_GUICHAN_HELP_OPTIONS_H
 #define SEAR_GUICHAN_HELP_OPTIONS_H
@@ -40,7 +41,7 @@ public:
   explicit HelpOptions(RootWidget * top);
   virtual ~HelpOptions();
 
-  void action(const std::string &, gcn::Widget *widget);
+  void action(const gcn::ActionEvent &);
   virtual void logic();
 };
 

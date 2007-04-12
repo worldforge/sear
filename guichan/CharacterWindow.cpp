@@ -114,7 +114,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 
   m_characterListModel = new CharacterListModel;
 
-  m_characters = new DblClkListBox(m_characterListModel, m_buttonListener, "take");
+  m_characters = new DblClkListBox(m_characterListModel, m_buttonListener, gcn::ActionEvent(this, "take"));
   m_widgets.push_back(SPtr<gcn::Widget>(m_characters));
   m_characters->setWidth(200);
   m_characters->setFocusable(false);
@@ -132,7 +132,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_refreshButton = new gcn::Button("Refresh");
   m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
   m_refreshButton->setFocusable(false);
-  m_refreshButton->setEventId("refresh");
+  m_refreshButton->setActionEventId("refresh");
   m_refreshButton->addActionListener(m_buttonListener);
   m_refreshButton->setPosition(0,y_pos);
   add(m_refreshButton);
@@ -166,7 +166,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_charButton = new gcn::Button("Create new character");
   m_widgets.push_back(SPtr<gcn::Widget>(m_charButton));
   m_charButton->setFocusable(false);
-  m_charButton->setEventId("create");
+  m_charButton->setActionEventId("create");
   m_charButton->addActionListener(m_buttonListener);
   m_charButton->setPosition(0, y_pos);
   add(m_charButton);
@@ -175,7 +175,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
-  m_closeButton->setEventId("close");
+  m_closeButton->setActionEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
   m_closeButton->setPosition(0, y_pos);
   add(m_closeButton);
@@ -210,7 +210,7 @@ void CharacterWindow::logic()
               m_nameField->setText(I->second->getName());
               m_typeField = type_name;
               m_charButton->setCaption("Take character");
-              m_charButton->setEventId("take");
+              m_charButton->setActionEventId("take");
               // Updates the type list box
               gcn::ListModel *lm =  m_types->getListModel();
               for (int i = 0; i < lm->getNumberOfElements(); ++i) {
@@ -239,7 +239,7 @@ void CharacterWindow::logic()
                 m_typeField != I->second->getParents().front()) {
               m_characters->setSelected(-1);
               m_charButton->setCaption("Create new character");
-              m_charButton->setEventId("create");
+              m_charButton->setActionEventId("create");
             }
           }
         }
@@ -260,7 +260,7 @@ void CharacterWindow::logic()
       }
       m_characters->setSelected(-1);
       m_charButton->setCaption("Create new character");
-      m_charButton->setEventId("create");
+      m_charButton->setActionEventId("create");
     }
   }
   if (new_type_sel >= 0) {
@@ -281,7 +281,7 @@ void CharacterWindow::actionPressed(std::string event)
 {
   bool close = false;
 
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
     return;

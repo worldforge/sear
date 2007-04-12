@@ -9,12 +9,13 @@
 
 namespace Sear {
 
-class RootWidget : public gcn::Container
+class RootWidget : public gcn::Container, public gcn::MouseListener
 {
   public:
     typedef std::map<std::string, std::pair<int, int> > CoordDict;
   protected:
     CoordDict m_coords;
+    bool mWidgetWithMouse;
   public:
     RootWidget();
 
@@ -31,6 +32,9 @@ class RootWidget : public gcn::Container
     virtual void logic();
     void contextCreated();
     void contextDestroyed(bool check);
+
+    void mouseEntered(gcn::MouseEvent& mouseEvent);
+    void mouseExited(gcn::MouseEvent& mouseEvent);
 };
 
 } // namespace Sear

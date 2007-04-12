@@ -133,7 +133,7 @@ void Panel::addWindow(gcn::Window * window)
 {
   gcn::Button * button = new gcn::Button(window->getCaption());
   button->setFocusable(false);
-  button->setEventId(window->getCaption());
+  button->setActionEventId(window->getCaption());
   button->addActionListener(m_buttonListener);
   m_hbox->pack(button);
 

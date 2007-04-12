@@ -2,6 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
 
+
 #include <sigc++/object_slot.h>
 
 #include "guichan/Workarea.h"
@@ -34,7 +35,8 @@
 #include <sage/GL.h>
 
 #include <iostream>
-
+#include "imagefontxpm.h"
+#include "rpgfont.h"
 namespace Sear {
 
 static const bool debug = false;
@@ -110,7 +112,8 @@ void Workarea::init()
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->getFilePath(font_path);
 
-    gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    //gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    gcn::ImageFontXPM * font = new gcn::ImageFontXPM("default_font", rpgfont_xpm, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
     gcn::Widget::setGlobalFont(font);
   } catch (...) {
@@ -342,7 +345,8 @@ void Workarea::contextCreated() {
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->getFilePath(font_path);
 
-    gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    //gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    gcn::ImageFontXPM * font = new gcn::ImageFontXPM("default_font", rpgfont_xpm, m_fixed_font_characters);
     // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
     gcn::Widget::setGlobalFont(font);
   } catch (...) {
@@ -368,7 +372,7 @@ void Workarea::removeLaters() {
   std::list<gcn::Widget*>::iterator I = m_remove_widgets.begin();
   while (I != m_remove_widgets.end()) {
     gcn::Widget *w = *I;
-    gcn::BasicContainer *p = w->getParent();
+    gcn::Widget *p = w->getParent();
     gcn::Container *p2 = dynamic_cast<gcn::Container*>(p);
     if (p2) p2->remove(w);
 

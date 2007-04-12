@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/RootWidget.h"
 #include "guichan/CommandLine.h"
@@ -15,17 +16,19 @@
 
 namespace Sear {
 
-RootWidget::RootWidget()
+RootWidget::RootWidget() :
+  mWidgetWithMouse(0)
 {
     setBaseColor(gcn::Color(63, 63, 63, 191));
     setOpaque(false);
+    addMouseListener(this);
 }
 
 /// Determine if the mouse is over the root widget, and is thus not
 /// over any of the other widgets.
 bool RootWidget::childHasMouse()
 {
-    return (mWidgetWithMouse != 0);
+    return (mWidgetWithMouse == false);
 }
 
 void RootWidget::resize(int width, int height, int old_width, int old_height)
@@ -107,6 +110,14 @@ void RootWidget::contextCreated() {
 }
 void RootWidget::contextDestroyed(bool check) {
   Overlay::instance()->contextDestroyed(check);
+}
+
+void RootWidget::mouseEntered(gcn::MouseEvent& mouseEvent) { 
+  mWidgetWithMouse = true;
+}
+
+void RootWidget::mouseExited(gcn::MouseEvent& mouseEvent) {  
+ mWidgetWithMouse = false;
 }
 
 } // namespace Sear

@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/LoginWindow.h"
 
@@ -50,7 +51,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l2 = new gcn::Label("Password");
   m_widgets.push_back(SPtr<gcn::Widget>(l2));
-  m_pswdField = new PasswordField("                ", m_buttonListener, "login");
+  m_pswdField = new PasswordField("                ", m_buttonListener, gcn::ActionEvent(this, "login"));
   m_widgets.push_back(SPtr<gcn::Widget>(m_pswdField));
   m_pswdField->setText("");
   hbox->pack(l2);
@@ -62,7 +63,7 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   gcn::Label * l3 = new gcn::Label("        ");
   m_widgets.push_back(SPtr<gcn::Widget>(l3));
-  m_pswdConfirmField = new PasswordField("                ");
+  m_pswdConfirmField = new PasswordField("                ", NULL, gcn::ActionEvent(this, ""));
   m_widgets.push_back(SPtr<gcn::Widget>(m_pswdConfirmField));
   m_pswdConfirmField->setText("");
   m_pswdConfirmField->setEnabled(false);
@@ -96,14 +97,14 @@ LoginWindow::LoginWindow() : gcn::Window("Login to server")
   m_loginButton = new gcn::Button("Login");
   m_widgets.push_back(SPtr<gcn::Widget>(m_loginButton));
   m_loginButton->setFocusable(false);
-  m_loginButton->setEventId("login");
+  m_loginButton->setActionEventId("login");
   m_loginButton->addActionListener(m_buttonListener);
   hbox->pack(m_loginButton);
 
   m_cancelButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_cancelButton));
   m_cancelButton->setFocusable(false);
-  m_cancelButton->setEventId("close");
+  m_cancelButton->setActionEventId("close");
   m_cancelButton->addActionListener(m_buttonListener);
   hbox->pack(m_cancelButton);
 
@@ -143,7 +144,7 @@ void LoginWindow::actionPressed(std::string event)
   bool close = false;
 //  bool password_error = false;
 
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
     return;

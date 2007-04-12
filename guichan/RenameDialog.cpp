@@ -55,7 +55,7 @@ RenameDialog::RenameDialog(const std::string &id, const std::string &old_name) :
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
   l1 = new gcn::Label("New Name");
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
-  m_nameField = new ActionTextField("                ", m_buttonListener, "rename");
+  m_nameField = new ActionTextField("                ", m_buttonListener, gcn::ActionEvent(this, "rename"));
   m_widgets.push_back(SPtr<gcn::Widget>(m_nameField));
   m_nameField->setText("");
   hbox->pack(l1);
@@ -68,14 +68,14 @@ RenameDialog::RenameDialog(const std::string &id, const std::string &old_name) :
   m_renameButton = new gcn::Button("Rename");
   m_widgets.push_back(SPtr<gcn::Widget>(m_renameButton));
   m_renameButton->setFocusable(false);
-  m_renameButton->setEventId("rename");
+  m_renameButton->setActionEventId("rename");
   m_renameButton->addActionListener(m_buttonListener);
   hbox->pack(m_renameButton);
 
   m_cancelButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_cancelButton));
   m_cancelButton->setFocusable(false);
-  m_cancelButton->setEventId("close");
+  m_cancelButton->setActionEventId("close");
   m_cancelButton->addActionListener(m_buttonListener);
   hbox->pack(m_cancelButton);
 
@@ -111,7 +111,7 @@ void RenameDialog::actionPressed(std::string event)
   bool close = false;
 //  bool password_error = false;
 
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cout << "NO PARENT" << std::endl << std::flush;
     return;

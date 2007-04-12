@@ -130,14 +130,14 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
 
   gcn::Button * b = new gcn::Button("Apply");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("apply");
+  b->setActionEventId("apply");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   hbox->pack(b);
 
   b = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("close");
+  b->setActionEventId("close");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   hbox->pack(b);
@@ -192,7 +192,7 @@ void VideoOptions::logic()
   gcn::Window::logic();
 }
 
-void VideoOptions::action(const std::string &, gcn::Widget *widget)
+void VideoOptions::action(const gcn::ActionEvent &actionEvent)
 {
   m_checkFullChanged = true;
 }

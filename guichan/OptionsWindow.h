@@ -6,6 +6,7 @@
 #define SEAR_GUICHAN_OPTIONSWINDOW_H
 
 #include <guichan/widgets/window.hpp>
+#include <guichan/actionevent.hpp>
 
 #include <sigc++/object.h>
 

@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/OptionsWindow.h"
 
@@ -44,49 +45,49 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
 
   gcn::Button * b = new gcn::Button("Video");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("video");
+  b->setActionEventId("video");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Audio");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("audio");
+  b->setActionEventId("audio");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Controls");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("controls");
+  b->setActionEventId("controls");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Help");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("help");
+  b->setActionEventId("help");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Leave World");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("leave");
+  b->setActionEventId("leave");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Quit game");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("quit");
+  b->setActionEventId("quit");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);
 
   b = new gcn::Button("Return to game");
   m_widgets.push_back(SPtr<gcn::Widget>(b));
-  b->setEventId("close");
+  b->setActionEventId("close");
   b->setFocusable(false);
   b->addActionListener(m_buttonListener);
   vbox->pack(b);

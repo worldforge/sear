@@ -12,7 +12,7 @@
 class DblClkListBox : public gcn::ListBox
 {
 public:
-  DblClkListBox(gcn::ListModel *m, gcn::ActionListener *a, const std::string &event) :
+  DblClkListBox(gcn::ListModel *m, gcn::ActionListener *a, const gcn::ActionEvent &event) :
      ListBox(m),
      m_action(a),
      m_event(event),
@@ -21,13 +21,14 @@ public:
   {}
 
 
-  virtual void mousePress(int x, int y, int button) {
-    ListBox::mousePress(x, y, button);
+  virtual void mousePressed(gcn::MouseEvent& mouseEvent) {
+    ListBox::mousePressed(mouseEvent);
     long int time = SDL_GetTicks();
+    int button = (int)mouseEvent.getButton();
     if (button == m_last_button) {
       // TODO Make 500 configurable
       if (time - m_last_time < 500) {
-        if (m_action) m_action->action(m_event, this);
+        if (m_action) m_action->action(m_event);
         // Reset state
         time = -1;
         button = -1;
@@ -39,7 +40,7 @@ public:
 
 protected:
   gcn::ActionListener *m_action;
-  std::string m_event;
+  gcn::ActionEvent m_event;
   long int m_last_time;
   int m_last_button;
 };

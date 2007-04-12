@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 #include "guichan/ConnectWindow.h"
 #include "guichan/DblClkListBox.h"
@@ -82,7 +83,7 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_buttonListener = new ActionListenerSigC;
   m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
 
-  m_servers = new DblClkListBox(m_serverListModel, m_buttonListener, "connect");
+  m_servers = new DblClkListBox(m_serverListModel, m_buttonListener, gcn::ActionEvent(this, "connect"));
   m_widgets.push_back(SPtr<gcn::Widget>(m_servers));
   m_servers->setWidth(200);
   m_servers->setFocusable(false);
@@ -106,21 +107,21 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_connectButton = new gcn::Button("Connect");
   m_widgets.push_back(SPtr<gcn::Widget>(m_connectButton));
   m_connectButton->setFocusable(false);
-  m_connectButton->setEventId("connect");
+  m_connectButton->setActionEventId("connect");
   m_connectButton->addActionListener(m_buttonListener);
   hbox->pack(m_connectButton);
 
   m_refreshButton = new gcn::Button("Refresh");
   m_widgets.push_back(SPtr<gcn::Widget>(m_refreshButton));
   m_refreshButton->setFocusable(false);
-  m_refreshButton->setEventId("refresh");
+  m_refreshButton->setActionEventId("refresh");
   m_refreshButton->addActionListener(m_buttonListener);
   hbox->pack(m_refreshButton);
 
   m_closeButton = new gcn::Button("Close");
   m_widgets.push_back(SPtr<gcn::Widget>(m_closeButton));
   m_closeButton->setFocusable(false);
-  m_closeButton->setEventId("close");
+  m_closeButton->setActionEventId("close");
   m_closeButton->addActionListener(m_buttonListener);
   hbox->pack(m_closeButton);
 
@@ -161,7 +162,7 @@ void ConnectWindow::actionPressed(std::string event)
 {
   bool close = false;
 
-  gcn::BasicContainer * parent_widget = getParent();
+  gcn::Widget * parent_widget = getParent();
   if (parent_widget == 0) {
     std::cerr << "NO PARENT" << std::endl << std::flush;
     return;
