@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* src/sear.in: Added a datarootdir variable to keep some autoconf/make
+	  versions happy.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/3ds.cpp: Fix bug where textures were requested, but never 
 	  used or released.
 
