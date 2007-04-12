@@ -1,6 +1,9 @@
 #! /bin/sh
 
 rm -f config.cache
+rm -rf autom4te.cache
+
+cat macros/*.m4 > acinclude.m4
 
 echo aclocal...
 (aclocal --version) < /dev/null > /dev/null 2>&1 || {

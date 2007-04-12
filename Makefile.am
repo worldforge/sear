@@ -5,7 +5,7 @@ SUBDIRS = autopackage data scripts interfaces common loaders renderers environme
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \
-	autogen.sh sear.spec sear.spec.in
+	autogen.sh sear.spec sear.spec.in macros/*.m4
 
 # Rule to build tar-gzipped distribution package
 $(PACKAGE)-$(VERSION).tar.gz: dist

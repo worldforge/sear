@@ -1,5 +1,14 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* autogen.sh, acinclude.m4, configure.ac, Makefile.am, 
+	  macros/binreloc.m4, macros/guichan.m4, macros/lib3ds.m4,
+	  macros/sdl.m4: Create a directory called macros containing the source
+	  files for acinclude.m4. Automatically create acinclude.m4 when running
+	  autogen.sh and remove from CVS. Added a new script to specify where to
+	  find guichan libs and includes.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/3ds.cpp, loaders/cal3d/Cal3dCoreModel.cpp, src/Console.cpp:
 	  Removed some debugging output that is not really required.
 

@@ -1,83 +1,3 @@
-dnl
-dnl AM_PATH_LIB3DS([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
-dnl
-AC_DEFUN([AM_PATH_LIB3DS],
-[
-
-AC_ARG_WITH(lib3ds-prefix,[  --with-lib3ds-prefix=PFX   Prefix where lib3ds is installed (optional)],
-            lib3ds_config_prefix="$withval", lib3ds_config_prefix="")
-AC_ARG_WITH(lib3ds-exec-prefix,[  --with-lib3ds-exec-prefix=PFX  Exec prefix where lib3ds is installed (optional)],
-            lib3ds_config_exec_prefix="$withval", lib3ds_config_exec_prefix="")
-
-  if test x$lib3ds_config_exec_prefix != x ; then
-     lib3ds_config_args="$lib3ds_config_args --exec-prefix=$lib3ds_config_exec_prefix"
-     if test x${LIB3DS_CONFIG+set} != xset ; then
-        LIB3DS_CONFIG=$lib3ds_config_exec_prefix/bin/lib3ds-config
-     fi
-  fi
-  if test x$lib3ds_config_prefix != x ; then
-     lib3ds_config_args="$lib3ds_config_args --prefix=$lib3ds_config_prefix"
-     if test x${LIB3DS_CONFIG+set} != xset ; then
-        LIB3DS_CONFIG=$lib3ds_config_prefix/bin/lib3ds-config
-     fi
-  fi
-
-  AC_PATH_PROG(LIB3DS_CONFIG, lib3ds-config, no)
-  lib3ds_version_min=$1
-
-  AC_MSG_CHECKING(for Lib3ds - version >= $lib3ds_version_min)
-  no_lib3ds=""
-  if test "$LIB3DS_CONFIG" = "no" ; then
-    no_lib3ds=yes
-  else
-    LIB3DS_CFLAGS=`$LIB3DS_CONFIG --cflags`
-    LIB3DS_LIBS=`$LIB3DS_CONFIG --libs`
-    lib3ds_version=`$LIB3DS_CONFIG --version`
-
-    lib3ds_major_version=`echo $lib3ds_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-    lib3ds_minor_version=`echo $lib3ds_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-    lib3ds_micro_version=`echo $lib3ds_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-
-    lib3ds_major_min=`echo $lib3ds_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-    lib3ds_minor_min=`echo $lib3ds_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-    lib3ds_micro_min=`echo $lib3ds_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-
-    lib3ds_version_proper=`expr \
-        $lib3ds_major_version \> $lib3ds_major_min \| \
-        $lib3ds_major_version \= $lib3ds_major_min \& \
-        $lib3ds_minor_version \> $lib3ds_minor_min \| \
-        $lib3ds_major_version \= $lib3ds_major_min \& \
-        $lib3ds_minor_version \= $lib3ds_minor_min \& \
-        $lib3ds_micro_version \>= $lib3ds_micro_min `
-
-    if test "$lib3ds_version_proper" = "1" ; then
-      AC_MSG_RESULT([$lib3ds_major_version.$lib3ds_minor_version.$lib3ds_micro_version])
-    else
-      AC_MSG_RESULT(no)
-      no_lib3ds=yes
-    fi
-  fi
-
-  if test "x$no_lib3ds" = x ; then
-     ifelse([$2], , :, [$2])     
-  else
-     LIB3DS_CFLAGS=""
-     LIB3DS_LIBS=""
-     ifelse([$3], , :, [$3])
-  fi
-
-  AC_SUBST(LIB3DS_CFLAGS)
-  AC_SUBST(LIB3DS_LIBS)
-])
-
-
-
 # Configure paths for SDL
 # Sam Lantinga 9/21/99
 # stolen from Manish Singh
@@ -100,20 +20,21 @@ AC_ARG_ENABLE(sdltest, [  --disable-sdltest       Do not try to compile and run 
 		    , enable_sdltest=yes)
 
   if test x$sdl_exec_prefix != x ; then
-     sdl_args="$sdl_args --exec-prefix=$sdl_exec_prefix"
-     if test x${SDL_CONFIG+set} != xset ; then
-        SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
-     fi
+    sdl_args="$sdl_args --exec-prefix=$sdl_exec_prefix"
+    if test x${SDL_CONFIG+set} != xset ; then
+      SDL_CONFIG=$sdl_exec_prefix/bin/sdl-config
+    fi
   fi
   if test x$sdl_prefix != x ; then
-     sdl_args="$sdl_args --prefix=$sdl_prefix"
-     if test x${SDL_CONFIG+set} != xset ; then
-        SDL_CONFIG=$sdl_prefix/bin/sdl-config
-     fi
+    sdl_args="$sdl_args --prefix=$sdl_prefix"
+    if test x${SDL_CONFIG+set} != xset ; then
+      SDL_CONFIG=$sdl_prefix/bin/sdl-config
+    fi
   fi
 
-  AC_REQUIRE([AC_CANONICAL_TARGET])
-  PATH="$prefix/bin:$prefix/usr/bin:$PATH"
+  if test "x$prefix" != xNONE; then
+    PATH="$prefix/bin:$prefix/usr/bin:$PATH"
+  fi
   AC_PATH_PROG(SDL_CONFIG, sdl-config, no, [$PATH])
   min_sdl_version=ifelse([$1], ,0.11.0,$1)
   AC_MSG_CHECKING(for SDL - version >= $min_sdl_version)
@@ -257,81 +178,4 @@ int main(int argc, char *argv[])
   AC_SUBST(SDL_CFLAGS)
   AC_SUBST(SDL_LIBS)
   rm -f conf.sdltest
-])
-# Check for binary relocation support
-# Hongli Lai
-# http://autopackage.org/
-
-AC_DEFUN([AM_BINRELOC],
-[
-	AC_ARG_ENABLE(binreloc,
-		[  --enable-binreloc       compile with binary relocation support
-                          (default=enable when available)],
-		enable_binreloc=$enableval,enable_binreloc=auto)
-
-	AC_ARG_ENABLE(binreloc-threads,
-		[  --enable-binreloc-threads      compile binary relocation with threads support
-	                         (default=yes)],
-		enable_binreloc_threads=$enableval,enable_binreloc_threads=yes)
-
-	BINRELOC_CFLAGS=
-	BINRELOC_LIBS=
-	if test "x$enable_binreloc" = "xauto"; then
-		AC_CHECK_FILE([/proc/self/maps])
-		AC_CACHE_CHECK([whether everything is installed to the same prefix],
-			       [br_cv_valid_prefixes], [
-				if test "$bindir" = '${exec_prefix}/bin' -a "$sbindir" = '${exec_prefix}/sbin' -a \
-					"$datadir" = '${prefix}/share' -a "$libdir" = '${exec_prefix}/lib' -a \
-					"$libexecdir" = '${exec_prefix}/libexec' -a "$sysconfdir" = '${prefix}/etc'
-				then
-					br_cv_valid_prefixes=yes
-				else
-					br_cv_valid_prefixes=no
-				fi
-				])
-	fi
-	AC_CACHE_CHECK([whether binary relocation support should be enabled],
-		       [br_cv_binreloc],
-		       [if test "x$enable_binreloc" = "xyes"; then
-		       	       br_cv_binreloc=yes
-		       elif test "x$enable_binreloc" = "xauto"; then
-			       if test "x$br_cv_valid_prefixes" = "xyes" -a \
-			       	       "x$ac_cv_file__proc_self_maps" = "xyes"; then
-				       br_cv_binreloc=yes
-			       else
-				       br_cv_binreloc=no
-			       fi
-		       else
-			       br_cv_binreloc=no
-		       fi])
-
-	if test "x$br_cv_binreloc" = "xyes"; then
-		BINRELOC_CFLAGS="-DENABLE_BINRELOC"
-		AC_DEFINE(ENABLE_BINRELOC,,[Use binary relocation?])
-		if test "x$enable_binreloc_threads" = "xyes"; then
-			AC_CHECK_LIB([pthread], [pthread_getspecific])
-		fi
-
-		AC_CACHE_CHECK([whether binary relocation should use threads],
-			       [br_cv_binreloc_threads],
-			       [if test "x$enable_binreloc_threads" = "xyes"; then
-					if test "x$ac_cv_lib_pthread_pthread_getspecific" = "xyes"; then
-						br_cv_binreloc_threads=yes
-					else
-						br_cv_binreloc_threads=no
-					fi
-			        else
-					br_cv_binreloc_threads=no
-				fi])
-
-		if test "x$br_cv_binreloc_threads" = "xyes"; then
-			BINRELOC_LIBS="-lpthread"
-			AC_DEFINE(BR_PTHREAD,1,[Include pthread support for binary relocation?])
-		else
-			BINRELOC_CFLAGS="$BINRELOC_CFLAGS -DBR_PTHREADS=0"
-			AC_DEFINE(BR_PTHREAD,0,[Include pthread support for binary relocation?])
-		fi
-	fi
-	AC_SUBST(BINRELOC_CFLAGS)
-	AC_SUBST(BINRELOC_LIBS)
 ])
