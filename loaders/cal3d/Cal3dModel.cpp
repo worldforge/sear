@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.52 2007-04-01 19:00:21 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.53 2007-04-12 14:14:44 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -168,47 +168,47 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
           dyno->contextCreated();
           m_dos[counter] = dyno;
 
-// Lets assume this doesn't change
-        static unsigned char meshColor[4];
-        static float ambient[4];
-        static float diffuse[4];
-        static float specular[4];
-	static float shininess;
+          // Lets assume this doesn't change
+          static unsigned char meshColor[4];
+          static float ambient[4];
+          static float diffuse[4];
+          static float specular[4];
+          static float shininess;
 
-        pCalRenderer->getAmbientColor(&meshColor[0]);
-        ambient[0] = meshColor[0] / 255.0f;
-        ambient[1] = meshColor[1] / 255.0f;
-        ambient[2] = meshColor[2] / 255.0f;
-        ambient[3] = meshColor[3] / 255.0f;
-        dyno->setAmbient(ambient);
+          pCalRenderer->getAmbientColor(&meshColor[0]);
+          ambient[0] = meshColor[0] / 255.0f;
+          ambient[1] = meshColor[1] / 255.0f;
+          ambient[2] = meshColor[2] / 255.0f;
+          ambient[3] = meshColor[3] / 255.0f;
+          dyno->setAmbient(ambient);
 
-        // set the material diffuse color
-        pCalRenderer->getDiffuseColor(&meshColor[0]);
-        diffuse[0] = meshColor[0] / 255.0f;
-        diffuse[1] = meshColor[1] / 255.0f;
-        diffuse[2] = meshColor[2] / 255.0f;
-        diffuse[3] = 1.0f;//meshColor[3] / 255.0f;
-        dyno->setDiffuse(diffuse);
+          // set the material diffuse color
+          pCalRenderer->getDiffuseColor(&meshColor[0]);
+          diffuse[0] = meshColor[0] / 255.0f;
+          diffuse[1] = meshColor[1] / 255.0f;
+          diffuse[2] = meshColor[2] / 255.0f;
+          diffuse[3] = 1.0f;//meshColor[3] / 255.0f;
+          dyno->setDiffuse(diffuse);
 
-        // set the material specular color
-        pCalRenderer->getSpecularColor(&meshColor[0]);
-        specular[0] = meshColor[0] / 255.0f;
-        specular[1] = meshColor[1] / 255.0f;
-        specular[2] = meshColor[2] / 255.0f;
-        specular[3] = meshColor[3] / 255.0f;
-        dyno->setSpecular(specular);
+          // set the material specular color
+          pCalRenderer->getSpecularColor(&meshColor[0]);
+          specular[0] = meshColor[0] / 255.0f;
+          specular[1] = meshColor[1] / 255.0f;
+          specular[2] = meshColor[2] / 255.0f;
+          specular[3] = meshColor[3] / 255.0f;
+          dyno->setSpecular(specular);
 
-        dyno->setEmission(0.0f, 0.0f, 0.0f,0.0f);
+          dyno->setEmission(0.0f, 0.0f, 0.0f,0.0f);
 
-        shininess = pCalRenderer->getShininess();
-        dyno->setShininess(shininess);
+          shininess = pCalRenderer->getShininess();
+          dyno->setShininess(shininess);
         }
 
         // get the transformed vertices of the submesh
         int vertexCount = pCalRenderer->getVertexCount();
         bool realloc = false;
         float *vertex_ptr, *normal_ptr, *texture_ptr;
-        int textureCoordinateCount;
+        int textureCoordinateCount = 0;
 
         if (vertexCount > dyno->getNumPoints()) {
           realloc = true;
@@ -235,13 +235,11 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
           int *face_ptr;
           if (faceCount > dyno->getNumFaces()) {
             face_ptr = dyno->createIndices(faceCount * 3);
-            pCalRenderer->getFaces(face_ptr);
-            dyno->releaseIndicesPtr();
           } else {
             face_ptr = dyno->getIndicesPtr();
-            pCalRenderer->getFaces(face_ptr);
-            dyno->releaseIndicesPtr();
           }
+          pCalRenderer->getFaces(face_ptr);
+          dyno->releaseIndicesPtr();
 
           dyno->setNumFaces(faceCount);
         }
@@ -255,10 +253,21 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
         // Each model can be a mixture of the above. We want objects with
         // textures and texture coords.
         bool mapDataFound = false;
+
+
+        std::vector<std::vector<CalCoreSubmesh::TextureCoordinate> > & vectorvectorTextureCoordinate =
+            m_calModel->getVectorMesh()[meshId]->getSubmesh(submeshId)->getCoreSubmesh()->getVectorVectorTextureCoordinate();
+
+        // check if the map id is valid
+        if ( vectorvectorTextureCoordinate.size() > 0) {
+          textureCoordinateCount = vectorvectorTextureCoordinate[0].size();
+        }
+
+
         if((pCalRenderer->getMapCount() > 0) && (textureCoordinateCount > 0)) {
           for (int i = 0; i < pCalRenderer->getMapCount(); ++i) {
             MapData *md = reinterpret_cast<MapData*>
-                                          (pCalRenderer->getMapUserData(0));
+                                          (pCalRenderer->getMapUserData(i));
             if (md) {
               dyno->setTexture(i, md->textureID, md->textureMaskID);
               mapDataFound = true;
@@ -266,8 +275,8 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
               // Can't have a missing texture map between units.
               break; 
             }
-	  }
-	}
+          }
+        }
 
         if (mapDataFound){
           if (realloc) {
@@ -279,7 +288,10 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
             textureCoordinateCount = pCalRenderer->getTextureCoordinates(0, texture_ptr);
             dyno->releaseTextureDataPtr();
           }
-          assert(textureCoordinateCount == vertexCount);
+          if (textureCoordinateCount == -1) {
+            // Need to ignore the texture buffer
+          }
+//          assert(textureCoordinateCount == vertexCount);
         }
       }
     }

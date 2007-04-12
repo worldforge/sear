@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/cal3d/Cal3dModel.cpp: Fix allocation of texture memory when
+	  really required.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* autogen.sh, acinclude.m4, configure.ac, Makefile.am, 
 	  macros/binreloc.m4, macros/guichan.m4, macros/lib3ds.m4,
 	  macros/sdl.m4: Create a directory called macros containing the source
