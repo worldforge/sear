@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.50 2007-03-29 20:11:51 simon Exp $
+// $Id: TextureManager.cpp,v 1.51 2007-04-12 20:01:57 simon Exp $
 
 #include <unistd.h>
 
@@ -230,7 +230,7 @@ void TextureManager::shutdown()
   ReferenceCounter::const_iterator I = m_ref_counter.begin();
   ReferenceCounter::const_iterator Iend = m_ref_counter.end();
   while (I != Iend) {
-    printf("%s\n", getTextureName(I->first).c_str());
+    printf("%s (%d) -> %d\n", getTextureName(I->first).c_str(), I->first,I->second);
     ++I;
   }
 
@@ -531,7 +531,7 @@ void TextureManager::unloadTexture(const std::string &texture_name)
   unsigned int texture_id = m_texture_map[texture_name];
   unloadTexture(m_textures[texture_id]);
   m_textures[texture_id] = 0;
-  m_texture_map[texture_name] = 0;
+//  m_texture_map[texture_name] = 0;
 }
 
 void TextureManager::unloadTexture(GLuint texture_id) {

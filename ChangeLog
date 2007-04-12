@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/TextureManager.cpp: Fix bug in the unload function where the
+	  TextureId was lost.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* environment/TerrainRenderer.cpp: Added missing VBO check.
 
 2007-04-12  Simon Goodall  <simon@worldforge.org>
