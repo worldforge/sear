@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/3ds.cpp: Fix bug where textures were requested, but never 
+	  used or released.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/cal3d/Cal3dModel.cpp: Fix allocation of texture memory when
 	  really required.
 

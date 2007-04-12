@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.69 2007-04-12 13:46:01 simon Exp $
+// $Id: 3ds.cpp,v 1.70 2007-04-12 15:01:42 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -531,17 +531,19 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
                                                          KEY_texture_map_0);
           texture_id = RenderSystem::getInstance().requestTexture(name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
+          assert(texture_id != 0);
         } else if ( mat->texture1_map.name[0]) {
           texture_id = RenderSystem::getInstance().requestTexture(
                                                           mat->texture1_map.name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(
                                                   mat->texture1_map.name, true);
+          assert(texture_id != 0);
         } else { 
           // Do nothing, use default vals
         }
       }
       // Request default texture to keep the reference counting happy.
-      if (texture_id == 0) {
+      if (mesh->texels && texture_id == 0) {
         texture_id = RenderSystem::getInstance().requestTexture("default_texture");
         texture_mask_id = RenderSystem::getInstance().requestTexture("default_texture", true);
       }
