@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* src/client.cpp: Fixed a bug where attempting to create an account when
+	  already logged in would hit an assert.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* src/MediaManager.cpp: Read tempwfut.xml to avoid re-downloading
 	  existing files. Clear the updates list each time /check_for_updates
 	  is called.

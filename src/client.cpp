@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.87 2006-12-12 22:31:15 simon Exp $
+// $Id: client.cpp,v 1.88 2007-04-12 13:43:55 simon Exp $
 
 #include "System.h"
 
@@ -210,7 +210,7 @@ int Client::createAccount(const std::string &username, const std::string &fullna
     m_system->pushMessage("Error: Already logging in", CONSOLE_MESSAGE);
     return 1;
   }
-  if (m_status > CLIENT_STATUS_LOGGED_IN) {
+  if (m_status >= CLIENT_STATUS_LOGGED_IN) {
     m_system->pushMessage("Error: Already logged in", CONSOLE_MESSAGE);
     return 1;
   }
