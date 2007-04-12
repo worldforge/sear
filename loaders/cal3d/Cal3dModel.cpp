@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.53 2007-04-12 14:14:44 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.54 2007-04-12 17:30:10 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -114,7 +114,7 @@ int Cal3dModel::init(Cal3dCoreModel *core_model) {
     // attach all meshes to the model
     for(int meshId = 0; meshId < m_core_model->getCalCoreModel()->getCoreMeshCount(); ++meshId) {
       m_calModel->attachMesh(meshId);
-      m_attached_meshes[meshId]++;
+//      m_attached_meshes[meshId]++;
     }
     m_calModel->setMaterialSet(0);
   }
@@ -512,6 +512,8 @@ void Cal3dModel::entityWorn(const std::string &where, WorldEntity *we) {
   const std::string key = /*where + "_" +*/ type;
 
   // Get meshes and materials
+  if (!m_core_model->m_appearance_config.find(key)) return;
+
   const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(key);
   varconf::sec_map::const_iterator I = sec.begin();
   varconf::sec_map::const_iterator Iend = sec.end();
@@ -565,6 +567,7 @@ void Cal3dModel::entityWorn(WorldEntity *we) {
 
 
   // Get meshes and materials
+  if (!m_core_model->m_appearance_config.find(type)) return;
   const varconf::sec_map &sec = m_core_model->m_appearance_config.getSection(type);
   varconf::sec_map::const_iterator I = sec.begin();
   varconf::sec_map::const_iterator Iend = sec.end();
