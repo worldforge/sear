@@ -1,5 +1,9 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* environment/TerrainRenderer.cpp: Added missing VBO check.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/cal3d/Cal3dModel.cpp: Fixed bug that caused models with n
 	  appearance map, but the entity has an outfit property to become
 	  invisible when it was updated. Added some checks in the entityWorn

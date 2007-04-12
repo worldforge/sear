@@ -575,9 +575,11 @@ void TerrainRenderer::contextDestroyed(bool check) {
   m_displayLists.clear();
  
   if (check) {
-    if (glIsBufferARB(m_lineIndeces_vbo)) {
-       glDeleteBuffersARB(1, &m_lineIndeces_vbo);
-     }
+    if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
+      if (glIsBufferARB(m_lineIndeces_vbo)) {
+         glDeleteBuffersARB(1, &m_lineIndeces_vbo);
+      }
+    }
   }
   m_lineIndeces_vbo = 0;
  
