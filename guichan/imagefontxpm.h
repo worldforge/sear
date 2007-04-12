@@ -94,7 +94,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
      * line in the image. However, these vertical lines must be of one pixel
      * size!
      */
-    class GCN_CORE_DECLSPEC ImageFontXPM: public Font, public OpenGLSDLImageLoader
+    class ImageFontXPM: public Font, public OpenGLSDLImageLoader
     {
     public:
 

@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/imagefontxpm.h: Removed guichan export tag on class as it
+	  is not required for Sear.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, README: Update required Guichan version text.
 
 	* guichan/imagefontxpm.cpp, guichan/imagefontxpm.h: Created a copy of
