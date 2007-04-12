@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.68 2007-04-01 19:00:21 simon Exp $
+// $Id: 3ds.cpp,v 1.69 2007-04-12 13:46:01 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -266,7 +266,6 @@ int ThreeDS::init(const std::string &file_name) {
   // Calculate initial positions
   lib3ds_file_eval(model,1);
   if (model->nodes == NULL) {
-    if (debug) printf("[3ds] Rendering Meshes direct\n");
     render_file(model);
   } else {
     for (Lib3dsNode *n = model->nodes; n != NULL; n = n->next) {

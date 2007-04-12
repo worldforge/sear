@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.44 2007-04-01 19:00:21 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.45 2007-04-12 13:46:02 simon Exp $
 
 #include <string>
 
@@ -355,7 +355,6 @@ void Cal3dCoreModel::varconf_callback(const std::string &section, const std::str
         // Get animation name
         const std::string &k = key.substr(KEY_animation.size() + 1);
         // Add pair to map.
-        if (debug) printf("[Debug:Cal3d]Adding animation: %s %s %f\n", section.c_str() , k.c_str(), (double)temp);
         m_anims[sec].push_back(AnimWeight(k, (double)temp));
       }
     }

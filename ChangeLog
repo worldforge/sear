@@ -1,5 +1,10 @@
 2007-04-12  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/3ds.cpp, loaders/cal3d/Cal3dCoreModel.cpp, src/Console.cpp:
+	  Removed some debugging output that is not really required.
+
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
 	* src/client.cpp: Fixed a bug where attempting to create an account when
 	  already logged in would hit an assert.
 

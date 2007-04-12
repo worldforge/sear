@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.40 2007-03-04 14:28:40 simon Exp $
+// $Id: Console.cpp,v 1.41 2007-04-12 13:46:01 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -406,7 +406,7 @@ void Console::vHandleInput(const SDLKey &KeySym, const Uint16 &UnicodeCharacter)
 }
 
 void Console::registerCommand(const std::string &command, ConsoleObject *object) {
-  if (debug) Log::writeLog(std::string("Registering: ") + command, Log::LOG_INFO);
+//  if (debug) Log::writeLog(std::string("Registering: ") + command, Log::LOG_INFO);
   // Assign the ConsoleObject to the command
   assert(m_registered_commands.find(command) == m_registered_commands.end());
   m_registered_commands[command] = object;
