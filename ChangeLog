@@ -1,3 +1,9 @@
+2007-04-12  Simon Goodall  <simon@worldforge.org>
+
+	* src/MediaManager.cpp: Read tempwfut.xml to avoid re-downloading
+	  existing files. Clear the updates list each time /check_for_updates
+	  is called.
+
 2007-04-01  Simon Goodall  <sear@simongoodall.co.uk>
 
 	* loaders/ParticleSystem.cpp: Release texture handles.

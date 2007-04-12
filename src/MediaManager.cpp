@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.3 2007-03-29 20:11:51 simon Exp $
+// $Id: MediaManager.cpp,v 1.4 2007-04-12 13:42:22 simon Exp $
 
 #include <sigc++/connection.h>
 #include <sigc++/bind.h>
@@ -39,7 +39,8 @@
 */
 static const bool debug = true;
 
-static const std::string WFUT_XML = "wfut.xml";
+static const std::string STR_wfut_xml = "wfut.xml";
+static const std::string STR_tempwfut = "tempwfut.xml";
 
 // Configuration file keys
 static const std::string SECTION_media = "media";
@@ -61,6 +62,7 @@ static const std::string CMD_enable_updates = "enable_updates";
 static const std::string CMD_disable_updates = "disable_updates";
 static const std::string CMD_download_file = "download_file";
 static const std::string CMD_download_updates = "download_updates";
+
 
 static void recordUpdate(const WFUT::FileObject &fo, const std::string &tmpfile) {
   FILE *fp = 0;
@@ -180,8 +182,9 @@ void MediaManager::runCommand(const std::string &command, const std::string &arg
       System::instance()->getFileHandler()->expandString(path);
 
       // Connect up the signal handlers
-      m_wfut.DownloadComplete.connect(sigc::bind(sigc::ptr_fun(::onDownloadComplete), m_updates_list, &m_local_list, path + "/tempwfut.xml"));
-//      m_wfut.DownloadComplete.connect(sigc::ptr_fun(::onDownloadComplete));
+      // TODO: This is a bit of a signal handler leak here....
+      m_wfut.DownloadComplete.connect(sigc::bind(sigc::ptr_fun(::onDownloadComplete), m_updates_list, &m_local_list, path + "/" + STR_tempwfut));
+
       m_wfut.updateChannel(m_updates_list, m_server_root + "/" + m_channel_name, path);
     }
   }
@@ -250,13 +253,35 @@ MediaManager::MediaStatus MediaManager::checkFile(const std::string &filename, M
 int MediaManager::checkForUpdates() {
   assert(m_initialised == true);
 
-  std::string local_wfut = m_local_root + "/" + m_channel_name + "/" + WFUT_XML; 
+  std::string local_wfut = m_local_root + "/" + m_channel_name + "/" + STR_wfut_xml; 
   System::instance()->getFileHandler()->getFilePath(local_wfut);
   if (debug) printf("[MediaManager] Local WFUT: %s\n", local_wfut.c_str());
   
   m_wfut.getLocalList(local_wfut, m_local_list);
 
-  std::string system_wfut = m_system_root + "/" + m_channel_name + "/" + WFUT_XML; 
+
+  // Look for tmpwfut file. If it exists, update the local files list.
+  std::string local_path = m_local_root + "/" + m_channel_name + "/";
+  System::instance()->getFileHandler()->getFilePath(local_path);
+
+  const std::string &tmp_wfut = local_path  + "/" + STR_tempwfut;
+  if (debug) printf("Tmp wfut: %s\n", tmp_wfut.c_str());
+
+  WFUT::ChannelFileList tmplist;
+  if (WFUT::os_exists(tmp_wfut)) {
+    if (m_wfut.getLocalList(tmp_wfut, tmplist)) {
+      fprintf(stderr, "Error reading tmpwfut.xml file\n");
+    } else {
+      const WFUT::FileMap &fm = tmplist.getFiles();
+      WFUT::FileMap::const_iterator I = fm.begin();
+      WFUT::FileMap::const_iterator Iend = fm.end();
+      for (; I != Iend; ++I) {
+        m_local_list.addFile(I->second);
+      }
+    }
+  }
+
+  std::string system_wfut = m_system_root + "/" + m_channel_name + "/" + STR_wfut_xml; 
   System::instance()->getFileHandler()->getFilePath(system_wfut);
   if (debug) printf("[MediaManager] System WFUT: %s\n", system_wfut.c_str());
   
@@ -265,7 +290,7 @@ int MediaManager::checkForUpdates() {
   // No need to download server list, or calculate updates if we do not want any
   if (!m_updates_enabled) return 0;
  
-  const std::string &server_wfut = m_server_root + "/" + m_channel_name + "/" + WFUT_XML;
+  const std::string &server_wfut = m_server_root + "/" + m_channel_name + "/" + STR_wfut_xml;
   if (debug) printf("[MediaManager] Server WFUT: %s\n", server_wfut.c_str());
   if (m_wfut.getFileList(server_wfut, m_server_list)) {
     // Error getting server list
@@ -273,12 +298,13 @@ int MediaManager::checkForUpdates() {
   }
 
   if (debug) printf("[MediaManager] Calculating Updates\n");
-  if (m_wfut.calculateUpdates(m_server_list, m_system_list, m_local_list, m_updates_list, m_local_root + "/" + m_channel_name)) {
+  m_updates_list.clear();
+  if (m_wfut.calculateUpdates(m_server_list, m_system_list, m_local_list, m_updates_list, local_path)) {
     // Error!
     fprintf(stderr, "[MediaManager] Error Calculating Updates\n");
     return 1;
   }
- 
+
   return 0;
 }
 
