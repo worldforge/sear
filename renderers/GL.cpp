@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.165 2007-03-04 14:28:40 simon Exp $
+// $Id: GL.cpp,v 1.166 2007-04-14 11:57:41 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -654,22 +654,22 @@ inline void GL::newLine() {
 
 void GL::getScreenCoords(int & x, int & y, double z_offset)
 {
-    GLint viewport[4];
+  GLint viewport[4];
 
-    GLdouble mvmatrix[16], projmatrix[16];
+  GLdouble mvmatrix[16], projmatrix[16];
 
-    GLdouble wx, wy, wz;  /*  returned window x, y, z coords  */
+  GLdouble wx, wy, wz;  /*  returned window x, y, z coords  */
 
-    glGetIntegerv (GL_VIEWPORT, viewport);
-    glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
-    glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
+  glGetIntegerv (GL_VIEWPORT, viewport);
+  glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
+  glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
 
-    gluProject (0, 0, z_offset, mvmatrix, projmatrix, viewport, &wx, &wy, &wz);
+  gluProject (0, 0, z_offset, mvmatrix, projmatrix, viewport, &wx, &wy, &wz);
 
-    x = (int)wx;
-    y = (int)wy;
+  x = (int)wx;
+  y = (int)wy;
 
-    // std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
+  // std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
 }
 
 void GL::drawTextRect(int x, int y, int width, int height, int texture) {
@@ -1026,8 +1026,9 @@ inline void GL::scaleObject(float scale) {
 }
 
 void GL::setViewMode(int type) {
+  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   if (type == CAMERA) {
-    if (RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->getType() == Camera::CAMERA_ISOMETRIC) 
+    if (cam->getType() == Camera::CAMERA_ISOMETRIC) 
       type = ISOMETRIC;
     else type = PERSPECTIVE;
   }
@@ -1041,7 +1042,11 @@ void GL::setViewMode(int type) {
   
       // Calculate The Aspect Ratio Of The Window
       //gluPerspective(m_fov,(GLfloat)m_width/(GLfloat)m_height, m_near_clip, m_far_clip_dist);
-      glOrtho(-10,10,-10,10,-10,m_far_clip_dist);
+      double region = cam->getDistance();
+      double far_clip = 100.0;
+      double near_clip = -100.0;
+      double aspect =  (double)m_width / (double)m_height;
+      glOrtho(-region * aspect, region * aspect, -region, region, near_clip, far_clip);//cam->getDistance());
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       break;

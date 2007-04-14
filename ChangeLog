@@ -1,5 +1,10 @@
 2007-04-14  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp: Fix isometric mode so that the aspect ratio is 
+	  correct and hook up the camera distance.
+
+2007-04-14  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/SearObject.cpp: Fix bug where the incorrect number of faces
 	  was read in.
 
