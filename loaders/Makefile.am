@@ -29,6 +29,7 @@ libModelLoader_a_SOURCES = \
 	StaticObject.cpp StaticObject.h \
 	DynamicObject.cpp DynamicObject.h \
 	SearObject.cpp SearObject.h SearObjectTypes.h \
-	SearObject_Loader.cpp SearObject_Loader.h
+	SearObject_Loader.cpp SearObject_Loader.h \
+	StaticObjectFunctions.cpp StaticObjectFunctions.h
 	
 	

@@ -1,5 +1,15 @@
 2007-04-14  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/StaticObjectFunctions.cpp, loaders/StaticObjectFunctions.h,
+	  loaders/Makefile.am, loaders/3ds.cpp, loaders/LibModelFile.cpp,
+	  loaders/SearObject.cpp: Moved the duplicated scale_object functions
+	  into a single code file.  Added a few more scaling and alignment 
+	  options (although not all are implemented yet).
+
+	* loaders/StaticObject.h: Include missing header.
+
+2007-04-14  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp: Fix isometric mode so that the aspect ratio is 
 	  correct and hook up the camera distance.
 
