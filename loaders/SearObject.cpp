@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.4 2007-04-01 19:00:21 simon Exp $
+// $Id: SearObject.cpp,v 1.5 2007-04-14 11:26:12 simon Exp $
 
 #include  <stdio.h>
 
@@ -233,7 +233,7 @@ int SearObject::init(const std::string &file_name) {
       return 1;
     }
   } else {
-    fprintf(stderr, "[SearObject] Error reading %s as varconf file. Trying as SwearObject file.\n", file_name.c_str());
+    fprintf(stderr, "[SearObject] Error reading %s as varconf file. Trying as SearObject file.\n", file_name.c_str());
     object = file_name;
   }
 
@@ -487,7 +487,7 @@ int SearObject::load(const std::string &filename) {
 
     if (som.num_faces > 0) {
       so->createIndices(som.num_faces * 3);
-      fread(so->getIndicesPtr(), sizeof(uint32_t), som.num_vertices * 2, fp);
+      fread(so->getIndicesPtr(), sizeof(uint32_t), som.num_faces * 3, fp);
       if (big_endian) {
         uptr = (uint32_t*)so->getIndicesPtr();
         c = som.num_faces * 3;
