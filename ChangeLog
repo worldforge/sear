@@ -1,3 +1,8 @@
+2007-04-15  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/Render.h, renderers/GL.cpp, renderers/GL.h,
+	  renderers/Frustum.cpp, renderers/Frustum.h: Make some functions const.
+
 2007-04-14  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/StaticObjectFunctions.cpp, loaders/StaticObjectFunctions.h,

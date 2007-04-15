@@ -41,7 +41,8 @@ class Console;
 class GL : public Render, public sigc::trackable {
 public:
   GL();
-  ~GL();
+  virtual ~GL();
+
   void init();
   void shutdown();
   bool isInitialised() const { return m_initialised; }
@@ -53,8 +54,8 @@ public:
   void destroyWindow();
   void toggleFullscreen();
 
-  void registerCommands(Console *console) {}
-  void runCommands(const std::string &command) {}
+  void registerCommands(Console *console) const {}
+  void runCommands(const std::string &command) const {}
 
 private:
 
@@ -76,16 +77,16 @@ public:
   void shutdownFont(bool check);
   void print(int x, int y, const char*, int set);
   void print3D(const char* string, int set);
-  inline void newLine();
+  inline void newLine() const;
 
-  void getScreenCoords(int & x, int & y, double z_offset);
+  void getScreenCoords(int & x, int & y, double z_offset) const;
 
   void buildColourSet();
-  void drawTextRect(int, int, int, int, int);
-  float distFromNear(float,float,float);  
-  void setColour(float red, float green, float blue, float alpha) { glColor4f(red, green, blue, alpha); }
+  void drawTextRect(int, int, int, int, int) const;
+  float distFromNear(float,float,float) const;
+  void setColour(float red, float green, float blue, float alpha) const { glColor4f(red, green, blue, alpha); }
 
-  int axisBoxInFrustum(const WFMath::AxisBox<3> &bbox);
+  int axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) const;
   
   void procEvent(int, int);
   int getWindowWidth() const { return m_width; }
@@ -99,15 +100,15 @@ public:
   void writeConfig(varconf::Config &config);
   void setupStates();
 
-  float getLightLevel() { return m_light_level; }
+  float getLightLevel() const { return m_light_level; }
 
-  void translateObject(float x, float y, float z);
-  void rotate(float angle, float x, float y, float z);
-  inline void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>);
-  inline void scaleObject(float scale);
-  void setViewMode(int type);
-  void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive);
-  void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture);
+  void translateObject(float x, float y, float z) const;
+  void rotate(float angle, float x, float y, float z) const;
+  inline void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) const;
+  inline void scaleObject(float scale) const;
+  void setViewMode(int type) const;
+  void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) const;
+  void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) const;
   void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
@@ -120,12 +121,12 @@ public:
                    bool select_mode);
 
  
-  void store() { glPushMatrix(); }
-  void restore() { glPopMatrix(); }
+  void store() const { glPushMatrix(); }
+  void restore() const { glPopMatrix(); }
   void beginFrame();
   void endFrame(bool select_mode);
   void drawSplashScreen();
-  void applyQuaternion(const WFMath::Quaternion & quaternion);
+  void applyQuaternion(const WFMath::Quaternion & quaternion) const;
   void applyLighting();
   inline void resetSelection();
   inline void renderActiveName();

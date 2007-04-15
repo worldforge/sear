@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Frustum.cpp,v 1.6 2006-07-10 16:53:48 simon Exp $
+// $Id: Frustum.cpp,v 1.7 2007-04-15 19:13:11 simon Exp $
 
 #include "common/Utility.h"
 
@@ -16,7 +16,7 @@
 #endif
 namespace Sear {
 
-void Frustum::getFrustum(float frustum[6][4], float proj[16], float modl[16]) {
+void Frustum::getFrustum(float frustum[6][4], const float proj[16], const float modl[16]) {
   float   clip[16];
   float   t;
   
@@ -117,7 +117,7 @@ void Frustum::getFrustum(float frustum[6][4], float proj[16], float modl[16]) {
    frustum[5][3] /= t;
 }
 
-bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
+bool Frustum::pointInFrustum(const float frustum[6][4], float x, float y, float z ) {
   int p;
   for( p = 0; p < 6; ++p)
     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ) return false;
@@ -132,7 +132,7 @@ bool Frustum::pointInFrustum(float frustum[6][4], float x, float y, float z ) {
 //  return axisBoxInFrustum(frustum, entity_bbox.moveCenterTo(pos));
 //}
 
-int Frustum::axisBoxInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox) {  
+int Frustum::axisBoxInFrustum(const float frustum[6][4], const WFMath::AxisBox<3> &bbox) {  
   int c;
   int c2 = 0;
 
@@ -152,15 +152,15 @@ int Frustum::axisBoxInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbo
   return (c2 == 6) ? 2 : 1;
 }
 
-float Frustum::distFromNear(float frustum[6][4], float x, float y, float z) {
+float Frustum::distFromNear(const float frustum[6][4], float x, float y, float z) {
   return (frustum[5][0] * x + frustum[5][1] * y + frustum[5][2] * z + frustum[5][3]);
 }
 
-bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos, const WFMath::Quaternion &orient) {
+bool Frustum::sphereInFrustum(const float frustum[6][4], const WFMath::AxisBox<3> &bbox, const WFMath::Point<3> &pos, const WFMath::Quaternion &orient) {
 
   // Rotate bbox corners into world coord space.
-  WFMath::Vector<3> lv = WFMath::Vector<3>(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z()).rotate(orient);
-  WFMath::Vector<3> hv = WFMath::Vector<3>(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z()).rotate(orient);
+  const WFMath::Vector<3> &lv = WFMath::Vector<3>(bbox.lowCorner().x(), bbox.lowCorner().y(), bbox.lowCorner().z()).rotate(orient);
+  const WFMath::Vector<3> &hv = WFMath::Vector<3>(bbox.highCorner().x(), bbox.highCorner().y(), bbox.highCorner().z()).rotate(orient);
 
   // Create a new bbox based on rotated corners
   WFMath::AxisBox<3> b = WFMath::AxisBox<3>(WFMath::Point<3>(lv.x(), lv.y(), lv.z()), WFMath::Point<3>(hv.x(), hv.y(), hv.z()));
@@ -173,7 +173,7 @@ bool Frustum::sphereInFrustum(float frustum[6][4], const WFMath::AxisBox<3> &bbo
 }
 
 
-bool Frustum::ballInFrustum(float frustum[6][4], const WFMath::Ball<3> &ball) {
+bool Frustum::ballInFrustum(const float frustum[6][4], const WFMath::Ball<3> &ball) {
   float x = ball.getCenter().x();
   float y = ball.getCenter().y();
   float z = ball.getCenter().z();
@@ -187,13 +187,13 @@ bool Frustum::ballInFrustum(float frustum[6][4], const WFMath::Ball<3> &ball) {
   return true;
 }
 
-int Frustum::orientBBoxInFrustum(float frustum[6][4], const OrientBBox &orient, const WFMath::Point<3> &pos) {  
+int Frustum::orientBBoxInFrustum(const float frustum[6][4], const OrientBBox &orient, const WFMath::Point<3> &pos) {  
   int c;
   int c2 = 0;
   //Translate BBox to correct position
   OrientBBox n;
   for (int i = 0; i < LAST_POSITION; ++i) {
-    WFMath::Point<3> p = orient.points[i] + pos;
+    const WFMath::Point<3> &p = orient.points[i] + pos;
     n.points[i] = WFMath::Vector<3>(p.x(), p.y(), p.z());
   }
 

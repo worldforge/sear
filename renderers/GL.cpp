@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.166 2007-04-14 11:57:41 simon Exp $
+// $Id: GL.cpp,v 1.167 2007-04-15 19:13:11 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -648,11 +648,11 @@ void GL::print3D(const char *string, int set) {
   glPopMatrix(); // Restore The Old Projection Matrix
 }
 
-inline void GL::newLine() {
+inline void GL::newLine() const {
   glTranslatef(0.0f,  ( FONT_HEIGHT) , 0.0f);
 }
 
-void GL::getScreenCoords(int & x, int & y, double z_offset)
+void GL::getScreenCoords(int & x, int & y, double z_offset) const
 {
   GLint viewport[4];
 
@@ -672,7 +672,7 @@ void GL::getScreenCoords(int & x, int & y, double z_offset)
   // std::cout << "Got screen coords " << x << ":" << y << std::endl << std::flush;
 }
 
-void GL::drawTextRect(int x, int y, int width, int height, int texture) {
+void GL::drawTextRect(int x, int y, int width, int height, int texture) const {
   RenderSystem::getInstance().switchTexture(texture);
   setViewMode(ORTHOGRAPHIC);
   // TODO: make into arrays?
@@ -985,15 +985,15 @@ void GL::setupStates() {
   glEnableClientState(GL_VERTEX_ARRAY);
 }
 
-inline void GL::translateObject(float x, float y, float z) {
+inline void GL::translateObject(float x, float y, float z) const {
   glTranslatef(x, y, z);
 }
 
-inline void GL::rotate(float angle, float x, float y, float z) {
+inline void GL::rotate(float angle, float x, float y, float z) const {
   glRotatef(angle, x, y, z);
 }
 
-void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) {
+void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) const {
   WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
   assert(we != 0);
 
@@ -1021,11 +1021,11 @@ void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_
   }
 }
 
-inline void GL::scaleObject(float scale) {
+inline void GL::scaleObject(float scale) const {
   glScalef(scale, scale, scale);
 }
 
-void GL::setViewMode(int type) {
+void GL::setViewMode(int type) const {
   Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   if (type == CAMERA) {
     if (cam->getType() == Camera::CAMERA_ISOMETRIC) 
@@ -1036,23 +1036,20 @@ void GL::setViewMode(int type) {
   glViewport(0, 0, m_width, m_height);
   switch (type) {
     case ISOMETRIC: {
-      if (m_height == 0) m_height = 1;
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity(); // Reset The Projection Matrix
   
       // Calculate The Aspect Ratio Of The Window
-      //gluPerspective(m_fov,(GLfloat)m_width/(GLfloat)m_height, m_near_clip, m_far_clip_dist);
+      double aspect =  (double)m_width / (double)m_height;
       double region = cam->getDistance();
       double far_clip = 100.0;
       double near_clip = -100.0;
-      double aspect =  (double)m_width / (double)m_height;
-      glOrtho(-region * aspect, region * aspect, -region, region, near_clip, far_clip);//cam->getDistance());
+      glOrtho(-region * aspect, region * aspect, -region, region, near_clip, far_clip);
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       break;
     }
     case PERSPECTIVE: {
-      if (m_height == 0) m_height = 1;
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity(); // Reset The Projection Matrix
   
@@ -1072,8 +1069,9 @@ void GL::setViewMode(int type) {
     }			    
   }	
 }
+
 // TODO put into material manager and use display lists to retrieve them
-void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) {
+void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) const {
   // TODO: set up missing values
   if (ambient)           glMaterialfv (GL_FRONT, GL_AMBIENT,   ambient);
   if (diffuse)           glMaterialfv (GL_FRONT, GL_DIFFUSE,   diffuse);
@@ -1083,7 +1081,7 @@ void GL::setMaterial(float *ambient, float *diffuse, float *specular, float shin
   else                   glMaterialfv (GL_FRONT, GL_EMISSION,  black);
 }
 
-void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) {
+void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data, bool multitexture) const {
  
   if (!vertex_data) {
     Log::writeLog("No Vertex Data", Log::LOG_ERROR);
@@ -1139,8 +1137,6 @@ void GL::renderArrays(unsigned int type, unsigned int offset, unsigned int numbe
 }
 
 void GL::drawQueue(QueueMap &queue, bool select_mode) {
-
-
   QueueMap::const_iterator I = queue.begin();
   QueueMap::const_iterator Iend = queue.end();
   for (; I != Iend; ++I) {
@@ -1266,11 +1262,11 @@ void GL::drawMessageQueue(MessageList &list) {
   }
 }
  
-inline float GL::distFromNear(float x, float y, float z) {
+inline float GL::distFromNear(float x, float y, float z) const {
   return Frustum::distFromNear(m_frustum, x, y, z);
 }
 
-inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) {
+inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) const {
   return Frustum::axisBoxInFrustum(m_frustum, bbox);
 }
 
@@ -1355,7 +1351,7 @@ void GL::drawSplashScreen() {
   setViewMode(PERSPECTIVE);
 }
   
-inline void GL::applyQuaternion(const WFMath::Quaternion & quaternion) {
+inline void GL::applyQuaternion(const WFMath::Quaternion & quaternion) const {
   assert(quaternion.isValid());
   float rotation_matrix[4][4];
   QuatToMatrix(quaternion, rotation_matrix); //Get the rotation matrix for base rotation
@@ -1572,7 +1568,8 @@ void GL::varconf_callback(const std::string &section, const std::string &key, va
 
 std::string GL::getActiveID() const {
   return (m_activeEntity) ? (m_activeEntity->getId()) : ("");
-} 
+}
+
 WorldEntity *GL::getActiveEntity() const {
   return dynamic_cast<WorldEntity*>(m_activeEntity.get());
 } 
@@ -1618,7 +1615,7 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
 
   float z = 1.f;
   glReadPixels (x, y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
-  if (debug) printf("Screen Depth: %f\n", z);
+//  if (debug) printf("Screen Depth: %f\n", z);
   if (!(z < 1.f)) {
       return false;
   }
@@ -1627,7 +1624,7 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
 
   glRotatef(-90.0f, 1.0f, 0.0f, 0.0f);
   m_graphics->setCameraTransform();
-  if (debug) printf("Screen Coord: %d %d %f\n", x, y, z);
+//  if (debug) printf("Screen Coord: %d %d %f\n", x, y, z);
   glGetIntegerv (GL_VIEWPORT, viewport);
   glGetDoublev (GL_MODELVIEW_MATRIX, mvmatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, projmatrix);
@@ -1638,7 +1635,7 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   wy = ty;
   wz = tz;
 
-  if (debug) printf("World Coord: %f %f %f\n", wx, wy, wz);
+//  if (debug) printf("World Coord: %f %f %f\n", wx, wy, wz);
   return true;
 }
 

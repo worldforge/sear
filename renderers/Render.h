@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.20 2007-01-10 17:36:23 simon Exp $
+// $Id: Render.h,v 1.21 2007-04-15 19:13:11 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -66,44 +66,44 @@ typedef std::map<std::string, Queue> QueueOldMap;
 //  virtual void vboMesh(Mesh &mesh)=0;
 //  virtual void cleanVBOMesh(Mesh &mesh) =0;
 
-  virtual void init() =0;
-  virtual void shutdown() =0;
+  virtual void init() = 0;
+  virtual void shutdown() = 0;
   virtual bool isInitialised() const = 0;
 
   virtual int contextCreated() = 0;
   virtual void contextDestroyed(bool check) = 0;
 
-  virtual void print(int x, int y, const char*, int set) =0;
-  virtual void print3D(const char*, int set) =0;
-  virtual void newLine() =0;
+  virtual void print(int x, int y, const char*, int set) = 0;
+  virtual void print3D(const char*, int set) = 0;
+  virtual void newLine() const = 0;
 
-  virtual void getScreenCoords(int & x, int & y, double z_offset) = 0;
+  virtual void getScreenCoords(int & x, int & y, double z_offset) const = 0;
 
-  virtual void store() =0;
-  virtual void restore() =0;
+  virtual void store() const = 0;
+  virtual void restore() const = 0;
  
-  virtual void beginFrame() =0;
-  virtual void endFrame(bool select_mode) =0; 
-  virtual void drawSplashScreen() =0;
-  virtual void applyQuaternion(const WFMath::Quaternion & quaternion) =0;
-  virtual void applyLighting() =0;
-  virtual void resetSelection() =0;
+  virtual void beginFrame() = 0;
+  virtual void endFrame(bool select_mode) = 0;
+  virtual void drawSplashScreen() = 0;
+  virtual void applyQuaternion(const WFMath::Quaternion & quaternion) const = 0;
+  virtual void applyLighting() = 0;
+  virtual void resetSelection() = 0;
   
-  virtual float getLightLevel() =0;
+  virtual float getLightLevel() const =0;
   
   virtual void buildColourSet() =0;
-  virtual void drawTextRect(int, int, int, int, int) =0;
-  virtual void setColour(float red, float blue , float green, float alpha) =0;
+  virtual void drawTextRect(int, int, int, int, int) const = 0;
+  virtual void setColour(float red, float blue , float green, float alpha) const = 0;
 	  
   virtual void procEvent(int, int) = 0;
   virtual int getWindowWidth() const = 0;
   virtual int getWindowHeight() const = 0;
 
-  virtual std::string getActiveID()const =0;
-  virtual WorldEntity * getActiveEntity()const =0;
+  virtual std::string getActiveID()const = 0;
+  virtual WorldEntity * getActiveEntity()const = 0;
 
-  virtual int axisBoxInFrustum(const WFMath::AxisBox<3> &) =0;
-  virtual float distFromNear(float,float,float) =0;
+  virtual int axisBoxInFrustum(const WFMath::AxisBox<3> &) const = 0;
+  virtual float distFromNear(float,float,float) const = 0;
 
   virtual void renderActiveName() =0;
 
@@ -111,13 +111,13 @@ typedef std::map<std::string, Queue> QueueOldMap;
   virtual void readConfig(varconf::Config &config) =0;
   virtual void writeConfig(varconf::Config &config) =0;
 
-  virtual void translateObject(float x, float y, float z) =0;
-  virtual void rotate(float angle, float x, float y, float z) =0;
-  virtual void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) =0;
-  virtual void scaleObject(float scale) =0;
-  virtual void setViewMode(int type) =0;
-  virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) =0;
-  virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
+  virtual void translateObject(float x, float y, float z) const = 0;
+  virtual void rotate(float angle, float x, float y, float z) const = 0;
+  virtual void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) const = 0;
+  virtual void scaleObject(float scale) const = 0;
+  virtual void setViewMode(int type) const = 0;
+  virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) const = 0;
+  virtual void renderArrays(unsigned int type, unsigned int offset, unsigned int number_of_points, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) const = 0;
 //  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode) =0;
 
