@@ -1,15 +1,15 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.18 2007-04-01 19:00:21 simon Exp $
+//$Id: Model.h,v 1.19 2007-04-22 17:45:14 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
 
 #include <map>
 #include <string>
-#include <list>
+#include <vector>
 
 #include <wfmath/vector.h>
 #include <wfmath/quaternion.h>
@@ -17,6 +17,7 @@
 
 #include "renderers/RenderTypes.h"
 #include "loaders/StaticObject.h"
+#include "loaders/DynamicObject.h"
 
 namespace Atlas
 {
@@ -29,8 +30,8 @@ typedef std::map<std::string, Element> MapType;
 
 namespace Sear {
 
-typedef std::list<SPtrShutdown<StaticObject> > StaticObjectList;
-
+typedef std::vector<SPtrShutdown<StaticObject> > StaticObjectList;
+typedef std::vector<SPtrShutdown<DynamicObject> > DynamicObjectList;
 
 typedef struct {
     WFMath::Vector<3> pos;
@@ -43,7 +44,7 @@ class Model {
 public:
   Model() : m_last_time(0) {}
   virtual ~Model() {}
-//  virtual int init() = 0;
+
   virtual int shutdown() = 0;
   virtual bool isInitialised() const = 0;
 
@@ -135,6 +136,9 @@ public:
   virtual bool hasStaticObjects() const { return false; }
   virtual StaticObjectList &getStaticObjects() { return m_static_objects; }
 
+  virtual bool hasDynamicObjects() const { return false; }
+  virtual DynamicObjectList &getDynamicObjects() { return m_dynamic_objects; }
+
   virtual void clearOutfit() {} 
   virtual void entityWorn(const std::string &where, WorldEntity *we) {}
   virtual void entityWorn(WorldEntity *we) {}
@@ -143,6 +147,7 @@ public:
 protected: 
   float m_last_time;
   StaticObjectList m_static_objects;
+  DynamicObjectList m_dynamic_objects;
   
 };
 

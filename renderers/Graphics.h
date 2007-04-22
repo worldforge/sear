@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.17 2006-12-21 20:28:07 simon Exp $
+// $Id: Graphics.h,v 1.18 2007-04-22 17:45:13 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -89,7 +89,8 @@ protected:
   Render::MessageList m_message_list;
   Render::MessageList m_name_list;
  
-  Render::QueueObjectMap m_object_map;
+  Render::QueueStaticObjectMap m_static_object_map;
+  Render::QueueDynamicObjectMap m_dynamic_object_map;
   Render::QueueMatrixMap m_matrix_map;
   Render::QueueStateMap m_state_map;
   Render::QueueOldMap m_queue_old_map;

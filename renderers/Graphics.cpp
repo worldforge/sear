@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.68 2007-04-22 16:37:36 simon Exp $
+// $Id: Graphics.cpp,v 1.69 2007-04-22 17:45:13 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -405,7 +405,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     m_message_list.clear();
     m_name_list.clear();
 
-    m_object_map.clear();
+    m_static_object_map.clear();
+    m_dynamic_object_map.clear();
     m_matrix_map.clear();
     m_state_map.clear();
 
@@ -428,7 +429,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     glPopMatrix();
 
     m_renderer->drawQueue(m_render_queue, select_mode);
-    m_renderer->drawQueue(m_object_map, m_matrix_map, m_state_map, select_mode);
+    m_renderer->drawQueue(m_static_object_map, m_matrix_map, m_state_map, select_mode);
+    m_renderer->drawQueue(m_dynamic_object_map, m_matrix_map, m_state_map, select_mode);
 
     if (!select_mode) {
       m_renderer->drawMessageQueue(m_message_list);
@@ -634,9 +636,9 @@ void Graphics::drawObjectExt(const std::string &model_id,
     modelRec->model->setLastTime(System::instance()->getTimef());
   } 
 
-  const std::string &key = modelRec->id;
-
-  if (model->hasStaticObjects()) {
+  bool has_static = model->hasStaticObjects();
+  bool has_dynamic = model->hasDynamicObjects();
+  if (has_static || has_dynamic) {
  
 // Calculate Transform Matrix //////////////////////////////////////////////////
 
@@ -692,15 +694,19 @@ void Graphics::drawObjectExt(const std::string &model_id,
     mx.setMatrix(m);
 
 ////////////////////////////////////////////////////////////////////////////////
+
+    // We need a different key depending on whether it's a static or dynamic object
+    const std::string &key = (has_static) ? ("static_" + modelRec->id) : ("dynamic_" + obj_we->getId() + modelRec->id);
+
     m_matrix_map[key].push_back(Render::MatrixEntityItem(mx, obj_we));
     if (m_state_map.find(key) == m_state_map.end()) {
       m_state_map[key] = state;
-      m_object_map[key] = model->getStaticObjects();
+      if (has_static)  m_static_object_map[key]  = model->getStaticObjects();
+      if (has_dynamic) m_dynamic_object_map[key] = model->getDynamicObjects();
     }
   } else {
     // Add to queue by state, then model record
     render_queue[state].push_back(Render::QueueItem(obj, modelRec));
-    // m_queue_old_map[key].push_back(Render::QueueItem(obj, modelRec));
   }
 
   // Add attached objects to the render queues.

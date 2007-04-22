@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #include <cassert>
 
@@ -162,15 +162,10 @@ void StaticObject::render(bool select_mode) const {
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
   glPushMatrix();
   // Set transform
-//  float m[4][4];
-//  m_matrix.getMatrix(m);
-//  glMultMatrixf(&m[0][0]);
   glMultMatrixf(m_matrix.getMatrix());
 
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();
-//  m_tex_matrix.getMatrix(m);
-//  glMultMatrixf(&m[0][0]);
   glMultMatrixf(m_tex_matrix.getMatrix());
   glMatrixMode(GL_MODELVIEW);
     
@@ -420,17 +415,14 @@ int StaticObject::save(const std::string &filename) {
   return 0;
 }
 
-void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, WorldEntity*> > &positions) const {
+void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, WorldEntity*> > &positions) const {
   assert(m_initialised == true);
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
   assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
 
   // Setup texture transform
-//  float m[4][4];
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();
-//  m_tex_matrix.getMatrix(m);
-//  glMultMatrixf(&m[0][0]);
   glMultMatrixf(m_tex_matrix.getMatrix());
   glMatrixMode(GL_MODELVIEW);
 
@@ -478,8 +470,9 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
     }
 
     /// Loop through each matrix here and do the render
-    std::list<std::pair<Matrix,WorldEntity*> >::const_iterator I = positions.begin();
-    while (I != positions.end()) {
+    std::vector<std::pair<Matrix,WorldEntity*> >::const_iterator I = positions.begin();
+    std::vector<std::pair<Matrix,WorldEntity*> >::const_iterator Iend = positions.end();
+    while (I != Iend) {
       const Matrix &mx = (*I).first;
       WorldEntity *we = (*I).second;
 
@@ -490,12 +483,8 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       glPushMatrix();
       // Set transform
       // Apply position transform 
-  //    mx.getMatrix(m);
-//      glMultMatrixf(&m[0][0]);
       glMultMatrixf(mx.getMatrix());
       // Apply mesh transform
-//      m_matrix.getMatrix(m);
-//      glMultMatrixf(&m[0][0]);
       glMultMatrixf(m_matrix.getMatrix());
 
       // Do we need to highlight this mesh?
@@ -517,7 +506,7 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
           glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
           if (m_indices) {
-             glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, m_num_faces * 3, GL_UNSIGNED_INT, 0);
           } else  {
             glDrawArrays(GL_TRIANGLES, 0, m_num_points);
           }
@@ -539,12 +528,16 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       } else { // Render object normaly
         GLboolean blend_enabled = true;
         GLboolean cmat_enabled = true;
+        bool reset_colour = false;
         if (!select_mode && we->getFade() < 1.0f) {
           glGetBooleanv(GL_BLEND, &blend_enabled);
           glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
           if (!blend_enabled) glEnable(GL_BLEND);
+          // TODO: Why does this appear to be enabled for far too long?
+          // Is the state being kept too long, or more likely is the Fade value somehow broken?
           if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
           glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+          reset_colour = true;
         }
 
         if (m_indices) {
@@ -555,6 +548,7 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
 
         if (!blend_enabled) glDisable(GL_BLEND);
         if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
+        if (reset_colour)   glColor4fv(white);
       }
 
       glPopMatrix();
@@ -715,8 +709,9 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
     glCallList(disp);
 
     /// Loop through each matrix here and do the render
-    std::list<std::pair<Matrix, WorldEntity*> >::const_iterator I = positions.begin();
-    while (I != positions.end()) {
+    std::vector<std::pair<Matrix, WorldEntity*> >::const_iterator I = positions.begin();
+    std::vector<std::pair<Matrix, WorldEntity*> >::const_iterator Iend = positions.end();
+    while (I != Iend) {
       const Matrix &mx = (*I).first;
       WorldEntity *we = (*I).second;
 
@@ -729,12 +724,8 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       glPushMatrix();
       // Set transform
       // Apply position transform 
-//      mx.getMatrix(m);
-//      glMultMatrixf(&m[0][0]);
       glMultMatrixf(mx.getMatrix());
       // Apply mesh transform
-//      m_matrix.getMatrix(m);
-//      glMultMatrixf(&m[0][0]);
       glMultMatrixf(m_matrix.getMatrix());
 
       // Render stuff
@@ -754,18 +745,21 @@ void StaticObject::render(bool select_mode, const std::list<std::pair<Matrix, Wo
       } else { // No outlining
         GLboolean blend_enabled = true;
         GLboolean cmat_enabled = true;
+        bool reset_colour = false;
         if (!select_mode && we->getFade() < 1.0f) {
           glGetBooleanv(GL_BLEND, &blend_enabled);
           glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
           if (!blend_enabled) glEnable(GL_BLEND);
           if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
           glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
+          reset_colour = true;
         }
 
         glCallList(disp + 2);
 
         if (!blend_enabled) glDisable(GL_BLEND);
         if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
+        if (reset_colour)   glColor4fv(white);
 
       }
 

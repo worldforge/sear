@@ -87,7 +87,10 @@ public:
 
     void setTextureName(const std::string& nm);
     void setBBox(const WFMath::AxisBox<3>& bb);
-    
+   
+   virtual bool hasDynamicObjects() const { return true; }
+   virtual DynamicObjectList &getDynamicObjects() { return m_dos; }
+ 
 private:
   friend class Particle;
   friend class ParticleSystemLoader;
@@ -129,7 +132,7 @@ private:
   Color_4d m_initialColors[2];
   Color_4d m_finalColors[2];
 
-  SPtrShutdown<DynamicObject> m_do;
+  DynamicObjectList m_dos;
 };
 
 } // of namespace Sear

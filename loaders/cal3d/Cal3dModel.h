@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.30 2007-04-01 19:00:21 simon Exp $
+// $Id: Cal3dModel.h,v 1.31 2007-04-22 17:45:15 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -76,6 +76,9 @@ public:
   void entityWorn(WorldEntity *we);
   void entityRemoved(WorldEntity *we);
 
+  virtual bool hasDynamicObjects() const { return true; }
+  virtual DynamicObjectList &getDynamicObjects() { return m_dos; }
+
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
 
@@ -87,8 +90,7 @@ private:
 
   float m_rotate;
   std::string m_cur_anim;
-  typedef std::vector<SPtrShutdown<DynamicObject> > DOVec;
-  DOVec m_dos;
+  DynamicObjectList m_dos;
 
   std::vector<int> m_attached_meshes;
 

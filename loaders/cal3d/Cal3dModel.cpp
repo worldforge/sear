@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.54 2007-04-12 17:30:10 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.55 2007-04-22 17:45:15 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -163,7 +163,7 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
         SPtrShutdown<DynamicObject> dyno = m_dos[++counter];
         if (!dyno.isValid()) {
-          dyno = SPtrShutdown<DynamicObject>(new DynamicObject);
+          dyno = SPtrShutdown<DynamicObject>(new DynamicObject());
           dyno->init();
           dyno->contextCreated();
           m_dos[counter] = dyno;
@@ -202,6 +202,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
           shininess = pCalRenderer->getShininess();
           dyno->setShininess(shininess);
+  
+          dyno->getMatrix().rotateZ(-m_rotate / 180.0 * WFMath::Pi);
+//  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
         }
 
         // get the transformed vertices of the submesh
@@ -301,11 +304,11 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
 void Cal3dModel::render(bool select_mode) {
   // TODO Make this into a matrix?
-  Render *render = RenderSystem::getInstance().getRenderer();
-  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
+//  Render *render = RenderSystem::getInstance().getRenderer();
+//  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
 
-  DOVec::iterator I = m_dos.begin();
-  DOVec::const_iterator Iend = m_dos.end();
+  DynamicObjectList::iterator I = m_dos.begin();
+  DynamicObjectList::const_iterator Iend = m_dos.end();
   while (I != Iend) {
     SPtrShutdown<DynamicObject> dyno = *I++;
     dyno->render(select_mode);
@@ -474,8 +477,8 @@ void Cal3dModel::removeAnimation(const Cal3dCoreModel::WeightList &list) {
 }
 
 void Cal3dModel::contextCreated() {
-  DOVec::const_iterator I = m_dos.begin();
-  DOVec::const_iterator Iend = m_dos.end();
+  DynamicObjectList::const_iterator I = m_dos.begin();
+  DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
     SPtrShutdown<DynamicObject> so = *I;
     assert(so);
@@ -484,8 +487,8 @@ void Cal3dModel::contextCreated() {
 }
 
 void Cal3dModel::contextDestroyed(bool check) {
-  DOVec::const_iterator I = m_dos.begin();
-  DOVec::const_iterator Iend = m_dos.end();
+  DynamicObjectList::const_iterator I = m_dos.begin();
+  DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
     SPtrShutdown<DynamicObject> so = *I;
     assert(so);

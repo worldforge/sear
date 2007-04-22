@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.167 2007-04-15 19:13:11 simon Exp $
+// $Id: GL.cpp,v 1.168 2007-04-22 17:45:12 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1639,32 +1639,73 @@ bool GL::getWorldCoords(int x, int y, float &wx, float &wy, float &wz) {
   return true;
 }
 
-void GL::drawQueue(const QueueObjectMap &object_map,
+void GL::drawQueue(const QueueStaticObjectMap &object_map,
 	           const QueueMatrixMap &matrix_map,
                    const QueueStateMap &state_map,
                    bool select_mode) {
 
-  QueueObjectMap::const_iterator I = object_map.begin();
-  QueueObjectMap::const_iterator Iend = object_map.end();
+  QueueStaticObjectMap::const_iterator I = object_map.begin();
+  QueueStaticObjectMap::const_iterator Iend = object_map.end();
   while (I != Iend) {
     // Get object id 
     const std::string &key = I->first;
 
     // Store ref to object list
-    const std::list<SPtrShutdown<StaticObject> > &objects = I->second;
+    const StaticObjectList &objects = I->second;
 
     // Get ref to matrix list
     assert(matrix_map.find(key) != matrix_map.end());
-    const std::list<MatrixEntityItem> &matrices = matrix_map.find(key)->second;
+    const MatrixEntityList &matrices = matrix_map.find(key)->second;
 
     // Switch to the appropriate render list.
     assert(state_map.find(key) != state_map.end());
     RenderSystem::getInstance().switchState(state_map.find(key)->second);
 
-    std::list<SPtrShutdown<StaticObject> >::const_iterator J = objects.begin();
-    std::list<SPtrShutdown<StaticObject> >::const_iterator Jend = objects.end();
+    StaticObjectList::const_iterator J = objects.begin();
+    StaticObjectList::const_iterator Jend = objects.end();
     while (J != Jend) {
       (*J++)->render(select_mode, matrices);
+    }
+    ++I;
+  }
+}
+
+void GL::drawQueue(const QueueDynamicObjectMap &object_map,
+	           const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode) {
+
+  QueueDynamicObjectMap::const_iterator I = object_map.begin();
+  QueueDynamicObjectMap::const_iterator Iend = object_map.end();
+  while (I != Iend) {
+    // Get object id 
+    const std::string &key = I->first;
+
+    // Store ref to object list
+    const DynamicObjectList &objects = I->second;
+
+    // Get ref to matrix list
+    assert(matrix_map.find(key) != matrix_map.end());
+    const MatrixEntityList &matrices = matrix_map.find(key)->second;
+
+    // Switch to the appropriate render list.
+    assert(state_map.find(key) != state_map.end());
+    RenderSystem::getInstance().switchState(state_map.find(key)->second);
+
+    MatrixEntityList::const_iterator K = matrices.begin();
+    MatrixEntityList::const_iterator Kend = matrices.end();
+    while (K != Kend) {
+      const Matrix &mx = (*K++).first;
+      glPushMatrix();
+      glMultMatrixf(mx.getMatrix());
+
+      DynamicObjectList::const_iterator J = objects.begin();
+      DynamicObjectList::const_iterator Jend = objects.end();
+      while (J != Jend) {
+  //      (*J++)->render(select_mode, matrices);
+        (*J++)->render(select_mode);
+      } 
+      glPopMatrix();
     }
     ++I;
   }

@@ -114,8 +114,13 @@ public:
   void drawNameQueue(MessageList &list);
   void drawOutline(SPtr<ModelRecord>);
 
+  void drawQueue(const QueueStaticObjectMap &object_map,
+                   const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode);
 
-  void drawQueue(const QueueObjectMap &object_map,
+
+  void drawQueue(const QueueDynamicObjectMap &object_map,
                    const QueueMatrixMap &matrix_map,
                    const QueueStateMap &state_map,
                    bool select_mode);

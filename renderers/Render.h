@@ -1,14 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.21 2007-04-15 19:13:11 simon Exp $
+// $Id: Render.h,v 1.22 2007-04-22 17:45:13 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
 
 #include <string>
-#include <list>
+#include <vector>
 #include <map>
 
 #include <wfmath/axisbox.h>
@@ -18,6 +18,8 @@
 #include "common/SPtr.h"
 
 #include "loaders/StaticObject.h"
+#include "loaders/DynamicObject.h"
+
 #include "StateManager.h"
 
 #define RENDER_FOV (45.0f)
@@ -45,15 +47,17 @@ class Render {
 public:
 
 typedef std::pair<SPtr<ObjectRecord>, SPtr<ModelRecord> > QueueItem;
-typedef std::list<QueueItem> Queue;
+typedef std::vector<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
-typedef std::list<WorldEntity*> MessageList;
+typedef std::vector<WorldEntity*> MessageList;
 // New render queue types
 typedef std::pair<Matrix, WorldEntity*> MatrixEntityItem;
-typedef std::map<std::string, std::list<MatrixEntityItem> > QueueMatrixMap;
-typedef std::map<std::string, std::list<SPtrShutdown<StaticObject> > > QueueObjectMap;
+typedef std::vector<MatrixEntityItem>  MatrixEntityList;
+typedef std::map<std::string, MatrixEntityList> QueueMatrixMap;
 typedef std::map<std::string, StateID> QueueStateMap;
 typedef std::map<std::string, Queue> QueueOldMap;
+typedef std::map<std::string, std::vector<SPtrShutdown<StaticObject> > > QueueStaticObjectMap;
+typedef std::map<std::string, std::vector<SPtrShutdown<DynamicObject> > > QueueDynamicObjectMap;
 
   Render() :
     m_context_instantiation(-1),
@@ -121,7 +125,12 @@ typedef std::map<std::string, Queue> QueueOldMap;
 //  virtual void renderElements(unsigned int type, unsigned int number_of_points, int *faces_data, Vertex_3 *vertex_data, Texel *texture_data, Normal *normal_data,bool) =0;
   virtual void drawQueue(QueueMap &queue, bool select_mode) =0;
 
-virtual void drawQueue(const QueueObjectMap &object_map,
+  virtual void drawQueue(const QueueStaticObjectMap &object_map,
+                   const QueueMatrixMap &matrix_map,
+                   const QueueStateMap &state_map,
+                   bool select_mode) =0;
+
+  virtual void drawQueue(const QueueDynamicObjectMap &object_map,
                    const QueueMatrixMap &matrix_map,
                    const QueueStateMap &state_map,
                    bool select_mode) =0;

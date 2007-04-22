@@ -1,12 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #ifndef SEAR_RENDERERS_STATICOBJECT_H
 #define SEAR_RENDERERS_STATICOBJECT_H 1
 
 #include <vector>
-#include <list>
 
 #include <sage/GL.h>
 #include "common/Matrix.h"
@@ -26,7 +25,7 @@ public:
   bool isInitialised() const { return m_initialised; }
 
   void render(bool select_mode) const;
-  void render(bool select_mode, const std::list<std::pair<Matrix, WorldEntity*> > &positions) const;
+  void render(bool select_mode, const std::vector<std::pair<Matrix, WorldEntity*> > &positions) const;
 
   int contextCreated();
   void contextDestroyed(bool check);

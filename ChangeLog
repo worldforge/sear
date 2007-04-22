@@ -1,5 +1,30 @@
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Use a matrix
+	  object instead of number array. Make render(...) const.
+
+	* loaders/Model.h: Added hasDynamicObjects and getDynamicObjects
+	  functions to act in a similar way to the existing functions for
+	  static objects. Convert the lists to vectors.
+
+	* loaders/ParticleSystem.cpp, loaders/ParticleSystem.h: Use the new
+	  dynamic object methods.
+
+	* loaders/cal3d/Cal3dModel.h, loaders/cal3d/Cal3dModel.cpp: Use the new 
+	  dynamic object methods. Store the model rotation in the dynamic object
+	  matrix.
+
+	* loaders/StaticObect.cpp, loaders/StaticObject.h: Convert the lists to
+	  vectors.
+
+	* renderers/Render.h, renderers/GL.cpp, renderers/GL.h, 
+	  renderers/Graphics.cpp, renderers/Graphics.h: Rename the existing
+	  QueueObjectMap to QueueStaticObjectMap and create a
+	  QueueDynamicObjectMap type. Duplicate and modify the existing
+	  functions for QueueStaticObjectMap to handle dynamic objects.
+
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/SearObject.cpp: Fix a copy/paste error in the swap_bytes
 	  section.
 
@@ -7,8 +32,8 @@
 	  the avatar height rather than a fixed distance.
 
 	* environment/Weather.cpp, enviroment/Weather.h: Adjust visibility 
-	 change speed based on the distance left to travel. Moves faster then 
-	 there is a lot more distance to cover.
+	  change speed based on the distance left to travel. Moves faster then 
+	  there is a lot more distance to cover.
 
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 

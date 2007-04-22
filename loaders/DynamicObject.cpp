@@ -45,7 +45,7 @@ int DynamicObject::init() {
   setEmission(0.0f, 0.0f, 0.0f, 0.0f);
   setShininess(50.0f);
 
-  identity();
+  m_matrix.identity();
 
   m_initialised = true;
 
@@ -173,7 +173,7 @@ void DynamicObject::contextDestroyed(bool check) {
   m_context_no = -1;
 }
 
-void DynamicObject::render(bool select_mode) {
+void DynamicObject::render(bool select_mode) const {
   assert(m_initialised == true);
 
   assert(RenderSystem::getInstance().getRenderer()->contextValid());
@@ -182,7 +182,7 @@ void DynamicObject::render(bool select_mode) {
   glPushMatrix();
 
   // Set transform
-  glMultMatrixf(&m_matrix[0][0]);
+  glMultMatrixf(m_matrix.getMatrix());
 
    // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {

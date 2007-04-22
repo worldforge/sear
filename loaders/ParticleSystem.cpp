@@ -166,22 +166,13 @@ ParticleSystem::ParticleSystem(WorldEntity *we) :
 
 ParticleSystem::~ParticleSystem() {
   assert(m_initialised == false);
-  // should be empty if we got shutdown ok.
-  assert(m_particles.empty());
-
-  int id, mask_id;
-  // Clean up textures
-  if (m_do->getTexture(0, id, mask_id) == 0) {
-    RenderSystem::getInstance().releaseTexture(id);
-    RenderSystem::getInstance().releaseTexture(mask_id);
-  }
 }
 
 void ParticleSystem::init()
 {
   assert(m_initialised == false);
 
-  m_do = SPtrShutdown<DynamicObject>(new DynamicObject());
+  SPtrShutdown<DynamicObject> m_do = SPtrShutdown<DynamicObject>(new DynamicObject());
   m_do->init();
   m_do->contextCreated();
   m_do->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
@@ -189,6 +180,8 @@ void ParticleSystem::init()
   m_do->setSpecular(1.0f, 1.0f, 1.0f, 1.0f);
   m_do->setEmission(1.0f, 1.0f, 1.0f, 1.0f);
   m_do->setShininess(50.0f);
+
+  m_dos.push_back(m_do);
   // arbitrary low starting number; we re-allocate storage if required
   // during update()
   int numParticles = 100;
@@ -230,6 +223,18 @@ void ParticleSystem::init()
 int ParticleSystem::shutdown()
 {
   assert(m_initialised == true);
+
+  // should be empty if we got shutdown ok.
+  assert(m_particles.empty());
+
+  int id, mask_id;
+  // Clean up textures
+  if (m_dos[0]->getTexture(0, id, mask_id) == 0) {
+    RenderSystem::getInstance().releaseTexture(id);
+    RenderSystem::getInstance().releaseTexture(mask_id);
+  }
+  m_dos.clear();
+
   // get rid of everything
   for (unsigned int p=0; p < m_particles.size(); ++p) delete m_particles[p];
   m_particles.clear();
@@ -288,12 +293,6 @@ void ParticleSystem::update(float elapsed)
       m_particles[p]->update(twister.rand(elapsed));
     }
   } // of spilled particles case
-
-//  m_do->copyVertexData((float*)m_vertexBuffer, m_particles.size() * 6 * 3);
-//  m_do->copyColourData((unsigned char*)m_colorBuffer, m_particles.size() * 6 * 3);
-//  m_do->copyTextureData((float*)m_texCoordBuffer, m_particles.size() * 6 * 2);
-
-//  m_do->setNumPoints(m_particles.size() * 6);
 }
 
 void ParticleSystem::render(bool select_mode) {
@@ -316,14 +315,14 @@ void ParticleSystem::render(bool select_mode) {
 
   // Note: This should ideally be done during the update function
   // However, the camera angle is unknown at this time.
-  m_do->copyVertexData((float*)m_vertexBuffer, m_activeCount * 6 * 3);
-  m_do->copyColourData((unsigned char*)m_colorBuffer, m_activeCount * 6 * 4);
-  m_do->copyTextureData((float*)m_texCoordBuffer, m_activeCount * 6 * 2);
+  m_dos[0]->copyVertexData((float*)m_vertexBuffer, m_activeCount * 6 * 3);
+  m_dos[0]->copyColourData((unsigned char*)m_colorBuffer, m_activeCount * 6 * 4);
+  m_dos[0]->copyTextureData((float*)m_texCoordBuffer, m_activeCount * 6 * 2);
 
-//  m_do->setNumPoints(m_particles.size() * 6);
-  m_do->setNumPoints(m_activeCount * 6);
+//  m_dos[0]->setNumPoints(m_particles.size() * 6);
+  m_dos[0]->setNumPoints(m_activeCount * 6);
 
-  m_do->render(select_mode);
+  m_dos[0]->render(select_mode);
 }
 
 static Vertex_3 vertexFromPoint(const Point3& p)
@@ -376,10 +375,10 @@ void ParticleSystem::submit(const Point3& pos, double sz, const Color_4d& c, dou
 }
 
 void ParticleSystem::contextCreated() {
-  m_do->contextCreated();
+  m_dos[0]->contextCreated();
 }
 void ParticleSystem::contextDestroyed(bool check) {
-  m_do->contextDestroyed(check);
+  m_dos[0]->contextDestroyed(check);
 }
 
 void ParticleSystem::activate(Particle* p)
@@ -417,7 +416,7 @@ Point3 ParticleSystem::initialPos() const
 
 void ParticleSystem::setTextureName(const std::string& nm)
 {
-  m_do->setTexture(0,
+  m_dos[0]->setTexture(0,
                    RenderSystem::getInstance().requestTexture(nm),
                    RenderSystem::getInstance().requestTexture(nm, true));
 }

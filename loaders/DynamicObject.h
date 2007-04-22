@@ -10,6 +10,7 @@
 #include <sage/GL.h>
 
 //#include "src/CacheObject.h"
+#include "common/Matrix.h"
 
 namespace Sear {
 
@@ -23,7 +24,7 @@ public:
 
   bool isInitialised() const { return m_initialised; }
 
-  void render(bool select_mode);
+  void render(bool select_mode) const;
 
   int contextCreated();
   void contextDestroyed(bool check);
@@ -137,7 +138,7 @@ public:
 //  int getState() const { return m_state; }
  
 //  void setType(GLenum type) { m_type = type; } 
-
+/*
   void setMatrix(float **m) {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
@@ -145,8 +146,12 @@ public:
       }
     }
   }
+*/
+  Matrix &getMatrix() { return m_matrix; }
+  const Matrix &getMatrix() const { return m_matrix; }
 
-    void identity() {
+
+/*  void identity() {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
         if (i == j)  m_matrix[i][j] = 1.0f;
@@ -167,7 +172,7 @@ public:
     m_matrix[2][3] += z;
   }
 
-
+*/
 //  int getType() { return 1; }
   DynamicObject *newInstance() { return new DynamicObject(); }
  
@@ -197,9 +202,10 @@ private:
 //  GLenum m_type;
 //  int m_state; 
   
-  GLuint m_vb_vertex_data, m_vb_colour_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
+  mutable GLuint m_vb_vertex_data, m_vb_colour_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
 
-  float m_matrix[4][4];
+  //float m_matrix[4][4];
+  Matrix m_matrix;
   int m_context_no;
 };
 
