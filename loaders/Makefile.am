@@ -30,6 +30,7 @@ libModelLoader_a_SOURCES = \
 	DynamicObject.cpp DynamicObject.h \
 	SearObject.cpp SearObject.h SearObjectTypes.h \
 	SearObject_Loader.cpp SearObject_Loader.h \
-	StaticObjectFunctions.cpp StaticObjectFunctions.h
+	StaticObjectFunctions.cpp StaticObjectFunctions.h \
+	EntityMapper.cpp EntityMapper.h
 	
 	

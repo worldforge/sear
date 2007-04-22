@@ -1,5 +1,24 @@
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 
+	* common/Utility.h: Fix bug in hasRemainingTokens where the wrong index
+	  was checked.
+
+	* loaders/EntityMapper.cpp, loaders/EntityMapper.h, loaders/Makefile.am:
+	  Created a EntityMapping class which will handle assigning an
+	  ObjectRecord to an entity based upon attributes. Currently it will
+	  randomly assign an object record to an entity from a specified list
+	  using the entity ID as the seed.
+
+	* loaders/ObjectHandler.cpp: Revert to using space separators as the 
+	  tokeniser class will also be able to strip out extra spaces directly
+	  this way.
+
+	* loaders/ModelSystem.cpp, loaders/ModelSystem.h: Use new EntityMapper
+	  class to find an object record, or fall back to old type hierarchy
+	  method if no mapping is found.
+
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
 	* common/Utility.cpp, common/Utility.h: Allow alternative separating
 	  characters to be defined in the tokeniser. Added a method to indicate
 	  that there are more tokens left.

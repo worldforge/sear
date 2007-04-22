@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.12 2007-04-22 12:14:08 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.13 2007-04-22 15:49:27 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -178,47 +178,31 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
   else if (key == KEY_LOW_QUALITY) {
     const std::string &low_quality = (std::string)config.getItem(section, key);
     // This string can be semi-colon separated, so split it up
-    Tokeniser tok(low_quality, ';');
+    Tokeniser tok(low_quality, ' ');
     while (tok.hasRemainingTokens()) {
       const std::string &str = tok.nextToken();
-      // There could be some white space either side of the string, so lets get rid of it
-      std::string::size_type b = str.find_first_not_of(" ");
-      std::string::size_type e = str.find_last_not_of(" ") + 1;
-      // Make sure we have a valid starting point
-      if (b == std::string::npos) b = 0;
-      // substr expects string length, not end position
-      e -= b;
-      record->quality_queue[ObjectRecord::QUEUE_low].push_back(str.substr(b, e));
+      if (str.empty()) continue;
+      record->quality_queue[ObjectRecord::QUEUE_low].push_back(str);
     }
   }
   else if (key == KEY_MEDIUM_QUALITY) { 
     const std::string &medium_quality = (std::string)config.getItem(section, key);
     // This string can be semi-colon separated, so split it up
-    Tokeniser tok(medium_quality, ';');
+    Tokeniser tok(medium_quality, ' ');
     while (tok.hasRemainingTokens()) {
       const std::string &str = tok.nextToken();
-      std::string::size_type b = str.find_first_not_of(" ");
-      std::string::size_type e = str.find_last_not_of(" ")  + 1;
-      // Make sure we have a valid starting point
-      if (b == std::string::npos) b = 0;
-      // substr expects string length, not end position
-      e -= b;
-      record->quality_queue[ObjectRecord::QUEUE_medium].push_back(str.substr(b, e));
+      if (str.empty()) continue;
+      record->quality_queue[ObjectRecord::QUEUE_medium].push_back(str);
     }
   }
   else if (key == KEY_HIGH_QUALITY) {
     const std::string &high_quality = (std::string)config.getItem(section, key);
     // This string can be semi-colon separated, so split it up
-    Tokeniser tok(high_quality, ';');
+    Tokeniser tok(high_quality, ' ');
     while (tok.hasRemainingTokens()) {
       const std::string &str = tok.nextToken();
-      std::string::size_type b = str.find_first_not_of(" ");
-      std::string::size_type e = str.find_last_not_of(" ") + 1;
-      // Make sure we have a valid starting point
-      if (b == std::string::npos) b = 0;
-      // substr expects string length, not end position
-      e -= b;
-      record->quality_queue[ObjectRecord::QUEUE_high].push_back(str.substr(b, e));
+      if (str.empty()) continue;
+      record->quality_queue[ObjectRecord::QUEUE_high].push_back(str);
     }
   }
 }

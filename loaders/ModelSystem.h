@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #ifndef SEAR_LOADERS_MODELSYSTEM_H
 #define SEAR_LOADERS_MODELSYSTEM_H 1
@@ -12,6 +12,7 @@
 #include "interfaces/ConsoleObject.h"
 #include "common/SPtr.h"
 
+#include "EntityMapper.h"
 #include "ModelHandler.h"
 #include "ObjectHandler.h"
 
@@ -22,8 +23,6 @@ class Config;
 namespace Sear {
 
 class Console;
-class ModelHandler;
-class ObjectHandler;
 class WorldEntity;
 class ObjectRecord;
 class ModelRecord;
@@ -55,6 +54,7 @@ public:
 
   ModelHandler  *getModelHandler()  { return m_model_handler.get(); }
   ObjectHandler *getObjectHandler() { return m_object_handler.get(); }
+  EntityMapper *getEntityMapper() { return m_entity_mapper.get(); }
 
   varconf::Config &getModelRecords();
  
@@ -92,6 +92,7 @@ private:
 
   SPtrShutdown<ModelHandler> m_model_handler;
   SPtrShutdown<ObjectHandler> m_object_handler;
+  SPtrShutdown<EntityMapper> m_entity_mapper;
 
 };
 

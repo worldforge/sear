@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.20 2007-04-22 12:14:08 simon Exp $
+// $Id: Utility.h,v 1.21 2007-04-22 15:49:27 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
@@ -72,13 +72,15 @@ public:
   Tokeniser(const std::string &String = "", char split = ' ') : m_String(String), m_Begin(0), m_End(0), m_split(split) {
   }
   
-  ~Tokeniser() {
-  }
+  ~Tokeniser() { }
   
   void initTokens(const std::string &String);
   std::string nextToken();
   std::string remainingTokens();
-  bool hasRemainingTokens() const { return m_Begin != m_String.size(); }
+  // This returns true if there is some remaining string to parse. This is not
+  // necessarily more tokens, but could just be whitespace.
+  bool hasRemainingTokens() const { return m_End < m_String.size(); }
+
 protected:
   std::string m_String;
   std::string::size_type m_Begin;

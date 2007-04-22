@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #include <sigc++/object_slot.h>
 
@@ -12,6 +12,7 @@
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
+#include "EntityMapper.h"
 #include "ModelSystem.h"
 #include "ObjectHandler.h"
 #include "ModelHandler.h"
@@ -32,7 +33,7 @@
 #ifdef DEBUG
   static const bool debug = true;
 #else
-  static const bool debug = false;
+  static censt bool debug = false;
 #endif
 
 namespace Sear {
@@ -64,6 +65,9 @@ int ModelSystem::init() {
   m_object_handler = SPtrShutdown<ObjectHandler>(new ObjectHandler());
   m_object_handler->init();
 
+  m_entity_mapper = SPtrShutdown<EntityMapper>(new EntityMapper());
+  m_entity_mapper->init();
+
   RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(this, &ModelSystem::contextCreated));
   RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(this, &ModelSystem::contextDestroyed));
 
@@ -79,6 +83,8 @@ int ModelSystem::shutdown() {
   m_object_handler.release();
 
   m_model_handler.release();
+
+  m_entity_mapper.release();
 
   // Cleanp signals
   notify_callbacks();
@@ -107,6 +113,7 @@ void ModelSystem::registerCommands(Console *console) {
 
   m_model_handler->registerCommands(console);
   m_object_handler->registerCommands(console);
+  m_entity_mapper->registerCommands(console);
 }
 
 void ModelSystem::runCommand(const std::string &command, const std::string &args) {
@@ -130,8 +137,20 @@ SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
   const std::string &id = we->getId();
   SPtr<ObjectRecord> object_record = m_object_handler->getObjectRecord(id);
 
-  std::string type = DEFAULT;
   if (!object_record) {
+    const std::string &mapper = m_entity_mapper->getEntityMapping(we);
+    if (mapper != "") {
+      object_record = m_object_handler->instantiateRecord(mapper, id);
+      if (object_record) {
+        object_record->type = we->type();
+        object_record->name = we->getName();
+        object_record->id = we->getId();
+        object_record->entity = we;
+      }
+    }
+  }
+  if (!object_record) {
+    std::string type = DEFAULT;
     Eris::TypeInfo *ti = we->getType();
 
     while (ti != NULL) {
