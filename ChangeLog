@@ -1,3 +1,13 @@
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
+	* common/Utility.cpp, common/Utility.h: Allow alternative separating
+	  characters to be defined in the tokeniser. Added a method to indicate
+	  that there are more tokens left.
+
+	* loaders/ObjectHandler.cpp: Allow low/medium/high_quality configuration
+	  strings to be semi-colon separated in addition to allowing multiple
+	  entries.
+
 2007-04-15  Simon Goodall  <simon@worldforge.org>
 
 	* renderers/Render.h, renderers/GL.cpp, renderers/GL.h,

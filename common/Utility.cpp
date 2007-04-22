@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.13 2007-02-12 18:21:53 simon Exp $
+// $Id: Utility.cpp,v 1.14 2007-04-22 12:14:08 simon Exp $
 
 #include "Utility.h"
 
@@ -140,7 +140,7 @@ std::string Tokeniser::nextToken() {
   bool bInString = false;
   bool bIsEscaped = false;
   
-  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == ' '); ++m_Begin);
+  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == m_split); ++m_Begin);
   if(m_Begin == m_String.length()) {
     m_End = m_Begin;
     
@@ -150,7 +150,7 @@ std::string Tokeniser::nextToken() {
     if((m_String[m_End] == '\\') && (bIsEscaped == false)) {
       bIsEscaped = true;
     } else {
-      if((m_String[m_End] == ' ') && (bInString == false) && (bIsEscaped == false)) {
+      if((m_String[m_End] == m_split) && (bInString == false) && (bIsEscaped == false)) {
         break;
       } else if((m_String[m_End] == '"') && (bIsEscaped == false)) {
         bInString = (bInString == false);
@@ -165,7 +165,7 @@ std::string Tokeniser::nextToken() {
 }
 
 std::string Tokeniser::remainingTokens() {
-  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == ' '); ++m_Begin);
+  for(m_Begin = m_End; (m_Begin < m_String.length()) && (m_String[m_Begin] == m_split); ++m_Begin);
     
   return m_String.substr(m_Begin);
 }
