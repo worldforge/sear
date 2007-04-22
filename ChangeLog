@@ -1,5 +1,12 @@
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/StaticObjectFunctions.cpp: Fix the align to centre of extent.
+
+	* loaders/SearObject.cpp: Add in config file hooks for extra alignment
+	  options.
+
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Implement a second
 	  render method taking a worldentity for use within the GL render loop.
 	  This fixes selection and fading for these models.

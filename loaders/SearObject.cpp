@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.7 2007-04-22 16:37:36 simon Exp $
+// $Id: SearObject.cpp,v 1.8 2007-04-22 21:17:13 simon Exp $
 
 #include  <stdio.h>
 
@@ -41,8 +41,12 @@ static const std::string KEY_scale_isotropic_x = "scale_isotropic_x";
 static const std::string KEY_scale_isotropic_y = "scale_isotropic_y";
 static const std::string KEY_scale_isotropic_z = "scale_isotropic_z";
 static const std::string KEY_scale_anisotropic = "scale_anisotropic";
-static const std::string KEY_z_align = "z_align";
 static const std::string KEY_ignore_minus_z = "ignore_minus_z";
+static const std::string KEY_z_align = "z_align";
+static const std::string KEY_align_extent = "align_extent";
+static const std::string KEY_align_mass = "align_mass";
+static const std::string KEY_align_bbox_lc = "align_bbox_lc";
+static const std::string KEY_align_bbox_hc = "align_bbox_hc";
 
 static const std::string KEY_texture_map_0 = "texture_map_0";
 static const std::string KEY_ambient = "ambient";
@@ -136,6 +140,30 @@ int SearObject::init(const std::string &file_name) {
     if ((bool)m_config.getItem(SECTION_model, KEY_z_align)) {
       process_model = true;
       align = ALIGN_Z;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_align_mass)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_align_mass)) {
+      process_model = true;
+      align = ALIGN_CENTRE_MASS;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_align_bbox_hc)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_align_bbox_hc)) {
+      process_model = true;
+      align = ALIGN_BBOX_HC;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_align_bbox_lc)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_align_bbox_lc)) {
+      process_model = true;
+      align = ALIGN_BBOX_LC;
+    }
+  }
+  if (m_config.findItem(SECTION_model, KEY_align_extent)) {
+    if ((bool)m_config.getItem(SECTION_model, KEY_align_extent)) {
+      process_model = true;
+      align = ALIGN_CENTRE_EXTENT;
     }
   }
   if (m_config.findItem(SECTION_model, KEY_scale_isotropic)) {

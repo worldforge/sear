@@ -128,16 +128,22 @@ void scale_object(StaticObjectList &objs, Scaling scale, Alignment align, bool i
       trans_y = -(sum_pos[2] / (float)num_points);
       break;
     case ALIGN_CENTRE_EXTENT: 
-      trans_x = -(max[0] - min[0]);
-      trans_y = -(max[1] - min[1]);
-      trans_z = -(max[2] - min[2]);
+      trans_x = -(max[0] - min[0]) / 2.0 -min[0];
+      trans_y = -(max[1] - min[1]) / 2.0 -min[1];
+      trans_z = -(max[2] - min[2]) / 2.0 -min[2];
       break;
     case ALIGN_Z:
       trans_z = -(min[2]);
       break;
     case ALIGN_BBOX_LC:
+      trans_x = -min[0];
+      trans_y = -min[1];
+      trans_z = -min[2];
       break;
     case ALIGN_BBOX_HC:
+      trans_x = -max[0];
+      trans_y = -max[1];
+      trans_z = -max[2];
       break;
   }
 
