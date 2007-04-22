@@ -190,9 +190,26 @@ void Weather::runCommand(const std::string &cmd, const std::string &args) {
     cast_stream(args, f);
     m_visibility = f;
   }
-
-
-
 }
+
+void Weather::update(float time_elapsed) {
+  // Adjust fog change speed based on how far it has to catch up
+  float speed = fabs(m_visibility - m_current_visibility);
+  time_elapsed *= speed; 
+  // Clamp maximum speed
+  if (time_elapsed > 3.0f) time_elapsed = 3.0f;
+
+  if (m_current_visibility > m_visibility) {
+    m_current_visibility -= time_elapsed;
+    if (m_current_visibility < m_visibility)
+       m_current_visibility = m_visibility;
+  }
+  else if (m_current_visibility < m_visibility) {
+    m_current_visibility += time_elapsed;
+    if (m_current_visibility > m_visibility)
+       m_current_visibility = m_visibility;
+  }
+}
+
 
 } // namespace Sear

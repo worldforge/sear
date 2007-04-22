@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.6 2007-04-14 13:46:42 simon Exp $
+// $Id: SearObject.cpp,v 1.7 2007-04-22 16:37:36 simon Exp $
 
 #include  <stdio.h>
 
@@ -366,7 +366,7 @@ int SearObject::load(const std::string &filename) {
     fread(so->getTextureDataPtr(), sizeof(float), som.num_vertices * 2, fp);
     if (big_endian) {
       fptr = so->getTextureDataPtr();
-      c = som.num_vertices * 3;
+      c = som.num_vertices * 2;
       while (c--) swap_bytes_float(*fptr++);
     }
 

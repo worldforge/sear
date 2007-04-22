@@ -1,5 +1,17 @@
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/SearObject.cpp: Fix a copy/paste error in the swap_bytes
+	  section.
+
+	* renderers/Graphics.cpp: Adjust camera distance above avatar based on
+	  the avatar height rather than a fixed distance.
+
+	* environment/Weather.cpp, enviroment/Weather.h: Adjust visibility 
+	 change speed based on the distance left to travel. Moves faster then 
+	 there is a lot more distance to cover.
+
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
 	* common/Utility.h: Fix bug in hasRemainingTokens where the wrong index
 	  was checked.
 

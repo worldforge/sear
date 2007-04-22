@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.67 2007-03-29 20:11:51 simon Exp $
+// $Id: Graphics.cpp,v 1.68 2007-04-22 16:37:36 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -261,7 +261,8 @@ void Graphics::setCameraTransform() {
        ? (focus->getBBox().highCorner().z() - focus->getBBox().lowCorner().z())
        : (1.0f);
 
-  height += 0.5f; // Make the camera be just above focus height.
+  //height += 0.5f; // Make the camera be just above focus height.
+  height *= 1.1f; // Make the camera be just above focus height. 10% of height
 
   const WFMath::Point<3> &pos = focus->getAbsPos();
 
@@ -294,6 +295,7 @@ void Graphics::setCameraTransform() {
     // or large views.
     m_renderer->translateObject(0.0f, cam->getDistance(), 0.0f);
   }
+  // Set the avatar's lighting
   m_renderer->applyCharacterLighting(0.5, 0, 0.5);
 
   m_renderer->applyQuaternion(m_orient.inverse());
@@ -409,7 +411,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     buildQueues(root, 0, select_mode, m_render_queue, m_message_list, m_name_list, time_elapsed);
 
-
     if (select_mode ) {
       m_renderer->selectTerrainColour(root);
     }
@@ -445,11 +446,15 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
       //  Switch to 2D mode for rendering rain
       m_renderer->setViewMode(ORTHOGRAPHIC);
 
+      // Render weather effects
       RenderSystem::getInstance().switchState(m_state_weather);
       Environment::getInstance().renderWeather();
+
       // Switch back to 3D
       m_renderer->setViewMode(PERSPECTIVE);
 
+      // Draw the compass
+      // TODO: Make this part of the GUI?
       m_compass->update(cam->getRotation());
       m_compass->draw(m_renderer, select_mode);
     } 
@@ -525,11 +530,10 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   // position. However, we can just translate and ignore rotation as we are 
   // using a sphere test and not working on the bbox directly.
 
-  // reject for drawing if object bbox is outside frustum   
-//  if (!Frustum::sphereInFrustum(m_frustum, obj->bbox, obj->position)) {
 
   // TODO, Objects without bbox will be rendered regardless.
   if (obj_we->hasBBox()) {
+    // reject for drawing if object bbox is outside frustum   
     if (!Frustum::sphereInFrustum(m_frustum, obj_we->getBBox(), obj_we->getAbsPos(), obj_we->getAbsOrient())) {
       obj_we->screenX() = -1;
       obj_we->screenY() = -1;

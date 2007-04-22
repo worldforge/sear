@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2006 - 2007 Simon Goodall
 
-// $Id: Weather.h,v 1.6 2007-03-04 14:28:40 simon Exp $
+// $Id: Weather.h,v 1.7 2007-04-22 16:37:37 simon Exp $
 
 #ifndef SEAR_ENVIRONMENT_WEATHER_H
 #define SEAR_ENVIRONMENT_WEATHER_H 1
@@ -33,18 +33,8 @@ public:
   void registerCommands(Console *con);
   void runCommand(const std::string &cmd, const std::string &args);  
 
-  void update(float time_elapsed) {
-    if (m_current_visibility > m_visibility) { 
-      m_current_visibility -= time_elapsed;
-      if (m_current_visibility < m_visibility)
-         m_current_visibility = m_visibility;
-    }
-    else if (m_current_visibility < m_visibility) { 
-      m_current_visibility += time_elapsed;
-      if (m_current_visibility > m_visibility)
-         m_current_visibility = m_visibility;
-    }
-  }
+  void update(float time_elapsed);
+
   float getVisibility() const { return m_current_visibility; }
 
 private:
