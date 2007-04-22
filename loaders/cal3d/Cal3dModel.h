@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.h,v 1.31 2007-04-22 17:45:15 simon Exp $
+// $Id: Cal3dModel.h,v 1.32 2007-04-22 18:28:32 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_CAL3DMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DMODEL_H 1
@@ -79,6 +79,16 @@ public:
   virtual bool hasDynamicObjects() const { return true; }
   virtual DynamicObjectList &getDynamicObjects() { return m_dos; }
 
+  void setState(int s) { m_state = s; }
+  int getState() const { return m_state; }
+
+  void setSelectState(int s) { m_select_state = s; }
+  int getSelectState() const { return m_select_state; }
+
+  void setUseStencil(bool b) { m_use_stencil = b; }
+
+
+
 private:
   void renderMesh(bool bWireframe, bool bLight, bool);
 
@@ -95,6 +105,10 @@ private:
   std::vector<int> m_attached_meshes;
 
   friend class Cal3dCoreModel;
+
+
+  int m_state, m_select_state;
+  bool m_use_stencil;
 };
 
 

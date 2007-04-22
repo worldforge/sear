@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.23 2007-04-01 19:00:21 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.24 2007-04-22 18:28:32 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -17,6 +17,8 @@
 #include "Cal3d_Loader.h"
 #include "Cal3dModel.h"
 #include "CoreModelHandler.h"
+
+#include "renderers/RenderSystem.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -54,6 +56,12 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
       std::cerr << "Unable to load model" << std::endl;	  
       return SPtr<ModelRecord>();
     }
+
+    bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
+
+    model->setState(model_record->state);
+    model->setSelectState(model_record->select_state);
+    model->setUseStencil(use_stencil);
 
     model_record->model = SPtrShutdown<Model>(model);
   } catch (...) {

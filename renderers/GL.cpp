@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.168 2007-04-22 17:45:12 simon Exp $
+// $Id: GL.cpp,v 1.169 2007-04-22 18:28:31 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -1695,7 +1695,8 @@ void GL::drawQueue(const QueueDynamicObjectMap &object_map,
     MatrixEntityList::const_iterator K = matrices.begin();
     MatrixEntityList::const_iterator Kend = matrices.end();
     while (K != Kend) {
-      const Matrix &mx = (*K++).first;
+      const Matrix &mx = K->first;
+      WorldEntity *we = K->second;
       glPushMatrix();
       glMultMatrixf(mx.getMatrix());
 
@@ -1703,9 +1704,10 @@ void GL::drawQueue(const QueueDynamicObjectMap &object_map,
       DynamicObjectList::const_iterator Jend = objects.end();
       while (J != Jend) {
   //      (*J++)->render(select_mode, matrices);
-        (*J++)->render(select_mode);
+        (*J++)->render(select_mode, we);
       } 
       glPopMatrix();
+      ++K;
     }
     ++I;
   }

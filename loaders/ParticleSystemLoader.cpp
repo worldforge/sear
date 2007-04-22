@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: ParticleSystemLoader.cpp,v 1.8 2006-02-16 15:59:01 simon Exp $
+// $Id: ParticleSystemLoader.cpp,v 1.9 2007-04-22 18:28:32 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -62,6 +62,18 @@ SPtr<ModelRecord> ParticleSystemLoader::loadModel(WorldEntity *we,
     model_record->model = SPtrShutdown<Model>(ps);
     model_record->state = RenderSystem::getInstance().requestState("particles");
     model_record->select_state = 2; // select
+
+    bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
+
+    DynamicObjectList &sol = ps->getDynamicObjects();
+    DynamicObjectList::iterator I = sol.begin();
+    while (I != sol.end()) {
+      (*I)->setState(model_record->state);
+      (*I)->setSelectState(model_record->select_state);
+      (*I)->setUseStencil(use_stencil);
+      ++I;
+    }
+
 
     return model_record;
 }

@@ -1,5 +1,17 @@
 2007-04-22  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Implement a second
+	  render method taking a worldentity for use within the GL render loop.
+	  This fixes selection and fading for these models.
+
+	* loaders/cal3d/Cal3d_Loader.cpp, loaders/cal3d/Cal3dModek.cpp,
+	  loaders/cal3d/Cal3dModel.h, loaders/ParticleSystemLoader.cpp: Store 
+	  select states and whether to use stencil mode for the dynamic objects.
+
+	* renderers/GL.cpp: Use new dynamic object render function.
+
+2007-04-22  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/DynamicObject.cpp, loaders/DynamicObject.h: Use a matrix
 	  object instead of number array. Make render(...) const.
 

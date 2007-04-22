@@ -14,6 +14,8 @@
 
 namespace Sear {
 
+class WorldEntity;
+
 class DynamicObject {//: public CacheObject {
 public:
   DynamicObject();
@@ -25,6 +27,7 @@ public:
   bool isInitialised() const { return m_initialised; }
 
   void render(bool select_mode) const;
+  void render(bool select_mode, WorldEntity *) const;
 
   int contextCreated();
   void contextDestroyed(bool check);
@@ -133,49 +136,29 @@ public:
   }
 
   void setShininess(float s) { m_shininess = s; }
-
-//  void setState(int s) { m_state = s; }
-//  int getState() const { return m_state; }
  
 //  void setType(GLenum type) { m_type = type; } 
-/*
-  void setMatrix(float **m) {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        m_matrix[i][j] = m[i][j];
-      }
-    }
-  }
-*/
+
   Matrix &getMatrix() { return m_matrix; }
   const Matrix &getMatrix() const { return m_matrix; }
 
+  Matrix &getTexMatrix() { return m_tex_matrix; }
+  const Matrix &getTexMatrix() const { return m_tex_matrix; }
 
-/*  void identity() {
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        if (i == j)  m_matrix[i][j] = 1.0f;
-        else  m_matrix[i][j] = 0.0f;
-      }
-    }
-  }
-
-  void scale(float s) {
-    for (int i = 0; i < 4; ++i) {
-      m_matrix[i][i] *= s;
-    }
-  }
-
-  void translate(float x, float y, float z) {
-    m_matrix[0][3] += x;
-    m_matrix[1][3] += y;
-    m_matrix[2][3] += z;
-  }
-
-*/
 //  int getType() { return 1; }
   DynamicObject *newInstance() { return new DynamicObject(); }
  
+
+  void setState(int s) { m_state = s; }
+  int getState() const { return m_state; }
+
+  void setSelectState(int s) { m_select_state = s; }
+  int getSelectState() const { return m_select_state; }
+
+  void setUseStencil(bool b) { m_use_stencil = b; }
+
+
+
 private:
   void createVBOs();
 
@@ -200,13 +183,15 @@ private:
 
   // I.e. GL_TRIANGLES, GL_QUADS etc..
 //  GLenum m_type;
-//  int m_state; 
+  int m_state, m_select_state;
+
   
   mutable GLuint m_vb_vertex_data, m_vb_colour_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
 
-  //float m_matrix[4][4];
-  Matrix m_matrix;
+  Matrix m_matrix, m_tex_matrix;
   int m_context_no;
+
+  bool m_use_stencil;
 };
 
 } // namespace Sear

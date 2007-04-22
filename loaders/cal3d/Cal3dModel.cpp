@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.55 2007-04-22 17:45:15 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.56 2007-04-22 18:28:32 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -49,7 +49,10 @@ Cal3dModel::Cal3dModel() :
   m_initialised(false),
   m_core_model(NULL),
   m_calModel(NULL),
-  m_rotate(90.0f)
+  m_rotate(90.0f),
+  m_state(0),
+  m_select_state(0),
+  m_use_stencil(false)
 {
   m_lodLevel = 1.0f;
 }
@@ -202,9 +205,13 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
 
           shininess = pCalRenderer->getShininess();
           dyno->setShininess(shininess);
-  
+
           dyno->getMatrix().rotateZ(-m_rotate / 180.0 * WFMath::Pi);
-//  render->rotate(m_rotate,0.0f,0.0f,1.0f); //so zero degrees points east
+
+          dyno->setState(m_state);
+          dyno->setSelectState(m_select_state);
+          dyno->setUseStencil(m_use_stencil);
+
         }
 
         // get the transformed vertices of the submesh
