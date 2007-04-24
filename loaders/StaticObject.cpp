@@ -15,7 +15,7 @@
 #include  "StaticObject.h"
 
 
-static GLfloat halo_colour[4] = {1.0f, 0.0f, 1.0f, 1.0f};
+static GLfloat halo_colour[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
 static GLfloat white[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 namespace Sear {
@@ -38,7 +38,8 @@ StaticObject::StaticObject() :
   m_disp_list(0),
   m_select_disp_list(0),
   m_list_count(0),
-  m_context_no(-1)
+  m_context_no(-1),
+  m_use_stencil(false)
 {
 }
 
@@ -526,18 +527,29 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         glColor4fv(white);
         RenderSystem::getInstance().switchState(m_state);
       } else { // Render object normaly
+
+
+// The problem here appears to be the enabling of GL_COLOR_MATERIAL
+// It appears to also enable something else??
+// glPushAttrib(GL_ALL_ATTRIB_BITS) fixes it, as does the more specific GL_LIGHTING_BIT
+
+
         GLboolean blend_enabled = true;
         GLboolean cmat_enabled = true;
+
         bool reset_colour = false;
+
+        // We push the lighting bit as enabling GL_COLOR_MATERIAL appears to change some
+        // lighting related state. Not sure what however. 
+        glPushAttrib(GL_LIGHTING_BIT);
+
         if (!select_mode && we->getFade() < 1.0f) {
-          glGetBooleanv(GL_BLEND, &blend_enabled);
-          glGetBooleanv(GL_COLOR_MATERIAL, &cmat_enabled);
-          if (!blend_enabled) glEnable(GL_BLEND);
-          // TODO: Why does this appear to be enabled for far too long?
-          // Is the state being kept too long, or more likely is the Fade value somehow broken?
-          if (!cmat_enabled) glEnable(GL_COLOR_MATERIAL);
+          cmat_enabled = glIsEnabled(GL_COLOR_MATERIAL);
+          blend_enabled = glIsEnabled(GL_BLEND);
           glColor4f(1.0f, 1.0f, 1.0f, we->getFade());
           reset_colour = true;
+          if (blend_enabled == GL_FALSE) glEnable(GL_BLEND);
+          if (cmat_enabled == GL_FALSE)  glEnable(GL_COLOR_MATERIAL);
         }
 
         if (m_indices) {
@@ -546,9 +558,11 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
           glDrawArrays(GL_TRIANGLES, 0, m_num_points);
         }
 
-        if (!blend_enabled) glDisable(GL_BLEND);
-        if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
+        if (blend_enabled == GL_FALSE) glDisable(GL_BLEND);
+        if (cmat_enabled == GL_FALSE)  glDisable(GL_COLOR_MATERIAL);
+
         if (reset_colour)   glColor4fv(white);
+        glPopAttrib();
       }
 
       glPopMatrix();
