@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: SearObject_Loader.cpp,v 1.1 2007-01-24 09:52:55 simon Exp $
+// $Id: SearObject_Loader.cpp,v 1.2 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -10,6 +10,7 @@
 #include "src/FileHandler.h"
 
 #include "ModelSystem.h"
+#include "ObjectRecord.h"
 
 #include "ModelRecord.h"
 #include "src/WorldEntity.h"
@@ -62,7 +63,7 @@ SPtr<ModelRecord> SearObject_Loader::loadModel(WorldEntity *we, const std::strin
     ++I;
   }
  
-  model_record->model = SPtrShutdown<Model>(model);
+  model_record->model = SPtr<Model>(model);
   return model_record;
 }
 

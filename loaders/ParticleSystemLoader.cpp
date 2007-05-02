@@ -1,13 +1,14 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: ParticleSystemLoader.cpp,v 1.9 2007-04-22 18:28:32 simon Exp $
+// $Id: ParticleSystemLoader.cpp,v 1.10 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
 #include "ParticleSystemLoader.h"
 #include "ParticleSystem.h"
+#include "ObjectRecord.h"
 #include "ModelRecord.h"
 #include "renderers/RenderSystem.h"
 #include "src/WorldEntity.h"
@@ -59,7 +60,7 @@ SPtr<ModelRecord> ParticleSystemLoader::loadModel(WorldEntity *we,
     ps->init();
     ps->setTextureName( cfg.getItem(model_id, KEY_particle_tex) );
     
-    model_record->model = SPtrShutdown<Model>(ps);
+    model_record->model = SPtr<Model>(ps);
     model_record->state = RenderSystem::getInstance().requestState("particles");
     model_record->select_state = 2; // select
 

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.32 2007-04-14 13:46:42 simon Exp $
+// $Id: LibModelFile.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
 
 /*
   Debug check list
@@ -72,9 +72,9 @@ LibModelFile::LibModelFile() : Model(),
 }
 
 LibModelFile::~LibModelFile() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
-  
+
 int LibModelFile::init(const std::string &filename) {
   assert(m_initialised == false);
 
@@ -129,7 +129,7 @@ int LibModelFile::init(const std::string &filename) {
   // Get mesh data
   libmd3_mesh *meshp = modelFile->meshes;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
-    SPtrShutdown<StaticObject> so(new StaticObject());
+    SPtr<StaticObject> so(new StaticObject());
     so->init();
 
     // Get Texture data from Mesh
@@ -270,7 +270,7 @@ int LibModelFile::shutdown() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     int id, mask_id;
     // Clean up textures
@@ -290,7 +290,7 @@ void LibModelFile::contextCreated() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -300,7 +300,7 @@ void LibModelFile::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -310,7 +310,7 @@ void LibModelFile::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
   }

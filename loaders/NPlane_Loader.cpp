@@ -1,14 +1,15 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.25 2006-12-03 16:12:59 simon Exp $
+// $Id: NPlane_Loader.cpp,v 1.26 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
 #include "src/System.h"
 #include <string>
 
+#include "ObjectRecord.h"
 #include "ModelRecord.h"
 #include "src/WorldEntity.h"
 
@@ -77,7 +78,7 @@ SPtr<ModelRecord> NPlane_Loader::loadModel(WorldEntity *we, const std::string &m
     ++I;
   }
 
-  model_record->model = SPtrShutdown<Model>(model);
+  model_record->model = SPtr<Model>(model);
   return model_record;
 }
 

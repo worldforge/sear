@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.169 2007-04-22 18:28:31 simon Exp $
+// $Id: GL.cpp,v 1.170 2007-05-02 20:47:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -512,7 +512,7 @@ GL::GL() :
 
 
 GL::~GL() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 void GL::shutdown() {
@@ -1148,7 +1148,7 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       SPtr<ObjectRecord> object_record = J->first;
       SPtr<ModelRecord> model_record = J->second;
-      SPtrShutdown<Model> model = model_record->model;
+      SPtr<Model> model = model_record->model;
       assert(model);
 
       WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
@@ -1272,7 +1272,7 @@ inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) const {
 
 void GL::drawOutline(SPtr<ModelRecord> model_record) {
   StateID cur_state = RenderSystem::getInstance().getCurrentState();
-  SPtrShutdown<Model> model = model_record->model;
+  SPtr<Model> model = model_record->model;
   assert(model);
   bool use_stencil = RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL) && model_record->outline;
   if (use_stencil) { // Using Stencil Buffer

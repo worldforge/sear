@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.41 2007-04-12 13:46:01 simon Exp $
+// $Id: Console.cpp,v 1.42 2007-05-02 20:47:55 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -96,7 +96,7 @@ Console::Console(System *system) :
 }
 
 Console::~Console() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 bool Console::init() {

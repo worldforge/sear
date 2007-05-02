@@ -36,7 +36,7 @@ public:
     m_initialised(false)
   { }
 
-  virtual ~ModelSystem() {}
+  virtual ~ModelSystem();
 
   int init();
   int shutdown();
@@ -90,9 +90,9 @@ private:
 
   bool m_initialised;
 
-  SPtrShutdown<ModelHandler> m_model_handler;
-  SPtrShutdown<ObjectHandler> m_object_handler;
-  SPtrShutdown<EntityMapper> m_entity_mapper;
+  SPtr<ModelHandler> m_model_handler;
+  SPtr<ObjectHandler> m_object_handler;
+  SPtr<EntityMapper> m_entity_mapper;
 
 };
 

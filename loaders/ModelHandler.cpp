@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.39 2007-03-29 20:11:51 simon Exp $
+// $Id: ModelHandler.cpp,v 1.40 2007-05-02 20:47:54 simon Exp $
 
 #include <string.h>
 #include <inttypes.h>
@@ -22,6 +22,7 @@
 #include "src/Console.h"
 #include "ModelRecord.h"
 #include "ObjectRecord.h"
+#include "ModelLoader.h"
 #include "src/FileHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
@@ -57,11 +58,10 @@ static const std::string KEY_SELECT_STATE_NUM = "select_state_num";
 ModelHandler::ModelHandler() :
   m_initialised(false),
   m_timeout(NULL)
-{
-}
+{}
 
 ModelHandler::~ModelHandler() {
-  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 void ModelHandler::init() {
@@ -152,7 +152,7 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   if (!model) {
     fprintf(stderr, "Error loading model of type %s for %s\n", model_loader.c_str(), model_id.c_str());
     model = SPtr<ModelRecord>(new ModelRecord);
-    model->model = SPtrShutdown<Model>(new NullModel());
+    model->model = SPtr<Model>(new NullModel());
   }
 
   // Set initial animation
@@ -203,7 +203,7 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
   ObjectRecordMap::iterator J = m_object_map.begin();
   while (J != Jend) {
     SPtr<ModelRecord> record = J->second;
-    SPtrShutdown<Model> model = record->model;
+    SPtr<Model> model = record->model;
     bool unload = forceUnload;
     if (!unload && model) {
       if (System::instance()->getTimef() - model->getLastTime() > 60.0f) {
@@ -219,7 +219,7 @@ void ModelHandler::checkModelTimeouts(bool forceUnload) {
   ModelRecordMap::iterator I = m_model_records_map.begin();
   while (I != Iend) {
     SPtr<ModelRecord> record = I->second;
-    SPtrShutdown<Model> model = record->model;
+    SPtr<Model> model = record->model;
     bool unload = forceUnload;
     if (!unload && model) {
       if (System::instance()->getTimef() - model->getLastTime() > 60.0f) {
@@ -288,7 +288,7 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
     ModelRecordMap::const_iterator I = m_model_records_map.find(id);
     if (I == m_model_records_map.end()) return;
 
-    SPtrShutdown<Model> model = I->second->model;
+    SPtr<Model> model = I->second->model;
     if (model->hasStaticObjects() == false) return;
     const StaticObjectList &sol = model->getStaticObjects();
     FILE *fp = fopen(filename.c_str(), "wb");
@@ -310,7 +310,7 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
     TextureManager *tm = RenderSystem::getInstance().getTextureManager();
     assert (tm != 0);
     for (; J != Jend; ++J) {
-      SPtrShutdown<StaticObject> so = *J;
+      SPtr<StaticObject> so = *J;
       so->getMatrix().getMatrix(som.mesh_transform);
       so->getTexMatrix().getMatrix(som.texture_transform);
 
@@ -381,7 +381,7 @@ void ModelHandler::contextCreated() {
   for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
-    SPtrShutdown<Model> model = record->model;
+    SPtr<Model> model = record->model;
     if (model) {
       model->contextCreated();
     }
@@ -394,7 +394,7 @@ void ModelHandler::contextDestroyed(bool check) {
   for (ObjectRecordMap::iterator I = m_object_map.begin(); I != m_object_map.end(); ++I) {
     SPtr<ModelRecord> record = I->second;
 
-    SPtrShutdown<Model> model = record->model;
+    SPtr<Model> model = record->model;
     if (model) {
       model->contextDestroyed(check);
     }

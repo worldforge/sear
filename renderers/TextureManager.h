@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.29 2007-03-29 20:11:51 simon Exp $
+// $Id: TextureManager.h,v 1.30 2007-05-02 20:47:56 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -66,9 +66,7 @@ public:
   /**
    * Destructor
    */ 
-  ~TextureManager() {
-    assert (m_initialised == false);
-  }
+  ~TextureManager();
 
   /**
    * Initialise a TextureManager object
@@ -110,6 +108,7 @@ public:
 
     // Increment Texture counter.
     ++m_ref_counter[texId];
+assert(texId > 0);
     return texId;
   }
 

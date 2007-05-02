@@ -11,7 +11,6 @@
 #include <sigc++/trackable.h>
 
 #include "interfaces/ConsoleObject.h"
-#include "common/SPtr.h"
 
 #include "RenderTypes.h"
 
@@ -52,7 +51,7 @@ public:
   static RenderSystem &getInstance() { return m_instance; }
 
   RenderSystem();
-  ~RenderSystem(); 
+  ~RenderSystem();
 
   void init();
   void shutdown();
@@ -123,11 +122,11 @@ private:
 
   bool m_initialised;
 
-  SPtrShutdown<StateManager> m_stateManager;
-  SPtrShutdown<TextureManager> m_textureManager;
-  SPtrShutdown<Render> m_renderer;
-  SPtrShutdown<Graphics> m_graphics;
-  SPtrShutdown<CameraSystem> m_cameraSystem;
+  std::auto_ptr<StateManager> m_stateManager;
+  std::auto_ptr<TextureManager> m_textureManager;
+  std::auto_ptr<Render> m_renderer;
+  std::auto_ptr<Graphics> m_graphics;
+  std::auto_ptr<CameraSystem> m_cameraSystem;
 
   bool  m_renderState[RENDER_LAST_STATE];
 

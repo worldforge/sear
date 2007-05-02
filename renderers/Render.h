@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.22 2007-04-22 17:45:13 simon Exp $
+// $Id: Render.h,v 1.23 2007-05-02 20:47:56 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -56,8 +56,8 @@ typedef std::vector<MatrixEntityItem>  MatrixEntityList;
 typedef std::map<std::string, MatrixEntityList> QueueMatrixMap;
 typedef std::map<std::string, StateID> QueueStateMap;
 typedef std::map<std::string, Queue> QueueOldMap;
-typedef std::map<std::string, std::vector<SPtrShutdown<StaticObject> > > QueueStaticObjectMap;
-typedef std::map<std::string, std::vector<SPtrShutdown<DynamicObject> > > QueueDynamicObjectMap;
+typedef std::map<std::string, std::vector<SPtr<StaticObject> > > QueueStaticObjectMap;
+typedef std::map<std::string, std::vector<SPtr<DynamicObject> > > QueueDynamicObjectMap;
 
   Render() :
     m_context_instantiation(-1),

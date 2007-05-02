@@ -1,3 +1,58 @@
+2007-05-02  Simon Goodall  <simon@worldforge.org>
+
+	* common/SPtr.h: Remove SPtrShutdown in preference of calling shutdown
+	  in the template class destructor instead.
+
+	* environment/Environment.cpp. environment/Environment.h,
+	  loaders/cal3d/Cal3d_Loader.h, loaders/cal3d/Cal3d_Loader.cpp,
+	  src/main.cpp: Use auto_ptr instead of SPtr.
+
+	* loaders/3ds_Loader.cpp, loaders/AreaModelLoader.cpp,
+	  loaders/BoundBox_Loader.cpp, loaders/LibModelFile_Loader.cpp,
+	  loaders/Model.h, loaders/ModelRecord.h, loaders/ModelSystem.h,
+	  loaders/NPlane_Loader.cpp, loaders/SearObject_Loader.cpp,
+	  loaders/StaticObjectFunctions.cpp, loaders/cal3d/Cal3d_Loader.cpp,
+	  loaders/cal3d/CoreModelHandler.h, renderers/Render.h: Use SPtr instead
+	  of SPtrShutdown
+
+	* environment/Stars.cpp: Some formatting changes.
+
+	* environment/Weather.cpp, loaders/AreaModel.cpp, 
+	  loaders/DynamicObject.cpp, loaders/EntityMapper.cpp,
+	  loaders/ObjectHandler.cpp, loaders/StaticObject.cpp,
+	  loaders/cal3d/Cal3dCoreModel.cpp, renderers/Camera.cpp,
+	  renderers/LightManager.cpp, renderers/StateManager.cpp,
+	  renderers/TextureManager.cpp, renderers/TesxtureManager.h,
+	  src/ActionHandler.cpp, src/Calendar.cpp, src/Character.cpp,
+	  src/Console.cpp, src/MediaManager.cpp, src/ScriptEngine.cpp,
+	  src/Sound.cpp, src/client.cpp: Call shutdown instead of assert.
+
+	* loaders/BoundBox.cpp, loaders/LibModelFile.cpp,
+	  loaders/ModelHandler.cpp, loaders/ModelSystem.cpp,
+	  loaders/NPlane.cpp, loaders/ParticleSystemLoader.cpp,
+	  loaders/SearObject.cpp, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/CoreModelHandler.cpp, renderers/GL.cpp,
+	  renderers/Graphics.cpp, renderers/RenderSystem.cpp,
+	  renderers/RenderSystem.h, src/System.cpp, src/System.h: Use SPtr 
+	 instead od SPtrShutdown. Call shutdown instead of assert.
+
+	* loaders/WireFrame.cpp, loaders/WireFrame.h, 
+	  loaders/WireFrame_Loader.cpp: Use shutdown instead of assert, const 
+	  ref for the bbox and change to SPtr.
+
+	* renderers/CameraSystem.cpp, renderers/CameraSystem.h: Use smart	
+	  pointer to manage cameras.
+
+	* src/Metaserver.cpp, src/Metaserver.h src/Makefile.am: Added a class to
+	  handle metaserver queries.
+
+	* src/System.cpp, src/System.h: Create and maintain the Metaserver 
+	  instance.
+
+	* guichan/ConnectWindow.cpp: Use the new metaserver class rather than
+	  the Eris metaserver directly as this allows more control e.g. only
+	  show contactable servers.
+
 2007-04-24  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/StaticObject.cpp: Work around bug where objects fading in or

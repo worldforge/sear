@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ActionHandler.cpp,v 1.24 2006-11-30 20:30:46 simon Exp $
+// $Id: ActionHandler.cpp,v 1.25 2007-05-02 20:47:55 simon Exp $
 
 #include <unistd.h>
 
@@ -41,7 +41,7 @@ ActionHandler::ActionHandler(System *system) :
 }
 
 ActionHandler::~ActionHandler() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 void ActionHandler::init() {

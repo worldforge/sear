@@ -12,8 +12,7 @@
 #include "guichan/box.hpp"
 
 #include "src/System.h"
-
-#include <Eris/Metaserver.h>
+#include "src/Metaserver.h"
 
 #include <guichan.hpp>
 
@@ -22,47 +21,36 @@
 #include <sigc++/object_slot.h>
 
 #include <iostream>
+#include <sstream>
 
 namespace Sear {
 
 class ServerListModel : public gcn::ListModel
 {
 public:
-  Eris::Meta * m_metaQuery;
+  Metaserver *m_meta;
 
   ServerListModel()
   {
-    m_metaQuery = new Eris::Meta("metaserver.worldforge.org", 16);
-    m_metaQuery->refresh();
+    m_meta = System::instance()->getMetaserver();
+    m_meta->runCommand("refresh_server_list", "");
   }
 
   virtual ~ServerListModel() {
-    delete m_metaQuery;
   }
 
   virtual int getNumberOfElements()
   {
-    return m_metaQuery->getGameServerCount();
+    const ServerList &server_list = m_meta->getServerList();
+    return server_list.size();
   }
 
   virtual std::string getElementAt(int i)
   {
-    const Eris::ServerInfo & si = m_metaQuery->getInfoForServer(i);
-    switch (si.getStatus()) {
-      case Eris::ServerInfo::QUERYING:
-        return si.getHostname();
-        break;
-      case Eris::ServerInfo::VALID:
-        return si.getServername();
-        break;
-      case Eris::ServerInfo::TIMEOUT:
-        return "*timeout*";
-        break;
-      case Eris::ServerInfo::INVALID:
-      default:
-        return "...";
-        break;
-    }
+    const ServerList &server_list = m_meta->getServerList();
+    ServerList::const_iterator I = server_list.begin();
+    for (size_t ii = 0; ii < i; ++ii, ++I);
+    return (I->second).servername;
   }
 };
 
@@ -144,15 +132,15 @@ void ConnectWindow::logic()
   int new_selected = m_servers->getSelected();
   if (new_selected != m_selected) {
     m_selected = new_selected;
-    if (m_selected >= 0 &&
-        m_selected < m_serverListModel->m_metaQuery->getGameServerCount()) {
-      const Eris::ServerInfo & si = m_serverListModel->m_metaQuery->getInfoForServer(m_selected);
-      if ((si.getStatus() == Eris::ServerInfo::QUERYING) ||
-          (si.getStatus() == Eris::ServerInfo::VALID)) {
-        m_serverField->setText(si.getHostname());
-      } else {
-        m_serverField->setText("");
-      }
+
+    const ServerList &server_list = m_serverListModel->m_meta->getServerList();
+
+    if (m_selected >= 0 && m_selected < server_list.size()) {
+      ServerList::const_iterator I = server_list.begin();
+      for (size_t ii = 0; ii < m_selected; ++ii, ++I);
+      std::stringstream ss;
+      ss << (I->second).hostname << " " << (I->second).port;
+      m_serverField->setText(ss.str());
     }
   }
   gcn::Window::logic();
@@ -185,7 +173,7 @@ void ConnectWindow::actionPressed(std::string event)
       close = true;
     }
   } else if (event == "refresh") {
-    m_serverListModel->m_metaQuery->refresh();
+    m_serverListModel->m_meta->runCommand("refresh_server_list", "");
   } else if (event == "close") {
     std::cout << "Close window" << std::endl << std::flush;
     close = true;
@@ -195,7 +183,6 @@ void ConnectWindow::actionPressed(std::string event)
 
   if (!close) { return; }
 
-  // parent->remove(this);
   System::instance()->getWorkarea()->removeLater(this);
 }
 

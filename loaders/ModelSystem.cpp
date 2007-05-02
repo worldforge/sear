@@ -38,6 +38,10 @@
 
 namespace Sear {
 
+ModelSystem::~ModelSystem() {
+  if (m_initialised) shutdown();
+}
+
 ModelSystem ModelSystem::m_instance;
 
 static const std::string DEFAULT = "default";
@@ -45,7 +49,7 @@ static const std::string DEFAULT = "default";
 int ModelSystem::init() {
   assert(m_initialised == false);
 
-  m_model_handler = SPtrShutdown<ModelHandler>(new ModelHandler());
+  m_model_handler = SPtr<ModelHandler>(new ModelHandler());
   m_model_handler->init();
 
   // Register ModelLoaders
@@ -62,10 +66,10 @@ int ModelSystem::init() {
   // does not get linked in correctly DynamicObject
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
   
-  m_object_handler = SPtrShutdown<ObjectHandler>(new ObjectHandler());
+  m_object_handler = SPtr<ObjectHandler>(new ObjectHandler());
   m_object_handler->init();
 
-  m_entity_mapper = SPtrShutdown<EntityMapper>(new EntityMapper());
+  m_entity_mapper = SPtr<EntityMapper>(new EntityMapper());
   m_entity_mapper->init();
 
   RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(this, &ModelSystem::contextCreated));

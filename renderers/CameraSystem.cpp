@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: CameraSystem.cpp,v 1.5 2006-02-20 20:36:23 simon Exp $
+// $Id: CameraSystem.cpp,v 1.6 2007-05-02 20:47:55 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -43,7 +43,6 @@ CameraSystem::CameraSystem() :
 {}
 
 CameraSystem::~CameraSystem() {
-  assert(m_initialised == false);
   if (m_initialised) shutdown();
 }
 
@@ -57,12 +56,7 @@ int CameraSystem::init() {
 int CameraSystem::shutdown() {
   assert(m_initialised == true);
   // Clean up cameras
-  while (!m_cameras.empty())  {
-    Camera *cam = *m_cameras.begin();
-    cam->shutdown();
-    delete cam;
-    m_cameras.erase(m_cameras.begin());
-  }
+  m_cameras.clear();
 
   m_initialised = false;
   return 0;

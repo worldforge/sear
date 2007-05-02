@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.56 2007-04-22 18:28:32 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.57 2007-05-02 20:47:54 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -58,7 +58,7 @@ Cal3dModel::Cal3dModel() :
 }
 
 Cal3dModel::~Cal3dModel() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int Cal3dModel::init(Cal3dCoreModel *core_model) {
@@ -164,9 +164,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId)) {
 
-        SPtrShutdown<DynamicObject> dyno = m_dos[++counter];
+        SPtr<DynamicObject> dyno = m_dos[++counter];
         if (!dyno.isValid()) {
-          dyno = SPtrShutdown<DynamicObject>(new DynamicObject());
+          dyno = SPtr<DynamicObject>(new DynamicObject());
           dyno->init();
           dyno->contextCreated();
           m_dos[counter] = dyno;
@@ -317,7 +317,7 @@ void Cal3dModel::render(bool select_mode) {
   DynamicObjectList::iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   while (I != Iend) {
-    SPtrShutdown<DynamicObject> dyno = *I++;
+    SPtr<DynamicObject> dyno = *I++;
     dyno->render(select_mode);
   }
 }
@@ -487,7 +487,7 @@ void Cal3dModel::contextCreated() {
   DynamicObjectList::const_iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<DynamicObject> so = *I;
+    SPtr<DynamicObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -497,7 +497,7 @@ void Cal3dModel::contextDestroyed(bool check) {
   DynamicObjectList::const_iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<DynamicObject> so = *I;
+    SPtr<DynamicObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }

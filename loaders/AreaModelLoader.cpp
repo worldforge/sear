@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #include <varconf/Config.h>
 #include <Mercator/AreaShader.h>
@@ -8,6 +8,7 @@
 #include "AreaModelLoader.h"
 #include "AreaModel.h"
 #include "ModelRecord.h"
+#include "ObjectRecord.h"
 #include "environment/Environment.h"
 #include "renderers/StateManager.h"
 #include "src/WorldEntity.h"
@@ -37,7 +38,7 @@ SPtr<ModelRecord> AreaModelLoader::loadModel(WorldEntity *we,
   //      return NULL;
     }
     
-    model_record->model = SPtrShutdown<Model>(amodel);
+    model_record->model = SPtr<Model>(amodel);
     model_record->select_state = 0; // default
     model_record->select_state = 2; // select
 // create a shader if required

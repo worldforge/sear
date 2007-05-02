@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.169 2007-03-29 20:11:51 simon Exp $
+// $Id: System.cpp,v 1.170 2007-05-02 20:47:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,6 +46,7 @@
 #include "WorldEntity.h"
 #include "Editor.h"
 #include "CacheManager.h"
+#include "Metaserver.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -142,11 +143,11 @@ System::System() :
   for (unsigned int i = 0; i < SYS_LAST_STATE; ++i) m_systemState[i] = false;
     
   // create the filehandler early, so we can call addSearchPath on it
-  m_file_handler = SPtr<FileHandler>(new FileHandler());
+  m_file_handler = std::auto_ptr<FileHandler>(new FileHandler());
 }
 
 System::~System() {
-  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 
   m_file_handler.release();
 
@@ -160,11 +161,11 @@ bool System::init(int argc, char *argv[]) {
 
   if (!initVideo()) return false;
 
-  m_script_engine = SPtrShutdown<ScriptEngine>(new ScriptEngine());
+  m_script_engine = std::auto_ptr<ScriptEngine>(new ScriptEngine());
   m_script_engine->init();
 
   // Pass client name and version when creating a connection
-  m_client = SPtrShutdown<Client>(new Client(this, PACKAGE_VERSION));
+  m_client = std::auto_ptr<Client>(new Client(this, PACKAGE_VERSION));
   if (!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
 
@@ -174,14 +175,17 @@ bool System::init(int argc, char *argv[]) {
     return false;
   }
   
-  m_action_handler = SPtrShutdown<ActionHandler>(new ActionHandler(this));
+  m_action_handler = std::auto_ptr<ActionHandler>(new ActionHandler(this));
   m_action_handler->init();
 
-  m_calendar = SPtrShutdown<Calendar>(new Calendar());
+  m_calendar = std::auto_ptr<Calendar>(new Calendar());
   m_calendar->init();
 
-  m_media_manager = SPtrShutdown<MediaManager>(new MediaManager());
+  m_media_manager = std::auto_ptr<MediaManager>(new MediaManager());
   m_media_manager->init();
+
+  m_meta_server = std::auto_ptr<Metaserver>(new Metaserver());
+  m_meta_server->init();
  
   // Connect signals for record processing 
 //  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
@@ -194,7 +198,7 @@ bool System::init(int argc, char *argv[]) {
   Bindings::bind("backquote", "/toggle_console");
   Bindings::bind("caret", "/toggle_console");
   
-  m_console = SPtrShutdown<Console>(new Console(this));
+  m_console = std::auto_ptr<Console>(new Console(this));
   m_console->init();
   registerCommands(m_console.get());
 
@@ -204,18 +208,19 @@ bool System::init(int argc, char *argv[]) {
   m_file_handler->registerCommands(m_console.get());
   m_calendar->registerCommands(m_console.get());
   m_media_manager->registerCommands(m_console.get());
+  m_meta_server->registerCommands(m_console.get());
 
-  m_character = SPtrShutdown<Character>(new Character());
+  m_character = std::auto_ptr<Character>(new Character());
   m_character->init();
   m_character->registerCommands(m_console.get());
 
-  m_editor = SPtr<Editor>(new Editor());
+  m_editor = std::auto_ptr<Editor>(new Editor());
   m_editor->registerCommands(m_console.get());
 
-  m_workarea = SPtr<Workarea>(new Workarea(this));
+  m_workarea = std::auto_ptr<Workarea>(new Workarea(this));
 
 #if 0
-  m_sound = SPtrShutdown<Sound>(new Sound());
+  m_sound = std::auto_ptr<Sound>(new Sound());
   if (m_sound->init()) {
     m_sound.release();
   } else { 
@@ -735,7 +740,7 @@ bool System::isMouselookEnabled() const {
 }
 
 void System::pushMessage(const std::string &msg, int type, int duration) {
-  assert(m_console);
+  assert(m_console.get() != 0);
   m_console->pushMessage(msg, type, duration);
   pushedMessage.emit(msg, type, duration);
 }
@@ -866,7 +871,7 @@ void System::registerCommands(Console *console) {
 }
 
 void System::runCommand(const std::string &command) {
-  if (debug) Log::writeLog(command, Log::LOG_INFO);
+//  if (debug) Log::writeLog(command, Log::LOG_INFO);
   m_console->runCommand(command);
 }
 

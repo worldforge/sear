@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Character.cpp,v 1.94 2007-02-15 20:20:21 simon Exp $
+// $Id: Character.cpp,v 1.95 2007-05-02 20:47:55 simon Exp $
 
 #include <math.h>
 #include <string>
@@ -143,7 +143,7 @@ Character::Character() :
 }
 
 Character::~Character() {
-  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 bool Character::init() {

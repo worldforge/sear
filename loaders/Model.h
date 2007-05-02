@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-//$Id: Model.h,v 1.19 2007-04-22 17:45:14 simon Exp $
+//$Id: Model.h,v 1.20 2007-05-02 20:47:54 simon Exp $
 
 #ifndef SEAR_MODEL_H
 #define SEAR_MODEL_H 1
@@ -30,8 +30,8 @@ typedef std::map<std::string, Element> MapType;
 
 namespace Sear {
 
-typedef std::vector<SPtrShutdown<StaticObject> > StaticObjectList;
-typedef std::vector<SPtrShutdown<DynamicObject> > DynamicObjectList;
+typedef std::vector<SPtr<StaticObject> > StaticObjectList;
+typedef std::vector<SPtr<DynamicObject> > DynamicObjectList;
 
 typedef struct {
     WFMath::Vector<3> pos;

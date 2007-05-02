@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.4 2007-04-12 13:42:22 simon Exp $
+// $Id: MediaManager.cpp,v 1.5 2007-05-02 20:47:55 simon Exp $
 
 #include <sigc++/connection.h>
 #include <sigc++/bind.h>
@@ -123,7 +123,7 @@ MediaManager::MediaManager() :
 }
 
 MediaManager::~MediaManager() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int MediaManager::init() {

@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2005 - 2007 Simon Goodall, University of Southampton
 
 /* TODO
 
@@ -165,14 +165,14 @@ ParticleSystem::ParticleSystem(WorldEntity *we) :
 }
 
 ParticleSystem::~ParticleSystem() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 void ParticleSystem::init()
 {
   assert(m_initialised == false);
 
-  SPtrShutdown<DynamicObject> m_do = SPtrShutdown<DynamicObject>(new DynamicObject());
+  SPtr<DynamicObject> m_do = SPtr<DynamicObject>(new DynamicObject());
   m_do->init();
   m_do->contextCreated();
   m_do->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);

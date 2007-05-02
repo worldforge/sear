@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ScriptEngine.cpp,v 1.15 2006-10-01 12:52:44 simon Exp $
+// $Id: ScriptEngine.cpp,v 1.16 2007-05-02 20:47:55 simon Exp $
 
 #include "ScriptEngine.h"
 
@@ -33,7 +33,7 @@ ScriptEngine::ScriptEngine() :
 {}
 
 ScriptEngine::~ScriptEngine() {
-  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 void ScriptEngine::init() {

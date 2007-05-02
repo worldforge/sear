@@ -39,7 +39,7 @@ void scale_object(StaticObjectList &objs, Scaling scale, Alignment align, bool i
   StaticObjectList::const_iterator I = objs.begin();
   StaticObjectList::const_iterator Iend = objs.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     
     float m[4][4];
@@ -148,7 +148,7 @@ void scale_object(StaticObjectList &objs, Scaling scale, Alignment align, bool i
   }
 
   for (I = objs.begin(); I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     
     float *v = so->getVertexDataPtr();

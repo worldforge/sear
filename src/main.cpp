@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.34 2006-11-30 20:32:29 simon Exp $
+// $Id: main.cpp,v 1.35 2007-05-02 20:47:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -16,7 +16,6 @@
 
 #include <signal.h>
 
-#include "common/SPtr.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -36,7 +35,7 @@ int main(int argc, char** argv) {
 #endif
 
   bool exit_program = false;
-  Sear::SPtrShutdown<Sear::System> sys;
+  std::auto_ptr<Sear::System> sys;
   std::list<std::string> path_list;
 
   char **p_argv  = argv;
@@ -83,7 +82,7 @@ This is free software, and you are welcome to redistribute it
 under certain conditions; type `show c' for details.
 */
   
-  sys = Sear::SPtrShutdown<Sear::System>(new Sear::System());
+  sys = std::auto_ptr<Sear::System>(new Sear::System());
   sys->addSearchPaths(path_list);
 
   if (!sys->init(p_argc, p_argv)) {

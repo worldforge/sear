@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: LibModelFile_Loader.cpp,v 1.11 2006-12-03 16:12:58 simon Exp $
+// $Id: LibModelFile_Loader.cpp,v 1.12 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -10,6 +10,7 @@
 #include "src/FileHandler.h"
 
 #include "ModelSystem.h"
+#include "ObjectRecord.h"
 
 #include "ModelRecord.h"
 #include "src/WorldEntity.h"
@@ -62,7 +63,7 @@ SPtr<ModelRecord> LibModelFile_Loader::loadModel(WorldEntity *we, const std::str
     ++I;
   }
  
-  model_record->model = SPtrShutdown<Model>(model);
+  model_record->model = SPtr<Model>(model);
   return model_record;
 }
 

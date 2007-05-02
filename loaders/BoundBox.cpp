@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: BoundBox.cpp,v 1.34 2007-03-04 14:28:40 simon Exp $
+// $Id: BoundBox.cpp,v 1.35 2007-05-02 20:47:54 simon Exp $
 
 #include "renderers/RenderSystem.h"
 
@@ -23,13 +23,13 @@ BoundBox::BoundBox() :
 {}
 
 BoundBox::~BoundBox() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
-  
+
 int BoundBox::init(WFMath::AxisBox<3> bbox, const std::string &texture, bool wrap) {
   assert(m_initialised == false);
 
-  SPtrShutdown<StaticObject> so = SPtrShutdown<StaticObject>(new StaticObject());
+  SPtr<StaticObject> so = SPtr<StaticObject>(new StaticObject());
   so->init();
   // Set material properties
   so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
@@ -263,7 +263,7 @@ int BoundBox::shutdown() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     int id, mask_id;
     so->getTexture(0, id, mask_id);
@@ -280,7 +280,7 @@ void BoundBox::contextCreated() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -290,7 +290,7 @@ void BoundBox::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -300,7 +300,7 @@ void BoundBox::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
   }

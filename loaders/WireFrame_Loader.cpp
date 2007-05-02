@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: WireFrame_Loader.cpp,v 1.21 2006-02-16 15:59:01 simon Exp $
+// $Id: WireFrame_Loader.cpp,v 1.22 2007-05-02 20:47:54 simon Exp $
 
 #include <string>
 
@@ -14,6 +14,7 @@
 
 #include "Model.h"
 #include "ModelRecord.h"
+#include "ObjectRecord.h"
 
 #include "WireFrame_Loader.h"
 #include "WireFrame.h"
@@ -37,13 +38,14 @@ SPtr<ModelRecord> WireFrame_Loader::loadModel(WorldEntity *we, const std::string
   SPtr<ModelRecord> model_record = ModelLoader::loadModel(we, model_id, model_config);
   WireFrame *model = new WireFrame();
 
-  WFMath::AxisBox<3> bbox = we->hasBBox() ? (we->getBBox()) : (WFMath::AxisBox<3>(WFMath::Point<3>(0.0f,0.0f,0.0f), WFMath::Point<3>(1.0f,1.0f,1.0f)));
+  const WFMath::AxisBox<3> &bbox = we->hasBBox() ? (we->getBBox()) : (WFMath::AxisBox<3>(WFMath::Point<3>(0.0f,0.0f,0.0f), WFMath::Point<3>(1.0f,1.0f,1.0f)));
 
   if (model->init(bbox)) {
     delete model;
     return SPtr<ModelRecord>();
   }
-  model_record->model = SPtrShutdown<Model>(model);
+  model_record->model = SPtr<Model>(model);
+
   return model_record;
 }
 

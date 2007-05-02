@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.22 2007-03-04 14:28:40 simon Exp $
+// $Id: RenderSystem.cpp,v 1.23 2007-05-02 20:47:56 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -40,27 +40,29 @@ RenderSystem::RenderSystem() :
   m_mouseVisible(true)
 { }
 
-RenderSystem::~RenderSystem() {}
+RenderSystem::~RenderSystem() {
+  if (m_initialised) shutdown();
+}
 
 void RenderSystem::init() {
   assert (m_initialised == false);
   
   if (debug) std::cout << "RenderSystem: Initialise" << std::endl;
 
-  m_stateManager = SPtrShutdown<StateManager>(new StateManager());
+  m_stateManager = std::auto_ptr<StateManager>(new StateManager());
   m_stateManager->init();
 
-  m_textureManager = SPtrShutdown<TextureManager>(new TextureManager());
+  m_textureManager = std::auto_ptr<TextureManager>(new TextureManager());
   m_textureManager->init();
 
-  m_renderer = SPtrShutdown<Render>(new GL());
+  m_renderer = std::auto_ptr<Render>(new GL());
   m_renderer->init();
 
-  m_graphics = SPtrShutdown<Graphics>(new Graphics(System::instance()));
+  m_graphics = std::auto_ptr<Graphics>(new Graphics(System::instance()));
   m_graphics->init();
   m_graphics->setRenderer(m_renderer.get());
 
-  m_cameraSystem = SPtrShutdown<CameraSystem>(new CameraSystem());
+  m_cameraSystem = std::auto_ptr<CameraSystem>(new CameraSystem());
   m_cameraSystem->init();
   // Create default cameras
   // Chase camera
@@ -157,7 +159,7 @@ void RenderSystem::switchTexture(unsigned int texUnit, TextureID to) {
 }
 
 StateID RenderSystem::requestState(const std::string &state) {
-  assert (m_stateManager.isValid());
+  assert (m_stateManager.get() != 0);
   return m_stateManager->requestState(state);
 }
 
@@ -186,7 +188,7 @@ void RenderSystem::contextDestroyed(bool check) {
 }
 
 StateID RenderSystem::getCurrentState() {
-  assert (m_stateManager.isValid());
+  assert (m_stateManager.get()  != 0);
   return m_stateManager->getCurrentState();
 }
 

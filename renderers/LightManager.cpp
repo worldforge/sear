@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: LightManager.cpp,v 1.4 2006-04-26 14:39:00 simon Exp $
+// $Id: LightManager.cpp,v 1.5 2007-05-02 20:47:55 simon Exp $
 
 #include <sage/GL.h>
 
@@ -20,7 +20,7 @@ LightManager::LightManager() :
 {}
 
 LightManager::~LightManager() {
-  assert (m_initialised == false);
+  if (m_initialised) shutdown();
 }
   
 int LightManager::init() {

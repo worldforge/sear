@@ -8,6 +8,7 @@
 #include <string>
 #include <sigc++/trackable.h>
 
+#include "common/SPtr.h"
 #include "interfaces/ConsoleObject.h"
 
 namespace varconf {
@@ -22,7 +23,7 @@ class Console;
 class CameraSystem : public ConsoleObject, public sigc::trackable {
 public:
 
-  typedef std::vector<Camera*> CameraVector;
+  typedef std::vector<SPtr<Camera> > CameraVector;
 
   CameraSystem();
   ~CameraSystem();
@@ -34,10 +35,10 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-  // Add a new camera to the system
+  // Add a new camera to the system. CameraSystem takes ownership
   int addCamera(Camera *camera) {
     int pos = m_cameras.size();
-    m_cameras.push_back(camera);
+    m_cameras.push_back(SPtr<Camera>(camera));
     return pos;
   }
 
@@ -47,10 +48,12 @@ public:
   void update(double time_elapsed);
 
   // Get a camera
-  Camera *getCamera(int pos) const { return m_cameras[pos]; }
+  const Camera *getCamera(int pos) const { return m_cameras[pos].get(); }
 
   // Get the camera currently in use
-  Camera *getCurrentCamera() const { return m_cameras[m_current]; }
+  const Camera *getCurrentCamera() const { return m_cameras[m_current].get(); }
+
+  Camera *getCurrentCamera() { return m_cameras[m_current].get(); }
 
   // Select a camera for use
   void setCurrentCamera(unsigned int i) {

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.73 2007-02-15 20:20:23 simon Exp $
+// $Id: System.h,v 1.74 2007-05-02 20:47:55 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -16,7 +16,6 @@
 #include <varconf/Config.h>
 #include <wfmath/point.h>
 #include "interfaces/ConsoleObject.h"
-#include "common/SPtr.h"
 
 namespace Sear {
 	
@@ -32,6 +31,7 @@ class Workarea;
 class Character;
 class Sound;
 class Editor;
+class Metaserver;
 
 typedef enum {
   SYS_UNKNOWN = 0,
@@ -185,6 +185,7 @@ public:
   Character *getCharacter() { return m_character.get(); }
   Client *getClient() { return m_client.get(); }
   MediaManager *getMediaManager() { return m_media_manager.get(); }
+  Metaserver *getMetaserver() { return m_meta_server.get(); }
   
   static System *instance() { return m_instance; }
 
@@ -222,16 +223,17 @@ protected:
   double m_click_seconds;
   WFMath::Point<3> m_click_pos;
 
-  SPtrShutdown<Client> m_client;
-  SPtrShutdown<ScriptEngine> m_script_engine; ///< Pointer to scripting engine object
-  SPtr<FileHandler> m_file_handler; ///< Pointer to file handler object
-  SPtrShutdown<ActionHandler> m_action_handler; ///< Pointer to action handler object
-  SPtrShutdown<Calendar> m_calendar; ///< Pointer to calender object
-  SPtr<Editor> m_editor;
-  SPtrShutdown<Console> m_console;
-  SPtr<Workarea> m_workarea;
-  SPtrShutdown<Character> m_character;
-  SPtrShutdown<MediaManager> m_media_manager;
+  std::auto_ptr<Client> m_client;
+  std::auto_ptr<ScriptEngine> m_script_engine; ///< Pointer to scripting engine object
+  std::auto_ptr<FileHandler> m_file_handler; ///< Pointer to file handler object
+  std::auto_ptr<ActionHandler> m_action_handler; ///< Pointer to action handler object
+  std::auto_ptr<Calendar> m_calendar; ///< Pointer to calender object
+  std::auto_ptr<Editor> m_editor;
+  std::auto_ptr<Console> m_console;
+  std::auto_ptr<Workarea> m_workarea;
+  std::auto_ptr<Character> m_character;
+  std::auto_ptr<MediaManager> m_media_manager;
+  std::auto_ptr<Metaserver> m_meta_server;
    
   varconf::Config m_general;
 
@@ -246,7 +248,7 @@ protected:
   double m_elapsed;
   unsigned int m_current_ticks;
 
-  SPtrShutdown<Sound> m_sound;
+  std::auto_ptr<Sound> m_sound;
   
   typedef enum {
     AXIS_STRAFE,

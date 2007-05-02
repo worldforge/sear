@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2005 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: CoreModelHandler.h,v 1.8 2006-11-30 20:39:48 simon Exp $
+// $Id: CoreModelHandler.h,v 1.9 2007-05-02 20:47:54 simon Exp $
 
 #ifndef SEAR_LOADERS_CAL3D_COREMODELHANDLER_H
 #define SEAR_LOADERS_CAL3D_COREMODELHANDLER_H 1
@@ -33,7 +33,7 @@ public:
   bool isInitialised() const { return m_initialised; }
   
 private:
-  typedef std::map <std::string, SPtrShutdown<Cal3dCoreModel> > CoreModelMap;
+  typedef std::map <std::string, SPtr<Cal3dCoreModel> > CoreModelMap;
   bool m_initialised;
   CoreModelMap m_core_models;
   

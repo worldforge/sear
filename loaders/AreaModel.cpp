@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2006 Simon Goodall
+// Copyright (C) 2005 - 2007 Simon Goodall
 
 #include <iostream>
 
@@ -25,9 +25,8 @@ AreaModel::AreaModel(WorldEntity *we) :
 {
 }
 
-AreaModel::~AreaModel()
-{
-  assert (m_initialised == false);
+AreaModel::~AreaModel() {
+  if (m_initialised) shutdown();
 }
 
 bool AreaModel::init() {

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.10 2007-01-10 17:36:22 simon Exp $
+// $Id: Camera.cpp,v 1.11 2007-05-02 20:47:55 simon Exp $
 
 #include <string>
 
@@ -74,7 +74,7 @@ Camera::Camera() :
 { }
 
 Camera::~Camera() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 bool Camera::init() {

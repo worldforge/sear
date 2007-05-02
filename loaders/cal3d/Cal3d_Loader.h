@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Cal3d_Loader.h,v 1.6 2006-11-30 20:39:47 simon Exp $
+// $Id: Cal3d_Loader.h,v 1.7 2007-05-02 20:47:54 simon Exp $
 
 #ifndef SEAR_CAL3D_LOADER_H
 #define SEAR_CAL3D_LOADER_H 1
@@ -25,7 +25,7 @@ public:
 
 private:
   static const std::string CAL3D;
-  SPtrShutdown<CoreModelHandler> m_core_model_handler;
+  std::auto_ptr<CoreModelHandler> m_core_model_handler;
   
 };
 

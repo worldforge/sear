@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.27 2006-12-03 16:12:58 simon Exp $
+// $Id: 3ds_Loader.cpp,v 1.28 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -12,6 +12,7 @@
 #include "ModelSystem.h"
 
 #include "ModelRecord.h"
+#include "ObjectRecord.h"
 #include "src/WorldEntity.h"
 
 #include "3ds_Loader.h"
@@ -60,15 +61,8 @@ SPtr<ModelRecord> ThreeDS_Loader::loadModel(WorldEntity *we, const std::string &
     ++I;
   }
 
-  // Set height
-//  if (model_record->scaleByHeight) {
-//    float height = fabs(we->getBBox().highCorner().z() 
-//                       - we->getBBox().lowCorner().z());
-//    model->setHeight(height);
-//  }
+  model_record->model = SPtr<Model>(model);
 
-  model_record->model = SPtrShutdown<Model>(model);
-  // Return newly created model
   return model_record;
 }
 

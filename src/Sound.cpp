@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <cassert>
 
-// $Id: Sound.cpp,v 1.20 2006-02-18 22:57:02 alriddoch Exp $
+// $Id: Sound.cpp,v 1.21 2007-05-02 20:47:55 simon Exp $
 
 // TODO: The sound systems appear to have a large number of memory leaks in SDL and/or SDL_mixer
 
@@ -32,7 +32,7 @@ Sound::Sound() :
 {}
 
 Sound::~Sound() {
-  assert(m_initialised == false);
+ if (m_initialised) shutdown();
 }
 	
 int Sound::init() {

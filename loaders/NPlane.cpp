@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: NPlane.cpp,v 1.32 2007-03-04 14:28:40 simon Exp $
+// $Id: NPlane.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
 
 #include <iostream>
 
@@ -26,14 +26,14 @@ NPlane::NPlane() :
 {}
 
 NPlane::~NPlane() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
   
 int NPlane::init(const std::string &texture, unsigned int num_planes, float width, float height) {
   assert(m_initialised == false);
 
   // Store texture name and get ID numbers
-  SPtrShutdown<StaticObject> so = SPtrShutdown<StaticObject>(new StaticObject());
+  SPtr<StaticObject> so = SPtr<StaticObject>(new StaticObject());
   so->init();
   // Set material properties
   so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
@@ -133,7 +133,7 @@ int NPlane::shutdown() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     int id, mask_id;
     so->getTexture(0, id, mask_id);
@@ -149,7 +149,7 @@ void NPlane::contextCreated() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -159,7 +159,7 @@ void NPlane::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -169,7 +169,7 @@ void NPlane::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
   }

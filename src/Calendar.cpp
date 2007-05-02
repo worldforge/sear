@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Calendar.cpp,v 1.29 2007-01-15 20:50:40 simon Exp $
+// $Id: Calendar.cpp,v 1.30 2007-05-02 20:47:55 simon Exp $
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -75,11 +75,11 @@ Calendar::Calendar() :
   m_time_in_area(0.0f),
   m_firstUpdate(true)
 {}
-	
-Calendar::~Calendar() {
-  assert(m_initialised == false);
-}
 
+Calendar::~Calendar() {
+  if (m_initialised) shutdown();
+}
+	
 void Calendar::init() {
   assert(m_initialised == false);
   // Bind signal to config for further updates

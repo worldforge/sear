@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: WireFrame.cpp,v 1.23 2007-01-09 17:44:50 simon Exp $
+// $Id: WireFrame.cpp,v 1.24 2007-05-02 20:47:54 simon Exp $
 
 #include <sage/sage.h>
 #include <sage/GL.h>
@@ -26,17 +26,16 @@ WireFrame::WireFrame() :
   m_initialised(false),
   m_disp(0)
 {}
- 
-WireFrame::~WireFrame() {
-  assert(m_initialised == false);
 
+WireFrame::~WireFrame() {
+  if (m_initialised) shutdown();
 }
-  
-int WireFrame::init(WFMath::AxisBox<3> bbox) {
+ 
+int WireFrame::init(const WFMath::AxisBox<3> &bbox) {
   assert(m_initialised == false);
 
   m_vertex_data[0].x = bbox.lowCorner().x(); m_vertex_data[0].y = bbox.highCorner().y(); m_vertex_data[0].z = bbox.lowCorner().z();
-  m_vertex_data[1].x = bbox.lowCorner().x();m_vertex_data[1].y = bbox.lowCorner().y(); m_vertex_data[1].z = bbox.lowCorner().z();
+  m_vertex_data[1].x = bbox.lowCorner().x(); m_vertex_data[1].y = bbox.lowCorner().y(); m_vertex_data[1].z = bbox.lowCorner().z();
 
   m_vertex_data[2].x = bbox.lowCorner().x(); m_vertex_data[2].y = bbox.lowCorner().y(); m_vertex_data[2].z = bbox.lowCorner().z();
   m_vertex_data[3].x = bbox.highCorner().x(); m_vertex_data[3].y = bbox.lowCorner().y(); m_vertex_data[3].z = bbox.lowCorner().z();

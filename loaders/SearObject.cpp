@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.8 2007-04-22 21:17:13 simon Exp $
+// $Id: SearObject.cpp,v 1.9 2007-05-02 20:47:54 simon Exp $
 
 #include  <stdio.h>
 
@@ -92,7 +92,7 @@ SearObject::SearObject() : Model(),
 }
 
 SearObject::~SearObject() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int SearObject::init(const std::string &file_name) {
@@ -218,7 +218,7 @@ int SearObject::shutdown() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     int id, mask_id;
     // Clean up textures
@@ -238,7 +238,7 @@ void SearObject::contextCreated() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -248,7 +248,7 @@ void SearObject::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -258,7 +258,7 @@ void SearObject::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
   }
@@ -341,7 +341,7 @@ int SearObject::load(const std::string &filename) {
       swap_bytes_float(som.shininess);
     }
 
-    SPtrShutdown<StaticObject> so(new StaticObject());
+    SPtr<StaticObject> so(new StaticObject());
     so->init();
    
     so->setNumPoints(som.num_vertices);

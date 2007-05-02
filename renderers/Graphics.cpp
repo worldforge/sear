@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.69 2007-04-22 17:45:13 simon Exp $
+// $Id: Graphics.cpp,v 1.70 2007-05-02 20:47:55 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -143,7 +143,6 @@ Graphics::Graphics(System *system) :
 }
 
 Graphics::~Graphics() {
-  assert (m_initialised == false);
   if (m_initialised) shutdown();
 }
 
@@ -245,7 +244,7 @@ void Graphics::setCameraTransform() {
   }
 
   // Get the current camera
-  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  const Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
 
   // Get the current focus entity
@@ -332,7 +331,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     glFogf(GL_FOG_START, visibility / 2.0f);
     glFogf(GL_FOG_END, visibility);
 
-    Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+    const Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
     assert(cam != NULL);
 
     // Initial Camera rotation
@@ -480,7 +479,7 @@ void Graphics::buildQueues(WorldEntity *we,
   we->updateAbsOrient();
   we->updateAbsPosition();
 
-  Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
+  const Camera *cam = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera();
   assert(cam != NULL);
 
   assert(we->getType());
@@ -622,7 +621,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
   SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(model_id, obj_we);
   assert(modelRec);
  
-  SPtrShutdown<Model> model = modelRec->model;
+  SPtr<Model> model = modelRec->model;
   assert(model);
 
   int state = select_mode ? modelRec->select_state : modelRec->state;
@@ -638,6 +637,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
 
   bool has_static = model->hasStaticObjects();
   bool has_dynamic = model->hasDynamicObjects();
+
   if (has_static || has_dynamic) {
  
 // Calculate Transform Matrix //////////////////////////////////////////////////
@@ -705,6 +705,10 @@ void Graphics::drawObjectExt(const std::string &model_id,
       if (has_dynamic) m_dynamic_object_map[key] = model->getDynamicObjects();
     }
   } else {
+    // We still get here through the wireframe model
+    // We also get here through the AreaModel and NullModel, but these can be ignored
+    // as they have no meshes to render in the first place
+
     // Add to queue by state, then model record
     render_queue[state].push_back(Render::QueueItem(obj, modelRec));
   }

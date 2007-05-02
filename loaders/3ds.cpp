@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.71 2007-04-14 13:46:42 simon Exp $
+// $Id: 3ds.cpp,v 1.72 2007-05-02 20:47:54 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -82,7 +82,7 @@ ThreeDS::ThreeDS() : Model(),
 }
 
 ThreeDS::~ThreeDS() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int ThreeDS::init(const std::string &file_name) {
@@ -214,7 +214,7 @@ int ThreeDS::shutdown() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     int id, mask_id;
     // Clean up textures
@@ -241,7 +241,7 @@ void ThreeDS::contextCreated() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -251,7 +251,7 @@ void ThreeDS::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -261,7 +261,7 @@ void ThreeDS::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtrShutdown<StaticObject> so = *I;
+    SPtr<StaticObject> so = *I;
     assert(so);
     so->render(select_mode);
   }
@@ -302,7 +302,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
   unsigned int n_counter = 0;
   unsigned int t_counter = 0;
 
-  SPtrShutdown<StaticObject> ro;
+  SPtr<StaticObject> ro;
   std::string material_name = "sear:noname";
   std::string current_material_name = "sear:bogus_name";
 
@@ -441,7 +441,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
       // Reset counters
       v_counter = n_counter = t_counter = 0;
       // Create a new render object and create data structures
-      ro = SPtrShutdown<StaticObject>(new StaticObject());
+      ro = SPtr<StaticObject>(new StaticObject());
       ro->init();
       ro->setNumPoints(3 * mesh->faces);
 

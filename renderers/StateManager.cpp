@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.32 2007-03-29 20:11:51 simon Exp $
+// $Id: StateManager.cpp,v 1.33 2007-05-02 20:47:56 simon Exp $
 
 /*
  * TODO
@@ -86,7 +86,7 @@ StateManager::StateManager() :
 {}
 
 StateManager::~StateManager() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int StateManager::init() {

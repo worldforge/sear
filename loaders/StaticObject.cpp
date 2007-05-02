@@ -43,8 +43,8 @@ StaticObject::StaticObject() :
 {
 }
 
-StaticObject::~StaticObject()  {
-  assert(m_initialised == false);
+StaticObject::~StaticObject() {
+  if (m_initialised) shutdown();
 }
 
 int StaticObject::init() {

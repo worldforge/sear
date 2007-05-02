@@ -41,8 +41,8 @@ DynamicObject::DynamicObject() :
 {
 }
 
-DynamicObject::~DynamicObject()  {
-  assert(m_initialised == false);
+DynamicObject::~DynamicObject() {
+  if (m_initialised) shutdown();
 }
 
 int DynamicObject::init() {

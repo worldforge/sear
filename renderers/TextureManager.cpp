@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.51 2007-04-12 20:01:57 simon Exp $
+// $Id: TextureManager.cpp,v 1.52 2007-05-02 20:47:56 simon Exp $
 
 #include <unistd.h>
 
@@ -166,6 +166,10 @@ TextureManager::TextureManager() :
 {  
   varconf::Config &cfg = System::instance()->getGeneral();
   cfg.sigsv.connect(sigc::mem_fun(this, &TextureManager::generalConfigChanged));
+}
+
+TextureManager::~TextureManager() {
+  if (m_initialised) shutdown();
 }
 
 void TextureManager::init()

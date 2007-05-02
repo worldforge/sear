@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.13 2007-04-22 15:49:27 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.14 2007-05-02 20:47:54 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -40,7 +40,7 @@ ObjectHandler::ObjectHandler() :
 {}
 
 ObjectHandler::~ObjectHandler() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int ObjectHandler::init() {

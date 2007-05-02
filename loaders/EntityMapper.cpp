@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: EntityMapper.cpp,v 1.1 2007-04-22 15:49:27 simon Exp $
+// $Id: EntityMapper.cpp,v 1.2 2007-05-02 20:47:54 simon Exp $
 
 /** The EntityMapper class aims to provide a mapping between an entity and it's state to
  * a object record. 
@@ -42,7 +42,7 @@ EntityMapper::EntityMapper() :
 }
 
 EntityMapper::~EntityMapper() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int EntityMapper::init() {

@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
+// Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: BoundBox_Loader.cpp,v 1.32 2006-12-03 16:12:58 simon Exp $
+// $Id: BoundBox_Loader.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -10,6 +10,7 @@
 
 #include <string>
 
+#include "ObjectRecord.h"
 #include "ModelRecord.h"
 
 #include "BoundBox_Loader.h"
@@ -77,7 +78,7 @@ SPtr<ModelRecord> BoundBox_Loader::loadModel(WorldEntity *we, const std::string 
     ++I;
   }
 
-  model_record->model = SPtrShutdown<Model>(model);
+  model_record->model = SPtr<Model>(model);
 
   return model_record;
 }

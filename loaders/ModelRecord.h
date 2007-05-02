@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: ModelRecord.h,v 1.9 2006-05-06 13:50:22 simon Exp $
+// $Id: ModelRecord.h,v 1.10 2007-05-02 20:47:54 simon Exp $
 
 #ifndef SEAR_MODELRECORD_H
 #define SEAR_MODELRECORD_H 1
@@ -35,7 +35,7 @@ public:
   std::string default_skin;
   bool model_by_type;
   bool outline;
-  SPtrShutdown<Model> model;	
+  SPtr<Model> model;	
   RotationStyle rotation_style;
   float offset_x, offset_y, offset_z;
   float rotate_x, rotate_y, rotate_z;

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: Cal3d_Loader.cpp,v 1.24 2007-04-22 18:28:32 simon Exp $
+// $Id: Cal3d_Loader.cpp,v 1.25 2007-05-02 20:47:54 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -31,7 +31,7 @@ namespace Sear {
 const std::string Cal3d_Loader::CAL3D = "cal3d";
 	
 Cal3d_Loader::Cal3d_Loader() {
-  m_core_model_handler = SPtrShutdown<CoreModelHandler>(new CoreModelHandler());
+  m_core_model_handler = std::auto_ptr<CoreModelHandler>(new CoreModelHandler());
   m_core_model_handler->init();
 }
 
@@ -63,7 +63,7 @@ SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &mo
     model->setSelectState(model_record->select_state);
     model->setUseStencil(use_stencil);
 
-    model_record->model = SPtrShutdown<Model>(model);
+    model_record->model = SPtr<Model>(model);
   } catch (...) {
     std::cerr << "Cal3d_Loader: Unknown Exception" << std::endl;
     return SPtr<ModelRecord>();

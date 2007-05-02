@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.88 2007-04-12 13:43:55 simon Exp $
+// $Id: client.cpp,v 1.89 2007-05-02 20:47:55 simon Exp $
 
 #include "System.h"
 
@@ -93,7 +93,7 @@ Client::Client(System *system, const std::string &client_name) :
 }
 
 Client::~Client() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 bool Client::init() {
