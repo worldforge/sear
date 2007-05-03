@@ -48,7 +48,7 @@ Weather::Weather() :
 {}
 
 Weather::~Weather() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 int Weather::init() {

@@ -11,8 +11,6 @@
 
 #include <wfmath/point.h>
 
-#include "common/SPtr.h"
-
 namespace Mercator { 
     class Area;
     class Shader;
@@ -67,10 +65,10 @@ private:
 
   static Environment instance;
 
-  SPtr<TerrainRenderer> m_terrain;
-  SPtr<SkyDome> m_skyDome;
-  SPtr<Stars> m_stars;
-  SPtrShutdown<Weather> m_weather;
+  std::auto_ptr<TerrainRenderer> m_terrain;
+  std::auto_ptr<SkyDome> m_skyDome;
+  std::auto_ptr<Stars> m_stars;
+  std::auto_ptr<Weather> m_weather;
 };
 
 } // namespace Sear

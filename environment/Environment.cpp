@@ -24,16 +24,16 @@ Environment::Environment() :
 {}
 
 Environment::~Environment() {
-  assert(m_initialised == false);
+  if (m_initialised) shutdown();
 }
 
 
 void Environment::init() {
   assert(m_initialised == false);
-  m_terrain = SPtr<TerrainRenderer>(new TerrainRenderer());
-  m_skyDome = SPtr<SkyDome>(new SkyDome(1.0f, 20, 20));
-  m_stars = SPtr<Stars>(new Stars());
-  m_weather = SPtrShutdown<Weather>(new Weather());
+  m_terrain = std::auto_ptr<TerrainRenderer>(new TerrainRenderer());
+  m_skyDome = std::auto_ptr<SkyDome>(new SkyDome(1.0f, 20, 20));
+  m_stars   = std::auto_ptr<Stars>(new Stars());
+  m_weather = std::auto_ptr<Weather>(new Weather());
   m_weather->init();
 
  
