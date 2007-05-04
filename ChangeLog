@@ -1,5 +1,9 @@
 2007-05-04  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/StaticObjectFunctions.cpp: #include <limits>
+
+2007-05-04  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/ModelSystem.cpp: Fix typo
 
 2007-05-04  Simon Goodall  <simon@worldforge.org>

@@ -17,6 +17,7 @@
 //#include "3ds.h"
 
 #include <math.h>
+#include <limits>
 
 #include "StaticObjectFunctions.h"
 
