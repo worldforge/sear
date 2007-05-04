@@ -3,6 +3,7 @@
 // Copyright (C) 2007 Simon Goodall
 
 #include "src/Metaserver.h"
+#include "src/Avahi.h"
 
 #include <cassert>
 
@@ -31,6 +32,9 @@ int Metaserver::init() {
 
   // Hook up signals
   m_meta->ReceivedServerInfo.connect(sigc::mem_fun(this, &Metaserver::onReceivedServerInfo));
+
+  m_avahi = std::auto_ptr<Avahi>(new Avahi());
+  m_avahi->init(this);
  
   m_initialised = true;
 
@@ -38,6 +42,8 @@ int Metaserver::init() {
 }
 void Metaserver::shutdown() {
   assert(m_initialised == true);
+
+  m_avahi->shutdown();
 
   delete m_meta;
 
@@ -56,7 +62,13 @@ void Metaserver::runCommand(const std::string &command, const std::string &args)
  
 
 void Metaserver::poll() {
+  assert(m_initialised == true);
   // metaserver polling is done during eris poll
+  m_avahi->poll();
+}
+
+void Metaserver::addServerObject(const ServerObject &so) {
+  m_server_list[so.servername] = so;
 }
 
  
@@ -70,7 +82,6 @@ void Metaserver::varconf_error_callback(const char *message) {
 
 
 void Metaserver::onReceivedServerInfo(const Eris::ServerInfo &info) {
-//  ServerList::iterator I = m_server_list.find(info.getServername());
   printf("Got a server: %s\n", info.getServername().c_str());
   ServerObject so;
   so.hostname    = info.getHostname();

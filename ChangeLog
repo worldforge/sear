@@ -1,3 +1,14 @@
+2007-05-04  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac: Check for avahi.
+
+	* src/Avahi.cpp, src/Avahi.h, src/Makefile.am: Added avahi capabilities
+	  to search for local Worldorge servers.
+
+	* src/Metaserver.cpp, src/Metaserver.h: Hook in the Avahi class.
+
+	* src/System.cpp: Call the metaserver poll method.
+
 2007-05-02  Simon Goodall  <simon@worldforge.org>
 
 	* common/SPtr.h: Remove SPtrShutdown in preference of calling shutdown

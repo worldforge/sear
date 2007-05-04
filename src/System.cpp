@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.170 2007-05-02 20:47:55 simon Exp $
+// $Id: System.cpp,v 1.171 2007-05-04 16:06:44 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -443,6 +443,8 @@ void System::mainLoop() {
       // poll network
       m_client->poll();
 
+      m_meta_server->poll();
+ 
       m_media_manager->poll();
 
       if (m_client->getAvatar() && m_client->getAvatar()->getView()) {
