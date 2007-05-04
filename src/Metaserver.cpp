@@ -34,7 +34,9 @@ int Metaserver::init() {
   m_meta->ReceivedServerInfo.connect(sigc::mem_fun(this, &Metaserver::onReceivedServerInfo));
 
   m_avahi = std::auto_ptr<Avahi>(new Avahi());
-  m_avahi->init(this);
+  if (m_avahi->init(this)) {
+    m_avahi.release();
+  }
  
   m_initialised = true;
 
@@ -43,7 +45,7 @@ int Metaserver::init() {
 void Metaserver::shutdown() {
   assert(m_initialised == true);
 
-  m_avahi->shutdown();
+  m_avahi.release();
 
   delete m_meta;
 
@@ -64,7 +66,7 @@ void Metaserver::runCommand(const std::string &command, const std::string &args)
 void Metaserver::poll() {
   assert(m_initialised == true);
   // metaserver polling is done during eris poll
-  m_avahi->poll();
+  if (m_avahi.get()) m_avahi->poll();
 }
 
 void Metaserver::addServerObject(const ServerObject &so) {
