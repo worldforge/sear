@@ -33,7 +33,7 @@
 #ifdef DEBUG
   static const bool debug = true;
 #else
-  static censt bool debug = false;
+  static const bool debug = false;
 #endif
 
 namespace Sear {

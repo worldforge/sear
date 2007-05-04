@@ -1,5 +1,9 @@
 2007-05-04  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ModelSystem.cpp: Fix typo
+
+2007-05-04  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac: Check for avahi.
 
 	* src/Avahi.cpp, src/Avahi.h, src/Makefile.am: Added avahi capabilities
