@@ -226,6 +226,19 @@ AM_PATH_LIB3DS($LIB3DS_VERSION, [
 ])
 
 
+PKG_CHECK_MODULES(
+  AVAHI, avahi-client,
+  [
+    CPPFLAGS="$CPPFLAGS $AVAHI_CFLAGS"
+    SEAR_LIBS="$SEAR_LIBS $AVAHI_LIBS"
+    AC_DEFINE(HAVE_AVAHI, 1, [Define to 1 if Avahi is available.])
+  ],
+  [
+    AC_MSG_WARN([Couldn't find Avahi. Avahi support will be disabled.])
+  ]
+)
+
+
 dnl Check other libs
 
 if test $cross_compiling == no; then
