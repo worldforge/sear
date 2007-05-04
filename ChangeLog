@@ -1,5 +1,9 @@
 2007-05-04  Simon Goodall  <simon@worldforge.org>
 
+	* src/Avahi.cpp: #include config.h
+
+2007-05-04  Simon Goodall  <simon@worldforge.org>
+
 	* src/Metaserver.cpp: Check to see that avahi starts ok before trying
 	  to use it.
 
