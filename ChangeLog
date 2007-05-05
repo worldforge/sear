@@ -1,5 +1,10 @@
 2007-05-05  Simon Goodall  <simon@worldforge.org>
 
+	* src/Bonjour.cpp: Process the TXT record. Only use the service name,
+	  not the service name + type + domain.
+
+2007-05-05  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, src/Bonjour.cpp, src/Bonjour.h: Use SDL_LoadObject and
 	  SDL_LoadFunction calls to make use of dnssd rather than directly 
 	  linking to the DLL. This allows Sear to be distributed without the
