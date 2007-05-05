@@ -27,6 +27,7 @@ public:
 private:
   bool m_initialised;
   std::auto_ptr<BonjourUserData> m_ud;
+  void *m_hnd;
 
 };
 

@@ -1,5 +1,12 @@
 2007-05-05  Simon Goodall  <simon@worldforge.org>
 
+	* configure.ac, src/Bonjour.cpp, src/Bonjour.h: Use SDL_LoadObject and
+	  SDL_LoadFunction calls to make use of dnssd rather than directly 
+	  linking to the DLL. This allows Sear to be distributed without the
+	  DLL, but still make use of it if it is present.
+
+2007-05-05  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac: Added dns-sd/bonjour check.
 
 	* src/Bonjour.cpp: Lots of compiler fixes

@@ -6,6 +6,7 @@
 #include "config.h"
 #endif
 
+#include "SDL_loadso.h"
 
 #include "src/Bonjour.h"
 #include "src/Metaserver.h"
@@ -24,9 +25,60 @@
 #include "dns_sd.h"
 #include <winsock2.h>
 
-//  Defafult search strings
+//  Default search strings
 static const std::string STR_service = "_worldforge._tcp";  
 static const std::string STR_domain  = "local";
+
+// Declare funtion pointers
+
+typedef int (DNSSD_API *pfnDNSServiceRefSockFD)(DNSServiceRef sdRef);
+
+typedef DNSServiceErrorType (DNSSD_API *pfnDNSServiceProcessResult) (DNSServiceRef sdRef);
+
+typedef void (DNSSD_API *pfnDNSServiceRefDeallocate) (DNSServiceRef sdRef);
+
+typedef DNSServiceErrorType (DNSSD_API *pfnDNSServiceBrowse)
+    (
+    DNSServiceRef                       *,
+    DNSServiceFlags                     ,
+    uint32_t                            ,
+    const char                          *,
+    const char                          *,   /* may be NULL */
+    DNSServiceBrowseReply               ,
+    void                                *    /* may be NULL */
+    );
+
+typedef DNSServiceErrorType (DNSSD_API *pfnDNSServiceResolve)
+    (
+    DNSServiceRef                       *,
+    DNSServiceFlags                     ,
+    uint32_t                            ,
+    const char                          *,
+    const char                          *,
+    const char                          *,
+    DNSServiceResolveReply              ,
+    void                                *  /* may be NULL */
+    );
+
+typedef DNSServiceErrorType (DNSSD_API *pfnDNSServiceQueryRecord)
+    (
+    DNSServiceRef                       *,
+    DNSServiceFlags                     ,
+    uint32_t                            ,
+    const char                          *,
+    uint16_t                            ,
+    uint16_t                            ,
+    DNSServiceQueryRecordReply          ,
+    void                                *  /* may be NULL */
+    );
+
+pfnDNSServiceRefSockFD SEAR_DNSServiceRefSockFD = 0;
+pfnDNSServiceQueryRecord SEAR_DNSServiceQueryRecord = 0;
+pfnDNSServiceResolve SEAR_DNSServiceResolve = 0;
+pfnDNSServiceBrowse SEAR_DNSServiceBrowse = 0;
+pfnDNSServiceProcessResult SEAR_DNSServiceProcessResult = 0;
+pfnDNSServiceRefDeallocate SEAR_DNSServiceRefDeallocate = 0;
+
 
 typedef std::vector<std::pair<DNSServiceRef,bool> > ResolverList;
 #endif
@@ -41,10 +93,10 @@ public:
   {}
   ~BonjourUserData() {
     // Clean up if required
-    if (client) DNSServiceRefDeallocate(client);
+    if (client) SEAR_DNSServiceRefDeallocate(client);
     while (resolvers.empty() == false) {
       DNSServiceRef c = resolvers.begin()->first;
-      if (c) DNSServiceRefDeallocate(c);
+      if (c) SEAR_DNSServiceRefDeallocate(c);
       resolvers.erase(resolvers.begin());
     }
   }
@@ -105,7 +157,7 @@ static void DNSSD_API resolve_callback(DNSServiceRef client, const DNSServiceFla
 }
 
 
-static void DNSSD_API browse_callback(DNSServiceRef client, const DNSServiceFlags flags, uint32_t ifIndex, DNSServiceErrorType errorcode, const char *replyName, const char *replyType, const char *replyDomain, void *context) {
+static void DNSSD_API browse_callback(DNSServiceRef client, DNSServiceFlags flags, uint32_t ifIndex, DNSServiceErrorType errorcode, const char *replyName, const char *replyType, const char *replyDomain, void *context) {
   printf("browse_callback called -- %s\n", replyName);
 
   assert(context);
@@ -116,7 +168,7 @@ static void DNSSD_API browse_callback(DNSServiceRef client, const DNSServiceFlag
   int idx = ud->resolvers.size();
   ud->resolvers.resize(ud->resolvers.size() + 1);
   // Hook up callback to reolve this entry
-  DNSServiceResolve(&(ud->resolvers[idx].first), 0, opinterface, replyName, replyType, replyDomain, (DNSServiceResolveReply)resolve_callback, context);
+  SEAR_DNSServiceResolve(&(ud->resolvers[idx].first), 0, opinterface, replyName, replyType, replyDomain, (DNSServiceResolveReply)resolve_callback, context);
 
 }
 
@@ -125,7 +177,8 @@ static void DNSSD_API browse_callback(DNSServiceRef client, const DNSServiceFlag
 namespace Sear {
 
 Bonjour::Bonjour() :
-  m_initialised(false)
+  m_initialised(false),
+  m_hnd(0)
 {}
 
 Bonjour::~Bonjour() {
@@ -141,7 +194,7 @@ void Bonjour::poll() {
   fd_set  readfds;
   struct timeval tv;
 
-  int fd = DNSServiceRefSockFD(m_ud->client);
+  int fd = SEAR_DNSServiceRefSockFD(m_ud->client);
 
   FD_ZERO(&readfds);
   FD_SET(fd, &readfds);
@@ -151,7 +204,7 @@ void Bonjour::poll() {
   ResolverList::const_iterator I = m_ud->resolvers.begin();
   ResolverList::const_iterator Iend = m_ud->resolvers.end();
   while (I != Iend) {
-    int fd_2 =  (I->first) ? DNSServiceRefSockFD(I->first) : -1;
+    int fd_2 =  (I->first) ? SEAR_DNSServiceRefSockFD(I->first) : -1;
     if (fd_2 >= nfds) nfds = fd_2 + 1;
     FD_SET(fd_2, &readfds);
     ++I;
@@ -164,7 +217,7 @@ void Bonjour::poll() {
   int result = select(nfds, &readfds, (fd_set*)NULL, (fd_set*)NULL, &tv);
   if (result > 0) { // There is some data!
     if (FD_ISSET(fd, &readfds)) {
-      err = DNSServiceProcessResult(m_ud->client);
+      err = SEAR_DNSServiceProcessResult(m_ud->client);
       if (err) {
         printf("Err  %d\n", err);
         return;
@@ -174,9 +227,9 @@ void Bonjour::poll() {
     ResolverList::const_iterator I = m_ud->resolvers.begin();
     ResolverList::const_iterator Iend = m_ud->resolvers.end();
     while (I != Iend) {
-      int fd_2 =  (I->first) ? DNSServiceRefSockFD(I->first) : -1;
+      int fd_2 =  (I->first) ? SEAR_DNSServiceRefSockFD(I->first) : -1;
       if ( FD_ISSET(fd_2, &readfds)) {
-        err = DNSServiceProcessResult(I->first);
+        err = SEAR_DNSServiceProcessResult(I->first);
         if (err) {
           printf("Err  %d\n", err);
           return;
@@ -199,7 +252,7 @@ void Bonjour::poll() {
   ResolverList::const_iterator Jend = m_ud->resolvers.end();
   while (J != Jend) {
     if (J->second) {
-      DNSServiceRefDeallocate(J->first);
+      SEAR_DNSServiceRefDeallocate(J->first);
       m_ud->resolvers.erase(J);
       // Reset iterators
       J = m_ud->resolvers.begin();
@@ -214,17 +267,31 @@ void Bonjour::poll() {
 int Bonjour::init(Metaserver *meta) {
   assert(m_initialised == false); 
 #ifdef HAVE_BONJOUR
+  m_hnd = SDL_LoadObject("dnssd.dll");
+  if (m_hnd == 0) return 1;
+
+  SEAR_DNSServiceRefSockFD = (pfnDNSServiceRefSockFD)SDL_LoadFunction(m_hnd, "DNSServiceRefSockFD");
+  SEAR_DNSServiceQueryRecord = (pfnDNSServiceQueryRecord)SDL_LoadFunction(m_hnd, "DNSServiceQueryRecord");
+  SEAR_DNSServiceResolve = (pfnDNSServiceResolve)SDL_LoadFunction(m_hnd, "DNSServiceResolve");
+  SEAR_DNSServiceBrowse = (pfnDNSServiceBrowse)SDL_LoadFunction(m_hnd, "DNSServiceBrowse");
+  SEAR_DNSServiceProcessResult = (pfnDNSServiceProcessResult)SDL_LoadFunction(m_hnd, "DNSServiceProcessResult");
+  SEAR_DNSServiceRefDeallocate = (pfnDNSServiceRefDeallocate)SDL_LoadFunction(m_hnd, "DNSServiceRefDeallocate");
+
   m_ud = std::auto_ptr<BonjourUserData>(new BonjourUserData());
 
   m_ud->meta = meta;
 
-  DNSServiceErrorType err = DNSServiceBrowse(&m_ud->client, 0, kDNSServiceInterfaceIndexAny, STR_service.c_str(), STR_domain.c_str(), browse_callback, m_ud.get());
+  DNSServiceFlags f = 0;
+  DNSServiceErrorType err = SEAR_DNSServiceBrowse(&m_ud->client, f, kDNSServiceInterfaceIndexAny, STR_service.c_str(), STR_domain.c_str(), browse_callback, (void*)m_ud.get());
 
   if (!m_ud->client || err != 0) {
     m_ud.release();
     return 1;
   }
 #endif
+
+  m_initialised = true;
+
   return 0;
 }
 
@@ -232,6 +299,9 @@ void Bonjour::shutdown() {
   assert(m_initialised == true);
 #ifdef HAVE_BONJOUR
   m_ud.release();
+
+  SDL_UnloadObject(m_hnd);
+  m_hnd = 0;
 #endif
   m_initialised = false;
 }

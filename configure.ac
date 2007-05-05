@@ -146,7 +146,6 @@ else
   AC_CHECK_HEADER(dns_sd.h,
     [ 
       AC_DEFINE(HAVE_BONJOUR, 1, [Define to 1 if Bonjour is available.])
-      SEAR_LIBS="$SEAR_LIBS -ldnssd"
     ],
     [
       AC_MSG_WARN([Couldn't find dns_sd.h. Bonjour support will be disabled.])
