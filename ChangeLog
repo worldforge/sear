@@ -1,5 +1,11 @@
 2007-05-05  Simon Goodall  <simon@worldforge.org>
 
+	* configure.ac: Added dns-sd/bonjour check.
+
+	* src/Bonjour.cpp: Lots of compiler fixes
+
+2007-05-05  Simon Goodall  <simon@worldforge.org>
+
 	* src/Makefile.am, src/Bonjour.cpp, src/Bonjour.h: Added a class to
 	  handle bonjour/dns-sd for platforms not supporting avahi.
 

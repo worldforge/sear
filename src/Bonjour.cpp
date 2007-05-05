@@ -8,6 +8,7 @@
 
 
 #include "src/Bonjour.h"
+#include "src/Metaserver.h"
 
 #include <string>
 #include <stdio.h>
@@ -26,12 +27,14 @@
 //  Defafult search strings
 static const std::string STR_service = "_worldforge._tcp";  
 static const std::string STR_domain  = "local";
+
+typedef std::vector<std::pair<DNSServiceRef,bool> > ResolverList;
 #endif
+
 // Data strcture passed about
 class BonjourUserData  {
 public:
 #ifdef HAVE_BONJOUR
-  typedef std::vector<std::pair<DNSServiceRef,bool> > ResolverList;
 
   BonjourUserData():
     meta(0)
@@ -40,14 +43,14 @@ public:
     // Clean up if required
     if (client) DNSServiceRefDeallocate(client);
     while (resolvers.empty() == false) {
-      DNSServiceRe c = resolvers.begin()->first;
+      DNSServiceRef c = resolvers.begin()->first;
       if (c) DNSServiceRefDeallocate(c);
       resolvers.erase(resolvers.begin());
     }
   }
 
   ResolverList resolvers;
-  Sear::Metadata *meta;
+  Sear::Metaserver *meta;
   DNSServiceRef client;
 #endif
 };
@@ -72,9 +75,9 @@ static void DNSSD_API resolve_callback(DNSServiceRef client, const DNSServiceFla
                                                  he->h_length);
 
     printf("IP: %s \n", inet_ntoa(out_peer.sin_addr));
-    ServerInfo so;
+    Sear::ServerObject so;
     so.hostname = inet_ntoa(out_peer.sin_addr);
-    so.name = fullname;
+    so.servername = fullname;
     so.port = ntohs(opaqueport);
     so.ping = -1;
     so.num_clients = -1;
@@ -111,9 +114,9 @@ static void DNSSD_API browse_callback(DNSServiceRef client, const DNSServiceFlag
 
   // Create a new entry by expanding list
   int idx = ud->resolvers.size();
-  ud->resolvers.resize(refs.size() + 1);
+  ud->resolvers.resize(ud->resolvers.size() + 1);
   // Hook up callback to reolve this entry
-  DNSServiceResolve(&(refs[idx].first), 0, opinterface, replyName, replyType, replyDomain, (DNSServiceResolveReply)resolve_callback, context);
+  DNSServiceResolve(&(ud->resolvers[idx].first), 0, opinterface, replyName, replyType, replyDomain, (DNSServiceResolveReply)resolve_callback, context);
 
 }
 
@@ -133,6 +136,7 @@ void Bonjour::poll() {
   assert(m_initialised == true);
 #ifdef HAVE_BONJOUR
 
+  DNSServiceErrorType err;
   // Poll for events
   fd_set  readfds;
   struct timeval tv;
@@ -160,7 +164,7 @@ void Bonjour::poll() {
   int result = select(nfds, &readfds, (fd_set*)NULL, (fd_set*)NULL, &tv);
   if (result > 0) { // There is some data!
     if (FD_ISSET(fd, &readfds)) {
-      err = DNSServiceProcessResult(client);
+      err = DNSServiceProcessResult(m_ud->client);
       if (err) {
         printf("Err  %d\n", err);
         return;
@@ -193,10 +197,10 @@ void Bonjour::poll() {
   // Clean up finished resolvers
   ResolverList::iterator J = m_ud->resolvers.begin();
   ResolverList::const_iterator Jend = m_ud->resolvers.end();
-  while ( != Jend) {
+  while (J != Jend) {
     if (J->second) {
-      DNSServiceRefDeallocate(I->first);
-      m_ud->resolvers.erase(I);
+      DNSServiceRefDeallocate(J->first);
+      m_ud->resolvers.erase(J);
       // Reset iterators
       J = m_ud->resolvers.begin();
       Jend = m_ud->resolvers.end();
@@ -210,13 +214,13 @@ void Bonjour::poll() {
 int Bonjour::init(Metaserver *meta) {
   assert(m_initialised == false); 
 #ifdef HAVE_BONJOUR
-  m_ud = std::auto_ptr<UserData>(new BonjourUserData());
+  m_ud = std::auto_ptr<BonjourUserData>(new BonjourUserData());
 
   m_ud->meta = meta;
 
-  DNSServiceErrorType err = DNSServiceBrowse(&m_ud->client, 0, kDNSServiceInterfaceIndexAny, service.c_str(), dom.c_str(), browse_callback, m_ud.get());
+  DNSServiceErrorType err = DNSServiceBrowse(&m_ud->client, 0, kDNSServiceInterfaceIndexAny, STR_service.c_str(), STR_domain.c_str(), browse_callback, m_ud.get());
 
-  if (!client || err != 0) {
+  if (!m_ud->client || err != 0) {
     m_ud.release();
     return 1;
   }

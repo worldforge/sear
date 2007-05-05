@@ -142,6 +142,20 @@ else
    else
        AC_MSG_ERROR(Error could not find SDL_mixer)
    fi
+
+  AC_CHECK_HEADER(dns_sd.h,
+    [ 
+      AC_DEFINE(HAVE_BONJOUR, 1, [Define to 1 if Bonjour is available.])
+      SEAR_LIBS="$SEAR_LIBS -ldnssd"
+    ],
+    [
+      AC_MSG_WARN([Couldn't find dns_sd.h. Bonjour support will be disabled.])
+    ],
+    [
+      #define _MSL_STDINT_H
+      #include <inttypes.h>
+    ]
+  )
 fi
 
 
