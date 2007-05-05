@@ -4,6 +4,7 @@
 
 #include "src/Metaserver.h"
 #include "src/Avahi.h"
+#include "src/Bonjour.h"
 
 #include <cassert>
 
@@ -37,6 +38,11 @@ int Metaserver::init() {
   if (m_avahi->init(this)) {
     m_avahi.release();
   }
+
+  m_bonjour = std::auto_ptr<Bonjour>(new Bonjour());
+  if (m_bonjour->init(this)) {
+    m_bonjour.release();
+  }
  
   m_initialised = true;
 
@@ -46,6 +52,7 @@ void Metaserver::shutdown() {
   assert(m_initialised == true);
 
   m_avahi.release();
+  m_bonjour.release();
 
   delete m_meta;
 
@@ -67,10 +74,11 @@ void Metaserver::poll() {
   assert(m_initialised == true);
   // metaserver polling is done during eris poll
   if (m_avahi.get()) m_avahi->poll();
+  if (m_bonjour.get()) m_bonjour->poll();
 }
 
 void Metaserver::addServerObject(const ServerObject &so) {
-  m_server_list[so.servername] = so;
+  m_server_list[so.hostname] = so;
 }
 
  
@@ -95,9 +103,9 @@ void Metaserver::onReceivedServerInfo(const Eris::ServerInfo &info) {
   so.num_clients = info.getNumClients();
   so.ping        = info.getPing();
   so.uptime      = info.getUptime();
-  so.port        = 6767;
+  so.port        = 6767; // The Metaserver can't handle different ports
 
-  m_server_list[so.servername] = so;
+  m_server_list[so.hostname] = so;
 }
   
 } /* namespace Sear */

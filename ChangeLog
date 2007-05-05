@@ -1,3 +1,14 @@
+2007-05-05  Simon Goodall  <simon@worldforge.org>
+
+	* src/Makefile.am, src/Bonjour.cpp, src/Bonjour.h: Added a class to
+	  handle bonjour/dns-sd for platforms not supporting avahi.
+
+	* src/Metaserver.cpp, src/Metaserver.h: Use the bonjour class. Index
+	  based on hostname (IP) rather than server name so machine with
+	  multiple IP's will be shown multiple times. This is to fix a problem
+	  where the ipv6 address could be used, but the client machine is not
+	  able to make ipv6 connections.
+
 2007-05-04  Simon Goodall  <simon@worldforge.org>
 
 	* src/Avahi.cpp: #include config.h

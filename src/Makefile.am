@@ -122,7 +122,8 @@ libSear_a_SOURCES = \
 	error.cpp error.h \
 	MediaManager.cpp MediaManager.h \
 	Metaserver.cpp Metaserver.h \
-	Avahi.cpp Avahi.h
+	Avahi.cpp Avahi.h \
+	Bonjour.cpp Bonjour.h
 
 icondir = $(datadir)/icons/worldforge
 icon_DATA = sear_icon.xpm

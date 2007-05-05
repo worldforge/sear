@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: Metaserver.h,v 1.2 2007-05-04 16:06:44 simon Exp $
+// $Id: Metaserver.h,v 1.3 2007-05-05 11:03:24 simon Exp $
 
 #ifndef SEAR_METASERVER_H
 #define SEAR_METASERVER_H 1
@@ -27,6 +27,7 @@ namespace Sear {
 class Console;
 
 class Avahi;
+class Bonjour;
 
 typedef struct {
   std::string hostname;
@@ -71,6 +72,7 @@ private:
   Eris::Meta *m_meta;
   ServerList m_server_list;
   std::auto_ptr<Avahi> m_avahi;
+  std::auto_ptr<Bonjour> m_bonjour;
 };
   
 } /* namespace Sear */
