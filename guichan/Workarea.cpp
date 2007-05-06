@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2007 Simon Goodall
 
 
 #include <sigc++/object_slot.h>
@@ -16,6 +17,7 @@
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/SpeechBubble.h"
 #include "guichan/Alert.h"
+#include "guichan/WFUTWindow.h"
 
 #include "guichan/box.hpp"
 
@@ -37,6 +39,7 @@
 #include <iostream>
 #include "imagefontxpm.h"
 #include "rpgfont.h"
+
 namespace Sear {
 
 static const bool debug = false;
@@ -145,6 +148,7 @@ void Workarea::init()
   m_windows["connect"] = con_w;
   m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
   m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
+  m_windows["update"] = SPtr<gcn::Window>(new WFUTWindow());
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");

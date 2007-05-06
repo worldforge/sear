@@ -1,3 +1,14 @@
+2007-05-06  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/WFUTWindow.cpp, guichan/WFUTWindow.h, guichan/Makefile.am:
+	  Added a basic WFUT GUI component.
+
+	* guichan/Workarea.cpp: Added an entry called "update" to the workarea
+	  windows list for testing the WFUTWindow class.
+
+	* src/MediaManager.cpp: Emit the DownloadComplete and DownloadFailed
+	  signals.
+
 2007-05-05  Simon Goodall  <simon@worldforge.org>
 
 	* src/Bonjour.cpp: Process the TXT record. Only use the service name,

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.5 2007-05-02 20:47:55 simon Exp $
+// $Id: MediaManager.cpp,v 1.6 2007-05-06 16:48:33 simon Exp $
 
 #include <sigc++/connection.h>
 #include <sigc++/bind.h>
@@ -310,10 +310,13 @@ int MediaManager::checkForUpdates() {
 
 void MediaManager::onDownloadComplete(const std::string &url, const std::string &filename) {
   printf("DownloadComplete: %s\n", filename.c_str());
+  DownloadComplete.emit(url, filename);
 }
 
 void MediaManager::onDownloadFailed(const std::string &url, const std::string &filename, const std::string &reason) {
+  
   printf("DownloadFailed: %s\n", filename.c_str());
+  DownloadFailed.emit(url, filename, reason);
 }
 
 } /* namespace Sear */

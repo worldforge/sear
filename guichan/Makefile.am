@@ -28,5 +28,6 @@ libGuichan_a_SOURCES = box.cpp box.hpp \
                        SpeechBubble.cpp SpeechBubble.h \
                        CommandLine.h DblClkListBox.h \
                        RenameDialog.cpp RenameDialog.h \
-	               imagefontxpm.cpp imagefontxpm.h rpgfont.h
+	               imagefontxpm.cpp imagefontxpm.h rpgfont.h \
+		       WFUTWindow.cpp WFUTWindow.h
 
