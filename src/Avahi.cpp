@@ -59,12 +59,16 @@ static void resolve_callback(
       so.hostname = addr;
       so.port = port;
       so.ping = -1; // How to get this info? -- Hook into eris code maybe?
+      // Set some default values
+      so.num_clients = -1;
+      so.uptime = -1.0;
       // Process the TXT field to get the other data
       AvahiStringList *ptxt = txt;
       char  *key, *value;
       while (ptxt != 0) {
         if (avahi_string_list_get_pair(ptxt, &key, &value, NULL) == 0) {
           printf("[Avahi] Key: %s value %s\n", key, value);
+          // Put into a std::string so we can use ==
           std::string skey = key;
           if (skey == "ruleset") so.ruleset = value;
           else if (skey == "server") so.server = value;
@@ -79,8 +83,10 @@ static void resolve_callback(
           avahi_free(key);
           avahi_free(value);
         }
+        // Move to next item in list
         ptxt = ptxt->next;
       }
+      // Add/Update item in the metaserver list
       ud->meta->addServerObject(so);
     }
   }
@@ -111,6 +117,8 @@ static void browse_callback(
     case AVAHI_BROWSER_FAILURE:
       
       fprintf(stderr, "[Avahi] %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
+      // TODO: If we get here, will poll still work?
+      //        or will we get some funky behaviour?
       avahi_simple_poll_quit(ud->simple_poll);
       return;
 
@@ -225,7 +233,6 @@ void Avahi::shutdown() {
     avahi_simple_poll_free(m_ud->simple_poll);
 
   m_ud.release();
-
 #endif
   m_initialised = false;
 }

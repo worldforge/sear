@@ -1,5 +1,13 @@
 2007-05-06  Simon Goodall  <simon@worldforge.org>
 
+	* src/Avahi.cpp: Give some default values to numeric server object
+	  params.
+
+	* src/MediaManager.h: Added a function to return the size of the updates
+	  list.
+
+2007-05-06  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/WFUTWindow.cpp, guichan/WFUTWindow.h, guichan/Makefile.am:
 	  Added a basic WFUT GUI component.
 

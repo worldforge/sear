@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.h,v 1.2 2007-03-28 11:09:43 simon Exp $
+// $Id: MediaManager.h,v 1.3 2007-05-06 17:01:50 simon Exp $
 
 #ifndef SEAR_MEDIA_MANAGER_H
 #define SEAR_MEDIA_MANAGER_H 1
@@ -81,7 +81,7 @@ public:
   sigc::signal<void, const std::string&, const std::string&> DownloadComplete;
   sigc::signal<void, const std::string&, const std::string&, const std::string&> DownloadFailed;
 
-
+  size_t getNumUpdates() const { return m_updates_list.size(); }
 
 private:
   void onDownloadComplete(const std::string &url, const std::string &filename);
