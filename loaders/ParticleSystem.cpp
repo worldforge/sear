@@ -23,7 +23,7 @@ glTexEnv <--to tell GL how to map the texture
 
 #include "common/types.h"
 #include "renderers/RenderSystem.h"
-#include "renderers/Render.h"
+//#include "renderers/Render.h"
 #include "src/WorldEntity.h"
 
 #include "ParticleSystem.h"
@@ -224,9 +224,6 @@ int ParticleSystem::shutdown()
 {
   assert(m_initialised == true);
 
-  // should be empty if we got shutdown ok.
-  assert(m_particles.empty());
-
   int id, mask_id;
   // Clean up textures
   if (m_dos[0]->getTexture(0, id, mask_id) == 0) {
@@ -293,20 +290,20 @@ void ParticleSystem::update(float elapsed)
       m_particles[p]->update(twister.rand(elapsed));
     }
   } // of spilled particles case
-}
 
-void ParticleSystem::render(bool select_mode) {
   // figure out the up and left vectors for the billboard, based on the
   // modelview matrix. The following code was 'borrowed' from a snippet
   // on the web; apologies for it's obscurity.
     
-  float modelview[4][4];
-  Render *render = RenderSystem::getInstance().getRenderer();
-  render->getModelviewMatrix(modelview);
+ // float modelview[4][4];
+//  Render *render = RenderSystem::getInstance().getRenderer();
+//  render->getModelviewMatrix(modelview);
     
   // setup submit data
-  m_billboardX = Vector3(modelview[0][0], modelview[1][0], modelview[2][0]);
-  m_billboardY = Vector3(modelview[0][1], modelview[1][1], modelview[2][1]);
+//  m_billboardX = Vector3(modelview[0][0], modelview[1][0], modelview[2][0]);
+//  m_billboardY = Vector3(modelview[0][1], modelview[1][1], modelview[2][1]);
+  m_billboardX = Vector3(1.0f, 0.0f, 0.0f);
+  m_billboardY = Vector3(0.0f, 1.0f, 0.0f);
   m_activeCount = 0;
     
   for (unsigned int p=0; p < m_particles.size(); ++p) {
@@ -322,6 +319,9 @@ void ParticleSystem::render(bool select_mode) {
 //  m_dos[0]->setNumPoints(m_particles.size() * 6);
   m_dos[0]->setNumPoints(m_activeCount * 6);
 
+}
+
+void ParticleSystem::render(bool select_mode) {
   m_dos[0]->render(select_mode);
 }
 

@@ -539,6 +539,12 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       glActiveTextureARB(GL_TEXTURE0_ARB);
     }
 
+    if (!select_mode && !we->isSelectedEntity() && glIsBufferARB(m_vb_colour_data)) {
+      glEnableClientState(GL_COLOR_ARRAY);
+      glBindBufferARB(GL_ARRAY_BUFFER_ARB, m_vb_colour_data);
+      glColorPointer(4, GL_UNSIGNED_BYTE, 0, 0);
+    }
+
     if (glIsBufferARB(m_vb_indices)) {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
     }
@@ -632,9 +638,15 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       // Reset current texture unit
       glActiveTextureARB(GL_TEXTURE0_ARB);
     }
+
     if (glIsBufferARB(m_vb_normal_data)) {
       glDisableClientState(GL_NORMAL_ARRAY);
     }
+
+    if (glIsBufferARB(m_vb_colour_data)) {
+      glDisableClientState(GL_COLOR_ARRAY);
+    }
+
   } else { // Fall back to vertex arrays
     // Set material properties
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   m_ambient);
@@ -666,6 +678,11 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       }
       // Reset current texture unit
       glActiveTextureARB(GL_TEXTURE0_ARB);
+    }
+
+    if (!select_mode  && !we->isSelectedEntity() && m_colour_data) {
+      glEnableClientState(GL_COLOR_ARRAY);
+      glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
     }
 
     if (select_mode) {
@@ -754,8 +771,10 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       glDisableClientState(GL_NORMAL_ARRAY);
     }
 
+    if (m_colour_data) {
+      glDisableClientState(GL_COLOR_ARRAY);
+    }
   }
-
   glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);

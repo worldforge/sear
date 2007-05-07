@@ -1,5 +1,13 @@
 2007-05-07  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ParticleSystem.cpp: Fix update/render functions so the fire
+	  will now get rendered.
+
+	* loaders/DynamicObject.cpp: Add colour arrays to the second render
+	  function.
+
+2007-05-07  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp, renderers/GL.h: Fix bug were the number of
 	  selectable colours (thus meshes) was limited to 512. Changed how the
 	  GL_XXX strings are printed. Initialise lots of GL states just in case.
