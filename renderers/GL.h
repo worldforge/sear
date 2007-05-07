@@ -45,6 +45,7 @@ public:
 
   void init();
   void shutdown();
+  
   bool isInitialised() const { return m_initialised; }
 
   int contextCreated();
@@ -184,7 +185,6 @@ protected:
   float m_fog_end;
   float m_light_level;
 
-  GLubyte *m_colourArray;
   std::vector<WorldEntity*> m_entityArray;
 
   unsigned int m_colour_index;

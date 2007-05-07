@@ -6,7 +6,6 @@
 #include <sage/GL.h>
 #include <math.h>
 #include <iostream>
-#include "renderers/Render.h"
 #include "src/System.h"
 #include "renderers/Graphics.h"
 #include "src/Calendar.h"
@@ -231,10 +230,10 @@ void SkyDome::contextDestroyed(bool check) {
 }
 
 void SkyDome::contextCreated() {
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(RenderSystem::getInstance().contextValid());
 
   assert(m_context_no == -1);
-  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  m_context_no = RenderSystem::getInstance().currentContextNo();
   domeInit(m_radius, m_levels, m_segments);
 }
 
@@ -308,8 +307,8 @@ void SkyDome::updateFogColor(float t)
 
 void SkyDome::render() {
 
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
 
   glColor3f(1.0f, 1.0f, 1.0f);
   Calendar *cal = System::instance()->getCalendar();

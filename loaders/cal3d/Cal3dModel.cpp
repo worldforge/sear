@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.57 2007-05-02 20:47:54 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.58 2007-05-07 10:31:57 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -16,8 +16,8 @@
 #include "src/System.h"
 #include "src/WorldEntity.h"
 
-#include "renderers/Render.h"
-#include "renderers/RenderSystem.h"
+//#include "renderers/Render.h"
+//#include "renderers/RenderSystem.h"
 
 #include "DynamicObject.h"
 

@@ -39,7 +39,7 @@ static GLfloat ty1[] = { 0.f, 0.015625f, 0.f, 0.f };
 
 void TerrainRenderer::DataSeg::contextCreated() {
   assert(m_context_no == -1);
-  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  m_context_no = RenderSystem::getInstance().currentContextNo();
 }
 
 void TerrainRenderer::DataSeg::contextDestroyed(bool check) {
@@ -267,8 +267,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
        lowYBound = lrintf (camPos[1]) / (long)segSize - 2,
        upYBound = lrintf (camPos[1]) / (long)segSize + 2;
 
-  Render *r = RenderSystem::getInstance ().getRenderer ();
-  assert (r != 0);
+  RenderSystem &rs = RenderSystem::getInstance();
 //  float frustum[6][4];
 //  r->getFrustum (frustum);
 
@@ -325,7 +324,7 @@ void TerrainRenderer::drawMap(Mercator::Terrain & t,
 
       WFMath::AxisBox<3> box (WFMath::Point <3> (I->first * segSize, J->first * segSize, min), WFMath::Point < 3 > ((I->first + 1) * segSize, (J->first + 1) * segSize, max));
 
-      if (!r->axisBoxInFrustum (box)) {
+      if (!rs.axisBoxInFrustum (box)) {
         continue;
       }
 
@@ -528,8 +527,8 @@ void TerrainRenderer::reset() {
 }
 
 void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
 
   if (!m_haveTerrain) {
     m_haveTerrain = true;
@@ -543,7 +542,7 @@ void TerrainRenderer::render (const PosType & camPos, bool select_mode) {
 void TerrainRenderer::contextCreated() {
   assert(m_context_no == -1);
 
-  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  m_context_no = RenderSystem::getInstance().currentContextNo();
 
   DisplayListStore::iterator I = m_displayLists.begin();
   while (I != m_displayLists.end()) {

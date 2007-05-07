@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.170 2007-05-02 20:47:55 simon Exp $
+// $Id: GL.cpp,v 1.171 2007-05-07 10:31:55 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -269,39 +269,45 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     fprintf(stderr, "Unable to set %d x %d video: %s\n", m_width, m_height, SDL_GetError());
     return false;
   }
+
   // Check OpenGL flags
   if (debug) {
     int value;
     SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &value);
-    Log::writeLog(std::string("Red Size: ") + string_fmt(value), Log::LOG_DEFAULT);
-    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
-    Log::writeLog(std::string("Blue Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    printf("[GL] Red Size: %d\n", value);
+
     SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &value);
-    Log::writeLog(std::string("Green Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    printf("[GL] Green Size: %d\n", value);
+
+    SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &value);
+    printf("[GL] Blue Size: %d\n", value);
+
     SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &value);
-    Log::writeLog(std::string("Depth Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    printf("[GL] Depth Size: %d\n", value);
+
     SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &value);
-    Log::writeLog(std::string("Stencil Size: ") + string_fmt(value), Log::LOG_DEFAULT);
+    printf("[GL] Stencil Size: %d\n", value);
+
     SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
-    Log::writeLog(std::string("Double Buffer: ") + string_fmt(value), Log::LOG_DEFAULT);
+    printf("[GL] Double Buffer: %d\n", value);
   }
 
-  std::string vendor = string_fmt(glGetString(GL_VENDOR));
-  std::string renderer = string_fmt(glGetString(GL_RENDERER));
-  std::string version = string_fmt(glGetString(GL_VERSION));
-  std::string extensions = string_fmt(glGetString(GL_EXTENSIONS));
-                                                                                
-  Log::writeLog(std::string("GL_VENDER: ") + vendor, Log::LOG_DEFAULT);
-  Log::writeLog(std::string("GL_RENDERER: ") + renderer, Log::LOG_DEFAULT);
-  Log::writeLog(std::string("GL_VERSION: ") + version, Log::LOG_DEFAULT);
-  Log::writeLog(std::string("GL_EXTENSIONS: ") + extensions, Log::LOG_DEFAULT);
-                                                                                
-  // These will be empty if there was a problem initialising the driver
-  if (vendor.empty() || renderer.empty()) {
+  const GLubyte *vendor     = glGetString(GL_VENDOR);
+  const GLubyte *renderer   = glGetString(GL_RENDERER);
+  const GLubyte *version    = glGetString(GL_VERSION);
+  const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+
+   // These will be empty if there was a problem initialising the driver
+  if (vendor == 0 || renderer == 0 || version == 0 || extensions == 0) {
     std::cerr << "Error with OpenGL system" << std::endl;
     return false;
   }
 
+  printf("[GL] GL_VENDER: %s\n", vendor);
+  printf("[GL] GL_RENDERER: %s\n", renderer);
+  printf("[GL] GL_VERSION: %s\n", version);
+  printf("[GL] GL_EXTENSIONS: %s\n", extensions);
+                                                                                
   // TODO: Check that the OpenGL version is at least 1.3
 
   if (contextCreated()) {
@@ -340,15 +346,15 @@ int GL::contextCreated() {
                                                                                 
   setViewMode(PERSPECTIVE);
   if (setupExtensions()) {
-    fprintf(stderr, "Error finding required extensions.\n");
+    fprintf(stderr, "[GL] Error finding required extensions.\n");
     return 1;
   }
 
   buildColourSet();
-  if (debug) std::cout << "Window created" << std::endl << std::flush;
+  if (debug) std::cout << "[GL] Window created" << std::endl << std::flush;
 
   incrementContext();
-  if (debug) printf("New Context Number: %d\n", m_context_instantiation);
+  if (debug) printf("[GL] New Context Number: %d\n", m_context_instantiation);
   m_context_valid = true;
   RenderSystem::getInstance().ContextCreated.emit();
 
@@ -402,19 +408,19 @@ int GL::setupExtensions() {
   //sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;  
 
   if (sage_ext[GL_ARB_MULTITEXTURE]) {
-    if (debug) std::cout << "Found arb_multitexture" << std::endl;
+    if (debug) std::cout << "[GL] Found arb_multitexture" << std::endl;
   } else {
-    fprintf(stderr, "Error, no GL_ARB_multitexture. Sear cannot run\n");
+    fprintf(stderr, "[GL] Error, no GL_ARB_multitexture. Sear cannot run\n");
     return 1;
   }
 
   if (use_ext_compiled_vertex_array) {
-    if (debug) std::cout << "Using use_ext_compiled_vertex_array" << std::endl;
+    if (debug) std::cout << "[GL] Using use_ext_compiled_vertex_array" << std::endl;
   }
   return 0;
 }
                                                                                 
-void GL::nextColour(WorldEntity *we) {
+void GL::nextColour(WorldEntity *we){
   assert(we != 0);
   // TODO: we are now passing the same we to this function several times per
   // frame. We might want to return the same colour each time, rather than 
@@ -424,10 +430,15 @@ void GL::nextColour(WorldEntity *we) {
   if (m_colour_index >= m_entityArray.size()) {
     m_entityArray.resize((m_entityArray.size() + 1) * 2);
   }
+
   m_entityArray[m_colour_index] = we; // Store entity in array slot
-  glColor3ubv(&m_colourArray[m_colour_index * 3]); // Set colour from appropriate index
+
+  GLubyte red = (m_colour_index & (m_redMask << m_redShift)) >> (m_redShift - (8 - m_redBits));
+  GLubyte green = (m_colour_index & (m_greenMask << m_greenShift)) >> (m_greenShift - (8 - m_greenBits));
+  GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) >> (m_blueShift - (8 - m_blueBits));
+  glColor3ub(red, green, blue);
+
   ++m_colour_index; // Increment counter for next pass
-//  assert(m_colour_index < NUM_COLOURS);
 }
 
 void GL::selectTerrainColour(WorldEntity * we) {
@@ -440,9 +451,6 @@ void GL::buildColourSet() {
   glGetIntegerv (GL_GREEN_BITS, &m_greenBits);
   glGetIntegerv (GL_BLUE_BITS, &m_blueBits);
 
-  if (m_colourArray != 0) delete [] m_colourArray;
-  m_colourArray = new GLubyte[m_redBits * m_greenBits * m_blueBits * 3];
-
   // Create masks
   m_redMask = makeMask(m_redBits);
   m_greenMask = makeMask(m_greenBits);
@@ -451,31 +459,6 @@ void GL::buildColourSet() {
   m_redShift =   m_greenBits + m_blueBits;
   m_greenShift =  m_blueBits;
   m_blueShift = 0;
-  
-  // Pre-Calculate each colour and store in array
-  unsigned int shift;
-  for (int indx = 0; indx < m_redBits * m_greenBits * m_blueBits; ++indx) {
-    // Get value from 0 -> 2^num_bits
-    GLubyte red = (indx & (m_redMask << m_redShift)) >> (m_redShift);
-    GLubyte green = (indx & (m_greenMask << m_greenShift)) >> (m_greenShift);
-    GLubyte blue = (indx & (m_blueMask << m_blueShift)) >> (m_blueShift);
-    // Bit shift to MSB format
-    // Warning, there is an overflow here if shift is negative
-    // Should only happen if num bits > num bits in glubyte
-    shift = 8 - m_redBits;
-    if (shift > 0) red <<= shift;
-    else if (shift < 0) red >>= shift;
-    shift = 8 - m_greenBits;
-    if (shift > 0) green <<= shift;
-    else if (shift < 0) green >>= shift;
-    shift = 8 - m_blueBits;
-    if (shift > 0) blue <<= shift;
-    else if (shift < 0) blue >>= shift;
-
-    m_colourArray[indx * 3 + 0] = red;
-    m_colourArray[indx * 3 + 1] = green;
-    m_colourArray[indx * 3 + 2] = blue;
-  }
 }
 
 GL::GL() :
@@ -500,7 +483,6 @@ GL::GL() :
   m_fog_start(100.0f),
   m_fog_end(150.0f),
   m_light_level(1.0f),
-  m_colourArray(0),
   m_colour_index(0),
   m_redBits(0), m_greenBits(0), m_blueBits(0),
   m_redMask(0), m_greenMask(0), m_blueMask(0),
@@ -521,10 +503,6 @@ void GL::shutdown() {
   if (debug) std::cout << "GL: Shutdown" << std::endl;
 
   assert(m_screen == NULL);
-  if (m_colourArray) {
-    delete [] m_colourArray;
-    m_colourArray = NULL;
-  }
 
   // TODO: This is too late
   if (m_font_id != -1) RenderSystem::getInstance().releaseTexture(m_font_id);
@@ -698,6 +676,9 @@ void GL::procEvent(int x, int y) {
     dynamic_cast<WorldEntity*>(m_activeEntity.get())->setIsSelected(false);
   }
 
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
 
   GLubyte i[3];
   glClear(GL_COLOR_BUFFER_BIT);
@@ -705,6 +686,7 @@ void GL::procEvent(int x, int y) {
   m_x_pos = x;
   y = m_height - y;
   m_y_pos = y;
+  // This is a very expensive operation!
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
 // TODO pre-cache 8 - bits?
@@ -982,7 +964,80 @@ void GL::setupStates() {
   glFogf(GL_FOG_END, m_fog_end);
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+  // Initial GL states
+  glDisable(GL_ALPHA_TEST);
+  glDisable(GL_AUTO_NORMAL);
+  glDisable(GL_BLEND);
+  //TODO: More of these!
+  glDisable(GL_CLIP_PLANE0);
+
+
+  glDisable(GL_COLOR_LOGIC_OP);
+  glDisable(GL_COLOR_MATERIAL);
+  glDisable(GL_COLOR_TABLE);
+  glDisable(GL_CONVOLUTION_1D);
+  glDisable(GL_CONVOLUTION_2D);
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DITHER);
+  glDisable(GL_FOG);
+  glDisable(GL_HISTOGRAM);
+  glDisable(GL_INDEX_LOGIC_OP);
+
+   // TODO More of these
+  glDisable(GL_LIGHT0);
+
+  glDisable(GL_LIGHTING);
+  glDisable(GL_LINE_SMOOTH);
+  glDisable(GL_LINE_STIPPLE);
+  glDisable(GL_MAP1_COLOR_4);
+  glDisable(GL_MAP1_INDEX);
+  glDisable(GL_MAP1_NORMAL);
+  glDisable(GL_MAP1_TEXTURE_COORD_1);
+  glDisable(GL_MAP1_TEXTURE_COORD_2);
+  glDisable(GL_MAP1_TEXTURE_COORD_3);
+  glDisable(GL_MAP1_TEXTURE_COORD_4);
+  glDisable(GL_MAP1_VERTEX_3);
+  glDisable(GL_MAP1_VERTEX_4);
+  glDisable(GL_MAP2_COLOR_4);
+  glDisable(GL_MAP2_INDEX);
+  glDisable(GL_MAP2_NORMAL);
+  glDisable(GL_MAP2_TEXTURE_COORD_1);
+  glDisable(GL_MAP2_TEXTURE_COORD_2);
+  glDisable(GL_MAP2_TEXTURE_COORD_3);
+  glDisable(GL_MAP2_TEXTURE_COORD_4);
+  glDisable(GL_MAP2_VERTEX_3);
+  glDisable(GL_MAP2_VERTEX_4);
+  glDisable(GL_MINMAX);
+  glDisable(GL_NORMALIZE);
+  glDisable(GL_POINT_SMOOTH);
+  glDisable(GL_POLYGON_OFFSET_FILL);
+  glDisable(GL_POLYGON_OFFSET_LINE);
+  glDisable(GL_POLYGON_OFFSET_POINT);
+  glDisable(GL_POLYGON_SMOOTH);
+  glDisable(GL_POLYGON_STIPPLE);
+  glDisable(GL_POST_COLOR_MATRIX_COLOR_TABLE);
+  glDisable(GL_POST_CONVOLUTION_COLOR_TABLE);
+  glDisable(GL_RESCALE_NORMAL);
+  glDisable(GL_SEPARABLE_2D);
+  glDisable(GL_SCISSOR_TEST);
+  glDisable(GL_STENCIL_TEST);
+  glDisable(GL_TEXTURE_1D);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_TEXTURE_3D);
+  glDisable(GL_TEXTURE_GEN_Q);
+  glDisable(GL_TEXTURE_GEN_R);
+  glDisable(GL_TEXTURE_GEN_S);
+  glDisable(GL_TEXTURE_GEN_T);
+
+  // Initial client states
   glEnableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_EDGE_FLAG_ARRAY);
+  glDisableClientState(GL_INDEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 inline void GL::translateObject(float x, float y, float z) const {

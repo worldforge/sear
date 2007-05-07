@@ -7,7 +7,6 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include "src/WorldEntity.h"
@@ -141,10 +140,10 @@ void DynamicObject::copyIndices(int *ptr, size_t size) {
 }
 
 int DynamicObject::contextCreated() {
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(RenderSystem::getInstance().contextValid());
   // We could have contextCreated called several times for a shared mesh
-  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
-  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().currentContextNo());
+  m_context_no = RenderSystem::getInstance().currentContextNo();
   return 0;
 }
 
@@ -186,8 +185,8 @@ void DynamicObject::contextDestroyed(bool check) {
 void DynamicObject::render(bool select_mode) const {
   assert(m_initialised == true);
 
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
 
   glPushMatrix();
 
@@ -493,8 +492,8 @@ void DynamicObject::releaseIndicesPtr() {
 
 void DynamicObject::render(bool select_mode, WorldEntity *we) const {
   assert(m_initialised == true);
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
 
   // Setup texture transform
   glMatrixMode(GL_TEXTURE);
@@ -545,7 +544,7 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
     }
 
     if (select_mode) {
-      RenderSystem::getInstance().getRenderer()->nextColour(we);
+      RenderSystem::getInstance().nextColour(we);
     }
 
     glPushMatrix();
@@ -670,7 +669,7 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
     }
 
     if (select_mode) {
-      RenderSystem::getInstance().getRenderer()->nextColour(we);
+      RenderSystem::getInstance().nextColour(we);
     }
 
     glPushMatrix();

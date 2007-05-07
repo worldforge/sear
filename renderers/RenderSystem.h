@@ -10,6 +10,8 @@
 #include <sigc++/signal.h>
 #include <sigc++/trackable.h>
 
+#include <wfmath/axisbox.h>
+
 #include "interfaces/ConsoleObject.h"
 
 #include "RenderTypes.h"
@@ -116,6 +118,13 @@ public:
 
   int getWindowWidth() const;
   int getWindowHeight() const;
+
+  void nextColour(WorldEntity*);
+  bool contextValid() const;
+  int currentContextNo() const;
+
+  int axisBoxInFrustum(const WFMath::AxisBox<3> &) const;
+  
 
 private:
   static RenderSystem m_instance;

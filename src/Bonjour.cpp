@@ -208,7 +208,7 @@ void Bonjour::poll() {
   FD_SET(fd, &readfds);
 
   // Hook in the resolver socket fd's
-  int nfds = fd + 1;
+  int nfds = fd + 1; // This is the highest numbers fd in the set +1
   ResolverList::const_iterator I = m_ud->resolvers.begin();
   ResolverList::const_iterator Iend = m_ud->resolvers.end();
   while (I != Iend) {
@@ -218,9 +218,9 @@ void Bonjour::poll() {
     ++I;
   }
 
-  // Change values?
+  // Setting to 0 for immediate return since we are polling
   tv.tv_sec = 0;
-  tv.tv_usec = 10;
+  tv.tv_usec = 0;
 
   // See if there is any data waiting
   int result = select(nfds, &readfds, (fd_set*)NULL, (fd_set*)NULL, &tv);

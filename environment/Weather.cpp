@@ -22,7 +22,6 @@
 #include "src/WorldEntity.h"
 #include "src/Console.h"
 
-#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include "Weather.h"
@@ -120,8 +119,8 @@ void Weather::render() {
 
   if (num_points > max_points) num_points = max_points;
 
-  float w = RenderSystem::getInstance().getRenderer()->getWindowWidth();
-  float h = RenderSystem::getInstance().getRenderer()->getWindowHeight();
+  float w = RenderSystem::getInstance().getWindowWidth();
+  float h = RenderSystem::getInstance().getWindowHeight();
 
   static float buf[2 * max_points];
   int cnt = -1;

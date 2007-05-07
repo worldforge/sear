@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.23 2007-05-02 20:47:56 simon Exp $
+// $Id: RenderSystem.cpp,v 1.24 2007-05-07 10:31:55 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -260,6 +260,26 @@ int RenderSystem::getWindowWidth() const {
 int RenderSystem::getWindowHeight() const {
   assert (m_initialised);
   return m_renderer->getWindowHeight();
+}
+
+void RenderSystem::nextColour(WorldEntity *we)  {
+  assert (m_initialised);
+  return m_renderer->nextColour(we);
+}
+
+bool RenderSystem::contextValid() const {
+  assert (m_initialised);
+  return m_renderer->contextValid();
+}
+
+int RenderSystem::currentContextNo() const {
+  assert (m_initialised);
+  return m_renderer->currentContextNo();
+}
+
+int RenderSystem::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) const {
+  assert (m_initialised);
+  return m_renderer->axisBoxInFrustum(bbox);
 }
 
 } // namespace Sear

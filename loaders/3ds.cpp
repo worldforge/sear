@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.72 2007-05-02 20:47:54 simon Exp $
+// $Id: 3ds.cpp,v 1.73 2007-05-07 10:31:56 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -40,7 +40,7 @@
 #include "src/System.h"
 #include "src/FileHandler.h"
 #include "renderers/Graphics.h"
-#include "renderers/Render.h"
+//#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 #include "StaticObject.h"
 

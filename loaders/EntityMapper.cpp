@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: EntityMapper.cpp,v 1.2 2007-05-02 20:47:54 simon Exp $
+// $Id: EntityMapper.cpp,v 1.3 2007-05-07 10:31:57 simon Exp $
 
 /** The EntityMapper class aims to provide a mapping between an entity and it's state to
  * a object record. 
@@ -96,14 +96,13 @@ std::string EntityMapper::getEntityMapping(WorldEntity *we) {
         memset(u.c, '\0', sizeof(char) * 4);
         // Take last 4 chars of ID if possible as these change more than the first few
         // I.e. entities created sequentially could have the same beginning for their ID.
-        unsigned int idx = (id.size() > 4) ? (id.size() - 4) : (0);
+        unsigned int idx = (id.size() > 4) ? (id.size() - 3) : (0);
         // Copy up to 4 chars of the id field
         strncpy(u.c, &id.c_str()[idx], 4);
         srand(u.i); 
         // Gen random index
         float r = (float)rand() / (float)RAND_MAX * (float)options.size();
         idx = (unsigned int)(r);
-
         if (idx == options.size()) --idx; // Bounds check
         return options[idx];
       }
@@ -114,7 +113,6 @@ std::string EntityMapper::getEntityMapping(WorldEntity *we) {
 
 void EntityMapper::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   const std::string &value = (std::string)config.getItem(section, key);
-printf("Item: %s\n", section.c_str());
   if (key == KEY_rule) {
     m_rules_map[section] = value;
   } else if (key == KEY_options) {

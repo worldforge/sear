@@ -1,3 +1,26 @@
+2007-05-07  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/GL.cpp, renderers/GL.h: Fix bug were the number of
+	  selectable colours (thus meshes) was limited to 512. Changed how the
+	  GL_XXX strings are printed. Initialise lots of GL states just in case.
+
+	* renderers/RenderSystem.cpp, renderers/RenderSystem.h: Added methods 
+	  for nextColour, contextValid, currentContextNo and axisBoxInFrustsum
+	  to reduce dependence on Render.h
+
+	* environment/SkyDome.cpp, environment/TerrainRenderer.cpp,
+	  environment/Weather.cpp, loaders/3ds.cpp, loaders/DynamicObject.cpp,
+	  loaders/StaticObject.cpp, loadesr/cal3d/Cal3dCoreModel.cpp,
+	  loaders/cal3d/Cal3dModel.cpp: Remove include of Render.h and include
+	  RenderSystem.h if required. 
+
+	* renderers/TextureManager.h: Include RenderTypes.h instead of
+	  RenderSystem.h.
+
+	* src/Bonjour.cpp: Change timeout settings.
+
+	* loaders/EntityMapper.cpp: Fix off by one error in random selection.
+
 2007-05-06  Simon Goodall  <simon@worldforge.org>
 
 	* src/Avahi.cpp: Give some default values to numeric server object

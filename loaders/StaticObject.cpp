@@ -7,7 +7,7 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include "renderers/Render.h"
+//#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include "src/WorldEntity.h"
@@ -112,10 +112,10 @@ void StaticObject::createVBOs() const {
 }
 
 int StaticObject::contextCreated() {
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
+  assert(RenderSystem::getInstance().contextValid());
   // We could have contextCreated called several times for a shared mesh
-  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
-  m_context_no = RenderSystem::getInstance().getRenderer()->currentContextNo();
+  assert(m_context_no == -1 || m_context_no == RenderSystem::getInstance().currentContextNo());
+  m_context_no = RenderSystem::getInstance().currentContextNo();
   return 0;
 }
 
@@ -159,8 +159,8 @@ void StaticObject::contextDestroyed(bool check) {
 
 void StaticObject::render(bool select_mode) const {
   assert(m_initialised == true);
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
   glPushMatrix();
   // Set transform
   glMultMatrixf(m_matrix.getMatrix());
@@ -418,8 +418,8 @@ int StaticObject::save(const std::string &filename) {
 
 void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, WorldEntity*> > &positions) const {
   assert(m_initialised == true);
-  assert(RenderSystem::getInstance().getRenderer()->contextValid());
-  assert(m_context_no == RenderSystem::getInstance().getRenderer()->currentContextNo());
+  assert(RenderSystem::getInstance().contextValid());
+  assert(m_context_no == RenderSystem::getInstance().currentContextNo());
 
   // Setup texture transform
   glMatrixMode(GL_TEXTURE);
@@ -478,7 +478,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
       WorldEntity *we = (*I).second;
 
       if (select_mode) {
-        RenderSystem::getInstance().getRenderer()->nextColour(we);
+        RenderSystem::getInstance().nextColour(we);
       }
 
       glPushMatrix();
@@ -732,7 +732,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
       assert(we != 0);
 
       if (select_mode) {
-        RenderSystem::getInstance().getRenderer()->nextColour(we);
+        RenderSystem::getInstance().nextColour(we);
       }
 
       glPushMatrix();
