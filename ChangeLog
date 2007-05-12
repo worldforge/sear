@@ -1,3 +1,9 @@
+2007-05-12  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/cal3d/Cal3dCoreModel.cpp: Fix bug where the path variable was
+	  evaluted before the filename was appended leading to incorrect paths
+	  to files when media updates are spread across multiple dirs.
+
 2007-05-07  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/ParticleSystem.cpp: Fix update/render functions so the fire

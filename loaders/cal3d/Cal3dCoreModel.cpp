@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dCoreModel.cpp,v 1.47 2007-05-07 10:31:57 simon Exp $
+// $Id: Cal3dCoreModel.cpp,v 1.48 2007-05-12 17:47:01 simon Exp $
 
 #include <string>
 
@@ -129,7 +129,7 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   
   if (config.findItem(SECTION_model, KEY_path)) {
     path = (std::string)config.getItem(SECTION_model, KEY_path);
-    System::instance()->getFileHandler()->getFilePath(path);
+//    System::instance()->getFileHandler()->getFilePath(path);
   }
 
   if (config.findItem(SECTION_model, KEY_appearance)) {
@@ -141,7 +141,9 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
 
 
   // Load skeleton
-  if (m_core_model->loadCoreSkeleton(path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton)) == 0)  {
+  std::string skeleton_path = path + "/" + (std::string)config.getItem(SECTION_model, KEY_skeleton);
+  System::instance()->getFileHandler()->getFilePath(skeleton_path);
+  if (m_core_model->loadCoreSkeleton(skeleton_path) == 0)  {
     CalError::printLastError();
     return 1;
   }
@@ -160,9 +162,11 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   // Load all meshes 
   for (MeshMap::const_iterator I = m_meshes.begin(); I != m_meshes.end(); ++I) {
     const std::string &mesh_name = I->first;
-    int mesh = m_core_model->loadCoreMesh(path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name));
+    std::string mesh_path = path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name);
+    System::instance()->getFileHandler()->getFilePath(mesh_path);
+    int mesh = m_core_model->loadCoreMesh(mesh_path);
     if (mesh == -1) {
-      std::cerr << "Error loading mesh - " << path + (std::string)config.getItem(SECTION_model, KEY_mesh + "_" + mesh_name) << std::endl;
+      fprintf(stderr, "[Cal3dCoreModel] Error loading mesh - %s\n", mesh_path.c_str());
       CalError::printLastError();
     } else {
       m_meshes[mesh_name] = mesh;
@@ -172,9 +176,11 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
   // Load all animations
   for (AnimationMap::const_iterator I = m_animations.begin(); I != m_animations.end(); ++I) {
     const std::string &animation_name = I->first;
-    int animation = m_core_model->loadCoreAnimation(path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name));
+    std::string anim_path = path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name);
+    System::instance()->getFileHandler()->getFilePath(anim_path);
+    int animation = m_core_model->loadCoreAnimation(anim_path);
     if (animation == -1) {
-      std::cerr << "Error loading animation - " << path + (std::string)config.getItem(SECTION_model, KEY_animation + "_" + animation_name) << std::endl;
+      fprintf(stderr, "[Cal3dCoreModel] Error loading animation - %s\n", anim_path.c_str());
       CalError::printLastError();
     } else {
       m_animations[animation_name] = animation;
@@ -189,9 +195,11 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
     const std::string &set = material_name.substr(0,length);
     const std::string &part = material_name.substr(length + 1);
 
-    int material = m_core_model->loadCoreMaterial(path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name));
+    std::string material_path = path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name);
+    System::instance()->getFileHandler()->getFilePath(material_path);
+    int material = m_core_model->loadCoreMaterial(material_path);
     if (material == -1) {
-      std::cerr << "Error loading material - " << path + (std::string)config.getItem(SECTION_model, KEY_material + "_" + material_name) << std::endl;
+      fprintf(stderr, "[Cal3dCoreModel] Error loading material - %s\n", material_path.c_str());
       CalError::printLastError();
     } else {
       m_materials[set][part] = material;
