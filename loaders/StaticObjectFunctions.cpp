@@ -2,21 +2,8 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-//#include <iostream>
-//#include <list>
-//#include <map>
-#include <algorithm>
-
-//#include <sigc++/object_slot.h>
-
-//#include <sage/sage.h>
-//#include <sage/GL.h>
-
-//#include "common/Utility.h"
-
-//#include "3ds.h"
-
 #include <math.h>
+#include <algorithm>
 #include <limits>
 
 #include "StaticObjectFunctions.h"
@@ -29,6 +16,36 @@
 
 namespace Sear {
 
+void transform_object(StaticObjectList &objs, const float m[4][4]) {
+  // Find bounds of object
+  StaticObjectList::const_iterator I = objs.begin();
+  StaticObjectList::const_iterator Iend = objs.end();
+  for (; I != Iend; ++I) {
+    SPtr<StaticObject> so = *I;
+    assert(so);
+    
+    float *v = so->getVertexDataPtr();
+    for (unsigned int i = 0; i < so->getNumPoints(); ++i) {
+
+      float x = v[i * 3 + 0];
+      float y = v[i * 3 + 1];
+      float z = v[i * 3 + 2];
+      float w = 1.0f;
+
+      // Transform points by matrix
+      float nx = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * w;
+      float ny = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3] * w;
+      float nz = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3] * w;
+      float nw = m[3][0] * x + m[3][1] * y + m[3][2] * z + m[3][3] * w;
+
+      v[i * 3 + 0] = nx / nw;
+      v[i * 3 + 1] = ny / nw;
+      v[i * 3 + 2] = nz / nw;
+
+    }
+  }
+}
+ 
 void scale_object(StaticObjectList &objs, Scaling scale, Alignment align, bool ignore_minus_z) {
   float min[3] = { std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max() };
   float max[3] = { std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min() };

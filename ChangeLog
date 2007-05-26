@@ -1,5 +1,11 @@
 2007-05-26  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/StaticObjectFunctions.cpp, loaders/StaticObjectFunctions.h,
+	  loaders/SearObject.cpp: Created a function to apply a matrix to a 
+	  list of static objects. Use this function in the SearObject loader.
+
+2007-05-26  Simon Goodall  <simon@worldforge.org>
+
 	* src/FileHandler.cpp, src/FileHandler.h, src/MediaManager.cpp,
 	  src/sear.in: Changed sear-media channel name to sear-media-0.7 so we
 	  can update the media without breaking sear 0.6.x installs. Remove the

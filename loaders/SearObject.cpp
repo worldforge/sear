@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.10 2007-05-26 18:49:10 simon Exp $
+// $Id: SearObject.cpp,v 1.11 2007-05-26 21:09:55 simon Exp $
 
 #include  <stdio.h>
 
@@ -121,6 +121,32 @@ int SearObject::init(const std::string &file_name) {
     return 1;
   }
 
+
+ // Initialise transform matrix
+  float matrix[4][4];
+  for (int j = 0; j < 4; ++j) {
+    for (int i = 0; i < 4; ++i) {
+      if (i == j) matrix[j][i] = 1.0f;
+      else matrix[j][i] = 0.0f;
+    }
+  }
+  bool do_transform = false;
+  if (m_config.findItem(SECTION_model, KEY_rotation)) {
+    const std::string &str=(std::string)m_config.getItem(SECTION_model, KEY_rotation);
+    float w,x,y,z;
+    sscanf(str.c_str(), "%f;%f;%f;%f", &w, &x, &y, &z);
+    WFMath::Quaternion q(w,x,y,z);
+    QuatToMatrix(q, matrix);
+    do_transform = true;
+  }
+  if (m_config.findItem(SECTION_model, KEY_scale)) {
+    double s = (double)m_config.getItem(SECTION_model, KEY_scale);
+    for (int i = 0; i < 4; ++i) matrix[i][i] *= s;
+    do_transform = true;
+  }
+  if (do_transform) {
+    transform_object(m_static_objects, matrix);
+  }
 
   bool ignore_minus_z = false;
 

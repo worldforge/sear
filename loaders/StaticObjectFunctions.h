@@ -27,6 +27,7 @@ typedef enum {
   SCALE_ANISOTROPIC
 } Scaling;
 
+extern void transform_object(StaticObjectList &objs, const float m[4][4]);
 extern void scale_object(StaticObjectList &objs, Scaling scale, Alignment align, bool ignore_minus_z);
 
 } /* namespace Sear */
