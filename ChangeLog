@@ -1,3 +1,8 @@
+2007-05-26  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/cal3d/Cal3dModel.cpp: Use style sttribute when selecting a
+	  submesh.
+
 2007-05-12  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/cal3d/Cal3dCoreModel.cpp: Fix bug where the path variable was

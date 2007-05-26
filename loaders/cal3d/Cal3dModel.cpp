@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Cal3dModel.cpp,v 1.58 2007-05-07 10:31:57 simon Exp $
+// $Id: Cal3dModel.cpp,v 1.59 2007-05-26 14:37:46 simon Exp $
 
 #include <Atlas/Message/Element.h>
 
@@ -517,9 +517,12 @@ void Cal3dModel::entityWorn(const std::string &where, WorldEntity *we) {
 
   // Get entity type.
   const std::string &type = we->type();
-
+  std::string style = "default";
+  if (we->hasAttr("style")) {
+    style = we->valueOfAttr("style").asString();
+  }
   // Key to config file
-  const std::string key = /*where + "_" +*/ type;
+  const std::string &key = /*where + "_" +*/ type + "_default_" + style;
 
   // Get meshes and materials
   if (!m_core_model->m_appearance_config.find(key)) return;
