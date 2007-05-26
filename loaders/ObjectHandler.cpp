@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.14 2007-05-02 20:47:54 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.15 2007-05-26 18:49:10 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -161,9 +161,9 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
     record->draw_self = true;
     record->draw_members = true;
     m_type_map[section] = record;
-    if (debug) {
-      printf("Adding ObjectRecord: %s\n", section.c_str());
-    }
+//    if (debug) {
+//      printf("Adding ObjectRecord: %s\n", section.c_str());
+//    }
   }
 
   if (key == KEY_DRAW_SELF) {

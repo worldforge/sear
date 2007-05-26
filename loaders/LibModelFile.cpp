@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: LibModelFile.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
+// $Id: LibModelFile.cpp,v 1.34 2007-05-26 18:49:10 simon Exp $
 
 /*
   Debug check list
@@ -114,7 +114,7 @@ int LibModelFile::init(const std::string &filename) {
   System::instance()->getFileHandler()->getFilePath(object);
 
   // Load md3 file
-  if (debug) printf("[LibModelFile] Loading: %s\n", object.c_str());
+//  if (debug) printf("[LibModelFile] Loading: %s\n", object.c_str());
 
   libmd3_file *modelFile = libmd3_file_load(object.c_str());
   if (!modelFile) {

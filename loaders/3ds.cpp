@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds.cpp,v 1.73 2007-05-07 10:31:56 simon Exp $
+// $Id: 3ds.cpp,v 1.74 2007-05-26 18:49:10 simon Exp $
 
 /** TODO
  * - Make Material map only available within loader routines, not as a member
@@ -104,7 +104,7 @@ int ThreeDS::init(const std::string &file_name) {
   System::instance()->getFileHandler()->getFilePath(object);
 
   // Load 3ds file
-  if (debug) printf("[3ds] Loading: %s\n", object.c_str());
+//  if (debug) printf("[3ds] Loading: %s\n", object.c_str());
 
   Lib3dsFile *model = lib3ds_file_load(object.c_str());
 
@@ -418,7 +418,7 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
           texture_id = RenderSystem::getInstance().requestTexture(name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
           assert(texture_id != 0);
-        } else if ( mat->texture1_map.name[0]) {
+        } else if (mat && mat->texture1_map.name[0]) {
           texture_id = RenderSystem::getInstance().requestTexture(
                                                           mat->texture1_map.name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(

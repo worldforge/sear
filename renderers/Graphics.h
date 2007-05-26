@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.18 2007-04-22 17:45:13 simon Exp $
+// $Id: Graphics.h,v 1.19 2007-05-26 18:49:10 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
@@ -41,7 +41,6 @@ public:
 
   Graphics(System *system);
   ~Graphics();
-
   
   void init();
   void initWindow(int width, int height);
@@ -104,9 +103,9 @@ protected:
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
-    Compass* m_compass;
+  std::auto_ptr<Compass> m_compass;
   
-  LightManager *m_lm;
+  std::auto_ptr<LightManager> m_lm;
 
   Light m_fire;
   bool m_show_names, m_show_bbox;

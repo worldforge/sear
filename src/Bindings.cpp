@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Bindings.cpp,v 1.24 2006-05-17 23:15:35 alriddoch Exp $
+// $Id: Bindings.cpp,v 1.25 2007-05-26 18:49:10 simon Exp $
 
 
 #include <SDL/SDL.h>
@@ -20,6 +20,9 @@
 #else
   static const bool debug = false;
 #endif
+
+static const std::string KEY_key_bindings = "key_bindings";
+
 namespace Sear {
 
 // Static Declarations	
@@ -176,10 +179,8 @@ void Bindings::shutdown() {
     delete m_bindings;
     m_bindings = NULL;
   }
-  // Delete m_keymap
-  while (!m_keymap.empty()) {
-    m_keymap.erase(m_keymap.begin());
-  }
+
+  m_keymap.clear();
 }
 
 void Bindings::loadBindings(const std::string &file_name, bool user) {
@@ -198,7 +199,7 @@ void Bindings::saveBindings(const std::string &file_name) {
 void Bindings::bind(std::string key, std::string command) {
   assert((m_bindings != NULL) && "Bindings config is NULL");
   if (key.empty()) return; // Check we were sent a key
-  m_bindings->setItem("key_bindings", key, command, varconf::USER); // Store new binding
+  m_bindings->setItem(KEY_key_bindings, key, command, varconf::USER); // Store new binding
 }
 
 std::string Bindings::idToString(int key) {
@@ -214,7 +215,7 @@ std::string Bindings::getBinding(const std::string &key) {
   // Retrive current binding
   std::string the_key = std::string(key);
   m_bindings->clean(the_key);
-  std::string cmd = m_bindings->getItem("key_bindings", the_key);
+  const std::string &cmd = m_bindings->getItem(KEY_key_bindings, the_key);
   if (cmd.empty()) { // Retrieved command should not be the empty string
     return "";
   }
@@ -239,13 +240,13 @@ std::string Bindings::getBindingForKeysym(const SDL_keysym& key) {
     decoratedName = "ctrl_" + decoratedName;
     
   m_bindings->clean(decoratedName);
-  if (m_bindings->findItem("key_bindings", decoratedName))
-    return m_bindings->getItem("key_bindings", decoratedName);
+  if (m_bindings->findItem(KEY_key_bindings, decoratedName))
+    return m_bindings->getItem(KEY_key_bindings, decoratedName);
     
-  if (m_bindings->findItem("key_bindings", plainName))
-    return m_bindings->getItem("key_bindings", plainName);
+  if (m_bindings->findItem(KEY_key_bindings, plainName))
+    return m_bindings->getItem(KEY_key_bindings, plainName);
     
-  std::cout << "no binding specified for key " << decoratedName << std::endl;
+//  std::cout << "no binding specified for key " << decoratedName << std::endl;
   return "";
 }
   

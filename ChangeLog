@@ -1,5 +1,26 @@
 2007-05-26  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/Alert.cpp: Check event name before performing action.
+
+	* guichan/Workarea.cpp: Call removeLaters after the call to gui->logic()
+
+	* guichan/imagefontxpm.cpp: Fix some compiler warnings.
+
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp,
+	  loaders/LibModelFile_Loader.cpp, loaders/ObjectHandler.cpp,
+	  loaders/SearObject.cpp, loaders/SearObject_Loader.cpp, src/Avahi.cpp:
+	  Remove some extra debugging output.
+
+	* renderers/Graphics.cpp, renderers/Graphics.h: Use auto_ptr to manage 
+	  some member variables. Add some extra const keywords.
+
+	* renderers/Render.h, renderers/TextureManager.h: Change a header 
+	  include.
+
+	* src/Bindings.cpp: Move "key_bindings" into static const variable.
+
+2007-05-26  Simon Goodall  <simon@worldforge.org>
+
 	* src/client.cpp: Change default eris log level to error. Set debug eris
 	  to false as this flag is never used in eris.
 

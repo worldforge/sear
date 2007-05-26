@@ -120,8 +120,6 @@ ImageFontXPM::ImageFontXPM(const std::string &name, char **array, const std::str
       addGlyph(k, x, y, separator);
   }
 
-  int w = mImage->getWidth();
-  int h = mImage->getHeight();
   mImage->convertToDisplayFormat();
 
   mRowSpacing = 0;
@@ -167,8 +165,6 @@ ImageFontXPM::ImageFontXPM(const std::string &name, char **array, const std::str
             addGlyph(k, x, y, separator);
         }
 
-        int w = mImage->getWidth();
-        int h = mImage->getHeight();
         mImage->convertToDisplayFormat();
 
         mRowSpacing = 0;
@@ -205,15 +201,13 @@ ImageFontXPM::ImageFontXPM(const std::string &name, char **array, const std::str
 
         mHeight = j;
         int x = 0, y = 0;
-        unsigned char k;
+//        unsigned char k;
 
         for (i=glyphsFrom; i<glyphsTo+1; i++)
         {
             addGlyph(i, x, y, separator);
         }
 
-        int w = mImage->getWidth();
-        int h = mImage->getHeight();
         mImage->convertToDisplayFormat();
 
         mRowSpacing = 0;

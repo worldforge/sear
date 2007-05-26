@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.30 2007-05-02 20:47:56 simon Exp $
+// $Id: TextureManager.h,v 1.31 2007-05-26 18:49:10 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -21,7 +21,7 @@
 
 #include <varconf/Config.h>
 
-#include "RenderSystem.h"
+#include "RenderTypes.h"
 
 struct SDL_Surface;
 /*

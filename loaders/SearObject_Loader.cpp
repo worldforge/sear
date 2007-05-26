@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: SearObject_Loader.cpp,v 1.2 2007-05-02 20:47:54 simon Exp $
+// $Id: SearObject_Loader.cpp,v 1.3 2007-05-26 18:49:10 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -43,8 +43,6 @@ SPtr<ModelRecord> SearObject_Loader::loadModel(WorldEntity *we, const std::strin
   std::string file_name = model_record->data_file_path;
 
   System::instance()->getFileHandler()->getFilePath(file_name);
-
-  if (debug) printf("[SearObject_Loader] Loading %s\n", file_name.c_str());
 
   SearObject *model = new SearObject();
   if (model->init(file_name)) {

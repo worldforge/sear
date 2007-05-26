@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.70 2007-05-02 20:47:55 simon Exp $
+// $Id: Graphics.cpp,v 1.71 2007-05-26 18:49:10 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -16,7 +16,7 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
-#include "common/Log.h"
+//#include "common/Log.h"
 #include "common/Utility.h"
 #include "environment/Environment.h"
 #include "src/Character.h"
@@ -25,7 +25,7 @@
 #include "loaders/Model.h"
 #include "loaders/ModelRecord.h"
 #include "loaders/ObjectRecord.h"
-#include "loaders/ObjectHandler.h"
+//#include "loaders/ObjectHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 #include "src/client.h"
@@ -34,7 +34,7 @@
 
 #include "Graphics.h"
 #include "Camera.h"
-#include "Sprite.h"
+//#include "Sprite.h"
 #include "Frustum.h"
 #include "Light.h"
 #include "LightManager.h"
@@ -50,10 +50,10 @@
 #endif
 
 
-static const WFMath::Vector<3> x_vector = WFMath::Vector<3>(1.0f, 0.0f, 0.0f);
-static const WFMath::Vector<3> y_vector = WFMath::Vector<3>(0.0f, 1.0f, 0.0f);
-static const WFMath::Vector<3> z_vector = WFMath::Vector<3>(0.0f, 0.0f, 1.0f);
-static const WFMath::Quaternion quaternion_by_90 = WFMath::Quaternion(z_vector, WFMath::Pi / 2.0f);
+static const WFMath::Vector<3> x_vector(1.0f, 0.0f, 0.0f);
+static const WFMath::Vector<3> y_vector(0.0f, 1.0f, 0.0f);
+static const WFMath::Vector<3> z_vector(0.0f, 0.0f, 1.0f);
+static const WFMath::Quaternion quaternion_by_90(z_vector, WFMath::Pi / 2.0f);
 
 static bool c_select = false;
 
@@ -148,18 +148,19 @@ Graphics::~Graphics() {
 
 void Graphics::init() {
   assert (m_initialised == false);
-  if (m_initialised) shutdown();
+
   // Add callbeck to detect updated options
-  m_system->getGeneral().sigsv.connect(SigC::slot(*this, &Graphics::varconf_callback));
+  m_system->getGeneral().sigsv.connect(sigc::mem_fun(this, &Graphics::varconf_callback));
 
   // Create the compass
-  m_compass = new Compass(580.f, 50.f);
+  m_compass = std::auto_ptr<Compass>(new Compass(580.f, 50.f));
   m_compass->setup();
 
   // Create the LightManager    
-  m_lm = new LightManager();
+  m_lm = std::auto_ptr<LightManager>(new LightManager());
   m_lm->init();
 
+  // Store state record id numbers
   m_state_weather = RenderSystem::getInstance().requestState("weather");
   m_state_terrain = RenderSystem::getInstance().requestState("terrain");
   m_state_select  = RenderSystem::getInstance().requestState("select");
@@ -171,16 +172,8 @@ void Graphics::init() {
 void Graphics::shutdown() {
   assert(m_initialised == true);
  
-  if (m_compass) {
-    delete m_compass;
-    m_compass = NULL;
-  } 
-
-  if (m_lm) {  
-    m_lm->shutdown();
-    delete m_lm;
-    m_lm = NULL;
-  }
+  m_compass.release();
+  m_lm.release();
 
   m_initialised = false;
 }
@@ -192,7 +185,10 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
 
   // Update camera position
   RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->updateCameraPos(time_elapsed);
+
+  // Tell environment stuff to update
   Environment::getInstance().update(time_elapsed);
+
   // Do necessary GL initialisation for the frame
   m_renderer->beginFrame();
 
@@ -248,7 +244,7 @@ void Graphics::setCameraTransform() {
   assert(cam != NULL);
 
   // Get the current focus entity
-  Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+  const Eris::Avatar *avatar = m_system->getClient()->getAvatar();
   assert(avatar != NULL);
 
   //Get the player character entity
@@ -340,7 +336,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Rotate by 90 degrees, WF 0 degrees is East
     m_orient *= quaternion_by_90;
  
-    Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+    const Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
 
     //Get the player character entity
@@ -351,11 +347,15 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // This will get called later on anyway, but we need this information
     // now to calculate the correct camera position.
     std::list<WorldEntity*> entity_list;
+
+    // Push each parent location to the start of the list
+    // for ordered processing later
     WorldEntity *we_update = focus;
     while (we_update != 0) {
       entity_list.push_front(we_update);
       we_update = dynamic_cast<WorldEntity*>(we_update->getLocation());
     }
+    //  Update each entity in turn
     while (entity_list.empty() == false) {
       WorldEntity *we = entity_list.front();
       we->updateAbsOrient();
@@ -364,10 +364,15 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     }
  
     // Apply character orientation 
-    m_orient *= focus->getAbsOrient().inverse();
+    const WFMath::Quaternion &focus_orient = focus->getAbsOrient().inverse();
+    assert(focus_orient.isValid());
+    m_orient *= focus_orient;
 
     // Apply camera rotations
-    m_orient *= cam->getOrientation();
+
+    const WFMath::Quaternion &cam_orient = cam->getOrientation();
+    assert(cam_orient.isValid());
+    m_orient *= cam_orient;
 
     // Draw Sky box, requires the rotation to be done before any translation to
     // keep the camera centered
@@ -388,7 +393,7 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Setup main light sources
     m_renderer->applyLighting();
 
-    Eris::View *view = avatar->getView();
+    const Eris::View *view = avatar->getView();
     assert(view);
     WorldEntity *root = dynamic_cast<WorldEntity *>(view->getTopLevel());
     assert(root);

@@ -53,7 +53,6 @@ static void resolve_callback(
       char addr[AVAHI_ADDRESS_STR_MAX];
       avahi_address_snprint(addr, sizeof(addr), address);
 
-      printf("[Avahi] Found avahi host %s : %hu\n", host_name, port);
       Sear::ServerObject so;
       so.servername = name;
       so.hostname = addr;
@@ -67,7 +66,6 @@ static void resolve_callback(
       char  *key, *value;
       while (ptxt != 0) {
         if (avahi_string_list_get_pair(ptxt, &key, &value, NULL) == 0) {
-          printf("[Avahi] Key: %s value %s\n", key, value);
           // Put into a std::string so we can use ==
           std::string skey = key;
           if (skey == "ruleset") so.ruleset = value;
@@ -163,7 +161,7 @@ void Avahi::poll() {
   assert(m_initialised == true);
 #ifdef HAVE_AVAHI
   if (m_ud->simple_poll) {
-    avahi_simple_poll_iterate(m_ud->simple_poll, 10);
+    avahi_simple_poll_iterate(m_ud->simple_poll, 0);
   }
 #endif
 }

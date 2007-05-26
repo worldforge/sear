@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: SearObject.cpp,v 1.9 2007-05-02 20:47:54 simon Exp $
+// $Id: SearObject.cpp,v 1.10 2007-05-26 18:49:10 simon Exp $
 
 #include  <stdio.h>
 
@@ -114,8 +114,6 @@ int SearObject::init(const std::string &file_name) {
   System::instance()->getFileHandler()->getFilePath(object);
 
   // Load SearObject file
-  if (debug) printf("[SearObject] Loading: %s\n", object.c_str());
-
   if (load(object)) {
     //  Error loading object
     fprintf(stderr, "[SearObject] Error loading SearObject %s\n", object.c_str());

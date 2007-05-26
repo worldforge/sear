@@ -142,9 +142,9 @@ void Workarea::init()
 
   m_panel = SPtr<gcn::Window>(new Panel(m_top));
   // m_top->add(m_panel, 0, 0);
+  m_top->setWindowCoords(m_panel.get(), std::make_pair(0,0));
 
   m_windows["panel"] = m_panel;
-  m_top->setWindowCoords(m_panel.get(), std::make_pair(0,0));
   m_windows["connect"] = con_w;
   m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
   m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
@@ -225,6 +225,7 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
     std::cerr << "Asked to open ALERT" << args
               << std::endl << std::flush;
     Alert * al = new Alert(m_top, args);
+    // This should be deleted in removeLaters if all goes well...
     m_widgets.push_back(SPtr<gcn::Widget>(al));
     // m_top->openWindow(al);
   }
@@ -256,7 +257,7 @@ void Workarea::writeConfig(varconf::Config & config)
 
 void Workarea::resize()
 {
-  Render * render = RenderSystem::getInstance().getRenderer();
+  Render *render = RenderSystem::getInstance().getRenderer();
   int width = render->getWindowWidth(),
       height = render->getWindowHeight();
   m_graphics->setTargetPlane(width, height);
@@ -268,17 +269,17 @@ void Workarea::resize()
 
 bool Workarea::handleEvent(const SDL_Event & event)
 {
-  gcn::FocusHandler * fh = m_gui->getFocusHandler();
+  gcn::FocusHandler *fh = m_gui->getFocusHandler();
   assert(fh != 0);
 
-  gcn::Widget * focus = fh->getFocused();
+  gcn::Widget *focus = fh->getFocused();
 
   bool gui_has_mouse = m_top->childHasMouse();
 
   bool clear_focus = false;
   bool event_eaten = false;
   bool suppress = false;
-  Panel * panel = dynamic_cast<Panel*>(m_panel.get());
+  Panel *panel = dynamic_cast<Panel*>(m_panel.get());
   switch (event.type) {
     case SDL_MOUSEMOTION:
     case SDL_MOUSEBUTTONDOWN:
@@ -334,11 +335,11 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
 void Workarea::draw()
 {
-  removeLaters();
 
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState(WORKSPACE));
   glLineWidth(1.f);
   m_gui->logic();
+  removeLaters();
   m_gui->draw();
 
   glLineWidth(4.f);

@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Render.h,v 1.23 2007-05-02 20:47:56 simon Exp $
+// $Id: Render.h,v 1.24 2007-05-26 18:49:10 simon Exp $
 
 #ifndef SEAR_RENDER_H
 #define SEAR_RENDER_H 1
@@ -20,7 +20,7 @@
 #include "loaders/StaticObject.h"
 #include "loaders/DynamicObject.h"
 
-#include "StateManager.h"
+#include "RenderTypes.h"
 
 #define RENDER_FOV (45.0f)
 #define RENDER_FAR_CLIP (1000.0f)

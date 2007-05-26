@@ -63,18 +63,20 @@ Alert::~Alert()
 
 void Alert::actionPressed(std::string event)
 {
-  gcn::Widget * parent_widget = getParent();
-  if (parent_widget == 0) {
-    std::cout << "NO PARENT" << std::endl << std::flush;
-    return;
+  if (event == "ok") {
+    gcn::Widget * parent_widget = getParent();
+    if (parent_widget == 0) {
+      std::cout << "NO PARENT" << std::endl << std::flush;
+      return;
+    }
+    gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
+    if (parent == 0) {
+      std::cout << "WEIRD PARENT" << std::endl << std::flush;
+      return;
+    }
+    System::instance()->getWorkarea()->removeLater(this);
+    //parent->remove(this);
   }
-  gcn::Container * parent = dynamic_cast<gcn::Container *>(parent_widget);
-  if (parent == 0) {
-    std::cout << "WEIRD PARENT" << std::endl << std::flush;
-    return;
-  }
-  System::instance()->getWorkarea()->removeLater(this);
-  //parent->remove(this);
 }
 
 void Alert::logic()
