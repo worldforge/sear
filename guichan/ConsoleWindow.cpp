@@ -21,7 +21,7 @@ namespace Sear {
 
 void ConsoleWindow::pushMessage(const std::string & msg, int, int)
 {
-  std::cout << "Got console message " << msg << std::endl << std::flush;
+//  std::cout << "Got console message " << msg << std::endl << std::flush;
   m_textBox->addRow(msg);
   m_textBox->setCaretRow(m_textBox->getNumberOfRows() -1);
   m_textBox->scrollToCaret();
@@ -75,7 +75,7 @@ ConsoleWindow::~ConsoleWindow()
 
 void ConsoleWindow::lineEntered()
 {
-  std::cout << "Line entered" << std::endl << std::flush;
+//  std::cout << "Line entered" << std::endl << std::flush;
   if (m_entry->getText() == "") {
     _getFocusHandler()->focusNone();
   } else {
@@ -87,7 +87,7 @@ void ConsoleWindow::lineEntered()
 bool ConsoleWindow::requestConsoleFocus()
 {
   if (!m_entry->isFocused()) {
-    std::cout << "Request Focus" << std::endl << std::flush;
+//    std::cout << "Request Focus" << std::endl << std::flush;
     m_entry->requestFocus();
     return true;
   }

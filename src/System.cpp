@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.171 2007-05-04 16:06:44 simon Exp $
+// $Id: System.cpp,v 1.172 2007-05-26 18:38:03 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -444,7 +444,7 @@ void System::mainLoop() {
       m_client->poll();
 
       m_meta_server->poll();
- 
+
       m_media_manager->poll();
 
       if (m_client->getAvatar() && m_client->getAvatar()->getView()) {
@@ -470,6 +470,7 @@ void System::mainLoop() {
 }
 
 void System::handleEvents(const SDL_Event &event) {
+
   if (!m_console->consoleStatus()) {
     try {
       if (m_workarea->handleEvent(event)) {
@@ -513,10 +514,10 @@ void System::handleEvents(const SDL_Event &event) {
               if ((period > DEFAULT_max_click_time) &&
                   ((event.button.x != m_click_x) ||
                    (event.button.y != m_click_y))) {
-                  if (debug) printf("[System] DRAG\n"); fflush(stdout);
+//                  if (debug) printf("[System] DRAG\n"); fflush(stdout);
                   m_character->getEntity(m_click_id);
               } else {
-                  if (debug) printf("[System] CLICK\n"); fflush(stdout);
+//                  if (debug) printf("[System] CLICK\n"); fflush(stdout);
                   m_character->touchEntity(m_click_id);
               }
             }

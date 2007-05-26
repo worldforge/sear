@@ -92,7 +92,6 @@ void Metaserver::varconf_error_callback(const char *message) {
 
 
 void Metaserver::onReceivedServerInfo(const Eris::ServerInfo &info) {
-  printf("Got a server: %s\n", info.getServername().c_str());
   ServerObject so;
   so.hostname    = info.getHostname();
   so.servername  = info.getServername();

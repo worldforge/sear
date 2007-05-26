@@ -146,7 +146,7 @@ void Panel::addWindow(gcn::Window * window)
 bool Panel::requestConsole()
 {
   if (m_console->getParent() != 0) {
-    std::cout << "Goo" << std::endl << std::flush;
+//    std::cout << "Goo" << std::endl << std::flush;
     return m_console->requestConsoleFocus();
   } else {
     m_top->openWindow(m_console);

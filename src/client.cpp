@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.89 2007-05-02 20:47:55 simon Exp $
+// $Id: client.cpp,v 1.90 2007-05-26 18:38:03 simon Exp $
 
 #include "System.h"
 
@@ -34,13 +34,6 @@
   static const bool debug = true;
 #else
   static const bool debug = false;
-#endif
-#ifdef DEBUG
-  #define DEBUG_ERIS 1
-#elif defined(NDEBUG)
-  #define DEBUG_ERIS 0
-#else
-  #define DEBUG_ERIS 0
 #endif
 
 namespace Sear {
@@ -87,7 +80,7 @@ Client::Client(System *system, const std::string &client_name) :
   m_client_name(client_name),
   m_initialised(false),
   m_takeFirst(false),
-  m_loglevel(Eris::LOG_WARNING)
+  m_loglevel(Eris::LOG_ERROR)
 {
   assert((system != NULL) && "System is NULL");
 }
@@ -147,7 +140,7 @@ int Client::connect(const std::string &host, int port) {
   assert(m_connection.get() == NULL);
 
   // Create new eris connection object
-  m_connection = SPtr<Eris::Connection>(new Eris::Connection(m_client_name, host, port, DEBUG_ERIS));
+  m_connection = SPtr<Eris::Connection>(new Eris::Connection(m_client_name, host, port, false));
 
   // Set up connection callbacks
   m_connection->Failure.connect(sigc::mem_fun(this, &Client::NetFailure));
@@ -604,7 +597,7 @@ void Client::LogoutComplete(bool clean_logout) {
 }
 
 void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
-  if (debug) printf("[Client] Got Char - Name: %s ID: %s\n ", ge->getName().c_str(), ge->getId().c_str());
+  if (debug) printf("[Client] Got Char - Name: %s ID: %s\n", ge->getName().c_str(), ge->getId().c_str());
 }
 
 void Client::GotAllCharacters() {

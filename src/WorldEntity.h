@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.h,v 1.43 2007-02-12 18:21:53 simon Exp $
+// $Id: WorldEntity.h,v 1.44 2007-05-26 18:38:03 simon Exp $
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -127,7 +127,7 @@ protected:
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
-  std::list<message> m_messages;
+  std::vector<message> m_messages;
 
   static const int message_life = 5000;
   static const int string_size = 40;
@@ -156,8 +156,6 @@ protected:
   bool m_has_local_orient, m_has_local_pos;
   WFMath::Quaternion m_local_orient, m_abs_orient;
   WFMath::Point<3> m_local_pos, m_abs_position;
-
-
 
   bool m_selected;
 

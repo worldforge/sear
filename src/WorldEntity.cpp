@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: WorldEntity.cpp,v 1.94 2007-02-12 21:44:00 simon Exp $
+// $Id: WorldEntity.cpp,v 1.95 2007-05-26 18:38:03 simon Exp $
 
 /*
  TODO
@@ -91,6 +91,8 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
       m_parent_type = ti->getName();
     }
   }
+  m_abs_orient.identity();
+  m_local_orient.identity();
 }
 
 void WorldEntity::onMove() {
@@ -128,7 +130,6 @@ void WorldEntity::onImaginary(const Atlas::Objects::Root &imaginaryArg)
     System::instance()->pushMessage(getName()+" " + attr.String(), CONSOLE_MESSAGE | SCREEN_MESSAGE);
 }
 
-//const WFMath::Quaternion &WorldEntity::getAbsOrient() {
 void WorldEntity::updateAbsOrient() {
 
   WorldEntity *loc = dynamic_cast<WorldEntity*>(getLocation());
@@ -362,7 +363,7 @@ void WorldEntity::onSightOutfit(Eris::Entity *ent, std::string where) {
 
 void WorldEntity::onSightAttached(Eris::Entity* ent, const std::string slot)
 {
-  if (debug) printf("Slot is %s\n", slot.c_str());
+//  if (debug) printf("Slot is %s\n", slot.c_str());
   m_attached[slot] = dynamic_cast<WorldEntity*>(ent);
 }
 
@@ -428,7 +429,6 @@ void WorldEntity::updateFade(float f) {
 
 
 static void dumpElement(const std::string &prefix, const std::string &name, const Atlas::Message::Element &e) {
-
   if (e.isMap()) {
     printf("%s%s: Dumping Map\n", prefix.c_str(), name.c_str());
     Atlas::Message::MapType::const_iterator itr = e.asMap().begin();
@@ -452,8 +452,6 @@ void WorldEntity::dumpAttributes() const {
   for (; itr != end; ++itr) {
     dumpElement("  ",itr->first, itr->second);
   }
-
 }
-
 
 } /* namespace Sear */

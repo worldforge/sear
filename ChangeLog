@@ -1,5 +1,16 @@
 2007-05-26  Simon Goodall  <simon@worldforge.org>
 
+	* src/client.cpp: Change default eris log level to error. Set debug eris
+	  to false as this flag is never used in eris.
+
+	* guichan/ConsoleWindow.cpp, guichan/Panel.cpp, src/Metaserver.cpp,
+	  src/System.cpp, src/WorldEntity.cpp: Removed some obsolete debugging
+	  output.
+
+	* src/WorldEntity.h: Use a vector instead of a list for the messages.
+
+2007-05-26  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/cal3d/Cal3dModel.cpp: Use style sttribute when selecting a
 	  submesh.
 
