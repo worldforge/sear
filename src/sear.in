@@ -8,20 +8,15 @@ datarootdir=@datarootdir@
 datadir=@datadir@
 homedata=$HOME/.sear
 
-WFUT_JAR=WFUT.jar
-MEDIA_CHANNEL="sear-media-0.6"
+WFUT_BIN=wfut
+MEDIA_CHANNEL="sear-media-0.7"
 UPDATED=0
 
 # Create dir if required 
 if [ ! -d $homedata ] ; then
   echo "Creating sear configuration directory..."
   mkdir $homedata
-
-  # Create startup.script
-  # echo "/insert_file_path SEAR_MEDIA \${SEAR_HOME}/$MEDIA_CHANNEL/" > $homedata/startup.script
-  # echo "/setvar SEAR_INSTALL $datadir/sear/" >> $homedata/startup.script
 fi
-
 
 ## First check to see if a native compile of wfut exists
 if [ "$UPDATED" -eq "0" ] ; then
@@ -32,8 +27,8 @@ if [ "$UPDATED" -eq "0" ] ; then
     # wfut might be installed with the same prefix as sear...
     if test -x $bindir/wfut; then
       WFUT_BIN="$bindir/wfut"
-#    else
-#      echo "Could not find the 'wfut' binary, did you install this package? Updater cannot be run."
+    else
+      echo "Could not find the 'wfut' binary. Update will not be run"
     fi
   fi
 
@@ -42,9 +37,9 @@ if [ "$UPDATED" -eq "0" ] ; then
     pushd $homedata
     # Update
     if [ -e  $datadir/sear/$MEDIA_CHANNEL/wfut.xml ]; then
-      $WFUT_BIN ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
+      $WFUT_BIN -S $datadir/sear/$MEDIA_CHANNEL -u $MEDIA_CHANNEL
     else
-      $WFUT_BIN update $MEDIA_CHANNEL
+      $WFUT_BIN -u$MEDIA_CHANNEL
     fi
     # Restore dir
     popd
@@ -52,67 +47,9 @@ if [ "$UPDATED" -eq "0" ] ; then
   fi
 fi
 
-## Next check for a .JAR file and an installed java implementation
-if [ "$UPDATED" -eq "0" ] ; then
-  # Check to see if WFUT.jar is in the install dir
-  if [ -e $datadir/sear/$WFUT_JAR ] ; then
-    WFUT_JAR_CP=$datadir/sear/$WFUT_JAR;
-  fi
-
-  # See if Updater exists in home dir
-  if [ -e $homedata/$WFUT_JAR ] ; then
-    WFUT_JAR_CP=$homedata/$WFUT_JAR;
-  fi
-
-  # Determine if java executable exists in path
-  ## TODO Could also examine JAVA_HOME
-  JAVA=`which java`
-  GIJ=`which gij`
-
-  if [ -x $JAVA ] ; then
-    # Run Updater if it exists
-    if [ -e $WFUT_JAR_CP ] ; then
-      # We need to change here so updater knows where to find / store data
-      pushd $homedata
-      # Update
-      if [ -e  $datadir/sear/$MEDIA_CHANNEL/wfut.xml ]; then
-        $JAVA -jar $WFUT_JAR_CP ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
-      else 
-        $JAVA -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
-      fi
-      UPDATED=1
-      # Restore dir
-      popd
-    else
-      echo "Could not find WFUT.jar"
-    fi
-  elif [-x $GIJ ] ; then
-    ## TODO Check GIJ Version
-    ## Version 1.4.2 Works for cmd line wfut.
-
-    # Run Updater if it exists
-    if [ -e $WFUT_JAR_CP ] ; then
-      # We need to change here so updater knows where to find / store data
-      pushd $homedata
-      # Update
-      if [ -e  $datadir/sear/$MEDIA_CHANNEL/wfut.xml ]; then
-        $GIJ -jar $WFUT_JAR_CP ref $datadir/sear/$MEDIA_CHANNEL update $MEDIA_CHANNEL
-      else
-        $GIJ -jar $WFUT_JAR_CP update $MEDIA_CHANNEL
-      fi
-      UPDATED=1
-      # Restore dir
-      popd
-    else
-      echo "Could not find WFUT.jar"
-    fi
-  else
-    echo "No Java or GIJ binary found on path";
-  fi
-fi
 
 if [ "$UPDATED" -eq "0" ] ; then
-   echo "Error running WFUT. No native 'wfut' found on path or no Java found on path or missing WFUT.jar "
+   echo "Error running WFUT. No native 'wfut' found on path."
 fi
 
 # Execute real sear binary

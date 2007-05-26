@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.h,v 1.15 2006-10-08 14:51:49 simon Exp $
+// $Id: FileHandler.h,v 1.16 2007-05-26 18:54:45 simon Exp $
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -31,7 +31,7 @@ class Console;
 class FileHandler : public ConsoleObject {
 public:	
   FileHandler();
-  ~FileHandler();
+  ~FileHandler() {}
 
   typedef std::set<std::string> FileSet;
   typedef std::list<std::string> FileList;

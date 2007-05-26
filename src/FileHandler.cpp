@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.25 2007-02-14 11:38:50 simon Exp $
+// $Id: FileHandler.cpp,v 1.26 2007-05-26 18:54:45 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -111,17 +111,15 @@ FileHandler::FileHandler() {
     // This is the user's home dir
     setVariable("SEAR_HOME", getUserDataPath());
     // Search $HOME/.sear for media first
-    insertFilePath("SEAR_MEDIA", "${SEAR_HOME}/sear-media-0.6/");
+    insertFilePath("SEAR_MEDIA", "${SEAR_HOME}/sear-media-0.7/");
     // Check prefix location second
-    appendFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.6/");
+    appendFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.7/");
     
     if (!exists(getUserDataPath())) {
       std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
       mkdir(getUserDataPath());
     }
 }
-
-FileHandler::~FileHandler() {}
 
 std::string FileHandler::getInstallBasePath() const
 {

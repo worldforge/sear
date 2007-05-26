@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.6 2007-05-06 16:48:33 simon Exp $
+// $Id: MediaManager.cpp,v 1.7 2007-05-26 18:54:45 simon Exp $
 
 #include <sigc++/connection.h>
 #include <sigc++/bind.h>
@@ -52,7 +52,7 @@ static const std::string KEY_enable_updates = "enable_updates";
 static const std::string DEFAULT_local_root = "${SEAR_HOME}/";
 static const std::string DEFAULT_system_root = "${SEAR_INSTALL}/share/sear/";
 static const std::string DEFAULT_server_root = "http://white.worldforge.org/downloads/WFUT/";
-static const std::string DEFAULT_channel_name = "sear-media-0.6";
+static const std::string DEFAULT_channel_name = "sear-media-0.7";
 
 static const bool DEFAULT_enable_updates = false;
 

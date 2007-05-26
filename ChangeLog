@@ -1,5 +1,13 @@
 2007-05-26  Simon Goodall  <simon@worldforge.org>
 
+	* src/FileHandler.cpp, src/FileHandler.h, src/MediaManager.cpp,
+	  src/sear.in: Changed sear-media channel name to sear-media-0.7 so we
+	  can update the media without breaking sear 0.6.x installs. Remove the
+	  java related code in sear.in in favour of using the wfut binary. There
+	  might be some problems if it finds the gcj binary.
+
+2007-05-26  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/Alert.cpp: Check event name before performing action.
 
 	* guichan/Workarea.cpp: Call removeLaters after the call to gui->logic()
