@@ -146,7 +146,7 @@ int SpeechBubble::loadImages(const std::vector<std::string> &)
     for (int i = 0; i < 9; ++i) {
       System::instance()->getFileHandler()->getFilePath(filenames[i]);
     }
-    std::cout << "Loading images" << std::endl << std::flush;
+//    std::cout << "Loading images" << std::endl << std::flush;
 
     try {
       m_n = gcn::Image::load(filenames[0]);
@@ -161,7 +161,7 @@ int SpeechBubble::loadImages(const std::vector<std::string> &)
     }
     catch (...) {
       m_n = 0;
-std::cout<< "Error loading images" << std::endl << std::flush;
+      std::cout<< "Error loading images" << std::endl << std::flush;
     }
     return 0;
 }
@@ -170,6 +170,15 @@ void SpeechBubble::contextCreated() {
 }
 
 void SpeechBubble::contextDestroyed(bool check) {
- // TODO: Clean up images
+  if (m_n)   delete m_n;   m_n = 0;
+  if (m_e)   delete m_e;   m_e = 0;
+  if (m_s)   delete m_s;   m_s = 0;
+  if (m_w)   delete m_w;   m_w = 0;
+  if (m_ne)  delete m_ne;  m_ne = 0;
+  if (m_nw)  delete m_nw;  m_nw = 0;
+  if (m_se)  delete m_se;  m_se = 0;
+  if (m_sw)  delete m_sw;  m_sw = 0;
+  if (m_mid) delete m_mid; m_mid = 0;
 }
+
 } // namespace Sear

@@ -1,3 +1,9 @@
+2007-08-15  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/SpeechBubble.cpp, guichan/SpeechBubble.h: Clean up
+	  speechbubble images on context destruction or speech bubble
+	  destructor.
+
 2007-05-26  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/StaticObjectFunctions.cpp, loaders/StaticObjectFunctions.h,

@@ -19,6 +19,9 @@ public:
     float m_xoff;
 
     SpeechBubble();
+    ~SpeechBubble() {
+      contextDestroyed(true);
+    }
 
     virtual void logic();
 
