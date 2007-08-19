@@ -1,3 +1,11 @@
+2007-08-19  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/Graphics.cpp: Tweak the fire entity lighting a little.
+
+2007-08-19  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/Light.h: Fix Blue/Green index values.
+
 2007-08-15  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/SpeechBubble.cpp, guichan/SpeechBubble.h: Clean up

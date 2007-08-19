@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.71 2007-05-26 18:49:10 simon Exp $
+// $Id: Graphics.cpp,v 1.72 2007-08-19 20:51:16 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -96,17 +96,17 @@ static const std::string SECTION_graphics = "graphics";
   static const float DEFAULT_fire_al = 0.2f;
   static const float DEFAULT_fire_aq = 0.15f;
 
-  static const float DEFAULT_fire_amb_red = 0.0f;
-  static const float DEFAULT_fire_amb_green = 0.0f;
-  static const float DEFAULT_fire_amb_blue = 0.0f;
+  static const float DEFAULT_fire_amb_red = 0.4f;
+  static const float DEFAULT_fire_amb_green = 0.3f;
+  static const float DEFAULT_fire_amb_blue = 0.1f;
   static const float DEFAULT_fire_amb_alpha = 0.0f;
   static const float DEFAULT_fire_diff_red = 1.0f;
-  static const float DEFAULT_fire_diff_green = 1.0f;
-  static const float DEFAULT_fire_diff_blue = 0.9f;
+  static const float DEFAULT_fire_diff_green = 0.7f;
+  static const float DEFAULT_fire_diff_blue = 0.2f;
   static const float DEFAULT_fire_diff_alpha = 0.0f;
-  static const float DEFAULT_fire_spec_red = 0.0f;
-  static const float DEFAULT_fire_spec_green = 0.0f;
-  static const float DEFAULT_fire_spec_blue = 0.0f;
+  static const float DEFAULT_fire_spec_red = 0.4f;
+  static const float DEFAULT_fire_spec_green = 0.3f;
+  static const float DEFAULT_fire_spec_blue = 0.1f;
   static const float DEFAULT_fire_spec_alpha = 0.0f;
 
 
@@ -786,11 +786,11 @@ void Graphics::drawFire(WorldEntity* we) {
   // One component on its own gives too little, or too much light.
 
   // Add light to gl system
-  m_fire.attenuation_constant = 1.0f;// - status;
-  m_fire.attenuation_linear =  1.0f - status;
-  m_fire.attenuation_quadratic =  0.0f;//1.0f - status;
+  m_fire.attenuation_constant = 1.0f - status + 0.01f ;//0.5f;// status ;//1.0f;
+  m_fire.attenuation_linear = 0.05f;//  1.0f - status;
+  m_fire.attenuation_quadratic =  0.01f;//1.0f - status;
   m_lm->applyLight(m_fire);
-        
+
   // Disable as we don't need it again for now 
   m_fire.enabled = false;
 }
