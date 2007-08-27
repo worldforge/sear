@@ -66,7 +66,7 @@ void TaskWindow::logic()
       m_progressBar->setValue(0);
     } else {
       Eris::Task * t = tasks.front();
-      std::cout << "GOT TASK" << t->name() << ":" << t->progress() << std::endl << std::flush;
+//      std::cout << "GOT TASK" << t->name() << ":" << t->progress() << std::endl << std::flush;
       setCaption(t->name());
       m_progressBar->setValue(t->progress());
     }

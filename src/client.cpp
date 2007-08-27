@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.90 2007-05-26 18:38:03 simon Exp $
+// $Id: client.cpp,v 1.91 2007-08-27 16:06:39 simon Exp $
 
 #include "System.h"
 
@@ -459,7 +459,7 @@ int Client::createCharacter(const std::string &name, const std::string &type, co
 
 int Client::takeCharacter(const std::string &id) {
   assert ((m_initialised == true) && "Client not initialised");
-  if (debug) printf("[Client] takeCharacter\n");
+//  if (debug) printf("[Client] takeCharacter\n");
   if (m_status != CLIENT_STATUS_LOGGED_IN) {
      return 1;
   }
@@ -601,7 +601,7 @@ void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
 }
 
 void Client::GotAllCharacters() {
-  if (debug) printf("[Client] getCharacters\n");
+//  if (debug) printf("[Client] getCharacters\n");
   assert(m_account);
 
   Eris::CharacterMap m = m_account->getCharacters();
