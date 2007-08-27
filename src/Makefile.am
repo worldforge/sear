@@ -118,7 +118,7 @@ libSear_a_SOURCES = \
 	Editor.cpp \
 	Editor.h \
 	TerrainEntity.cpp TerrainEntity.h \
-	prefix.c prefix.h \
+	binreloc.c binreloc.h \
 	error.cpp error.h \
 	MediaManager.cpp MediaManager.h \
 	Metaserver.cpp Metaserver.h \

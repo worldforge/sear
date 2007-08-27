@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: main.cpp,v 1.35 2007-05-02 20:47:55 simon Exp $
+// $Id: main.cpp,v 1.36 2007-08-27 16:03:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -15,6 +15,8 @@
 #include "error.h"
 
 #include <signal.h>
+
+#include "binreloc.h"
 
 
 #ifdef DEBUG
@@ -33,6 +35,13 @@ int main(int argc, char** argv) {
     fprintf(stderr, "Warning: Attempt to ignore SIGPIPE failed.\n");
   }
 #endif
+
+  BrInitError error;
+
+  if (br_init(&error) == 0 && error != BR_INIT_ERROR_DISABLED) {
+    printf ("Warning: BinReloc failed to initialize (error code %d)\n", error);
+    printf ("Will fallback to hardcoded default path.\n");
+  }
 
   bool exit_program = false;
   std::auto_ptr<Sear::System> sys;

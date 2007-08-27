@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: FileHandler.cpp,v 1.26 2007-05-26 18:54:45 simon Exp $
+// $Id: FileHandler.cpp,v 1.27 2007-08-27 16:03:32 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -18,7 +18,7 @@
 #include "System.h"
 #include "common/Utility.h"
 
-#include "prefix.h"
+#include "binreloc.h"
 
 #ifdef __WIN32__
     #include <io.h> // for _access, Win32 version of stat()
@@ -99,26 +99,26 @@ namespace Sear {
   static const std::string CMD_DELETE_VARIABLE = "delete_variable";
 	
 FileHandler::FileHandler() {
-    std::string installBase = getInstallBasePath();
+  const std::string &installBase = getInstallBasePath();
 
-    addSearchPath(getUserDataPath());
-    addSearchPath(".");
-    addSearchPath(installBase);
-    addSearchPath(installBase + "/scripts");
+  addSearchPath(getUserDataPath());
+  addSearchPath(".");
+  addSearchPath(installBase);
+  addSearchPath(installBase + "/scripts");
     
-    // This is the prefix 
-    setVariable("SEAR_INSTALL", installBase);
-    // This is the user's home dir
-    setVariable("SEAR_HOME", getUserDataPath());
-    // Search $HOME/.sear for media first
-    insertFilePath("SEAR_MEDIA", "${SEAR_HOME}/sear-media-0.7/");
-    // Check prefix location second
-    appendFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.7/");
+  // This is the prefix 
+  setVariable("SEAR_INSTALL", installBase);
+  // This is the user's home dir
+  setVariable("SEAR_HOME", getUserDataPath());
+  // Search $HOME/.sear for media first
+  insertFilePath("SEAR_MEDIA", "${SEAR_HOME}/sear-media-0.7/");
+  // Check prefix location second
+  appendFilePath("SEAR_MEDIA", "${SEAR_INSTALL}/sear-media-0.7/");
     
-    if (!exists(getUserDataPath())) {
-      std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
-      mkdir(getUserDataPath());
-    }
+  if (!exists(getUserDataPath())) {
+    std::cout << "creating user data directory at " << getUserDataPath() << std::endl;
+    mkdir(getUserDataPath());
+  }
 }
 
 std::string FileHandler::getInstallBasePath() const
@@ -128,11 +128,13 @@ std::string FileHandler::getInstallBasePath() const
 #elif __WIN32__
   return std::string(".");
 #else
-  #ifdef ENABLE_BINRELOC
-  return std::string(DATADIR) + std::string("/sear");
-#else
-  return std::string(INSTALLDIR) + std::string("/share/sear");
-#endif
+  static const std::string base_path(INSTALLDIR  "/share");
+  return std::string(br_find_data_dir(base_path.c_str())) + std::string("/sear");
+//  #ifdef ENABLE_BINRELOC
+//  return std::string(DATADIR) + std::string("/sear");
+//#else
+//  return std::string(INSTALLDIR) + std::string("/share/sear");
+//#endif
 #endif
 }
 
@@ -154,7 +156,7 @@ std::string FileHandler::getUserDataPath() const
 #elif __APPLE__
     return getAppSupportDirPath() + "/Sear/";
 #else
-  std::string path = getenv("HOME");
+  const std::string &path = getenv("HOME");
   if (path.empty()) {
     std::cerr << "$HOME not set, using '.' for user settings" << std::endl;
     return ".";
