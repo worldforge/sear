@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Light.h,v 1.2 2006-04-26 14:39:00 simon Exp $
+// $Id: Light.h,v 1.3 2007-08-27 16:04:20 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1
@@ -22,8 +22,8 @@ public:
 
   typedef enum {
     RED = 0,
-    BLUE,
     GREEN,
+    BLUE,
     ALPHA
   } Channels;
   

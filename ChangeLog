@@ -1,5 +1,9 @@
 2007-08-27  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/Light.h: Fix rgb ordering bug.
+
+2007-08-27  Simon Goodall  <simon@worldforge.org>
+
 	* src/Makefile.am, src/binreloc.c, src/binreloc.h, src/prefix.cm
 	  src/prefix.h, src/FileHandler.cpp, src/main.cpp, macros/binreloc.m4:
 	  Update binreloc code to version 2. The binreloc.* files replace the
