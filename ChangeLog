@@ -1,3 +1,7 @@
+2007-08-30  Simon Goodall  <simon@worldforge.org>
+
+	* src/MediaManager.cpp: Update WFUT url.
+
 2007-08-27  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/TaskWindow.cpp, src/client.cpp: Remove some unneccessary
