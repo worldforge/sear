@@ -1,3 +1,11 @@
+2007-09-02  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/default_states.h, renderers/StateManager.cpp,
+	  renderers/StateManager.h, renderers/Makefile.am: Remove the
+	  createDefaultStates function in favour of #including a header file
+	  with a std::string containing the definitions of the default states.
+	  Use varconf::Config::parseStream to read the encoded string.
+
 2007-08-30  Simon Goodall  <simon@worldforge.org>
 
 	* src/MediaManager.cpp: Update WFUT url.

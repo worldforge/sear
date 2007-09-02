@@ -4,6 +4,7 @@ INCLUDES = -I$(top_srcdir)
 
 libRendererGL_a_SOURCES = \
 	cursors.h \
+	default_states.h \
 	Camera.cpp Camera.h \
 	CameraSystem.cpp CameraSystem.h \
 	Graphics.cpp Graphics.h \

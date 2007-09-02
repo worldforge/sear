@@ -2,12 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.33 2007-05-02 20:47:56 simon Exp $
+// $Id: StateManager.cpp,v 1.34 2007-09-02 19:19:10 simon Exp $
 
 /*
  * TODO
  * custom of default settings
  * */
+
+#include <sstream>
 
 #include <sigc++/object_slot.h>
 
@@ -25,6 +27,8 @@
 #include "src/Console.h"
 #include "src/System.h"
 #include "src/FileHandler.h"
+
+#include "default_states.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -102,124 +106,15 @@ int StateManager::init() {
   m_state_change_vector.resize(256);
   for (unsigned int i = 0; i < 256; m_state_change_vector[i++].resize(256));
   
-  createDefaultStates(); 
+  varconf::Config config;
+  config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
+  config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
+
+  std::istringstream ss (default_states);
+  config.parseStream(ss, varconf::GLOBAL);
 
   m_initialised = true;
   return 0;
-}
-
-void StateManager::createDefaultStates() {
-  SPtr<StateProperties> default_state = SPtr<StateProperties> (new StateProperties);
-  SPtr<StateProperties> font_state = SPtr<StateProperties> (new StateProperties);
-  SPtr<StateProperties> select_state = SPtr<StateProperties> (new StateProperties);
-  SPtr<StateProperties> cursor_state = SPtr<StateProperties> (new StateProperties);
-  // Create a default record
-  default_state->state = "default";
-  default_state->alpha_test = false;
-  default_state->blend = false;
-  default_state->lighting = false;
-  default_state->two_sided_lighting = false;
-  default_state->textures[0] = true;
-  for (unsigned int i = 1; i < MAX_UNITS; ++i)
-    default_state->textures[i] = false;
-  default_state->colour_material = false;
-  default_state->depth_test = false;
-  default_state->depth_write = true;
-  default_state->cull_face = false;
-  default_state->cull_face_cw = false;
-  default_state->stencil = false;
-  default_state->fog = false;
-  default_state->rescale_normals = false;
-  default_state->normalise = false;
-  default_state->alpha_function = GL_GREATER;
-  default_state->alpha_value = 0.1f;
-  default_state->blend_src_function = GL_SRC_ALPHA;
-  default_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  m_states[m_state_counter] = default_state;
-  m_state_name_map[default_state->state] = m_state_counter;
-  m_name_state_vector[m_state_counter] = default_state->state;
-  ++m_state_counter;
-  
-  //Create a font state so we can still see text
-  //even if no files have been loaded into Sear
-  font_state->state = "font";
-  font_state->alpha_test = true;
-  font_state->blend = true;
-  font_state->lighting = false;
-  font_state->two_sided_lighting = false;
-  font_state->textures[0] = true;
-  for (unsigned int  i = 1; i < MAX_UNITS; ++i)
-    font_state->textures[i] = false;
-  font_state->colour_material = false;
-  font_state->depth_test = false;
-  font_state->depth_write = true;
-  font_state->cull_face = false;
-  font_state->cull_face_cw = false;
-  font_state->stencil = false;
-  font_state->fog = false;
-  font_state->rescale_normals = false;
-  font_state->normalise = false;
-  font_state->alpha_function = GL_GREATER;
-  font_state->alpha_value = 0.1f;
-  font_state->blend_src_function = GL_SRC_ALPHA;
-  font_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  m_states[m_state_counter] = font_state;
-  m_state_name_map[font_state->state] = m_state_counter;
-  m_name_state_vector[m_state_counter] = font_state->state;
-  ++m_state_counter;
- 
-  // Create default select mode state
-  select_state->state = "select";
-  select_state->alpha_test = false;
-  select_state->blend = false;
-  select_state->lighting = false;
-  select_state->two_sided_lighting = false;
-  for (unsigned int  i = 0; i < MAX_UNITS; ++i)
-    select_state->textures[i] = false;
-  select_state->colour_material = false;
-  select_state->depth_test = true;
-  select_state->depth_write = true;
-  select_state->cull_face = false;
-  select_state->cull_face_cw = false;
-  select_state->stencil = false;
-  select_state->fog = false;
-  select_state->rescale_normals = false;
-  select_state->normalise = false;
-  select_state->alpha_function = GL_GREATER;
-  select_state->alpha_value = 0.1f;
-  select_state->blend_src_function = GL_SRC_ALPHA;
-  select_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  m_states[m_state_counter] = select_state;
-  m_state_name_map[select_state->state] = m_state_counter;
-  m_name_state_vector[m_state_counter] = select_state->state;
-  ++m_state_counter;
-
-  // Create default state for mouse cursor
-  cursor_state->state = "cursor";
-  cursor_state->alpha_test = true;
-  cursor_state->blend = false;
-  cursor_state->lighting = false;
-  cursor_state->two_sided_lighting = false;
-  for (unsigned int  i = 1; i < MAX_UNITS; ++i)
-    cursor_state->textures[i] = false;
-  cursor_state->textures[0] = true;
-  cursor_state->colour_material = false;
-  cursor_state->depth_test = false;
-  cursor_state->depth_write = true;
-  cursor_state->cull_face = false;
-  cursor_state->cull_face_cw = false;
-  cursor_state->stencil = false;
-  cursor_state->fog = false;
-  cursor_state->rescale_normals = false;
-  cursor_state->normalise = false;
-  cursor_state->alpha_function = GL_GREATER;
-  cursor_state->alpha_value = 0.1f;
-  cursor_state->blend_src_function = GL_SRC_ALPHA;
-  cursor_state->blend_dest_function = GL_ONE_MINUS_SRC_ALPHA;
-  m_states[m_state_counter] = cursor_state;
-  m_state_name_map[cursor_state->state] = m_state_counter;
-  m_name_state_vector[m_state_counter] = cursor_state->state;
-  ++m_state_counter;
 }
 
 int StateManager::shutdown() {
@@ -240,7 +135,6 @@ void StateManager::readFiles(const std::string &file_name) {
 }
 
 void StateManager::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  assert(m_initialised);
   StateID sID = m_state_name_map[section];
 
   SPtr<StateProperties> record = SPtr<StateProperties>();
