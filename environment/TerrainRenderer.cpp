@@ -490,11 +490,11 @@ TerrainRenderer::TerrainRenderer ():
   m_numLineIndeces = ++idx;
 
   // TODO set these texture names in a config file
-  registerShader(new Mercator::FillShader(), "granite.png");
-  registerShader(new Mercator::BandShader (-2.f, 1.5f), "sand.png");  // Sandy beach
-  registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
-  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
-  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
+//  registerShader(new Mercator::FillShader(), "granite.png");
+//  registerShader(new Mercator::BandShader (-2.f, 1.5f), "sand.png");  // Sandy beach
+//  registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
+//  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
+//  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
 }
 
 TerrainRenderer::~TerrainRenderer() {
@@ -593,6 +593,7 @@ void TerrainRenderer::contextDestroyed(bool check) {
 
 void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& texName)
 {
+  // TODO: Watch out for duplicate shaders!
   int index = m_shaders.size();
   m_shaders.push_back(ShaderEntry(s, texName));
   m_terrain.addShader(s, index);
@@ -665,5 +666,23 @@ void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) 
   delete [] texcoords;
   delete [] indices;
 }
+
+void TerrainRenderer::setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params) {
+  // TODO: Check params length
+  if (pattern == "fill") {
+    registerShader(new Mercator::FillShader(), "terrain_" + name);
+  } else if (pattern == "band") {
+    registerShader(new Mercator::BandShader (params[0], params[1]), "terrain_" + name);
+  } else if (pattern == "grass") {
+    registerShader(new Mercator::GrassShader (params[0], params[1], params[2], params[3]), "terrain_" + name);
+  } else if (pattern == "depth") {
+    registerShader(new Mercator::DepthShader (params[0], params[1]), "terrain_" + name);
+  } else if (pattern == "high") {
+    registerShader(new Mercator::HighShader (params[0]), "terrain_" + name);
+  } else {
+    printf("Unknown pattern (%s) for surface %s\n", pattern.c_str(), name.c_str());
+  }
+}
+
 
 } /* namespace Sear */

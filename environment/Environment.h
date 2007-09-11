@@ -30,7 +30,8 @@ public:
   Environment();
   ~Environment();
 
-  void init();
+  int init();
+  int reinit();
   void shutdown();
 
   static Environment &getInstance() {
@@ -39,6 +40,7 @@ public:
 
   float getHeight(float x, float y);
   void setBasePoint(int x, int y, float z);
+  void setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params);
 
   void update(float time_elapsed);
 

@@ -27,8 +27,7 @@ Environment::~Environment() {
   if (m_initialised) shutdown();
 }
 
-
-void Environment::init() {
+int Environment::init() {
   assert(m_initialised == false);
   m_terrain = std::auto_ptr<TerrainRenderer>(new TerrainRenderer());
   m_skyDome = std::auto_ptr<SkyDome>(new SkyDome(1.0f, 20, 20));
@@ -44,6 +43,14 @@ void Environment::init() {
   System::instance()->LeftWorld.connect(SigC::slot(*this, &Environment::resetWorld));
  
   m_initialised = true;
+
+  return 0;
+}
+
+int Environment::reinit() {
+
+
+  return 0;
 }
 
 void Environment::shutdown() {
@@ -72,6 +79,10 @@ void Environment::setBasePoint(int x, int y, float z) {
   m_terrain->m_terrain.setBasePoint(x, y, z);
 }
 
+void Environment::setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params) {
+  assert(m_initialised == true);
+  m_terrain->setSurface(name, pattern, params);
+}
 void Environment::renderSky() {
   assert(m_initialised == true);
   RenderSystem::getInstance().switchState(RenderSystem::getInstance().requestState("stars"));

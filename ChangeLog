@@ -1,3 +1,12 @@
+2007-09-11  Simon Goodall  <simon@worldforge.org>
+
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  src/TerrainEntity.cpp: Initial code to read surface information from
+	  the server. Currently no surfaces will be populated if the server
+	  does not send any. It may also break if the terrain updates causing
+	  the surfaces to be repopulated.
+
 2007-09-02  Simon Goodall  <simon@worldforge.org>
 
 	* renderers/default_states.h, renderers/StateManager.cpp,
