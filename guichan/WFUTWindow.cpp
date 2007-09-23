@@ -2,33 +2,28 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
+#include <libwfut/WFUT.h>
+
+#include <guichan.hpp>
+
 #include "guichan/WFUTWindow.h"
-
-
 #include "guichan/ActionListenerSigC.h"
 #include "guichan/box.hpp"
 #include "guichan/bar.hpp"
 
-#include <guichan.hpp>
-
 #include "src/System.h"
-
-#include"src/MediaManager.h"
-#include  <libwfut/WFUT.h>
+#include "src/MediaManager.h"
 
 namespace Sear {
 
-
 WFUTWindow::WFUTWindow()
 {
-
   m_media_manager = System::instance()->getMediaManager();
   m_media_manager->DownloadComplete.connect(sigc::mem_fun(this, &WFUTWindow::onDownloadComplete));
   m_media_manager->DownloadFailed.connect(sigc::mem_fun(this, &WFUTWindow::onDownloadFailed));
 
   // Setup base colour
   gcn::Color base = getBaseColor();
-  base.a = 128;
   setBaseColor(base);
 
   // Let this window be moved
@@ -56,12 +51,13 @@ WFUTWindow::WFUTWindow()
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   // Add in the current status.
-  gcn::Label *l = new gcn::Label("Downloaded: ");
+  gcn::Label *l = new gcn::Label("Status: ");
   m_widgets.push_back(SPtr<gcn::Widget>(l));
   hbox->pack(l);
 
   // Add in the current status.
-  m_status = new gcn::Label("/home/test/file");
+  m_status = new gcn::Label("");
+  m_status->setWidth(256);
   m_widgets.push_back(SPtr<gcn::Widget>(m_status));
   hbox->pack(m_status);
 
@@ -76,6 +72,7 @@ WFUTWindow::WFUTWindow()
   update->addActionListener(m_button_listener);
   hbox->pack(update);
 
+/*
   // Add a Cancel button
   gcn::Button *cancel = new gcn::Button("Cancel");
   m_widgets.push_back(SPtr<gcn::Widget>(cancel));
@@ -84,7 +81,7 @@ WFUTWindow::WFUTWindow()
   // Not enabled until the update starts.
   cancel->setFocusable(false);
   hbox->pack(cancel);
-
+*/
   vbox->pack(hbox);
 
   add(vbox);
@@ -95,11 +92,7 @@ WFUTWindow::~WFUTWindow() {
   delete m_button_listener;
 }
 
-
 void WFUTWindow::logic() {
-
-  
-
   gcn::Window::logic();
 }
 
@@ -107,6 +100,7 @@ void WFUTWindow::actionPressed(std::string event) {
 
   if (event == "update") {
     System::instance()->runCommand("/enable_updates");
+    m_status->setCaption("Checking for updates");
     System::instance()->runCommand("/check_for_updates");
     m_updates_total = m_media_manager->getNumUpdates();
     m_updates_completed = 0;
@@ -122,7 +116,7 @@ void WFUTWindow::actionPressed(std::string event) {
 
 void WFUTWindow::onDownloadComplete(const std::string &url, const std::string &filename) {
   ++m_updates_completed;
-  m_status->setCaption(filename);
+  m_status->setCaption("Downloaded: " + filename);
   m_progress_bar->setValue((double)m_updates_completed / (double)m_updates_total);
 }
 
