@@ -79,7 +79,7 @@ void Environment::setBasePoint(int x, int y, float z) {
   m_terrain->m_terrain.setBasePoint(x, y, z);
 }
 
-void Environment::setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params) {
+void Environment::setSurface(const std::string &name, const std::string &pattern, const Mercator::Shader::Parameters &params) {
   assert(m_initialised == true);
   m_terrain->setSurface(name, pattern, params);
 }

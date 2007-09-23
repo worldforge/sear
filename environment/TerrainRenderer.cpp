@@ -667,18 +667,18 @@ void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) 
   delete [] indices;
 }
 
-void TerrainRenderer::setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params) {
+void TerrainRenderer::setSurface(const std::string &name, const std::string &pattern, const Mercator::Shader::Parameters &params) {
   // TODO: Check params length
   if (pattern == "fill") {
-    registerShader(new Mercator::FillShader(), "terrain_" + name);
+    registerShader(new Mercator::FillShader(params), "terrain_" + name);
   } else if (pattern == "band") {
-    registerShader(new Mercator::BandShader (params[0], params[1]), "terrain_" + name);
+    registerShader(new Mercator::BandShader (params), "terrain_" + name);
   } else if (pattern == "grass") {
-    registerShader(new Mercator::GrassShader (params[0], params[1], params[2], params[3]), "terrain_" + name);
+    registerShader(new Mercator::GrassShader(params), "terrain_" + name);
   } else if (pattern == "depth") {
-    registerShader(new Mercator::DepthShader (params[0], params[1]), "terrain_" + name);
+    registerShader(new Mercator::DepthShader (params), "terrain_" + name);
   } else if (pattern == "high") {
-    registerShader(new Mercator::HighShader (params[0]), "terrain_" + name);
+    registerShader(new Mercator::HighShader (params), "terrain_" + name);
   } else {
     printf("Unknown pattern (%s) for surface %s\n", pattern.c_str(), name.c_str());
   }

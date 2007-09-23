@@ -9,6 +9,8 @@
 
 #include <sigc++/trackable.h>
 
+#include <Mercator/Shader.h>
+
 #include <wfmath/point.h>
 
 namespace Mercator { 
@@ -40,7 +42,7 @@ public:
 
   float getHeight(float x, float y);
   void setBasePoint(int x, int y, float z);
-  void setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params);
+  void setSurface(const std::string &name, const std::string &pattern, const Mercator::Shader::Parameters &params);
 
   void update(float time_elapsed);
 

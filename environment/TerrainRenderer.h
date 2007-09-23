@@ -96,7 +96,7 @@ public:
     void drawMap(Mercator::Terrain &, const PosType & camPos, bool select_mode);
     void drawSea( Mercator::Terrain &);
     void drawShadow(const WFMath::Point<2> & pos, float radius = 1.f);
-    void setSurface(const std::string &name, const std::string &pattern, const std::vector<double> &params);
+    void setSurface(const std::string &name, const std::string &pattern, const Mercator::Shader::Parameters &params);
   public:
     TerrainRenderer();
     virtual ~TerrainRenderer();

@@ -1,5 +1,13 @@
 2007-09-23  Simon Goodall  <simon@worldforge.org>
 
+	* environment/Environment.cpp, environment/Environment.h,
+	  environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  src/TerrainEntity.cpp: Update for changes to surfaces atlas data 
+	  structure which now uses a map instead of a list for surface
+	  parameters.
+
+2007-09-23  Simon Goodall  <simon@worldforge.org>
+
 	* src/MediaManager.cpp: Print out download failure reason.
 
 2007-09-23  Simon Goodall  <simon@worldforge.org>

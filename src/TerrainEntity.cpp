@@ -3,11 +3,13 @@
 // Copyright (C) 2002 - 2003 Alistair Riddoch
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: TerrainEntity.cpp,v 1.7 2007-09-11 19:52:20 simon Exp $
+// $Id: TerrainEntity.cpp,v 1.8 2007-09-23 09:37:00 simon Exp $
 
 #include <sigc++/object_slot.h>
 
 #include <Eris/View.h>
+
+#include <Mercator/Shader.h>
 
 #include "renderers/Graphics.h"
 #include "environment/Environment.h"
@@ -98,6 +100,7 @@ void TerrainEntity::updateTerrain() {
     }
   }
 
+  // Read surfaces data
   Atlas::Message::MapType::const_iterator J = tmap.find("surfaces");
   if (J == tmap.end()) {
     std::cerr << "Terrain surfaces does not exist" << std::endl;
@@ -127,16 +130,18 @@ void TerrainEntity::updateTerrain() {
     const std::string &name = name_itr->second.asString(); 
     const std::string &pattern = pattern_itr->second.asString(); 
     printf("Name: %s - Pattern %s\n", name.c_str(), pattern.c_str());
-    std::vector<double> params;
+
+    Mercator::Shader::Parameters params;
     if (params_itr != L.end()) {
-      const Atlas::Message::ListType & mlist = params_itr->second.asList();
-      Atlas::Message::ListType::const_iterator M = mlist.begin();
-      Atlas::Message::ListType::const_iterator Mend = mlist.end();
+      const Atlas::Message::MapType & mlist = params_itr->second.asMap();
+      Atlas::Message::MapType::const_iterator M = mlist.begin();
+      Atlas::Message::MapType::const_iterator Mend = mlist.end();
       for(; M != Mend; ++M) {
         // TODO: Check type first
-        params.push_back((*M).asNum());
+        params[M->first] = M->second.asNum();
       }
     }
+
     Environment::getInstance().setSurface(name, pattern, params);
   }
 }
