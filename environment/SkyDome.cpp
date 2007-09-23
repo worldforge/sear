@@ -273,7 +273,8 @@ void SkyDome::updateFogColor(float t)
 {
     if (m_horizonColors.empty()) getHorizonColors();
 
-    assert (m_horizonColors.empty() == false);
+    //assert (m_horizonColors.empty() == false);
+    if (m_horizonColors.empty()) return;
 
     // ensure t is in the range [0.0 .. 1.0)
     if (t < 0.0f) t = 0.0f;
