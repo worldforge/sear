@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: MediaManager.cpp,v 1.8 2007-08-30 07:40:14 simon Exp $
+// $Id: MediaManager.cpp,v 1.9 2007-09-23 08:31:35 simon Exp $
 
 #include <sigc++/connection.h>
 #include <sigc++/bind.h>
@@ -315,7 +315,7 @@ void MediaManager::onDownloadComplete(const std::string &url, const std::string 
 
 void MediaManager::onDownloadFailed(const std::string &url, const std::string &filename, const std::string &reason) {
   
-  printf("DownloadFailed: %s\n", filename.c_str());
+  printf("DownloadFailed: %s - %s\n", filename.c_str(), reason.c_str());
   DownloadFailed.emit(url, filename, reason);
 }
 
