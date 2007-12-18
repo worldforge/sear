@@ -92,6 +92,7 @@ if test "$GUICHAN_LIBS" = ""; then
 			/usr/local/lib64 \
 			/usr/*/lib \
 			/usr/*/lib64 \
+			/usr/lib64 \
 			"${prefix}"/lib/* /usr/lib/* \
 			"${prefix}"/lib64/* /usr/lib64/* \
 			/usr/local/lib/* /*/lib; do
