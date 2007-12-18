@@ -87,9 +87,13 @@ if test "$GUICHAN_LIBS" = ""; then
 		# A whole bunch of guesses
 		for dir in \
 			"${prefix}"/*/lib \
+			"${prefix}"/*/lib64 \
 			/usr/local/lib \
+			/usr/local/lib64 \
 			/usr/*/lib \
+			/usr/*/lib64 \
 			"${prefix}"/lib/* /usr/lib/* \
+			"${prefix}"/lib64/* /usr/lib64/* \
 			/usr/local/lib/* /*/lib; do
 			if test -d "$dir" && test "`ls $dir/libguichan.* 2> /dev/null`" != ""; then
 				GUICHAN_LIBS="-L$dir  -lguichan_sdl -lguichan_opengl -lguichan"
