@@ -83,11 +83,11 @@ public:
 
   virtual void render(Render *) = 0;
 
-  SigC::Signal0<void> MouseDown;
-  SigC::Signal0<void> MouseUp;
-  SigC::Signal0<void> MouseEnter;
-  SigC::Signal0<void> MouseLeave;
-  SigC::Signal2<void, SDLKey, Uint16> KeyPress;
+  sigc::signal0<void> MouseDown;
+  sigc::signal0<void> MouseUp;
+  sigc::signal0<void> MouseEnter;
+  sigc::signal0<void> MouseLeave;
+  sigc::signal2<void, SDLKey, Uint16> KeyPress;
 };
 
 } // namespace Sear
