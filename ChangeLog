@@ -1,3 +1,26 @@
+2008-04-06  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac: Use libwfut 0.2.0. Disable sigc++ 1.2 API.
+
+	* environment/Environment.cpp, gui/Button.cpp, gui/Button.h,
+	  gui/ConnectDialog.cpp, gui/ConnectDialogue.h, gui/LoginDialog.cpp,
+	  gui/LoginDialog.h, gui/TextEntry.cpp, gui/ToggleButton.cpp,
+	  gui/ToggleButton.h, gui/Widget.h, gui/Window.h, gui/focus.cpp,
+	  gui/focus.h, guichan/ActionListenerSigC.h, guichan/Alert.cpp,
+	  guichan/Alert.h, guichan/CharacterWindow.cpp,
+	  guichan/CharacterWindow.h, guichan/CommandLine.h,
+	  guichan/ConnectWindow.cpp, guichan/ConnectWindow.h,
+	  guichan/ConsoleWindow.cpp, guichan/ConsoleWindow.h,
+	  guichan/Inventory.cpp, guichan/Inventory.h, guichan/LoginWindow.h,
+	  guichan/OptionsWindow.cpp, guichan/OptionsWindow.h,
+	  guichan/Overlay.cpp, guichan/Overlay.h, guichan/Panel.cpp,
+	  guichan/Panel.h, guichan/RenameDialog.h, guichan/StatusWindow.h,
+	  guichan/TaskWindow.h, guichan/VideoOptions.cpp,
+	  guichan/VideoOptions.h, guichan/Workarea.cpp,
+	  loaders/ObjectHandler.cpp, renderers/Camera.cpp, renderers/GL.cpp,
+	  renderers/RenderSystem.cpp, renderers/StateManager.cpp, src/System.h:
+	  Replace sigc++ 1.2 calls with sigc++ 2.0 calls. 
+
 2007-12-18  Al Riddoch  <alriddoch@zepler.org>
 
 	* macros/guichan.m4: Experimental change adding 64 bit paths to the
@@ -17,7 +40,7 @@
 
 2007-09-23  Simon Goodall  <simon@worldforge.org>
 
-	* guichan/WUTWindow.cpp: Update component labels.
+	* guichan/WUTWndow.cpp: Update component labels.
 
 2007-09-23  Simon Goodall  <simon@worldforge.org>
 

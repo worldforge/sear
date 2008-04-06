@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.cpp,v 1.15 2007-05-26 18:49:10 simon Exp $
+// $Id: ObjectHandler.cpp,v 1.16 2008-04-06 14:21:40 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -72,13 +72,15 @@ void ObjectHandler::shutdown() {
   m_id_map.clear();
   m_type_map.clear();
 
+  m_object_configs.clear();
+
   m_initialised = false;
 }
 
 void ObjectHandler::loadObjectRecords(const std::string &filename) {
   varconf::Config config;
-  config.sigsv.connect(SigC::slot(*this, &ObjectHandler::varconf_callback));
-  config.sige.connect(SigC::slot(*this, &ObjectHandler::varconf_error_callback));
+  config.sigsv.connect(sigc::mem_fun(*this, &ObjectHandler::varconf_callback));
+  config.sige.connect(sigc::mem_fun(*this, &ObjectHandler::varconf_error_callback));
   config.readFromFile(filename);
 }
 
@@ -158,12 +160,10 @@ void ObjectHandler::varconf_callback(const std::string &section, const std::stri
   if (!record) {
     record = SPtr<ObjectRecord>(new ObjectRecord());
     record->name = section;
+    // Set some defaults
     record->draw_self = true;
     record->draw_members = true;
     m_type_map[section] = record;
-//    if (debug) {
-//      printf("Adding ObjectRecord: %s\n", section.c_str());
-//    }
   }
 
   if (key == KEY_DRAW_SELF) {

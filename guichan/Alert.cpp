@@ -37,7 +37,7 @@ Alert::Alert(gcn::Container * parent, const std::string & msg)
   m_widgets.push_back(SPtr<gcn::Widget>(l1));
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &Alert::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &Alert::actionPressed));
 
   m_okButton = new gcn::Button("Okay");
   m_widgets.push_back(SPtr<gcn::Widget>(m_okButton));

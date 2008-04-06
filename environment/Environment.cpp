@@ -36,11 +36,11 @@ int Environment::init() {
   m_weather->init();
 
  
-  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Environment::contextCreated));
-  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Environment::contextDestroyed));
+  RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(*this, &Environment::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(*this, &Environment::contextDestroyed));
 
   // Clean up terrain data when leaving game world
-  System::instance()->LeftWorld.connect(SigC::slot(*this, &Environment::resetWorld));
+  System::instance()->LeftWorld.connect(sigc::mem_fun(*this, &Environment::resetWorld));
  
   m_initialised = true;
 

@@ -20,7 +20,7 @@ namespace Sear {
 
 class CommandLine;
 
-class ConsoleWindow : public gcn::Window, virtual public SigC::Object {
+class ConsoleWindow : public gcn::Window, virtual public sigc::trackable {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::TextBox * m_textBox;

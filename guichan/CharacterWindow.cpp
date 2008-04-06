@@ -110,7 +110,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
 //  vbox->pack(l1);
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &CharacterWindow::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &CharacterWindow::actionPressed));
 
   m_characterListModel = new CharacterListModel;
 

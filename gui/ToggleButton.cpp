@@ -30,9 +30,9 @@ ToggleButton::~ToggleButton()
 
 void ToggleButton::connectSignals()
 {
-  m_frame->MouseDown.connect(SigC::slot(*this, &ToggleButton::onPressed));
-  m_frame->MouseUp.connect(SigC::slot(*this, &ToggleButton::onRelease));
-  // m_frame->MouseLeave.connect(SigC::slot(*this, &ToggleButton::onLeave));
+  m_frame->MouseDown.connect(sigc::mem_fun(*this, &ToggleButton::onPressed));
+  m_frame->MouseUp.connect(sigc::mem_fun(*this, &ToggleButton::onRelease));
+  // m_frame->MouseLeave.connect(sigc::mem_fun(*this, &ToggleButton::onLeave));
   m_frame->setEvents(MOUSE_BUTTON_DOWN | MOUSE_BUTTON_UP | MOUSE_LEAVE);
 }
 

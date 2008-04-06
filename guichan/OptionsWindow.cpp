@@ -38,7 +38,7 @@ OptionsWindow::OptionsWindow(RootWidget * top) : gcn::Window("System"),
   setOpaque(true);
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &OptionsWindow::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &OptionsWindow::actionPressed));
 
   gcn::Box * vbox = new gcn::VBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));

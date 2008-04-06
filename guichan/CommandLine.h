@@ -21,7 +21,7 @@ protected:
     gcn::TextField::keyPressed(key);
   }
 public:
-  SigC::Signal0<void> ReturnPressed;
+  sigc::signal0<void> ReturnPressed;
 };
 
 } // namespace Sear

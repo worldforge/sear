@@ -14,7 +14,7 @@ class Window;
 void grabFocus(Window *);
 void dropFocus(Window *);
 Window * queryFocus();
-SigC::Signal1<void, Window *> & focusSignal();
+sigc::signal1<void, Window *> & focusSignal();
 
 } // namespace Sear
 

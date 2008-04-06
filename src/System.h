@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.74 2007-05-02 20:47:55 simon Exp $
+// $Id: System.h,v 1.75 2008-04-06 14:21:40 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -265,7 +265,7 @@ public:
   void varconf_general_callback(const std::string &, const std::string &, varconf::Config &);
   void varconf_error_callback(const char *);
   
-  SigC::Signal3<void, std::string, int, int> pushedMessage;
+  sigc::signal3<void, std::string, int, int> pushedMessage;
 
   sigc::signal<void> EnteredWorld;
   sigc::signal<void> LeftWorld;

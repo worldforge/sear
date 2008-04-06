@@ -27,7 +27,7 @@ class PasswordField;
 
 class ActionListenerSigC;
 
-class RenameDialog : virtual public SigC::Object, public gcn::Window {
+class RenameDialog : virtual public sigc::trackable, public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::Button * m_renameButton;

@@ -27,7 +27,7 @@ public:
   void onRelease();
   void onLeave();
 
-  SigC::Signal0<void> UnClicked;
+  sigc::signal0<void> UnClicked;
 };
 
 } // namespace Sear

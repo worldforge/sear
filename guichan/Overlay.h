@@ -30,7 +30,7 @@ class StatusWindow;
 class TaskWindow;
 class WorldEntity;
 
-class Overlay : virtual public SigC::Object {
+class Overlay : virtual public sigc::trackable {
   friend class SPtr<Overlay>;
 public:
   typedef std::map<Eris::EntityRef, SPtr<SpeechBubble> > BubbleMap;

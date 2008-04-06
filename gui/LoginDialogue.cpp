@@ -21,8 +21,8 @@ LoginDialogue::LoginDialogue() : Dialogue("Connect to Server")
   m_passwordEntry = new TextEntry(10, "", true);
   m_realnameEntry = new TextEntry(20, "");
 
-  m_loginButton->Clicked.connect(SigC::slot(*this, &LoginDialogue::login));
-  m_createButton->Clicked.connect(SigC::slot(*this, &LoginDialogue::create));
+  m_loginButton->Clicked.connect(sigc::mem_fun(*this, &LoginDialogue::login));
+  m_createButton->Clicked.connect(sigc::mem_fun(*this, &LoginDialogue::create));
 
   HBox * hb = new HBox(2);
 

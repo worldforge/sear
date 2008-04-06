@@ -45,7 +45,7 @@ Panel::Panel(RootWidget * top) : gcn::Window(""), m_top(top)
   m_hbox = new gcn::HBox(6);
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &Panel::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &Panel::actionPressed));
 
   add(m_hbox);
 

@@ -22,7 +22,7 @@ namespace Sear {
 class InventoryListAdaptor;
 class ActionListenerSigC;
 
-class Inventory : virtual public SigC::Object, public gcn::Window {
+class Inventory : virtual public sigc::trackable, public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
  

@@ -54,9 +54,9 @@ void TextEntry::map(Window * win, int x, int y, int & w, int & h)
   m_frame->addChild(m_text);
   m_frame->setPos(x, y);
   m_frame->setSize(m_border * 2 + cw, m_border * 2 + ch);
-  m_frame->MouseDown.connect(SigC::slot(*this, &TextEntry::onPressed));
-  m_frame->KeyPress.connect(SigC::slot(*this, &TextEntry::onKeyPress));
-  focusSignal().connect(SigC::slot(*this, &TextEntry::onFocus));
+  m_frame->MouseDown.connect(sigc::mem_fun(*this, &TextEntry::onPressed));
+  m_frame->KeyPress.connect(sigc::mem_fun(*this, &TextEntry::onKeyPress));
+  focusSignal().connect(sigc::mem_fun(*this, &TextEntry::onFocus));
   m_frame->setEvents(MOUSE_BUTTON_DOWN | KEY_PRESS);
   m_caret->setPos((int)(m_caretPos * 10 * m_text->scale()) + m_border + 4, m_border);
   win->addChild(m_frame);

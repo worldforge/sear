@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: StateManager.cpp,v 1.34 2007-09-02 19:19:10 simon Exp $
+// $Id: StateManager.cpp,v 1.35 2008-04-06 14:21:40 simon Exp $
 
 /*
  * TODO
@@ -107,8 +107,8 @@ int StateManager::init() {
   for (unsigned int i = 0; i < 256; m_state_change_vector[i++].resize(256));
   
   varconf::Config config;
-  config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
-  config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
+  config.sigsv.connect(sigc::mem_fun(*this, &StateManager::varconf_callback));
+  config.sige.connect(sigc::mem_fun(*this, &StateManager::varconf_error_callback));
 
   std::istringstream ss (default_states);
   config.parseStream(ss, varconf::GLOBAL);
@@ -129,8 +129,8 @@ int StateManager::shutdown() {
 void StateManager::readFiles(const std::string &file_name) {
   assert(m_initialised);
   varconf::Config config;
-  config.sigsv.connect(SigC::slot(*this, &StateManager::varconf_callback));
-  config.sige.connect(SigC::slot(*this, &StateManager::varconf_error_callback));
+  config.sigsv.connect(sigc::mem_fun(*this, &StateManager::varconf_callback));
+  config.sige.connect(sigc::mem_fun(*this, &StateManager::varconf_error_callback));
   config.readFromFile(file_name);
 }
 

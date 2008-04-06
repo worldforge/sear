@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.171 2007-05-07 10:31:55 simon Exp $
+// $Id: GL.cpp,v 1.172 2008-04-06 14:21:40 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -516,7 +516,7 @@ void GL::init() {
 
   if (debug) std::cout << "GL: Initialise" << std::endl;
 
-  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &GL::varconf_callback));
+  System::instance()->getGeneral().sigsv.connect(sigc::mem_fun(*this, &GL::varconf_callback));
 
   m_initialised = true;
 }

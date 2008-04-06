@@ -9,7 +9,7 @@
 namespace Sear {
 
 static Window * focusWindow = 0;
-SigC::Signal1<void, Window *> focusChangedSignal;
+sigc::signal1<void, Window *> focusChangedSignal;
 
 void grabFocus(Window * w)
 {
@@ -32,7 +32,7 @@ Window * queryFocus()
   return focusWindow;
 }
 
-SigC::Signal1<void, Window *> & focusSignal()
+sigc::signal1<void, Window *> & focusSignal()
 {
   return focusChangedSignal;
 }

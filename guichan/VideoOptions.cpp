@@ -94,7 +94,7 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
   setOpaque(true);
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &VideoOptions::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &VideoOptions::actionPressed));
 
   gcn::Box * vbox = new gcn::VBox(6);
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));

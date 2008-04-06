@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.11 2007-05-02 20:47:55 simon Exp $
+// $Id: Camera.cpp,v 1.12 2008-04-06 14:21:40 simon Exp $
 
 #include <string>
 
@@ -85,7 +85,7 @@ bool Camera::init() {
   updateValues();
 
   // Connect callback to check for updates
-  System::instance()->getGeneral().sigsv.connect(SigC::slot(*this, &Camera::varconf_callback));
+  System::instance()->getGeneral().sigsv.connect(sigc::mem_fun(*this, &Camera::varconf_callback));
 
   m_initialised = true;
 

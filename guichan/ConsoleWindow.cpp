@@ -58,7 +58,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   m_entry->setWidth(400);
   m_entry->setTabInEnabled(false);
   m_entry->setTabOutEnabled(false);
-  m_entry->ReturnPressed.connect(SigC::slot(*this, &ConsoleWindow::lineEntered));
+  m_entry->ReturnPressed.connect(sigc::mem_fun(*this, &ConsoleWindow::lineEntered));
 
   vbox->pack(m_entry);
 
@@ -66,7 +66,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 
   resizeToContent();
 
-  System::instance()->pushedMessage.connect(SigC::slot(*this, &ConsoleWindow::pushMessage));
+  System::instance()->pushedMessage.connect(sigc::mem_fun(*this, &ConsoleWindow::pushMessage));
 }
 
 ConsoleWindow::~ConsoleWindow()

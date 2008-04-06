@@ -25,7 +25,7 @@ namespace Sear {
 class ActionListenerSigC;
 class RootWidget;
 
-class OptionsWindow : virtual public SigC::Object, public gcn::Window {
+class OptionsWindow : virtual public sigc::trackable, public gcn::Window {
 public:
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:

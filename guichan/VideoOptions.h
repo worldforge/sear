@@ -23,7 +23,7 @@ class ActionListenerSigC;
 class RootWidget;
 class ResolutionListModel;
 
-class VideoOptions : virtual public SigC::Object, public gcn::Window, virtual public gcn::ActionListener {
+class VideoOptions : virtual public sigc::trackable, public gcn::Window, virtual public gcn::ActionListener {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   RootWidget * m_top;

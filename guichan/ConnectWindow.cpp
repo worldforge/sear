@@ -69,7 +69,7 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_serverListModel = new ServerListModel;
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &ConnectWindow::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &ConnectWindow::actionPressed));
 
   m_servers = new DblClkListBox(m_serverListModel, m_buttonListener, gcn::ActionEvent(this, "connect"));
   m_widgets.push_back(SPtr<gcn::Widget>(m_servers));

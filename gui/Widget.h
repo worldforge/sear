@@ -13,7 +13,7 @@ class Window;
 
 /// Higher level class defining any part in the gui.
 /// They key difference is that some widgets may not have a visible component.
-class Widget : virtual public SigC::Object {
+class Widget : virtual public sigc::trackable {
 private:
   // Private and unimplemented to prevent slicing
   Widget(const Widget &);

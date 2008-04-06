@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.24 2007-05-07 10:31:55 simon Exp $
+// $Id: RenderSystem.cpp,v 1.25 2008-04-06 14:21:40 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -92,8 +92,8 @@ void RenderSystem::init() {
   m_mouseState[CURSOR_USE] = m_textureManager->requestTextureID("cursor_use", false);
   m_mouseState[CURSOR_ATTACK] = m_textureManager->requestTextureID("cursor_attack", false);
 
-  ContextCreated.connect(SigC::slot(*this, &RenderSystem::contextCreated));
-  ContextDestroyed.connect(SigC::slot(*this, &RenderSystem::contextDestroyed));
+  ContextCreated.connect(sigc::mem_fun(*this, &RenderSystem::contextCreated));
+  ContextDestroyed.connect(sigc::mem_fun(*this, &RenderSystem::contextDestroyed));
 
   m_initialised = true;
 }

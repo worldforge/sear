@@ -165,8 +165,8 @@ void Workarea::init()
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle Inventory");
 
 
-  RenderSystem::getInstance().ContextCreated.connect(SigC::slot(*this, &Workarea::contextCreated));
-  RenderSystem::getInstance().ContextDestroyed.connect(SigC::slot(*this, &Workarea::contextDestroyed));
+  RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(*this, &Workarea::contextCreated));
+  RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(*this, &Workarea::contextDestroyed));
 
 }
 

@@ -31,7 +31,7 @@ class ActionListenerSigC;
 class RootWidget;
 class ConsoleWindow;
 
-class Panel : virtual public SigC::Object,
+class Panel : virtual public sigc::trackable,
               public ConsoleObject,
               public gcn::Window {
 public:

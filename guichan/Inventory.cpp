@@ -91,7 +91,7 @@ Inventory::Inventory() : gcn::Window("Inventory")
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
 
   m_buttonListener = new ActionListenerSigC;
-  m_buttonListener->Action.connect(SigC::slot(*this, &Inventory::actionPressed));
+  m_buttonListener->Action.connect(sigc::mem_fun(*this, &Inventory::actionPressed));
 
   gcn::Button * button = new gcn::Button("Wield");
   m_widgets.push_back(SPtr<gcn::Widget>(button));

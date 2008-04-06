@@ -19,7 +19,7 @@ class ActionListenerSigC : public gcn::ActionListener
     }
 
   public:
-    SigC::Signal1<void, std::string> Action;
+    sigc::signal1<void, std::string> Action;
 };
 
 } // namespace Sear

@@ -24,7 +24,7 @@ namespace Sear {
 class ActionListenerSigC;
 class ServerListModel;
 
-class ConnectWindow : virtual public SigC::Object, public gcn::Window {
+class ConnectWindow : virtual public sigc::trackable, public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
 

@@ -22,7 +22,7 @@ namespace Sear {
 
 class ActionListenerSigC;
 
-class Alert : virtual public SigC::Object, public gcn::Window {
+class Alert : virtual public sigc::trackable, public gcn::Window {
 protected:
   gcn::Button * m_okButton;
 

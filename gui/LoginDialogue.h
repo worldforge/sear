@@ -31,8 +31,8 @@ public:
   LoginDialogue();
   virtual ~LoginDialogue();
 
-  SigC::Signal2<void, const std::string &, const std::string &> Login;
-  SigC::Signal3<void, const std::string &, const std::string &, const std::string &> Create;
+  sigc::signal2<void, const std::string &, const std::string &> Login;
+  sigc::signal3<void, const std::string &, const std::string &, const std::string &> Create;
 };
 
 } // namespace Sear

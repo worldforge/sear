@@ -25,7 +25,7 @@ class Bar;
 
 namespace Sear {
 
-class StatusWindow : // virtual public SigC::Object,
+class StatusWindow : // virtual public sigc::trackable,
                      public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;

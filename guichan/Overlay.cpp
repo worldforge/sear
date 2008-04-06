@@ -55,7 +55,7 @@ void Overlay::logic(RootWidget * rw)
   }
 
   if (m_top == 0) {
-    avatar->Hear.connect(SigC::slot(*this, &Overlay::heard));
+    avatar->Hear.connect(sigc::mem_fun(*this, &Overlay::heard));
     m_top = rw;
 
     m_selfStatus = SPtr<StatusWindow>(new StatusWindow(avatar->getEntity()));

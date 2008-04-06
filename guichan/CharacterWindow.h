@@ -25,7 +25,7 @@ namespace Sear {
 class ActionListenerSigC;
 class CharacterListModel;
 
-class CharacterWindow : virtual public SigC::Object, public gcn::Window {
+class CharacterWindow : virtual public sigc::trackable, public gcn::Window {
 protected:
   std::list<SPtr<gcn::Widget> > m_widgets;
   gcn::ListBox * m_characters;

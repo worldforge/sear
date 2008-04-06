@@ -27,7 +27,7 @@ public:
   ConnectDialogue();
   virtual ~ConnectDialogue();
 
-  SigC::Signal1<void, const std::string &> Connect;
+  sigc::signal1<void, const std::string &> Connect;
 };
 
 } // namespace Sear
