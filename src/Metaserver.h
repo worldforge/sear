@@ -2,13 +2,14 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: Metaserver.h,v 1.3 2007-05-05 11:03:24 simon Exp $
+// $Id: Metaserver.h,v 1.4 2008-05-08 20:22:56 simon Exp $
 
 #ifndef SEAR_METASERVER_H
 #define SEAR_METASERVER_H 1
 
 #include <map>
 #include <string>
+#include <memory>
 
 #include <sigc++/trackable.h>
 

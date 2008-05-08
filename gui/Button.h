@@ -9,6 +9,8 @@
 
 #include <sigc++/signal.h>
 
+#include <string>
+
 namespace Sear {
 
 class Graphic;

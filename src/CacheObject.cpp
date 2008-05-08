@@ -2,9 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: CacheObject.cpp,v 1.2 2006-04-26 14:39:00 simon Exp $
+// $Id: CacheObject.cpp,v 1.3 2008-05-08 20:22:56 simon Exp $
 
 #include "CacheObject.h"
+
+#include <cstring>
 
 namespace Sear {
 

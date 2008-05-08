@@ -6,6 +6,7 @@
 #define SEAR_RENDERERS_STATICOBJECT_H 1
 
 #include <vector>
+#include <cstring>
 
 #include <sage/GL.h>
 #include "common/Matrix.h"

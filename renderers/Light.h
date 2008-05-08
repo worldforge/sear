@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: Light.h,v 1.3 2007-08-27 16:04:20 simon Exp $
+// $Id: Light.h,v 1.4 2008-05-08 20:22:56 simon Exp $
 
 #ifndef SEAR_LIGHT_H
 #define SEAR_LIGHT_H 1
 
+#include <cstring>
 #include <wfmath/point.h>
 
 namespace Sear {

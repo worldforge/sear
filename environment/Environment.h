@@ -6,6 +6,7 @@
 #define SEAR_ENVIRONMENT_H 1
 
 #include <map>
+#include <memory>
 
 #include <sigc++/trackable.h>
 

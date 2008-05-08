@@ -5,7 +5,7 @@
 #ifndef SEAR_BONJOUR_H
 #define SEAR_BONJOUR_H 1
 
-#include <algorithm>
+#include <memory>
 
 class BonjourUserData;
 

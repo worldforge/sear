@@ -23,6 +23,7 @@
 #include <Mercator/Area.h>
 #include <Mercator/Surface.h>
 
+#include <limits>
 #include <iostream>
 
 namespace Sear {

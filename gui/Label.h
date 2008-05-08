@@ -24,7 +24,7 @@ public:
   explicit Label(const std::string & text);
   virtual ~Label();
 
-  virtual void map(Window * w, int x, int y, int & w, int & h);
+  virtual void map(Window * window, int x, int y, int & w, int & h);
 };
 
 } // namespace Sear

@@ -1,3 +1,11 @@
+2008-05-08  Simon Goodall  <simon@worldforge.org>
+
+	* environment/Environment.h, evironment/TerrainRenderer.cpp,
+	  gui/Label.h, gui/Button.h, loaders/DynamicObject.h,
+	  loaders/StaticObject.h, renderers/Graphics.h, renderers/Light.h,
+	  src/Avahi.h, src/Bonjour.h, src/CacheObject.cpp, src/Metaserver.h:
+	  GCC 4.3 Fixes.
+
 2008-04-06  Simon Goodall  <simon@worldforge.org>
 
 	* configure.ac: Use libwfut 0.2.0. Disable sigc++ 1.2 API.

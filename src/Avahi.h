@@ -6,6 +6,8 @@
 #define SEAR_AVAHI_H 1
 
 
+#include <memory>
+
 class AvahiClient;
 class AvahiSimplePoll;
 class AvahiServiceBrowser;

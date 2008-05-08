@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.h,v 1.19 2007-05-26 18:49:10 simon Exp $
+// $Id: Graphics.h,v 1.20 2008-05-08 20:22:56 simon Exp $
 
 #ifndef SEAR_GRAPHICS_H
 #define SEAR_GRAPHICS_H 1
 
+#include <memory>
 #include <string>
 #include <list>
 #include <map>
