@@ -5,6 +5,7 @@
 #ifndef SEAR_RENDERSYSTEM_H
 #define SEAR_RENDERSYSTEM_H 1
 
+#include <memory>
 #include <string>
 
 #include <sigc++/signal.h>
@@ -56,6 +57,7 @@ public:
   ~RenderSystem();
 
   void init();
+  int reinit();
   void shutdown();
   bool isInitialised() const { return m_initialised; }
 

@@ -6,6 +6,7 @@
 #define SEAR_LOADERS_MODELSYSTEM_H 1
 
 #include <string>
+#include <memory>
 
 #include <sigc++/trackable.h>
 
@@ -39,6 +40,7 @@ public:
   virtual ~ModelSystem();
 
   int init();
+  int reinit();
   int shutdown();
 
   bool isInitialised() const { return m_initialised; }
@@ -90,9 +92,9 @@ private:
 
   bool m_initialised;
 
-  SPtr<ModelHandler> m_model_handler;
-  SPtr<ObjectHandler> m_object_handler;
-  SPtr<EntityMapper> m_entity_mapper;
+  std::auto_ptr<ModelHandler> m_model_handler;
+  std::auto_ptr<ObjectHandler> m_object_handler;
+  std::auto_ptr<EntityMapper> m_entity_mapper;
 
 };
 

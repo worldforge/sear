@@ -1,5 +1,12 @@
 2008-05-08  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ModelSystem.cpp, loaders/ModelSystem.h,
+	  renderers/RenderSystem.cpp, renderers/RenderSystem.h,
+	  src/System.cpp, src/System.h: Added a reinit command and associated
+	  methods.
+
+2008-05-08  Simon Goodall  <simon@worldforge.org>
+
 	* environment/Environment.h, evironment/TerrainRenderer.cpp,
 	  gui/Label.h, gui/Button.h, loaders/DynamicObject.h,
 	  loaders/StaticObject.h, renderers/Graphics.h, renderers/Light.h,

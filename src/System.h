@@ -2,11 +2,12 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.75 2008-04-06 14:21:40 simon Exp $
+// $Id: System.h,v 1.76 2008-05-08 20:31:23 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
 
+#include <memory>
 #include <string>
 #include <list>
 #include <SDL/SDL.h>
@@ -71,6 +72,7 @@ public:
    * @return True on success
    */ 
   bool init(int argc, char *argv[]);
+  int reinit();
 
   /**
    * Shutdown the system object. This will destroy any objects created by the system

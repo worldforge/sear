@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.172 2007-05-26 18:38:03 simon Exp $
+// $Id: System.cpp,v 1.173 2008-05-08 20:31:23 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -349,6 +349,32 @@ bool System::init(int argc, char *argv[]) {
   return true;
 }
 
+int System::reinit() {
+  // Restart these engines
+  m_script_engine->shutdown();
+  m_script_engine->init();
+  m_action_handler->shutdown();
+  m_action_handler->init();
+
+  RenderSystem::getInstance().reinit();
+  ModelSystem::getInstance().reinit();
+  Environment::getInstance().reinit();
+
+  // Re-run all the startup scripts.
+  FileHandler::FileSet startup_scripts = m_file_handler->getAllinSearchPaths(STARTUP_SCRIPT);
+  FileHandler::FileSet::const_iterator I = startup_scripts.begin();
+  FileHandler::FileSet::const_iterator Iend = startup_scripts.end();
+  for (; I != Iend; ++I) {
+    m_script_engine->runScript(*I);
+  }
+
+  // Re-read configs
+  readConfig(m_general);
+  RenderSystem::getInstance().readConfig(m_general);
+
+  return 0;
+}
+
 void System::shutdown() {
 
   assert (m_initialised == true);
@@ -433,7 +459,7 @@ void System::mainLoop() {
       m_seconds = (double)m_current_ticks / 1000.0;
       m_elapsed = m_seconds - last_time;
       last_time = m_seconds;
-      while (SDL_PollEvent(&event)  ) {
+      while (SDL_PollEvent(&event)) {
         handleEvents(event);
         // Stop processing events if we are quiting
         if (!m_system_running) break;
@@ -871,6 +897,8 @@ void System::registerCommands(Console *console) {
   console->registerCommand(CMD_IDENTIFY_ENTITY, this);
   console->registerCommand(CMD_DUMP_ATTRIBUTES, this);
   console->registerCommand(CMD_reload_configs, this);
+
+  console->registerCommand("reinit", this);
 }
 
 void System::runCommand(const std::string &command) {
@@ -945,6 +973,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
     runCommand("/reload_config_models");
     runCommand("/reload_config_states");
   } 
+  else if (command == "reinit") reinit();
   else fprintf(stderr, "[System] Command not found: %s\n", command.c_str());
 }
 

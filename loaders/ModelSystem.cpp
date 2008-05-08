@@ -49,7 +49,7 @@ static const std::string DEFAULT = "default";
 int ModelSystem::init() {
   assert(m_initialised == false);
 
-  m_model_handler = SPtr<ModelHandler>(new ModelHandler());
+  m_model_handler = std::auto_ptr<ModelHandler>(new ModelHandler());
   m_model_handler->init();
 
   // Register ModelLoaders
@@ -66,10 +66,10 @@ int ModelSystem::init() {
   // does not get linked in correctly DynamicObject
   m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
   
-  m_object_handler = SPtr<ObjectHandler>(new ObjectHandler());
+  m_object_handler = std::auto_ptr<ObjectHandler>(new ObjectHandler());
   m_object_handler->init();
 
-  m_entity_mapper = SPtr<EntityMapper>(new EntityMapper());
+  m_entity_mapper = std::auto_ptr<EntityMapper>(new EntityMapper());
   m_entity_mapper->init();
 
   RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(this, &ModelSystem::contextCreated));
@@ -78,6 +78,34 @@ int ModelSystem::init() {
   System::instance()->LeftWorld.connect(sigc::mem_fun(this, &ModelSystem::resetModels));
 
   m_initialised = true;
+  return 0;
+}
+
+int ModelSystem::reinit() {
+  m_model_handler->shutdown();
+  m_model_handler->init();
+
+  // Register ModelLoaders
+  // The smart pointer makes sure they get clean up.
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new BoundBox_Loader())); // This is the default loader
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new WireFrame_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new NPlane_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new SearObject_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ThreeDS_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new LibModelFile_Loader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new AreaModelLoader()));
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new ParticleSystemLoader()));
+  // The cal3d loader requires the particle sys loader otherwise the
+  // does not get linked in correctly DynamicObject
+  m_model_handler->registerModelLoader(SPtr<ModelLoader>(new Cal3d_Loader()));
+
+
+  m_object_handler->shutdown();
+  m_object_handler->init();
+
+  m_entity_mapper->shutdown();
+  m_entity_mapper->init();
+
   return 0;
 }
 

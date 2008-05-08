@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.25 2008-04-06 14:21:40 simon Exp $
+// $Id: RenderSystem.cpp,v 1.26 2008-05-08 20:31:23 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -97,6 +97,17 @@ void RenderSystem::init() {
 
   m_initialised = true;
 }
+
+int RenderSystem::reinit() {
+//  m_stateManager->shutdown();
+//  m_stateManager->init();
+
+//  m_textureManager->shutdown();
+//  m_textureManager->init();
+
+  return 0;
+}
+
 
 void RenderSystem::registerCommands(Console *con) {
   assert (m_initialised);
