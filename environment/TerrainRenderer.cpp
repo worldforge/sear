@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000 - 2003 Alistair Riddoch
-// Copyright (C) 2004 - 2007 Simon Goodall
+// Copyright (C) 2004 - 2008 Simon Goodall
 
 #include "TerrainRenderer.h"
 
@@ -37,6 +37,11 @@ static GLfloat ty0[] = { 0.f, 0.125f, 0.f, 0.f };
 static GLfloat sx1[] = { 0.015625f, 0.f, 0.f, 0.f };
 static GLfloat ty1[] = { 0.f, 0.015625f, 0.f, 0.f };
 
+static  GLfloat sea_vertices[] = { 0.f, 0.f, 0.f,
+    segSize, 0, 0.f,
+    segSize, segSize, 0.f,
+    0, segSize, 0.f
+  };
 
 void TerrainRenderer::DataSeg::contextCreated() {
   assert(m_context_no == -1);
@@ -436,21 +441,19 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
   glColor4f (0.8f, 0.8f, 1.f, 0.6f);
   glNormal3f (0.0f, 0.0f, 1.0f);
   glEnable (GL_COLOR_MATERIAL);
+
+  glVertexPointer (3, GL_FLOAT, 0, sea_vertices);
+
   float seaLevel = 0.1f * sin (System::instance ()->getTime () / 10000.0f);
   for (; I != segs.end (); ++I) {
     const Terrain::Segmentcolumn & col = I->second;
     Terrain::Segmentcolumn::const_iterator J = col.begin ();
+    const int x_offset = I->first * segSize;
     for (; J != col.end (); ++J) {
-      Mercator::Segment * s = J->second;
-if (s == NULL) continue;
+      const Mercator::Segment * s = J->second;
+      if (s == NULL) continue;
       glPushMatrix ();
-      glTranslatef (I->first * segSize, J->first * segSize, seaLevel);
-      GLfloat vertices[] = { 0.f, 0.f, 0.f,
-        segSize, 0, 0.f,
-        segSize, segSize, 0.f,
-        0, segSize, 0.f
-      };
-      glVertexPointer (3, GL_FLOAT, 0, vertices);
+      glTranslatef (x_offset, J->first * segSize, seaLevel);
       glDrawArrays (GL_QUADS, 0, 4);
       glPopMatrix ();
     }
