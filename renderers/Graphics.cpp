@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.72 2007-08-19 20:51:16 simon Exp $
+// $Id: Graphics.cpp,v 1.73 2008-10-04 17:57:37 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -665,10 +665,14 @@ void Graphics::drawObjectExt(const std::string &model_id,
 
     // Do not perform scaling if it is to zero or has no effect
     if (scale != 0.0f && scale != 1.0f) glScalef(scale, scale, scale);
-  
-    glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
  
-    glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+    if (modelRec->offset_x != 0.0f || modelRec->offset_y != 0.0f || modelRec->offset_z != 0.0f) {
+      glTranslatef(modelRec->offset_x, modelRec->offset_y, modelRec->offset_z);
+    }
+
+    if (modelRec->rotate_z != 0.0f) { 
+      glRotatef(modelRec->rotate_z, 0.0f, 0.0f, 1.0f);
+    }
 
     // 3) Apply final scaling once model is in place
 

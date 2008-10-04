@@ -1,5 +1,10 @@
 2008-10-04  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/Graphics.cpp: Check for non-zero values before calling
+	  glRotate and glTranslate in drawObjectExt.
+
+2008-10-04  Simon Goodall  <simon@worldforge.org>
+
 	* environment/TerrainRenderer.cpp: Make the vertex array for the sea a
 	  static declaration and move call to glVertexPointer outside loop.
 
