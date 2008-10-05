@@ -274,9 +274,9 @@ if test $cross_compiling == no; then
   ], "-lGL")
 
   #AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.5.0.]))
-  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.6.0.])])
+  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
   SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
-  CPPFLAGS="$CPPFLAGS $GUICHAN_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
 
   AC_LANG_RESTORE
  else
@@ -292,9 +292,9 @@ if test $cross_compiling == no; then
 #     AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.])
 #   fi
 
-  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.6.0.])])
+  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
   SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
-  CPPFLAGS="$CPPFLAGS $GUICHAN_CFLAGS"
+  CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
 
 
    AC_CHECK_HEADER(GL/gl.h,
