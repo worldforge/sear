@@ -2,13 +2,15 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: Utility.h,v 1.21 2007-04-22 15:49:27 simon Exp $
+// $Id: Utility.h,v 1.22 2008-10-05 12:07:58 simon Exp $
 
 #ifndef SEAR_UTILITY_H
 #define SEAR_UTILITY_H 1
 
 #include <wfmath/const.h>
 #include <wfmath/axisbox.h>
+
+#include <varconf/Config.h>
 
 #include <string>
 #include <deque>
@@ -66,6 +68,12 @@ void QuatToMatrix(const WFMath::Quaternion & quat, float m[4][4]);
 WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox);
 
 unsigned char *xpm_to_image(const char * image[], unsigned int &width, unsigned int &height);
+
+bool readBoolValue(const varconf::Config &config, const std::string &section, const std::string &key, bool defValue);
+int readIntValue(const varconf::Config &config, const std::string &section, const std::string &key, int defValue);
+double readDoubleValue(const varconf::Config &config, const std::string &section, const std::string &key, double defValue);
+std::string readStringValue(const varconf::Config &config, const std::string &section, const std::string &key, const std::string &defValue);
+
 
 class Tokeniser {
 public:

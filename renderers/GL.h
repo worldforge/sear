@@ -210,7 +210,26 @@ protected:
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 
+  int m_sdl_gl_red_size;
+  int m_sdl_gl_green_size;
+  int m_sdl_gl_blue_size;
+  int m_sdl_gl_alpha_size;
 
+  int m_sdl_gl_accum_red_size;
+  int m_sdl_gl_accum_green_size;
+  int m_sdl_gl_accum_blue_size;
+  int m_sdl_gl_accum_alpha_size;
+
+  int m_sdl_gl_doublebuffer;
+  int m_sdl_gl_buffer_size;
+  int m_sdl_gl_depth_size;
+  int m_sdl_gl_stencil_size;
+  int m_sdl_gl_stereo;
+  int m_sdl_gl_swap_control;
+  int m_sdl_gl_accelerated_visual;
+
+  int m_sdl_gl_multisamplesamples;
+  int m_sdl_gl_multisamplebuffers;
 };
 
 

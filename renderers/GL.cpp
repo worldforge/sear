@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.172 2008-04-06 14:21:40 simon Exp $
+// $Id: GL.cpp,v 1.173 2008-10-05 12:07:58 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -112,6 +112,28 @@
   static const std::string KEY_far_clip_dist = "far_clip_dist";
   static const std::string KEY_texture_scale = "texture_scale";
   
+
+  static const std::string KEY_sdl_gl_red_size = "sdl_gl_red_size";
+  static const std::string KEY_sdl_gl_green_size = "sdl_gl_green_size";
+  static const std::string KEY_sdl_gl_blue_size = "sdl_gl_blue_size";
+  static const std::string KEY_sdl_gl_alpha_size = "sdl_gl_alpha_size";
+
+  static const std::string KEY_sdl_gl_doublebuffer = "sdl_gl_doublebuffer";
+  static const std::string KEY_sdl_gl_buffer_size = "sdl_gl_buffer_size";
+  static const std::string KEY_sdl_gl_depth_size = "sdl_gl_depth_size";
+  static const std::string KEY_sdl_gl_stencil_size = "sdl_gl_stencil_size";
+  static const std::string KEY_sdl_gl_stereo = "sdl_gl_stereo";
+  static const std::string KEY_sdl_gl_swap_control = "sdl_gl_swap_control";
+  static const std::string KEY_sdl_gl_accelerated_visual = "sdl_gl_accelerated_visual";
+
+  static const std::string KEY_sdl_gl_accum_red_size = "sdl_gl_accum_red_size";
+  static const std::string KEY_sdl_gl_accum_green_size = "sdl_gl_accum_green_size";
+  static const std::string KEY_sdl_gl_accum_blue_size = "sdl_gl_accum_blue_size";
+  static const std::string KEY_sdl_gl_accum_alpha_size = "sdl_gl_accum_alpha_size";
+
+  static const std::string KEY_sdl_gl_multisamplesamples = "sdl_gl_multisamplesamples";
+  static const std::string KEY_sdl_gl_multisamplebuffers = "sdl_gl_multisamplebuffers";
+
   // Default config values
   static const float DEFAULT_character_light_kc = 0.5f;
   static const float DEFAULT_character_light_kl = 0.2f;
@@ -160,6 +182,27 @@
   static const float DEFAULT_far_clip_dist = 1000.0f;
   static const float DEFAULT_texture_scale = 10.0f;
 
+  static const int DEFAULT_sdl_gl_red_size = 5;
+  static const int DEFAULT_sdl_gl_green_size = 6;
+  static const int DEFAULT_sdl_gl_blue_size = 5;
+  static const int DEFAULT_sdl_gl_alpha_size = 5;
+
+  static const int DEFAULT_sdl_gl_doublebuffer = 1;
+  static const int DEFAULT_sdl_gl_buffer_size = 16;
+  static const int DEFAULT_sdl_gl_depth_size = 5;
+  static const int DEFAULT_sdl_gl_stencil_size = 1;
+  static const int DEFAULT_sdl_gl_stereo = 0;
+  static const int DEFAULT_sdl_gl_swap_control = 1;
+  static const int DEFAULT_sdl_gl_accelerated_visual = 1;
+
+  static const int DEFAULT_sdl_gl_accum_red_size = 0;
+  static const int DEFAULT_sdl_gl_accum_green_size = 0;
+  static const int DEFAULT_sdl_gl_accum_blue_size = 0;
+  static const int DEFAULT_sdl_gl_accum_alpha_size = 0;
+
+  static const int DEFAULT_sdl_gl_multisamplesamples = 4;
+  static const int DEFAULT_sdl_gl_multisamplebuffers = 1;
+
 static bool use_ext_compiled_vertex_array = false;
 
 static const std::string STATE_font = "font";
@@ -204,25 +247,33 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_InitSubSystem(SDL_INIT_VIDEO);
   SDL_EnableUNICODE(1);
 
-
   //Request Open GL window attributes
-  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 5 );
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16 );
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1 );
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, m_sdl_gl_red_size);
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, m_sdl_gl_green_size);
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, m_sdl_gl_blue_size);
+  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, m_sdl_gl_alpha_size);
+  SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, m_sdl_gl_buffer_size);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, m_sdl_gl_doublebuffer);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, m_sdl_gl_depth_size);
+  SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE, m_sdl_gl_accum_red_size);
+  SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, m_sdl_gl_accum_green_size);
+  SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, m_sdl_gl_accum_blue_size);
+  SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, m_sdl_gl_accum_alpha_size);
+  SDL_GL_SetAttribute(SDL_GL_STEREO, m_sdl_gl_stereo);
+  SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, m_sdl_gl_swap_control);
+ SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, m_sdl_gl_accelerated_visual);
 #ifdef HAVE_SDL_GL_MULTISAMPLE
   if (m_use_fsaa) {
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4 );
-    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1 );
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, m_sdl_gl_multisamplesamples);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, m_sdl_gl_multisamplebuffers);
   }
 #endif
 
   //RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL,false);
   // Only request stencil if specified
   if (RenderSystem::getInstance().getState(RenderSystem::RENDER_STENCIL)) {
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, m_sdl_gl_stencil_size);
+   // SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
   }
 
 
@@ -290,6 +341,9 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
 
     SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &value);
     printf("[GL] Double Buffer: %d\n", value);
+
+    SDL_GL_GetAttribute(SDL_GL_ACCELERATED_VISUAL, &value);
+    printf("[GL] Accelerated Visual: %d\n", value);
   }
 
   const GLubyte *vendor     = glGetString(GL_VENDOR);
@@ -719,194 +773,81 @@ void GL::procEvent(int x, int y) {
 //TODO should be in general render class
 void GL::readConfig(varconf::Config &config) {
   if (debug) std::cout << "GL: readConfig" << std::endl;
-  varconf::Variable temp;
   if (debug) Log::writeLog("Loading Renderer Config", Log::LOG_DEFAULT);
 
   // Setup character light source
-  if (config.findItem(RENDER, KEY_character_light_kc)) {
-    temp = config.getItem(RENDER, KEY_character_light_kc);
-    m_lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].attenuation_constant = DEFAULT_character_light_kc;
-  }
-  if (config.findItem(RENDER, KEY_character_light_kl)) {
-    temp = config.getItem(RENDER, KEY_character_light_kl);
-    m_lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].attenuation_linear = DEFAULT_character_light_kl;
-  }
-  if (config.findItem(RENDER, KEY_character_light_kq)) {
-    temp = config.getItem(RENDER, KEY_character_light_kq);
-    m_lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].attenuation_quadratic = DEFAULT_character_light_kq;
-  }
-  if (config.findItem(RENDER, KEY_character_light_ambient_red)) {
-    temp = config.getItem(RENDER, KEY_character_light_ambient_red);
-    m_lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].ambient[0] = DEFAULT_character_light_ambient_red;
-  }
-  if (config.findItem(RENDER, KEY_character_light_ambient_green)) {
-    temp = config.getItem(RENDER, KEY_character_light_ambient_green);
-    m_lights[LIGHT_CHARACTER].ambient[1] = (float)((!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp)));
-  } else {
-    m_lights[LIGHT_CHARACTER].ambient[1] = DEFAULT_character_light_ambient_green;
-  }
-  if (config.findItem(RENDER, KEY_character_light_ambient_blue)) {
-    temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
-    m_lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].ambient[2] = DEFAULT_character_light_ambient_blue;
-  }
-  if (config.findItem(RENDER, KEY_character_light_ambient_alpha)) {
-    temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
-    m_lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].ambient[3] = DEFAULT_character_light_ambient_alpha;
-  }
+  m_lights[LIGHT_CHARACTER].attenuation_constant = readDoubleValue(config, RENDER, KEY_character_light_kc, DEFAULT_character_light_kc);
+  m_lights[LIGHT_CHARACTER].attenuation_linear = readDoubleValue(config, RENDER, KEY_character_light_kl, DEFAULT_character_light_kl);
+  m_lights[LIGHT_CHARACTER].attenuation_quadratic = readDoubleValue(config, RENDER, KEY_character_light_kq, DEFAULT_character_light_kq);
 
-  if (config.findItem(RENDER, KEY_character_light_diffuse_red)) {
-    temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
-    m_lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].diffuse[0] = DEFAULT_character_light_diffuse_red;
-  }
-  if (config.findItem(RENDER, KEY_character_light_diffuse_green)) {
-    temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
-    m_lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].diffuse[1] = DEFAULT_character_light_diffuse_green;
-  }
-  if (config.findItem(RENDER, KEY_character_light_diffuse_blue)) {
-    temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
-    m_lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].diffuse[2] = DEFAULT_character_light_diffuse_blue;
-  }
-  if (config.findItem(RENDER, KEY_character_light_diffuse_alpha)) {
-    temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
-    m_lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].diffuse[3] = DEFAULT_character_light_diffuse_alpha;
-  }
 
-  if (config.findItem(RENDER, KEY_character_light_specular_red)) {
-    temp = config.getItem(RENDER, KEY_character_light_specular_red);
-    m_lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].specular[0] = DEFAULT_character_light_specular_red;
-  }
-  if (config.findItem(RENDER, KEY_character_light_specular_green)) {
-    temp = config.getItem(RENDER, KEY_character_light_specular_green);
-    m_lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].specular[1] = DEFAULT_character_light_specular_green;
-  }
-  if (config.findItem(RENDER, KEY_character_light_specular_blue)) {
-    temp = config.getItem(RENDER, KEY_character_light_specular_blue);
-    m_lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].specular[2] = DEFAULT_character_light_specular_blue;
-  }
-  if (config.findItem(RENDER, KEY_character_light_specular_alpha)) {
-    temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
-    m_lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_CHARACTER].specular[3] = DEFAULT_character_light_specular_alpha;
-  }
+  m_lights[LIGHT_CHARACTER].ambient[0] = readDoubleValue(config, RENDER, KEY_character_light_ambient_red, DEFAULT_character_light_ambient_red);
+  m_lights[LIGHT_CHARACTER].ambient[1] = readDoubleValue(config, RENDER, KEY_character_light_ambient_green, DEFAULT_character_light_ambient_green);
+  m_lights[LIGHT_CHARACTER].ambient[2] = readDoubleValue(config, RENDER, KEY_character_light_ambient_blue, DEFAULT_character_light_ambient_blue);
+  m_lights[LIGHT_CHARACTER].ambient[3] = readDoubleValue(config, RENDER, KEY_character_light_ambient_alpha, DEFAULT_character_light_ambient_alpha);
+
+
+  m_lights[LIGHT_CHARACTER].diffuse[0] = readDoubleValue(config, RENDER, KEY_character_light_diffuse_red, DEFAULT_character_light_diffuse_red);
+  m_lights[LIGHT_CHARACTER].diffuse[1] = readDoubleValue(config, RENDER, KEY_character_light_diffuse_green, DEFAULT_character_light_diffuse_green);
+  m_lights[LIGHT_CHARACTER].diffuse[2] = readDoubleValue(config, RENDER, KEY_character_light_diffuse_blue, DEFAULT_character_light_diffuse_blue);
+  m_lights[LIGHT_CHARACTER].diffuse[3] = readDoubleValue(config, RENDER, KEY_character_light_diffuse_alpha, DEFAULT_character_light_diffuse_alpha);
+
+  m_lights[LIGHT_CHARACTER].specular[0] = readDoubleValue(config, RENDER, KEY_character_light_specular_red, DEFAULT_character_light_specular_red);
+  m_lights[LIGHT_CHARACTER].specular[1] = readDoubleValue(config, RENDER, KEY_character_light_specular_green, DEFAULT_character_light_specular_green);
+  m_lights[LIGHT_CHARACTER].specular[2] = readDoubleValue(config, RENDER, KEY_character_light_specular_blue, DEFAULT_character_light_specular_blue);
+  m_lights[LIGHT_CHARACTER].specular[3] = readDoubleValue(config, RENDER, KEY_character_light_specular_alpha, DEFAULT_character_light_specular_alpha);
+
   //Setup Sun light source
-  if (config.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = config.getItem(RENDER, KEY_sun_light_kc);
-    m_lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_SUN].attenuation_constant = DEFAULT_sun_light_kc;
-  }
-  if (config.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = config.getItem(RENDER, KEY_sun_light_kl);
-    m_lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_SUN].attenuation_linear = DEFAULT_sun_light_kl;
-  }
-  if (config.findItem(RENDER, KEY_sun_light_kc)) {
-    temp = config.getItem(RENDER, KEY_sun_light_kq);
-    m_lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
-  } else {
-    m_lights[LIGHT_SUN].attenuation_quadratic = DEFAULT_sun_light_kq;
-  }
+  m_lights[LIGHT_SUN].attenuation_constant = readDoubleValue(config, RENDER, KEY_sun_light_kc, DEFAULT_sun_light_kc);
+  m_lights[LIGHT_SUN].attenuation_linear = readDoubleValue(config, RENDER, KEY_sun_light_kl, DEFAULT_sun_light_kl);
+  m_lights[LIGHT_SUN].attenuation_quadratic = readDoubleValue(config, RENDER, KEY_sun_light_kq, DEFAULT_sun_light_kq);
+
 
   // Setup render states
-  if (config.findItem(RENDER, KEY_use_textures)) {
-    temp = config.getItem(RENDER, KEY_use_textures);
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
-  } else {
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, DEFAULT_use_textures);
-  }
-  if (config.findItem(RENDER, KEY_use_lighting)) {
-    temp = config.getItem(RENDER, KEY_use_lighting);
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
-  } else {
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, DEFAULT_use_lighting);
-  }
-  if (config.findItem(RENDER, KEY_use_stencil)) {
-    temp = config.getItem(RENDER, KEY_use_stencil);
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));
-  } else {
-    RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, DEFAULT_use_stencil);
-  }
-  if (config.findItem(RENDER, KEY_use_fsaa)) {
-    temp = config.getItem(RENDER, KEY_use_fsaa);
-    m_use_fsaa = temp.is_bool() ? ((bool)(temp)) : DEFAULT_use_fsaa;
-  } else {
-    m_use_fsaa = DEFAULT_use_fsaa;
-  }
+  bool b;
+  b = readBoolValue(config, RENDER, KEY_use_textures, DEFAULT_use_textures);
+  RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, b);
+
+  b = readBoolValue(config, RENDER, KEY_use_lighting, DEFAULT_use_lighting);
+  RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, b);
+
+  b = readBoolValue(config, RENDER, KEY_use_stencil, DEFAULT_use_stencil);
+  RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, b);
+
+  m_use_fsaa = readBoolValue(config, RENDER, KEY_use_fsaa, DEFAULT_use_fsaa);
 
   // Setup the speech offsets
-  if(config.findItem(RENDER, KEY_speech_offset_x)) {
-    temp = config.getItem(RENDER, KEY_speech_offset_x);
-    m_speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
-  } else {
-    m_speech_offset_x = DEFAULT_speech_offset_x;
-  }
-  if(config.findItem(RENDER, KEY_speech_offset_y)) {
-    temp = config.getItem(RENDER, KEY_speech_offset_y);
-    m_speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
-  } else {
-    m_speech_offset_y = DEFAULT_speech_offset_y;
-  }
-  if(config.findItem(RENDER, KEY_speech_offset_z)) {
-    temp = config.getItem(RENDER, KEY_speech_offset_z);
-    m_speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
-  } else {
-    m_speech_offset_z = DEFAULT_speech_offset_y;
-  }
+  m_speech_offset_x = readDoubleValue(config, RENDER, KEY_speech_offset_x, DEFAULT_speech_offset_x);
+  m_speech_offset_z = readDoubleValue(config, RENDER, KEY_speech_offset_y, DEFAULT_speech_offset_y);
+  m_speech_offset_y = readDoubleValue(config, RENDER, KEY_speech_offset_z, DEFAULT_speech_offset_z);
 
-  if (config.findItem(RENDER, KEY_fog_start)) {
-    temp = config.getItem(RENDER, KEY_fog_start);
-    m_fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
-  } else {
-    m_fog_start = DEFAULT_fog_start;
-  }
-  if (config.findItem(RENDER, KEY_fog_end)) {
-    temp = config.getItem(RENDER, KEY_fog_end);
-    m_fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
-  } else {
-    m_fog_end = DEFAULT_fog_end;
-  }
+  m_fog_start = readDoubleValue(config, RENDER, KEY_fog_start, DEFAULT_fog_start);
+  m_fog_end = readDoubleValue(config, RENDER, KEY_fog_end, DEFAULT_fog_end);
 
-  if (config.findItem(RENDER, KEY_near_clip)) {
-    temp = config.getItem(RENDER, KEY_near_clip);
-    m_near_clip = (!temp.is_double()) ? (DEFAULT_near_clip) : ((double)(temp));
-  } else {
-    m_near_clip = DEFAULT_near_clip;
-  }
+  m_near_clip = readDoubleValue(config, RENDER, KEY_near_clip, DEFAULT_near_clip);
+  m_far_clip_dist = readDoubleValue(config, RENDER, KEY_far_clip_dist, DEFAULT_far_clip_dist);
 
-  if (config.findItem(RENDER, KEY_far_clip_dist)) {
-    temp = config.getItem(RENDER, KEY_far_clip_dist);
-    m_far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
-  } else {
-    m_far_clip_dist = DEFAULT_far_clip_dist;
-  }
+
+  m_sdl_gl_red_size = readIntValue(config, RENDER, KEY_sdl_gl_red_size, DEFAULT_sdl_gl_red_size);
+  m_sdl_gl_green_size = readIntValue(config, RENDER, KEY_sdl_gl_green_size, DEFAULT_sdl_gl_green_size);
+  m_sdl_gl_blue_size = readIntValue(config, RENDER, KEY_sdl_gl_blue_size, DEFAULT_sdl_gl_blue_size);
+  m_sdl_gl_alpha_size = readIntValue(config, RENDER, KEY_sdl_gl_alpha_size, DEFAULT_sdl_gl_alpha_size);
+
+  m_sdl_gl_accum_red_size = readIntValue(config, RENDER, KEY_sdl_gl_accum_red_size, DEFAULT_sdl_gl_accum_red_size);
+  m_sdl_gl_accum_green_size = readIntValue(config, RENDER, KEY_sdl_gl_accum_green_size, DEFAULT_sdl_gl_accum_green_size);
+  m_sdl_gl_accum_blue_size = readIntValue(config, RENDER, KEY_sdl_gl_accum_blue_size, DEFAULT_sdl_gl_accum_blue_size);
+  m_sdl_gl_accum_alpha_size = readIntValue(config, RENDER, KEY_sdl_gl_accum_alpha_size, DEFAULT_sdl_gl_accum_alpha_size);
+
+  m_sdl_gl_doublebuffer = readIntValue(config, RENDER, KEY_sdl_gl_doublebuffer, DEFAULT_sdl_gl_doublebuffer);
+  m_sdl_gl_buffer_size = readIntValue(config, RENDER, KEY_sdl_gl_buffer_size, DEFAULT_sdl_gl_buffer_size);
+  m_sdl_gl_depth_size = readIntValue(config, RENDER, KEY_sdl_gl_depth_size, DEFAULT_sdl_gl_depth_size);
+  m_sdl_gl_stencil_size = readIntValue(config, RENDER, KEY_sdl_gl_stencil_size, DEFAULT_sdl_gl_stencil_size);
+  m_sdl_gl_stereo = readIntValue(config, RENDER, KEY_sdl_gl_stereo, DEFAULT_sdl_gl_stereo);
+  m_sdl_gl_swap_control = readIntValue(config, RENDER, KEY_sdl_gl_swap_control, DEFAULT_sdl_gl_swap_control);
+  m_sdl_gl_accelerated_visual = readIntValue(config, RENDER, KEY_sdl_gl_accelerated_visual, DEFAULT_sdl_gl_accelerated_visual);
+
+  m_sdl_gl_multisamplesamples = readIntValue(config, RENDER, KEY_sdl_gl_multisamplesamples, DEFAULT_sdl_gl_multisamplesamples);
+  m_sdl_gl_multisamplebuffers = readIntValue(config, RENDER, KEY_sdl_gl_multisamplebuffers, DEFAULT_sdl_gl_multisamplebuffers);
 }
 
 void GL::writeConfig(varconf::Config &config) {
@@ -950,6 +891,30 @@ void GL::writeConfig(varconf::Config &config) {
   config.setItem(RENDER, KEY_fog_end, m_fog_end);
   config.setItem(RENDER, KEY_near_clip, m_near_clip);
   config.setItem(RENDER, KEY_far_clip_dist, m_far_clip_dist);
+
+
+
+  config.setItem(RENDER, KEY_sdl_gl_red_size, m_sdl_gl_red_size);
+  config.setItem(RENDER, KEY_sdl_gl_green_size, m_sdl_gl_green_size);
+  config.setItem(RENDER, KEY_sdl_gl_blue_size, m_sdl_gl_blue_size);
+  config.setItem(RENDER, KEY_sdl_gl_alpha_size, m_sdl_gl_alpha_size);
+
+  config.setItem(RENDER, KEY_sdl_gl_accum_red_size, m_sdl_gl_accum_red_size);
+  config.setItem(RENDER, KEY_sdl_gl_accum_green_size, m_sdl_gl_accum_green_size);
+  config.setItem(RENDER, KEY_sdl_gl_accum_blue_size, m_sdl_gl_accum_blue_size);
+  config.setItem(RENDER, KEY_sdl_gl_accum_alpha_size, m_sdl_gl_accum_alpha_size);
+
+  config.setItem(RENDER, KEY_sdl_gl_doublebuffer, m_sdl_gl_doublebuffer);
+  config.setItem(RENDER, KEY_sdl_gl_buffer_size, m_sdl_gl_buffer_size);
+  config.setItem(RENDER, KEY_sdl_gl_depth_size, m_sdl_gl_depth_size);
+  config.setItem(RENDER, KEY_sdl_gl_stencil_size, m_sdl_gl_stencil_size);
+  config.setItem(RENDER, KEY_sdl_gl_stereo, m_sdl_gl_stereo);
+  config.setItem(RENDER, KEY_sdl_gl_swap_control, m_sdl_gl_swap_control);
+  config.setItem(RENDER, KEY_sdl_gl_accelerated_visual, m_sdl_gl_accelerated_visual);
+
+  config.setItem(RENDER, KEY_sdl_gl_multisamplesamples, m_sdl_gl_multisamplesamples);
+  config.setItem(RENDER, KEY_sdl_gl_multisamplebuffers, m_sdl_gl_multisamplebuffers);
+
 }  
 
 void GL::setupStates() {

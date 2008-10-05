@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall, University of Southampton
 
-// $Id: Utility.cpp,v 1.14 2007-04-22 12:14:08 simon Exp $
+// $Id: Utility.cpp,v 1.15 2008-10-05 12:07:58 simon Exp $
 
 #include "Utility.h"
 
@@ -128,6 +128,56 @@ WFMath::AxisBox<3> bboxCheck(WFMath::AxisBox<3> bbox) {
  if (count == 0 || count == 2) return bbox;
  else return WFMath::AxisBox<3>(bbox.highCorner(), bbox.lowCorner());	  
 }
+
+bool readBoolValue(const varconf::Config &config, const std::string &section, const std::string &key, bool defValue) {
+  bool value;
+  varconf::Variable temp;
+  if (config.findItem(section, key)) {
+    temp = config.getItem(section, key);
+    value = (!temp.is_bool()) ? (defValue) : ((bool)(temp));
+  } else {
+    value = defValue;
+  }
+  return value;
+}
+
+int readIntValue(const varconf::Config &config, const std::string &section, const std::string &key, int defValue) {
+  int value;
+  varconf::Variable temp;
+  if (config.findItem(section, key)) {
+    temp = config.getItem(section, key);
+    value = (!temp.is_int()) ? (defValue) : ((int)(temp));
+  } else {
+    value = defValue;
+  }
+  return value;
+}
+
+
+double readDoubleValue(const varconf::Config &config, const std::string &section, const std::string &key, double defValue) {
+  double value;
+  varconf::Variable temp;
+  if (config.findItem(section, key)) {
+    temp = config.getItem(section, key);
+    value = (!temp.is_double()) ? (defValue) : ((double)(temp));
+  } else {
+    value = defValue;
+  }
+  return value;
+}
+
+std::string readStringValue(const varconf::Config &config, const std::string &section, const std::string &key, const std::string &defValue) {
+  varconf::Variable temp;
+  std::string value;
+  if (config.findItem(section, key)) {
+    temp = config.getItem(section, key);
+    value = (!temp.is_string()) ? (defValue) : ((std::string)(temp));
+  } else {
+    value = defValue;
+  }
+  return value;
+}
+
 
 void Tokeniser::initTokens(const std::string &String) {
   m_String = String;

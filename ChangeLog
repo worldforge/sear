@@ -1,5 +1,13 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* common/Utility.cpp, common/Utility.h: Add some helper methods to
+	  read config values.
+
+	* renderers/GL.cpp, renderers/GL.h: Add parameters passed into
+	  SDL_GL_SetAttribute to configuration file.
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/EntityMapper.cpp: Clear maps in shutdown.
 
 2008-10-05  Simon Goodall  <simon@worldforge.org>
