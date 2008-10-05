@@ -244,6 +244,7 @@ private:
   // allocation.....
   mutable GLuint m_vb_vertex_data, m_vb_normal_data, m_vb_texture_data, m_vb_indices;
   mutable GLuint m_disp_list, m_select_disp_list;
+  mutable bool m_disp_list_set, m_select_disp_list_set;
   mutable int m_list_count;
 
   Matrix m_matrix;

@@ -37,6 +37,8 @@ StaticObject::StaticObject() :
   m_vb_indices(0),
   m_disp_list(0),
   m_select_disp_list(0),
+  m_disp_list_set(false),
+  m_select_disp_list_set(false),
   m_list_count(0),
   m_context_no(-1),
   m_use_stencil(false)
@@ -151,6 +153,8 @@ void StaticObject::contextDestroyed(bool check) {
   m_vb_normal_data = 0;
   m_vb_texture_data = 0;
   m_vb_indices = 0;
+  m_select_disp_list_set = false;
+  m_disp_list_set = false;
   m_select_disp_list = 0;
   m_disp_list = 0;
 
@@ -171,7 +175,7 @@ void StaticObject::render(bool select_mode) const {
   glMatrixMode(GL_MODELVIEW);
     
 
-   // If VBO's are enabled
+  // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
 
@@ -232,9 +236,12 @@ void StaticObject::render(bool select_mode) const {
     }
   } else {
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
-    if (glIsList(disp)) {
+    bool &isSet = (select_mode) ? (m_select_disp_list_set) : (m_disp_list_set);
+    //if (glIsList(disp)) {
+    if (isSet) {
       glCallList(disp);
     } else {
+isSet = true;
       // Need to reset textures otherwise the display list may not record a
       // texture change if the previous object has the same texture. This is 
       // fine until the order of objects changes and the wrong texture is in 
@@ -313,6 +320,7 @@ void StaticObject::render(bool select_mode) const {
       }
       glEndList();
       glCallList(disp);
+      isSet = true;
     }
   }
   glPopMatrix();
@@ -591,7 +599,10 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
   } else { // Fall back to vertex arrays and display lists
 
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
-    if (!glIsList(disp)) {
+    bool& isSet = (select_mode) ? (m_select_disp_list_set) : (m_disp_list_set);
+    //if (!glIsList(disp)) {
+    if (!isSet) {
+      isSet = true;
       // Need to reset textures otherwise the display list may not record a
       // texture change if the previous object has the same texture. This is 
       // fine until the order of objects changes and the wrong texture is in 
@@ -658,45 +669,43 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
       glEndList();
 
       if (m_use_stencil) {      
-      // Second display list, setup stencil op for outlines
-      glNewList(disp + 1, GL_COMPILE);
-      glEnable(GL_STENCIL_TEST);
-      glStencilFunc(GL_ALWAYS, -1, 1);
-      glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-      glEndList();
+        // Second display list, setup stencil op for outlines
+        glNewList(disp + 1, GL_COMPILE);
+        glEnable(GL_STENCIL_TEST);
+        glStencilFunc(GL_ALWAYS, -1, 1);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glEndList();
    
-      // Fourth list, render the outline
-      glNewList(disp + 3, GL_COMPILE);
-      RenderSystem::getInstance().forceState(m_select_state);
-      glStencilFunc(GL_NOTEQUAL, -1, 1);
-      glColor4fv(halo_colour);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      glEndList();
+        // Fourth list, render the outline
+        glNewList(disp + 3, GL_COMPILE);
+        RenderSystem::getInstance().forceState(m_select_state);
+        glStencilFunc(GL_NOTEQUAL, -1, 1);
+        glColor4fv(halo_colour);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glEndList();
 
 
-      //Fifth list, finish outline
-      glNewList(disp + 4, GL_COMPILE);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-      glDisable(GL_STENCIL_TEST);
-      glColor4fv(white);
-      RenderSystem::getInstance().forceState(m_state);
-      glEndList();
+        //Fifth list, finish outline
+        glNewList(disp + 4, GL_COMPILE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glDisable(GL_STENCIL_TEST);
+        glColor4fv(white);
+        RenderSystem::getInstance().forceState(m_state);
+        glEndList();
       } else {
-      // Fourth list, render the outline
-      glNewList(disp + 3, GL_COMPILE);
-      RenderSystem::getInstance().forceState(m_select_state);
-      glColor4fv(halo_colour);
-      glEndList();
+        // Fourth list, render the outline
+        glNewList(disp + 3, GL_COMPILE);
+        RenderSystem::getInstance().forceState(m_select_state);
+        glColor4fv(halo_colour);
+        glEndList();
 
-
-      //Fifth list, finish outline
-      glNewList(disp + 4, GL_COMPILE);
-      glColor4fv(white);
-      RenderSystem::getInstance().forceState(m_state);
-      glEndList();
- 
-
+        //Fifth list, finish outline
+        glNewList(disp + 4, GL_COMPILE);
+        glColor4fv(white);
+        RenderSystem::getInstance().forceState(m_state);
+        glEndList();
       }
+
       // sixth disp list, clean up state 
       glNewList(disp + 5, GL_COMPILE);
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
