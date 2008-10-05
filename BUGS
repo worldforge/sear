@@ -1,6 +1,26 @@
 BUGS
 
+ * Double-clicking on an empty characters list, then selecting a character type
+   appears to break guichan.
+
+ * The lighting flickers on some objects when others fade in. Seems like a flag is not being reset, or is somehow being shared across all copies. Typically on model_by_type objects.
+
+ * /reload_configs can lead to funny textures being used where the default was used before
+
+ * /reload_configs clear worn entities.
+
  * Crashes if connected to a server when cyclient is run. Long standing eris issue?
+
+ * Terrain Textures do not always render correctly. usually happens if the segment changes/is added when connected
+
+ * The getHeight function fails if a segment has not been populated,e.g. because it is outside of the view frustrum.
+
+ * The server list needs sorting out to hide (or just not show initially) servers which are unavailable.
+ 
+ * Drop down list should have up/down keys and search by first letter (or serveral letters)
+
+ * Mercator has no way to remove additions to surfaces. This is a problem when
+   tree area's need to be removed as they are currently leaked.
 
 
 Demitar Issues:
