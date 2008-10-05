@@ -130,7 +130,7 @@ LoginWindow::~LoginWindow()
 
 void LoginWindow::logic()
 {
-  bool show_create = m_createCheck->isMarked();
+  bool show_create = m_createCheck->isSelected();
   m_pswdConfirmField->setEnabled(show_create);
   m_pswdConfirmField->setVisible(show_create);
   m_nameField->setEnabled(show_create);
@@ -164,7 +164,7 @@ void LoginWindow::actionPressed(std::string event)
     } else if (password.empty()) {
         new Alert(parent, "No password specified");
     } else {
-      if (m_createCheck->isMarked()) {
+      if (m_createCheck->isSelected()) {
         if (m_nameField->getText().empty()) {
           new Alert(parent, "No name specified");
         } else if (password == m_pswdConfirmField->getText()) {

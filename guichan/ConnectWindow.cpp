@@ -49,7 +49,7 @@ public:
   {
     const ServerList &server_list = m_meta->getServerList();
     ServerList::const_iterator I = server_list.begin();
-    for (size_t ii = 0; ii < i; ++ii, ++I);
+    for (size_t ii = 0; ii < (size_t) i; ++ii, ++I);
     return (I->second).servername;
   }
 };
@@ -81,7 +81,7 @@ ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
   m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(200);
   scroll_area->setHeight(200);
-  scroll_area->setBorderSize(1);
+  scroll_area->setFrameSize(1);
   vbox->pack(scroll_area);
 
   m_serverField = new gcn::TextField("                ");
@@ -124,7 +124,6 @@ ConnectWindow::~ConnectWindow()
 {
   delete m_serverListModel;
   delete m_buttonListener;
-
 }
 
 void ConnectWindow::logic()
@@ -135,9 +134,9 @@ void ConnectWindow::logic()
 
     const ServerList &server_list = m_serverListModel->m_meta->getServerList();
 
-    if (m_selected >= 0 && m_selected < server_list.size()) {
+    if (m_selected >= 0 && (size_t) m_selected < server_list.size()) {
       ServerList::const_iterator I = server_list.begin();
-      for (size_t ii = 0; ii < m_selected; ++ii, ++I);
+      for (size_t ii = 0; ii < (size_t) m_selected; ++ii, ++I);
       std::stringstream ss;
       ss << (I->second).hostname << " " << (I->second).port;
       m_serverField->setText(ss.str());

@@ -82,7 +82,7 @@ public:
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account == 0) { return ""; }
     const std::vector<std::string> & types = account->getCharacterTypes();
-    if (i < types.size()) {
+    if ((size_t) i < types.size()) {
       return types[i];
     } else {
       return "UNKNOWN";
@@ -124,7 +124,7 @@ CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
   m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(200);
   scroll_area->setHeight(200);
-  scroll_area->setBorderSize(1);
+  scroll_area->setFrameSize(1);
   scroll_area->setPosition(0,y_pos);
   add(scroll_area);
   y_pos += scroll_area->getHeight() + 4;
@@ -254,7 +254,7 @@ void CharacterWindow::logic()
       Eris::Account * account = System::instance()->getClient()->getAccount();
       if (account != 0) {
         const std::vector<std::string> & types = account->getCharacterTypes();
-        if (m_typeSelected < types.size()) {
+        if ((size_t) m_typeSelected < types.size()) {
           m_typeField = types[m_typeSelected];
         }
       }
@@ -267,7 +267,7 @@ void CharacterWindow::logic()
     Eris::Account * account = System::instance()->getClient()->getAccount();
     if (account != 0) {
       const std::vector<std::string> & types = account->getCharacterTypes();
-      if (new_type_sel >= 0 && m_typeSelected < types.size()) {
+      if (new_type_sel >= 0 && (size_t) m_typeSelected < types.size()) {
         if (m_typeField != types[m_typeSelected]) {
           m_types->setSelected(-1);
         }

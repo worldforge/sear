@@ -83,7 +83,7 @@ Inventory::Inventory() : gcn::Window("Inventory")
   m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(120);
   scroll_area->setHeight(100);
-  scroll_area->setBorderSize(1);
+  scroll_area->setFrameSize(1);
   scroll_area->setFocusable(false);
   vbox->pack(scroll_area);
 

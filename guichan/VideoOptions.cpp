@@ -116,7 +116,7 @@ VideoOptions::VideoOptions(RootWidget * top) : gcn::Window("video"), m_top(top),
   m_widgets.push_back(SPtr<gcn::Widget>(scroll_area));
   scroll_area->setWidth(100);
   scroll_area->setHeight(100);
-  scroll_area->setBorderSize(1);
+  scroll_area->setFrameSize(1);
   vbox->pack(scroll_area);
 
   m_fullCheck = new gcn::CheckBox("Full screen");
@@ -162,7 +162,7 @@ void VideoOptions::actionPressed(std::string event)
     GL * gl_render = dynamic_cast<GL *>(render);
 
     if (gl_render != 0) {
-      if (m_fullCheck->isMarked() != gl_render->isFullScreen()) {
+      if (m_fullCheck->isSelected() != gl_render->isFullScreen()) {
         gl_render->toggleFullscreen();
       }
 
@@ -186,7 +186,7 @@ void VideoOptions::logic()
   GL * gl_render = dynamic_cast<GL *>(render);
 
   if (gl_render != 0 && !m_checkFullChanged) {
-    m_fullCheck->setMarked(gl_render->isFullScreen());
+    m_fullCheck->setSelected(gl_render->isFullScreen());
   }
   
   gcn::Window::logic();

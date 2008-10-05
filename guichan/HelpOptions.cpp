@@ -55,7 +55,7 @@ public:
 
   virtual std::string getElementAt(int n)
   {
-    if (n >= files.size()) {
+    if ((size_t) n >= files.size()) {
       return "NONE";
     }
     return files[n];
@@ -87,7 +87,7 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
   m_widgets.push_back(SPtr<gcn::Widget>(m_filesScroll));
   m_filesScroll->setWidth(100);
   m_filesScroll->setHeight(300);
-  m_filesScroll->setBorderSize(1);
+  m_filesScroll->setFrameSize(1);
   hbox->pack(m_filesScroll);
 
   m_helpText = new gcn::TextBox;
@@ -101,7 +101,7 @@ HelpOptions::HelpOptions(RootWidget * top) : gcn::Window("Help"),
   m_widgets.push_back(SPtr<gcn::Widget>(m_textScroll));
   m_textScroll->setWidth(500);
   m_textScroll->setHeight(300);
-  m_textScroll->setBorderSize(1);
+  m_textScroll->setFrameSize(1);
   hbox->pack(m_textScroll);
 
   vbox->pack(hbox);

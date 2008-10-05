@@ -54,7 +54,7 @@ ControlsOptions::ControlsOptions(RootWidget * top) : gcn::Window("Controls"),
   m_widgets.push_back(SPtr<gcn::Widget>(control_scroll));
   control_scroll->setWidth(500);
   control_scroll->setHeight(300);
-  control_scroll->setBorderSize(1);
+  control_scroll->setFrameSize(1);
   vbox->pack(control_scroll);
 
   readBindings();

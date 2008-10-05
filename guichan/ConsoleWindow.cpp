@@ -49,7 +49,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
   m_widgets.push_back(SPtr<gcn::Widget>(m_scrollArea));
   m_scrollArea->setWidth(400);
   m_scrollArea->setHeight(100);
-  m_scrollArea->setBorderSize(1);
+  m_scrollArea->setFrameSize(1);
 
   vbox->pack(m_scrollArea);
 
