@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.73 2008-10-04 17:57:37 simon Exp $
+// $Id: Graphics.cpp,v 1.74 2008-10-05 09:54:17 simon Exp $
 
 #include <sigc++/object_slot.h>
 
@@ -198,7 +198,11 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
   if (!select_mode) { 
     Workarea * wa = m_system->getWorkarea();
     assert (wa != NULL);
-    wa->draw();
+    try {
+      wa->draw();
+    } catch (const gcn::Exception &e) {
+      fprintf(stderr, "Caught Guichan Exception\n");
+    }
 
     Console *con = m_system->getConsole();
     assert(con);
@@ -550,6 +554,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   // Get world coord of object
   const WFMath::Point<3> &p = obj_we->getAbsPos();
   assert(p.isValid());
+
   // Transform world coord into camera coord
   WFMath::Vector<3> cam_pos(
     p.x() * m_modelview_matrix[0][0] 

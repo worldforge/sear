@@ -1,5 +1,9 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/Graphics.cpp: Catch Guichan exceptions.
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, guichan/CharacterWindow.cpp,
 	  guichan/ConnectWindow.cpp, guichan/ConsoleWindow.cpp,
 	  guichan/ControlOptions.cpp, guichan/HelpOptions.cpp,
