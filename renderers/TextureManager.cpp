@@ -1,8 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.52 2007-05-02 20:47:56 simon Exp $
+// $Id: TextureManager.cpp,v 1.53 2008-10-05 13:27:05 simon Exp $
 
 #include <unistd.h>
 
@@ -50,11 +50,13 @@ static const bool debug = false;
 #endif
 namespace Sear {
 
+  static const std::string SECTION_texture = "textures";
+  static const std::string KEY_max_texture_size = "max_texture_size";
+  static const int DEFAULT_max_texture_size = -1;
+
 // Find the next largest power of 2 to i, but no bigger than the max texture
 // size we are allowed
-inline int scaleDimension(int i) {
-  GLint texSize;
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+inline int scaleDimension(int i, GLint texSize) {
   int n = 2;
   while (n < i && n <= texSize) {
     n <<= 1;
@@ -162,7 +164,8 @@ TextureManager::TextureManager() :
   m_initGL(false),
   m_texture_counter(1),
   m_texture_units(1),
-  m_baseMipmapLevel(0)
+  m_baseMipmapLevel(0),
+  m_max_texture_size(-1)
 {  
   varconf::Config &cfg = System::instance()->getGeneral();
   cfg.sigsv.connect(sigc::mem_fun(this, &TextureManager::generalConfigChanged));
@@ -257,7 +260,6 @@ void TextureManager::shutdown()
 
 void TextureManager::readTextureConfig(const std::string &filename) {
   assert((m_initialised == true) && "TextureManager not initialised");
-  
   m_texture_config.readFromFile(filename);
 }
 
@@ -457,9 +459,15 @@ GLuint TextureManager::loadTexture(const std::string &name, SDL_Surface *surface
             fmt = GL_RGB5_A1; break; // Set default
         }
     }
+
 // TODO Create this in a new SDL_surface, and assign in surface so the mipmap stuff will work below 
-  int width = scaleDimension(surface->w);
-  int height = scaleDimension(surface->h);
+  GLint texSize = m_max_texture_size;
+
+  if (texSize == -1) {
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &texSize);
+  }
+  int width = scaleDimension(surface->w, texSize);
+  int height = scaleDimension(surface->h, texSize);
 
   // Scale the image to a 2^N x 2^M size that is within the size allowed by GL
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -545,6 +553,7 @@ void TextureManager::unloadTexture(GLuint texture_id) {
 
 void TextureManager::switchTexture(TextureID texture_id) {
   assert((m_initialised == true) && "TextureManager not initialised");
+  // Don't try and reload texture if it is the current texture.
   if (texture_id == m_last_textures[0]) return;
   GLuint to = m_textures[texture_id];
   if (to == 0) {
@@ -576,7 +585,8 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
   if (!use_arb_multitexture) return switchTexture(texture_id);
   if ((int)texture_unit >= m_texture_units) return; // Check we have enough texture units
   glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
-
+  // TODO: There is a problem if the texture is the same as the one loaded in texture unit 0
+  //       switchTexture will just return....
   switchTexture(texture_id);
 /*
   GLuint to = (texture_id == -1) ? (m_textures[m_default_texture]) : (m_textures[texture_id]);
@@ -815,6 +825,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
   }
   else 
   if (command == CMD_reload_config_textures) {
+    contextDestroyed(true);
     m_texture_config = varconf::Config();
     m_texture_config.sige.connect(sigc::mem_fun(this, &TextureManager::varconf_error_callback));
     std::list<std::string>::const_iterator I = m_texture_configs.begin();
@@ -824,10 +835,12 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
       System::instance()->getFileHandler()->getFilePath(a);
       m_texture_config.readFromFile(a);
     }
+    contextCreated();
   }
   else 
   if (command == CMD_reload_config_sprites) {
     m_spriteConfig = varconf::Config();
+    contextDestroyed(true);
     std::list<std::string>::const_iterator I = m_sprite_configs.begin();
     std::list<std::string>::const_iterator Iend = m_sprite_configs.end();
     while (I != Iend) {
@@ -835,6 +848,7 @@ void TextureManager::runCommand(const std::string &command, const std::string &a
       System::instance()->getFileHandler()->getFilePath(a);
       m_spriteConfig.readFromFile(a);
     }
+    contextCreated();
   }
 }
 
@@ -936,5 +950,12 @@ void TextureManager::varconf_error_callback(const char *error) {
   printf("Varconf Error: %s\n ", error);
 }
 
+void TextureManager::readConfig(const varconf::Config &config) {
+  m_max_texture_size = readIntValue(config, SECTION_texture, KEY_max_texture_size, DEFAULT_max_texture_size);
+}
+
+void TextureManager::writeConfig(varconf::Config &config) const {
+  config.setItem(SECTION_texture, KEY_max_texture_size, m_max_texture_size);
+}
 
 } /* namespace Sear */

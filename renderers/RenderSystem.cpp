@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: RenderSystem.cpp,v 1.26 2008-05-08 20:31:23 simon Exp $
+// $Id: RenderSystem.cpp,v 1.27 2008-10-05 13:27:05 simon Exp $
 
 #include <SDL/SDL.h>
 
@@ -225,7 +225,7 @@ void RenderSystem::drawScene(bool select_mode, float time_elapsed) {
 void RenderSystem::readConfig(varconf::Config &config) {
   assert (m_initialised);
   m_renderer->readConfig(config);
-//  m_textureManager->readConfig();
+  m_textureManager->readConfig(config);
 //  m_stateManager->readConfig();
   m_graphics->readConfig(config);
   m_cameraSystem->readConfig(config);
@@ -234,6 +234,7 @@ void RenderSystem::readConfig(varconf::Config &config) {
 void RenderSystem::writeConfig(varconf::Config &config) {
   assert (m_initialised);
   m_renderer->writeConfig(config);
+  m_textureManager->writeConfig(config);
   m_graphics->writeConfig(config);
   m_cameraSystem->writeConfig(config);
 } 

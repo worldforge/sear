@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.h,v 1.31 2007-05-26 18:49:10 simon Exp $
+// $Id: TextureManager.h,v 1.32 2008-10-05 13:27:05 simon Exp $
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -108,7 +108,7 @@ public:
 
     // Increment Texture counter.
     ++m_ref_counter[texId];
-assert(texId > 0);
+    assert(texId > 0);
     return texId;
   }
 
@@ -185,6 +185,8 @@ assert(texId > 0);
     
     void clearLastTexture(unsigned int index);
     
+  void readConfig(const varconf::Config &config);
+  void writeConfig(varconf::Config &config) const;
 private:
 
   /** 
@@ -213,6 +215,7 @@ private:
   std::vector<TextureID> m_cursor_ids;
 
   int m_baseMipmapLevel;
+  int m_max_texture_size;
   
   void generalConfigChanged(const std::string &section, const std::string &key, varconf::Config &config);  
 

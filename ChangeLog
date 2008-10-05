@@ -1,5 +1,11 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/RenderSystem.cpp, renderers/TextureManager.cpp,
+	  renderers/TextureManager.h: Hook in config read/writes and allow the
+	  maximum texture size to be user specified.
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/ObjectHandler.h: Remove unused member variable;
 
 2008-10-05  Simon Goodall  <simon@worldforge.org>
