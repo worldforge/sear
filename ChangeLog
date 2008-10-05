@@ -1,5 +1,9 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/Panel.cpp: Workaround guichan bug causing opengl errors.
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/StaticObject.cpp, loaders/StaticObject.h: Add a boolean flag
 	  to track display list state rather than call glIsList.
 

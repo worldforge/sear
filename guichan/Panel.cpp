@@ -37,7 +37,8 @@ Panel::Panel(RootWidget * top) : gcn::Window(""), m_top(top)
   base.a = 128;
   setBaseColor(base);
 
-  setTitleBarHeight(0);
+  // This used to be 0, however setting to 1 to workaround a Guichan bug.
+  setTitleBarHeight(1);
   setMovable(false);
 
   // setOpaque(true);
