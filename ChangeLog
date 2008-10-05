@@ -1,5 +1,9 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ObjectHandler.h: Remove unused member variable;
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* common/Utility.cpp, common/Utility.h: Add some helper methods to
 	  read config values.
 

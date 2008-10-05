@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: ObjectHandler.h,v 1.8 2007-03-29 20:11:51 simon Exp $
+// $Id: ObjectHandler.h,v 1.9 2008-10-05 12:17:09 simon Exp $
 
 #ifndef SEAR_LOADERS_OBJECTHANDLER_H
 #define SEAR_LOADERS_OBJECTHANDLER_H 1
@@ -44,8 +44,6 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
   
-//  varconf::Config &getObjectRecords() { return m_object_records; }
-
   void reset();
 
 protected:
@@ -58,7 +56,6 @@ protected:
   bool m_initialised;
   ObjectRecordMap m_type_map;
   ObjectRecordMap m_id_map;
-  varconf::Config m_object_records;
 
   std::list<std::string> m_object_configs;
 };
