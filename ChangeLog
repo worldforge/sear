@@ -1,5 +1,9 @@
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ModelHandler.cpp: Clean model config filenames on shutdown.
+
+2008-10-05  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/Graphics.cpp: Catch Guichan exceptions.
 
 2008-10-05  Simon Goodall  <simon@worldforge.org>

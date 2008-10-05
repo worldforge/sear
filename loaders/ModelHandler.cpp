@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.cpp,v 1.40 2007-05-02 20:47:54 simon Exp $
+// $Id: ModelHandler.cpp,v 1.41 2008-10-05 10:03:15 simon Exp $
 
 #include <string.h>
 #include <inttypes.h>
@@ -93,6 +93,9 @@ void ModelHandler::shutdown() {
   m_object_map.clear();
   // Delete all remaining records
   m_model_records_map.clear();
+
+  // Clear all model config filenames
+  m_model_configs.clear();
 
   // Disconnect the sigc callbacks
   notify_callbacks();
@@ -191,7 +194,6 @@ void ModelHandler::unregisterModelLoader(const std::string &model_type) {
 
 void ModelHandler::checkModelTimeouts(bool forceUnload) {
   assert (m_initialised == true);
-
   // This function checks to see when the last time a model record was rendered.
   // If the time has been longer than a threshold, we unload the model record 
   // and associated models.
