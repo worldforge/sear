@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.cpp,v 1.173 2008-05-08 20:31:23 simon Exp $
+// $Id: System.cpp,v 1.174 2008-10-07 19:33:14 simon Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,7 +39,7 @@
 #include "client.h"
 #include "Console.h"
 #include "FileHandler.h"
-#include "Sound.h"
+//#include "Sound.h"
 #include "ScriptEngine.h"
 #include "MediaManager.h"
 #include "System.h"
@@ -227,7 +227,7 @@ bool System::init(int argc, char *argv[]) {
     m_sound->registerCommands(m_console.get());
   }
 #else
-  #warning Sound Disabled
+ // #warning Sound Disabled
 #endif
   RenderSystem::getInstance().init();
   RenderSystem::getInstance().registerCommands(m_console.get());
@@ -325,7 +325,7 @@ bool System::init(int argc, char *argv[]) {
     m_workarea.release();
     m_character.release();
     m_media_manager.release();
-    m_sound.release();
+    //m_sound.release();
 
     Bindings::shutdown();
 
@@ -406,7 +406,7 @@ void System::shutdown() {
 
   m_console.release();
  
-  m_sound.release();
+  //m_sound.release();
 
 //  CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();

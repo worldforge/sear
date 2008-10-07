@@ -119,11 +119,11 @@ if test $cross_compiling == no; then
   ], [
     AC_MSG_ERROR(Couldn't find SDL_image or wrong version found. Please goto http://www.libsdl.org/projects/SDL_image and get at least version 1.2.1)
 ])
-  AC_CHECK_LIB(SDL_mixer,Mix_OpenAudio, [
-    SEAR_LIBS="$SEAR_LIBS -lSDL_mixer"
-  ], [
-    AC_MSG_ERROR(Couldn't find SDL_mixer. Please goto http://www.libsdl.org/projects/SDL_mixer/)
-])
+#  AC_CHECK_LIB(SDL_mixer,Mix_OpenAudio, [
+#    SEAR_LIBS="$SEAR_LIBS -lSDL_mixer"
+#  ], [
+#    AC_MSG_ERROR(Couldn't find SDL_mixer. Please goto http://www.libsdl.org/projects/SDL_mixer/)
+#])
 else
    AC_CHECK_HEADER(SDL/SDL_image.h,
        [found_sdl_image=yes break],
@@ -135,15 +135,15 @@ else
        AC_MSG_ERROR(Error could not find SDL_image)
    fi
 
-   AC_CHECK_HEADER(SDL/SDL_mixer.h,
-       [found_sdl_mixer=yes break],
-       [found_sdl_mixer=no])
-
-   if test $found_sdl_mixer == yes; then
-       SEAR_LIBS="$SEAR_LIBS -lSDL_mixer"
-   else
-       AC_MSG_ERROR(Error could not find SDL_mixer)
-   fi
+#   AC_CHECK_HEADER(SDL/SDL_mixer.h,
+#       [found_sdl_mixer=yes break],
+#       [found_sdl_mixer=no])
+#
+#   if test $found_sdl_mixer == yes; then
+#       SEAR_LIBS="$SEAR_LIBS -lSDL_mixer"
+#   else
+#       AC_MSG_ERROR(Error could not find SDL_mixer)
+#   fi
 
   AC_CHECK_HEADER(dns_sd.h,
     [ 
