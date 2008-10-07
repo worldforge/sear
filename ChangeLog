@@ -1,5 +1,10 @@
 2008-10-07  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/CameraSystem.cpp: Allow default camera to be set in config
+	  file.
+
+2008-10-07  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, src/Makefile.am, src/System.cpp, src/Sounds.h: Disable
 	  SDL_Mixer check and comment out use of Sound class. It has not been
 	  used for a long time.

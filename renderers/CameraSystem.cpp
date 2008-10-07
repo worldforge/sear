@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: CameraSystem.cpp,v 1.6 2007-05-02 20:47:55 simon Exp $
+// $Id: CameraSystem.cpp,v 1.7 2008-10-07 20:37:37 simon Exp $
 
 #include <varconf/Config.h>
 
@@ -21,6 +21,10 @@
 #endif
 
 namespace Sear {
+
+static const std::string SECTION_camera = "camera";
+static const std::string KEY_default_camera = "default_camera";
+static const int DEFAULT_default_camera = 0;
 
 static const std::string CMD_SWITCH_CAMERA = "switch_camera";
 static const std::string CMD_ZOOM_IN = "+camera_zoom_in";
@@ -133,6 +137,7 @@ void CameraSystem::readConfig(varconf::Config &config) {
   for (unsigned int i = 0; i < m_cameras.size(); ++i) {
     m_cameras[i]->readConfig(config);
   }
+  m_current = readIntValue(config, SECTION_camera, KEY_default_camera, DEFAULT_default_camera);
 }
 
 void CameraSystem::writeConfig(varconf::Config &config) {
