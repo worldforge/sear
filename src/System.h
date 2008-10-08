@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
 
-// $Id: System.h,v 1.76 2008-05-08 20:31:23 simon Exp $
+// $Id: System.h,v 1.77 2008-10-07 19:33:14 simon Exp $
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -30,7 +30,7 @@ class ScriptEngine;
 class Console;
 class Workarea;
 class Character;
-class Sound;
+//class Sound;
 class Editor;
 class Metaserver;
 
@@ -250,7 +250,7 @@ protected:
   double m_elapsed;
   unsigned int m_current_ticks;
 
-  std::auto_ptr<Sound> m_sound;
+  //std::auto_ptr<Sound> m_sound;
   
   typedef enum {
     AXIS_STRAFE,

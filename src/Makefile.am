@@ -12,18 +12,19 @@ EXTRA_DIST = sear-res.rc
 if BUILD_STATIC
 sear_bin_LDFLAGS = -nodefaultlibs
 
+#	/usr/lib/libSDL_mixer.a \
+#	/usr/lib/libvorbisfile.a \
+#	/usr/lib/libvorbis.a \
+#	/usr/lib/libogg.a \
+#	/usr/lib/libasound.a 
+
 SEAR_EXT_LIBS = \
 	/usr/lib/libSDL_image.a \
 	/usr/lib/libtiff.a \
 	/usr/lib/libjpeg.a \
 	/usr/lib/libpng12.a \
 	/usr/lib/libz.a \
-	/usr/lib/libSDL_mixer.a \
-	/usr/lib/libvorbisfile.a \
-	/usr/lib/libvorbis.a \
-	/usr/lib/libogg.a \
 	/usr/lib/libSDL.a \
-	/usr/lib/libasound.a \
 	/usr/X11R6/lib/libX11.a \
 	/usr/X11R6/lib/libXext.a \
 	/usr/lib/libmercator-0.2.a \
@@ -100,8 +101,6 @@ libSear_a_SOURCES = \
 	Factory.cpp \
 	Factory.h \
 	main.cpp \
-	Sound.cpp \
-	Sound.h \
 	System.cpp \
 	System.h \
 	WorldEntity.cpp \
@@ -124,6 +123,9 @@ libSear_a_SOURCES = \
 	Metaserver.cpp Metaserver.h \
 	Avahi.cpp Avahi.h \
 	Bonjour.cpp Bonjour.h
+
+#	Sound.cpp \
+#	Sound.h 
 
 icondir = $(datadir)/icons/worldforge
 icon_DATA = sear_icon.xpm
