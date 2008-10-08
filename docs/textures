@@ -49,7 +49,7 @@ BMP, PNM, XPM, LBM, PCX, GIF, JPEG, PNG, TGA.
 
 Image sizes
 ----------
-Images sizes need to be powers of 2, i.e 2^N x 2^M.
+Images should ideally be powers of 2, i.e 2^N x 2^M.
 recommended size 256x256 -> 512x512 
 Larger formats become less supported and reduce performace
 
@@ -60,4 +60,3 @@ Currently only support RGB or RGBA formats
 
 Future Work
 Allow other pixel formats
-Allow image resampling to avoid 2^n by 2^m limitation
