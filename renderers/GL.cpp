@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.173 2008-10-05 12:07:58 simon Exp $
+// $Id: GL.cpp,v 1.174 2008-10-07 19:20:29 simon Exp $
 
 #ifdef HAVE_CONFIG_H
   #include "config.h"
@@ -487,9 +487,23 @@ void GL::nextColour(WorldEntity *we){
 
   m_entityArray[m_colour_index] = we; // Store entity in array slot
 
+  // From a 32-bit number, extract red, green and blue components so that they are suitable for use
+  // in glColor3ub. We use at most 24 bits (ignore alpha).
+  // We break up m_colour_index as follows;
+  // [unused | red bits | green bits | blue bits].
+  // For colour components with less than 8 bits, we bitshift so that high order bits are used over low order bits.
+  // I.e. for a 5-bit depth, 00011011 becomes 11011000
+  // In procEvent, these three colour components will be re-combined to obtain the original number.
+  
+  // Bitshift an 8-bit mask into the correct position in the 32-bit number, extract bits, then shift contents
+  // back to a 8-bit placement.
   GLubyte red = (m_colour_index & (m_redMask << m_redShift)) >> (m_redShift - (8 - m_redBits));
   GLubyte green = (m_colour_index & (m_greenMask << m_greenShift)) >> (m_greenShift - (8 - m_greenBits));
-  GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) >> (m_blueShift - (8 - m_blueBits));
+  // Blue shift will often be 0, so we could end up with negative bitshifting.
+  //GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) >> (m_blueShift - (8 - m_blueBits));
+  GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) << (8 - m_blueBits);
+
+  // Set the colour
   glColor3ub(red, green, blue);
 
   ++m_colour_index; // Increment counter for next pass
@@ -510,8 +524,8 @@ void GL::buildColourSet() {
   m_greenMask = makeMask(m_greenBits);
   m_blueMask = makeMask(m_blueBits);
   // Calculate shifts
-  m_redShift =   m_greenBits + m_blueBits;
-  m_greenShift =  m_blueBits;
+  m_redShift = m_greenBits + m_blueBits;
+  m_greenShift = m_blueBits;
   m_blueShift = 0;
 }
 
@@ -744,21 +758,29 @@ void GL::procEvent(int x, int y) {
   glReadPixels(x, y, 1, 1, GL_RGB , GL_UNSIGNED_BYTE, &i);
 
 // TODO pre-cache 8 - bits?
-  
+ 
+  // Convert the RGB components back into the index from nextColour(); 
+
+  // Shift back into low-order bits
+  // I.e. for a 5-bit depth, 11011000 becomes 00011011 
   GLubyte red = i[0] >> (8 - m_redBits);// & m_redMask;
   GLubyte green = i[1] >> (8 - m_greenBits);// & m_greenMask;
   GLubyte blue = i[2] >> (8 - m_blueBits);// & m_blueMask;
 
+  // Reconstruct original index
   unsigned int ic = red;
-  ic <<= m_redBits;
-  ic += green;
   ic <<= m_greenBits;
+  ic += green;
+  ic <<= m_blueBits;
   ic += blue;
 
-  //selected_id = getSelectedID(ic);
+  // Find WorldEntity associated with index.
   WorldEntity *selected_entity = getSelectedID(ic);
 
+  // Mark entity as selected
   if (selected_entity) selected_entity->setIsSelected(true);
+
+  // If this entity is different to the previously selected entity, update our ref.
   if (selected_entity != m_activeEntity.get()) {
     if (selected_entity != NULL ) {
       m_activeEntity = Eris::EntityRef(selected_entity);
@@ -1466,6 +1488,7 @@ void GL::getModelviewMatrix(float m[4][4])
 }
 
 void GL::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+  // TODO: Use Utility::readXXXValue
   varconf::Variable temp;
   if (section == RENDER) {
     if (key == KEY_character_light_kc) {

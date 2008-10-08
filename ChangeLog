@@ -1,3 +1,8 @@
+2008-10-07  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/GL.cpp: Fix some problems with entity selection on lower
+	  colour depth screens.
+
 2008-10-05  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/Panel.cpp: Workaround guichan bug causing opengl errors.
