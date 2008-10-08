@@ -310,7 +310,8 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   if (debug) printf("Setting video to %d x %d\n", m_width, m_height);
 
    // TODO:these are probably leaked, however freeing them often causes a segfault!
-  SDL_Surface *icon = IMG_ReadXPMFromArray(sear_icon_xpm);
+  // TODO: SDL_image still uses non-const ref
+  SDL_Surface *icon = IMG_ReadXPMFromArray(const_cast<char**>(sear_icon_xpm));
   SDL_WM_SetIcon(icon, NULL);
   SDL_FreeSurface(icon);
 

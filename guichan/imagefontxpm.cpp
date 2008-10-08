@@ -75,10 +75,10 @@
 namespace gcn
 {
 
-ImageFontXPM::ImageFontXPM(const std::string &name, char **array, const std::string &glyphs) {
+ImageFontXPM::ImageFontXPM(const std::string &name, const char **array, const std::string &glyphs) {
   mFilename = name;
 
-  SDL_Surface *s = IMG_ReadXPMFromArray(array);
+  SDL_Surface *s = IMG_ReadXPMFromArray(const_cast<char**>(array));
   SDL_Surface *surface = convertToStandardFormat(s);
   SDL_FreeSurface(s);
 

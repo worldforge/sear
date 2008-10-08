@@ -1,5 +1,5 @@
 /* XPM */
-static char * default_image_xpm[] = {
+static const char * default_image_xpm[] = {
 "128 128 11 1",
 " 	c None",
 ".	c #FFFFFF",

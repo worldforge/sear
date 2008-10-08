@@ -1,5 +1,5 @@
 /* XPM */
-static char * rpgfont_xpm[] = {
+static const char * rpgfont_xpm[] = {
 "256 63 3 1",
 " 	c None",
 ".	c #FFFF00",

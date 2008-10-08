@@ -1,3 +1,11 @@
+2008-10-08  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/imagefontxpm.cpp, guichan/imagefontxpm.h, guichan/rpgfont.h,
+	  renderers/GL.cpp, renderers/TextureManager.cpp,
+	  renderers/default_image.xpm, src/sear_icon.xpm : Make xpm definitions
+	  const to avoid compiler warning. Use const_cast in 
+	  IMG_ReadXPMFromArray.
+
 2008-10-07  Simon Goodall  <simon@worldforge.org>
 
 	* renderers/CameraSystem.cpp: Allow default camera to be set in config

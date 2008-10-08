@@ -98,7 +98,7 @@ pqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"); @endcode
     {
     public:
 
-        ImageFontXPM(const std::string &name, char **array, const std::string &glyphs);
+        ImageFontXPM(const std::string &name, const char **array, const std::string &glyphs);
 
 
         /**
