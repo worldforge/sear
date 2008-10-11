@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 // $Id: Graphics.cpp,v 1.74 2008-10-05 09:54:17 simon Exp $
 
@@ -598,7 +598,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
     // Make sure we don't redraw the attached objects
     bool da = obj->draw_attached;
     obj->draw_attached = false;
-    drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+    drawObjectExt("generic_wireframe", obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed, dist);
     obj->draw_attached = da;
   }
 
@@ -606,7 +606,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
   //      try to add any attached meshes to the render queue. This means the 
   //      same entity can be rendered multiple times!
   for (I = Ibegin; I != Iend; ++I) {
-    drawObjectExt(*I, obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed);
+    drawObjectExt(*I, obj, obj_we, select_mode, render_queue, message_list, name_list, time_elapsed, dist);
   }
  
   // if rendering, add any messages
@@ -625,7 +625,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
                         Render::MessageList &name_list,
-                        float time_elapsed) {
+                        float time_elapsed, float camera_dist) {
 
   // retrieve or create the model and modelRecord as necessary
   SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(model_id, obj_we);
@@ -640,8 +640,18 @@ void Graphics::drawObjectExt(const std::string &model_id,
 
   // Update Model
   if (!select_mode) { // Only needs to be done once a frame
+    // Reduce detail level according to camera distance. Must be called before
+    // model->update.
+    // TODO: This might need some better scaling
+    model->setDetailLevel(1.0f / camera_dist);
+
+    // If we are fading in/out, then we update here
     obj_we->updateFade(time_elapsed);
+
+    // Update any animations with elapsed time
     modelRec->model->update(time_elapsed);
+
+    // Update last used time to delay model unloading.
     modelRec->model->setLastTime(System::instance()->getTimef());
   } 
 
@@ -771,7 +781,6 @@ void Graphics::drawObjectExt(const std::string &model_id,
                     message_list,
                     name_list,
                     time_elapsed);
-
     }
   }
 }
@@ -808,120 +817,31 @@ void Graphics::readConfig(varconf::Config &config) {
   varconf::Variable temp;
 
   // Read Distances for quality queues
-//  if (config.findItem(SECTION_graphics, KEY_low_dist)) {
-//    temp =  config.getItem(SECTION_graphics, KEY_low_dist);
-//    m_low_dist = (!temp.is_double()) ? (DEFAULT_low_dist) : ((double)(temp));
-//  } else {
-//    m_low_dist = DEFAULT_low_dist;
-//  } 
-  if (config.findItem(SECTION_graphics, KEY_medium_dist)) {
-    temp = config.getItem(SECTION_graphics, KEY_medium_dist);
-    m_medium_dist = (!temp.is_double()) ? (DEFAULT_medium_dist) : ((double)(temp));
-  } else {
-    m_medium_dist = DEFAULT_medium_dist;
-  } 
-  if (config.findItem(SECTION_graphics, KEY_high_dist)) {
-    temp = config.getItem(SECTION_graphics, KEY_high_dist);
-    m_high_dist = (!temp.is_double()) ? (DEFAULT_high_dist) : ((double)(temp));
-  } else {
-    m_high_dist = DEFAULT_high_dist;
-  } 
+  // m_low_dist = readDoubleValue(config, SECTION_graphics, KEY_low_dist, DEFAULT_low_dist);
+  m_medium_dist = readDoubleValue(config, SECTION_graphics, KEY_medium_dist, DEFAULT_medium_dist);
+  m_high_dist = readDoubleValue(config, SECTION_graphics, KEY_high_dist, DEFAULT_high_dist);
+
   // Read Fire properties 
-  if (config.findItem(SECTION_graphics, KEY_fire_ac)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_ac);
-    m_fire.attenuation_constant = (!temp.is_double()) ? (DEFAULT_fire_ac) : ((double)(temp));
-  } else {
-    m_fire.attenuation_constant = DEFAULT_fire_ac;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_al)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_al);
-    m_fire.attenuation_linear = (!temp.is_double()) ? (DEFAULT_fire_al) : ((double)(temp));
-  } else {
-    m_fire.attenuation_linear = DEFAULT_fire_al;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_aq)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_aq);
-    m_fire.attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_fire_aq) : ((double)(temp));
-  } else {
-    m_fire.attenuation_quadratic = DEFAULT_fire_aq;
-  }
+  m_fire.attenuation_constant = readDoubleValue(config, SECTION_graphics, KEY_fire_ac, DEFAULT_fire_ac);
+  m_fire.attenuation_linear = readDoubleValue(config, SECTION_graphics, KEY_fire_al, DEFAULT_fire_al);
+  m_fire.attenuation_quadratic = readDoubleValue(config, SECTION_graphics, KEY_fire_aq, DEFAULT_fire_aq);
 
-  if (config.findItem(SECTION_graphics, KEY_fire_amb_red)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_amb_red);
-    m_fire.ambient[0] = (!temp.is_double()) ? (DEFAULT_fire_amb_red) : ((double)(temp));
-  } else {
-    m_fire.ambient[0] = DEFAULT_fire_amb_red;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_amb_green)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_amb_green);
-    m_fire.ambient[1] = (!temp.is_double()) ? (DEFAULT_fire_amb_green) : ((double)(temp));
-  } else {
-    m_fire.ambient[1] = DEFAULT_fire_amb_green;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_amb_blue)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_amb_blue);
-    m_fire.ambient[2] = (!temp.is_double()) ? (DEFAULT_fire_amb_blue) : ((double)(temp));
-  } else {
-    m_fire.ambient[3] = DEFAULT_fire_amb_blue;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_amb_alpha)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_amb_alpha);
-    m_fire.ambient[3] = (!temp.is_double()) ? (DEFAULT_fire_amb_alpha) : ((double)(temp));
-  } else {
-    m_fire.ambient[4] = DEFAULT_fire_amb_alpha;
-  }
+  m_fire.ambient[0] = readDoubleValue(config, SECTION_graphics, KEY_fire_amb_red, DEFAULT_fire_amb_red);
+  m_fire.ambient[1] = readDoubleValue(config, SECTION_graphics, KEY_fire_amb_green, DEFAULT_fire_amb_green);
+  m_fire.ambient[2] = readDoubleValue(config, SECTION_graphics, KEY_fire_amb_blue, DEFAULT_fire_amb_blue);
+  m_fire.ambient[3] = readDoubleValue(config, SECTION_graphics, KEY_fire_amb_alpha, DEFAULT_fire_amb_alpha);
 
 
-  if (config.findItem(SECTION_graphics, KEY_fire_diff_red)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_diff_red);
-    m_fire.diffuse[0] = (!temp.is_double()) ? (DEFAULT_fire_diff_red) : ((double)(temp));
-  } else {
-    m_fire.diffuse[0] = DEFAULT_fire_diff_red;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_diff_green)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_diff_green);
-    m_fire.diffuse[1] = (!temp.is_double()) ? (DEFAULT_fire_diff_green) : ((double)(temp));
-  } else {
-    m_fire.diffuse[1] = DEFAULT_fire_diff_green;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_diff_blue)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_diff_blue);
-    m_fire.diffuse[2] = (!temp.is_double()) ? (DEFAULT_fire_diff_blue) : ((double)(temp));
-  } else {
-    m_fire.diffuse[2] =  DEFAULT_fire_diff_blue;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_diff_alpha)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_diff_alpha);
-    m_fire.diffuse[3] = (!temp.is_double()) ? (DEFAULT_fire_diff_alpha) : ((double)(temp));
-  } else {
-    m_fire.diffuse[3] = DEFAULT_fire_diff_alpha;
-  }
+  m_fire.diffuse[0] = readDoubleValue(config, SECTION_graphics, KEY_fire_diff_red, DEFAULT_fire_diff_red);
+  m_fire.diffuse[1] = readDoubleValue(config, SECTION_graphics, KEY_fire_diff_green, DEFAULT_fire_diff_green);
+  m_fire.diffuse[2] = readDoubleValue(config, SECTION_graphics, KEY_fire_diff_blue, DEFAULT_fire_diff_blue);
+  m_fire.diffuse[3] = readDoubleValue(config, SECTION_graphics, KEY_fire_diff_alpha, DEFAULT_fire_diff_alpha);
 
-  if (config.findItem(SECTION_graphics, KEY_fire_spec_red)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_spec_red);
-    m_fire.specular[0] = (!temp.is_double()) ? (DEFAULT_fire_spec_red) : ((double)(temp));
-  } else {
-    m_fire.specular[0] = DEFAULT_fire_spec_red;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_spec_green)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_spec_green);
-    m_fire.specular[1] = (!temp.is_double()) ? (DEFAULT_fire_spec_green) : ((double)(temp));
-  } else {
-    m_fire.specular[1] = DEFAULT_fire_spec_green;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_spec_blue)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_spec_blue);
-    m_fire.specular[2] = (!temp.is_double()) ? (DEFAULT_fire_spec_blue) : ((double)(temp));
-  } else {
-    m_fire.specular[2] = DEFAULT_fire_spec_blue;
-  }
-  if (config.findItem(SECTION_graphics, KEY_fire_spec_alpha)) {
-    temp = config.getItem(SECTION_graphics, KEY_fire_spec_alpha);
-    m_fire.specular[3] = (!temp.is_double()) ? (DEFAULT_fire_spec_alpha) : ((double)(temp));
-  } else {
-    m_fire.specular[3] = DEFAULT_fire_spec_alpha;
-  }
 
+  m_fire.specular[0] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_red, DEFAULT_fire_spec_red);
+  m_fire.specular[1] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_green, DEFAULT_fire_spec_green);
+  m_fire.specular[2] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_blue, DEFAULT_fire_spec_blue);
+  m_fire.specular[3] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_alpha, DEFAULT_fire_spec_alpha);
 }  
 
 void Graphics::writeConfig(varconf::Config &config) {

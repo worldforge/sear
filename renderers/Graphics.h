@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 // $Id: Graphics.h,v 1.20 2008-05-08 20:22:56 simon Exp $
 
@@ -132,7 +132,7 @@ private:
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
                         Render::MessageList &name_list,
-                        float time_elapsed);
+                        float time_elapsed, float camera_dist);
                         
     void drawFire(WorldEntity*);
     
