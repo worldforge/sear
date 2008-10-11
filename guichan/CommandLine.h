@@ -13,6 +13,10 @@ namespace Sear {
 
 class CommandLine : public gcn::TextField
 {
+public:
+  CommandLine(const std::string &txt) :
+    TextField(txt) {}
+
 protected:
   virtual void keyPressed(gcn::KeyEvent& key) {
     if (key.getKey().getValue() == gcn::Key::ENTER) {

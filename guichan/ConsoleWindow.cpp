@@ -53,7 +53,7 @@ ConsoleWindow::ConsoleWindow() : gcn::Window("Console")
 
   vbox->pack(m_scrollArea);
 
-  m_entry = new CommandLine;
+  m_entry = new CommandLine("");
   m_widgets.push_back(SPtr<gcn::Widget>(m_entry));
   m_entry->setWidth(400);
   m_entry->setTabInEnabled(false);
@@ -81,6 +81,8 @@ void ConsoleWindow::lineEntered()
   } else {
     System::instance()->runCommand(m_entry->getText());
     m_entry->setText("");
+    // Reset caret position. This could (is?) a guichan svn bug. setText should do this!
+    m_entry->setCaretPosition(0);
   }
 }
 

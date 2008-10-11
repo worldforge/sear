@@ -1,3 +1,8 @@
+2008-10-10  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/CommandLine.h, guichan/ConsoleWindow.cpp: Fix/Work around
+	  some issues with guichan api changes.
+
 2008-10-09  Simon Goodall  <simon@worldforge.org>
   
  	* guichan/passwordfield.cpp: Update to include border/highlight code
