@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #ifndef SEAR_ENVIRONMENT_H
 #define SEAR_ENVIRONMENT_H 1
@@ -55,7 +55,8 @@ public:
   void contextCreated();
   void contextDestroyed(bool check);
 
-  void registerArea(Mercator::Area* we);
+  void addArea(Mercator::Area* we);
+  void removeArea(Mercator::Area* we);
   void registerTerrainShader(Mercator::Shader* s, const std::string& texId);
   
   void resetWorld();

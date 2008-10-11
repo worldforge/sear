@@ -1,5 +1,11 @@
 2008-10-11  Simon Goodall  <simon@worldforge.org>
 
+	* environment/Environment.cpp, environment/Environment.h,
+	  loaders/AreaModel.cpp: Remove Mercator areas when models are
+	  unloaded. Renamed Env::registerArea to addArea.
+
+2008-10-11  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/Graphics.cpp, renderers/Graphics.h: Hook in model detail
 	  level changes based on distance of model from camera.
 

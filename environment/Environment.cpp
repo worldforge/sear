@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #include <sigc++/object_slot.h>
 
@@ -118,7 +118,12 @@ void Environment::contextDestroyed(bool check) {
   m_skyDome->contextDestroyed(check);
 }
 
-void Environment::registerArea(Mercator::Area* ar)
+void Environment::removeArea(Mercator::Area* ar)
+{
+    assert(ar);
+    m_terrain->m_terrain.removeArea(ar);
+}
+void Environment::addArea(Mercator::Area* ar)
 {
     assert(ar);
     m_terrain->m_terrain.addArea(ar);

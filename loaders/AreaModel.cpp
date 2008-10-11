@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2007 Simon Goodall
+// Copyright (C) 2005 - 2008 Simon Goodall
 
 #include <iostream>
 
@@ -82,7 +82,7 @@ bool AreaModel::init() {
   poly.shift(WFMath::Vector<2>(pos.x(), pos.y()));
     
   m_area->setShape(poly);
-  Environment::getInstance().registerArea(m_area);
+  Environment::getInstance().addArea(m_area);
   m_initialised = true;
   return true;
 }
@@ -93,7 +93,8 @@ void AreaModel::contextDestroyed(bool check) {}
 int AreaModel::shutdown()
 {
   assert (m_initialised == true);
-
+  Environment::getInstance().removeArea(m_area);
+  delete m_area; m_area = NULL;
   m_initialised = false;
 
   return 0;
