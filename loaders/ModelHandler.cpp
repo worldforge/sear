@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 // $Id: ModelHandler.cpp,v 1.41 2008-10-05 10:03:15 simon Exp $
 
@@ -46,6 +46,7 @@ namespace Sear {
 static const std::string CMD_LOAD_MODEL_RECORDS = "load_model_records";
 static const std::string CMD_dump_object = "dump_object";
 static const std::string CMD_reload_config_models = "reload_config_models";
+static const std::string CMD_unload_models = "unload_models";
 
 static const std::string ATTR_GUISE= "guise";
 static const std::string ATTR_MODE = "mode";
@@ -269,6 +270,7 @@ void ModelHandler::registerCommands(Console *console) {
   console->registerCommand(CMD_LOAD_MODEL_RECORDS, this);
   console->registerCommand(CMD_dump_object, this);
   console->registerCommand(CMD_reload_config_models, this);
+  console->registerCommand(CMD_unload_models, this);
 }
 
 void ModelHandler::runCommand(const std::string &command, const std::string &args) {
@@ -375,6 +377,10 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
       loadModelRecords(args_cpy);
     }
     contextCreated();
+  }
+  else
+  if (command == CMD_unload_models) {
+    checkModelTimeouts(false);
   }
 }
 void ModelHandler::contextCreated() {

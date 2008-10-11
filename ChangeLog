@@ -1,5 +1,9 @@
 2008-10-11  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/ModelHandler.cpp: Add command to trigger model unloading.
+
+2008-10-11  Simon Goodall  <simon@worldforge.org>
+
 	* environment/Environment.cpp, environment/Environment.h,
 	  loaders/AreaModel.cpp: Remove Mercator areas when models are
 	  unloaded. Renamed Env::registerArea to addArea.
