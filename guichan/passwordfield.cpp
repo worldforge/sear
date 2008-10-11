@@ -42,21 +42,46 @@ PasswordField::PasswordField(const std::string& text, gcn::ActionListener *a, co
 
 void PasswordField::draw(gcn::Graphics *graphics)
 {
-    graphics->setColor(getBackgroundColor());
-    graphics->fillRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
+      std::string stars;
+      stars.assign(getText().size(), '*');
 
-    std::string stars;
-    stars.assign(mText.length(), '*');
+     gcn::Color faceColor = getBaseColor();
+     gcn::Color highlightColor, shadowColor;
+     int alpha = getBaseColor().a;
+     highlightColor = faceColor + 0x303030;
+     highlightColor.a = alpha;
+     shadowColor = faceColor - 0x303030;
+     shadowColor.a = alpha;
+ 
+     // Draw a border.
+     graphics->setColor(shadowColor);
+     graphics->drawLine(0, 0, getWidth() - 1, 0);
+     graphics->drawLine(0, 1, 0, getHeight() - 2);
+     graphics->setColor(highlightColor);
+     graphics->drawLine(getWidth() - 1, 1, getWidth() - 1, getHeight() - 1);
+     graphics->drawLine(0, getHeight() - 1, getWidth() - 1, getHeight() - 1);
+ 
+     // Push a clip area so the other drawings don't need to worry
+     // about the border.
+     graphics->pushClipArea(gcn::Rectangle(1, 1, getWidth() - 2, getHeight() - 2));
+ 
+     graphics->setColor(getBackgroundColor());
+     graphics->fillRectangle(gcn::Rectangle(0, 0, getWidth(), getHeight()));
 
-    if (isFocused()) {
-        drawCaret(graphics,
-                getFont()->getWidth(stars.substr(0, mCaretPosition)) -
-                mXScroll);
-    }
+     if (isFocused())
+     {
+       drawCaret(graphics,
+       getFont()->getWidth(stars.substr(0, getCaretPosition())) -
+       mXScroll);
+       //drawCaret(graphics, mText->getCaretX(getFont()) - mXScroll);
+     }
+ 
+     graphics->setColor(getForegroundColor());
+     graphics->setFont(getFont());
+ 
+     graphics->drawText(stars, 1 - mXScroll, 1);
 
-    graphics->setColor(getForegroundColor());
-    graphics->setFont(getFont());
-    graphics->drawText(stars, 1 - mXScroll, 1);
+     graphics->popClipArea();
 }
 
 void PasswordField::keyPressed(gcn::KeyEvent& key) {

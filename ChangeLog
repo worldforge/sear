@@ -1,3 +1,8 @@
+2008-10-09  Simon Goodall  <simon@worldforge.org>
+  
+ 	* guichan/passwordfield.cpp: Update to include border/highlight code
+ 	  from textfield class.
+ 
 2008-10-08  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/imagefontxpm.cpp, guichan/imagefontxpm.h, guichan/rpgfont.h,
