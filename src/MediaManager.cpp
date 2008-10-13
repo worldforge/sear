@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2008  Simon Goodall
 
 // $Id: MediaManager.cpp,v 1.9 2007-09-23 08:31:35 simon Exp $
 
@@ -16,8 +16,6 @@
 #include "src/System.h"
 
 #include "MediaManager.h"
-
-
 
 /*
   We need to record the updates files we have downloaded. If we assume there is only one channel, then we can 
@@ -63,9 +61,13 @@ static const std::string CMD_disable_updates = "disable_updates";
 static const std::string CMD_download_file = "download_file";
 static const std::string CMD_download_updates = "download_updates";
 
-
+/**
+ * Log a download to the temporary wfut.xml file. Should the real wfut.xml not
+ *  be created/updated, we will not need to re-download updates.
+ */
 static void recordUpdate(const WFUT::FileObject &fo, const std::string &tmpfile) {
   FILE *fp = 0;
+  // If file does not exist, write out the xml header first.
   if (!WFUT::os_exists(tmpfile)) {
     // Write header 
     fp = fopen(tmpfile.c_str(), "wt");
@@ -76,12 +78,14 @@ static void recordUpdate(const WFUT::FileObject &fo, const std::string &tmpfile)
     fprintf(fp, "<?xml version=\"1.0\"?>\n");
     fprintf(fp, "<fileList dir=\"\">\n");
   } else {
+    // Otherwise we append records to the existing file.
     fp = fopen(tmpfile.c_str(), "at");
     if (!fp) {
       //error
       return;
     }
   }
+  // Append record.
   fprintf(fp, "<file filename=\"%s\" version=\"%d\" crc32=\"%lu\" size=\"%ld\" execute=\"%s\"/>\n", WFUT::Encoder::encodeString(fo.filename).c_str(), fo.version, fo.crc32, fo.size, (fo.execute) ? ("true") : ("false"));
   fclose(fp);
 }
@@ -134,6 +138,7 @@ int MediaManager::init() {
   // Hook up signals
   m_wfut.DownloadComplete.connect(sigc::mem_fun(this, &MediaManager::onDownloadComplete));
   m_wfut.DownloadFailed.connect(sigc::mem_fun(this, &MediaManager::onDownloadFailed));
+  m_wfut.UpdateReason.connect(sigc::mem_fun(this, &MediaManager::onUpdateReason));
 
   m_initialised = true;
 
@@ -253,24 +258,29 @@ MediaManager::MediaStatus MediaManager::checkFile(const std::string &filename, M
 int MediaManager::checkForUpdates() {
   assert(m_initialised == true);
 
+  // Construct filename of local wfut.xml file
   std::string local_wfut = m_local_root + "/" + m_channel_name + "/" + STR_wfut_xml; 
+  // Expand variables
   System::instance()->getFileHandler()->getFilePath(local_wfut);
   if (debug) printf("[MediaManager] Local WFUT: %s\n", local_wfut.c_str());
-  
-  m_wfut.getLocalList(local_wfut, m_local_list);
 
+  // Read local list from disk  
+  m_wfut.getLocalList(local_wfut, m_local_list);
 
   // Look for tmpwfut file. If it exists, update the local files list.
   std::string local_path = m_local_root + "/" + m_channel_name + "/";
+  // Expand variables
   System::instance()->getFileHandler()->getFilePath(local_path);
 
+  // Build location of tempwfut.xml
   const std::string &tmp_wfut = local_path  + "/" + STR_tempwfut;
-  if (debug) printf("Tmp wfut: %s\n", tmp_wfut.c_str());
+  if (debug) printf("[MediaManager] Tmp wfut: %s\n", tmp_wfut.c_str());
 
+  // Load temwfut.xml if it exists and update the in-memory local wfut file.
   WFUT::ChannelFileList tmplist;
   if (WFUT::os_exists(tmp_wfut)) {
     if (m_wfut.getLocalList(tmp_wfut, tmplist)) {
-      fprintf(stderr, "Error reading tmpwfut.xml file\n");
+      fprintf(stderr, "[MediaManager] Error reading tmpwfut.xml file\n");
     } else {
       const WFUT::FileMap &fm = tmplist.getFiles();
       WFUT::FileMap::const_iterator I = fm.begin();
@@ -281,24 +291,32 @@ int MediaManager::checkForUpdates() {
     }
   }
 
+  // Build up system wfut.xml filename
   std::string system_wfut = m_system_root + "/" + m_channel_name + "/" + STR_wfut_xml; 
+  // Expand filename
   System::instance()->getFileHandler()->getFilePath(system_wfut);
   if (debug) printf("[MediaManager] System WFUT: %s\n", system_wfut.c_str());
-  
+ 
+  // Read system wfut.xml 
   m_wfut.getLocalList(system_wfut, m_system_list) ;
 
   // No need to download server list, or calculate updates if we do not want any
+  // TODO: Why do we wait till here to return? -- Possibly this was part of the dynamic update stuff.
   if (!m_updates_enabled) return 0;
- 
+
+  // Build up server URL of remote update.
   const std::string &server_wfut = m_server_root + "/" + m_channel_name + "/" + STR_wfut_xml;
   if (debug) printf("[MediaManager] Server WFUT: %s\n", server_wfut.c_str());
   if (m_wfut.getFileList(server_wfut, m_server_list)) {
     // Error getting server list
+    fprintf(stderr, "[MediaManager] Error obtaining remote wfut.xml\n"); 
     return 1;
   }
 
   if (debug) printf("[MediaManager] Calculating Updates\n");
+  // Clear pending updates list
   m_updates_list.clear();
+  // Calculate new updates list
   if (m_wfut.calculateUpdates(m_server_list, m_system_list, m_local_list, m_updates_list, local_path)) {
     // Error!
     fprintf(stderr, "[MediaManager] Error Calculating Updates\n");
@@ -314,9 +332,26 @@ void MediaManager::onDownloadComplete(const std::string &url, const std::string 
 }
 
 void MediaManager::onDownloadFailed(const std::string &url, const std::string &filename, const std::string &reason) {
-  
   printf("DownloadFailed: %s - %s\n", filename.c_str(), reason.c_str());
   DownloadFailed.emit(url, filename, reason);
+}
+
+/**
+ * This callback is fired when calculating updates. It tells us the reason each
+ *file is selected for an update or not.
+ */ 
+void MediaManager::onUpdateReason(const std::string &filename, const WFUT::WFUTUpdateReason &reason) {
+ //#DownloadFailed.emit(url, filename, reason);
+ // printf("UpdateReason: %s - %d\n", filename.c_str(), reason);
+}
+
+void MediaManager::saveList(const std::string &filename, const WFUT::ChannelFileList &list) {
+  WFUT::WFUTError err = m_wfut.saveLocalList(list, filename);
+  // TODO: Handle error
+}
+
+void MediaManager::cancelAll() {
+  m_wfut.cancelAll();
 }
 
 } /* namespace Sear */

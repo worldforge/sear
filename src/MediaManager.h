@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
-
-// $Id: MediaManager.h,v 1.3 2007-05-06 17:01:50 simon Exp $
+// Copyright (C) 2007 - 2008 Simon Goodall
 
 #ifndef SEAR_MEDIA_MANAGER_H
 #define SEAR_MEDIA_MANAGER_H 1
@@ -33,6 +31,7 @@ public:
     MEDIA_CONFIG
   } MediaType;
 
+  // Enum listing status of media. Will be used with dynamic updates.
   typedef enum {
     STATUS_OK = 0,
     STATUS_USE_OLD,
@@ -55,8 +54,11 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-
-  // Need to call repeatedly to download files.
+  /** Poll the media manager.
+   * This method performs some downloading and updates internal structures when
+   * a file download completes (sucessfully or not).
+   * @return Number of outstanding file downloads. 
+   */
   int poll();
 
   // This function is used to request the status of a particular file.
@@ -83,12 +85,24 @@ public:
 
   size_t getNumUpdates() const { return m_updates_list.size(); }
 
+  /** Save local list to disk
+   */
+  void saveList(const std::string &filename, const WFUT::ChannelFileList &list);
+
+  /** Abort all current and pending updates.
+   * Currently no feedback is given to the user.
+   */ 
+  void cancelAll();
+
 private:
+  // Internal handlers for libWFUT callbacks 
   void onDownloadComplete(const std::string &url, const std::string &filename);
   void onDownloadFailed(const std::string &url, const std::string &filename, const std::string &reason);
+void onUpdateReason(const std::string &filename, const WFUT::WFUTUpdateReason &reason) ;
 
-
+  // Flag indicating object initiialisation status
   bool m_initialised;
+  // Flag indicating whether or not to download updates
   bool m_updates_enabled;
 
   WFUT::WFUTClient m_wfut;
@@ -102,7 +116,6 @@ private:
   WFUT::ChannelFileList m_system_list;
   WFUT::ChannelFileList m_local_list;
   WFUT::ChannelFileList m_updates_list;
-
 };
 
 } /* namespace Sear */

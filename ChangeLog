@@ -1,5 +1,11 @@
 2008-10-13  Simon Goodall  <simon@worldforge.org>
 
+	* src/MediaManager.cpp, src/MediaManger.h: Add cancelAll method. Add
+	  basic saveLocalList implementation. Add hook into 
+	  WFUTClient::UpdateReason callback.
+
+2008-10-13  Simon Goodall  <simon@worldforge.org>
+
 	* environment/Environment.cpp, environment/Environment.h, 
 	  environment/Weather.cpp, environment/Weather.h, src/System.cpp: A
 	  config option to the Weather component to disable rain rendering. 
