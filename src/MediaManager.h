@@ -82,6 +82,7 @@ public:
 //  Signal<void, MediaType, const std::string &> onDownloadFailed;
   sigc::signal<void, const std::string&, const std::string&> DownloadComplete;
   sigc::signal<void, const std::string&, const std::string&, const std::string&> DownloadFailed;
+  sigc::signal<void, const std::string&, const WFUT::WFUTUpdateReason&> UpdateReason;
 
   size_t getNumUpdates() const { return m_updates_list.size(); }
 

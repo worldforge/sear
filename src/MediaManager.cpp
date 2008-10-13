@@ -341,7 +341,7 @@ void MediaManager::onDownloadFailed(const std::string &url, const std::string &f
  *file is selected for an update or not.
  */ 
 void MediaManager::onUpdateReason(const std::string &filename, const WFUT::WFUTUpdateReason &reason) {
- //#DownloadFailed.emit(url, filename, reason);
+ UpdateReason.emit(filename, reason);
  // printf("UpdateReason: %s - %d\n", filename.c_str(), reason);
 }
 
