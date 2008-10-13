@@ -1,5 +1,11 @@
 2008-10-13  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/WFUTWindow.cpp, guichan/WFUTWindow.h: Create a message/log
+	  area to display lots of data. Output which files will be updated
+	  before starting update. Add a cancel button. 
+
+2008-10-13  Simon Goodall  <simon@worldforge.org>
+
 	* src/MediaManger.cpp, src/MediaManger.h: Create an UpdateReason
 	  callback passing on libwfut data.
 
