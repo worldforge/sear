@@ -159,6 +159,14 @@ float Environment::getVisibility() const {
 void Environment::update(float time_elapsed) {
   assert(m_initialised == true);
   m_weather->update(time_elapsed);
-
 }
+
+void Environment::readConfig(const varconf::Config &config) {
+  m_weather->readConfig(config);
+}
+
+void Environment::writeConfig(varconf::Config &config) const {
+  m_weather->writeConfig(config);
+}
+
 } // namespace Sear

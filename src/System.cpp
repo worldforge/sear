@@ -833,6 +833,7 @@ void System::readConfig(varconf::Config &config) {
   m_client->readConfig(config);
   RenderSystem::getInstance().readConfig(config);
   ModelSystem::getInstance().readConfig(config);
+  Environment::getInstance().readConfig(config);
   m_character->readConfig(config);
   m_calendar->readConfig(config);
   m_workarea->readConfig(m_general);
@@ -850,6 +851,7 @@ void System::writeConfig(varconf::Config &config) {
   m_client->writeConfig(config);
   RenderSystem::getInstance().writeConfig(config);
   ModelSystem::getInstance().writeConfig(config);
+  Environment::getInstance().writeConfig(config);
   m_character->writeConfig(config);
   m_calendar->writeConfig(config);
   m_workarea->writeConfig(m_general);

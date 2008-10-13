@@ -19,6 +19,10 @@ namespace Mercator {
     class Shader;
 }
 
+namespace varconf {
+  class Config;
+}
+
 namespace Sear {
 
 class Console;
@@ -40,6 +44,9 @@ public:
   static Environment &getInstance() {
     return instance;
   }
+
+  void readConfig(const varconf::Config &config);
+  void writeConfig(varconf::Config &config) const;
 
   float getHeight(float x, float y);
   void setBasePoint(int x, int y, float z);

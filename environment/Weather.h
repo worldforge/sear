@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2006 - 2007 Simon Goodall
+// Copyright (C) 2006 - 2008 Simon Goodall
 
 // $Id: Weather.h,v 1.7 2007-04-22 16:37:37 simon Exp $
 
@@ -11,6 +11,10 @@
 #include <Eris/Types.h>
 
 #include "interfaces/ConsoleObject.h"
+
+namespace varconf {
+  class Config;
+}
 
 namespace Sear {
 
@@ -26,6 +30,9 @@ public:
   int init();
   void shutdown();
   bool isInitialised() const { return m_initialised; }
+
+  void readConfig(const varconf::Config &);
+  void writeConfig(varconf::Config &) const;
 
   void setWeatherEntity(WorldEntity *we);
   void render();
@@ -46,6 +53,7 @@ private:
   float m_visibility, m_current_visibility;
 
   int m_rain_drop_id;
+  bool m_draw_rain;
 };
 
 } // namespace Sear

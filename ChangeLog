@@ -1,3 +1,9 @@
+2008-10-13  Simon Goodall  <simon@worldforge.org>
+
+	* environment/Environment.cpp, environment/Environment.h, 
+	  environment/Weather.cpp, environment/Weather.h, src/System.cpp: A
+	  config option to the Weather component to disable rain rendering. 
+
 2008-10-11  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/ModelHandler.cpp: Add command to trigger model unloading.

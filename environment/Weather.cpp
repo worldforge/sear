@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2006 - 2007  Simon Goodall
+// Copyright (C) 2006 - 2008  Simon Goodall
 
 /*
  * This class is meant to model weather in Sear.
@@ -27,6 +27,12 @@
 #include "Weather.h"
 
 static const bool debug = false;
+
+static const std::string SECTION_weather = "weather";
+
+static const std::string KEY_draw_rain = "draw_rain";
+
+static const bool DEFAULT_draw_rain = true;
 
 static const std::string ATTR_RAIN = "rain";
 static const std::string ATTR_SNOW = "snow";
@@ -104,7 +110,7 @@ void Weather::weatherChanged(const Eris::StringSet &s, Sear::WorldEntity *we) {
 }
    
 void Weather::render() {
-  if (m_rain==0.0f) return;
+  if (!m_draw_rain || m_rain==0.0f) return;
   // Render Rain effects.
   // TODO, check possible values for m_rain.
   // Make buf permanent.
@@ -208,6 +214,13 @@ void Weather::update(float time_elapsed) {
     if (m_current_visibility > m_visibility)
        m_current_visibility = m_visibility;
   }
+}
+
+void Weather::readConfig(const varconf::Config &config) {
+  m_draw_rain = readBoolValue(config, SECTION_weather, KEY_draw_rain, DEFAULT_draw_rain);
+}
+
+void Weather::writeConfig(varconf::Config &config) const {
 }
 
 
