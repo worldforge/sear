@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2008 Simon Goodall
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -8,8 +8,8 @@
 
 #include "SDL_loadso.h"
 
-#include "src/Bonjour.h"
-#include "src/Metaserver.h"
+#include "Bonjour.h"
+#include "Localserver.h"
 
 #include <string>
 #include <stdio.h>
@@ -72,7 +72,7 @@ public:
   }
 
   ResolverList resolvers;
-  Sear::Metaserver *meta;
+  Sear::Localserver *meta;
   DNSServiceRef client;
 #endif
 };
@@ -274,7 +274,7 @@ void Bonjour::poll() {
 #endif
 }
 
-int Bonjour::init(Metaserver *meta) {
+int Bonjour::init(Localserver *meta) {
   assert(m_initialised == false); 
 #ifdef HAVE_BONJOUR
   // Try and load the bonjour dll

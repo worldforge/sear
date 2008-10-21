@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2007 Simon Goodall
 
-// $Id: Metaserver.h,v 1.4 2008-05-08 20:22:56 simon Exp $
+// $Id: Localserver.h,v 1.4 2008-05-08 20:22:56 simon Exp $
 
 #ifndef SEAR_METASERVER_H
 #define SEAR_METASERVER_H 1
@@ -45,10 +45,10 @@ typedef struct {
 
 typedef std::map<std::string, ServerObject> ServerList;
 
-class Metaserver : public ConsoleObject, public sigc::trackable {
+class Localserver : public ConsoleObject, public sigc::trackable {
 public:
-  Metaserver();
-  ~Metaserver();
+  Localserver();
+  ~Localserver();
 
   int init();
   void shutdown();

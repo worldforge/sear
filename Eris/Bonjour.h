@@ -11,14 +11,14 @@ class BonjourUserData;
 
 namespace Sear {
 
-class Metaserver;
+class Localserver;
 
 class Bonjour {
 public:
   Bonjour();
   ~Bonjour();
 
-  int init(Metaserver *meta);
+  int init(Localserver *meta);
   void shutdown();
   bool isInitialised() const { return m_initialised; }
 

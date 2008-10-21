@@ -1,3 +1,11 @@
+2008-10-21  Simon Goodall  <simon@worldforge.org>
+
+	* Eris/Avahi.cpp, Eris/Avahi.h, Eris/Bonjour.cpp, Eris/Bonjour.h,
+	  Eris/Localserver.cpp, Eris/Localserver.h: Move Avahi/Bonjour and
+	  Metaserver code to Eris module with the aim of making this code more
+	  generic and potentially added to Eris. Re-named Metaserver to 
+	  Localserver to avoid name clashes.
+
 2008-10-13  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/WFUTWindow.cpp, guichan/WFUTWindow.h: Create a message/log

@@ -20,7 +20,7 @@
 #endif
 
 #include "Avahi.h"
-#include "Metaserver.h"
+#include "Localserver.h"
 
 #ifdef HAVE_AVAHI
 static void resolve_callback(
@@ -166,7 +166,7 @@ void Avahi::poll() {
 #endif
 }
 
-int Avahi::init(Metaserver *meta) {
+int Avahi::init(Localserver *meta) {
   assert(m_initialised == false);
 #ifdef HAVE_AVAHI
   m_ud = std::auto_ptr<UserData>(new UserData());

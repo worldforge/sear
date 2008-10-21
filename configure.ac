@@ -345,6 +345,7 @@ AC_OUTPUT([
 	Makefile
 	interfaces/Makefile
 	common/Makefile
+	Eris/Makefile
 	src/Makefile
 	loaders/Makefile
 	loaders/cal3d/Makefile

@@ -46,7 +46,7 @@
 #include "WorldEntity.h"
 #include "Editor.h"
 #include "CacheManager.h"
-#include "Metaserver.h"
+#include "Eris/Localserver.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -184,8 +184,8 @@ bool System::init(int argc, char *argv[]) {
   m_media_manager = std::auto_ptr<MediaManager>(new MediaManager());
   m_media_manager->init();
 
-  m_meta_server = std::auto_ptr<Metaserver>(new Metaserver());
-  m_meta_server->init();
+  m_local_server = std::auto_ptr<Localserver>(new Localserver());
+  m_local_server->init();
  
   // Connect signals for record processing 
 //  m_general.sigsv.connect(sigc::mem_fun(this, &System::varconf_callback));
@@ -208,7 +208,7 @@ bool System::init(int argc, char *argv[]) {
   m_file_handler->registerCommands(m_console.get());
   m_calendar->registerCommands(m_console.get());
   m_media_manager->registerCommands(m_console.get());
-  m_meta_server->registerCommands(m_console.get());
+  m_local_server->registerCommands(m_console.get());
 
   m_character = std::auto_ptr<Character>(new Character());
   m_character->init();
@@ -469,7 +469,7 @@ void System::mainLoop() {
       // poll network
       m_client->poll();
 
-      m_meta_server->poll();
+      m_local_server->poll();
 
       m_media_manager->poll();
 

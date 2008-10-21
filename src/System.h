@@ -32,7 +32,7 @@ class Workarea;
 class Character;
 //class Sound;
 class Editor;
-class Metaserver;
+class Localserver;
 
 typedef enum {
   SYS_UNKNOWN = 0,
@@ -187,7 +187,7 @@ public:
   Character *getCharacter() { return m_character.get(); }
   Client *getClient() { return m_client.get(); }
   MediaManager *getMediaManager() { return m_media_manager.get(); }
-  Metaserver *getMetaserver() { return m_meta_server.get(); }
+  Localserver *getLocalserver() { return m_local_server.get(); }
   
   static System *instance() { return m_instance; }
 
@@ -235,7 +235,7 @@ protected:
   std::auto_ptr<Workarea> m_workarea;
   std::auto_ptr<Character> m_character;
   std::auto_ptr<MediaManager> m_media_manager;
-  std::auto_ptr<Metaserver> m_meta_server;
+  std::auto_ptr<Localserver> m_local_server;
    
   varconf::Config m_general;
 

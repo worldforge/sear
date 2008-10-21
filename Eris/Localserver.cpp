@@ -1,10 +1,10 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2008 Simon Goodall
 
-#include "src/Metaserver.h"
-#include "src/Avahi.h"
-#include "src/Bonjour.h"
+#include "Localserver.h"
+#include "Avahi.h"
+#include "Bonjour.h"
 
 #include <cassert>
 
@@ -16,23 +16,23 @@ static const std::string CMD_refresh_servers = "refresh_server_list";
 
 namespace Sear {
 
-Metaserver::Metaserver() :
+Localserver::Localserver() :
   m_initialised(false),
   m_meta(0)
 {}
 
-Metaserver::~Metaserver() {
+Localserver::~Localserver() {
   if (m_initialised) shutdown();
 }
 
-int Metaserver::init() {
+int Localserver::init() {
   assert(m_initialised == false);
 
   // TODO Get params from configs
   m_meta = new Eris::Meta("metaserver.worldforge.org", 16);
 
   // Hook up signals
-  m_meta->ReceivedServerInfo.connect(sigc::mem_fun(this, &Metaserver::onReceivedServerInfo));
+  m_meta->ReceivedServerInfo.connect(sigc::mem_fun(this, &Localserver::onReceivedServerInfo));
 
   m_avahi = std::auto_ptr<Avahi>(new Avahi());
   if (m_avahi->init(this)) {
@@ -48,7 +48,7 @@ int Metaserver::init() {
 
   return 0;
 }
-void Metaserver::shutdown() {
+void Localserver::shutdown() {
   assert(m_initialised == true);
 
   m_avahi.release();
@@ -59,39 +59,39 @@ void Metaserver::shutdown() {
   m_initialised = false;
 }
 
-void Metaserver::registerCommands(Console *console) {
+void Localserver::registerCommands(Console *console) {
   assert(console);
   console->registerCommand(CMD_refresh_servers, this);
 }
-void Metaserver::runCommand(const std::string &command, const std::string &args) {
+void Localserver::runCommand(const std::string &command, const std::string &args) {
   if (command == CMD_refresh_servers) {
     m_meta->refresh();
   }
 }
  
 
-void Metaserver::poll() {
+void Localserver::poll() {
   assert(m_initialised == true);
   // metaserver polling is done during eris poll
   if (m_avahi.get()) m_avahi->poll();
   if (m_bonjour.get()) m_bonjour->poll();
 }
 
-void Metaserver::addServerObject(const ServerObject &so) {
+void Localserver::addServerObject(const ServerObject &so) {
   m_server_list[so.hostname] = so;
 }
 
  
-void Metaserver::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
+void Localserver::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   
 }
 
-void Metaserver::varconf_error_callback(const char *message) {
-  printf("[Metaserver] %s\n", message);
+void Localserver::varconf_error_callback(const char *message) {
+  printf("[Localserver] %s\n", message);
 }
 
 
-void Metaserver::onReceivedServerInfo(const Eris::ServerInfo &info) {
+void Localserver::onReceivedServerInfo(const Eris::ServerInfo &info) {
   ServerObject so;
   so.hostname    = info.getHostname();
   so.servername  = info.getServername();

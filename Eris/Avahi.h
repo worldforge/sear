@@ -13,14 +13,14 @@ class AvahiSimplePoll;
 class AvahiServiceBrowser;
 
 namespace Sear {
-class Metaserver;
+class Localserver;
 }
 
 typedef struct {
   AvahiClient *c;
   AvahiServiceBrowser *sb;
   AvahiSimplePoll *simple_poll;
-  Sear::Metaserver *meta;
+  Sear::Localserver *meta;
 } UserData;
 
 namespace Sear {
@@ -30,7 +30,7 @@ public:
   Avahi();
   ~Avahi();
 
-  int init(Metaserver *meta);
+  int init(Localserver *meta);
   void shutdown();
   bool isInitialised() const { return m_initialised; }
 

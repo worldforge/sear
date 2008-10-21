@@ -70,6 +70,7 @@ endif
 sear_bin_LDADD = \
 	libSear.a \
 	../common/libCommon.a \
+	../Eris/libEris.a \
 	../renderers/libRendererGL.a \
 	../environment/libEnvironment.a \
 	../loaders/libModelLoader.a \
@@ -119,10 +120,7 @@ libSear_a_SOURCES = \
 	TerrainEntity.cpp TerrainEntity.h \
 	binreloc.c binreloc.h \
 	error.cpp error.h \
-	MediaManager.cpp MediaManager.h \
-	Metaserver.cpp Metaserver.h \
-	Avahi.cpp Avahi.h \
-	Bonjour.cpp Bonjour.h
+	MediaManager.cpp MediaManager.h
 
 #	Sound.cpp \
 #	Sound.h 
