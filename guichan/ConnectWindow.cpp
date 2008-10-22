@@ -12,7 +12,7 @@
 #include "guichan/box.hpp"
 
 #include "src/System.h"
-#include "src/Metaserver.h"
+#include "Eris/Localserver.h"
 
 #include <guichan.hpp>
 
@@ -28,11 +28,11 @@ namespace Sear {
 class ServerListModel : public gcn::ListModel
 {
 public:
-  Metaserver *m_meta;
+  Localserver *m_meta;
 
   ServerListModel()
   {
-    m_meta = System::instance()->getMetaserver();
+    m_meta = System::instance()->getLocalserver();
     m_meta->runCommand("refresh_server_list", "");
   }
 

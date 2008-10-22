@@ -1,3 +1,8 @@
+2008-10-22  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ConnectWindow.cpp: Update for Metaserver to Localserver 
+	  rename. 
+
 2008-10-21  Simon Goodall  <simon@worldforge.org>
 
 	* Eris/Avahi.cpp, Eris/Avahi.h, Eris/Bonjour.cpp, Eris/Bonjour.h,
