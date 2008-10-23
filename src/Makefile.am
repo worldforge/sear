@@ -69,14 +69,14 @@ endif
 
 sear_bin_LDADD = \
 	libSear.a \
-	../common/libCommon.a \
-	../Eris/libEris.a \
 	../renderers/libRendererGL.a \
 	../environment/libEnvironment.a \
 	../loaders/libModelLoader.a \
 	../loaders/cal3d/libLoaderCal3d.a \
 	../gui/libGui.a \
 	../guichan/libGuichan.a \
+	../Eris/libEris.a \
+	../common/libCommon.a \
 	$(SEAR_RC_O) \
 	$(SEAR_EXT_LIBS)
 
