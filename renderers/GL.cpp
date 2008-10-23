@@ -259,6 +259,7 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
   SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE, m_sdl_gl_accum_green_size);
   SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, m_sdl_gl_accum_blue_size);
   SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE, m_sdl_gl_accum_alpha_size);
+  // This should always be zero for sear...
   SDL_GL_SetAttribute(SDL_GL_STEREO, m_sdl_gl_stereo);
   SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, m_sdl_gl_swap_control);
  SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, m_sdl_gl_accelerated_visual);
@@ -275,7 +276,6 @@ bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) 
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, m_sdl_gl_stencil_size);
    // SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1 );
   }
-
 
   const SDL_VideoInfo *info = SDL_GetVideoInfo();
   if (!info) {
@@ -460,6 +460,8 @@ int GL::checkError() {
 int GL::setupExtensions() {
   sage_init();
 
+  // Uncomment this line to disable VBO's and force use of vertex arrays and
+  // display lists.
   //sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;  
 
   if (sage_ext[GL_ARB_MULTITEXTURE]) {
@@ -915,8 +917,6 @@ void GL::writeConfig(varconf::Config &config) {
   config.setItem(RENDER, KEY_near_clip, m_near_clip);
   config.setItem(RENDER, KEY_far_clip_dist, m_far_clip_dist);
 
-
-
   config.setItem(RENDER, KEY_sdl_gl_red_size, m_sdl_gl_red_size);
   config.setItem(RENDER, KEY_sdl_gl_green_size, m_sdl_gl_green_size);
   config.setItem(RENDER, KEY_sdl_gl_blue_size, m_sdl_gl_blue_size);
@@ -937,7 +937,6 @@ void GL::writeConfig(varconf::Config &config) {
 
   config.setItem(RENDER, KEY_sdl_gl_multisamplesamples, m_sdl_gl_multisamplesamples);
   config.setItem(RENDER, KEY_sdl_gl_multisamplebuffers, m_sdl_gl_multisamplebuffers);
-
 }  
 
 void GL::setupStates() {
@@ -1265,6 +1264,9 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
   }
 }
 
+/**
+ * Render the list of entity names in the world.
+ */
 void GL::drawNameQueue(MessageList &list) {
   glColor4fv(blue);
   RenderSystem::getInstance().switchState(m_state_font);
@@ -1286,6 +1288,7 @@ void GL::drawNameQueue(MessageList &list) {
     glPopMatrix();
   }
 }
+
 void GL::drawMessageQueue(MessageList &list) {
   glColor4fv(yellow);
   RenderSystem::getInstance().switchState(m_state_font);
@@ -1489,123 +1492,96 @@ void GL::getModelviewMatrix(float m[4][4])
 }
 
 void GL::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
-  // TODO: Use Utility::readXXXValue
-  varconf::Variable temp;
   if (section == RENDER) {
     if (key == KEY_character_light_kc) {
-      temp = config.getItem(RENDER, KEY_character_light_kc);
-      m_lights[LIGHT_CHARACTER].attenuation_constant = (!temp.is_double()) ? (DEFAULT_character_light_kc) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_constant = readDoubleValue(config, section, key, DEFAULT_character_light_kc);
     }
     else if (key ==  KEY_character_light_kl) {
-      temp = config.getItem(RENDER, KEY_character_light_kl);
-      m_lights[LIGHT_CHARACTER].attenuation_linear = (!temp.is_double()) ? (DEFAULT_character_light_kl) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_linear = readDoubleValue(config, section, key, DEFAULT_character_light_kl);
     }
     else if (key == KEY_character_light_kq) {
-      temp = config.getItem(RENDER, KEY_character_light_kq);
-      m_lights[LIGHT_CHARACTER].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_character_light_kq) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].attenuation_quadratic = readDoubleValue(config, section, key, DEFAULT_character_light_kq);
     }
     else if (key == KEY_character_light_ambient_red) {
-      temp = config.getItem(RENDER, KEY_character_light_ambient_red);
-      m_lights[LIGHT_CHARACTER].ambient[0] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[0] = readDoubleValue(config, section, key, DEFAULT_character_light_ambient_red);
     }
     else if (key == KEY_character_light_ambient_green) {
-      temp = config.getItem(RENDER, KEY_character_light_ambient_green);
-      m_lights[LIGHT_CHARACTER].ambient[1] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[1] = readDoubleValue(config, section, key, DEFAULT_character_light_ambient_green);
     }
     else if (key == KEY_character_light_ambient_blue) {
-      temp = config.getItem(RENDER, KEY_character_light_ambient_blue);
-      m_lights[LIGHT_CHARACTER].ambient[2] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[2] = readDoubleValue(config, section, key, DEFAULT_character_light_ambient_blue);
     }
     else if (key == KEY_character_light_ambient_alpha) {
-      temp = config.getItem(RENDER, KEY_character_light_ambient_alpha);
-      m_lights[LIGHT_CHARACTER].ambient[3] = (!temp.is_double()) ? (DEFAULT_character_light_ambient_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].ambient[3] = readDoubleValue(config, section, key, DEFAULT_character_light_ambient_alpha);
     }
     else if (key == KEY_character_light_diffuse_red) {
-      temp = config.getItem(RENDER, KEY_character_light_diffuse_red);
-      m_lights[LIGHT_CHARACTER].diffuse[0] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[0] = readDoubleValue(config, section, key, DEFAULT_character_light_diffuse_red);
     }
     else if (key == KEY_character_light_diffuse_green) {
-      temp = config.getItem(RENDER, KEY_character_light_diffuse_green);
-      m_lights[LIGHT_CHARACTER].diffuse[1] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[1] = readDoubleValue(config, section, key, DEFAULT_character_light_diffuse_green);
     }
     else if (key == KEY_character_light_diffuse_blue) {
-      temp = config.getItem(RENDER, KEY_character_light_diffuse_blue);
-      m_lights[LIGHT_CHARACTER].diffuse[2] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[2] = readDoubleValue(config, section, key, DEFAULT_character_light_diffuse_blue);
     }
     else if (key == KEY_character_light_diffuse_alpha) {
-      temp = config.getItem(RENDER, KEY_character_light_diffuse_alpha);
-      m_lights[LIGHT_CHARACTER].diffuse[3] = (!temp.is_double()) ? (DEFAULT_character_light_diffuse_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].diffuse[3] = readDoubleValue(config, section, key, DEFAULT_character_light_diffuse_alpha);
     }
     else if (key == KEY_character_light_specular_red) {
-      temp = config.getItem(RENDER, KEY_character_light_specular_red);
-      m_lights[LIGHT_CHARACTER].specular[0] = (!temp.is_double()) ? (DEFAULT_character_light_specular_red) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[0] = readDoubleValue(config, section, key, DEFAULT_character_light_specular_red);
     }
     else if (key == KEY_character_light_specular_green) {
-      temp = config.getItem(RENDER, KEY_character_light_specular_green);
-      m_lights[LIGHT_CHARACTER].specular[1] = (!temp.is_double()) ? (DEFAULT_character_light_specular_green) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[1] = readDoubleValue(config, section, key, DEFAULT_character_light_specular_green);
     }
     else if (key == KEY_character_light_specular_blue) {
-      temp = config.getItem(RENDER, KEY_character_light_specular_blue);
-      m_lights[LIGHT_CHARACTER].specular[2] = (!temp.is_double()) ? (DEFAULT_character_light_specular_blue) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[2] = readDoubleValue(config, section, key, DEFAULT_character_light_specular_blue);
     }
     else if (key == KEY_character_light_specular_alpha) {
-      temp = config.getItem(RENDER, KEY_character_light_specular_alpha);
-      m_lights[LIGHT_CHARACTER].specular[3] = (!temp.is_double()) ? (DEFAULT_character_light_specular_alpha) : ((double)(temp));
+      m_lights[LIGHT_CHARACTER].specular[3] = readDoubleValue(config, section, key, DEFAULT_character_light_specular_alpha);
     }
     //Setup Sun light source
     else if (key == KEY_sun_light_kc) {
-      temp = config.getItem(RENDER, KEY_sun_light_kc);
-      m_lights[LIGHT_SUN].attenuation_constant = (!temp.is_double()) ? (DEFAULT_sun_light_kc) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_constant = readDoubleValue(config, section, key, DEFAULT_sun_light_kc);
     }
     else if (key == KEY_sun_light_kl) {
-      temp = config.getItem(RENDER, KEY_sun_light_kl);
-      m_lights[LIGHT_SUN].attenuation_linear = (!temp.is_double()) ? (DEFAULT_sun_light_kl) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_linear = readDoubleValue(config, section, key, DEFAULT_sun_light_kl);
     }
     else if (key == KEY_sun_light_kq) {
-      temp = config.getItem(RENDER, KEY_sun_light_kq);
-      m_lights[LIGHT_SUN].attenuation_quadratic = (!temp.is_double()) ? (DEFAULT_sun_light_kq) : ((double)(temp));
+      m_lights[LIGHT_SUN].attenuation_quadratic = readDoubleValue(config, section, key, DEFAULT_sun_light_kq);
     }
     // Setup render states
     else if (key == KEY_use_textures) {
-      temp = config.getItem(RENDER, KEY_use_textures);
-      RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, ((!temp.is_bool()) ? (DEFAULT_use_textures) : ((bool)(temp))));
+      bool b = readBoolValue(config, section, key, DEFAULT_use_textures);
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_TEXTURES, b);
     }
     else if (key == KEY_use_lighting) {
-      temp = config.getItem(RENDER, KEY_use_lighting);
-      RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, ((!temp.is_bool()) ? (DEFAULT_use_lighting) : ((bool)(temp))));
+      bool b = readBoolValue(config, section, key, DEFAULT_use_lighting);
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_LIGHTING, b);
     }
     else if (key == KEY_use_stencil) {
-      temp = config.getItem(RENDER, KEY_use_stencil);
-      RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, ((!temp.is_bool()) ? (DEFAULT_use_stencil) : ((bool)(temp))));  
+      bool b = readBoolValue(config, section, key, DEFAULT_use_stencil);
+      RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, b);
     }
     // Setup the speech offsets
     else if (key == KEY_speech_offset_x) {
-      temp = config.getItem(RENDER, KEY_speech_offset_x);
-      m_speech_offset_x = (!temp.is_double()) ? (DEFAULT_speech_offset_x) : ((double)(temp));
+      m_speech_offset_x = readDoubleValue(config, section, key, DEFAULT_speech_offset_x);
     }
     else if (key == KEY_speech_offset_y) {
-      temp = config.getItem(RENDER, KEY_speech_offset_y);
-      m_speech_offset_y = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+      m_speech_offset_y = readDoubleValue(config, section, key, DEFAULT_speech_offset_y);
     }
     else if (key == KEY_speech_offset_z) {
-      temp = config.getItem(RENDER, KEY_speech_offset_z);
-      m_speech_offset_z = (!temp.is_double()) ? (DEFAULT_speech_offset_y) : ((double)(temp));
+      m_speech_offset_z = readDoubleValue(config, section, key, DEFAULT_speech_offset_z);
     }
     else if (key == KEY_fog_start) {
-      temp = config.getItem(RENDER, KEY_fog_start);
-      m_fog_start = (!temp.is_double()) ? (DEFAULT_fog_start) : ((double)(temp));
+      m_fog_start = readDoubleValue(config, section, key, DEFAULT_fog_start);
     }
     else if (key == KEY_fog_end) {
-      temp = config.getItem(RENDER, KEY_fog_end);
-      m_fog_end = (!temp.is_double()) ? (DEFAULT_fog_end) : ((double)(temp));
+      m_fog_end = readDoubleValue(config, section, key, DEFAULT_fog_end);
     }
     else if (key == KEY_near_clip) {
-      temp = config.getItem(RENDER, KEY_near_clip);
-      m_near_clip = (!temp.is_double()) ? (DEFAULT_near_clip) : ((double)(temp));
+      m_near_clip = readDoubleValue(config, section, key, DEFAULT_near_clip);
     }
     else if (key == KEY_far_clip_dist) {
-      temp = config.getItem(RENDER, KEY_far_clip_dist);
-      m_far_clip_dist = (!temp.is_double()) ? (DEFAULT_far_clip_dist) : ((double)(temp));
+      m_far_clip_dist = readDoubleValue(config, section, key, DEFAULT_far_clip_dist);
     }
   }
 }
@@ -1638,6 +1614,7 @@ void GL::resize(int width, int height) {
     // Need a better error condition
     return;
   }
+
   // Have the textures been destroyed?
   if (!glIsTexture(1)) {
     printf("Warning, context lost after resize!\n");

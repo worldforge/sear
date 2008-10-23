@@ -1,5 +1,10 @@
 2008-10-23  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp: Update varconf_callback to use new readXXXValue
+	  methods.
+
+2008-10-23  Simon Goodall  <simon@worldforge.org>
+
 	* src/Makefile.am: Move libEris.a to correct place in link order.
 
 2008-10-23  Simon Goodall  <simon@worldforge.org>
