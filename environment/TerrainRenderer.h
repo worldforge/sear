@@ -18,6 +18,7 @@
 namespace Sear {
 
 class Environment;
+class SearTerrainModHandler;
 
 typedef WFMath::Point<3> PosType;
 
@@ -87,6 +88,7 @@ public:
     int m_shadowTexture;
     GLuint m_landscapeList;
     bool m_haveTerrain;
+    SearTerrainModHandler *m_tmh;
 
     void enableRendererState();
     void disableRendererState();

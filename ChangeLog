@@ -1,3 +1,15 @@
+2008-10-23  Simon Goodall  <simon@worldforge.org>
+
+	* Eris/TerrainMod.cpp, Eris/TerrainMod.h, Eris/TerrainMod_impl.cpp,
+	  Eris/TerrainMod_impl.h, Eris/TerrainModHandler.cpp,
+	  Eris/TerrainModHandler.h, Eris/Makefile.am,
+	  environment/SearTerrainModHandler.cpp,
+	  environment/TerrainModHandler.h, environment/TerrainRenderer.cpp,
+	  environment/TerrainRenderer.h, environment/Makefile.am: Copy
+	  TerrainMod implementation from Ember into Sear. Refactor so that the
+	  TerrainModHandler is an abstract class which can be sub-classed for
+	  use in Sear and hopefully Ember too.
+
 2008-10-22  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/ConnectWindow.cpp: Update for Metaserver to Localserver 

@@ -4,6 +4,7 @@
 // Copyright (C) 2004 - 2008 Simon Goodall
 
 #include "TerrainRenderer.h"
+#include "SearTerrainModHandler.h"
 
 #include "renderers/RenderSystem.h"
 
@@ -14,6 +15,9 @@
 #include <sage/GL.h>
 
 #include "src/System.h"
+#include "src/client.h"
+#include <Eris/Avatar.h>
+
 #include <Mercator/Segment.h>
 #include <Mercator/FillShader.h>
 #include <Mercator/ThresholdShader.h>
@@ -26,9 +30,13 @@
 #include <limits>
 #include <iostream>
 
+#include <sigc++/bind.h>
+#include <sigc++/slot.h>
+
 namespace Sear {
 
 static const bool debug_flag = false;
+
 static const int segSize = 64;
 
 static GLfloat sx0[] = { 0.125f, 0.f, 0.f, 0.f };
@@ -464,6 +472,23 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
   glEnable (GL_TEXTURE_2D);
 }
 
+static void onEnteredWorld(SearTerrainModHandler *tmh) {
+  Eris::View *view = System::instance()->getClient()->getAvatar()->getView();
+  tmh->setView(view);
+}
+
+static void onTerrainModChanged(Eris::Entity *e, Mercator::TerrainMod *mod, TerrainRenderer *tr) {
+  tr->m_terrain.removeMod(mod);
+  // TODO: This returns a ptr too?
+  tr->m_terrain.addMod(*mod);
+}
+
+static void onTerrainModDeleted(Eris::Entity *e, Mercator::TerrainMod *mod, TerrainRenderer *tr) {
+  tr->m_terrain.removeMod(mod);
+}
+
+
+
 TerrainRenderer::TerrainRenderer ():
   m_terrain (Terrain::SHADED),
   m_numLineIndeces (0),
@@ -499,9 +524,27 @@ TerrainRenderer::TerrainRenderer ():
 //  registerShader(new Mercator::DepthShader (0.f, -10.f), "dark.png");  // Underwater
 //  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
 //  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
+
+  m_tmh = new SearTerrainModHandler();
+  m_tmh->init();
+
+  // Hook up callbacks to modify terrain renderer
+//  m_tmh->TerrainModAdded.connect();
+  m_tmh->TerrainModChanged.connect(sigc::bind(sigc::ptr_fun(onTerrainModChanged), this));
+  m_tmh->TerrainModDeleted.connect(sigc::bind(sigc::ptr_fun(onTerrainModDeleted), this));
+
+  // Hook up callback to View.
+  System::instance()->EnteredWorld.connect(sigc::bind(sigc::ptr_fun(onEnteredWorld), m_tmh));
+  // TODO: Also hook up left world to de-init
+
+
 }
 
 TerrainRenderer::~TerrainRenderer() {
+
+  m_tmh->shutdown();
+  delete m_tmh;
+  m_tmh = NULL;
 
   RenderSystem::getInstance ().releaseTexture(m_seaTexture);
   RenderSystem::getInstance ().releaseTexture(m_shadowTexture);
