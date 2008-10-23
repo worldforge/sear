@@ -49,10 +49,10 @@ protected:
 
   gcn::Bar *m_progress_bar;
   gcn::Label *m_status;
-  gcn::Button *m_cancel, *m_update, *m_close;
+  gcn::Button *m_cancel, *m_check, *m_update, *m_close;
   gcn::TextBox *m_log;
 
-  int m_updates_total, m_updates_completed;
+  size_t m_updates_total, m_updates_completed;
   MediaManager *m_media_manager;
 
 };

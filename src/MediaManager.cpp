@@ -351,7 +351,7 @@ void MediaManager::saveList(const std::string &filename, const WFUT::ChannelFile
 }
 
 void MediaManager::cancelAll() {
-  m_wfut.cancelAll();
+  m_wfut.abortAll();
 }
 
 } /* namespace Sear */

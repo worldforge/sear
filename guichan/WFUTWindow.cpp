@@ -124,11 +124,23 @@ WFUTWindow::WFUTWindow()
 
   hbox = new gcn::HBox();
   m_widgets.push_back(SPtr<gcn::Widget>(hbox));
+
+  hbox->setSpacing(5);
+
+  // Add an Update button
+  m_check = new gcn::Button("Check");
+  m_widgets.push_back(SPtr<gcn::Widget>(m_check));
+  m_check->setActionEventId("check");
+  m_check->addActionListener(m_button_listener);
+  enableButton(m_check);
+  hbox->pack(m_check);
+
   // Add an Update button
   m_update = new gcn::Button("Update");
   m_widgets.push_back(SPtr<gcn::Widget>(m_update));
   m_update->setActionEventId("update");
   m_update->addActionListener(m_button_listener);
+  disableButton(m_update);
   hbox->pack(m_update);
 
   // Add a Cancel button
@@ -137,8 +149,7 @@ WFUTWindow::WFUTWindow()
   m_cancel->setActionEventId("cancel");
   m_cancel->addActionListener(m_button_listener);
   // Not enabled until the update starts.
-  m_cancel->setFocusable(false);
-  m_cancel->setEnabled(false);
+  disableButton(m_cancel);
   hbox->pack(m_cancel);
 
   // Add a Close button
@@ -146,6 +157,7 @@ WFUTWindow::WFUTWindow()
   m_widgets.push_back(SPtr<gcn::Widget>(m_close));
   m_close->setActionEventId("close");
   m_close->addActionListener(m_button_listener);
+  enableButton(m_close);
   hbox->pack(m_close);
 
   vbox->pack(hbox);
@@ -161,10 +173,20 @@ WFUTWindow::~WFUTWindow() {
 void WFUTWindow::logic() {
 
   // Update button enabled state.
-  if (m_updates_completed == m_updates_total) {
+  if (m_updates_total == 0) {
+    enableButton(m_check);
+    disableButton(m_update);
+    disableButton(m_cancel);
+  } else if (m_updates_completed == 0) {
+    enableButton(m_check);
     enableButton(m_update);
     disableButton(m_cancel);
+  } else if (m_updates_completed == m_updates_total) {
+    enableButton(m_check);
+    disableButton(m_update);
+    disableButton(m_cancel);
   } else {
+    disableButton(m_check);
     disableButton(m_update);
     enableButton(m_cancel);
   }
@@ -173,14 +195,15 @@ void WFUTWindow::logic() {
 }
 
 void WFUTWindow::actionPressed(std::string event) {
-
-  if (event == "update") {
+  if (event == "check") {
     System::instance()->runCommand("/enable_updates");
     m_status->setCaption("Checking for updates");
     System::instance()->runCommand("/check_for_updates");
     m_updates_total = m_media_manager->getNumUpdates();
     m_updates_completed = 0;
     writeLogEntry("Found " + string_fmt(m_updates_total) + " updates");
+  } else 
+  if (event == "update") {
     if (m_updates_total > 0) {
       m_status->setCaption("Downloading Updates");
       System::instance()->runCommand("/download_updates");

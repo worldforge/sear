@@ -1,5 +1,11 @@
 2008-10-23  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/WFUTWindow.cpp, guichan/WFUTWindow.h, src/MediaManager.cpp: 
+	  Split update into check and update buttons. Add a cancel button to
+	  hook into new libwfut abort code.
+
+2008-10-23  Simon Goodall  <simon@worldforge.org>
+
 	* Eris/TerrainMod.cpp, Eris/TerrainMod.h, Eris/TerrainMod_impl.cpp,
 	  Eris/TerrainMod_impl.h, Eris/TerrainModHandler.cpp,
 	  Eris/TerrainModHandler.h, Eris/Makefile.am,
