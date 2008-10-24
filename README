@@ -1,7 +1,7 @@
  Sear
 -====-
 
-Sear is a 3-D client for use with the WorldForge project. It requires a 3-D accelerated graphics card supporting Open GL.
+Sear is a 3-D client for use with the WorldForge project. It requires a 3-D accelerated graphics card supporting Open GL. Sear aims to be able to only relatively low power hardware. 
 
 Please visit website for full instructions. 
 
@@ -44,13 +44,14 @@ Dependencies
 ------------
 
 Atlas: 0.6.0
-Eris: 1.3.12
+Eris: 1.3.13
 Varconf: 0.6.4
 WFmath: 0.3.2
 Skstream2: 0.3.1
 Mercator: 0.2.4
 LibModelFile: 0.1.92
 Sage: 0.2.0
+libwfut: 0.2.1
 
 http://sourceforge.net/projects/worldforge
 
@@ -71,10 +72,10 @@ http://sourceforge.net/projects/lib3ds/
 
 OpenGL 1.3 or greater
 
-Cal3D 0.11.0
+Cal3D 0.10.0
 http://sourceforge.net/projects/cal3d/
 
-Guichan 0.6.0
+Guichan 0.8.1
 http://guichan.sourceforge.net/
 
 
