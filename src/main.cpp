@@ -97,7 +97,7 @@ under certain conditions; type `show c' for details.
   if (!sys->init(p_argc, p_argv)) {
     fprintf(stderr, "Error initialising Sear!\n");
     Sear::ErrorDialog("Error initialising Sear. See log files or stdout/stderr for more details");
-    sys.release();
+    sys.reset(0);
     exit (1);
   }
   try {
@@ -108,7 +108,7 @@ under certain conditions; type `show c' for details.
     std::cerr << "Caught Unhandled Exception" << std::endl;
   }
   sys->shutdown();
-  sys.release();
+  sys.reset(0);
   exit(0);
 }
 

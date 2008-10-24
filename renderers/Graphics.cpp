@@ -172,8 +172,8 @@ void Graphics::init() {
 void Graphics::shutdown() {
   assert(m_initialised == true);
  
-  m_compass.release();
-  m_lm.release();
+  m_compass.reset(0);
+  m_lm.reset(0);
 
   m_initialised = false;
 }

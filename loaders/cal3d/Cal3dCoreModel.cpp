@@ -79,7 +79,7 @@ int Cal3dCoreModel::init(const std::string &filename) {
 
   if (readConfig(filename)) {
     printf("Error while loading %s\n", filename.c_str());
-    m_core_model.release();
+    m_core_model.reset(0);
 
     return 1;
   }
@@ -106,7 +106,7 @@ int Cal3dCoreModel::shutdown() {
     }
   }
 
-  m_core_model.release();
+  m_core_model.reset(0);
 
   m_initialised = false;
   return 0;

@@ -56,10 +56,10 @@ int Environment::reinit() {
 void Environment::shutdown() {
   assert(m_initialised == true);
 
-  m_terrain.release();
-  m_skyDome.release();
-  m_stars.release();
-  m_weather.release();
+  m_terrain.reset(0);
+  m_skyDome.reset(0);
+  m_stars.reset(0);
+  m_weather.reset(0);
 
   notify_callbacks();
  

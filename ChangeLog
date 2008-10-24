@@ -1,3 +1,17 @@
+2008-10-24  Simon Goodall  <simon@worldforge.org>
+
+	* environment/Environment.cpp, loaders/ModelSystem.cpp,
+	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dModel.cpp, 
+	  renderers/Graphics.cpp, renderers/RenderSystem.cpp, src/System.cpp,
+	  src/main.cpp: Correct usage of auto_ptr. release() does not delete
+	  contained object. reset(0) performs the expected action.
+
+2008-10-24  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/GL.cpp, renderers/RenderSystem.cpp,
+	  renderers/TextureManager.cpp: Fix some bugs in texture allocation
+	  and release.
+
 2008-10-23  Simon Goodall  <simon@worldforge.org>
 
 	* renderers/GL.cpp: Update varconf_callback to use new readXXXValue

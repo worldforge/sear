@@ -149,7 +149,7 @@ System::System() :
 System::~System() {
   if (m_initialised) shutdown();
 
-  m_file_handler.release();
+  m_file_handler.reset(0);
 
   // Explicity Tell sigc to disconnect signals
   notify_callbacks();
@@ -169,8 +169,8 @@ bool System::init(int argc, char *argv[]) {
   if (!m_client->init()) {
     Log::writeLog("Error initializing Eris", Log::LOG_ERROR);
 
-    m_client.release();
-    m_script_engine.release();
+    m_client.reset(0);
+    m_script_engine.reset(0);
 
     return false;
   }
@@ -222,7 +222,7 @@ bool System::init(int argc, char *argv[]) {
 #if 0
   m_sound = std::auto_ptr<Sound>(new Sound());
   if (m_sound->init()) {
-    m_sound.release();
+    m_sound.reset(0);
   } else { 
     m_sound->registerCommands(m_console.get());
   }
@@ -316,16 +316,16 @@ bool System::init(int argc, char *argv[]) {
   }
   if (!success) {
     // TODO lots more cleaning up required!
-    m_client.release();
-    m_calendar.release();
-    m_action_handler.release();
-    m_script_engine.release();
-    m_editor.release();
-    m_console.release();
-    m_workarea.release();
-    m_character.release();
-    m_media_manager.release();
-    //m_sound.release();
+    m_client.reset(0);
+    m_calendar.reset(0);
+    m_action_handler.reset(0);
+    m_script_engine.reset(0);
+    m_editor.reset(0);
+    m_console.reset(0);
+    m_workarea.reset(0);
+    m_character.reset(0);
+    m_media_manager.reset(0);
+    //m_sound.reset(0);
 
     Bindings::shutdown();
 
@@ -384,13 +384,13 @@ void System::shutdown() {
   // Save config
   writeConfig(m_general);
 
-  m_client.release();
+  m_client.reset(0);
   
-  m_character.release();
+  m_character.reset(0);
 
-  m_action_handler.release();
+  m_action_handler.reset(0);
 
-  m_media_manager.release();
+  m_media_manager.reset(0);
 
   if (debug) Log::writeLog("Running shutdown scripts", Log::LOG_INFO);
   FileHandler::FileSet shutdown_scripts = m_file_handler->getAllinSearchPaths(SHUTDOWN_SCRIPT);
@@ -400,13 +400,14 @@ void System::shutdown() {
 
   Bindings::shutdown();
 
-  m_script_engine.release();
+  m_script_engine.reset(0);
 
-  m_file_handler.release();
+  m_file_handler.reset(0);
 
-  m_console.release();
+  // TODO: Release does not delete object! 
+  m_console.reset(0);
  
-  //m_sound.release();
+  //m_sound.reset(0);
 
 //  CacheManager::getInstance().shutdown();
   Environment::getInstance().shutdown();
@@ -414,11 +415,11 @@ void System::shutdown() {
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
 
-  m_editor.release();
+  m_editor.reset(0);
 
-  m_workarea.release();
+  m_workarea.reset(0);
 
-  m_calendar.release();
+  m_calendar.reset(0);
 
   // Explicity Tell sigc to disconnect signals
   notify_callbacks();

@@ -332,7 +332,7 @@ int Cal3dModel::shutdown() {
   assert (m_initialised == true);
 
   // destroy the model instance
-  m_calModel.release();
+  m_calModel.reset(0);
 
   m_initialised = false;
   return 0;

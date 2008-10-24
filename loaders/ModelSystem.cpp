@@ -112,11 +112,11 @@ int ModelSystem::reinit() {
 int ModelSystem::shutdown() {
   assert(m_initialised == true);
 
-  m_object_handler.release();
+  m_object_handler.reset(0);
 
-  m_model_handler.release();
+  m_model_handler.reset(0);
 
-  m_entity_mapper.release();
+  m_entity_mapper.reset(0);
 
   // Cleanp signals
   notify_callbacks();
