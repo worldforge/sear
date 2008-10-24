@@ -1,5 +1,10 @@
 2008-10-24  Simon Goodall  <simon@worldforge.org>
 
+ 	* renderers/RenderSystem.cpp, renderers/TextureManager.cpp: Further
+	  fixes to texture ref count code.
+
+2008-10-24  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp, renderers/GL.h: Add config option to disable VBO
 	  extensions.
 

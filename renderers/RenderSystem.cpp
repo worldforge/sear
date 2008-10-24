@@ -129,9 +129,10 @@ void RenderSystem::runCommand(const std::string &command, const std::string &arg
 
 void RenderSystem::shutdown() {
   assert (m_initialised);
-  
+ 
   if (debug) std::cout << "RenderSystem: Shutdown" << std::endl;
-
+  ContextDestroyed.emit(true);
+  
   releaseTexture(m_mouseState[CURSOR_DEFAULT]);
   releaseTexture(m_mouseState[CURSOR_TOUCH]);
   releaseTexture(m_mouseState[CURSOR_PICKUP]);
@@ -143,8 +144,8 @@ void RenderSystem::shutdown() {
   m_cameraSystem.reset(0);
   m_graphics.reset(0);
   m_renderer.reset(0);
-  m_textureManager.reset(0);
   m_stateManager.reset(0);
+  m_textureManager.reset(0);
 
   m_initialised = false;
 }

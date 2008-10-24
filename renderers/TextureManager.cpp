@@ -227,8 +227,14 @@ void TextureManager::shutdown()
   if (!m_initialised) return;
   if (debug) std::cout << "TextureManager: Shutdown" << std::endl;
 
-  releaseTextureID(m_default_texture);
-  releaseTextureID(m_default_font);
+  if (m_default_texture != -1) {
+    releaseTextureID(m_default_texture);
+    m_default_texture = -1;
+  }
+  if (m_default_font != -1) {
+    releaseTextureID(m_default_font);
+    m_default_font = -1;
+  }
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
     if (m_cursor_ids[i] != -1) {
@@ -859,6 +865,16 @@ void TextureManager::contextDestroyed(bool check)
 {
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL);
+
+  if (m_default_texture != -1) {
+    releaseTextureID(m_default_texture);
+    m_default_texture = -1;
+  }
+
+  if (m_default_font != -1) {
+    releaseTextureID(m_default_font);
+    m_default_font = -1;
+  }
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
     if (m_cursor_ids[i] != -1) {
