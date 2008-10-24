@@ -206,6 +206,7 @@ protected:
 
   int setupExtensions();
   bool m_use_fsaa;
+  bool m_use_vbo;
   bool m_initialised;
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);

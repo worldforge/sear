@@ -1,5 +1,10 @@
 2008-10-24  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp, renderers/GL.h: Add config option to disable VBO
+	  extensions.
+
+2008-10-24  Simon Goodall  <simon@worldforge.org>
+
 	* Eris/Avahi.cpp, Eris/Bonjour.cpp, Eris/Localserver.cpp:  Correct
 	  usage of auto_ptr. release() does not delete contained object. 
 	  reset(0) performs the expected action.

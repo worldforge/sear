@@ -69,6 +69,7 @@
   static const std::string KEY_show_fps = "render_show_fps";
   static const std::string KEY_use_stencil = "render_use_stencil";
   static const std::string KEY_use_fsaa = "render_use_fsaa";
+  static const std::string KEY_use_vbo = "render_use_vbo";
 
   static const std::string KEY_character_light_kc = "character_light_kc";
   static const std::string KEY_character_light_kl = "character_light_kl";
@@ -168,6 +169,7 @@
   static const bool DEFAULT_show_fps = true;
   static const bool DEFAULT_use_stencil = true;
   static const bool DEFAULT_use_fsaa = false;
+  static const bool DEFAULT_use_vbo = true;
 
   static const float DEFAULT_lower_frame_rate_bound = 25.0f;
   static const float DEFAULT_upper_frame_rate_bound = 30.0f;
@@ -460,9 +462,10 @@ int GL::checkError() {
 int GL::setupExtensions() {
   sage_init();
 
-  // Uncomment this line to disable VBO's and force use of vertex arrays and
-  // display lists.
-  //sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;  
+  // Disable VBO's if requested.
+  if (!m_use_vbo) {
+    sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT] = false;  
+  }
 
   if (sage_ext[GL_ARB_MULTITEXTURE]) {
     if (debug) std::cout << "[GL] Found arb_multitexture" << std::endl;
@@ -491,7 +494,8 @@ void GL::nextColour(WorldEntity *we){
   m_entityArray[m_colour_index] = we; // Store entity in array slot
 
   // From a 32-bit number, extract red, green and blue components so that they are suitable for use
-  // in glColor3ub. We use at most 24 bits (ignore alpha).
+  // in glColor3ub. We use at most 24 bits (ignore alpha - it's used for
+  // transparency).
   // We break up m_colour_index as follows;
   // [unused | red bits | green bits | blue bits].
   // For colour components with less than 8 bits, we bitshift so that high order bits are used over low order bits.
@@ -559,6 +563,7 @@ GL::GL() :
   m_redMask(0), m_greenMask(0), m_blueMask(0),
   m_redShift(0), m_greenShift(0), m_blueShift(0),
   m_use_fsaa(DEFAULT_use_fsaa),
+  m_use_vbo(DEFAULT_use_vbo),
   m_initialised(false)
 {
 }
@@ -844,6 +849,7 @@ void GL::readConfig(varconf::Config &config) {
   RenderSystem::getInstance().setState(RenderSystem::RENDER_STENCIL, b);
 
   m_use_fsaa = readBoolValue(config, RENDER, KEY_use_fsaa, DEFAULT_use_fsaa);
+  m_use_vbo = readBoolValue(config, RENDER, KEY_use_vbo, DEFAULT_use_vbo);
 
   // Setup the speech offsets
   m_speech_offset_x = readDoubleValue(config, RENDER, KEY_speech_offset_x, DEFAULT_speech_offset_x);
