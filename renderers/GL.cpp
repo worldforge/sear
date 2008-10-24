@@ -578,6 +578,8 @@ void GL::shutdown() {
   // TODO: This is too late
   if (m_font_id != -1) RenderSystem::getInstance().releaseTexture(m_font_id);
   if (m_splash_id != -1) RenderSystem::getInstance().releaseTexture(m_splash_id);
+  m_font_id = -1;
+  m_splash_id = -1;
 
   m_initialised = false;
 }
@@ -662,7 +664,9 @@ void GL::shutdownFont(bool check) {
       glDeleteLists(m_base, 256); // Delete All 256 Display Lists
     }
   }
-  RenderSystem::getInstance().releaseTexture(m_font_id);
+  if (m_font_id != -1) {
+    RenderSystem::getInstance().releaseTexture(m_font_id);
+  }
 
   m_fontInitialised = false;
 }

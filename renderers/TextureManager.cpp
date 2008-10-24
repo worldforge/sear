@@ -231,7 +231,10 @@ void TextureManager::shutdown()
   releaseTextureID(m_default_font);
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
-    releaseTextureID(m_cursor_ids[i]);
+    if (m_cursor_ids[i] != -1) {
+      releaseTextureID(m_cursor_ids[i]);
+      m_cursor_ids[i] = -1;
+    }
   }
 
   ReferenceCounter::const_iterator I = m_ref_counter.begin();
@@ -858,7 +861,10 @@ void TextureManager::contextDestroyed(bool check)
   assert(m_initGL);
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
-    releaseTextureID(m_cursor_ids[i]);
+    if (m_cursor_ids[i] != -1) {
+      releaseTextureID(m_cursor_ids[i]);
+      m_cursor_ids[i] = -1;
+    }
   }
   
   // unload textures first.

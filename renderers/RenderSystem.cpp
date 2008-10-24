@@ -142,9 +142,9 @@ void RenderSystem::shutdown() {
 
   m_cameraSystem.release();
   m_graphics.release();
+  m_renderer.release();
   m_textureManager.release();
   m_stateManager.release();
-  m_renderer.release();
 
   m_initialised = false;
 }
