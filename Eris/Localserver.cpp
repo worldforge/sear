@@ -36,12 +36,12 @@ int Localserver::init() {
 
   m_avahi = std::auto_ptr<Avahi>(new Avahi());
   if (m_avahi->init(this)) {
-    m_avahi.release();
+    m_avahi.reset(0);
   }
 
   m_bonjour = std::auto_ptr<Bonjour>(new Bonjour());
   if (m_bonjour->init(this)) {
-    m_bonjour.release();
+    m_bonjour.reset(0);
   }
  
   m_initialised = true;
@@ -51,8 +51,8 @@ int Localserver::init() {
 void Localserver::shutdown() {
   assert(m_initialised == true);
 
-  m_avahi.release();
-  m_bonjour.release();
+  m_avahi.reset(0);
+  m_bonjour.reset(0);
 
   delete m_meta;
 

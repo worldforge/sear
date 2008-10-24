@@ -301,7 +301,7 @@ int Bonjour::init(Localserver *meta) {
   DNSServiceErrorType err = SEAR_DNSServiceBrowse(&m_ud->client, f, kDNSServiceInterfaceIndexAny, STR_service.c_str(), STR_domain.c_str(), browse_callback, (void*)m_ud.get());
 
   if (!m_ud->client || err != 0) {
-    m_ud.release();
+    m_ud.reset(0);
     return 1;
   }
 #endif
@@ -314,7 +314,7 @@ int Bonjour::init(Localserver *meta) {
 void Bonjour::shutdown() {
   assert(m_initialised == true);
 #ifdef HAVE_BONJOUR
-  m_ud.release();
+  m_ud.reset(0);
 
   SDL_UnloadObject(m_hnd);
   m_hnd = 0;

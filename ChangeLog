@@ -1,5 +1,11 @@
 2008-10-24  Simon Goodall  <simon@worldforge.org>
 
+	* Eris/Avahi.cpp, Eris/Bonjour.cpp, Eris/Localserver.cpp:  Correct
+	  usage of auto_ptr. release() does not delete contained object. 
+	  reset(0) performs the expected action.
+
+2008-10-24  Simon Goodall  <simon@worldforge.org>
+
 	* environment/Environment.cpp, loaders/ModelSystem.cpp,
 	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dModel.cpp, 
 	  renderers/Graphics.cpp, renderers/RenderSystem.cpp, src/System.cpp,

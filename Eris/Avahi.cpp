@@ -213,7 +213,7 @@ fail:
   if (m_ud->simple_poll)
     avahi_simple_poll_free(m_ud->simple_poll);
 
-  m_ud.release();
+  m_ud.reset(0);
   return 1;
 #endif 
 }
@@ -230,7 +230,7 @@ void Avahi::shutdown() {
   if (m_ud->simple_poll)
     avahi_simple_poll_free(m_ud->simple_poll);
 
-  m_ud.release();
+  m_ud.reset(0);
 #endif
   m_initialised = false;
 }
