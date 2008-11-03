@@ -15,6 +15,8 @@
 
 #include "interfaces/ConsoleObject.h"
 
+#include "renderers/RenderTypes.h"
+
 
 #define MAX_MESSAGES (5)
 #define FONT_HEIGHT  (15)
@@ -110,9 +112,9 @@ protected:
   int m_consoleHeight; // the height of the console. determined by number of messages allowed
   std::list<std::string> m_console_messages; // Current console messages
   std::list<screenMessage> m_screen_messages; // Current screen messages
-  int m_panel_id; // The texture id of the console's panel texture
-  int m_panel_state;
-  int m_font_state;
+  TextureID m_panel_id; // The texture id of the console's panel texture
+  StateID m_panel_state;
+  StateID m_font_state;
   System *m_system;
 
   // Mapping of registered commands to assoicated object

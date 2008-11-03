@@ -638,6 +638,7 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   m_base = glGenLists(256); // Creating 256 Display Lists
 
+  assert(m_font_id == -1);
   m_font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
   m_state_font = RenderSystem::getInstance().requestState(STATE_font);
 
@@ -671,6 +672,7 @@ void GL::shutdownFont(bool check) {
   }
   if (m_font_id != -1) {
     RenderSystem::getInstance().releaseTexture(m_font_id);
+    m_font_id = -1;
   }
 
   m_fontInitialised = false;

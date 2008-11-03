@@ -85,6 +85,9 @@ public:
    */ 
   void readTextureConfig(const std::string &filename);
 
+  /** Request a TextureID for the given texture name (and mask flag).
+   * Valid texture id's start from 1.
+   */ 
   TextureID requestTextureID(const std::string &texture_name, bool mask)
   {
     assert(!texture_name.empty());

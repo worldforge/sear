@@ -268,10 +268,9 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
       // Need to query object
       for (int i = 0; i < 2; ++i) {
 	const std::string &key = KEY_texture_map + "_" + string_fmt(i);
+        std::string texture;
         if (config.findItem(section, key)) { // Is texture name over-ridden?
-          const std::string &texture = (std::string)config.getItem(section, key);
-          unsigned int textureId = loadTexture(texture, false);
-          unsigned int textureMaskId = loadTexture(texture, true);
+          texture = (std::string)config.getItem(section, key);
 	  if (material->getMapCount() <= i) {
             // Increase the space available to store data
 	    material->reserve(i + 1);
@@ -279,24 +278,21 @@ int Cal3dCoreModel::readConfig(const std::string &filename) {
               std::cerr << "Error setting map data" << std::endl;
             }
 	  }
-          MapData *md = new MapData();
-          md->textureID = textureId;
-          md->textureMaskID = textureMaskId;
-          if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
-            std::cerr << "Error setting map user data" << std::endl;
-	  }
         } else { // Use default texture
-          const std::string &texture = material->getMapFilename(i);
-	  if (texture.empty()) continue;
-          unsigned int textureId = loadTexture(texture, false);
-          unsigned int textureMaskId = loadTexture(texture, true);
+          texture = material->getMapFilename(i);
+	}
+        // Setup textures
+	if (!texture.empty()) {
+          TextureID textureId = loadTexture(texture, false);
+          TextureID textureMaskId = loadTexture(texture, true);
           MapData *md = new MapData();
           md->textureID = textureId;
           md->textureMaskID = textureMaskId;
-          if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md))) {
-            std::cerr << "Error setting map user data" << std::endl;
+          if (!material->setMapUserData(i, reinterpret_cast<Cal::UserData>(md)))
+          {
+            fprintf(stderr, "[Cal3dCoreModel] Error setting map user data\n");
 	  }
-	}
+        }
       }
     }
   }
@@ -373,8 +369,8 @@ void Cal3dCoreModel::varconf_error_callback(const char *message) {
   std::cerr << message << std::endl << std::flush;
 }
 
-unsigned int Cal3dCoreModel::loadTexture(const std::string& strFilename, bool mask) {
-  unsigned int textureId;
+TextureID Cal3dCoreModel::loadTexture(const std::string& strFilename, bool mask) {
+  TextureID textureId;
   textureId = RenderSystem::getInstance().requestTexture(strFilename, mask);
   return textureId;
 }

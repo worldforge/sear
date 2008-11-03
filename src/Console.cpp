@@ -84,7 +84,7 @@ Console::Console(System *system) :
   m_consoleHeight(0),
   m_console_messages(std::list<std::string>()),
   m_screen_messages(std::list<screenMessage>()),
-  m_panel_id(-1),
+  m_panel_id(0),
   m_panel_state(-1),
   m_font_state(-1),
   m_system(system),
@@ -122,9 +122,9 @@ void Console::shutdown() {
   
   std::ofstream HistoryFile((m_system->getFileHandler()->getUserDataPath() + "history").c_str());
   
-  if (m_panel_id != -1) {
+  if (m_panel_id > 0) {
     RenderSystem::getInstance().releaseTexture(m_panel_id);
-    m_panel_id = -1;
+    m_panel_id = 0;
   }
 
   // TODO: Sometimes this can stall for a long time
@@ -199,7 +199,7 @@ void Console::renderConsoleMessages(void) {
   int consoleOffset = CONSOLE_HEIGHT - m_consoleHeight;
   //Make panel slightly transparent
   renderer->setColour(0.0f, 0.0f, 1.0f, 0.85f);
-  if (m_panel_id == -1) {
+  if (m_panel_id < 1) {
     m_panel_id = RenderSystem::getInstance().requestTexture(PANEL);
     m_panel_state = RenderSystem::getInstance().requestState(PANEL);
   }

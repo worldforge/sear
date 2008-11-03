@@ -15,6 +15,8 @@
 #include <Mercator/Shader.h>
 #include <wfmath/point.h>
 
+#include "renderers/RenderTypes.h"
+
 namespace Sear {
 
 class Environment;
@@ -84,8 +86,8 @@ public:
     unsigned short * const m_lineIndeces;
     GLuint m_lineIndeces_vbo;
    
-    int m_seaTexture;
-    int m_shadowTexture;
+    TextureID m_seaTexture;
+    TextureID m_shadowTexture;
     GLuint m_landscapeList;
     bool m_haveTerrain;
     SearTerrainModHandler *m_tmh;

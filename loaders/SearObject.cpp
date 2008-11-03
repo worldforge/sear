@@ -334,7 +334,7 @@ int SearObject::load(const std::string &filename) {
   } 
 
   SearObjectMesh som;
-  int tex_id, tex_mask_id;
+  TextureID tex_id, tex_mask_id;
   uint32_t *uptr;
   float *fptr;
   int c,x,y;

@@ -11,6 +11,8 @@
 #include <sage/GL.h>
 #include "common/Matrix.h"
 
+#include "renderers/RenderTypes.h"
+
 namespace Sear {
 
 class WorldEntity;
@@ -31,7 +33,7 @@ public:
   int contextCreated();
   void contextDestroyed(bool check);
 
-  void setTexture(unsigned int num, int texture, int texture_mask) {
+  void setTexture(unsigned int num, TextureID texture, TextureID texture_mask) {
     if (m_textures.size() <= num) {
       m_textures.resize(num + 1);
       m_texture_masks.resize(num + 1);
@@ -40,7 +42,7 @@ public:
     m_texture_masks[num] = texture_mask;
   }
 
-  int getTexture(unsigned int num, int &texture, int &texture_mask) {
+  int getTexture(unsigned int num, TextureID &texture, TextureID &texture_mask) {
     if (num >= m_textures.size()) return 1;
     texture      = m_textures[num];
     texture_mask = m_texture_masks[num];
@@ -224,8 +226,8 @@ private:
 
   unsigned int m_num_points;
   unsigned int m_num_faces;
-  std::vector<int> m_textures;
-  std::vector<int> m_texture_masks;
+  std::vector<TextureID> m_textures;
+  std::vector<TextureID> m_texture_masks;
 
   float m_ambient[4];
   float m_diffuse[4];

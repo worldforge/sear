@@ -1,3 +1,11 @@
+2008-11-03  Simon Goodall  <simon@worldforge.org>
+
+	* environment/TerrainRenderer.h, loaders/3ds.cpp,
+	  loaders/SearObject.cpp, loaders/StaticObject.h, 
+	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h,
+	  renderers/GL.cpp, renderers/TextureManager.h, src/Console.cpp,
+	  src/Console.h: Use the TextureID typedef rather than just int.
+
 2008-10-24  Simon Goodall  <simon@worldforge.org>
 
  	* renderers/RenderSystem.cpp, renderers/TextureManager.cpp: Further

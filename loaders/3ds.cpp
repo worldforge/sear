@@ -417,22 +417,29 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
                                                          KEY_texture_map_0);
           texture_id = RenderSystem::getInstance().requestTexture(name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
-          assert(texture_id != 0);
+          assert(texture_id > 0);
+          assert(texture_mask_id > 0);
         } else if (mat && mat->texture1_map.name[0]) {
           texture_id = RenderSystem::getInstance().requestTexture(
                                                           mat->texture1_map.name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(
                                                   mat->texture1_map.name, true);
-          assert(texture_id != 0);
+          assert(texture_id > 0);
+          assert(texture_mask_id > 0);
         } else { 
           // Do nothing, use default vals
         }
       }
+
       // Request default texture to keep the reference counting happy.
-      if (mesh->texels && texture_id == 0) {
+      if (mesh->texels && texture_id < 1) {
         texture_id = RenderSystem::getInstance().requestTexture("default_texture");
         texture_mask_id = RenderSystem::getInstance().requestTexture("default_texture", true);
       }
+
+      assert(texture_id > 0);
+      assert(texture_mask_id > 0);
+
       current_material_name = material_name;
       // Create new render object for change in texture
       // Set correct num of points in old render object

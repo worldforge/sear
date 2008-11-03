@@ -18,14 +18,16 @@
 #include <cal3d/cal3d.h>
 #include <wfmath/quaternion.h>
 
+#include "renderers/RenderTypes.h"
+
 namespace Sear {
 
 // Forward declarations
 class Cal3dModel;
 
 typedef struct {
-  int textureID;
-  int textureMaskID;
+  TextureID textureID;
+  TextureID textureMaskID;
 } MapData;
 	
 class Cal3dCoreModel : public sigc::trackable {
@@ -123,7 +125,7 @@ private:
    * @param strFilename image filename
    * @return The texture object id
    */ 
-  unsigned int loadTexture(const std::string &strFilename, bool mask);
+  TextureID loadTexture(const std::string &strFilename, bool mask);
   
   bool m_initialised; ///< Flag indicating whether object has been initialised
   std::auto_ptr<CalCoreModel> m_core_model; ///< Pointer to the cal3d core model we represent
