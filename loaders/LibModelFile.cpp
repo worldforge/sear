@@ -129,7 +129,7 @@ int LibModelFile::init(const std::string &filename) {
   // Get mesh data
   libmd3_mesh *meshp = modelFile->meshes;
   for (int i = 0; i < modelFile->header->mesh_count; ++i, ++meshp) {
-    SPtr<StaticObject> so(new StaticObject());
+    StaticObject* so = new StaticObject();
     so->init();
 
     // Get Texture data from Mesh
@@ -270,7 +270,7 @@ int LibModelFile::shutdown() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     int id, mask_id;
     // Clean up textures
@@ -278,7 +278,9 @@ int LibModelFile::shutdown() {
       RenderSystem::getInstance().releaseTexture(id);
       RenderSystem::getInstance().releaseTexture(mask_id);
     }
+    delete so;
   }
+  m_static_objects.clear();
 
   //  Clean up OpenGL data
   contextDestroyed(true);
@@ -290,7 +292,7 @@ void LibModelFile::contextCreated() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -300,7 +302,7 @@ void LibModelFile::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -310,7 +312,7 @@ void LibModelFile::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->render(select_mode);
   }

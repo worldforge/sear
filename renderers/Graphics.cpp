@@ -493,7 +493,7 @@ void Graphics::buildQueues(WorldEntity *we,
 
   assert(we->getType());
     
-  SPtr<ObjectRecord> obj = ModelSystem::getInstance().getObjectRecord(we);
+  ObjectRecord* obj = ModelSystem::getInstance().getObjectRecord(we).get();
   assert (obj);
 
   // Setup lights as we go
@@ -525,7 +525,7 @@ void Graphics::buildQueues(WorldEntity *we,
   } // of draw_members case
 }
 
-void Graphics::drawObject(SPtr<ObjectRecord> obj, 
+void Graphics::drawObject(ObjectRecord* obj, 
                         bool select_mode,
                         Render::QueueMap &render_queue,
                         Render::MessageList &message_list,
@@ -619,7 +619,7 @@ void Graphics::drawObject(SPtr<ObjectRecord> obj,
 }
 
 void Graphics::drawObjectExt(const std::string &model_id,
-                        SPtr<ObjectRecord> obj,
+                        ObjectRecord* obj,
                         WorldEntity *obj_we,
                         bool select_mode,
                         Render::QueueMap &render_queue,
@@ -628,7 +628,7 @@ void Graphics::drawObjectExt(const std::string &model_id,
                         float time_elapsed, float camera_dist) {
 
   // retrieve or create the model and modelRecord as necessary
-  SPtr<ModelRecord> modelRec = ModelSystem::getInstance().getModel(model_id, obj_we);
+  ModelRecord* modelRec = ModelSystem::getInstance().getModel(model_id, obj_we).get();
   assert(modelRec);
  
   SPtr<Model> model = modelRec->model;

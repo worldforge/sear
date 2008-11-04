@@ -118,15 +118,15 @@ private:
     /**
     Helper to qeueue the models for a single object record
     */
-    void drawObject(SPtr<ObjectRecord> obj, 
-                        bool select_mode,
-                        Render::QueueMap &render_queue,
-                        Render::MessageList &message_list,
-                        Render::MessageList &name_list,
-                        float time_elapsed);
+    void drawObject(ObjectRecord* obj, 
+                    bool select_mode,
+                    Render::QueueMap &render_queue,
+                    Render::MessageList &message_list,
+                    Render::MessageList &name_list,
+                    float time_elapsed);
 
      void drawObjectExt(const std::string &model_id,
-                        SPtr<ObjectRecord> obj, 
+                        ObjectRecord* obj, 
                         WorldEntity *obj_we,
                         bool select_mode,
                         Render::QueueMap &render_queue,

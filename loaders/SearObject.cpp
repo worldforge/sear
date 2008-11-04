@@ -242,7 +242,7 @@ int SearObject::shutdown() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     int id, mask_id;
     // Clean up textures
@@ -250,6 +250,7 @@ int SearObject::shutdown() {
       RenderSystem::getInstance().releaseTexture(id);
       RenderSystem::getInstance().releaseTexture(mask_id);
     }
+    delete so;
   }
 
   m_static_objects.clear();
@@ -262,7 +263,7 @@ void SearObject::contextCreated() {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -272,7 +273,7 @@ void SearObject::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -282,7 +283,7 @@ void SearObject::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_static_objects.begin();
   StaticObjectList::const_iterator Iend = m_static_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->render(select_mode);
   }
@@ -365,7 +366,7 @@ int SearObject::load(const std::string &filename) {
       swap_bytes_float(som.shininess);
     }
 
-    SPtr<StaticObject> so(new StaticObject());
+    StaticObject* so = new StaticObject();
     so->init();
    
     so->setNumPoints(som.num_vertices);

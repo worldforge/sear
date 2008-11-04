@@ -13,7 +13,6 @@
 
 #include <wfmath/vector.h>
 #include <wfmath/quaternion.h>
-#include "common/SPtr.h"
 
 #include "renderers/RenderTypes.h"
 #include "loaders/StaticObject.h"
@@ -30,8 +29,8 @@ typedef std::map<std::string, Element> MapType;
 
 namespace Sear {
 
-typedef std::vector<SPtr<StaticObject> > StaticObjectList;
-typedef std::vector<SPtr<DynamicObject> > DynamicObjectList;
+typedef std::vector<StaticObject*> StaticObjectList;
+typedef std::vector<DynamicObject*> DynamicObjectList;
 
 typedef struct {
     WFMath::Vector<3> pos;

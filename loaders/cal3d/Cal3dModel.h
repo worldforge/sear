@@ -16,7 +16,6 @@
 #include "Cal3dCoreModel.h"
 #include "Model.h"
 #include "renderers/RenderTypes.h"
-#include "common/SPtr.h"
 
 namespace Sear {
 

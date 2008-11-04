@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2007 Simon Goodall
+// Copyright (C) 2005 - 2008 Simon Goodall
 
 #ifndef SEAR_RENDERERS_STATICOBJECT_H
 #define SEAR_RENDERERS_STATICOBJECT_H 1

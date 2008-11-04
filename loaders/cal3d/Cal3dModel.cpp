@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: Cal3dModel.cpp,v 1.59 2007-05-26 14:37:46 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #include <Atlas/Message/Element.h>
 
@@ -164,9 +162,9 @@ void Cal3dModel::renderMesh(bool useTextures, bool useLighting, bool select_mode
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId)) {
 
-        SPtr<DynamicObject> dyno = m_dos[++counter];
-        if (!dyno.isValid()) {
-          dyno = SPtr<DynamicObject>(new DynamicObject());
+        DynamicObject* dyno = m_dos[++counter];
+        if (!dyno) {
+          dyno = new DynamicObject();
           dyno->init();
           dyno->contextCreated();
           m_dos[counter] = dyno;
@@ -317,7 +315,7 @@ void Cal3dModel::render(bool select_mode) {
   DynamicObjectList::iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   while (I != Iend) {
-    SPtr<DynamicObject> dyno = *I++;
+    DynamicObject* dyno = *I++;
     dyno->render(select_mode);
   }
 }
@@ -330,6 +328,18 @@ void Cal3dModel::update(float time_elapsed) {
 
 int Cal3dModel::shutdown() {
   assert (m_initialised == true);
+
+  // TODO: Clear m_dos
+  DynamicObjectList::const_iterator I = m_dos.begin();
+  DynamicObjectList::const_iterator Iend = m_dos.end();
+  for (; I != Iend; ++I) {
+    DynamicObject* so = *I;
+    assert(so);
+    so->contextDestroyed(true);
+    so->shutdown();
+    delete so;
+  }
+  m_dos.clear();
 
   // destroy the model instance
   m_calModel.reset(0);
@@ -487,7 +497,7 @@ void Cal3dModel::contextCreated() {
   DynamicObjectList::const_iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
-    SPtr<DynamicObject> so = *I;
+    DynamicObject* so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -497,7 +507,7 @@ void Cal3dModel::contextDestroyed(bool check) {
   DynamicObjectList::const_iterator I = m_dos.begin();
   DynamicObjectList::const_iterator Iend = m_dos.end();
   for (; I != Iend; ++I) {
-    SPtr<DynamicObject> so = *I;
+    DynamicObject* so = *I;
     assert(so);
     so->contextDestroyed(check);
   }

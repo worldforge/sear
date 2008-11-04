@@ -15,7 +15,6 @@
 
 #include "common/Matrix.h"
 #include "common/types.h"
-#include "common/SPtr.h"
 
 #include "loaders/StaticObject.h"
 #include "loaders/DynamicObject.h"
@@ -46,7 +45,7 @@ class Render {
 
 public:
 
-typedef std::pair<SPtr<ObjectRecord>, SPtr<ModelRecord> > QueueItem;
+typedef std::pair<ObjectRecord*, ModelRecord*> QueueItem;
 typedef std::vector<QueueItem> Queue;
 typedef std::map<int, Queue> QueueMap;
 typedef std::vector<WorldEntity*> MessageList;
@@ -56,8 +55,8 @@ typedef std::vector<MatrixEntityItem>  MatrixEntityList;
 typedef std::map<std::string, MatrixEntityList> QueueMatrixMap;
 typedef std::map<std::string, StateID> QueueStateMap;
 typedef std::map<std::string, Queue> QueueOldMap;
-typedef std::map<std::string, std::vector<SPtr<StaticObject> > > QueueStaticObjectMap;
-typedef std::map<std::string, std::vector<SPtr<DynamicObject> > > QueueDynamicObjectMap;
+typedef std::map<std::string, std::vector<StaticObject*> > QueueStaticObjectMap;
+typedef std::map<std::string, std::vector<DynamicObject*> > QueueDynamicObjectMap;
 
   Render() :
     m_context_instantiation(-1),
@@ -117,7 +116,7 @@ typedef std::map<std::string, std::vector<SPtr<DynamicObject> > > QueueDynamicOb
 
   virtual void translateObject(float x, float y, float z) const = 0;
   virtual void rotate(float angle, float x, float y, float z) const = 0;
-  virtual void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) const = 0;
+  virtual void rotateObject(ObjectRecord*, ModelRecord*) const = 0;
   virtual void scaleObject(float scale) const = 0;
   virtual void setViewMode(int type) const = 0;
   virtual void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) const = 0;

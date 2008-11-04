@@ -1047,7 +1047,7 @@ inline void GL::rotate(float angle, float x, float y, float z) const {
   glRotatef(angle, x, y, z);
 }
 
-void GL::rotateObject(SPtr<ObjectRecord> object_record, SPtr<ModelRecord> model_record) const {
+void GL::rotateObject(ObjectRecord* object_record, ModelRecord* model_record) const {
   WorldEntity *we = dynamic_cast<WorldEntity*>(object_record->entity.get());
   assert(we != 0);
 
@@ -1200,8 +1200,8 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
     Queue::const_iterator Jend = I->second.end();
     for (;J != Jend; ++J) {
 
-      SPtr<ObjectRecord> object_record = J->first;
-      SPtr<ModelRecord> model_record = J->second;
+      ObjectRecord* object_record = J->first;
+      ModelRecord* model_record = J->second;
       SPtr<Model> model = model_record->model;
       assert(model);
 
@@ -1328,7 +1328,7 @@ inline int GL::axisBoxInFrustum(const WFMath::AxisBox<3> &bbox) const {
   return Frustum::axisBoxInFrustum(m_frustum, bbox);
 }
 
-void GL::drawOutline(SPtr<ModelRecord> model_record) {
+void GL::drawOutline(ModelRecord* model_record) {
   StateID cur_state = RenderSystem::getInstance().getCurrentState();
   SPtr<Model> model = model_record->model;
   assert(model);

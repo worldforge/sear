@@ -105,7 +105,7 @@ public:
 
   void translateObject(float x, float y, float z) const;
   void rotate(float angle, float x, float y, float z) const;
-  inline void rotateObject(SPtr<ObjectRecord>, SPtr<ModelRecord>) const;
+  inline void rotateObject(ObjectRecord*, ModelRecord*) const;
   inline void scaleObject(float scale) const;
   void setViewMode(int type) const;
   void setMaterial(float *ambient, float *diffuse, float *specular, float shininess, float *emissive) const;
@@ -113,7 +113,7 @@ public:
   void drawQueue(QueueMap &queue, bool select_mode);
   void drawMessageQueue(MessageList &list);
   void drawNameQueue(MessageList &list);
-  void drawOutline(SPtr<ModelRecord>);
+  void drawOutline(ModelRecord*);
 
   void drawQueue(const QueueStaticObjectMap &object_map,
                    const QueueMatrixMap &matrix_map,

@@ -1,18 +1,17 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2005 - 2007 Simon Goodall
+// Copyright (C) 2005 - 2008 Simon Goodall
 
 #include <cassert>
 
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-//#include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
 #include "src/WorldEntity.h"
 
-#include  "StaticObject.h"
+#include "StaticObject.h"
 
 
 static GLfloat halo_colour[4] = { 1.0f, 0.0f, 1.0f, 1.0f };

@@ -15,7 +15,6 @@
 #include <varconf/Config.h>
 
 #include "common/types.h"
-#include "common/SPtr.h"
 #include "Model.h"
 
 namespace Sear {

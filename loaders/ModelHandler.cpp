@@ -314,7 +314,8 @@ void ModelHandler::runCommand(const std::string &command, const std::string &arg
     TextureManager *tm = RenderSystem::getInstance().getTextureManager();
     assert (tm != 0);
     for (; J != Jend; ++J) {
-      SPtr<StaticObject> so = *J;
+      StaticObject* so = *J;
+      assert(so);
       so->getMatrix().getMatrix(som.mesh_transform);
       so->getTexMatrix().getMatrix(som.texture_transform);
 

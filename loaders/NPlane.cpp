@@ -33,7 +33,7 @@ int NPlane::init(const std::string &texture, unsigned int num_planes, float widt
   assert(m_initialised == false);
 
   // Store texture name and get ID numbers
-  SPtr<StaticObject> so = SPtr<StaticObject>(new StaticObject());
+  StaticObject* so = new StaticObject();
   so->init();
   // Set material properties
   so->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
@@ -133,13 +133,15 @@ int NPlane::shutdown() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     int id, mask_id;
     so->getTexture(0, id, mask_id);
     RenderSystem::getInstance().releaseTexture(id);
     RenderSystem::getInstance().releaseTexture(mask_id);
+    delete so;
   }
+  m_render_objects.clear();
 
   m_initialised = false;
   return 0;
@@ -149,7 +151,7 @@ void NPlane::contextCreated() {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextCreated();
   }
@@ -159,7 +161,7 @@ void NPlane::contextDestroyed(bool check) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->contextDestroyed(check);
   }
@@ -169,7 +171,7 @@ void NPlane::render(bool select_mode) {
   StaticObjectList::const_iterator I = m_render_objects.begin();
   StaticObjectList::const_iterator Iend = m_render_objects.end();
   for (; I != Iend; ++I) {
-    SPtr<StaticObject> so = *I;
+    StaticObject* so = *I;
     assert(so);
     so->render(select_mode);
   }

@@ -6,7 +6,6 @@
 #define SEAR_PARTICLE_SYSTEM_H
 
 #include <common/types.h>
-#include <common/SPtr.h>
 
 #include "loaders/Model.h"
 

@@ -9,8 +9,6 @@
 
 #include <string>
 
-#include "common/SPtr.h"
-
 #include "Model.h"
 
 namespace Sear {

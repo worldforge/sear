@@ -17,8 +17,6 @@
 
 #include "Model.h"
 
-#include "common/SPtr.h"
-
 namespace Sear {
 
 class StaticObject;

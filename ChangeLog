@@ -1,3 +1,23 @@
+2008-11-04  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/3ds.cpp: Init static object pointer.
+
+2008-11-03  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/3ds.cpp, loaders/3ds.h, loaders/BoundBox.cpp,
+	  loaders/BoundBox.h, loaders/LibModelFile.cpp, loaders/LibModelFile.h,
+	  loaders/Model.h, loaders/ModelHandler.cpp, loaders/NPlane.cpp, 
+	  loaders/NPlane.h, loaders/ParticleSystem.cpp, 
+	  loaders/ParticleSystem.h, loaders/SearObject.cpp, 
+	  loaders/SearObject.h, loaders/StaticObject.cpp, 
+	  loaders/StaticObjectFunctions.cpp, loaders/cal3d/Cal3dModel.cpp,
+	  loaders/cal3d/Cal3dModel.h, renderers/GL.cpp, renderers/GL.h, 
+	  renderers/Graphics.cpp, renderers/Graphics.h, renderers/Render.h: 
+	  Passing SPtr wrapped ObjectRecord and ModelRecord instances to the
+	  Graphics/GL rendering functions could lead to such objects being 
+	  cleaned up too late in the shutdown process. We now use the raw
+	  pointers to avoid this ownership issue.
+
 2008-11-03  Simon Goodall  <simon@worldforge.org>
 
 	* configure.ac: Update deps version numbers.

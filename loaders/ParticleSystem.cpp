@@ -172,7 +172,7 @@ void ParticleSystem::init()
 {
   assert(m_initialised == false);
 
-  SPtr<DynamicObject> m_do = SPtr<DynamicObject>(new DynamicObject());
+  DynamicObject* m_do = new DynamicObject();
   m_do->init();
   m_do->contextCreated();
   m_do->setAmbient(1.0f, 1.0f, 1.0f, 1.0f);
@@ -229,6 +229,7 @@ int ParticleSystem::shutdown()
   if (m_dos[0]->getTexture(0, id, mask_id) == 0) {
     RenderSystem::getInstance().releaseTexture(id);
     RenderSystem::getInstance().releaseTexture(mask_id);
+    delete m_dos[0];
   }
   m_dos.clear();
 

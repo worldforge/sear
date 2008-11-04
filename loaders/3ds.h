@@ -22,8 +22,6 @@
 
 #include "Model.h"
 
-#include "common/SPtr.h"
-
 namespace Sear {
 
 // Forward declarations	
