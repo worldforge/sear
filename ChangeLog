@@ -1,5 +1,10 @@
 2008-11-05  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/cal3d/Cal3d_Loader.cpp: Use reset(0) instead of release for
+	  auto_ptr.
+
+2008-11-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/3ds.cpp, loaders/LibModelFile.cpp, loaders/SearObject.cpp,
 	  renderers/GL.cpp, renderers/RenderTypes.h, 
 	  renderers/TextureManager.cpp, renderers/TextureManager.h: Add a

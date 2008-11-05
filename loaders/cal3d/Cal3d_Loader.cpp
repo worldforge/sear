@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall
+// Copyright (C) 2001 - 2008 Simon Goodall
 
 // $Id: Cal3d_Loader.cpp,v 1.25 2007-05-02 20:47:54 simon Exp $
 
@@ -36,7 +36,7 @@ Cal3d_Loader::Cal3d_Loader() {
 }
 
 Cal3d_Loader::~Cal3d_Loader() {
-  m_core_model_handler.release();
+  m_core_model_handler.reset(0);
 }
 
 SPtr<ModelRecord> Cal3d_Loader::loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config) {
