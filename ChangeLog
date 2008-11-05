@@ -1,5 +1,10 @@
 2008-11-05  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/Graphics.cpp, renderers/Graphics.h: Add config option
+	  "adjust_detail_level" to turn on model detail level scaling.
+
+2008-11-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/cal3d/Cal3d_Loader.cpp: Use reset(0) instead of release for
 	  auto_ptr.
 

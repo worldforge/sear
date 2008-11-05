@@ -2,8 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: Graphics.cpp,v 1.74 2008-10-05 09:54:17 simon Exp $
-
 #include <sigc++/object_slot.h>
 
 #include <sage/sage.h>
@@ -82,6 +80,8 @@ static const std::string SECTION_graphics = "graphics";
   static const std::string KEY_fire_spec_blue = "fire_specular_blue";
   static const std::string KEY_fire_spec_alpha = "fire_specular_alpha";
 
+  static const std::string KEY_adjust_detail = "adjust_detail_level";
+
 //  static const std::string KEY_low_dist = "low_dist";
   static const std::string KEY_medium_dist = "medium_dist";
   static const std::string KEY_high_dist = "high_dist";
@@ -109,6 +109,7 @@ static const std::string SECTION_graphics = "graphics";
   static const float DEFAULT_fire_spec_blue = 0.1f;
   static const float DEFAULT_fire_spec_alpha = 0.0f;
 
+  static const bool DEFAULT_adjust_detail = false;
 
 //  static const float DEFAULT_low_dist    = 1000.0f;
   static const float DEFAULT_medium_dist = 9000.0f;
@@ -137,6 +138,7 @@ Graphics::Graphics(System *system) :
   m_compass(NULL),
   m_show_names(false),
   m_show_bbox(false),
+  m_adjust_detail(DEFAULT_adjust_detail),
   m_medium_dist(DEFAULT_medium_dist),
   m_high_dist(DEFAULT_high_dist)
 {
@@ -404,11 +406,12 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
     // Build entity queues before rendering so entity lighting will be enabled.
     // Need to be careful we don't change our view matrices because of frustum
-    //  culling
+    // culling
 
     assert(System::instance()->getCharacter());
 
     System::instance()->getCharacter()->updateLocals(false);
+
     m_render_queue.clear();
     m_message_list.clear();
     m_name_list.clear();
@@ -640,11 +643,14 @@ void Graphics::drawObjectExt(const std::string &model_id,
 
   // Update Model
   if (!select_mode) { // Only needs to be done once a frame
-    // Reduce detail level according to camera distance. Must be called before
-    // model->update.
-    // TODO: This might need some better scaling
-    model->setDetailLevel(1.0f / camera_dist);
-
+    if (m_adjust_detail) {
+      // Reduce detail level according to camera distance. Must be called before
+      // model->update.
+      // TODO: This might need some better scaling
+      model->setDetailLevel(1.0f / camera_dist);
+    } else {
+      model->setDetailLevel(1.0f);
+    }
     // If we are fading in/out, then we update here
     obj_we->updateFade(time_elapsed);
 
@@ -842,6 +848,8 @@ void Graphics::readConfig(varconf::Config &config) {
   m_fire.specular[1] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_green, DEFAULT_fire_spec_green);
   m_fire.specular[2] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_blue, DEFAULT_fire_spec_blue);
   m_fire.specular[3] = readDoubleValue(config, SECTION_graphics, KEY_fire_spec_alpha, DEFAULT_fire_spec_alpha);
+
+  m_adjust_detail = readBoolValue(config, SECTION_graphics, KEY_adjust_detail, DEFAULT_adjust_detail);
 }  
 
 void Graphics::writeConfig(varconf::Config &config) {

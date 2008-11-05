@@ -110,6 +110,7 @@ private:
 
   Light m_fire;
   bool m_show_names, m_show_bbox;
+  bool m_adjust_detail;
   float m_modelview_matrix[4][4];
   float m_medium_dist, m_high_dist;
 
