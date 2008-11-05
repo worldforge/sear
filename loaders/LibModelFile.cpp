@@ -133,7 +133,8 @@ int LibModelFile::init(const std::string &filename) {
     so->init();
 
     // Get Texture data from Mesh
-    int texture_id = 0, texture_mask_id = 0;
+    int texture_id = NO_TEXTURE_ID;
+    int texture_mask_id = NO_TEXTURE_ID;
     if (meshp->mesh_header->skin_count != 0) {
       std::string name = (const char*)(meshp->skins[0].name);
       m_config.clean(name);

@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
-
-// $Id: SearObject.cpp,v 1.11 2007-05-26 21:09:55 simon Exp $
+// Copyright (C) 2007 - 2008  Simon Goodall
 
 #include  <stdio.h>
 
@@ -335,7 +333,8 @@ int SearObject::load(const std::string &filename) {
   } 
 
   SearObjectMesh som;
-  TextureID tex_id, tex_mask_id;
+  TextureID tex_id = NO_TEXTURE_ID;
+  TextureID tex_mask_id = NO_TEXTURE_ID;
   uint32_t *uptr;
   float *fptr;
   int c,x,y;

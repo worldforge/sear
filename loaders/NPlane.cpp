@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: NPlane.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #include <iostream>
 

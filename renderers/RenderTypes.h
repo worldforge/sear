@@ -28,6 +28,8 @@ typedef enum {
 } RotationStyle;
 
 typedef int TextureID;
+static const TextureID NO_TEXTURE_ID = 0;
+
 typedef int StateID;
 
 } // namespace Sear

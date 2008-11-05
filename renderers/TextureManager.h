@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: TextureManager.h,v 1.32 2008-10-05 13:27:05 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #ifndef SEAR_RENDER_TEXTUREMANAGER_H
 #define SEAR_RENDER_TEXTUREMANAGER_H 1
@@ -30,7 +28,6 @@ struct SDL_Surface;
  Add console commands
  - determine max_texture_units from gl query
  - read/write config values
- - add ability to resample image to 2^N by 2^M
  - allow more formats than just RGB and RGBA
  - work in image loaders
  - create default textures
@@ -111,7 +108,7 @@ public:
 
     // Increment Texture counter.
     ++m_ref_counter[texId];
-    assert(texId > 0);
+    assert(texId > NO_TEXTURE_ID);
     return texId;
   }
 
@@ -126,7 +123,7 @@ public:
   }
 
   std::string getTextureName(TextureID id) const {
-    if ((size_t)id < m_names.size() && id >= 0) {
+    if ((size_t)id < m_names.size() && id >= NO_TEXTURE_ID) {
       return m_names[id];
     }
     return "";
@@ -241,9 +238,11 @@ private:
   /** sprite configuration file */
   varconf::Config m_spriteConfig;
 
+  // Experimental members for dynamic updates
   typedef std::map<std::string, TextureID> UpdatesMap;
   UpdatesMap m_pending_updates;
 
+  // Filenames previously used to load texture configs.
   std::list<std::string> m_texture_configs;
   std::list<std::string> m_sprite_configs;
 };

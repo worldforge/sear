@@ -547,8 +547,8 @@ GL::GL() :
   m_near_clip(RENDER_NEAR_CLIP),
   m_far_clip_dist(100.0f),
   m_base(0),
-  m_font_id(-1),
-  m_splash_id(-1),
+  m_font_id(NO_TEXTURE_ID),
+  m_splash_id(NO_TEXTURE_ID),
   m_state_font(-1),
   m_state_splash(-1),
   m_x_pos(0), m_y_pos(0),
@@ -580,11 +580,10 @@ void GL::shutdown() {
 
   assert(m_screen == NULL);
 
-  // TODO: This is too late
-  if (m_font_id != -1) RenderSystem::getInstance().releaseTexture(m_font_id);
-  if (m_splash_id != -1) RenderSystem::getInstance().releaseTexture(m_splash_id);
-  m_font_id = -1;
-  m_splash_id = -1;
+  if (m_font_id != NO_TEXTURE_ID) RenderSystem::getInstance().releaseTexture(m_font_id);
+  if (m_splash_id != NO_TEXTURE_ID) RenderSystem::getInstance().releaseTexture(m_splash_id);
+  m_font_id = NO_TEXTURE_ID;
+  m_splash_id = NO_TEXTURE_ID;
 
   m_initialised = false;
 }
@@ -638,7 +637,7 @@ void GL::initFont() {
   float cy; // Holds Our Y Character Coord
   m_base = glGenLists(256); // Creating 256 Display Lists
 
-  assert(m_font_id == -1);
+  assert(m_font_id == NO_TEXTURE_ID);
   m_font_id = RenderSystem::getInstance().requestTexture(DEFAULT_FONT);
   m_state_font = RenderSystem::getInstance().requestState(STATE_font);
 
@@ -670,9 +669,9 @@ void GL::shutdownFont(bool check) {
       glDeleteLists(m_base, 256); // Delete All 256 Display Lists
     }
   }
-  if (m_font_id != -1) {
+  if (m_font_id != NO_TEXTURE_ID) {
     RenderSystem::getInstance().releaseTexture(m_font_id);
-    m_font_id = -1;
+    m_font_id = NO_TEXTURE_ID;
   }
 
   m_fontInitialised = false;
@@ -1383,7 +1382,7 @@ inline void GL::endFrame(bool select_mode) {
   
 void GL::drawSplashScreen() {
 
-  if (m_splash_id == -1) {
+  if (m_splash_id == NO_TEXTURE_ID) {
     m_state_splash = RenderSystem::getInstance().requestState(STATE_splash);
     m_splash_id = RenderSystem::getInstance().requestTexture(TEXTURE_splash_texture);
   }

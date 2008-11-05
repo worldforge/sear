@@ -390,8 +390,9 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
     Material *cm = m_material_map[material_name];
     assert(cm);
 
-    int texture_id = 0;
-    int texture_mask_id = 0;
+    int texture_id = NO_TEXTURE_ID;
+    int texture_mask_id = NO_TEXTURE_ID;
+
     // If a material is set get texture map names.
     Matrix tex_matrix;
     tex_matrix.identity();
@@ -416,15 +417,15 @@ void ThreeDS::render_mesh(Lib3dsMesh *mesh, Lib3dsFile *file, Lib3dsObjectData *
                                                          KEY_texture_map_0);
           texture_id = RenderSystem::getInstance().requestTexture(name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(name, true);
-          assert(texture_id > 0);
-          assert(texture_mask_id > 0);
+          assert(texture_id > NO_TEXTURE_ID);
+          assert(texture_mask_id > NO_TEXTURE_ID);
         } else if (mat && mat->texture1_map.name[0]) {
           texture_id = RenderSystem::getInstance().requestTexture(
                                                           mat->texture1_map.name);
           texture_mask_id = RenderSystem::getInstance().requestTexture(
                                                   mat->texture1_map.name, true);
-          assert(texture_id > 0);
-          assert(texture_mask_id > 0);
+          assert(texture_id > NO_TEXTURE_ID);
+          assert(texture_mask_id > NO_TEXTURE_ID);
         } else { 
           // Do nothing, use default vals
         }

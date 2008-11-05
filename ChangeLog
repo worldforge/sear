@@ -1,3 +1,10 @@
+2008-11-05  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/3ds.cpp, loaders/LibModelFile.cpp, loaders/SearObject.cpp,
+	  renderers/GL.cpp, renderers/RenderTypes.h, 
+	  renderers/TextureManager.cpp, renderers/TextureManager.h: Add a
+	  NO_TEXTURE_ID declaration to use instead of 0 or -1
+
 2008-11-04  Simon Goodall  <simon@worldforge.org>
 
 	* loaders/3ds.cpp: Init static object pointer.

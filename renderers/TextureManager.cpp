@@ -2,8 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: TextureManager.cpp,v 1.53 2008-10-05 13:27:05 simon Exp $
-
 #include <unistd.h>
 
 #include <sigc++/object_slot.h>
@@ -207,11 +205,11 @@ void TextureManager::contextCreated() {
 
   // Setup default texture properties
   m_default_texture = createDefaultTexture();
-  if (m_default_texture == -1) std::cerr << "Error building default texture" << std::endl;
+  if (m_default_texture == NO_TEXTURE_ID) std::cerr << "Error building default texture" << std::endl;
 
   // create default font
   m_default_font = createDefaultFont();
-  if (m_default_font == -1) std::cerr << "Error building default font" << std::endl;
+  if (m_default_font == NO_TEXTURE_ID) std::cerr << "Error building default font" << std::endl;
 
   m_cursor_ids.push_back(createCursor("cursor_default", arrow));
   m_cursor_ids.push_back(createCursor("cursor_pickup", pickup));
@@ -227,19 +225,19 @@ void TextureManager::shutdown()
   if (!m_initialised) return;
   if (debug) std::cout << "TextureManager: Shutdown" << std::endl;
 
-  if (m_default_texture != -1) {
+  if (m_default_texture != NO_TEXTURE_ID) {
     releaseTextureID(m_default_texture);
-    m_default_texture = -1;
+    m_default_texture = NO_TEXTURE_ID;
   }
-  if (m_default_font != -1) {
+  if (m_default_font != NO_TEXTURE_ID) {
     releaseTextureID(m_default_font);
-    m_default_font = -1;
+    m_default_font = NO_TEXTURE_ID;
   }
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
-    if (m_cursor_ids[i] != -1) {
+    if (m_cursor_ids[i] != NO_TEXTURE_ID) {
       releaseTextureID(m_cursor_ids[i]);
-      m_cursor_ids[i] = -1;
+      m_cursor_ids[i] = NO_TEXTURE_ID;
     }
   }
 
@@ -590,7 +588,7 @@ void TextureManager::switchTexture(TextureID texture_id) {
 void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_id) {
   assert((m_initialised == true) && "TextureManager not initialised");
   if (texture_id == m_last_textures[texture_unit]) return;
-//  if (texture_id == -1) texture_id = m_default_texture;
+//  if (texture_id == NO_TEXTURE_ID) texture_id = m_default_texture;
   if (!use_arb_multitexture) return switchTexture(texture_id);
   if ((int)texture_unit >= m_texture_units) return; // Check we have enough texture units
   glActiveTextureARB(GL_TEXTURE0_ARB + texture_unit);
@@ -598,7 +596,7 @@ void TextureManager::switchTexture(unsigned int texture_unit, TextureID texture_
   //       switchTexture will just return....
   switchTexture(texture_id);
 /*
-  GLuint to = (texture_id == -1) ? (m_textures[m_default_texture]) : (m_textures[texture_id]);
+  GLuint to = (texture_id == NO_TEXTURE_ID) ? (m_textures[m_default_texture]) : (m_textures[texture_id]);
   if (to == 0) {
     to = loadTexture(m_names[texture_id]);
     if (to == 0) {
@@ -866,20 +864,20 @@ void TextureManager::contextDestroyed(bool check)
   assert((m_initialised == true) && "TextureManager not initialised");
   assert(m_initGL);
 
-  if (m_default_texture != -1) {
+  if (m_default_texture != NO_TEXTURE_ID) {
     releaseTextureID(m_default_texture);
-    m_default_texture = -1;
+    m_default_texture = NO_TEXTURE_ID;
   }
 
-  if (m_default_font != -1) {
+  if (m_default_font != NO_TEXTURE_ID) {
     releaseTextureID(m_default_font);
-    m_default_font = -1;
+    m_default_font = NO_TEXTURE_ID;
   }
 
   for (size_t i = 0; i < m_cursor_ids.size(); ++i) {
-    if (m_cursor_ids[i] != -1) {
+    if (m_cursor_ids[i] != NO_TEXTURE_ID) {
       releaseTextureID(m_cursor_ids[i]);
-      m_cursor_ids[i] = -1;
+      m_cursor_ids[i] = NO_TEXTURE_ID;
     }
   }
   
