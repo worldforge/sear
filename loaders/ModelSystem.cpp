@@ -112,6 +112,8 @@ int ModelSystem::reinit() {
 int ModelSystem::shutdown() {
   assert(m_initialised == true);
 
+  contextDestroyed(true);
+
   m_object_handler.reset(0);
 
   m_model_handler.reset(0);
