@@ -329,8 +329,8 @@ bool System::init(int argc, char *argv[]) {
 
     Bindings::shutdown();
 
-    Environment::getInstance().shutdown();
     ModelSystem::getInstance().shutdown(); 
+    Environment::getInstance().shutdown();
     RenderSystem::getInstance().shutdown();
 
     SDL_Quit();
@@ -410,8 +410,8 @@ void System::shutdown() {
   //m_sound.reset(0);
 
 //  CacheManager::getInstance().shutdown();
-  Environment::getInstance().shutdown();
   ModelSystem::getInstance().shutdown(); 
+  Environment::getInstance().shutdown();
   RenderSystem::getInstance().destroyWindow();
   RenderSystem::getInstance().shutdown();
 

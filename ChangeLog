@@ -1,5 +1,11 @@
 2008-11-06  Simon Goodall  <simon@worldforge.org>
 
+	* src/System.cpp: Swap ordering of Environment and ModelLoader
+	  shutdown. Models can contribute to the terrain so should be shutdown
+	  first.
+
+2008-11-06  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/ModelSystem.cpp: Destroy context on shutdown.
 
 2008-11-05  Simon Goodall  <simon@worldforge.org>
