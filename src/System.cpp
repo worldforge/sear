@@ -300,9 +300,6 @@ bool System::init(int argc, char *argv[]) {
         m_axisBindings[3] = AXIS_ELEVATE;
   }
 
-
-
-
   // Try and create the window
   bool success;
   if (!(success = RenderSystem::getInstance().createWindow(m_width, m_height, m_startFullscreen))) {
