@@ -1,15 +1,11 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: Cal3dCoreModel.cpp,v 1.48 2007-05-12 17:47:01 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #include <string>
 
 #include <SDL/SDL.h>
 #include <sigc++/object_slot.h>
-
-#include <varconf/Config.h>
 
 #include "common/Utility.h"
 #include "src/System.h"

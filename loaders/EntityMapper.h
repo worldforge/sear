@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
-
-// $Id: EntityMapper.h,v 1.1 2007-04-22 15:49:27 simon Exp $
+// Copyright (C) 2007 - 2008 Simon Goodall
 
 #ifndef SEAR_LOADERS_ENTITYMAPPER_H
 #define SEAR_LOADERS_ENTITYMAPPER_H 1
@@ -11,7 +9,7 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <interfaces/ConsoleObject.h>
 

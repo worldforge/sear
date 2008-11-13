@@ -2,15 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
 
-// $Id: ModelHandler.h,v 1.15 2007-03-29 20:11:51 simon Exp $
-
 #ifndef SEAR_LOADERS_MODELHANDLER_H
 #define SEAR_LOADERS_MODELHANDLER_H 1
 
 #include <map>
 #include <string>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <sigc++/trackable.h>
 

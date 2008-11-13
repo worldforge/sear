@@ -25,7 +25,7 @@
 
 #include <unistd.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 #include <Eris/Entity.h>

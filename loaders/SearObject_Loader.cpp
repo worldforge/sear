@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-// $Id: SearObject_Loader.cpp,v 1.3 2007-05-26 18:49:10 simon Exp $
-
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "src/System.h"
 #include "src/FileHandler.h"

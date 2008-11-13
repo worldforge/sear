@@ -2,7 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2007 Simon Goodall
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 #include <Mercator/AreaShader.h>
 
 #include "AreaModelLoader.h"

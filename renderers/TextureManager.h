@@ -17,7 +17,7 @@
 
 #include "interfaces/ConsoleObject.h"
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "RenderTypes.h"
 

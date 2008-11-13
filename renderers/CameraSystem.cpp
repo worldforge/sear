@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 - 2006 Simon Goodall
 
-// $Id: CameraSystem.cpp,v 1.7 2008-10-07 20:37:37 simon Exp $
-
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <cassert>
 

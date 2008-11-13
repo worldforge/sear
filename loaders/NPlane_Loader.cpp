@@ -1,10 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall
+// Copyright (C) 2001 - 2008 Simon Goodall
 
-// $Id: NPlane_Loader.cpp,v 1.26 2007-05-02 20:47:54 simon Exp $
-
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "src/System.h"
 #include <string>

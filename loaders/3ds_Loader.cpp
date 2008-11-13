@@ -2,9 +2,7 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2007 Simon Goodall
 
-// $Id: 3ds_Loader.cpp,v 1.28 2007-05-02 20:47:54 simon Exp $
-
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "src/System.h"
 #include "src/FileHandler.h"

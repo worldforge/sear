@@ -2,8 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2005 Simon Goodall
 
-// $Id: Cal3dCoreModel.h,v 1.16 2006-12-02 18:54:37 simon Exp $
-
 #ifndef SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H
 #define SEAR_LOADERS_CAL3D_CAL3DCOREMODEL_H 1
 
@@ -14,7 +12,7 @@
 #include <memory>
 
 #include <sigc++/trackable.h>
-#include <varconf/Config.h>
+#include <varconf/config.h>
 #include <cal3d/cal3d.h>
 #include <wfmath/quaternion.h>
 

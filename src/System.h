@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: System.h,v 1.77 2008-10-07 19:33:14 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -14,7 +12,7 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 #include <wfmath/point.h>
 #include "interfaces/ConsoleObject.h"
 

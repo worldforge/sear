@@ -2,13 +2,11 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton 
 
-// $Id: Camera.cpp,v 1.12 2008-04-06 14:21:40 simon Exp $
-
 #include <string>
 
 #include <sigc++/object_slot.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "common/Utility.h"
 #include "common/Log.h"

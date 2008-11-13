@@ -4,7 +4,7 @@
 
 // $Id: BoundBox_Loader.cpp,v 1.33 2007-05-02 20:47:54 simon Exp $
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "src/System.h"
 

@@ -12,7 +12,7 @@
 #include <map>
 
 #include <sigc++/trackable.h>
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "common/types.h"
 #include "Model.h"

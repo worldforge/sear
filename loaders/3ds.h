@@ -2,8 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: 3ds.h,v 1.28 2006-12-03 13:38:47 simon Exp $
-
 #ifndef SEAR_3DS_H
 #define SEAR_3DS_H 1
 
@@ -16,7 +14,7 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "common/types.h"
 

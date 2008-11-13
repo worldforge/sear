@@ -1,12 +1,10 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall
-
-// $Id: ObjectHandler.cpp,v 1.16 2008-04-06 14:21:40 simon Exp $
+// Copyright (C) 2001 - 2008 Simon Goodall
 
 #include <sigc++/object_slot.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "common/Log.h"
 #include "common/Utility.h"

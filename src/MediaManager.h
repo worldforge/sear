@@ -9,7 +9,7 @@
 
 #include <sigc++/signal.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include  <libwfut/WFUT.h>
 

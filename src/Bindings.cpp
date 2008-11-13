@@ -7,7 +7,7 @@
 
 #include <SDL/SDL.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "common/Log.h"
 

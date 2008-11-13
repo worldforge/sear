@@ -10,7 +10,7 @@
 #include <wfmath/const.h>
 #include <wfmath/axisbox.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <string>
 #include <deque>

@@ -1,3 +1,21 @@
+2008-11-13  Simon Goodall  <simon@worldforge.org>
+
+	* common/Utility.h, loaders/3ds.h, loaders/3ds_Loader.cpp,
+	  loaders/AreaModelLoader.cpp, loaders/BoundBox_Loader.cpp,
+	  loaders/EntityMapper.h, loaders/LibModelFile.h, 
+	  loaders/LibModelFile_Loader.cpp, loaders/ModelHandler.cpp, 
+	  loaders/ModelHandler.h, loaders/ModelLoader.cpp, 
+	  loaders/NPlane_Loader.cpp, loaders/ObjectHandler.cpp, 
+	  loaders/ParticleSystemLoader.cpp, loaders/SearObject.h, 
+	  loaders/SearObject_Loader.cpp, loaders/WireFrame_Loader.cpp, 
+	  loaders/cal3d/Cal3dCoreModel.cpp, loaders/cal3d/Cal3dCoreModel.h,
+	  loaders/cal3d/Cal3d_Loader.cpp, renderers/Camera.cpp, 
+	  renderers/CameraSystem.cpp, renderers/GL.cpp,
+	  renderers/Graphics.cpp, renderers/TextureManager.h,
+	  src/Bindings.cpp, src/CacheManager.h, src/Character.cpp, 
+	  src/MediaManager.h, src/System.h, Eris/Localserver.h: Change
+	  varconf/Config.h include to reference new lower case filename.
+
 2008-11-06  Simon Goodall  <simon@worldforge.org>
 
 	* src/System.cpp: Swap ordering of Environment and ModelLoader

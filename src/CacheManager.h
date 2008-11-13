@@ -2,15 +2,13 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2006 Simon Goodall
 
-// $Id: CacheManager.h,v 1.3 2006-05-17 23:15:35 alriddoch Exp $
-
 #ifndef SEAR_CACHEMANAGER_H
 #define SEAR_CACHEMANAGER_H 1
 
 #include <string>
 #include <map>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 namespace Sear {
 

@@ -2,11 +2,9 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2002 - 2006 Simon Goodall
 
-// $Id: ModelLoader.cpp,v 1.10 2006-12-03 11:32:15 simon Exp $
-
 #include "ModelLoader.h"
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include "Model.h"
 #include "ModelRecord.h"

@@ -13,7 +13,7 @@
 
 #include <sigc++/trackable.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <Eris/ServerInfo.h>
 

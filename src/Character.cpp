@@ -12,7 +12,7 @@
 
 #include <Atlas/Objects/Operation.h>
 #include <Atlas/Objects/Anonymous.h>
-#include <varconf/Config.h>
+#include <varconf/config.h>
 
 #include <wfmath/atlasconv.h>
 

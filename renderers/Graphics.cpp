@@ -7,7 +7,7 @@
 #include <sage/sage.h>
 #include <sage/GL.h>
 
-#include <varconf/Config.h>
+#include <varconf/config.h>
 #include <Eris/Entity.h>
 #include <Eris/Avatar.h>
 #include <Eris/View.h>
