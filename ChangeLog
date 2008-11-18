@@ -1,5 +1,9 @@
 2008-11-18  Simon Goodall  <simon@worldforge.org>
 
+	* gui/Window.cpp: Fix compiler warning about operator precedence.
+
+2008-11-18  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp: Added some debug code to help validate entity colour
 	  picking.
 

@@ -52,8 +52,8 @@ void Window::mouseMotion(short x, short y, short ox, short oy)
           ry = y - w.m_y,
           rox = ox - w.m_x,
           roy = oy - w.m_y;
-    if ((rx >= 0) && (rx < w.m_w) && (ry >= 0) && (ry < w.m_h) ||
-        (rox >= 0) && (rox < w.m_w) && (roy >= 0) && (roy < w.m_h)) {
+    if (((rx >= 0) && (rx < w.m_w) && (ry >= 0) && (ry < w.m_h)) ||
+        ((rox >= 0) && (rox < w.m_w) && (roy >= 0) && (roy < w.m_h))) {
       w.mouseMotion(rx, ry, rox, roy);
     }
   }
