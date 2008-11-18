@@ -2,8 +2,6 @@
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: GL.cpp,v 1.174 2008-10-07 19:20:29 simon Exp $
-
 #ifdef HAVE_CONFIG_H
   #include "config.h"
 #endif
@@ -231,6 +229,13 @@ static const GLfloat blackLight[]    = { 0.0f,  0.0f, 0.0f, 1.0f };
 static const bool debug = true;
 #else
 static const bool debug = false;
+#endif
+
+//#define VALIDATE_COLOUR_PICKING
+#ifdef VALIDATE_COLOUR_PICKING
+  std::vector<unsigned char> red_array;
+  std::vector<unsigned char> green_array;
+  std::vector<unsigned char> blue_array;
 #endif
 
 namespace Sear {
@@ -488,7 +493,13 @@ void GL::nextColour(WorldEntity *we){
 
   // Dynamically grow array as needed.
   if (m_colour_index >= m_entityArray.size()) {
-    m_entityArray.resize((m_entityArray.size() + 1) * 2);
+    size_t new_size = (m_entityArray.size() + 1) * 2;
+    m_entityArray.resize(new_size);
+#ifdef VALIDATE_COLOUR_PICKING
+  red_array.resize(new_size);
+  green_array.resize(new_size);
+  blue_array.resize(new_size);
+#endif
   }
 
   m_entityArray[m_colour_index] = we; // Store entity in array slot
@@ -512,6 +523,12 @@ void GL::nextColour(WorldEntity *we){
 
   // Set the colour
   glColor3ub(red, green, blue);
+
+#ifdef VALIDATE_COLOUR_PICKING  
+  red_array[m_colour_index] = red;
+  green_array[m_colour_index] = green;
+  blue_array[m_colour_index] = blue;
+#endif
 
   ++m_colour_index; // Increment counter for next pass
 }
@@ -786,6 +803,14 @@ void GL::procEvent(int x, int y) {
   ic += green;
   ic <<= m_blueBits;
   ic += blue;
+
+  assert(ic < m_colour_index);
+
+#ifdef VALIDATE_COLOUR_PICKING  
+  assert(red_array[ic] == red);
+  assert(green_array[ic] == green);
+  assert(blue_array[ic] == blue);
+#endif
 
   // Find WorldEntity associated with index.
   WorldEntity *selected_entity = getSelectedID(ic);
