@@ -120,20 +120,22 @@ void Environment::contextDestroyed(bool check) {
 
 void Environment::removeArea(Mercator::Area* ar)
 {
-    assert(ar);
-    m_terrain->m_terrain.removeArea(ar);
+  assert(m_initialised == true);
+  assert(ar);
+  m_terrain->m_terrain.removeArea(ar);
 }
 void Environment::addArea(Mercator::Area* ar)
 {
-    assert(ar);
-    m_terrain->m_terrain.addArea(ar);
+  assert(m_initialised == true);
+  assert(ar);
+  m_terrain->m_terrain.addArea(ar);
 }
 
 void Environment::registerTerrainShader(Mercator::Shader* shade, const std::string& texId)
 {
   assert(m_initialised == true);
-    assert(shade);
-    m_terrain->registerShader(shade, texId);
+  assert(shade);
+  m_terrain->registerShader(shade, texId);
 }
 
 void Environment::resetWorld() {
