@@ -1,7 +1,12 @@
 BUGS
 
+ * Creating a new character does not always enter the world. Eris bug?
+
+ * Toggling full screen mode hits asserts (at least on win32). These are in the
+   texture manager and hits the ref counting assert. -- Hopefully fixed now.
+
  * Double-clicking on an empty characters list, then selecting a character type
-   appears to break guichan.
+   appears to break guichan. -- Fixed in SVN version of guichan.
 
  * The lighting flickers on some objects when others fade in. Seems like a flag is not being reset, or is somehow being shared across all copies. Typically on model_by_type objects.
 
@@ -31,7 +36,7 @@ Demitar Issues:
 	* dropping rotating stake crashes sear
  
 
-* GUI transitions need more work. Close should ideally go back a step if required. 
+ * GUI transitions need more work. Close should ideally go back a step if required. 
 
  * The StaticObject stores indices as an int, but tells GL they are unsigned ints. Might cause a problem somewhere along the line. 
 
@@ -43,6 +48,6 @@ Demitar Issues:
 
 Need to check init functions. They do not always clean up in event of failure (e.g. System::init();
 
- * Text box sometimes  repeatslast 3/4 chars across lines
+ * Text box sometimes repeats last 3/4 chars across lines
 
  * some problems with multi texturing on cal3d when model doesn't have any second texture (or even first!) breaks alpha-mapping
