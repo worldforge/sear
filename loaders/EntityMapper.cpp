@@ -1,16 +1,15 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2008  Simon Goodall
 
-// $Id: EntityMapper.cpp,v 1.4 2008-10-05 10:06:02 simon Exp $
-
-/** The EntityMapper class aims to provide a mapping between an entity and it's state to
- * a object record. 
- * A mapping file needs to be defined which can check particular attributes of an entity
- * to allow for model and texture selection.
- * The mapper can also be used to randomly select a model from a pool, perhaps by seeding 
- * a rnd with the id.
- * This to some extend will need to interact with the cal3d loader, e.g. for face/head mesh selection.
+/** The EntityMapper class aims to provide a mapping between an entity and it's
+ *  state to an object record. 
+ * A mapping file needs to be defined which can check particular attributes of
+ * an entity to allow for model and texture selection.
+ * The mapper can also be used to randomly select a model from a pool, perhaps
+ * by seeding a rnd with the id.
+ * This to some extend will need to interact with the cal3d loader, e.g. for
+ * face/head mesh selection.
  * Returns nothing if no entry available
  */
 
@@ -25,6 +24,7 @@
 #include "src/FileHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
+#include "IEntityMapperRule.h"
 
 static const std::string CMD_load_entity_mappings = "load_entity_mappings";
 
@@ -56,7 +56,7 @@ int EntityMapper::init() {
 void EntityMapper::shutdown() {
   assert(m_initialised == true);
 
-  m_rules_map.clear();
+  m_type_rule_map.clear();
   m_options_map.clear();
 
   m_initialised = false;
@@ -77,37 +77,25 @@ void EntityMapper::runCommand(const std::string &command, const std::string &arg
   }
 }
 
-std::string EntityMapper::getEntityMapping(WorldEntity *we) {
+std::string EntityMapper::getEntityMapping(const WorldEntity *we) {
   assert(we != 0);
 
-  const std::string &id = we->getId();
+  //const std::string &id = we->getId();
   const std::string &type = we->type();
 
   // Do we have a rule defined?
-  StringMap::const_iterator I = m_rules_map.find(type);
-  if (I != m_rules_map.end()) {
-    if (I->second == RULE_random) {
-      // The random rule picks a random entry from the options list
+  StringMap::const_iterator I = m_type_rule_map.find(type);
+  if (I != m_type_rule_map.end()) {
+
+    RuleMap::const_iterator R = m_rules_map.find(I->second);
+    if (R != m_rules_map.end()) {
+      const SPtr<IEntityMapperRule> rule = R->second; 
+
       StringListMap::const_iterator J = m_options_map.find(type);
       if (J != m_options_map.end()) {
         const StringList &options = J->second;
-        // Setup seed based on entity ID.
 
-        // To allow aliasing
-        union { char c[4]; uint32_t i; } u; 
-        // Blank array as ID might not fill it up
-        memset(u.c, '\0', sizeof(char) * 4);
-        // Take last 4 chars of ID if possible as these change more than the first few
-        // I.e. entities created sequentially could have the same beginning for their ID.
-        unsigned int idx = (id.size() > 4) ? (id.size() - 3) : (0);
-        // Copy up to 4 chars of the id field
-        strncpy(u.c, &id.c_str()[idx], 4);
-        srand(u.i); 
-        // Gen random index
-        float r = (float)rand() / (float)RAND_MAX * (float)options.size();
-        idx = (unsigned int)(r);
-        if (idx == options.size()) --idx; // Bounds check
-        return options[idx];
+        return rule->getEntityMapping(we, options);
       }
     }
   }
@@ -117,7 +105,7 @@ std::string EntityMapper::getEntityMapping(WorldEntity *we) {
 void EntityMapper::varconf_callback(const std::string &section, const std::string &key, varconf::Config &config) {
   const std::string &value = (std::string)config.getItem(section, key);
   if (key == KEY_rule) {
-    m_rules_map[section] = value;
+    m_type_rule_map[section] = value;
   } else if (key == KEY_options) {
     Tokeniser tok(value, ' ');
     while (tok.hasRemainingTokens()) {
@@ -131,6 +119,5 @@ void EntityMapper::varconf_callback(const std::string &section, const std::strin
 void EntityMapper::varconf_error_callback(const char *message) {
   fprintf(stderr, "[EntityMapper] %s\n", message);
 }
-
 
 } /* namespace Sear */

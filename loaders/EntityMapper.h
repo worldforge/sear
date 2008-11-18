@@ -13,6 +13,10 @@
 
 #include <interfaces/ConsoleObject.h>
 
+#include <common/SPtr.h>
+
+#include "IEntityMapperRule.h"
+
 namespace Sear {
 
 class Console;
@@ -30,7 +34,11 @@ public:
   void registerCommands(Console *console);
   void runCommand(const std::string &command, const std::string &args);
 
-  std::string getEntityMapping(WorldEntity *we);
+  std::string getEntityMapping(const WorldEntity *we);
+
+  void registerEntityMapperRule(const std::string &rule, SPtr<IEntityMapperRule> impl) {
+    m_rules_map[rule] = impl;
+  }
 
 private:
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
@@ -41,12 +49,13 @@ private:
   typedef std::map<std::string, std::string> StringMap;
   typedef std::map<std::string, StringList> StringListMap;
 
+  typedef std::map<std::string, SPtr<IEntityMapperRule> > RuleMap;
 
   bool m_initialised;
 
-  StringMap     m_rules_map;
+  StringMap     m_type_rule_map;
   StringListMap m_options_map;
-
+  RuleMap m_rules_map;
 };
 
 } /* namespace Sear */

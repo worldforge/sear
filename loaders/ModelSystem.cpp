@@ -30,6 +30,8 @@
 #include "ParticleSystemLoader.h"
 #include "SearObject_Loader.h"
 
+#include "EntityMapperRule_Random.h"
+
 #ifdef DEBUG
   static const bool debug = true;
 #else
@@ -72,6 +74,9 @@ int ModelSystem::init() {
   m_entity_mapper = std::auto_ptr<EntityMapper>(new EntityMapper());
   m_entity_mapper->init();
 
+  // Register entity mapping rules
+  m_entity_mapper->registerEntityMapperRule("random", SPtr<IEntityMapperRule>(new EntityMapperRule_Random()));
+
   RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(this, &ModelSystem::contextCreated));
   RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(this, &ModelSystem::contextDestroyed));
 
@@ -82,6 +87,7 @@ int ModelSystem::init() {
 }
 
 int ModelSystem::reinit() {
+
   m_model_handler->shutdown();
   m_model_handler->init();
 

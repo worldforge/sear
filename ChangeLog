@@ -1,3 +1,13 @@
+2008-11-18  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/EntityMapper.cpp, loaders/EntityMapper.h,
+	  loaders/Makefile.am, loaders/ModelSystem.cpp,
+	  loaders/EntityMapperRule_Random.cpp, 
+	  loaders/EntityMapperRule_Random.h, loaders/IEntityMapperRule.h:
+	  Split up the entity mapper so that rules can be registered by
+	  different classes. Split out the random rule into it's own class.
+	  Register rules in the ModelSystem class.
+
 2008-11-13  Simon Goodall  <simon@worldforge.org>
 
 	* common/Utility.h, loaders/3ds.h, loaders/3ds_Loader.cpp,
