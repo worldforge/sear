@@ -147,6 +147,7 @@ void StaticObject::contextDestroyed(bool check) {
     if (glIsList(m_select_disp_list)) glDeleteLists(m_list_count, m_select_disp_list);
     if (glIsList(m_disp_list)) glDeleteLists(m_list_count, m_disp_list);
   }
+
   m_list_count = 0;
   m_vb_vertex_data = 0;
   m_vb_normal_data = 0;
@@ -173,7 +174,6 @@ void StaticObject::render(bool select_mode) const {
   glMultMatrixf(m_tex_matrix.getMatrix());
   glMatrixMode(GL_MODELVIEW);
     
-
   // If VBO's are enabled
   if (sage_ext[GL_ARB_VERTEX_BUFFER_OBJECT]) {
     if (!glIsBufferARB(m_vb_vertex_data)) createVBOs();
@@ -236,11 +236,11 @@ void StaticObject::render(bool select_mode) const {
   } else {
     GLuint &disp = (select_mode) ? (m_select_disp_list) : (m_disp_list);
     bool &isSet = (select_mode) ? (m_select_disp_list_set) : (m_disp_list_set);
-    //if (glIsList(disp)) {
+ 
     if (isSet) {
       glCallList(disp);
     } else {
-isSet = true;
+      isSet = true;
       // Need to reset textures otherwise the display list may not record a
       // texture change if the previous object has the same texture. This is 
       // fine until the order of objects changes and the wrong texture is in 
@@ -288,7 +288,6 @@ isSet = true;
         glActiveTextureARB(GL_TEXTURE0_ARB);
       }
 
-
       // Use the Lock arrays extension if available.
       if (sage_ext[GL_EXT_COMPILED_VERTEX_ARRAY]) {
         glLockArraysEXT(0, m_num_points);
@@ -327,7 +326,6 @@ isSet = true;
   glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
- 
 }
 
 int StaticObject::load(const std::string &filename) {
@@ -415,7 +413,6 @@ error:
   fprintf(stderr, "Error reading StaticObject.\n");
 #endif
   return 1;
-
 }
 
 int StaticObject::save(const std::string &filename) {
@@ -477,7 +474,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
     }
 
-    /// Loop through each matrix here and do the render
+    // Loop through each matrix here and do the render
     std::vector<std::pair<Matrix,WorldEntity*> >::const_iterator I = positions.begin();
     std::vector<std::pair<Matrix,WorldEntity*> >::const_iterator Iend = positions.end();
     while (I != Iend) {
@@ -533,7 +530,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         }
         glColor4fv(white);
         RenderSystem::getInstance().switchState(m_state);
-      } else { // Render object normaly
+      } else { // Render object normally
 
 
 // The problem here appears to be the enabling of GL_COLOR_MATERIAL
@@ -568,7 +565,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         if (blend_enabled == GL_FALSE) glDisable(GL_BLEND);
         if (cmat_enabled == GL_FALSE)  glDisable(GL_COLOR_MATERIAL);
 
-        if (reset_colour)   glColor4fv(white);
+        if (reset_colour) glColor4fv(white);
         glPopAttrib();
       }
 
@@ -656,7 +653,6 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         glLockArraysEXT(0, m_num_points);
       }
       glEndList();
-
  
       // Third disp list, render the object
       glNewList(disp + 2, GL_COMPILE);
@@ -682,7 +678,6 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         glColor4fv(halo_colour);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glEndList();
-
 
         //Fifth list, finish outline
         glNewList(disp + 4, GL_COMPILE);
@@ -782,7 +777,6 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
         if (!blend_enabled) glDisable(GL_BLEND);
         if (!cmat_enabled)  glDisable(GL_COLOR_MATERIAL);
         if (reset_colour)   glColor4fv(white);
-
       }
 
       glPopMatrix();
@@ -795,7 +789,6 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
   glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
- 
 }
 
 } // namespace Sear
