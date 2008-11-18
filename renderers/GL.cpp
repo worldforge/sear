@@ -238,6 +238,9 @@ static const bool debug = false;
   std::vector<unsigned char> blue_array;
 #endif
 
+//#define TEST_CONTEXT_DESTRUCTION
+
+
 namespace Sear {
 
 bool GL::createWindow(unsigned int width, unsigned int height, bool fullscreen) {
@@ -435,11 +438,19 @@ void GL::destroyWindow() {
 void GL::toggleFullscreen() {
   m_fullscreen = !m_fullscreen;
   // If fullscreen fails, create a new window with the fullscreen flag (un)set
+
+#ifndef TEST_CONTEXT_DESTRUCTION
   if (!SDL_WM_ToggleFullScreen(m_screen)) {
+#endif
+
     destroyWindow();
     contextDestroyed(false);
     createWindow(m_width, m_height, m_fullscreen);
+
+#ifndef TEST_CONTEXT_DESTRUCTION
   }
+#endif
+
 }
 
 int GL::checkError() {
@@ -1652,14 +1663,25 @@ void GL::resize(int width, int height) {
   }
 
   // Have the textures been destroyed?
+#ifndef TEST_CONTEXT_DESTRUCTION
   if (!glIsTexture(1)) {
+#endif
+
     printf("Warning, context lost after resize!\n");
     // TODO: What is going on in this situation
     // The window has been resized, however the GL context needs to be
     // re-created. Do we need to destroy the whole window?
+#ifndef TEST_CONTEXT_DESTRUCTION
     contextDestroyed(false);
+#else
+    contextDestroyed(true);
+#endif
     contextCreated();
+
+#ifndef TEST_CONTEXT_DESTRUCTION
   }
+#endif
+
   // Update view port
   setViewMode(PERSPECTIVE);
 }

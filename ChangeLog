@@ -1,5 +1,10 @@
 2008-11-18  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp: Add a conditional to test context destruction
+	  (e.g. win32 behaviour on the Linux build).
+
+2008-11-18  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/StaticObject.cpp: Clean up isSet changes.
 
 2008-11-18  Simon Goodall  <simon@worldforge.org>
