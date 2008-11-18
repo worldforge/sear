@@ -447,6 +447,8 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
   glEnable (GL_BLEND);
   glDisable (GL_TEXTURE_2D);
   glColor4f (0.8f, 0.8f, 1.f, 0.6f);
+  // TODO: We should vary this vector per vertex a little to improve 3-d
+  //  appearance of the sea. Perhaps a combination of seaLevel + x/y vertex pos.
   glNormal3f (0.0f, 0.0f, 1.0f);
   glEnable (GL_COLOR_MATERIAL);
 
@@ -498,6 +500,9 @@ TerrainRenderer::TerrainRenderer ():
   m_haveTerrain (false),
   m_context_no(-1)
 {
+  // TODO: We do not seem to use the water texture?
+  //       Check against history!
+  //       -- No longer have textures enabled for sea
   m_seaTexture    = RenderSystem::getInstance ().requestTexture ("water");
   m_shadowTexture = RenderSystem::getInstance ().requestTexture ("shadow");
 
@@ -536,7 +541,6 @@ TerrainRenderer::TerrainRenderer ():
   // Hook up callback to View.
   System::instance()->EnteredWorld.connect(sigc::bind(sigc::ptr_fun(onEnteredWorld), m_tmh));
   // TODO: Also hook up left world to de-init
-
 
 }
 
