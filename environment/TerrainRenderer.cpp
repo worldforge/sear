@@ -480,16 +480,18 @@ static void onEnteredWorld(SearTerrainModHandler *tmh) {
 }
 
 static void onTerrainModChanged(Eris::Entity *e, Mercator::TerrainMod *mod, TerrainRenderer *tr) {
-  tr->m_terrain.removeMod(mod);
-  // TODO: This returns a ptr too?
-  tr->m_terrain.addMod(*mod);
+  if (mod != 0) {
+    tr->m_terrain.removeMod(mod);
+    // TODO: This returns a ptr too?
+    tr->m_terrain.addMod(*mod);
+  }
 }
 
 static void onTerrainModDeleted(Eris::Entity *e, Mercator::TerrainMod *mod, TerrainRenderer *tr) {
-  tr->m_terrain.removeMod(mod);
+  if (mod != 0) {
+    tr->m_terrain.removeMod(mod);
+  }
 }
-
-
 
 TerrainRenderer::TerrainRenderer ():
   m_terrain (Terrain::SHADED),
@@ -535,6 +537,7 @@ TerrainRenderer::TerrainRenderer ():
 
   // Hook up callbacks to modify terrain renderer
 //  m_tmh->TerrainModAdded.connect();
+  m_tmh->TerrainModAdded.connect(sigc::bind(sigc::ptr_fun(onTerrainModChanged), this));
   m_tmh->TerrainModChanged.connect(sigc::bind(sigc::ptr_fun(onTerrainModChanged), this));
   m_tmh->TerrainModDeleted.connect(sigc::bind(sigc::ptr_fun(onTerrainModDeleted), this));
 

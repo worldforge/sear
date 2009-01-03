@@ -1,5 +1,9 @@
 2009-01-03  Simon Goodall  <simon@worldforge.org>
 
+	* environment/TerrainRenderer.cpp: Check for null mods.
+
+2009-01-03  Simon Goodall  <simon@worldforge.org>
+
 	* Eris/TerrainModHandler.h: Add default constructor and virtual
 	  destructor.
 
