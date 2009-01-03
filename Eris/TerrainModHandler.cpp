@@ -41,6 +41,21 @@ void TerrainModHandler::setView(View *view) {
   // Use of appearance and disappearance should also work, but lead to an
   // increased number of add/remove calls
 
+  // By the time this method is called, several entities have already been seen.
+  // We need to run through the list and hook up these entities.
+
+  // TODO: We are only looking one level deep, perhaps this should be recursive.
+  Entity  e = view->getTopLevel();
+  if (e != 0) {
+    onEntityCreated(e);
+    unsigned int numContained = e ->numContained();
+    for (unsigned int n  = 0; n < numContained; ++n) {
+      Entity *ee = e->getContained(n);
+      onEntityCreated(ee);
+    }
+  }
+
+
   // view->EntityCreated.connect(sigc::mem_fun(this, &TerrainModHandler::onEntityCreated));
   //view->EntityDeleted.connect(sigc::mem_fun(this, &TerrainModHandler::onEntityDeleted));
 
@@ -50,6 +65,12 @@ void TerrainModHandler::setView(View *view) {
 
 void TerrainModHandler::onEntityCreated(Entity *e) {
 
+  TerrainModMap::iterator I = m_modMap.find(e->getId());
+  if (I != m_modMap.end()) {
+    // Already added... lets ignore for now..
+    return;
+  }
+  
   TerrainMod *tm = new TerrainMod(e, this);
 
   tm->EventModChanged.connect(sigc::mem_fun(*this, &TerrainModHandler::onEventModChanged));
@@ -58,6 +79,8 @@ void TerrainModHandler::onEntityCreated(Entity *e) {
   tm->init();
 
   m_modMap[e->getId()] = tm;
+
+  onEventModChanged(tm);
 }
 
 void TerrainModHandler::onEntityDeleted(Entity *e) {

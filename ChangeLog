@@ -1,3 +1,9 @@
+2009-01-03  Simon Goodall  <simon@worldforge.org>
+
+	* Eris/TerrainModHandler.cpp: Allow multiple onEntityCreated calls.
+	  Examine top level entity children for terrain mods. (only one level
+	  deep).
+
 2008-11-18  Simon Goodall  <simon@worldforge.org>
 
 	* renderers/GL.cpp: Add a conditional to test context destruction
