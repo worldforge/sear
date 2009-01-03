@@ -154,7 +154,7 @@ typedef std::map<std::string, std::vector<DynamicObject*> > QueueDynamicObjectMa
   int currentContextNo() const { return m_context_instantiation; }
   bool contextValid() const { return m_context_valid; }
 
-  virtual void nextColour(WorldEntity*) = 0;
+  virtual void nextColour(WorldEntity*, bool) = 0;
 
 protected:
   int m_context_instantiation ;

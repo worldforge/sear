@@ -1,5 +1,11 @@
 2009-01-03  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp, renderers/GL.h, renderers/Render.h,
+	  renderers/RenderSystem.cpp: Added  "/next_entity" and
+	  "/prev_entity" commands to manually cycle through visible entities.
+
+2009-01-03  Simon Goodall  <simon@worldforge.org>
+
 	* environment/TerrainRenderer.cpp: Check for null mods.
 
 2009-01-03  Simon Goodall  <simon@worldforge.org>

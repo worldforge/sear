@@ -23,6 +23,8 @@
 #include "Light.h"
 #include "Render.h"
 
+#include "interfaces/ConsoleObject.h"
+
 namespace WFMath {
 class Quaternion;
 }
@@ -38,7 +40,7 @@ class ObjectRecord;
 class ModelRecord;
 class Console;
 
-class GL : public Render, public sigc::trackable {
+class GL : public Render, public sigc::trackable, public ConsoleObject {
 public:
   GL();
   virtual ~GL();
@@ -55,8 +57,8 @@ public:
   void destroyWindow();
   void toggleFullscreen();
 
-  void registerCommands(Console *console) const {}
-  void runCommands(const std::string &command) const {}
+  void registerCommands(Console *console) ;
+  void runCommand(const std::string &command, const std::string &args) ;
 
 private:
 
@@ -202,7 +204,7 @@ protected:
   WorldEntity *getSelectedID(unsigned int i) const  {
     return (i >= m_entityArray.size()) ? (NULL) : (m_entityArray[i]);
   }
-  void nextColour(WorldEntity*);
+  void nextColour(WorldEntity*, bool);
 
   int setupExtensions();
   bool m_use_fsaa;
@@ -231,6 +233,7 @@ protected:
 
   int m_sdl_gl_multisamplesamples;
   int m_sdl_gl_multisamplebuffers;
+  int m_selection_counter;
 };
 
 

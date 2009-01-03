@@ -496,7 +496,7 @@ int GL::setupExtensions() {
   return 0;
 }
                                                                                 
-void GL::nextColour(WorldEntity *we){
+void GL::nextColour(WorldEntity *we, bool set){
   assert(we != 0);
   // TODO: we are now passing the same we to this function several times per
   // frame. We might want to return the same colour each time, rather than 
@@ -533,7 +533,9 @@ void GL::nextColour(WorldEntity *we){
   GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) << (8 - m_blueBits);
 
   // Set the colour
-  glColor3ub(red, green, blue);
+  if (set) {
+    glColor3ub(red, green, blue);
+  }
 
 #ifdef VALIDATE_COLOUR_PICKING  
   red_array[m_colour_index] = red;
@@ -545,7 +547,7 @@ void GL::nextColour(WorldEntity *we){
 }
 
 void GL::selectTerrainColour(WorldEntity * we) {
-  nextColour(we);
+  nextColour(we, true);
 }
 
 void GL::buildColourSet() {
@@ -592,7 +594,8 @@ GL::GL() :
   m_redShift(0), m_greenShift(0), m_blueShift(0),
   m_use_fsaa(DEFAULT_use_fsaa),
   m_use_vbo(DEFAULT_use_vbo),
-  m_initialised(false)
+  m_initialised(false),
+  m_selection_counter(0)
 {
 }
 
@@ -1282,9 +1285,10 @@ void GL::drawQueue(QueueMap &queue, bool select_mode) {
 
       // Draw Model
       if (select_mode) {
-        nextColour(we);
+        nextColour(we, true);
         model->render(true);
       } else {
+        nextColour(we, false);
         if (we->isSelectedEntity()) {
           m_active_name = object_record->entity->getName();
           drawOutline(model_record);
@@ -1791,5 +1795,68 @@ void GL::drawQueue(const QueueDynamicObjectMap &object_map,
     ++I;
   }
 }
+
+void GL::registerCommands(Console *console) {
+  console->registerCommand("next_entity", this);
+  console->registerCommand("prev_entity", this);
+}
+
+void GL::runCommand(const std::string &command, const std::string &args) {
+  if (command == "next_entity") {
+    if (m_activeEntity) {
+      dynamic_cast<WorldEntity*>(m_activeEntity.get())->setIsSelected(false);
+    }
+
+    m_selection_counter++;
+    m_selection_counter = m_selection_counter % m_colour_index;
+
+    WorldEntity *selected_entity = m_entityArray[m_selection_counter];
+
+    // Mark entity as selected
+    if (selected_entity) {
+      selected_entity->setIsSelected(true);
+    }
+
+    // If this entity is different to the previously selected entity, update our ref.
+    if (selected_entity != m_activeEntity.get()) {
+      if (selected_entity != NULL ) {
+        m_activeEntity = Eris::EntityRef(selected_entity);
+      } else {
+        m_activeEntity = Eris::EntityRef();
+      }
+
+      if (debug && m_activeEntity) Log::writeLog(std::string("ActiveID: ") + m_activeEntity->getId(), Log::LOG_DEFAULT);
+    }
+  }
+
+  else if (command == "prev_entity") {
+
+    if (m_activeEntity) {
+      dynamic_cast<WorldEntity*>(m_activeEntity.get())->setIsSelected(false);
+    }
+    m_selection_counter--;
+    if (m_selection_counter < 0) {
+      m_selection_counter = m_colour_index - 1;
+    }
+    m_selection_counter = m_selection_counter % m_colour_index;
+ 
+    WorldEntity *selected_entity = m_entityArray[m_selection_counter];
+    // Mark entity as selected
+    if (selected_entity) {
+      selected_entity->setIsSelected(true);
+    }
+    // If this entity is different to the previously selected entity, update our ref.
+    if (selected_entity != m_activeEntity.get()) {
+      if (selected_entity != NULL ) {
+        m_activeEntity = Eris::EntityRef(selected_entity);
+      } else {
+        m_activeEntity = Eris::EntityRef();
+      }
+
+      if (debug && m_activeEntity) Log::writeLog(std::string("ActiveID: ") + m_activeEntity->getId(), Log::LOG_DEFAULT);
+    }
+  }
+}
+
 
 } // namespace Sear
