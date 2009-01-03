@@ -1,5 +1,10 @@
 2009-01-03  Simon Goodall  <simon@worldforge.org>
 
+	* Eris/TerrainModHandler.h: Add default constructor and virtual
+	  destructor.
+
+2009-01-03  Simon Goodall  <simon@worldforge.org>
+
 	* Eris/TerrainModHandler.cpp: Allow multiple onEntityCreated calls.
 	  Examine top level entity children for terrain mods. (only one level
 	  deep).

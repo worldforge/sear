@@ -21,6 +21,12 @@ namespace Eris {
 class TerrainModHandler {
 public:
 
+  TerrainModHandler() :
+    m_initialised(false)
+  {}
+
+  virtual ~TerrainModHandler() {}
+
   virtual bool init();
   virtual void shutdown();
 
