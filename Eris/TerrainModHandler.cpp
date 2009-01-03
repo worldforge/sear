@@ -45,7 +45,7 @@ void TerrainModHandler::setView(View *view) {
   // We need to run through the list and hook up these entities.
 
   // TODO: We are only looking one level deep, perhaps this should be recursive.
-  Entity  e = view->getTopLevel();
+  Entity *e = view->getTopLevel();
   if (e != 0) {
     onEntityCreated(e);
     unsigned int numContained = e ->numContained();

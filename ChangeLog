@@ -1,5 +1,9 @@
 2009-01-03  Simon Goodall  <simon@worldforge.org>
 
+	*  Eris/TerrainModHandler.cpp: Fix missing * on pointer declaration.
+
+2009-01-03  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp, renderers/GL.h, renderers/Render.h,
 	  renderers/RenderSystem.cpp: Added  "/next_entity" and
 	  "/prev_entity" commands to manually cycle through visible entities.
