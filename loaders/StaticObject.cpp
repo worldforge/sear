@@ -144,8 +144,12 @@ void StaticObject::contextDestroyed(bool check) {
     }
 
     // Clean up display lists 
-    if (glIsList(m_select_disp_list)) glDeleteLists(m_list_count, m_select_disp_list);
-    if (glIsList(m_disp_list)) glDeleteLists(m_list_count, m_disp_list);
+    if (m_disp_list_set) {
+      if (glIsList(m_select_disp_list)) glDeleteLists(m_list_count, m_select_disp_list);
+    }
+    if (m_select_disp_list_set) {
+      if (glIsList(m_disp_list)) glDeleteLists(m_list_count, m_disp_list);
+    }
   }
 
   m_list_count = 0;

@@ -1,5 +1,10 @@
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/StaticObject.cpp: Check the set flags when destroying
+	  display lists.
+
+2009-01-04  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/AreaModel.cpp, loaders/AreaModel.h,
 	  loaders/AreaModelLoader.cpp, loaders/AreaModelLoader.h: Hook in some
 	  reference counting so that when all AreaModel instances for a
