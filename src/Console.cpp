@@ -1,8 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
 
-// $Id: Console.cpp,v 1.42 2007-05-02 20:47:55 simon Exp $
 #include "common/Utility.h"
 #include "common/Log.h"
 
@@ -434,6 +433,7 @@ void Console::runCommand(const std::string &comd) {
     }
     return; 
   }
+
   // If command has a leading /, remove it
   std::string command_string = (c == '/')? command.substr(1) : command;
   // Split string into command / arguments pair
@@ -454,12 +454,19 @@ void Console::runCommand(const std::string &comd) {
     // the above checks for commands that are abbrevs of others 'get' <=> 'get_time'
     pushMessage("Ambigious command: " + cmd, CONSOLE_MESSAGE, 0);
   }
-  
-  ConsoleObject* con_obj = m_registered_commands[cmd];
+
+
   // Print all commands apart form toggle console to the console
   if (cmd != TOGGLE_CONSOLE) pushMessage(command_string, CONSOLE_MESSAGE, 0);
-  // If object exists, run the command
-  if (con_obj) con_obj->runCommand(cmd, args);
+
+  // Find the registered handler
+  std::map<std::string, ConsoleObject*>::iterator I = m_registered_commands.find(cmd);
+
+  if (I != m_registered_commands.end()) {
+    ConsoleObject* con_obj = I->second;
+    // If object exists, run the command
+    if (con_obj) con_obj->runCommand(cmd, args);
+  }
 }
 
 void Console::runCommand(const std::string &command, const std::string &args) {
