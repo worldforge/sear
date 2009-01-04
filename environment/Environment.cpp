@@ -131,6 +131,13 @@ void Environment::addArea(Mercator::Area* ar)
   m_terrain->m_terrain.addArea(ar);
 }
 
+void Environment::deregisterTerrainShader(Mercator::Shader* shade)
+{
+  assert(m_initialised == true);
+  assert(shade);
+  m_terrain->deregisterShader(shade);
+}
+
 void Environment::registerTerrainShader(Mercator::Shader* shade, const std::string& texId)
 {
   assert(m_initialised == true);

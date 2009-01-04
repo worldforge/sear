@@ -1,5 +1,11 @@
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  environment/Environment.cpp, environment/Environment.h: Added
+	  methods to de-register terrain shaders.
+
+2009-01-04  Simon Goodall  <simon@worldforge.org>
+
 	* src/Console.cpp: Fix bug where any /command string would be added to 
 	  the ist of available commands even if it is not a valid command.
 

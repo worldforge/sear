@@ -557,8 +557,12 @@ TerrainRenderer::~TerrainRenderer() {
   RenderSystem::getInstance ().releaseTexture(m_shadowTexture);
 
   for (unsigned int i = 0; i < m_shaders.size();  ++i) {
-    RenderSystem::getInstance().releaseTexture(m_shaders[i].texId);
-    delete m_shaders[i].shader;
+
+    if (m_shaders[i].shader != 0) {
+   deregisterShader(m_shaders[i].shader);
+
+      delete m_shaders[i].shader;
+    }
   }
   delete [] m_lineIndeces;
   contextDestroyed(true);
@@ -653,6 +657,25 @@ void TerrainRenderer::registerShader(Mercator::Shader* s, const std::string& tex
   m_terrain.addShader(s, index);
   m_shaders[index].texId = RenderSystem::getInstance().requestTexture(texName);
   // assert m_shaders[index].texId is non-zero?
+}
+
+void TerrainRenderer::deregisterShader(Mercator::Shader* s)
+{
+  int index = 0;
+  std::vector<ShaderEntry>::iterator I = m_shaders.begin();
+  std::vector<ShaderEntry>::iterator Iend = m_shaders.end();
+  while (I != Iend) {
+    ShaderEntry &se = *I;
+    if (se.shader == s) {
+      m_terrain.removeShader(s, index);
+      RenderSystem::getInstance().releaseTexture(m_shaders[index].texId);
+      m_shaders[index].shader = 0;
+      // We should only have one shader in the list
+      break;
+    }
+    ++index;
+   ++I;
+  }
 }
 
 void TerrainRenderer::drawShadow (const WFMath::Point < 2 > &pos, float radius) {

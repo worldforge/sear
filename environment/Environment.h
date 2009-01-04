@@ -65,6 +65,7 @@ public:
   void addArea(Mercator::Area* we);
   void removeArea(Mercator::Area* we);
   void registerTerrainShader(Mercator::Shader* s, const std::string& texId);
+  void deregisterTerrainShader(Mercator::Shader* s);
   
   void resetWorld();
   void setWeatherEntity(WorldEntity *we);

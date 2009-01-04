@@ -36,7 +36,8 @@ public:
         disp(0),
         harray(NULL),
         narray(NULL),
-        m_context_no(-1)
+        m_context_no(-1),
+        m_list_set(false)
       {
       }
       
@@ -50,6 +51,7 @@ public:
       float *harray;
       float *narray;
       int m_context_no;
+      bool m_list_set;
 
       void contextCreated();
       void contextDestroyed(bool check);
@@ -110,6 +112,8 @@ public:
     friend class Environment;
     
     void registerShader(Mercator::Shader*, const std::string& texId);
+    void deregisterShader(Mercator::Shader* s);
+
 
   int m_context_no;
 };
