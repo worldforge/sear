@@ -53,8 +53,6 @@ SPtr<ModelRecord> AreaModelLoader::loadModel(WorldEntity *we,
 
     m_counters[amodel->getLayer()]++ ;
 
-
-printf("Layer ID %d just got %d refs\n", amodel->getLayer(), m_counters[amodel->getLayer()]);
     return model_record;
 }
 
@@ -63,7 +61,6 @@ void AreaModelLoader::releaseLayer(int id) {
   int count = m_counters[id];
   count--;
   m_counters[id] = count;
-  printf("Layer ID %d just got down to %d refs\n", id, count);
   if (count == 0) {
     Mercator::AreaShader* ashade = m_shaders[id];
     Environment::getInstance().deregisterTerrainShader(ashade);
