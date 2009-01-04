@@ -1,5 +1,9 @@
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
+	* data/bindings.cfg: Add /next_entity and /prev_entity bindings
+
+2009-01-04  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/StaticObject.cpp: Check the set flags when destroying
 	  display lists.
 
