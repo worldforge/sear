@@ -1,5 +1,12 @@
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
+	* loaders/AreaModel.cpp, loaders/AreaModel.h,
+	  loaders/AreaModelLoader.cpp, loaders/AreaModelLoader.h: Hook in some
+	  reference counting so that when all AreaModel instances for a
+	  paritcular layer have been destroyed, we release the shader.
+
+2009-01-04  Simon Goodall  <simon@worldforge.org>
+
 	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
 	  environment/Environment.cpp, environment/Environment.h: Added
 	  methods to de-register terrain shaders.

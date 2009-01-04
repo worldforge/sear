@@ -26,11 +26,14 @@ public:
   virtual std::string getType() const { return AREA_MODEL; }
 
   virtual SPtr<ModelRecord> loadModel(WorldEntity *we, const std::string &model_id, varconf::Config &model_config);
-    
+  // Call when the AreaModel is destroyed to allow shader to be released
+  void releaseLayer(int);
+
 private:
   static const std::string AREA_MODEL;
   typedef std::map<int, Mercator::AreaShader*> Shaderstore;
   Shaderstore m_shaders;
+  std::map<int, int> m_counters;
 };
 
 } // of namespace Sear

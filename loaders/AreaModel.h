@@ -15,10 +15,11 @@ namespace Mercator
 namespace Sear {
 
 class WorldEntity;
+class AreaModelLoader;
 
 class AreaModel : public Model {
 public:
-  AreaModel(WorldEntity *we);
+  AreaModel(WorldEntity *we, AreaModelLoader *loader);
   /**
    * initialise the model. Result indicates success (true) or failure
   */
@@ -37,6 +38,7 @@ private:
   bool m_initialised;
   WorldEntity *m_entity;
   Mercator::Area* m_area;
+  AreaModelLoader *m_loader;
 };
 
 }

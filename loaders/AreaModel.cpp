@@ -11,17 +11,19 @@
 #include "src/WorldEntity.h"
 
 #include "AreaModel.h"
+#include "AreaModelLoader.h"
 
 namespace Sear {
 
 typedef WFMath::Point<2> Point2;
 typedef WFMath::Vector<3> Vector3;
 
-AreaModel::AreaModel(WorldEntity *we) :
+AreaModel::AreaModel(WorldEntity *we, AreaModelLoader *loader) :
     Model(),
     m_initialised(false),
     m_entity(we),
-    m_area(NULL)
+    m_area(NULL),
+    m_loader(loader)
 {
 }
 
@@ -94,8 +96,13 @@ int AreaModel::shutdown()
 {
   assert (m_initialised == true);
   Environment::getInstance().removeArea(m_area);
+ 
+  // Allow shaders to be freed up 
+  m_loader->releaseLayer(getLayer());
+
   delete m_area; m_area = NULL;
   m_initialised = false;
+
 
   return 0;
 }
