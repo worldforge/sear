@@ -1,5 +1,9 @@
 2009-01-05  Simon Goodall  <simon@worldforge.org>
 
+	* configure.ac, Makefile.am: Add in extra m4 recommendations.
+
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
 	* loaders/DynamicObject.cpp, loaders/StaticObject.cpp,
 	  renderers/RenderSystem.cpp, renderers/RenderSystem.h: Change 
 	  nextColour to also specify the set param.

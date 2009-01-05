@@ -13,3 +13,6 @@ $(PACKAGE)-$(VERSION).tar.gz: dist
 
 appdir = $(datadir)/applications/
 app_DATA = sear.desktop
+
+
+ACLOCAL_AMFLAGS=-I m4
