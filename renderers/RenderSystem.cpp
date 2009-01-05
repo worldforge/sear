@@ -275,9 +275,9 @@ int RenderSystem::getWindowHeight() const {
   return m_renderer->getWindowHeight();
 }
 
-void RenderSystem::nextColour(WorldEntity *we)  {
+void RenderSystem::nextColour(WorldEntity *we, bool set)  {
   assert (m_initialised);
-  return m_renderer->nextColour(we, true);
+  return m_renderer->nextColour(we, set);
 }
 
 bool RenderSystem::contextValid() const {

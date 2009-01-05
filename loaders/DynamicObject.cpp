@@ -549,9 +549,7 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, m_vb_indices);
     }
 
-    if (select_mode) {
-      RenderSystem::getInstance().nextColour(we);
-    }
+    RenderSystem::getInstance().nextColour(we, select_mode);
 
     glPushMatrix();
     // Apply mesh transform
@@ -685,9 +683,7 @@ void DynamicObject::render(bool select_mode, WorldEntity *we) const {
       glColorPointer(4, GL_UNSIGNED_BYTE, 0, m_colour_data);
     }
 
-    if (select_mode) {
-      RenderSystem::getInstance().nextColour(we);
-    }
+    RenderSystem::getInstance().nextColour(we, select_mode);
 
     glPushMatrix();
     // Apply mesh transform

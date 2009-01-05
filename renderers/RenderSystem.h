@@ -121,7 +121,7 @@ public:
   int getWindowWidth() const;
   int getWindowHeight() const;
 
-  void nextColour(WorldEntity*);
+  void nextColour(WorldEntity*we, bool set);
   bool contextValid() const;
   int currentContextNo() const;
 

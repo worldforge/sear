@@ -1,3 +1,9 @@
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/DynamicObject.cpp, loaders/StaticObject.cpp,
+	  renderers/RenderSystem.cpp, renderers/RenderSystem.h: Change 
+	  nextColour to also specify the set param.
+
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
 	* data/bindings.cfg: Add /next_entity and /prev_entity bindings
