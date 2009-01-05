@@ -1,5 +1,10 @@
 2009-01-05  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/RootWidget.cpp, guichan/box.cpp: Remove use of WidgetList
+	  typedef as this will be gone in the next guichan release.
+
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, Makefile.am: Add in extra m4 recommendations.
 
 2009-01-05  Simon Goodall  <simon@worldforge.org>

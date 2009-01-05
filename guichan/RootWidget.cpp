@@ -34,8 +34,8 @@ bool RootWidget::childHasMouse()
 void RootWidget::resize(int width, int height, int old_width, int old_height)
 {
   setDimension(gcn::Rectangle(0, 0, width, height));
-  gcn::Container::WidgetListIterator I = mWidgets.begin();
-  gcn::Container::WidgetListIterator Iend = mWidgets.end();
+  std::list<gcn::Widget*>::const_iterator I = mWidgets.begin();
+  std::list<gcn::Widget*>::const_iterator Iend = mWidgets.end();
   for (; I != Iend; ++I) {
     gcn::Widget * child = *I;
     int x = child->getX(),
