@@ -274,18 +274,19 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
   gcn::Widget *focus = fh->getFocused();
 
-  bool gui_has_mouse = m_top->childHasMouse();
-
   bool clear_focus = false;
   bool event_eaten = false;
   bool suppress = false;
   Panel *panel = dynamic_cast<Panel*>(m_panel.get());
   switch (event.type) {
     case SDL_MOUSEMOTION:
+      // FIXME This should depend on whether the gui is visible.
+      event_eaten = m_gui->getWidgetAt(event.motion.x, event.motion.y) != m_top;
+      break;
     case SDL_MOUSEBUTTONDOWN:
     case SDL_MOUSEBUTTONUP:
       // FIXME This should depend on whether the gui is visible.
-      event_eaten = gui_has_mouse;
+      event_eaten = m_gui->getWidgetAt(event.button.x, event.button.y) != m_top;
       break;
     case SDL_KEYDOWN:
       if (event.key.keysym.sym == SDLK_RETURN) {

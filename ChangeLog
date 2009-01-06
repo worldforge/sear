@@ -1,3 +1,11 @@
+2009-01-06  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Workarea.cpp, guichan/Workarea.h: Fix gui so that mouse
+	  clicks do not fall through and call GL::procEvent.
+
+	* guichan/RootWidget.cpp, guichan/RootWidget.h: Remove mouse listener
+	  and childWithMouse method as we no longer need them. 
+
 2009-01-05  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/RootWidget.cpp, guichan/box.cpp: Remove use of WidgetList
