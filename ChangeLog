@@ -1,5 +1,10 @@
 2009-01-09  Simon Goodall  <simon@worldforge.org>
 
+	* renderers/GL.cpp, renderers/GL.h: Some changes to make each
+	  worldentity use a single colour during select mode.
+
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
 	* configure.ac, Makefile.am, src/Makefile.am, gui/*,
 	  guichan/Makefile.am, guichan/Compass.cpp, guichan/Compass.h: Delete 
 	  the old gui directory and create a new guichan version of the compass.

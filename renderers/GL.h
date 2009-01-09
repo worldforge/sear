@@ -188,19 +188,23 @@ protected:
   float m_light_level;
 
   std::vector<WorldEntity*> m_entityArray;
+  std::map<WorldEntity*, uint32_t> m_entityColourMap;
 
-  unsigned int m_colour_index;
-  std::map<unsigned int, std::string> m_colour_mapped;
+  uint32_t m_colour_index;
+  std::map<uint32_t, std::string> m_colour_mapped;
   
   GLint m_redBits, m_greenBits, m_blueBits;
   GLuint m_redMask, m_greenMask, m_blueMask;
-  int m_redShift, m_greenShift, m_blueShift;
+  uint32_t m_redShift, m_greenShift, m_blueShift;
   
   static GLuint makeMask(GLuint bits) {
     // Create an 8-bit mask with 'bits' set to 1
     return (0xFF >> (8 - bits));
   }
-  void resetColours() { m_colour_index = 1; }
+  void resetColours() { 
+    m_colour_index = 1; 
+    m_entityColourMap.clear();
+  }
   WorldEntity *getSelectedID(unsigned int i) const  {
     return (i >= m_entityArray.size()) ? (NULL) : (m_entityArray[i]);
   }

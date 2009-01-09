@@ -502,48 +502,69 @@ void GL::nextColour(WorldEntity *we, bool set){
   // frame. We might want to return the same colour each time, rather than 
   // allocate a new one.
 
-  // Dynamically grow array as needed.
-  if (m_colour_index >= m_entityArray.size()) {
-    size_t new_size = (m_entityArray.size() + 1) * 2;
-    m_entityArray.resize(new_size);
+  uint32_t colour = m_colour_index;
+
+  // Look up previously assigned colour if available
+  std::map<WorldEntity*, uint32_t>::const_iterator I = m_entityColourMap.find(we);
+  bool newColour = true;
+  if (I != m_entityColourMap.end()) {
+    colour = I->second;
+    newColour = false;
+  }
+
+  if (newColour) {
+    // Dynamically grow array as needed.
+    if (m_colour_index >= m_entityArray.size()) {
+      size_t new_size = (m_entityArray.size() + 1) * 2;
+      m_entityArray.resize(new_size);
+
 #ifdef VALIDATE_COLOUR_PICKING
-  red_array.resize(new_size);
-  green_array.resize(new_size);
-  blue_array.resize(new_size);
+      red_array.resize(new_size);
+      green_array.resize(new_size);
+      blue_array.resize(new_size);
 #endif
+    }
+
+    m_entityArray[m_colour_index] = we; // Store entity in array slot
+
+    ++m_colour_index; // Increment counter for next pass
   }
 
-  m_entityArray[m_colour_index] = we; // Store entity in array slot
-
-  // From a 32-bit number, extract red, green and blue components so that they are suitable for use
-  // in glColor3ub. We use at most 24 bits (ignore alpha - it's used for
-  // transparency).
-  // We break up m_colour_index as follows;
-  // [unused | red bits | green bits | blue bits].
-  // For colour components with less than 8 bits, we bitshift so that high order bits are used over low order bits.
-  // I.e. for a 5-bit depth, 00011011 becomes 11011000
-  // In procEvent, these three colour components will be re-combined to obtain the original number.
-  
-  // Bitshift an 8-bit mask into the correct position in the 32-bit number, extract bits, then shift contents
-  // back to a 8-bit placement.
-  GLubyte red = (m_colour_index & (m_redMask << m_redShift)) >> (m_redShift - (8 - m_redBits));
-  GLubyte green = (m_colour_index & (m_greenMask << m_greenShift)) >> (m_greenShift - (8 - m_greenBits));
-  // Blue shift will often be 0, so we could end up with negative bitshifting.
-  //GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) >> (m_blueShift - (8 - m_blueBits));
-  GLubyte blue = (m_colour_index & (m_blueMask << m_blueShift)) << (8 - m_blueBits);
-
-  // Set the colour
   if (set) {
+
+    // From a 32-bit number, extract red, green and blue components so that they are suitable for use
+    // in glColor3ub. We use at most 24 bits (ignore alpha - it's used for
+    // transparency).
+    // We break up m_colour_index as follows;
+    // [unused | red bits | green bits | blue bits].
+    // For colour components with less than 8 bits, we bitshift so that high order bits are used over low order bits.
+    // I.e. for a 5-bit depth, 00011011 becomes 11011000
+    // In procEvent, these three colour components will be re-combined to obtain the original number.
+  
+    // Bitshift an 8-bit mask into the correct position in the 32-bit number, extract bits, then shift contents
+    // back to a 8-bit placement.
+
+    uint32_t red_int = colour & (m_redMask << m_redShift);
+    GLubyte red = red_int >> (m_redShift - (8 - m_redBits));
+
+    uint32_t green_int = colour & (m_greenMask << m_greenShift);
+    GLubyte green = green_int >> (m_greenShift - (8 - m_greenBits));
+
+    // Blue shift will typically be 0, so we end up with negative bitshifting.
+    uint32_t blue_int = colour & (m_blueMask << m_blueShift);
+    //GLubyte blue = blue_int >> (m_blueShift - (8 - m_blueBits));
+    GLubyte blue = blue_int << (8 - m_blueBits);
+
+    // Set the colour
     glColor3ub(red, green, blue);
-  }
 
 #ifdef VALIDATE_COLOUR_PICKING  
-  red_array[m_colour_index] = red;
-  green_array[m_colour_index] = green;
-  blue_array[m_colour_index] = blue;
+    red_array[colour] = red;
+    green_array[colour] = green;
+    blue_array[colour] = blue;
 #endif
+  }
 
-  ++m_colour_index; // Increment counter for next pass
 }
 
 void GL::selectTerrainColour(WorldEntity * we) {
@@ -807,6 +828,7 @@ void GL::procEvent(int x, int y) {
 
   // Shift back into low-order bits
   // I.e. for a 5-bit depth, 11011000 becomes 00011011 
+
   GLubyte red = i[0] >> (8 - m_redBits);// & m_redMask;
   GLubyte green = i[1] >> (8 - m_greenBits);// & m_greenMask;
   GLubyte blue = i[2] >> (8 - m_blueBits);// & m_blueMask;
