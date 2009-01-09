@@ -8,6 +8,9 @@
 #include <string>
 #include <map>
 #include <sigc++/signal.h>
+#include <Atlas/Message/Element.h>
+#include <Eris/Entity.h>
+
 
 namespace Mercator {
   class TerrainMod;
@@ -40,21 +43,21 @@ public:
   sigc::signal<void, Entity*, Mercator::TerrainMod*> TerrainModDeleted;
   sigc::signal<void, Entity*, Mercator::TerrainMod*> TerrainModChanged;
 
-  // Override to get client estimiate of entity z pos.
-  virtual float getZPos(float x, float y) = 0;
-
- virtual void logFailure(const std::string &msg) = 0;
-   
-private:
   // Internal signals to catch entity creation/deletion
   void onEntityCreated(Entity*);
   void onEntityDeleted(Entity*);
+
+private:
+  void onAttrChanged(const Atlas::Message::Element& attributeValue, Entity*);
 
   void onEventModChanged(TerrainMod *);
   void onEventModDeleted(TerrainMod *);
 
   bool m_initialised;
 
+  TerrainMod *createTerrainMod(Entity *e);
+
+  std::map<Entity*, Entity::AttrChangedSlot> m_slots;
   typedef std::map<std::string, TerrainMod*> TerrainModMap;
   TerrainModMap m_modMap;
 };

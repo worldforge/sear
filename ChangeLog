@@ -1,5 +1,15 @@
 2009-01-09  Simon Goodall  <simon@worldforge.org>
 
+	* configure.ac, Eris/TerrainMod.cpp, Eris/TerrainMod.h,
+	  Eris/TerrainMod_impl.cpp, Eris/TerrainMod_impl.h,
+	  Eris/TerrainModHandler.cpp, Eris/TerrainModHandler.h,
+	  environment/SearTerrainModHandler.cpp,
+	  environment/SearTerrainModHandler.h,
+	  environment/TerrainRenderer/cpp, environment/TerrainRenderer.h:
+	  Remove local TerrainMod classes in favour of those now in Eris.
+
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/GL.cpp, renderers/GL.h: Some changes to make each
 	  worldentity use a single colour during select mode.
 
