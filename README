@@ -29,7 +29,7 @@ Local configuration files and updates will be stored in $HOME/.sear
 Known Issues
 ------------
 
- On Ubuntu systems, Sear can fail to start due to the following error:
+** On Ubuntu systems, Sear can fail to start due to the following error:
 
 Creating link /home/sg/.kde/socket-echo.
 can't create mcop directory.
@@ -38,6 +38,18 @@ can't create mcop directory.
   before starting Sear. E.g.
 
   $> SDL_AUDIODRIVER=alsa /opt/worldforge/bin/sear
+
+
+** Many Invalid Enum error messages
+
+On systems with NV_point_sprite but not ARB_point_sprite, Mesa 7.2 has a bug where a call to glPointParameterf(GL_POINT_SPRITE_COORD_ORIGIN, ??) can cause GL_INVALID_ENUM to be thrown. Sear itself does not make this call, however Guichan indirectly calls this function.
+
+Solution: Upgrade Mesa. 
+
+** Gui breaks on character type selection.
+
+This is a guichan bug which has been fixed in the current development version. 
+Current work around is to presss tab to move keyboard focus to the dropdown and then use the up/down cursor to select a character type.
 
 
 Dependencies
