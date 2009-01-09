@@ -187,6 +187,11 @@ public:
     
   void readConfig(const varconf::Config &config);
   void writeConfig(varconf::Config &config) const;
+
+
+  GLuint getTextureObject(TextureID id) const {
+    return m_textures[id];
+  }
 private:
 
   /** 

@@ -7,26 +7,29 @@
 
 #include "renderers/Sprite.h"
 
+
+#include <guichan.hpp>
+
 namespace Sear
 {
 
 class Render;
 
-class Compass
+class Compass : public gcn::Window
 {
   public:
-    Compass(float x, float y);
+    Compass();
     
-    virtual ~Compass();
+    virtual ~Compass() {}
 
-    virtual void setup();
+    virtual void logic();
     
     /** update the compass angle using Eris data, and factor in the
     camera's rotation too */
-    void update(double cameraRotation);
-    virtual void draw(Render*, bool select);
+//    void update(double cameraRotation);
+    virtual void draw(gcn::Graphics *);
     
-    virtual void click();
+//    virtual void click();
  //   virtual void release();
    // virtual bool key(int,int);
 

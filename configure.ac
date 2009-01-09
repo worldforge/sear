@@ -355,7 +355,6 @@ AC_OUTPUT([
 	data/Makefile
 	data/help/Makefile
 	scripts/Makefile
-	gui/Makefile
 	guichan/Makefile
 	sear.spec
 	sear-media.spec

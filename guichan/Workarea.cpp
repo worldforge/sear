@@ -12,6 +12,7 @@
 #include "guichan/ConnectWindow.h"
 #include "guichan/LoginWindow.h"
 #include "guichan/CharacterWindow.h"
+#include "guichan/Compass.h"
 #include "guichan/Panel.h"
 #include "guichan/StatusWindow.h"
 #include "guichan/ActionListenerSigC.h"
@@ -149,6 +150,7 @@ void Workarea::init()
   m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
   m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
   m_windows["update"] = SPtr<gcn::Window>(new WFUTWindow());
+  m_windows["compass"] = SPtr<gcn::Window>(new Compass());
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");

@@ -1,3 +1,9 @@
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, Makefile.am, src/Makefile.am, gui/*,
+	  guichan/Makefile.am, guichan/Compass.cpp, guichan/Compass.h: Delete 
+	  the old gui directory and create a new guichan version of the compass.
+
 2009-01-06  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/Workarea.cpp, guichan/Workarea.h: Fix gui so that mouse

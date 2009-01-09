@@ -13,6 +13,7 @@ libGuichan_a_SOURCES = \
                        AudioOptions.cpp AudioOptions.h \
                        CharacterWindow.cpp CharacterWindow.h \
                        CommandLine.h \
+                       Compass.cpp Compass.h \
                        ConnectWindow.cpp ConnectWindow.h \
                        ConsoleWindow.cpp ConsoleWindow.h \
                        ControlsOptions.cpp ControlsOptions.h \

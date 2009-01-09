@@ -23,11 +23,9 @@
 #include "loaders/Model.h"
 #include "loaders/ModelRecord.h"
 #include "loaders/ObjectRecord.h"
-//#include "loaders/ObjectHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 #include "src/client.h"
-#include "gui/Compass.h"
 #include "guichan/Workarea.h"
 
 #include "Graphics.h"
@@ -135,7 +133,6 @@ Graphics::Graphics(System *system) :
   m_num_frames(0),
   m_frame_time(0),
   m_initialised(false),
-  m_compass(NULL),
   m_show_names(false),
   m_show_bbox(false),
   m_adjust_detail(DEFAULT_adjust_detail),
@@ -154,10 +151,6 @@ void Graphics::init() {
   // Add callbeck to detect updated options
   m_system->getGeneral().sigsv.connect(sigc::mem_fun(this, &Graphics::varconf_callback));
 
-  // Create the compass
-  m_compass = std::auto_ptr<Compass>(new Compass(580.f, 50.f));
-  m_compass->setup();
-
   // Create the LightManager    
   m_lm = std::auto_ptr<LightManager>(new LightManager());
   m_lm->init();
@@ -174,7 +167,6 @@ void Graphics::init() {
 void Graphics::shutdown() {
   assert(m_initialised == true);
  
-  m_compass.reset(0);
   m_lm.reset(0);
 
   m_initialised = false;
@@ -201,7 +193,11 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     Workarea * wa = m_system->getWorkarea();
     assert (wa != NULL);
     try {
+      // The new compass code breaks our state, so record current state,
+      // then force it to be re-applied
+      StateID state = RenderSystem::getInstance().getCurrentState();
       wa->draw();
+      RenderSystem::getInstance().forceState(state);
     } catch (const gcn::Exception &e) {
       fprintf(stderr, "Caught Guichan Exception\n");
     }
@@ -465,11 +461,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
       // Switch back to 3D
       m_renderer->setViewMode(PERSPECTIVE);
-
-      // Draw the compass
-      // TODO: Make this part of the GUI?
-      m_compass->update(cam->getRotation());
-      m_compass->draw(m_renderer, select_mode);
     } 
   } else {
     m_renderer->drawSplashScreen();
