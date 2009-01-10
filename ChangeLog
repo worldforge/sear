@@ -1,3 +1,8 @@
+2009-01-10  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Compass.cpp, guichan/Compass.h: Show window background on
+	  mouse over.
+
 2009-01-09  Simon Goodall  <simon@worldforge.org>
 
 	* configure.ac, Eris/TerrainMod.cpp, Eris/TerrainMod.h,

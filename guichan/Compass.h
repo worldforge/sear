@@ -1,19 +1,17 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2003 Alistair Riddoch
+// Copyright (C) 2009 Simon Goodall
 
 #ifndef SEAR_COMPASS_H
 #define SEAR_COMPASS_H
 
 #include "renderers/Sprite.h"
 
-
 #include <guichan.hpp>
 
 namespace Sear
 {
-
-class Render;
 
 class Compass : public gcn::Window
 {
@@ -24,20 +22,19 @@ class Compass : public gcn::Window
 
     virtual void logic();
     
-    /** update the compass angle using Eris data, and factor in the
-    camera's rotation too */
-//    void update(double cameraRotation);
     virtual void draw(gcn::Graphics *);
     
-//    virtual void click();
- //   virtual void release();
-   // virtual bool key(int,int);
+    virtual void mouseEntered(gcn::MouseEvent &event) {
+      m_mouseEntered = true;
+    }
 
-    //void setAngle(float angle) { m_angle = angle; }
-    int width();
-    
+    virtual void mouseExited(gcn::MouseEvent &event) {
+      m_mouseEntered = false;
+    }
+
 protected:
-    float m_x, m_y;
+    bool m_mouseEntered;
+
     float m_angle;
     
     Sprite m_compassCase, m_compassNeedle, m_needleShadow;

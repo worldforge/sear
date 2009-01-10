@@ -1,6 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000-2003 Alistair Riddoch
+// Copyright (C) 2009 Simon Goodall
 
 #include "Compass.h"
 #include "renderers/Camera.h"
@@ -19,8 +20,9 @@
 namespace Sear
 {
 
-Compass::Compass() :  
-    m_angle(45)
+Compass::Compass() : Window(),
+  m_mouseEntered(false),
+  m_angle(45)
 {
   m_compassCase = Sprite("compass_case");
   m_compassNeedle = Sprite("compass_needle");
@@ -34,10 +36,16 @@ Compass::Compass() :
   setBaseColor(base);
 }
 
-
 void Compass::logic()
 {
-
+  // Only show window background when mouse is over this window 
+  gcn::Color base = getBaseColor();
+  if (m_mouseEntered) {
+    base.a = 50;
+  } else {
+    base.a = 0;
+  }
+  setBaseColor(base);
   // This logic should work out where north is, based on avatar rotation
   // and camera rotation.
   // Currently I do not believe it points in the correct direction
