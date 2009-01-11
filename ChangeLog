@@ -1,5 +1,10 @@
 2009-01-11  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/Compass.cpp, guichan/Compass.h: Make whole window draggable.
+	  Use new ImageBox widget.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/ImagenBox.cpp, guichan/ImageBox.h, guichan/Makefile.am:
 	  Added a widget to render a texture.
 

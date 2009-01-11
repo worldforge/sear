@@ -4,6 +4,7 @@
 // Copyright (C) 2009 Simon Goodall
 
 #include "Compass.h"
+#include "ImageBox.h"
 #include "renderers/Camera.h"
 #include "renderers/CameraSystem.h"
 #include "renderers/RenderSystem.h"
@@ -36,23 +37,39 @@ Compass::Compass() : Window(),
   m_mouseEntered(false),
   m_angle(45)
 {
-  m_compassCase = RenderSystem::getInstance().requestTexture("compass_case");
-  m_compassNeedle = RenderSystem::getInstance().requestTexture("compass_needle");
-  m_needleShadow = RenderSystem::getInstance().requestTexture("compass_needle_shadow");
+  setWidth(width);
+  setHeight(height);
 
-  setWidth(64);
-  setHeight(64);
+  setTitleBarHeight(1);
+  setMovable(true);
 
   gcn::Color base = getBaseColor();
   base.a = 0;
   setBaseColor(base);
+
+  m_compassCase = new ImageBox("compass_case");
+  m_compassNeedle = new ImageBox("compass_needle");
+  m_needleShadow = new ImageBox("compass_needle_shadow");
+
+  m_compassCase->setWidth(width);
+  m_compassNeedle->setWidth(width);
+  m_needleShadow->setWidth(width);
+
+  m_compassCase->setHeight(height);
+  m_compassNeedle->setHeight(height);
+  m_needleShadow->setHeight(height);
+
+  add(m_compassCase);
+  add(m_compassNeedle);
+  add(m_needleShadow);
+
 }
 
 Compass::~Compass()
 {
-  RenderSystem::getInstance().releaseTexture(m_compassCase);
-  RenderSystem::getInstance().releaseTexture(m_compassNeedle);
-  RenderSystem::getInstance().releaseTexture(m_needleShadow);
+  delete m_compassCase;
+  delete m_compassNeedle;
+  delete m_needleShadow;
 }
 
 void Compass::logic()
@@ -96,6 +113,9 @@ void Compass::logic()
     cameraRotation = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->getRotation();  
     radAngle += cameraRotation;
     m_angle = -(radAngle * 180) / M_PI;
+
+    m_compassNeedle->setRotation(m_angle);
+    m_needleShadow->setRotation(m_angle);
   }
 
   gcn::Window::logic();
@@ -104,40 +124,35 @@ void Compass::logic()
 void Compass::draw(gcn::Graphics *graphics)
 {
   gcn::Window::draw(graphics);
-  Render *r = RenderSystem::getInstance().getRenderer();
+}
 
-  // Note this code will break the current states during the sprite
-  // rendering. We should re-factor that code into this method.
+void Compass::mousePressed(gcn::MouseEvent& mouseEvent) {
 
-  glEnable(GL_TEXTURE_2D);
+  if (getParent() != NULL)
+  {
+    getParent()->moveToTop(this);
+  }
 
-  // Record current state
-  r->store();
-        
-  const gcn::ClipRectangle &rect = graphics->getCurrentClipArea();
-  // Draw the compass case
-  r->translateObject(rect.xOffset, rect.yOffset, 0.0f);
-  r->translateObject(32, 32, 0.0f);
-  RenderSystem::getInstance().switchTexture(m_compassCase);
-  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
+  mDragOffsetX = mouseEvent.getX();
+  mDragOffsetY = mouseEvent.getY();
 
-   // draw the shadow, offset a little bit    
-  r->store();
-  r->translateObject(-2.0f, -2.0f, 0.01f);
-  r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
-  RenderSystem::getInstance().switchTexture(m_needleShadow);
-  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
-  r->restore();
-    
-  // finally draw the needle
-  r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
-  RenderSystem::getInstance().switchTexture(m_compassNeedle);
-  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
+  mMoved = true;
+}
 
-  // Restore other state
-  r->restore();
+void Compass::mouseDragged(gcn::MouseEvent& mouseEvent) {
 
-  glDisable(GL_TEXTURE_2D);
+  if (mouseEvent.isConsumed())
+  {
+    return;
+  }
+
+  if (isMovable() && mMoved)
+  {
+    setPosition(mouseEvent.getX() - mDragOffsetX + getX(),
+                mouseEvent.getY() - mDragOffsetY + getY());
+  }
+
+  mouseEvent.consume();
 }
 
 } // namespace Sear

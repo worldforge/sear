@@ -13,6 +13,8 @@
 namespace Sear
 {
 
+class ImageBox;
+
 class Compass : public gcn::Window
 {
   public:
@@ -32,12 +34,15 @@ class Compass : public gcn::Window
       m_mouseEntered = false;
     }
 
-protected:
-    bool m_mouseEntered;
+    virtual void mouseDragged(gcn::MouseEvent &event);
+    virtual void mousePressed(gcn::MouseEvent &event);
 
-    float m_angle;
+protected:
+  bool m_mouseEntered;
+
+  float m_angle;
     
-    TextureID m_compassCase, m_compassNeedle, m_needleShadow;
+  ImageBox *m_compassCase, *m_compassNeedle, *m_needleShadow;
 };
 
 } // of namespace Sear
