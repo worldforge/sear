@@ -19,6 +19,7 @@ libGuichan_a_SOURCES = \
                        ControlsOptions.cpp ControlsOptions.h \
                        DblClkListBox.h \
                        HelpOptions.cpp HelpOptions.h \
+                       ImageBox.cpp ImageBox.h \
                        Inventory.cpp Inventory.h \
                        LoginWindow.cpp LoginWindow.h \
                        OptionsTemplate.cpp OptionsTemplate.h \

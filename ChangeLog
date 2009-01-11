@@ -1,5 +1,10 @@
 2009-01-11  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/ImagenBox.cpp, guichan/ImageBox.h, guichan/Makefile.am:
+	  Added a widget to render a texture.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
 	* src/Character.cpp, src/Character.h: Implement combine/divide ops.
 
 2009-01-11  Simon Goodall  <simon@worldforge.org>
