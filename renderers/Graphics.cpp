@@ -14,7 +14,6 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
-//#include "common/Log.h"
 #include "common/Utility.h"
 #include "environment/Environment.h"
 #include "src/Character.h"
@@ -193,11 +192,7 @@ void Graphics::drawScene(bool select_mode, float time_elapsed) {
     Workarea * wa = m_system->getWorkarea();
     assert (wa != NULL);
     try {
-      // The new compass code breaks our state, so record current state,
-      // then force it to be re-applied
-      StateID state = RenderSystem::getInstance().getCurrentState();
       wa->draw();
-      RenderSystem::getInstance().forceState(state);
     } catch (const gcn::Exception &e) {
       fprintf(stderr, "Caught Guichan Exception\n");
     }

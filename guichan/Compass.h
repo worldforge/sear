@@ -6,7 +6,7 @@
 #ifndef SEAR_COMPASS_H
 #define SEAR_COMPASS_H
 
-#include "renderers/Sprite.h"
+#include "renderers/RenderTypes.h"
 
 #include <guichan.hpp>
 
@@ -18,7 +18,7 @@ class Compass : public gcn::Window
   public:
     Compass();
     
-    virtual ~Compass() {}
+    virtual ~Compass();
 
     virtual void logic();
     
@@ -37,7 +37,7 @@ protected:
 
     float m_angle;
     
-    Sprite m_compassCase, m_compassNeedle, m_needleShadow;
+    TextureID m_compassCase, m_compassNeedle, m_needleShadow;
 };
 
 } // of namespace Sear

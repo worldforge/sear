@@ -19,14 +19,26 @@
 
 namespace Sear
 {
+static float texcoords[] = { 0, 0,
+                         1.0, 0,
+                         1.0,1.0,
+                          0,1.0 };
+
+static int width = 64;
+static int height = 64;
+static float vertices[] = { -width/2.f, -height/2.f, 0.f,
+                          width/2.f, -height/2.f, 0.f,
+                          width/2.f, height/2.f, 0.f,
+                         -width/2.f, height/2.f, 0.f };
+
 
 Compass::Compass() : Window(),
   m_mouseEntered(false),
   m_angle(45)
 {
-  m_compassCase = Sprite("compass_case");
-  m_compassNeedle = Sprite("compass_needle");
-  m_needleShadow = Sprite("compass_needle_shadow");
+  m_compassCase = RenderSystem::getInstance().requestTexture("compass_case");
+  m_compassNeedle = RenderSystem::getInstance().requestTexture("compass_needle");
+  m_needleShadow = RenderSystem::getInstance().requestTexture("compass_needle_shadow");
 
   setWidth(64);
   setHeight(64);
@@ -34,6 +46,13 @@ Compass::Compass() : Window(),
   gcn::Color base = getBaseColor();
   base.a = 0;
   setBaseColor(base);
+}
+
+Compass::~Compass()
+{
+  RenderSystem::getInstance().releaseTexture(m_compassCase);
+  RenderSystem::getInstance().releaseTexture(m_compassNeedle);
+  RenderSystem::getInstance().releaseTexture(m_needleShadow);
 }
 
 void Compass::logic()
@@ -90,35 +109,35 @@ void Compass::draw(gcn::Graphics *graphics)
   // Note this code will break the current states during the sprite
   // rendering. We should re-factor that code into this method.
 
+  glEnable(GL_TEXTURE_2D);
+
   // Record current state
   r->store();
-  glPushAttrib(GL_ALL_ATTRIB_BITS); 
-  glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS); 
         
   const gcn::ClipRectangle &rect = graphics->getCurrentClipArea();
-
   // Draw the compass case
   r->translateObject(rect.xOffset, rect.yOffset, 0.0f);
   r->translateObject(32, 32, 0.0f);
-  m_compassCase.draw(r);
+  RenderSystem::getInstance().switchTexture(m_compassCase);
+  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
 
- // draw the shadow, offset a little bit    
+   // draw the shadow, offset a little bit    
   r->store();
-  r->translateObject(-3.0f, -3.0f, 0.01f);
+  r->translateObject(-2.0f, -2.0f, 0.01f);
   r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
-  m_needleShadow.draw(r);
+  RenderSystem::getInstance().switchTexture(m_needleShadow);
+  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
   r->restore();
     
   // finally draw the needle
   r->rotate(m_angle, 0.0f, 0.0f, 1.0f);
-  m_compassNeedle.draw(r);
+  RenderSystem::getInstance().switchTexture(m_compassNeedle);
+  r->renderArrays(RES_QUADS, 0, 4, (Vertex_3*) vertices, (Texel*) texcoords, NULL, false);
 
   // Restore other state
   r->restore();
-  glPopClientAttrib();
-  glPopAttrib();
 
-  RenderSystem::getInstance().switchTexture(0); 
+  glDisable(GL_TEXTURE_2D);
 }
 
 } // namespace Sear
