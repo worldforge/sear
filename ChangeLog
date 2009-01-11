@@ -1,3 +1,8 @@
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* src/System.cpp: Move gui cleanup to earlier in the shutdown process
+	  so it can clean up rendering resources correctly.
+
 2009-01-10  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/Compass.cpp, guichan/Compass.h: Show window background on

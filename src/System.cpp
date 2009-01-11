@@ -405,6 +405,8 @@ void System::shutdown() {
   m_console.reset(0);
  
   //m_sound.reset(0);
+  //
+  m_workarea.reset(0);
 
 //  CacheManager::getInstance().shutdown();
   ModelSystem::getInstance().shutdown(); 
@@ -414,7 +416,6 @@ void System::shutdown() {
 
   m_editor.reset(0);
 
-  m_workarea.reset(0);
 
   m_calendar.reset(0);
 
