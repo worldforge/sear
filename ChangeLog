@@ -1,5 +1,9 @@
 2009-01-11  Simon Goodall  <simon@worldforge.org>
 
+	* src/Character.cpp, src/Character.h: Implement combine/divide ops.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
 	* renderers/Graphics.cpp, guichan/Compass.cpp, guichan/Compass.h: Use
 	  the texture manager and other Render calls rather than sprites. This
 	  means we do not need to reset the state after rendering the gui.

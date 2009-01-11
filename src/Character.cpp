@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: Character.cpp,v 1.95 2007-05-02 20:47:55 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #include <math.h>
 #include <string>
@@ -12,6 +10,7 @@
 
 #include <Atlas/Objects/Operation.h>
 #include <Atlas/Objects/Anonymous.h>
+#include <Atlas/Objects/Root.h>
 #include <varconf/config.h>
 
 #include <wfmath/atlasconv.h>
@@ -41,6 +40,7 @@
 using Atlas::Objects::Operation::Use;
 using Atlas::Objects::Operation::Wield;
 using Atlas::Objects::Entity::Anonymous;
+using Atlas::Objects::Root;
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -827,6 +827,46 @@ void Character::renameEntity(Eris::Entity *e, const std::string &name) {
   set->setArgs1(msg);
   m_avatar->getConnection()->send(set);
 
+}
+
+
+void Character::combineEntity(const std::vector<Eris::Entity *> &e) {
+
+  if (m_avatar == 0) return;
+
+  Atlas::Objects::Operation::Combine op;
+  op->setFrom(m_self->getId());
+
+  std::vector<Root> msgs;
+
+  std::vector<Eris::Entity*>::const_iterator I = e.begin();
+  std::vector<Eris::Entity*>::const_iterator Iend = e.end();
+
+  while (I != Iend) {
+    Root msg;
+    Eris::Entity *e = *I;
+    msg->setId(e->getId());
+    msgs.push_back(msg);
+    I++;
+  }
+
+  op->setArgs(msgs);
+  m_avatar->getConnection()->send(op);
+}
+
+void Character::divideEntity(Eris::Entity *e, int num) {
+
+  if (m_avatar == 0) return;
+
+  Atlas::Objects::Operation::Divide op;
+  op->setFrom(m_self->getId());
+
+  Root msg;
+  msg->setId(e->getId());
+  msg->setAttr("num", num);
+
+  op->setArgs1(msg);
+  m_avatar->getConnection()->send(op);
 }
 
 } /* namespace Sear */
