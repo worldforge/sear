@@ -18,6 +18,8 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
+#include <cassert>
+
 namespace Sear
 {
 

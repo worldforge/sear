@@ -11,6 +11,8 @@
 
 #include "src/System.h"
 
+#include <cassert>
+
 namespace Sear {
 
 LightManager::LightManager() :

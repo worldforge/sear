@@ -9,6 +9,7 @@
 #include "BoundBox.h"
 #include "StaticObject.h"
 
+#include <wfmath/point.h>
 
 #ifdef DEBUG
   static const bool debug = true;

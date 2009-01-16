@@ -7,6 +7,8 @@
 #ifndef SEAR_MATRIX_H
 #define SEAR_MATRIX_H 1
 
+#include <cmath>
+
 namespace Sear {
 
 class Matrix {

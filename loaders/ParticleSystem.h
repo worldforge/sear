@@ -9,6 +9,8 @@
 
 #include "loaders/Model.h"
 
+#include <wfmath/point.h>
+
 namespace Sear {
 
 class DynamicObject;
