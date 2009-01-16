@@ -1,16 +1,11 @@
 2009-01-06  Al Riddoch  <alriddoch@googlemail.com>
 
-	*
-common/Matrix.h,
-common/Utility.cpp,
-loaders/BoundBox.cpp,
-loaders/ParticleSystem.h,
-renderers/Frustum.cpp,
-renderers/ImageUtils.cpp,
-renderers/LightManager.cpp,
-renderers/TextureManager.cpp,
-src/ScriptEngine.cpp
-
+	* common/Matrix.h, common/Utility.cpp, loaders/BoundBox.cpp,
+	  loaders/ParticleSystem.h, renderers/Frustum.cpp,
+	  renderers/ImageUtils.cpp, renderers/LightManager.cpp,
+	  renderers/TextureManager.cpp, src/ScriptEngine.cpp:
+	  Add standard and wfmath includes required after the wfmath
+	  header cleanup.
 
 2009-01-06  Simon Goodall  <simon@worldforge.org>
 
