@@ -1,5 +1,10 @@
 2009-01-19  Simon Goodall  <simon@worldforge.org>
 
+ 	* guichan/Makefile.am guichan/grid.cpp guichan/grid.hpp: Added initial
+	  grid box impl.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
         * renderers/TextureManager.h: Member to see if a texture name exists.
 
 2009-01-19  Al Riddoch  <alriddoch@googlemail.com>

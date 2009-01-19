@@ -6,6 +6,7 @@ libGuichan_a_SOURCES = \
                        actiontextfield.cpp actiontextfield.h \
                        bar.cpp bar.hpp \
                        box.cpp box.hpp \
+                       grid.cpp grid.hpp \
 	               imagefontxpm.cpp imagefontxpm.h rpgfont.h \
                        passwordfield.cpp passwordfield.h \
                        ActionListenerCommand.h ActionListenerSigC.h \
