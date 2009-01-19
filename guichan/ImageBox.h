@@ -23,8 +23,7 @@ public:
 
   virtual void setRotation(float angle) { m_angle = angle; }
   virtual void setTextureName(const std::string &texture_name);
-    void mouseReleased(gcn::MouseEvent& mouseEvent)
-;    
+
 protected:
   std::string m_texture_name;
   TextureID m_texture_id;
