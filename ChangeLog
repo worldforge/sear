@@ -1,3 +1,8 @@
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp, guichan/ImageBox.h: Add member to change the 
+	  current texture.
+
 2009-01-11  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/Compass.cpp, guichan/Compass.h: Make whole window draggable.

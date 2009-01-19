@@ -31,6 +31,12 @@ ImageBox::~ImageBox()
   RenderSystem::getInstance().releaseTexture(m_texture_id);
 }
 
+void ImageBox::setTextureName(const std::string &texture_name) {
+  RenderSystem::getInstance().releaseTexture(m_texture_id);
+  m_texture_name = texture_name;
+  m_texture_id = RenderSystem::getInstance().requestTexture(m_texture_name);
+}
+
 void ImageBox::logic()
 {
   gcn::Widget::logic();
