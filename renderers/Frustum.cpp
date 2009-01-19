@@ -9,6 +9,8 @@
 #include "src/System.h"
 #include "Frustum.h"
 
+#include <wfmath/ball.h>
+
 #ifdef DEBUG
   static const bool debug = true;
 #else

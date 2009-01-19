@@ -7,6 +7,7 @@
 #include "Utility.h"
 
 #include <wfmath/quaternion.h>
+#include <wfmath/point.h>
 #include <stdio.h>
 #include <string>
 #include <map>

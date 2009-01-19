@@ -22,6 +22,8 @@
 
 #include "src/MediaManager.h"
 
+#include <cmath>
+
 #ifdef WINDOWS
     
 int ilogb(double x)

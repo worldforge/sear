@@ -16,6 +16,8 @@
 
 #include <fstream>
 
+#include <cassert>
+
 #ifdef DEBUG
   static const bool debug = true;
 #else
