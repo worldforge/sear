@@ -9,6 +9,7 @@ libGuichan_a_SOURCES = \
 	               imagefontxpm.cpp imagefontxpm.h rpgfont.h \
                        passwordfield.cpp passwordfield.h \
                        ActionListenerCommand.h ActionListenerSigC.h \
+                       ActionImageBox.cpp ActionImageBox.h \
                        Alert.cpp Alert.h \
                        AudioOptions.cpp AudioOptions.h \
                        CharacterWindow.cpp CharacterWindow.h \

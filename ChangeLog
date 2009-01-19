@@ -1,5 +1,11 @@
 2009-01-19  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/ActionImageBox.cpp, guichan/ActionImageBox.h,
+	  guichan/Makefile.am: Subclass of ImageBox which distributes action
+	  events on mouse releases.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/ImageBox.cpp, guichan/ImageBox.h: Add member to change the 
 	  current texture.
 
