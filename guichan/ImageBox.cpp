@@ -13,10 +13,10 @@ static const float texcoords[] = { 0.0f, 0.0f,
                                    1.0f, 1.0f,
                                    0.0f, 1.0f };
 
-static const float vertices[] = { 0.0f, 0.0f, 0.f,
-                            1.0f, 0.0f, 0.f,
-                            1.0f, 1.0f, 0.f,
-                            0.0f, 1.0f, 0.f };
+static const float vertices[] = { -1.0f, -1.0f, 0.f,
+                                  1.0f, -1.0f, 0.f,
+                                  1.0f, 1.0f, 0.f,
+                                  -1.0f, 1.0f, 0.f };
 
 
 ImageBox::ImageBox(const std::string &texture_name) : Widget(),
@@ -24,6 +24,7 @@ ImageBox::ImageBox(const std::string &texture_name) : Widget(),
   m_angle(0.0f)
 {
   m_texture_id = RenderSystem::getInstance().requestTexture(m_texture_name);
+printf("CPosition %d %d\n", getX(), getY());
 }
 
 ImageBox::~ImageBox()
@@ -50,13 +51,26 @@ void ImageBox::draw(gcn::Graphics *graphics)
 
   // Record current state
   r->store();
-        
-  const gcn::ClipRectangle &rect = graphics->getCurrentClipArea();
+  
+  // Translate to correct position      
+  int xpos, ypos;
+  getAbsolutePosition(xpos, ypos);
+  r->translateObject(xpos, ypos, 0.0f);
 
-  r->translateObject(rect.xOffset, rect.yOffset, 0.0f);
-  glScalef(rect.width, rect.height, 0.0f);
+  /// Get widget dimensions
+  const int width = getWidth();
+  const int height = getHeight();
 
-  glRotatef(m_angle, 0.0f, 0.0f, 1.0f);
+  // Translate a by half to position widget in correct position
+  glTranslatef(width/2,height/2,0.0f);
+
+  // Rotate widget if required
+  if (m_angle != 0) {
+    glRotatef(m_angle, 0.0f, 0.0f, 1.0f);
+  }
+
+  // Scale image to size of widget
+  glScalef(width/2, height/2, 0.0f);
 
   // Draw the texture
   RenderSystem::getInstance().switchTexture(m_texture_id);
@@ -64,6 +78,14 @@ void ImageBox::draw(gcn::Graphics *graphics)
 
   // Restore other state
   r->restore();
+
+  if (m_text.size() > 0) {
+    graphics->drawText(m_text, 0, 0);
+    // Rendering text switches textures outside of our manager, need to force
+    // a texture change again
+    RenderSystem::getInstance().switchTexture(0);
+  }
+
 
   glDisable(GL_TEXTURE_2D);
 }

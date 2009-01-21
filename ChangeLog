@@ -1,3 +1,8 @@
+2009-01-21  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp, guichan/ImageBox.h: Improve texture
+	  positioning and rotation. Render a text string if required.
+
 2009-01-19  Simon Goodall  <simon@worldforge.org>
 
  	* guichan/Makefile.am guichan/grid.cpp guichan/grid.hpp: Added initial

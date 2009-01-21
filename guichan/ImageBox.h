@@ -23,9 +23,10 @@ public:
 
   virtual void setRotation(float angle) { m_angle = angle; }
   virtual void setTextureName(const std::string &texture_name);
-
+  virtual void setText(const std::string &text) { m_text = text; }
 protected:
   std::string m_texture_name;
+  std::string m_text;
   TextureID m_texture_id;
   float m_angle;
 };
