@@ -8,10 +8,10 @@
 
 namespace Sear {
 
-static const float texcoords[] = { 0.0f, 0.0f,
-                                   1.0f, 0.0f,
+static const float texcoords[] = { 0.0f, 1.0f,
                                    1.0f, 1.0f,
-                                   0.0f, 1.0f };
+                                   1.0f, 0.0f,
+                                   0.0f, 0.0f };
 
 static const float vertices[] = { -1.0f, -1.0f, 0.f,
                                   1.0f, -1.0f, 0.f,

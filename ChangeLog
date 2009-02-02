@@ -1,5 +1,9 @@
 2009-02-03  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/ImageBox.cpp: Flip texture so it is no longer upside-down.
+
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/Compass.cpp: Remove some unused arrays. Adjust window
 	  padding/dimensions.
 
