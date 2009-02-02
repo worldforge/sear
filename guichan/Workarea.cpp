@@ -47,6 +47,7 @@ static const bool debug = false;
 
 static const std::string WORKSPACE = "workspace";
 
+static const std::string WORKAREA_TOGGLE = "workarea_toggle";
 static const std::string WORKAREA_OPEN = "workarea_open";
 static const std::string WORKAREA_CLOSE = "workarea_close";
 static const std::string WORKAREA_ALERT = "workarea_alert";
@@ -189,6 +190,7 @@ void Workarea::registerCommands(Console * console)
     dynamic_cast<Panel*>(m_panel.get())->registerCommands(console);
   }
 
+  console->registerCommand(WORKAREA_TOGGLE, this);
   console->registerCommand(WORKAREA_OPEN, this);
   console->registerCommand(WORKAREA_CLOSE, this);
   console->registerCommand(WORKAREA_ALERT, this);
@@ -216,6 +218,21 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
+        m_top->openWindow(win.get());
+      }
+    } else {
+      std::cerr << "Asked to open unknown window " << args
+                << std::endl << std::flush;
+    }
+  }
+  else if (command == WORKAREA_TOGGLE) {
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      SPtr<gcn::Window> win = I->second;
+      assert(win != 0);
+      if (win->getParent() != 0) {
+        m_top->closeWindow(win.get());
+      } else {
         m_top->openWindow(win.get());
       }
     } else {

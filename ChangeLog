@@ -1,3 +1,7 @@
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Workarea.cpp: Added command to toggle a workarea window.
+
 2009-01-21  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/ImageBox.cpp, guichan/ImageBox.h: Improve texture
