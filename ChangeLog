@@ -1,5 +1,10 @@
 2009-02-03  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/Compass.cpp: Remove some unused arrays. Adjust window
+	  padding/dimensions.
+
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/Workarea.cpp: Added command to toggle a workarea window.
 
 2009-01-21  Simon Goodall  <simon@worldforge.org>

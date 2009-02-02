@@ -20,27 +20,24 @@
 
 namespace Sear
 {
-static float texcoords[] = { 0, 0,
-                         1.0, 0,
-                         1.0,1.0,
-                          0,1.0 };
 
 static int width = 64;
 static int height = 64;
-static float vertices[] = { -width/2.f, -height/2.f, 0.f,
-                          width/2.f, -height/2.f, 0.f,
-                          width/2.f, height/2.f, 0.f,
-                         -width/2.f, height/2.f, 0.f };
-
 
 Compass::Compass() : Window(),
   m_mouseEntered(false),
   m_angle(45)
 {
-  setWidth(width);
-  setHeight(height);
 
   setTitleBarHeight(1);
+  setFrameSize(1);
+  setPadding(0);
+
+  int frame = 2 * getFrameSize();
+  int padding = 2 * getPadding();
+  setWidth(width + frame + padding);
+  setHeight(height + frame + padding + getTitleBarHeight());
+
   setMovable(true);
 
   gcn::Color base = getBaseColor();
@@ -62,7 +59,6 @@ Compass::Compass() : Window(),
   add(m_compassCase);
   add(m_compassNeedle);
   add(m_needleShadow);
-
 }
 
 Compass::~Compass()
@@ -86,6 +82,8 @@ void Compass::logic()
   // and camera rotation.
   // Currently I do not believe it points in the correct direction
 
+  WFMath::Vector<3> northAxis(0.0, 1.0, 0.0), facing(1.0, 0.0, 0.0);
+
   Eris::Avatar *avatar = System::instance()->getClient()->getAvatar();
   if (avatar != 0) {
     Eris::Entity *focus = avatar->getEntity();
@@ -102,21 +100,18 @@ void Compass::logic()
       ent = ent->getLocation();
     }
     
-    WFMath::Vector<3> northAxis(0.0, 1.0, 0.0),
-        facing(1.0, 0.0, 0.0);
     facing.rotate(q); // orient in direction avatar is facing
-    
-    double radAngle = WFMath::Angle<3>(northAxis, facing);
-    if (facing.x() < 0) radAngle = (M_PI * 2) - radAngle;
+  }    
+  double radAngle = WFMath::Angle<3>(northAxis, facing);
+  if (facing.x() < 0) radAngle = (M_PI * 2) - radAngle;
   
-    float cameraRotation = 0.0f;
-    cameraRotation = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->getRotation();  
-    radAngle += cameraRotation;
-    m_angle = -(radAngle * 180) / M_PI;
+  float cameraRotation = 0.0f;
+  cameraRotation = RenderSystem::getInstance().getCameraSystem()->getCurrentCamera()->getRotation();  
+  radAngle += cameraRotation;
+  m_angle = -(radAngle * 180) / M_PI;
 
-    m_compassNeedle->setRotation(m_angle);
-    m_needleShadow->setRotation(m_angle);
-  }
+  m_compassNeedle->setRotation(m_angle);
+  m_needleShadow->setRotation(m_angle);
 
   gcn::Window::logic();
 }
