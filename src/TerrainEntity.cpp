@@ -9,6 +9,8 @@
 
 #include <Eris/View.h>
 
+#include <Atlas/Message/Element.h>
+
 #include <Mercator/Shader.h>
 
 #include "renderers/Graphics.h"
