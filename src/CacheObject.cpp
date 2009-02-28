@@ -7,6 +7,7 @@
 #include "CacheObject.h"
 
 #include <cstring>
+#include <cstdio>
 
 namespace Sear {
 
