@@ -24,7 +24,6 @@ ImageBox::ImageBox(const std::string &texture_name) : Widget(),
   m_angle(0.0f)
 {
   m_texture_id = RenderSystem::getInstance().requestTexture(m_texture_name);
-printf("CPosition %d %d\n", getX(), getY());
 }
 
 ImageBox::~ImageBox()
