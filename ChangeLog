@@ -1,5 +1,12 @@
 2009-03-01  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/adjustingcontainer.cpp, guichan/adjustingcontainer.hpp,
+	  guichan/Makefile.am: Added adjusting container impl from Guichan
+	  contrib as an alternative to the box impls. This may only be a
+	  temporary addition during testing of new Inventory impl.
+
+2009-03-01  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/ImageBox.cpp: Remove debugging output.
 
 2009-02-28  Alexey Torkhov  <atorkhov@gmail.com>

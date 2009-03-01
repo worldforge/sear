@@ -4,6 +4,7 @@ INCLUDES = -I$(top_srcdir)
 
 libGuichan_a_SOURCES = \
                        actiontextfield.cpp actiontextfield.h \
+                       adjustingcontainer.cpp adjustingcontainer.hpp \
                        bar.cpp bar.hpp \
                        box.cpp box.hpp \
                        grid.cpp grid.hpp \
