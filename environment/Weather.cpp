@@ -17,6 +17,8 @@
 #include <sage/GL.h>
 #include <sage/GLU.h>
 
+#include <Atlas/Message/Element.h>
+
 #include "common/Utility.h"
 
 #include "src/WorldEntity.h"

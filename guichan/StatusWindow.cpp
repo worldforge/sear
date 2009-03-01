@@ -12,6 +12,8 @@
 
 #include <Eris/Entity.h>
 
+#include <Atlas/Message/Element.h>
+
 #include <guichan.hpp>
 
 #include <sigc++/bind.h>

@@ -6,6 +6,8 @@
 
 #include "Log.h"
 
+#include <cstdio>
+
 /* LOG AIMS
  * Will provide  ability to log each type to a different file
  * FREQUENT LOG ACTIONS SHOULD BE IN A #if #endif BLOCK and
