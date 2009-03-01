@@ -1,3 +1,14 @@
+2009-02-28  Alexey Torkhov  <atorkhov@gmail.com>
+
+	* common/Log.cpp, src/CacheObject.cpp: Fixing build with recent compilers.
+
+2009-02-05  Al Riddoch  <alriddoch@googlemail.com>
+
+	* environment/Weather.cpp, guichan/StatusWindow.cpp,
+	  loaders/AreaModel.cpp, src/Editor.cpp, src/TerrainEntity.cpp,
+	  src/client.h: Add includes and forward declarations required by the
+	  latest Eris release.
+
 2009-02-03  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/ImageBox.cpp: Flip texture so it is no longer upside-down.
