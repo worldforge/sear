@@ -1,5 +1,10 @@
 2009-03-01  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/Inventory.cpp, guichan/Inventory.h: Implementation of a icon
+	  based inventory. This is still a WIP.
+
+2009-03-01  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/adjustingcontainer.cpp, guichan/adjustingcontainer.hpp,
 	  guichan/Makefile.am: Added adjusting container impl from Guichan
 	  contrib as an alternative to the box impls. This may only be a
