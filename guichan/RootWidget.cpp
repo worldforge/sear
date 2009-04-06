@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2009 Simon Goodall
 
 #include "guichan/RootWidget.h"
 #include "guichan/CommandLine.h"
@@ -12,7 +12,7 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
-#include <iostream>
+#include <algorithm>
 
 namespace Sear {
 

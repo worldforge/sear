@@ -1,3 +1,7 @@
+2009-04-06  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/RootWidget.cpp: Includes fix.
+
 2009-03-01  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/Inventory.cpp, guichan/Inventory.h: Implementation of a icon
