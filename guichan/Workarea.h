@@ -43,6 +43,11 @@ public:
   gcn::FocusHandler * getFocusHandler() const {
     return mFocusHandler;
   }
+
+  virtual gcn::Widget* getWidgetAt(int x, int y) {
+    return gcn::Gui::getWidgetAt(x, y);
+   }
+
 };
 
 class Workarea : public ConsoleObject, public sigc::trackable {

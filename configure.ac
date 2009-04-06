@@ -3,6 +3,7 @@ dnl Initialise autoconf
 AC_INIT([sear], [0.6.3])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 ###################################
 # TODO remove unrequired checks when eris is released as it pulls in most libs
@@ -190,7 +191,7 @@ UNSUSED=0
 
 MERCATOR_VERSION=0.2.4
 VARCONF_VERSION=0.6.4
-ERIS_VERSION=1.3.13
+ERIS_VERSION=1.3.14
 SAGE_VERSION=0.2.0
 LIBWFUT_VERSION=0.2.1
 
@@ -354,7 +355,6 @@ AC_OUTPUT([
 	data/Makefile
 	data/help/Makefile
 	scripts/Makefile
-	gui/Makefile
 	guichan/Makefile
 	sear.spec
 	sear-media.spec

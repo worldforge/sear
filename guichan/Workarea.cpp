@@ -12,6 +12,7 @@
 #include "guichan/ConnectWindow.h"
 #include "guichan/LoginWindow.h"
 #include "guichan/CharacterWindow.h"
+#include "guichan/Compass.h"
 #include "guichan/Panel.h"
 #include "guichan/StatusWindow.h"
 #include "guichan/ActionListenerSigC.h"
@@ -46,6 +47,7 @@ static const bool debug = false;
 
 static const std::string WORKSPACE = "workspace";
 
+static const std::string WORKAREA_TOGGLE = "workarea_toggle";
 static const std::string WORKAREA_OPEN = "workarea_open";
 static const std::string WORKAREA_CLOSE = "workarea_close";
 static const std::string WORKAREA_ALERT = "workarea_alert";
@@ -149,6 +151,7 @@ void Workarea::init()
   m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
   m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
   m_windows["update"] = SPtr<gcn::Window>(new WFUTWindow());
+  m_windows["compass"] = SPtr<gcn::Window>(new Compass());
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
@@ -187,6 +190,7 @@ void Workarea::registerCommands(Console * console)
     dynamic_cast<Panel*>(m_panel.get())->registerCommands(console);
   }
 
+  console->registerCommand(WORKAREA_TOGGLE, this);
   console->registerCommand(WORKAREA_OPEN, this);
   console->registerCommand(WORKAREA_CLOSE, this);
   console->registerCommand(WORKAREA_ALERT, this);
@@ -214,6 +218,21 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
       SPtr<gcn::Window> win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
+        m_top->openWindow(win.get());
+      }
+    } else {
+      std::cerr << "Asked to open unknown window " << args
+                << std::endl << std::flush;
+    }
+  }
+  else if (command == WORKAREA_TOGGLE) {
+    WindowDict::const_iterator I = m_windows.find(args);
+    if (I != m_windows.end()) {
+      SPtr<gcn::Window> win = I->second;
+      assert(win != 0);
+      if (win->getParent() != 0) {
+        m_top->closeWindow(win.get());
+      } else {
         m_top->openWindow(win.get());
       }
     } else {
@@ -274,18 +293,19 @@ bool Workarea::handleEvent(const SDL_Event & event)
 
   gcn::Widget *focus = fh->getFocused();
 
-  bool gui_has_mouse = m_top->childHasMouse();
-
   bool clear_focus = false;
   bool event_eaten = false;
   bool suppress = false;
   Panel *panel = dynamic_cast<Panel*>(m_panel.get());
   switch (event.type) {
     case SDL_MOUSEMOTION:
+      // FIXME This should depend on whether the gui is visible.
+      event_eaten = m_gui->getWidgetAt(event.motion.x, event.motion.y) != m_top;
+      break;
     case SDL_MOUSEBUTTONDOWN:
     case SDL_MOUSEBUTTONUP:
       // FIXME This should depend on whether the gui is visible.
-      event_eaten = gui_has_mouse;
+      event_eaten = m_gui->getWidgetAt(event.button.x, event.button.y) != m_top;
       break;
     case SDL_KEYDOWN:
       if (event.key.keysym.sym == SDLK_RETURN) {

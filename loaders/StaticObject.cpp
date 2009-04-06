@@ -485,9 +485,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
       const Matrix &mx = (*I).first;
       WorldEntity *we = (*I).second;
 
-      if (select_mode) {
-        RenderSystem::getInstance().nextColour(we);
-      }
+      RenderSystem::getInstance().nextColour(we, select_mode);
 
       glPushMatrix();
       // Set transform
@@ -738,9 +736,7 @@ void StaticObject::render(bool select_mode, const std::vector<std::pair<Matrix, 
 
       assert(we != 0);
 
-      if (select_mode) {
-        RenderSystem::getInstance().nextColour(we);
-      }
+      RenderSystem::getInstance().nextColour(we, select_mode);
 
       glPushMatrix();
       // Set transform

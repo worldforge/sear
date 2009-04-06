@@ -134,6 +134,8 @@ private:
   void onChildAdded(Eris::Entity*);
   void onChildRemoved(Eris::Entity*);
   void renameEntity(Eris::Entity *e, const std::string &name);
+  void combineEntity(const std::vector<Eris::Entity *> &e);
+  void divideEntity(Eris::Entity *e, int num);
  
   Eris::Avatar *m_avatar;
   Eris::EntityRef m_self;

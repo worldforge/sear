@@ -6,6 +6,8 @@
 
 #include <Mercator/Area.h>
 
+#include <Atlas/Message/Element.h>
+
 #include "environment/Environment.h"
 
 #include "src/WorldEntity.h"

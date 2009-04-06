@@ -14,7 +14,6 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
-//#include "common/Log.h"
 #include "common/Utility.h"
 #include "environment/Environment.h"
 #include "src/Character.h"
@@ -23,11 +22,9 @@
 #include "loaders/Model.h"
 #include "loaders/ModelRecord.h"
 #include "loaders/ObjectRecord.h"
-//#include "loaders/ObjectHandler.h"
 #include "src/System.h"
 #include "src/WorldEntity.h"
 #include "src/client.h"
-#include "gui/Compass.h"
 #include "guichan/Workarea.h"
 
 #include "Graphics.h"
@@ -135,7 +132,6 @@ Graphics::Graphics(System *system) :
   m_num_frames(0),
   m_frame_time(0),
   m_initialised(false),
-  m_compass(NULL),
   m_show_names(false),
   m_show_bbox(false),
   m_adjust_detail(DEFAULT_adjust_detail),
@@ -154,10 +150,6 @@ void Graphics::init() {
   // Add callbeck to detect updated options
   m_system->getGeneral().sigsv.connect(sigc::mem_fun(this, &Graphics::varconf_callback));
 
-  // Create the compass
-  m_compass = std::auto_ptr<Compass>(new Compass(580.f, 50.f));
-  m_compass->setup();
-
   // Create the LightManager    
   m_lm = std::auto_ptr<LightManager>(new LightManager());
   m_lm->init();
@@ -174,7 +166,6 @@ void Graphics::init() {
 void Graphics::shutdown() {
   assert(m_initialised == true);
  
-  m_compass.reset(0);
   m_lm.reset(0);
 
   m_initialised = false;
@@ -465,11 +456,6 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
 
       // Switch back to 3D
       m_renderer->setViewMode(PERSPECTIVE);
-
-      // Draw the compass
-      // TODO: Make this part of the GUI?
-      m_compass->update(cam->getRotation());
-      m_compass->draw(m_renderer, select_mode);
     } 
   } else {
     m_renderer->drawSplashScreen();

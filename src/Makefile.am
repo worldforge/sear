@@ -73,7 +73,6 @@ sear_bin_LDADD = \
 	../environment/libEnvironment.a \
 	../loaders/libModelLoader.a \
 	../loaders/cal3d/libLoaderCal3d.a \
-	../gui/libGui.a \
 	../guichan/libGuichan.a \
 	../Eris/libEris.a \
 	../common/libCommon.a \

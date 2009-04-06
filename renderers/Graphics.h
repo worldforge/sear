@@ -33,7 +33,6 @@ class WorldEntity;
 class System;
 class Character;
 class Console;
-class Compass;
 class LightManager;
 
 class Graphics : public ConsoleObject, public sigc::trackable {
@@ -104,7 +103,6 @@ protected:
   
   void varconf_callback(const std::string &section, const std::string &key, varconf::Config &config);
 private:
-  std::auto_ptr<Compass> m_compass;
   
   std::auto_ptr<LightManager> m_lm;
 

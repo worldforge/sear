@@ -21,6 +21,10 @@ namespace varconf {
 class Config;
 }
 
+namespace Eris {
+class Entity;
+}
+
 //Client Messages
 #define CLIENT_CONNECTING       "Connecting"
 #define CLIENT_CONNECTED        "Connected"

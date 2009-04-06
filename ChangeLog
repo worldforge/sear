@@ -1,3 +1,156 @@
+2009-04-06  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/RootWidget.cpp: Includes fix.
+
+2009-03-01  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Inventory.cpp, guichan/Inventory.h: Implementation of a icon
+	  based inventory. This is still a WIP.
+
+2009-03-01  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/adjustingcontainer.cpp, guichan/adjustingcontainer.hpp,
+	  guichan/Makefile.am: Added adjusting container impl from Guichan
+	  contrib as an alternative to the box impls. This may only be a
+	  temporary addition during testing of new Inventory impl.
+
+2009-03-01  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp: Remove debugging output.
+
+2009-02-28  Alexey Torkhov  <atorkhov@gmail.com>
+
+	* common/Log.cpp, src/CacheObject.cpp: Fixing build with recent
+	  compilers.
+
+2009-02-05  Al Riddoch  <alriddoch@googlemail.com>
+
+	* environment/Weather.cpp, guichan/StatusWindow.cpp,
+	  loaders/AreaModel.cpp, src/Editor.cpp, src/TerrainEntity.cpp,
+	  src/client.h: Add includes and forward declarations required by the
+	  latest Eris release.
+
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp: Flip texture so it is no longer upside-down.
+
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Compass.cpp: Remove some unused arrays. Adjust window
+	  padding/dimensions.
+
+2009-02-03  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Workarea.cpp: Added command to toggle a workarea window.
+
+2009-01-21  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp, guichan/ImageBox.h: Improve texture
+	  positioning and rotation. Render a text string if required.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
+ 	* guichan/Makefile.am guichan/grid.cpp guichan/grid.hpp: Added initial
+	  grid box impl.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
+        * renderers/TextureManager.h: Member to see if a texture name exists.
+
+2009-01-19  Al Riddoch  <alriddoch@googlemail.com>
+
+	* common/Matrix.h, common/Utility.cpp, loaders/BoundBox.cpp,
+	  loaders/ParticleSystem.h, renderers/Frustum.cpp,
+	  renderers/ImageUtils.cpp, renderers/LightManager.cpp,
+	  renderers/TextureManager.cpp, src/ScriptEngine.cpp:
+	  Add standard and wfmath includes required after the wfmath
+	  header cleanup.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ActionImageBox.cpp, guichan/ActionImageBox.h,
+	  guichan/Makefile.am: Subclass of ImageBox which distributes action
+	  events on mouse releases.
+
+2009-01-19  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImageBox.cpp, guichan/ImageBox.h: Add member to change the 
+	  current texture.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Compass.cpp, guichan/Compass.h: Make whole window draggable.
+	  Use new ImageBox widget.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/ImagenBox.cpp, guichan/ImageBox.h, guichan/Makefile.am:
+	  Added a widget to render a texture.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* src/Character.cpp, src/Character.h: Implement combine/divide ops.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/Graphics.cpp, guichan/Compass.cpp, guichan/Compass.h: Use
+	  the texture manager and other Render calls rather than sprites. This
+	  means we do not need to reset the state after rendering the gui.
+
+2009-01-11  Simon Goodall  <simon@worldforge.org>
+
+	* src/System.cpp: Move gui cleanup to earlier in the shutdown process
+	  so it can clean up rendering resources correctly.
+
+2009-01-10  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Compass.cpp, guichan/Compass.h: Show window background on
+	  mouse over.
+
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, Eris/TerrainMod.cpp, Eris/TerrainMod.h,
+	  Eris/TerrainMod_impl.cpp, Eris/TerrainMod_impl.h,
+	  Eris/TerrainModHandler.cpp, Eris/TerrainModHandler.h,
+	  environment/SearTerrainModHandler.cpp,
+	  environment/SearTerrainModHandler.h,
+	  environment/TerrainRenderer/cpp, environment/TerrainRenderer.h:
+	  Remove local TerrainMod classes in favour of those now in Eris.
+
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
+	* renderers/GL.cpp, renderers/GL.h: Some changes to make each
+	  worldentity use a single colour during select mode.
+
+2009-01-09  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, Makefile.am, src/Makefile.am, gui/*,
+	  guichan/Makefile.am, guichan/Compass.cpp, guichan/Compass.h: Delete 
+	  the old gui directory and create a new guichan version of the compass.
+
+2009-01-06  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/Workarea.cpp, guichan/Workarea.h: Fix gui so that mouse
+	  clicks do not fall through and call GL::procEvent.
+
+	* guichan/RootWidget.cpp, guichan/RootWidget.h: Remove mouse listener
+	  and childWithMouse method as we no longer need them. 
+
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/RootWidget.cpp, guichan/box.cpp: Remove use of WidgetList
+	  typedef as this will be gone in the next guichan release.
+
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, Makefile.am: Add in extra m4 recommendations.
+
+2009-01-05  Simon Goodall  <simon@worldforge.org>
+
+	* loaders/DynamicObject.cpp, loaders/StaticObject.cpp,
+	  renderers/RenderSystem.cpp, renderers/RenderSystem.h: Change 
+	  nextColour to also specify the set param.
+
 2009-01-04  Simon Goodall  <simon@worldforge.org>
 
 	* data/bindings.cfg: Add /next_entity and /prev_entity bindings

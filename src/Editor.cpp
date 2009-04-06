@@ -15,6 +15,7 @@
 #include <Eris/Connection.h>
 #include <Eris/Avatar.h>
 
+#include <Atlas/Message/Element.h>
 #include <wfmath/atlasconv.h>
 #include <Atlas/Objects/Operation.h>
 

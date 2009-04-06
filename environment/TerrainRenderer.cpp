@@ -4,7 +4,7 @@
 // Copyright (C) 2004 - 2008 Simon Goodall
 
 #include "TerrainRenderer.h"
-#include "SearTerrainModHandler.h"
+#include "Eris/TerrainModHandler.h"
 
 #include "renderers/RenderSystem.h"
 
@@ -474,7 +474,7 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
   glEnable (GL_TEXTURE_2D);
 }
 
-static void onEnteredWorld(SearTerrainModHandler *tmh) {
+static void onEnteredWorld(Eris::TerrainModHandler *tmh) {
   Eris::View *view = System::instance()->getClient()->getAvatar()->getView();
   tmh->setView(view);
 }
@@ -532,7 +532,7 @@ TerrainRenderer::TerrainRenderer ():
 //  registerShader(new Mercator::HighShader (110.f), "snow.png");  // Snow
 //  registerShader(new Mercator::GrassShader (1.f, 80.f, .5f, 1.f), "rabbithill_grass_hh.png");  // Grass
 
-  m_tmh = new SearTerrainModHandler();
+  m_tmh = new Eris::TerrainModHandler();
   m_tmh->init();
 
   // Hook up callbacks to modify terrain renderer

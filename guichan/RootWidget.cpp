@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2009 Simon Goodall
 
 #include "guichan/RootWidget.h"
 #include "guichan/CommandLine.h"
@@ -12,30 +12,21 @@
 #include "renderers/Render.h"
 #include "renderers/RenderSystem.h"
 
-#include <iostream>
+#include <algorithm>
 
 namespace Sear {
 
-RootWidget::RootWidget() :
-  mWidgetWithMouse(0)
+RootWidget::RootWidget()
 {
     setBaseColor(gcn::Color(63, 63, 63, 191));
     setOpaque(false);
-    addMouseListener(this);
-}
-
-/// Determine if the mouse is over the root widget, and is thus not
-/// over any of the other widgets.
-bool RootWidget::childHasMouse()
-{
-    return (mWidgetWithMouse == false);
 }
 
 void RootWidget::resize(int width, int height, int old_width, int old_height)
 {
   setDimension(gcn::Rectangle(0, 0, width, height));
-  gcn::Container::WidgetListIterator I = mWidgets.begin();
-  gcn::Container::WidgetListIterator Iend = mWidgets.end();
+  std::list<gcn::Widget*>::const_iterator I = mWidgets.begin();
+  std::list<gcn::Widget*>::const_iterator Iend = mWidgets.end();
   for (; I != Iend; ++I) {
     gcn::Widget * child = *I;
     int x = child->getX(),
@@ -110,14 +101,6 @@ void RootWidget::contextCreated() {
 }
 void RootWidget::contextDestroyed(bool check) {
   Overlay::instance()->contextDestroyed(check);
-}
-
-void RootWidget::mouseEntered(gcn::MouseEvent& mouseEvent) { 
-  mWidgetWithMouse = true;
-}
-
-void RootWidget::mouseExited(gcn::MouseEvent& mouseEvent) {  
- mWidgetWithMouse = false;
 }
 
 } // namespace Sear

@@ -17,11 +17,13 @@
 
 #include "renderers/RenderTypes.h"
 
+namespace Eris {
+  class TerrainModHandler;
+}
+
 namespace Sear {
 
 class Environment;
-class SearTerrainModHandler;
-
 typedef WFMath::Point<3> PosType;
 
 
@@ -92,7 +94,7 @@ public:
     TextureID m_shadowTexture;
     GLuint m_landscapeList;
     bool m_haveTerrain;
-    SearTerrainModHandler *m_tmh;
+    Eris::TerrainModHandler *m_tmh;
 
     void enableRendererState();
     void disableRendererState();

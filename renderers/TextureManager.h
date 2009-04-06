@@ -129,7 +129,11 @@ public:
     return "";
   }
 
-  
+ bool isTextureName(const std::string &texture_name) {
+    std::string name = texture_name;
+    m_texture_config.clean(name);
+  return m_texture_config.findItem(name, "filename");
+ } 
 
   /**
    * Unloads the specified texture from the OpenGL system
@@ -187,6 +191,11 @@ public:
     
   void readConfig(const varconf::Config &config);
   void writeConfig(varconf::Config &config) const;
+
+
+  GLuint getTextureObject(TextureID id) const {
+    return m_textures[id];
+  }
 private:
 
   /** 

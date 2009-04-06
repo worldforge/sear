@@ -34,8 +34,8 @@ void VBox::pack(Widget* child, int padding)
     int x = 0, y = 0;
     WidgetPadding::const_iterator I = mWidgetPadding.begin();
     WidgetPadding::const_iterator Iend = mWidgetPadding.end();
-    WidgetList::const_iterator J = mWidgets.begin();
-    WidgetList::const_iterator Jend = mWidgets.end();
+    std::list<gcn::Widget*>::const_iterator J = mWidgets.begin();
+    std::list<gcn::Widget*>::const_iterator Jend = mWidgets.end();
     for (; I != Iend && J != Jend; ++I, ++J) {
         x = std::max(x, (*J)->getWidth());
         y += *I * 2;
@@ -69,8 +69,8 @@ void HBox::pack(Widget* child, int padding)
     int x = 0, y = 0;
     WidgetPadding::const_iterator I = mWidgetPadding.begin();
     WidgetPadding::const_iterator Iend = mWidgetPadding.end();
-    WidgetList::const_iterator J = mWidgets.begin();
-    WidgetList::const_iterator Jend = mWidgets.end();
+    std::list<gcn::Widget*>::const_iterator J = mWidgets.begin();
+    std::list<gcn::Widget*>::const_iterator Jend = mWidgets.end();
     for (; I != Iend && J != Jend; ++I, ++J) {
         x += *I * 2;
         x += (*J)->getWidth();
