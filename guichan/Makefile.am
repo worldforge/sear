@@ -15,6 +15,7 @@ libGuichan_a_SOURCES = \
                        Alert.cpp Alert.h \
                        AudioOptions.cpp AudioOptions.h \
                        CharacterWindow.cpp CharacterWindow.h \
+                       CharacterListModel.cpp CharacterListModel.h \
                        CommandLine.h \
                        Compass.cpp Compass.h \
                        ConnectWindow.cpp ConnectWindow.h \
@@ -34,6 +35,7 @@ libGuichan_a_SOURCES = \
                        SpeechBubble.cpp SpeechBubble.h \
                        StatusWindow.cpp StatusWindow.h \
                        TaskWindow.cpp TaskWindow.h \
+                       TypeListModel.cpp TypeListModel.h \
                        VideoOptions.cpp VideoOptions.h \
                        Workarea.cpp Workarea.h \
 		       WFUTWindow.cpp WFUTWindow.h

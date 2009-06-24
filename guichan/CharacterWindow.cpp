@@ -4,6 +4,8 @@
 // Copyright (C) 2006 - 2007 Simon Goodall
 
 #include "guichan/CharacterWindow.h"
+#include "guichan/CharacterListModel.h"
+#include "guichan/TypeListModel.h"
 #include "guichan/DblClkListBox.h"
 
 #include "guichan/Alert.h"
@@ -33,62 +35,6 @@
 namespace Sear {
 
 static const bool debug = false;
-
-class CharacterListModel : public gcn::ListModel
-{
-public:
-  CharacterListModel()
-  {
-    Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return; }
-    account->refreshCharacterInfo();
-  }
-
-  virtual int getNumberOfElements()
-  {
-    Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return 0; }
-    return account->getCharacters().size();
-  }
-
-  virtual std::string getElementAt(int i)
-  {
-    Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return ""; }
-    const Eris::CharacterMap & ci = account->getCharacters();
-    Eris::CharacterMap::const_iterator I = ci.begin();
-    Eris::CharacterMap::const_iterator Iend = ci.end();
-    for (int j = 0; I != Iend; ++I, ++j) {
-      if (i == j) {
-        return I->second->getName();
-      }
-    }
-    return "UNKNOWN";
-  }
-};
-
-class TypeListModel : public gcn::ListModel
-{
-public:
-  virtual int getNumberOfElements()
-  {
-    Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return 0; }
-    return account->getCharacterTypes().size();
-  }
-
-  virtual std::string getElementAt(int i)
-  {
-    Eris::Account * account = System::instance()->getClient()->getAccount();
-    if (account == 0) { return ""; }
-    const std::vector<std::string> & types = account->getCharacterTypes();
-    if ((size_t) i < types.size()) {
-      return types[i];
-    } else {
-      return "UNKNOWN";
-    }
-  }
-};
 
 CharacterWindow::CharacterWindow() : gcn::Window("Character selection"),
                                      m_charSelected(-1), m_typeSelected(-1)

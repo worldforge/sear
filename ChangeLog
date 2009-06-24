@@ -1,3 +1,10 @@
+2009-06-24  Simon Goodall  <simon@worldforge.org>
+
+	* guichan/CharacterListModel.cpp, guichan/CharacterListModel.h,
+	  guichan/TypeListModel.cpp, guichan/TypeListModel.h,
+	  guichan/Characterwindow.cpp: Break the list models out of
+	  CharacterWindow into their own code files.
+
 2009-04-06  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/RootWidget.cpp: Includes fix.
