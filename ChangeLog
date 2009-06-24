@@ -1,5 +1,10 @@
 2009-06-24  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/LogicWindow.h: Implementation of gcn::Window with a sigc
+	  callback for the logic() method.
+
+2009-06-24  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/CharacterListModel.cpp, guichan/CharacterListModel.h,
 	  guichan/TypeListModel.cpp, guichan/TypeListModel.h,
 	  guichan/Characterwindow.cpp: Break the list models out of

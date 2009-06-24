@@ -25,6 +25,7 @@ libGuichan_a_SOURCES = \
                        HelpOptions.cpp HelpOptions.h \
                        ImageBox.cpp ImageBox.h \
                        Inventory.cpp Inventory.h \
+                       LogicWindow.h \
                        LoginWindow.cpp LoginWindow.h \
                        OptionsTemplate.cpp OptionsTemplate.h \
                        OptionsWindow.cpp OptionsWindow.h \
