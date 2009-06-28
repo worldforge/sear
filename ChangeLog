@@ -1,3 +1,7 @@
+2009-06-28  Simon Goodall  <simon@worldforge.org>
+
+	* src/Makefile.am: Re-organise sources list and remove duplicates.
+
 2009-06-24  Simon Goodall  <simon@worldforge.org>
 
 	* guichan/LogicWindow.h: Implementation of gcn::Window with a sigc

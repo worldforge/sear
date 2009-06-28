@@ -83,43 +83,28 @@ sear_bin_SOURCES = \
 	main.cpp
 
 libSear_a_SOURCES = \
-	ActionHandler.cpp \
-	ActionHandler.h \
-	Bindings.cpp \
-	Bindings.h \
-	CacheManager.cpp \
-	CacheManager.h \
-	CacheObject.cpp \
-	CacheObject.h \
-	Character.cpp \
-	Character.h \
-	client.cpp \
-	client.h \
-	Console.cpp \
-	Console.h \
+	ActionHandler.cpp ActionHandler.h \
+	Bindings.cpp Bindings.h \
+	binreloc.c binreloc.h \
+	CacheManager.cpp CacheManager.h \
+	CacheObject.cpp CacheObject.h \
+	Calendar.cpp Calendar.h \
+	Character.cpp Character.h \
+	client.cpp client.h \
+	Console.cpp Console.h \
 	ConsoleObject.h \
-	Factory.cpp \
-	Factory.h \
-	main.cpp \
-	System.cpp \
-	System.h \
-	WorldEntity.cpp \
-	WorldEntity.h \
-	FileHandler.cpp \
-	FileHandler.h \
+	Editor.cpp Editor.h \
+	error.cpp error.h \
+	Factory.cpp Factory.h \
+	FileHandler.cpp FileHandler.h \
+	MediaManager.cpp MediaManager.h \
+	ScriptEngine.cpp ScriptEngine.h \
+	System.cpp System.h \
+	TerrainEntity.cpp TerrainEntity.h \
+	WorldEntity.cpp WorldEntity.h \
 	default_image.xpm \
 	default_font.xpm \
-	sear_icon.xpm \
-	ScriptEngine.cpp \
-	ScriptEngine.h \
-	Calendar.cpp \
-	Calendar.h \
-	Editor.cpp \
-	Editor.h \
-	TerrainEntity.cpp TerrainEntity.h \
-	binreloc.c binreloc.h \
-	error.cpp error.h \
-	MediaManager.cpp MediaManager.h
+	sear_icon.xpm
 
 #	Sound.cpp \
 #	Sound.h 
