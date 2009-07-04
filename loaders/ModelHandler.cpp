@@ -109,7 +109,7 @@ SPtr<ModelRecord> ModelHandler::getModel(const std::string &model_id, WorldEntit
   // Model loaded for this object?
 
   // Composite object_id + model id (model record name)
-  const std::string &id = we->getId() + model_id;
+  const std::string &id = we->getViewId() + model_id;
 
   // Look in per entity map
   ObjectRecordMap::const_iterator I = m_object_map.find(id);

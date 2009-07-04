@@ -1,10 +1,10 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000 - 2003 Alistair Riddoch
-// Copyright (C) 2004 - 2006 Simon Goodall
+// Copyright (C) 2004 - 2009 Simon Goodall
 
-#ifndef APOGEE_TERRAIN_RENDERER_H
-#define APOGEE_TERRAIN_RENDERER_H
+#ifndef SEAR_TERRAIN_RENDERER_H
+#define SEAR_TERRAIN_RENDERER_H
 
 #include <vector>
 
@@ -23,6 +23,7 @@ namespace Eris {
 
 namespace Sear {
 
+class Character;
 class Environment;
 typedef WFMath::Point<3> PosType;
 
@@ -105,6 +106,7 @@ public:
     void drawSea( Mercator::Terrain &);
     void drawShadow(const WFMath::Point<2> & pos, float radius = 1.f);
     void setSurface(const std::string &name, const std::string &pattern, const Mercator::Shader::Parameters &params);
+  void onActiveCharacterChanged(Character *c);
   public:
     TerrainRenderer();
     virtual ~TerrainRenderer();
@@ -120,4 +122,4 @@ public:
   int m_context_no;
 };
 }
-#endif // APOGEE_TERRAIN_RENDERER_H
+#endif // SEAR_TERRAIN_RENDERER_H

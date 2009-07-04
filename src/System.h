@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #ifndef SEAR_SYSTEM_H
 #define SEAR_SYSTEM_H 1
@@ -27,7 +27,7 @@ class MediaManager;
 class ScriptEngine;
 class Console;
 class Workarea;
-class Character;
+class CharacterManager;
 //class Sound;
 class Editor;
 class Localserver;
@@ -182,7 +182,7 @@ public:
   Calendar *getCalendar() { return m_calendar.get(); }
   Console *getConsole() { return m_console.get(); }
   Workarea *getWorkarea() { return m_workarea.get(); }
-  Character *getCharacter() { return m_character.get(); }
+  CharacterManager *getCharacterManager() { return m_character_manager.get(); }
   Client *getClient() { return m_client.get(); }
   MediaManager *getMediaManager() { return m_media_manager.get(); }
   Localserver *getLocalserver() { return m_local_server.get(); }
@@ -231,7 +231,7 @@ protected:
   std::auto_ptr<Editor> m_editor;
   std::auto_ptr<Console> m_console;
   std::auto_ptr<Workarea> m_workarea;
-  std::auto_ptr<Character> m_character;
+  std::auto_ptr<CharacterManager> m_character_manager;
   std::auto_ptr<MediaManager> m_media_manager;
   std::auto_ptr<Localserver> m_local_server;
    

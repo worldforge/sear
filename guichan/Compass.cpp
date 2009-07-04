@@ -11,6 +11,8 @@
 #include "renderers/Render.h"
 #include "src/System.h"
 #include "src/client.h"
+#include "src/Character.h"
+#include "src/CharacterManager.h"
 
 #include <Eris/Avatar.h>
 #include <Eris/Entity.h>
@@ -84,7 +86,7 @@ void Compass::logic()
 
   WFMath::Vector<3> northAxis(0.0, 1.0, 0.0), facing(1.0, 0.0, 0.0);
 
-  Eris::Avatar *avatar = System::instance()->getClient()->getAvatar();
+  Eris::Avatar *avatar = System::instance()->getCharacterManager()->getActiveCharacter()->getAvatar();
   if (avatar != 0) {
     Eris::Entity *focus = avatar->getEntity();
     if (!focus) {

@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2000 - 2003 Alistair Riddoch
-// Copyright (C) 2004 - 2008 Simon Goodall
+// Copyright (C) 2004 - 2009 Simon Goodall
 
 #include "TerrainRenderer.h"
 #include "Eris/TerrainModHandler.h"
@@ -16,7 +16,11 @@
 
 #include "src/System.h"
 #include "src/client.h"
+#include "src/Character.h"
+#include "src/CharacterManager.h"
+
 #include <Eris/Avatar.h>
+#include <Eris/View.h>
 
 #include <Mercator/Segment.h>
 #include <Mercator/FillShader.h>
@@ -32,6 +36,7 @@
 
 #include <sigc++/bind.h>
 #include <sigc++/slot.h>
+#include <sigc++/object_slot.h>
 
 namespace Sear {
 
@@ -475,7 +480,9 @@ void TerrainRenderer::drawSea (Mercator::Terrain & t) {
 }
 
 static void onEnteredWorld(Eris::TerrainModHandler *tmh) {
-  Eris::View *view = System::instance()->getClient()->getAvatar()->getView();
+// TODO: Hook up to Avatar/ViewChanged Signal
+  const Eris::Avatar *avatar = System::instance()->getCharacterManager()->getActiveCharacter()->getAvatar();
+  Eris::View *view = avatar->getView();
   tmh->setView(view);
 }
 
@@ -544,6 +551,8 @@ TerrainRenderer::TerrainRenderer ():
   // Hook up callback to View.
   System::instance()->EnteredWorld.connect(sigc::bind(sigc::ptr_fun(onEnteredWorld), m_tmh));
   // TODO: Also hook up left world to de-init
+
+  System::instance()->getCharacterManager()->ActiveCharacterChanged.connect(sigc::mem_fun(this, &TerrainRenderer::onActiveCharacterChanged));
 
 }
 
@@ -761,5 +770,13 @@ void TerrainRenderer::setSurface(const std::string &name, const std::string &pat
   }
 }
 
+void TerrainRenderer::onActiveCharacterChanged(Character *c) {
+
+  Eris::View *view = 0;
+  if (c != 0) {
+    view = c->getAvatar()->getView();
+  }
+  m_tmh->setView(view);
+}
 
 } /* namespace Sear */

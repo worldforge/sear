@@ -1,7 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2006 Alistair Riddoch
-// Copyright (C) 2007 Simon Goodall
+// Copyright (C) 2007 - 2009 Simon Goodall
 
 #include "Overlay.h"
 #include "SpeechBubble.h"
@@ -13,6 +13,8 @@
 #include "renderers/RenderSystem.h"
 
 #include "src/System.h"
+#include "src/Character.h"
+#include "src/CharacterManager.h"
 #include "src/WorldEntity.h"
 #include "src/client.h"
 
@@ -36,7 +38,8 @@ Overlay::~Overlay()
 
 void Overlay::logic(RootWidget * rw)
 {
-  Eris::Avatar * avatar = System::instance()->getClient()->getAvatar();
+  Character * activeCharacter = System::instance()->getCharacterManager()->getActiveCharacter();
+  Eris::Avatar * avatar = activeCharacter ? activeCharacter->getAvatar() : 0;
   Render * render = RenderSystem::getInstance().getRenderer();
   if (avatar == 0 || avatar->getEntity() == 0) {
     if (m_top != 0) {
@@ -178,7 +181,9 @@ void Overlay::heard(Eris::Entity * e,
 {
   assert(m_top != 0);
 
-  Eris::Avatar * avatar = System::instance()->getClient()->getAvatar();
+  Character * activeCharacter = System::instance()->getCharacterManager()->getActiveCharacter();
+  Eris::Avatar * avatar = activeCharacter ? activeCharacter->getAvatar() : 0;
+  //Eris::Avatar * avatar = System::instance()->getClient()->getAvatar();
   assert(avatar != 0);
   if (e == avatar->getEntity()) {
     return;

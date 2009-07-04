@@ -1,10 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
-// $Id: client.cpp,v 1.91 2007-08-27 16:06:39 simon Exp $
-
-#include "System.h"
+#include "client.h"
 
 #include <sigc++/object_slot.h>
 
@@ -23,11 +21,12 @@
 #include "common/Utility.h"
 
 #include "ActionHandler.h"
-#include "client.h"
-#include "Console.h"
-#include "Factory.h"
-#include "Character.h"
 #include "Calendar.h"
+#include "Console.h"
+#include "Character.h"
+#include "CharacterManager.h"
+#include "Factory.h"
+#include "System.h"
 #include "WorldEntity.h"
 
 #ifdef DEBUG
@@ -60,9 +59,6 @@ static const std::string SERVER_DISCONNECT = "disconnect";
 static const std::string ACCOUNT_CREATE = "create";
 static const std::string ACCOUNT_LOGIN = "login";
 static const std::string ACCOUNT_LOGOUT = "logout";
-static const std::string CHARACTER_LIST = "get";
-static const std::string CHARACTER_CREATE = "add";
-static const std::string CHARACTER_TAKE = "take";
 static const std::string LEAVE_WORLD = "leave";
 
 // Config items
@@ -75,11 +71,10 @@ static const std::string KEY_LOGLEVEL = "loglevel";
  * @param client_name - Name of client to pass to Eris
 */
 Client::Client(System *system, const std::string &client_name) :
-  m_system(system), m_avatar(0),
+  m_system(system), 
   m_status(CLIENT_STATUS_DISCONNECTED),
   m_client_name(client_name),
   m_initialised(false),
-  m_takeFirst(false),
   m_loglevel(Eris::LOG_ERROR)
 {
   assert((system != NULL) && "System is NULL");
@@ -107,9 +102,7 @@ void Client::shutdown() {
   notify_callbacks();
 
   m_account.release();
-//  m_avatar.release();
   m_connection.release();
-
 
   setStatus(CLIENT_STATUS_DISCONNECTED);
 
@@ -228,14 +221,17 @@ int Client::createAccount(const std::string &username, const std::string &fullna
   // m_account will still be around if previous attempts have failed
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
+
+    System::instance()->getCharacterManager()->setAccount(m_account.get());
+
+
     // Setup callbacks
     m_account->LoginFailure.connect(sigc::mem_fun(this, &Client::LoginFailure));
     m_account->LoginSuccess.connect(sigc::mem_fun(this, &Client::LoginSuccess));
     m_account->LogoutComplete.connect(sigc::mem_fun(this, &Client::LogoutComplete));
-    m_account->GotAllCharacters.connect(sigc::mem_fun(this, &Client::GotAllCharacters));
-    m_account->GotCharacterInfo.connect(sigc::mem_fun(this, &Client::GotCharacterInfo));
     m_account->AvatarSuccess.connect(sigc::mem_fun(this, &Client::AvatarSuccess));
     m_account->AvatarFailure.connect(sigc::mem_fun(this, &Client::AvatarFailure));
+    m_account->AvatarDeactivated.connect(sigc::mem_fun(this, &Client::AvatarDeactivated));
   }
 
   setStatus(CLIENT_STATUS_LOGGING_IN);
@@ -293,14 +289,14 @@ int Client::login(const std::string &username, const std::string &password) {
   
   if (m_account.get() == NULL) {
     m_account = SPtr<Eris::Account>(new Eris::Account(m_connection.get()));
+    System::instance()->getCharacterManager()->setAccount(m_account.get());
     // setup player callbacks
     m_account->LoginFailure.connect(sigc::mem_fun(this, &Client::LoginFailure));
     m_account->LoginSuccess.connect(sigc::mem_fun(this, &Client::LoginSuccess));
     m_account->LogoutComplete.connect(sigc::mem_fun(this, &Client::LogoutComplete));
-    m_account->GotAllCharacters.connect(sigc::mem_fun(this, &Client::GotAllCharacters));
-    m_account->GotCharacterInfo.connect(sigc::mem_fun(this, &Client::GotCharacterInfo));
     m_account->AvatarSuccess.connect(sigc::mem_fun(this, &Client::AvatarSuccess));
     m_account->AvatarFailure.connect(sigc::mem_fun(this, &Client::AvatarFailure));
+    m_account->AvatarDeactivated.connect(sigc::mem_fun(this, &Client::AvatarDeactivated));
   }
 
   setStatus(CLIENT_STATUS_LOGGING_IN);
@@ -385,131 +381,6 @@ void Client::LoginSuccess() {
   m_account->refreshCharacterInfo();
 }
 
-int Client::createCharacter(const std::string &name, const std::string &type, const std::string &sex, const std::string &description) {
-  assert ((m_initialised == true) && "Client not initialised");
-
-  if (m_status != CLIENT_STATUS_LOGGED_IN) {
-    if (m_status < CLIENT_STATUS_LOGGED_IN)  {
-      m_system->pushMessage("Error: Not logged in", CONSOLE_MESSAGE);
-    } else {
-      m_system->pushMessage("Error: A character is already in use", CONSOLE_MESSAGE);
-    }
-    return 1;
-  }
-
-  assert(m_connection.get() != NULL);
-  assert(m_connection->isConnected() == true);
-  assert(m_account.get() != NULL);
-
-  if (name.empty()) {
-    m_system->pushMessage("Error: No character name specified", CONSOLE_MESSAGE);
-    return 1;
-  }
-  if (type.empty()) {
-    m_system->pushMessage("Error: No character type specified", CONSOLE_MESSAGE);
-    return 1;
-  }
-  if (sex.empty()) {
-    m_system->pushMessage("Error: No character gender specified", CONSOLE_MESSAGE);
-    return 1;
-  }
-  if (description.empty()) {
-    m_system->pushMessage("Error: No character description specified", CONSOLE_MESSAGE);
-    return 1;
-  }
-
-
-  if  (debug) printf("[Client] Creating character - Name: %s Type: %s Sex: %s Description: %s\n", name.c_str(), type.c_str(), sex.c_str(), description.c_str());
-
-  m_system->pushMessage("Creating Character: " +  name, CONSOLE_MESSAGE);
-
-  // Create atlas character object
-  Atlas::Objects::Entity::GameEntity ch;
-  ch->setParents(std::list<std::string>(1, type));
-  ch->setName(name);
-  ch->setAttr("sex", sex);
-  ch->setAttr("description", description);
-
-  setStatus(CLIENT_STATUS_GOING_IN_WORLD);
-  Eris::Result res = m_account->createCharacter(ch);
-
-  switch (res) {
-    case Eris::NO_ERR: break;
-    case Eris::DUPLICATE_CHAR_ACTIVE:
-      fprintf(stderr, "[Client] Character is already in use.\n");
-      m_system->pushMessage("Character is already in use.",
-                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
-      setStatus(CLIENT_STATUS_LOGGED_IN);
-      return 1;
-      break;
-    case Eris::BAD_CHARACTER_ID:
-    case Eris::ALREADY_LOGGED_IN:
-    case Eris::NOT_CONNECTED:
-    case Eris::NOT_LOGGED_IN:
-      assert(false);
-      fprintf(stderr, "[Client] We've hit an unexpected return code %d\n", res);
-      m_system->pushMessage("An Unknown error occured", 
-                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
-      setStatus(CLIENT_STATUS_LOGGED_IN);
-      return 1;
-      break;
-  }
-  return 0;
-}
-
-int Client::takeCharacter(const std::string &id) {
-  assert ((m_initialised == true) && "Client not initialised");
-//  if (debug) printf("[Client] takeCharacter\n");
-  if (m_status != CLIENT_STATUS_LOGGED_IN) {
-     return 1;
-  }
-
-  assert(m_connection.get() != NULL);
-  assert(m_connection->isConnected() == true);
-  assert (m_account.get() != NULL);
-
-  if (id.empty()) {
-    m_takeFirst = true;
-    getCharacters();
-    return 0;
-  }
-
-  if (debug) printf("[Client] Taking character - %s\n", id.c_str());
-  m_system->pushMessage(std::string(CLIENT_TAKE_CHARACTER) + std::string(": ") + id, CONSOLE_MESSAGE);
-  
-  setStatus(CLIENT_STATUS_GOING_IN_WORLD);
-  Eris::Result res = m_account->takeCharacter(id);
-
-  switch (res) {
-    case Eris::NO_ERR: break;
-    case Eris::BAD_CHARACTER_ID:
-      break;
-      fprintf(stderr, "[Client] Bad character ID\n");
-      m_system->pushMessage("Bad character ID",
-                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
-      setStatus(CLIENT_STATUS_LOGGED_IN);
-      return 1;
-    case Eris::DUPLICATE_CHAR_ACTIVE:
-      fprintf(stderr, "[Client] Character is already in use.\n");
-      m_system->pushMessage("Character is already in use.",
-                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
-      setStatus(CLIENT_STATUS_LOGGED_IN);
-      return 1;
-      break;
-    case Eris::ALREADY_LOGGED_IN:
-    case Eris::NOT_CONNECTED:
-    case Eris::NOT_LOGGED_IN:
-      assert(false);
-      fprintf(stderr, "[Client] We've hit an unexpected return code\n");
-      m_system->pushMessage("An Unknown error occured", 
-                            CONSOLE_MESSAGE | SCREEN_MESSAGE);
-      setStatus(CLIENT_STATUS_LOGGED_IN);
-      return 1;
-      break;
-  }
-  return 0;
-}
-
 int Client::leaveWorld()
 {
     if (m_status != CLIENT_STATUS_IN_WORLD) {
@@ -518,11 +389,16 @@ int Client::leaveWorld()
         return 1;
     }
     
-    assert(m_avatar);
     setStatus(CLIENT_STATUS_GOING_OUT_WORLD);
-    m_account->deactivateCharacter(m_avatar);
-    m_account->AvatarDeactivated.connect(sigc::mem_fun(this, &Client::AvatarDeactivated));
-    
+
+    // Deactive each character
+    const Eris::ActiveCharacterMap &acm = m_account->getActiveCharacters();
+    while (acm.empty() == false) {
+      Eris::ActiveCharacterMap::const_iterator I = acm.begin();
+      Eris::Avatar *avatar = I->second;
+      m_account->deactivateCharacter(avatar);
+    }
+
     return 0;
 }
 
@@ -540,16 +416,6 @@ int Client::logout() {
     printf("[Client] Logging Out\n");
     setStatus(CLIENT_STATUS_LOGGING_OUT);
     m_account->logout();
-  }
-  return 0;
-}
-
-int Client::getCharacters() {
-  assert ((m_initialised == true) && "Client not initialised");
-  if (m_account) {
-    m_account->refreshCharacterInfo();
-  } else {
-    m_system->pushMessage("Error: Not logged in", CONSOLE_MESSAGE);
   }
   return 0;
 }
@@ -596,24 +462,6 @@ void Client::LogoutComplete(bool clean_logout) {
   m_account.release();
 }
 
-void Client::GotCharacterInfo(const Atlas::Objects::Entity::RootEntity& ge) {
-  if (debug) printf("[Client] Got Char - Name: %s ID: %s\n", ge->getName().c_str(), ge->getId().c_str());
-}
-
-void Client::GotAllCharacters() {
-//  if (debug) printf("[Client] getCharacters\n");
-  assert(m_account);
-
-  Eris::CharacterMap m = m_account->getCharacters();
-  for (Eris::CharacterMap::const_iterator I = m.begin(); I != m.end(); ++I) {
-    m_system->pushMessage(I->first.c_str(), CONSOLE_MESSAGE);
-    if (m_takeFirst) {
-      takeCharacter(I->first.c_str());
-      m_takeFirst = false;
-    }
-  }
-}
-
 void Client::registerCommands(Console *console) {
   assert ((m_initialised == true) && "Client not initialised");
   console->registerCommand(SERVER_CONNECT, this);
@@ -621,9 +469,6 @@ void Client::registerCommands(Console *console) {
   console->registerCommand(ACCOUNT_CREATE, this);
   console->registerCommand(ACCOUNT_LOGIN, this);
   console->registerCommand(ACCOUNT_LOGOUT, this);
-  console->registerCommand(CHARACTER_LIST, this);
-  console->registerCommand(CHARACTER_CREATE, this);
-  console->registerCommand(CHARACTER_TAKE, this);
   console->registerCommand(LEAVE_WORLD, this);
 }
 
@@ -659,19 +504,6 @@ void Client::runCommand(const std::string &command, const std::string &args) {
   else if (command == ACCOUNT_LOGOUT) {
     logout();
   }
-  else if (command == CHARACTER_LIST) { 
-    getCharacters();
-  }
-  else if (command == CHARACTER_CREATE) {
-    std::string name = tokeniser.nextToken();
-    std::string type = tokeniser.nextToken();
-    std::string sex = tokeniser.nextToken();
-    std::string desc = tokeniser.remainingTokens();
-    createCharacter(name, type, sex, desc);
-  }
-  else if (command == CHARACTER_TAKE) {
-    takeCharacter(args);
-  }
   else if (command == LEAVE_WORLD) {
     leaveWorld();
   }
@@ -680,57 +512,63 @@ void Client::runCommand(const std::string &command, const std::string &args) {
 void Client::AvatarSuccess(Eris::Avatar *avatar) {
   assert(avatar != NULL);
   printf("[Client] Avatar sucessfully created\n");
-  m_avatar = avatar;
 
+  // TODO: Make a member var and clean up correctly
   Factory* f = new Factory(*m_connection->getTypeService());
-  m_avatar->getView()->registerFactory(f);
+  avatar->getView()->registerFactory(f);
 
-  m_avatar->GotCharacterEntity.connect(sigc::mem_fun(this, &Client::GotCharacterEntity));
+  avatar->getView()->Appearance.connect(sigc::mem_fun(this, &Client::onEntityAppearance));
+  avatar->getView()->Disappearance.connect(sigc::mem_fun(this, &Client::onEntityDisappearance));
 
-  m_avatar->getView()->Appearance.connect(sigc::mem_fun(this, &Client::onEntityAppearance));
-  m_avatar->getView()->Disappearance.connect(sigc::mem_fun(this, &Client::onEntityDisappearance));
-
+  avatar->GotCharacterEntity.connect(sigc::mem_fun(this, &Client::GotCharacterEntity));
 }
 
 void Client::AvatarFailure(const std::string &msg) {
   fprintf(stderr, "[Client] AvatarFailure: %s\n", msg.c_str());
   m_system->pushMessage(msg, CONSOLE_MESSAGE | SCREEN_MESSAGE);
+
+  // TODO: Check Current status before falling back
   setStatus(CLIENT_STATUS_LOGGED_IN);
-  m_system->getCharacter()->setAvatar(NULL);
-  m_system->getCalendar()->setAvatar(NULL);
+
   m_system->getActionHandler()->handleAction("avatar_failed", 0);
 }
 
 void Client::AvatarDeactivated(Eris::Avatar* av)
 {
-    std::cout << "got avatar deactivated" << std::endl;
+  if (debug) printf("[Client] Avatar deactivated: %s\n", av->getId().c_str());
+ 
+  // Change status if we no longer have any active characters. 
+  Eris::ActiveCharacterMap acl = m_account->getActiveCharacters();
+  if (acl.empty()) {
     setStatus(CLIENT_STATUS_LOGGED_IN);
+  }
 }
 
 void Client::GotCharacterEntity(Eris::Entity *e) {
   assert(e != NULL);
-  assert(m_avatar != NULL);
 
-  m_system->getCharacter()->setAvatar(m_avatar);
-  m_system->getCalendar()->setAvatar(m_avatar);
-  setStatus(CLIENT_STATUS_IN_WORLD);
+  if (debug) printf("[Client] Character Entity Found: %s\n", e->getId().c_str());
+
+  // Change status if we have first entity.
+  // TODO: What happens if we have activated several chars but this is the first
+  //       trigger of the signal? 
+  Eris::ActiveCharacterMap acl = m_account->getActiveCharacters();
+  if (acl.size() == 1) {
+    setStatus(CLIENT_STATUS_IN_WORLD);
+  }
 }
 
 void Client::setStatus(int status) {
   assert(m_system);
-  assert(m_system->getCharacter());
+
   switch (status) {
     case CLIENT_STATUS_DISCONNECTED:
       m_system->getActionHandler()->handleAction("disconnected", 0);
-      m_avatar = NULL;
     case CLIENT_STATUS_DISCONNECTING:
     case CLIENT_STATUS_CONNECTING:
       m_system->setState(SYS_CONNECTED, false);
       m_system->setState(SYS_LOGGED_IN, false);
       m_system->setState(SYS_IN_WORLD, false);
-      m_avatar = NULL;
-      m_system->getCharacter()->setAvatar(NULL);
-      m_system->getCalendar()->setAvatar(NULL);
       break;
     case CLIENT_STATUS_CONNECTED:
     case CLIENT_STATUS_LOGGING_IN:
@@ -738,9 +576,6 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, false);
       m_system->setState(SYS_IN_WORLD, false);
-      m_avatar = NULL;
-      m_system->getCharacter()->setAvatar(NULL);
-      m_system->getCalendar()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("connected", 0);
       break;
     case CLIENT_STATUS_LOGGED_IN:
@@ -748,9 +583,6 @@ void Client::setStatus(int status) {
       m_system->setState(SYS_CONNECTED, true);
       m_system->setState(SYS_LOGGED_IN, true);
       m_system->setState(SYS_IN_WORLD, false);
-      m_avatar = NULL;
-      m_system->getCharacter()->setAvatar(NULL);
-      m_system->getCalendar()->setAvatar(NULL);
       m_system->getActionHandler()->handleAction("logged_in", 0);
       break;
     case CLIENT_STATUS_GOING_OUT_WORLD:

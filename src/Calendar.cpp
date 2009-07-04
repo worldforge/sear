@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
-
-// $Id: Calendar.cpp,v 1.30 2007-05-02 20:47:55 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall
 
 // TODO
 // * Check all values are correctly updated on SET_ commands
@@ -17,6 +15,8 @@
 #include "src/ActionHandler.h"
 #include "src/Console.h"
 #include "src/System.h"
+#include "src/Character.h"
+#include "src/CharacterManager.h"
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -87,6 +87,8 @@ void Calendar::init() {
 
   // Reset calendar on enter world. 
   System::instance()->EnteredWorld.connect(sigc::mem_fun(this, &Calendar::reset));
+
+  System::instance()->getCharacterManager()->ActiveCharacterChanged.connect(sigc::mem_fun(this, &Calendar::onActiveCharacterChanged));
  
   m_initialised = true;
 }
@@ -265,6 +267,15 @@ void Calendar::runCommand(const std::string &command, const std::string &args) {
     char message[19]; // HH:MM:SS YYYY:MM:DD
     snprintf(message, 19, fmt, m_hours, m_minutes, (int)m_seconds, m_years, m_months, m_days);
     System::instance()->pushMessage(message, 0x1);
+  }
+}
+
+void Calendar::onActiveCharacterChanged(Character *c) {
+
+  if (c != NULL) {
+    setAvatar(c->getAvatar());
+  } else {
+    setAvatar(NULL);
   }
 }
 

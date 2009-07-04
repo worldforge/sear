@@ -14,6 +14,7 @@
 
 #include "src/System.h"
 #include "src/Character.h"
+#include "src/CharacterManager.h"
 
 #include <Eris/Avatar.h>
 
@@ -189,7 +190,7 @@ void Inventory::buttonPressed(std::string event)
 
 void Inventory::logic() {
 
-  Character * chr = System::instance()->getCharacter();
+  Character * chr = System::instance()->getCharacterManager()->getActiveCharacter();
   if (chr == 0) { 
     gcn::Window::logic();
     return;
@@ -236,7 +237,6 @@ void Inventory::logic() {
     m_images[count]->setVisible(false);
   }
   m_grid->setHeight(64 * (1+(visible /8)));
-
   gcn::Window::logic();
 }
 

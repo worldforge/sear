@@ -90,6 +90,7 @@ libSear_a_SOURCES = \
 	CacheObject.cpp CacheObject.h \
 	Calendar.cpp Calendar.h \
 	Character.cpp Character.h \
+	CharacterManager.cpp CharacterManager.h \
 	client.cpp client.h \
 	Console.cpp Console.h \
 	ConsoleObject.h \

@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: WorldEntity.cpp,v 1.95 2007-05-26 18:38:03 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 /*
  TODO
@@ -22,6 +20,7 @@
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
 
+#include <Eris/Avatar.h>
 #include <Eris/Types.h>
 #include <Eris/TypeInfo.h>
 #include <Eris/View.h>
@@ -74,7 +73,8 @@ WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *
    m_selected(false),
    m_fading(false),
    m_fade_in(false),
-   m_fade(1.0f)
+   m_fade(1.0f),
+   m_view_id(id + "-" + view->getAvatar()->getId())
 {
   Acted.connect(sigc::mem_fun(this, &WorldEntity::onAction));
   LocationChanged.connect(sigc::mem_fun(this, &WorldEntity::locationChanged));

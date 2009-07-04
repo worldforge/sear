@@ -174,7 +174,7 @@ SPtr<ModelRecord> ModelSystem::getModel(const std::string &model_id, WorldEntity
 SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
   assert (we != NULL);
   // Find object record from entity id
-  const std::string &id = we->getId();
+  const std::string &id = we->getViewId();
   SPtr<ObjectRecord> object_record = m_object_handler->getObjectRecord(id);
 
   if (!object_record) {
@@ -184,7 +184,7 @@ SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
       if (object_record) {
         object_record->type = we->type();
         object_record->name = we->getName();
-        object_record->id = we->getId();
+        object_record->id = we->getViewId();
         object_record->entity = we;
       }
     }
@@ -218,7 +218,7 @@ SPtr<ObjectRecord> ModelSystem::getObjectRecord(WorldEntity *we) {
     // Set the values for the object record
     object_record->type = type;
     object_record->name = we->getName();
-    object_record->id = we->getId();
+    object_record->id = we->getViewId();
     object_record->entity = we;
   }
 

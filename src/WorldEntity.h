@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: WorldEntity.h,v 1.44 2007-05-26 18:38:03 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #ifndef SEAR_WORLDENTITY_H
 #define SEAR_WORLDENTITY_H 1
@@ -18,7 +16,6 @@
 #include <Eris/Types.h>
 #include "common/types.h"
 
-//#include "ObjectLoader.h"
 namespace Eris {
   class View;
 }
@@ -113,6 +110,11 @@ public:
   void updateAbsPosition();
   void updateAbsOrient();
 
+  /**
+   * Return composite string of the view and entity id.
+   */ 
+  const std::string &getViewId() const { return m_view_id; }
+
 protected:
   WFMath::Point<3> getEntityPosition() const {
     if (m_has_local_pos) return m_local_pos;
@@ -123,7 +125,6 @@ protected:
     if (m_has_local_orient) return m_local_orient;
     else return getOrientation();
   }
-
 
   typedef std::pair<std::string, unsigned int> screenMessage;
 
@@ -161,6 +162,7 @@ protected:
 
   bool m_fading, m_fade_in;
   float m_fade;
+  const std::string m_view_id;
 };
 
 } /* namespace Sear */

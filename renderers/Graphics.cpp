@@ -1,6 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2008 Simon Goodall, University of Southampton
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #include <sigc++/object_slot.h>
 
@@ -17,6 +17,7 @@
 #include "common/Utility.h"
 #include "environment/Environment.h"
 #include "src/Character.h"
+#include "src/CharacterManager.h"
 #include "src/Console.h"
 #include "loaders/ModelSystem.h"
 #include "loaders/Model.h"
@@ -241,7 +242,7 @@ void Graphics::setCameraTransform() {
   assert(cam != NULL);
 
   // Get the current focus entity
-  const Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+  const Eris::Avatar *avatar = m_system->getCharacterManager()->getActiveCharacter()->getAvatar();
   assert(avatar != NULL);
 
   //Get the player character entity
@@ -317,7 +318,9 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
   // Reset enabled light sources
   m_lm->reset();
   // Can we render the world yet?
-  if (m_system->checkState(SYS_IN_WORLD)) {
+  //
+  CharacterManager *cm = System::instance()->getCharacterManager();
+  if (m_system->checkState(SYS_IN_WORLD) && cm->getActiveCharacter() != 0) {
 
     // TODO we could set this only when the server updates the values...
     float visibility = Environment::getInstance().getVisibility();
@@ -333,7 +336,8 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Rotate by 90 degrees, WF 0 degrees is East
     m_orient *= quaternion_by_90;
  
-    const Eris::Avatar *avatar = m_system->getClient()->getAvatar();
+  const Eris::Avatar *avatar = m_system->getCharacterManager()->getActiveCharacter()->getAvatar();
+  //  const Eris::Avatar *avatar = m_system->getClient()->getAvatar();
     assert(avatar != NULL);
 
     //Get the player character entity
@@ -399,9 +403,9 @@ void Graphics::drawWorld(bool select_mode, float time_elapsed) {
     // Need to be careful we don't change our view matrices because of frustum
     // culling
 
-    assert(System::instance()->getCharacter());
+    assert(cm->getActiveCharacter());
 
-    System::instance()->getCharacter()->updateLocals(false);
+    cm->getActiveCharacter()->updateLocals(false);
 
     m_render_queue.clear();
     m_message_list.clear();
@@ -491,7 +495,8 @@ void Graphics::buildQueues(WorldEntity *we,
       
   // Loop through all models in list
   if (obj->draw_self) {
-    WorldEntity *self = dynamic_cast<WorldEntity*>(m_system->getClient()->getAvatar()->getEntity());
+  const Eris::Avatar *avatar = m_system->getCharacterManager()->getActiveCharacter()->getAvatar();
+    WorldEntity *self = dynamic_cast<WorldEntity*>(avatar->getEntity());
     if ((cam->getType() == Camera::CAMERA_FIRST) && (we == self)) { 
       /* first person, don't draw self */
     } else {

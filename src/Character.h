@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: Character.h,v 1.47 2007-02-12 21:44:00 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #ifndef SEAR_CHARACTER_H
 #define SEAR_CHARACTER_H 1
@@ -12,7 +10,6 @@
 #include <wfmath/quaternion.h>
 #include <Eris/EntityRef.h>
 #include <sigc++/trackable.h>
-#include "interfaces/ConsoleObject.h"
 
 namespace Atlas {
   namespace Message {
@@ -32,7 +29,6 @@ namespace varconf {
 namespace Sear {
 
 // Forward declarations
-class Console;
 class Client;
 class System;
 class WorldEntity;
@@ -42,7 +38,7 @@ class WorldEntity;
  *
  */
 
-class Character : public ConsoleObject, public sigc::trackable {
+class Character : public sigc::trackable {
 public:
   typedef std::map<std::string,  int> InventoryMap;
   /**
@@ -59,7 +55,7 @@ public:
    * Initialise character object
    * @return True on success, false on failure
    */
-  bool init();
+  bool init(Eris::Avatar *avatar);
 
   /**
    * Shutdown character object
@@ -110,20 +106,9 @@ public:
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config);
 
-  void registerCommands(Console*);
-  void runCommand(const std::string &, const std::string &);
-	
   void setHeight(float);
 
-  void setAvatar(Eris::Avatar *avatar);
   const InventoryMap &getInventoryMap() const { return m_imap; }
-
-private:
-  void updateMove(const WFMath::Vector<3> &, const WFMath::Quaternion &);
-  void sendUpdate();
-  void onLocationChanged(Eris::Entity *);
-  void onMoved();
-  void getOrientation(WorldEntity *);
   /**
   @brief Locate an item in the inventory by instance or type name
   @param name The instance or type name to search for
@@ -131,9 +116,16 @@ private:
   items are present.
   */
   WorldEntity* findInInventory(const std::string& name);
-  void onChildAdded(Eris::Entity*);
-  void onChildRemoved(Eris::Entity*);
   void renameEntity(Eris::Entity *e, const std::string &name);
+ 
+private:
+  void updateMove(const WFMath::Vector<3> &, const WFMath::Quaternion &);
+  void sendUpdate();
+  void onLocationChanged(Eris::Entity *);
+  void onMoved();
+  void getOrientation(WorldEntity *);
+ void onChildAdded(Eris::Entity*);
+  void onChildRemoved(Eris::Entity*);
   void combineEntity(const std::vector<Eris::Entity *> &e);
   void divideEntity(Eris::Entity *e, int num);
  

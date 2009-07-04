@@ -29,7 +29,6 @@
 #include "client.h"
 #include "System.h"
 #include "Character.h"
-#include "Console.h"
 #include "renderers/RenderSystem.h"
 #include "renderers/Render.h"
 #include "loaders/ObjectHandler.h"
@@ -55,52 +54,6 @@ static std::string getNameOrType(Sear::WorldEntity *we) {
   }
   return str;
 }
-
-// Console commands
-static const std::string CMD_MOVE_FORWARD = "+character_move_forward";
-static const std::string CMD_MOVE_BACKWARD = "+character_move_backward";
-static const std::string CMD_MOVE_STOP_FORWARD = "-character_move_forward";
-static const std::string CMD_MOVE_STOP_BACKWARD = "-character_move_backward";
-
-static const std::string CMD_MOVE_UPWARD = "+character_move_upwards";
-static const std::string CMD_MOVE_DOWNWARD = "+character_move_downwards";
-static const std::string CMD_MOVE_STOP_UPWARD = "-character_move_upwards";
-static const std::string CMD_MOVE_STOP_DOWNWARD = "-character_move_downwards";
-
-static const std::string CMD_ROTATE_LEFT = "+character_rotate_left";
-static const std::string CMD_ROTATE_RIGHT = "+character_rotate_right";
-static const std::string CMD_ROTATE_STOP_LEFT = "-character_rotate_left";
-static const std::string CMD_ROTATE_STOP_RIGHT = "-character_rotate_right";
-
-static const std::string CMD_STRAFE_LEFT = "+character_strafe_left";
-static const std::string CMD_STRAFE_RIGHT = "+character_strafe_right";
-static const std::string CMD_STRAFE_STOP_LEFT = "-character_strafe_left";
-static const std::string CMD_STRAFE_STOP_RIGHT = "-character_strafe_right";
-
-static const std::string CMD_RUN = "+run";
-static const std::string CMD_STOP_RUN = "-run";
-static const std::string CMD_TOGGLE_RUN = "toggle_run";
-
-static const std::string CMD_SAY = "say";
-static const std::string CMD_ME = "me";
-static const std::string CMD_PICKUP = "pickup";
-static const std::string CMD_TOUCH = "touch";
-static const std::string CMD_DROP = "drop";
-static const std::string CMD_EAT = "eat";
-static const std::string CMD_GIVE = "give";
-static const std::string CMD_DISPLAY_INVENTORY = "inventory";
-static const std::string CMD_MAKE = "make";
-static const std::string CMD_USE = "use";
-static const std::string CMD_IDLE = "idle";
-static const std::string CMD_WIELD = "wield";
-static const std::string CMD_ATTACK = "attack";
-static const std::string CMD_DISPLAY_USE_OPS = "use_ops";
-  
-static const std::string CMD_SET_HEIGHT = "set_height";
-static const std::string CMD_RENAME_ENTITY = "rename_entity";
-
-static const std::string CMD_MOVE_TO = "move_to";
-static const std::string CMD_MOVE_TO_ORIGIN = "return_to_origin";
 
 static const unsigned int server_update_interval = 500;
 
@@ -144,18 +97,6 @@ Character::Character() :
 
 Character::~Character() {
   if (m_initialised) shutdown();
-}
-
-bool Character::init() {
-  assert (m_initialised == false);
-
-  System::instance()->getGeneral().sigsv.connect(sigc::mem_fun(this, &Character::varconf_callback));
-
-  m_pred_orient.identity();
-
-
-  m_initialised = true;
-  return true;
 }
 
 void Character::shutdown() {
@@ -526,7 +467,7 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     return;
   }
 
-  Eris::EntityPtr te = System::instance()->getClient()->getAvatar()->getView()->getEntity(target);
+  Eris::EntityPtr te = m_avatar->getView()->getEntity(target);
   if(!te) {
     Log::writeLog("No target " + target + " to give " + string_fmt(quantity) + " items of " + name + " to", Log::LOG_DEFAULT);
     return;
@@ -540,159 +481,6 @@ void Character::giveEntity(const std::string &name, int quantity, const std::str
     m_avatar->place(we, te, pos);
     --quantity;
     we = findInInventory(name);
-  }
-}
-
-void Character::registerCommands(Console *console) {
-  console->registerCommand(CMD_MOVE_FORWARD, this);
-  console->registerCommand(CMD_MOVE_BACKWARD, this);
-  console->registerCommand(CMD_MOVE_STOP_FORWARD, this);
-  console->registerCommand(CMD_MOVE_STOP_BACKWARD, this);
-
-  console->registerCommand(CMD_MOVE_UPWARD, this);
-  console->registerCommand(CMD_MOVE_DOWNWARD, this);
-  console->registerCommand(CMD_MOVE_STOP_UPWARD, this);
-  console->registerCommand(CMD_MOVE_STOP_DOWNWARD, this);
-
-  console->registerCommand(CMD_ROTATE_LEFT, this);
-  console->registerCommand(CMD_ROTATE_RIGHT, this);
-  console->registerCommand(CMD_ROTATE_STOP_LEFT, this);
-  console->registerCommand(CMD_ROTATE_STOP_RIGHT, this);
-
-  console->registerCommand(CMD_STRAFE_LEFT, this);
-  console->registerCommand(CMD_STRAFE_RIGHT, this);
-  console->registerCommand(CMD_STRAFE_STOP_LEFT, this);
-  console->registerCommand(CMD_STRAFE_STOP_RIGHT, this);
-
-  console->registerCommand(CMD_RUN, this);
-  console->registerCommand(CMD_STOP_RUN, this);
-  console->registerCommand(CMD_TOGGLE_RUN, this);
-
-  console->registerCommand(CMD_PICKUP, this);
-  console->registerCommand(CMD_DROP, this);
-  console->registerCommand(CMD_EAT, this);
-  console->registerCommand(CMD_GIVE, this);
-  console->registerCommand(CMD_DISPLAY_INVENTORY, this);
-  console->registerCommand(CMD_MAKE, this);
-  console->registerCommand(CMD_ME, this);
-  console->registerCommand(CMD_TOUCH, this);
-  console->registerCommand(CMD_SAY, this);
-  console->registerCommand(CMD_USE, this);
-  console->registerCommand(CMD_IDLE, this);
-  console->registerCommand(CMD_WIELD, this);
-  console->registerCommand(CMD_ATTACK, this);
-  console->registerCommand(CMD_SET_HEIGHT, this);
-  console->registerCommand(CMD_DISPLAY_USE_OPS, this);
-  console->registerCommand(CMD_RENAME_ENTITY, this);
-  console->registerCommand(CMD_MOVE_TO, this);
-  console->registerCommand(CMD_MOVE_TO_ORIGIN, this);
-}
-
-void Character::runCommand(const std::string &command, const std::string &args) {
-  assert ((m_initialised == true) && "Character not initialised");
-
-  if (!m_avatar) return;
-
-  Tokeniser tokeniser = Tokeniser();
-  tokeniser.initTokens(args);
-  if (command == CMD_MOVE_FORWARD) moveForward(1);
-  else if (command == CMD_MOVE_BACKWARD) moveForward(-1);
-  else if (command == CMD_MOVE_STOP_FORWARD) moveForward(-1);
-  else if (command == CMD_MOVE_STOP_BACKWARD) moveForward( 1);
-
-  else if (command == CMD_MOVE_UPWARD) moveUpward(1);
-  else if (command == CMD_MOVE_DOWNWARD) moveUpward(-1);
-  else if (command == CMD_MOVE_STOP_UPWARD) moveUpward(-1);
-  else if (command == CMD_MOVE_STOP_DOWNWARD) moveUpward( 1);
-
-  else if (command == CMD_ROTATE_LEFT) rotate( 1);
-  else if (command == CMD_ROTATE_RIGHT) rotate(-1);
-  else if (command == CMD_ROTATE_STOP_LEFT) rotate(-1);
-  else if (command == CMD_ROTATE_STOP_RIGHT) rotate( 1);
-
-  else if (command == CMD_STRAFE_LEFT) strafe( 1);
-  else if (command == CMD_STRAFE_RIGHT) strafe(-1);
-  else if (command == CMD_STRAFE_STOP_LEFT) strafe(-1);
-  else if (command == CMD_STRAFE_STOP_RIGHT) strafe( 1);
-
-  else if (command == CMD_RUN || command == CMD_STOP_RUN || command == CMD_TOGGLE_RUN) toggleRunModifier();
-
-  else if (command == CMD_SAY) say(args);
-  else if (command == CMD_ME) emote(args);
-  else if (command == CMD_GIVE) {
-    const std::string &quantity_str = tokeniser.nextToken();
-    const std::string &item = tokeniser.remainingTokens();
-    int quantity = 0;
-    cast_stream(quantity_str, quantity);
-    giveEntity(item, quantity, RenderSystem::getInstance().getRenderer()->getActiveID());
-  }
-  else if (command == CMD_DROP) {
-    const std::string &quantity_str = tokeniser.nextToken();
-    const std::string &item = tokeniser.remainingTokens();
-    int quantity = 0;
-    cast_stream(quantity_str, quantity);
-    dropEntity(item, quantity);
-  }
-  else if (command == CMD_PICKUP) System::instance()->setAction(ACTION_PICKUP);
-  else if (command == CMD_TOUCH) System::instance()->setAction(ACTION_TOUCH);
-  else if (command == CMD_DISPLAY_INVENTORY) {
-//    displayInventory();
-    System::instance()->getActionHandler()->handleAction("inventory_open", NULL);
-  }
-  else if (command == CMD_MAKE) {
-    const std::string &type = tokeniser.nextToken();
-    std::string name = tokeniser.remainingTokens();
-    if (name.empty()) {
-        name = type;
-    }
-    make(type, name);
-  }
-  else if (command == CMD_USE) {
-    System::instance()->setAction(ACTION_USE);
-//    useToolOnEntity(RenderSystem::getInstance().getRenderer()->getActiveID());
-  }
-  else if (command == CMD_IDLE) {
-    becomeIdle();
-  }
-  else if (command == CMD_DISPLAY_USE_OPS) {
-    displayUseOperations();
-  }
-  else if (command == CMD_WIELD) {
-    const std::string &name = tokeniser.nextToken();
-    wieldEntity(name);
-  }
-  else if (command == CMD_EAT) {
-    const std::string &name = tokeniser.nextToken();
-    eatEntity(name);
-  }
-  else if (command == CMD_ATTACK) {
-    System::instance()->setAction(ACTION_ATTACK);
-  }
-  else if (command == CMD_SET_HEIGHT) {
-    const std::string &hStr = tokeniser.nextToken();
-    float h;
-    cast_stream(hStr, h);
-    setHeight(h);
-  }
-  else if (command ==  CMD_RENAME_ENTITY) {
-    const std::string &id = tokeniser.nextToken();
-    const std::string &name = tokeniser.remainingTokens();
-    WorldEntity *we = findInInventory(id);
-    if (we) renameEntity(we, name);
-  }
-  else if (command == CMD_MOVE_TO_ORIGIN) {
-    m_avatar->moveToPoint(WFMath::Point<3>(0,0,0));
-  }
-  else if (command == CMD_MOVE_TO) {
-
-    const std::string &str_x = tokeniser.nextToken();
-    const std::string &str_y = tokeniser.nextToken();
-    const std::string &str_z = tokeniser.nextToken();
-    float x,y,z;
-    cast_stream(str_x, x);
-    cast_stream(str_y, y);
-    cast_stream(str_z, z);
-    m_avatar->moveToPoint(WFMath::Point<3>(x,y,z));
   }
 }
 
@@ -730,31 +518,33 @@ void Character::setHeight(float height) {
   m_avatar->getConnection()->send(set);
 }
 
-void Character::setAvatar(Eris::Avatar *avatar) {
+bool Character::init(Eris::Avatar *avatar) {
+
+  assert(m_initialised == false);
+
+  System::instance()->getGeneral().sigsv.connect(sigc::mem_fun(this, &Character::varconf_callback));
+
+  m_pred_orient.identity();
+
   m_avatar = avatar;
-  if (avatar == NULL) {
-    m_self = Eris::EntityRef();
-    // TODO we also need to disconnect any signals at this point!
-    // Otherwise we can clear the list during a disconnect, and then the
-    // ChildRemoved signal can get fired!
-    // We can't use notify_callbacks as other signals are used in this class.
-    m_imap.clear();
-  } else {
-    m_self = Eris::EntityRef(m_avatar->getEntity());
-    WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
 
-    we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded)); 
-    we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));
-    we->LocationChanged.connect(sigc::mem_fun(this, &Character::onLocationChanged));
-    we->Moved.connect(sigc::mem_fun(this, &Character::onMoved));
-    m_refresh_orient = true;
-    onMoved();
+  m_self = Eris::EntityRef(m_avatar->getEntity());
+  WorldEntity *we = dynamic_cast<WorldEntity*>(m_self.get());
 
-    m_imap.clear();
-    for (unsigned int i = 0; i < m_self->numContained(); ++i) {
-      onChildAdded(m_self->getContained(i));
-    }
+  we->ChildAdded.connect(sigc::mem_fun(this, &Character::onChildAdded)); 
+  we->ChildRemoved.connect(sigc::mem_fun(this, &Character::onChildRemoved));
+  we->LocationChanged.connect(sigc::mem_fun(this, &Character::onLocationChanged));
+  we->Moved.connect(sigc::mem_fun(this, &Character::onMoved));
+  m_refresh_orient = true;
+
+  onMoved();
+
+  for (unsigned int i = 0; i < m_self->numContained(); ++i) {
+    onChildAdded(m_self->getContained(i));
   }
+
+  m_initialised = true;
+  return true;
 }
 
 void Character::getOrientation(WorldEntity *we){

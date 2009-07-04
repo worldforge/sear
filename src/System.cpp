@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2007 Simon Goodall, University of Southampton
-
-// $Id: System.cpp,v 1.174 2008-10-07 19:33:14 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +34,7 @@
 #include "Bindings.h"
 #include "Calendar.h"
 #include "Character.h"
+#include "CharacterManager.h"
 #include "client.h"
 #include "Console.h"
 #include "FileHandler.h"
@@ -178,6 +177,9 @@ bool System::init(int argc, char *argv[]) {
   m_action_handler = std::auto_ptr<ActionHandler>(new ActionHandler(this));
   m_action_handler->init();
 
+  m_character_manager = std::auto_ptr<CharacterManager>(new CharacterManager());
+  m_character_manager->init();
+
   m_calendar = std::auto_ptr<Calendar>(new Calendar());
   m_calendar->init();
 
@@ -210,9 +212,7 @@ bool System::init(int argc, char *argv[]) {
   m_media_manager->registerCommands(m_console.get());
   m_local_server->registerCommands(m_console.get());
 
-  m_character = std::auto_ptr<Character>(new Character());
-  m_character->init();
-  m_character->registerCommands(m_console.get());
+  m_character_manager->registerCommands(m_console.get());
 
   m_editor = std::auto_ptr<Editor>(new Editor());
   m_editor->registerCommands(m_console.get());
@@ -320,7 +320,7 @@ bool System::init(int argc, char *argv[]) {
     m_editor.reset(0);
     m_console.reset(0);
     m_workarea.reset(0);
-    m_character.reset(0);
+    m_character_manager.reset(0);
     m_media_manager.reset(0);
     //m_sound.reset(0);
 
@@ -383,7 +383,7 @@ void System::shutdown() {
 
   m_client.reset(0);
   
-  m_character.reset(0);
+  m_character_manager.reset(0);
 
   m_action_handler.reset(0);
 
@@ -472,8 +472,9 @@ void System::mainLoop() {
 
       m_media_manager->poll();
 
-      if (m_client->getAvatar() && m_client->getAvatar()->getView()) {
-        m_client->getAvatar()->getView()->update();
+      Character *c = m_character_manager->getActiveCharacter();
+      if (c && c->getAvatar() && c->getAvatar()->getView()) {
+        c->getAvatar()->getView()->update();
       }
       // Update Calendar
       if (checkState(SYS_IN_WORLD)) {
@@ -506,6 +507,8 @@ void System::handleEvents(const SDL_Event &event) {
     }
   }
 
+  Character *activeCharacter = m_character_manager->getActiveCharacter();
+
   switch (event.type) {
     case SDL_MOUSEBUTTONDOWN: {
       switch (event.button.button) {
@@ -524,43 +527,45 @@ void System::handleEvents(const SDL_Event &event) {
         }
         break;
         case (SDL_BUTTON_RIGHT):   { 
-          m_character->moveForward(1);
+          activeCharacter->moveForward(1);
         }
         break;
       }
       break;
     }
     case SDL_MOUSEBUTTONUP: {
-      switch (event.button.button) {
-        case (SDL_BUTTON_LEFT):   {
-          switch (m_action) {
-            case (ACTION_DEFAULT): {
-              double period = m_seconds - m_click_seconds;
-              if ((period > DEFAULT_max_click_time) &&
-                  ((event.button.x != m_click_x) ||
-                   (event.button.y != m_click_y))) {
-//                  if (debug) printf("[System] DRAG\n"); fflush(stdout);
-                  m_character->getEntity(m_click_id);
-              } else {
-//                  if (debug) printf("[System] CLICK\n"); fflush(stdout);
-                  m_character->touchEntity(m_click_id);
+      if (activeCharacter != 0) {
+        switch (event.button.button) {
+          case (SDL_BUTTON_LEFT):   {
+            switch (m_action) {
+              case (ACTION_DEFAULT): {
+                double period = m_seconds - m_click_seconds;
+                if ((period > DEFAULT_max_click_time) &&
+                    ((event.button.x != m_click_x) ||
+                     (event.button.y != m_click_y))) {
+//                if (debug) printf("[System] DRAG\n"); fflush(stdout);
+                  activeCharacter->getEntity(m_click_id);
+                } else {
+//                if (debug) printf("[System] CLICK\n"); fflush(stdout);
+                  activeCharacter->touchEntity(m_click_id);
+                }
               }
+              break;
+              case (ACTION_PICKUP): activeCharacter->getEntity(m_click_id); break;
+              case (ACTION_TOUCH): activeCharacter->touchEntity(m_click_id); break;
+              case (ACTION_USE): activeCharacter->useToolOnEntity(m_click_id, m_click_pos); break;
+              case (ACTION_ATTACK): activeCharacter->attackEntity(m_click_id); break;
             }
+            setAction(ACTION_DEFAULT);
+            m_click_on = false;
             break;
-            case (ACTION_PICKUP): m_character->getEntity(m_click_id); break;
-            case (ACTION_TOUCH): m_character->touchEntity(m_click_id); break;
-            case (ACTION_USE): m_character->useToolOnEntity(m_click_id, m_click_pos); break;
-            case (ACTION_ATTACK): m_character->attackEntity(m_click_id); break;
           }
-          setAction(ACTION_DEFAULT);
-          m_click_on = false;
+          break;
+          case (SDL_BUTTON_RIGHT):   { 
+            activeCharacter->moveForward(-1);
+          }
           break;
         }
-        break;
-        case (SDL_BUTTON_RIGHT):   { 
-            m_character->moveForward(-1);
-        }
-        break;
       }
       break;
     }
@@ -615,15 +620,17 @@ void System::handleEvents(const SDL_Event &event) {
     }
     
     case SDL_JOYBUTTONDOWN: {
-      if (event.jbutton.button == DEFAULT_joystick_touch_button) {
-        RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
-        m_character->touchEntity(RenderSystem::getInstance().getActiveEntityID());
+      if (activeCharacter != 0) {
+        if (event.jbutton.button == DEFAULT_joystick_touch_button) {
+          RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
+          activeCharacter->touchEntity(RenderSystem::getInstance().getActiveEntityID());
+        }
+        if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
+          RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
+          activeCharacter->getEntity(RenderSystem::getInstance().getActiveEntityID());
+        }
+        break;
       }
-      if (event.jbutton.button == DEFAULT_joystick_pickup_button) {
-        RenderSystem::getInstance().processMouseClick(m_width / 2, m_height / 2);
-	m_character->getEntity(RenderSystem::getInstance().getActiveEntityID());
-      }
-      break;
     }
     case SDL_VIDEORESIZE: {
       resizeScreen(event.resize.w, event.resize.h);
@@ -637,6 +644,10 @@ void System::handleEvents(const SDL_Event &event) {
 }
 
 void System::handleAnalogueControllers() {
+
+  Character *activeCharacter = m_character_manager->getActiveCharacter();
+  if (activeCharacter == 0) return;
+
   if (m_mouseLook) {
     // We should still be ok if the user wants to drag something
     int mx = m_width / 2,
@@ -648,7 +659,7 @@ void System::handleAnalogueControllers() {
         
     if (dx != 0) {
       float rotation = dx / 4.f;
-      m_character->rotateImmediate(-rotation);
+      activeCharacter->rotateImmediate(-rotation);
     }
     if (dy != 0) {
       float elevation = -dy / 4.f;
@@ -692,33 +703,36 @@ void System::handleJoystickMotion(Uint8 axis, Sint16 value)
 
   if (!m_axisBindings.count(axis)) return;
     
+  Character *activeCharacter = m_character_manager->getActiveCharacter();
+  if (activeCharacter == 0) return;
+ 
     if (debug) printf("[System] got joy motion for axis %d, value =%d\n", (int)axis, value);
     
     switch (m_axisBindings[axis]) {
     case AXIS_STRAFE: // Left right move
         if (abs(value) > 3200) {
-          m_character->setStrafeSpeed(value / 10000.f);
+          activeCharacter->setStrafeSpeed(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
-          m_character->setStrafeSpeed(0);
+          activeCharacter->setStrafeSpeed(0);
         }
         break;
           
     case AXIS_MOVE: // For back move
         if (abs(value) > 3200) {
-          m_character->setMovementSpeed(value / -10000.f);
+          activeCharacter->setMovementSpeed(value / -10000.f);
         } else {
             std::cout << "Y too small" << std::endl << std::flush;
-          m_character->setMovementSpeed(0);
+          activeCharacter->setMovementSpeed(0);
         }
       break;
           
     case AXIS_PAN: // Left right view
         if (abs(value) > 3200) {
-          m_character->setRotationRate(value / 10000.f);
+          activeCharacter->setRotationRate(value / 10000.f);
         } else {
             std::cout << "X too small" << std::endl << std::flush;
-          m_character->setRotationRate(0);
+          activeCharacter->setRotationRate(0);
         }
         break;
           
@@ -833,7 +847,7 @@ void System::readConfig(varconf::Config &config) {
   RenderSystem::getInstance().readConfig(config);
   ModelSystem::getInstance().readConfig(config);
   Environment::getInstance().readConfig(config);
-  m_character->readConfig(config);
+  m_character_manager->readConfig(config);
   m_calendar->readConfig(config);
   m_workarea->readConfig(m_general);
 }
@@ -851,7 +865,7 @@ void System::writeConfig(varconf::Config &config) {
   RenderSystem::getInstance().writeConfig(config);
   ModelSystem::getInstance().writeConfig(config);
   Environment::getInstance().writeConfig(config);
-  m_character->writeConfig(config);
+  m_character_manager->writeConfig(config);
   m_calendar->writeConfig(config);
   m_workarea->writeConfig(m_general);
   m_media_manager->writeConfig(m_general);
@@ -946,7 +960,7 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == CMD_READ_CONFIG) {
     readConfig(m_general);
-    m_character->readConfig(m_general);
+    m_character_manager->readConfig(m_general);
   }
   else if (command == CMD_BIND_KEY) {
     std::string key = tokeniser.nextToken();
@@ -958,12 +972,12 @@ void System::runCommand(const std::string &command, const std::string &args_t) {
   }
   else if (command == CMD_TOGGLE_MLOOK) toggleMouselook();
   else if (command == CMD_IDENTIFY_ENTITY) {
-    if (!m_client->getAvatar()) return;
+//    if (!m_client->getAvatar()) return;
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->displayInfo();  
   }
    else if (command == CMD_DUMP_ATTRIBUTES) {
-    if (!m_client->getAvatar()) return;
+  //  if (!m_client->getAvatar()) return;
     WorldEntity *we = RenderSystem::getInstance().getActiveEntity();
     if (we) we->dumpAttributes();  
   }

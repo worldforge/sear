@@ -1,5 +1,22 @@
 2009-07-04  Simon Goodall  <simon@worldforge.org>
 
+	* environment/TerrainRenderer.cpp, environment/TerrainRenderer.h,
+	  guichan/Compass.cpp, guichan/Inventory.cpp, guichan/Overlay.cpp,
+	  loaders/ModelHandler.cpp, loaders/ModelSystem.cpp, 
+	  renderers/Graphics.cpp, src/Calendar.cpp, src/Calendar.h,
+	  src/Character.cpp, src/Character.h, src/CharacterManager.cpp,
+	  src/CharacterManager.h, src/Editor.cpp, src/Makefile.am,
+	  src/System.cpp, src/System.h, src/WorldEntity.cpp,
+	  src/WorldEntity.h, src/client.cpp, src/client.h: Various changes to 
+	  allow multiple avatars to be controlled within a single session. 
+	  A CharacterManager class now takes over functionality from client
+	  and Charatcter classes. The /switch_character command has been added
+	  and takes a zero-based integer argument indicating the active 
+	  character index to activate. The character creation and take methods 
+	  can now be called mutliple times.
+
+2009-07-04  Simon Goodall  <simon@worldforge.org>
+
 	* guichan/Inventory.cpp: Add the grid to the list of managed widgets.
 
 2009-06-28  Simon Goodall  <simon@worldforge.org>

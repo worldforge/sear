@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall, University of Southampton
-
-// $Id: client.h,v 1.28 2006-12-12 22:31:15 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall, University of Southampton
 
 #ifndef SEAR_CLIENT_H
 #define SEAR_CLIENT_H 1
@@ -89,9 +87,6 @@ public:
   int login(const std::string &, const std::string &);
   int logout();
 
-  int getCharacters();	
-  int createCharacter(const std::string &, const std::string &, const std::string&, const std::string &);
-  int takeCharacter(const std::string &);
   int leaveWorld();
 
   void poll();
@@ -101,11 +96,10 @@ public:
  
   Eris::Account    *getAccount() { return m_account.get(); }
   Eris::Connection *getConnection() { return m_connection.get(); }
-  Eris::Avatar     *getAvatar() const { return m_avatar; }
 
   void readConfig(varconf::Config &config);
   void writeConfig(varconf::Config &config) const;
- 
+
 protected:
   void setStatus(int status);
   void setErisLogLevel(const std::string &level);
@@ -123,8 +117,6 @@ protected:
   void LoginSuccess();
   void LoginFailure(const std::string&);
   void LogoutComplete(bool);
-  void GotCharacterInfo(const Atlas::Objects::Entity::RootEntity&);
-  void GotAllCharacters();
   void AvatarSuccess(Eris::Avatar *);
   void AvatarFailure(const std::string &msg);
   void AvatarDeactivated(Eris::Avatar* av);
@@ -139,14 +131,12 @@ protected:
   SPtr<Eris::Connection> m_connection;
   SPtr<Eris::Account>    m_account;
 
-  Eris::Avatar *m_avatar;
-
   int m_status;
   std::string m_client_name;
   bool m_initialised;
-  bool m_takeFirst;
 
   Eris::LogLevel m_loglevel;
+
 };
 
 } /* namespace Sear */

@@ -30,6 +30,7 @@ namespace Sear {
 
 // Forward Declarations
 class Console;
+class Character;
 
 /**
  * This class regulates the client-side game time.
@@ -210,6 +211,9 @@ public:
   void setAvatar(Eris::Avatar *avatar);
 
 private:
+
+  void onActiveCharacterChanged(Character *c);
+
   bool m_initialised; ///< Calendar initialisation state
   
   int m_seconds_per_minute; ///< Number of seconds in a minute

@@ -1,15 +1,8 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2004 - 2006 Simon Goodall
-
-// $Id: Editor.cpp,v 1.10 2006-04-30 18:13:41 alriddoch Exp $
+// Copyright (C) 2004 - 2009 Simon Goodall
 
 #include "Editor.h"
-#include "client.h"
-#include "System.h"
-#include "renderers/RenderSystem.h"
-#include "renderers/Render.h"
-
 #include <Eris/Entity.h>
 #include <Eris/View.h>
 #include <Eris/Connection.h>
@@ -18,6 +11,13 @@
 #include <Atlas/Message/Element.h>
 #include <wfmath/atlasconv.h>
 #include <Atlas/Objects/Operation.h>
+#include "Character.h"
+#include "CharacterManager.h"
+#include "client.h"
+#include "System.h"
+#include "renderers/RenderSystem.h"
+#include "renderers/Render.h"
+
 
 namespace Sear {
 
@@ -157,7 +157,7 @@ void Editor::deleteEntity(const std::string& target)
 
 Eris::Avatar* Editor::getAvatar() const
 {
-    return System::instance()->getClient()->getAvatar();
+    return System::instance()->getCharacterManager()->getActiveCharacter()->getAvatar();
 }
 
 } // of namespace Sear
