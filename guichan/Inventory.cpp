@@ -51,6 +51,7 @@ Inventory::Inventory() : gcn::Window("Inventory")
   m_widgets.push_back(SPtr<gcn::Widget>(vbox));
 
   m_grid = new gcn::contrib::AdjustingContainer();
+  m_widgets.push_back(SPtr<gcn::Widget>(m_grid));
   m_grid->setNumberOfColumns(8);
   m_grid->setVerticalSpacing(4);
   m_grid->setHorizontalSpacing(4);
