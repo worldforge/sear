@@ -9,13 +9,15 @@
   * frame.
 */
 
-//#include <set>
+#include "WorldEntity.h"
+
 #include <sigc++/bind.h>
 #include <sigc++/hide.h>
 #include <sigc++/object_slot.h>
 
 #include <Atlas/Objects/Operation.h>
 
+#include <wfmath/atlasconv.h>
 #include <wfmath/axisbox.h>
 #include <wfmath/quaternion.h>
 #include <wfmath/vector.h>
@@ -28,14 +30,15 @@
 #include "common/Log.h"
 #include "common/Utility.h"
 
-#include "System.h"
-#include "Console.h"
+#include "environment/Environment.h"
+
 #include "loaders/ObjectRecord.h"
 #include "loaders/ModelSystem.h"
-#include "WorldEntity.h"
-#include "ActionHandler.h"
 
-#include "environment/Environment.h"
+#include "ActionHandler.h"
+#include "Console.h"
+#include "System.h"
+
 
 #ifdef DEBUG
   static const bool debug = true;
@@ -53,10 +56,19 @@ static const std::string ATTR_right_hand_wield = "right_hand_wield";
 static const std::string ATTR_say = "say";
 static const std::string ATTR_status = "status";
 static const std::string ATTR_terrain = "terrain";
+static const std::string ATTR_velocity = "velocity";
 
 static const std::string MODE_floating = "floating";
 static const std::string MODE_fixed = "fixed";
 static const std::string MODE_swimming = "swimming";
+
+static const std::string MODE_IDLE     = "idle";
+static const std::string MODE_STANDING = "standing";
+static const std::string MODE_WALKING  = "walking";
+static const std::string MODE_RUNNING  = "running";
+
+static const float SPEED_IDLE = 0.000001f;
+static const float SPEED_WALKING = 2.0f;
 
 static const std::string TYPE_jetty = "jetty";
 
@@ -300,7 +312,35 @@ void WorldEntity::displayInfo() {
 
 void WorldEntity::onAttrChanged(const std::string& str, const Atlas::Message::Element& v) {
   if (str == ATTR_mode) {
+    /*
+    // This is now obsolete. We need to check velocity to determine animation.
     const std::string &mode = v.asString();
+    static ActionHandler *ac = System::instance()->getActionHandler();
+    assert(ac);
+    ac->handleAction(mode + "_" + type(), NULL);
+    if (mode != m_last_mode) {
+      SPtr<ObjectRecord> record = ModelSystem::getInstance().getObjectRecord(this);
+      if (record) record->animate(mode);
+      m_last_mode = mode;
+    }
+    */
+  } else if (str == ATTR_velocity) {
+    // Extract velocity into vector object
+    WFMath::Vector<3> vel;
+    vel.fromAtlas(v);
+    // Work out speed from velocity
+    float speed = vel.mag();
+
+    // Determine mode string from speed.
+    std::string mode = MODE_IDLE;
+    if (speed < SPEED_IDLE) {
+      mode = MODE_STANDING;
+    } else if (speed <  SPEED_WALKING) {
+      mode = MODE_WALKING;
+    } else {
+      mode = MODE_RUNNING;
+    }
+
     static ActionHandler *ac = System::instance()->getActionHandler();
     assert(ac);
     ac->handleAction(mode + "_" + type(), NULL);
