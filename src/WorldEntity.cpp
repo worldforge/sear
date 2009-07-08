@@ -67,8 +67,8 @@ static const std::string MODE_STANDING = "standing";
 static const std::string MODE_WALKING  = "walking";
 static const std::string MODE_RUNNING  = "running";
 
-static const float SPEED_IDLE = 0.000001f;
-static const float SPEED_WALKING = 2.0f;
+static const float SPEED_IDLE = 0.001f;
+static const float SPEED_WALKING = 2.001f;
 
 static const std::string TYPE_jetty = "jetty";
 
