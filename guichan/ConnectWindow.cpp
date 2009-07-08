@@ -23,36 +23,9 @@
 #include <iostream>
 #include <sstream>
 
+#include "ServerListModel.h"
+
 namespace Sear {
-
-class ServerListModel : public gcn::ListModel
-{
-public:
-  Localserver *m_meta;
-
-  ServerListModel()
-  {
-    m_meta = System::instance()->getLocalserver();
-    m_meta->runCommand("refresh_server_list", "");
-  }
-
-  virtual ~ServerListModel() {
-  }
-
-  virtual int getNumberOfElements()
-  {
-    const ServerList &server_list = m_meta->getServerList();
-    return server_list.size();
-  }
-
-  virtual std::string getElementAt(int i)
-  {
-    const ServerList &server_list = m_meta->getServerList();
-    ServerList::const_iterator I = server_list.begin();
-    for (size_t ii = 0; ii < (size_t) i; ++ii, ++I);
-    return (I->second).servername;
-  }
-};
 
 ConnectWindow::ConnectWindow() : gcn::Window("Connect to Server"),
                                  m_selected(-1)

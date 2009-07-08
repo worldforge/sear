@@ -33,6 +33,7 @@ libGuichan_a_SOURCES = \
                        Panel.cpp Panel.h \
                        RenameDialog.cpp RenameDialog.h \
                        RootWidget.cpp RootWidget.h \
+                       ServerListModel.cpp ServerListModel.h \
                        SpeechBubble.cpp SpeechBubble.h \
                        StatusWindow.cpp StatusWindow.h \
                        TaskWindow.cpp TaskWindow.h \

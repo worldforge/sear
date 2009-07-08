@@ -1,5 +1,11 @@
 2009-07-08  Simon Goodall  <simon@worldforge.org>
 
+	* guichan/ConnectWindow.cpp, guichan/ServerListModel.cpp,
+	  guichan/ServerListModel.h, guichan/Makefile.am: Break out 
+	  ServerListModel class into own files.
+
+2009-07-08  Simon Goodall  <simon@worldforge.org>
+
 	* src/WorldEntity.cpp: Use velocity to determine animations rather
 	  than the "mode" attribute.
 
