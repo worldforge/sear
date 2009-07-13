@@ -1,9 +1,12 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
+// Copyright (C) 2005 - 2009 Simon Goodall
 
 #ifndef SEAR_GUICHAN_WORKAREA_H
 #define SEAR_GUICHAN_WORKAREA_H
+
+#include <cassert>
 
 #include <sigc++/trackable.h>
 
@@ -12,8 +15,6 @@
 #include <guichan.hpp>
 
 #include <SDL/SDL.h>
-
-#include <common/SPtr.h>
 
 namespace varconf {
   class Config;
@@ -52,13 +53,12 @@ public:
 
 class Workarea : public ConsoleObject, public sigc::trackable {
 public:
-  typedef std::map<std::string, SPtr<gcn::Button> > ButtonDict;
-  typedef std::map<std::string, SPtr<gcn::Window> > WindowDict;
+  typedef std::map<std::string, gcn::Window*> WindowDict;
   typedef std::map<std::string, std::pair<int, int> > CoordDict;
 protected:
-  std::list<SPtr<gcn::Widget> > m_widgets;
-
+  std::list<gcn::Widget*> m_widgets;
   std::list<gcn::Widget*> m_remove_widgets;
+
   System * m_system;
   int m_width, m_height;
   std::string m_fixed_font;
@@ -69,11 +69,11 @@ protected:
   gcn::OpenGLSDLImageLoader * m_imageLoader;  // For loading images
   Gui * m_gui;                             // A Gui object - binds it together
 
-  ButtonDict m_buttons;
+  //ButtonDict m_buttons;
   WindowDict m_windows;
 
-  SPtr<gcn::Window> m_panel;
-  SPtr<gcn::Window> m_connectWindow;
+  gcn::Window* m_panel;
+  gcn::Window* m_connectWindow;
 
   RootWidget * m_top;                  // Top level container widget
 public:
@@ -96,6 +96,14 @@ public:
 
   void removeLater(gcn::Widget* w) { assert(w != 0); m_remove_widgets.push_back(w); }
   void removeLaters();
+
+
+  void registerWindow(const std::string &name, gcn::Window *win) {
+    m_windows[name] = win;
+  }
+  void deregisterWindow(const std::string &name, gcn::Window *win) {
+    m_windows.erase(m_windows.find(name));
+  }
 };
 
 } // namespace Sear

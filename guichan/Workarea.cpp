@@ -1,8 +1,7 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
 // Copyright (C) 2005 Alistair Riddoch
-// Copyright (C) 2007 Simon Goodall
-
+// Copyright (C) 2007 - 2009 Simon Goodall
 
 #include <sigc++/object_slot.h>
 
@@ -117,41 +116,26 @@ void Workarea::init()
     std::string font_path = m_fixed_font;
     m_system->getFileHandler()->getFilePath(font_path);
 
-    //gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
     gcn::ImageFontXPM * font = new gcn::ImageFontXPM("default_font", rpgfont_xpm, m_fixed_font_characters);
-    // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
+    
     gcn::Widget::setGlobalFont(font);
   } catch (...) {
     std::cerr << "Failed to load font " << m_fixed_font << std::endl << std::flush;
   }
 
-  // gcn::Image * image = new gcn::Image("/tmp/gui-chan.bmp");
-  // gcn::Icon * icon = new gcn::Icon(image);
+  gcn::Window* con_w = new ConnectWindow();
+  m_top->add(con_w, m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
 
-  // m_top->add(icon, 10, 30);
-
-  // LoginWindow * lw = new LoginWindow;
-  // m_top->add(lw, m_width / 2 - lw->getWidth() / 2, m_height / 2 - lw->getHeight () / 2);
-  // ConsoleWindow * cw = new ConsoleWindow;
-  // m_top->add(cw, 4, m_height - cw->getHeight() - 4);
-
-  // SpeechBubble * sp = new SpeechBubble;
-  // sp->loadImages(std::vector<std::string>());
-  // m_top->add(sp, 50, 50);
-
-  SPtr<gcn::Window> con_w = SPtr<gcn::Window>(new ConnectWindow);
-  m_top->add(con_w.get(), m_width / 2 - con_w->getWidth() / 2, m_height / 2 - con_w->getHeight () / 2);
-
-  m_panel = SPtr<gcn::Window>(new Panel(m_top));
+  m_panel = new Panel(m_top);
   // m_top->add(m_panel, 0, 0);
-  m_top->setWindowCoords(m_panel.get(), std::make_pair(0,0));
-
+  m_top->setWindowCoords(m_panel, std::make_pair(0,0));
   m_windows["panel"] = m_panel;
+
   m_windows["connect"] = con_w;
-  m_windows["login"] = SPtr<gcn::Window>(new LoginWindow);
-  m_windows["character"] = SPtr<gcn::Window>(new CharacterWindow);
-  m_windows["update"] = SPtr<gcn::Window>(new WFUTWindow());
-  m_windows["compass"] = SPtr<gcn::Window>(new Compass());
+  m_windows["login"] = new LoginWindow();
+  m_windows["character"] = new CharacterWindow();
+  m_windows["update"] = new WFUTWindow();
+  m_windows["compass"] = new Compass();
 
   m_system->getActionHandler()->addHandler("connected", "/workarea_close connect");
   m_system->getActionHandler()->addHandler("connected", "/workarea_open login");
@@ -167,10 +151,8 @@ void Workarea::init()
 
   m_system->getActionHandler()->addHandler("inventory_open", "/panel_toggle Inventory");
 
-
   RenderSystem::getInstance().ContextCreated.connect(sigc::mem_fun(*this, &Workarea::contextCreated));
   RenderSystem::getInstance().ContextDestroyed.connect(sigc::mem_fun(*this, &Workarea::contextDestroyed));
-
 }
 
 Workarea::~Workarea()
@@ -180,14 +162,12 @@ Workarea::~Workarea()
   delete m_graphics;
   delete m_imageLoader;
   delete m_top;
-
-  
 }
 
 void Workarea::registerCommands(Console * console)
 {
   if (m_panel != 0) {
-    dynamic_cast<Panel*>(m_panel.get())->registerCommands(console);
+    dynamic_cast<Panel*>(m_panel)->registerCommands(console);
   }
 
   console->registerCommand(WORKAREA_TOGGLE, this);
@@ -202,10 +182,10 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
     if (debug) std::cout << "Got the workarea close command" << std::endl << std::flush;
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      SPtr<gcn::Window> win = I->second;
+      gcn::Window* win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        m_top->closeWindow(win.get());
+        m_top->closeWindow(win);
       }
     } else {
       std::cerr << "Asked to close unknown window " << args
@@ -215,10 +195,10 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
   else if (command == WORKAREA_OPEN) {
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      SPtr<gcn::Window> win = I->second;
+      gcn::Window* win = I->second;
       assert(win != 0);
       if (win->getParent() == 0) {
-        m_top->openWindow(win.get());
+        m_top->openWindow(win);
       }
     } else {
       std::cerr << "Asked to open unknown window " << args
@@ -228,12 +208,12 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
   else if (command == WORKAREA_TOGGLE) {
     WindowDict::const_iterator I = m_windows.find(args);
     if (I != m_windows.end()) {
-      SPtr<gcn::Window> win = I->second;
+      gcn::Window* win = I->second;
       assert(win != 0);
       if (win->getParent() != 0) {
-        m_top->closeWindow(win.get());
+        m_top->closeWindow(win);
       } else {
-        m_top->openWindow(win.get());
+        m_top->openWindow(win);
       }
     } else {
       std::cerr << "Asked to open unknown window " << args
@@ -245,7 +225,7 @@ void Workarea::runCommand(const std::string & command, const std::string & args)
               << std::endl << std::flush;
     Alert * al = new Alert(m_top, args);
     // This should be deleted in removeLaters if all goes well...
-    m_widgets.push_back(SPtr<gcn::Widget>(al));
+    m_widgets.push_back(al);
     // m_top->openWindow(al);
   }
 }
@@ -296,7 +276,7 @@ bool Workarea::handleEvent(const SDL_Event & event)
   bool clear_focus = false;
   bool event_eaten = false;
   bool suppress = false;
-  Panel *panel = dynamic_cast<Panel*>(m_panel.get());
+  Panel *panel = dynamic_cast<Panel*>(m_panel);
   switch (event.type) {
     case SDL_MOUSEMOTION:
       // FIXME This should depend on whether the gui is visible.
@@ -368,11 +348,13 @@ void Workarea::draw()
 void Workarea::contextCreated() {
   try {
     std::string font_path = m_fixed_font;
+    // Expand variables
     m_system->getFileHandler()->getFilePath(font_path);
 
-    //gcn::ImageFont * font = new gcn::ImageFont(font_path, m_fixed_font_characters);
+    // Create ImageFont from data sources
     gcn::ImageFontXPM * font = new gcn::ImageFontXPM("default_font", rpgfont_xpm, m_fixed_font_characters);
-    // gcn::ImageFont * font = new gcn::ImageFont("/tmp/Font-Utopia.bmp", " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{!}~");
+
+    // Set default font
     gcn::Widget::setGlobalFont(font);
   } catch (...) {
     std::cerr << "Failed to load font " << m_fixed_font << std::endl << std::flush;
@@ -398,8 +380,13 @@ void Workarea::removeLaters() {
   while (I != m_remove_widgets.end()) {
     gcn::Widget *w = *I;
     gcn::Widget *p = w->getParent();
-    gcn::Container *p2 = dynamic_cast<gcn::Container*>(p);
-    if (p2) p2->remove(w);
+
+    if (p) {
+      gcn::Container *p2 = dynamic_cast<gcn::Container*>(p);
+      if (p2) {
+        p2->remove(w);
+      }
+    }
 
     m_remove_widgets.erase(I); 
     I = m_remove_widgets.begin();
