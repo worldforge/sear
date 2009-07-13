@@ -26,6 +26,7 @@ AC_CHECK_TOOL(STRIP, strip)
 AC_CHECK_TOOL(AR, ar)
 AC_CHECK_TOOL(AS, as)
 AC_CHECK_TOOL(WINDRES, windres)
+AC_CHECK_TOOL(SWIG, swig)
 AM_CONDITIONAL(BUILD_RC_O, test x$ac_cv_prog_WINDRES != x)
 AC_PROG_LIBTOOL
 
@@ -254,6 +255,24 @@ PKG_CHECK_MODULES(
   ]
 )
 
+#check for lua
+PKG_CHECK_MODULES(LUA, lua5.1 >= 5.1,
+[
+        CXXFLAGS="$CXXFLAGS $LUA_CFLAGS -DLUA51"
+        SEAR_LIBS="$SEAR_LIBS $LUA_LIBS"
+        AC_MSG_NOTICE([Lua version => 5.1])
+],
+[
+        PKG_CHECK_MODULES(LUA, lua >= 5.1,
+        [
+                CXXFLAGS="$CXXFLAGS $LUA_CFLAGS -DLUA51"
+                SEAR_LIBS="$SEAR_LIBS $LUA_LIBS"
+                AC_MSG_NOTICE([Lua version => 5.1])
+        ],
+        [
+                AC_MSG_ERROR([Couldn't find Lua or tests failed. Error: $LUA_PKG_ERRORS. Please go to http://www.lua.org to get the latest, or check config.log to see why the tests failed, and fix it.])
+        ])
+])
 
 dnl Check other libs
 
@@ -365,4 +384,6 @@ AC_OUTPUT([
 	sear.desktop
 	autopackage/Makefile
 	autopackage/default.apspec
+	swig/Makefile
+	swig/lua/Makefile
 ],[chmod +x src/sear])

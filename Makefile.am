@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ## For top-level sear directory
 
-SUBDIRS = autopackage data scripts interfaces common Eris loaders renderers environment guichan src
+SUBDIRS = autopackage data scripts interfaces common Eris loaders renderers environment guichan swig src
 
 ## Files that aren't included automatically (e.g. html, docs, etc.)
 EXTRA_DIST =  \

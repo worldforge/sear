@@ -69,6 +69,7 @@ endif
 
 sear_bin_LDADD = \
 	libSear.a \
+	../swig/lua/libluaSear.a \
 	../renderers/libRendererGL.a \
 	../environment/libEnvironment.a \
 	../loaders/libModelLoader.a \

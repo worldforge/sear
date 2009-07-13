@@ -569,6 +569,4 @@ void CharacterManager::GotAllCharacters() {
   }
 }
 
-
-
 } /* namespace Sear */

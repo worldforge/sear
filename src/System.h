@@ -25,6 +25,7 @@ class Client;
 class FileHandler;
 class MediaManager;
 class ScriptEngine;
+class LuaScriptEngine;
 class Console;
 class Workarea;
 class CharacterManager;
@@ -177,6 +178,7 @@ public:
   void vEnableKeyRepeat(bool bEnable = true);
  
   ScriptEngine *getScriptEngine() { return m_script_engine.get(); }
+  LuaScriptEngine *getLuaScriptEngine() { return m_lua_script_engine.get(); }
   ActionHandler *getActionHandler() { return m_action_handler.get(); }
   FileHandler *getFileHandler() { return m_file_handler.get(); }
   Calendar *getCalendar() { return m_calendar.get(); }
@@ -225,6 +227,7 @@ protected:
 
   std::auto_ptr<Client> m_client;
   std::auto_ptr<ScriptEngine> m_script_engine; ///< Pointer to scripting engine object
+  std::auto_ptr<LuaScriptEngine> m_lua_script_engine; ///< Pointer to scripting engine object
   std::auto_ptr<FileHandler> m_file_handler; ///< Pointer to file handler object
   std::auto_ptr<ActionHandler> m_action_handler; ///< Pointer to action handler object
   std::auto_ptr<Calendar> m_calendar; ///< Pointer to calender object
@@ -280,7 +283,6 @@ private:
   bool m_startFullscreen;
 
   unsigned int m_delay;
-
 };
 
 } /* namespace Sear */

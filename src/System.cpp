@@ -40,6 +40,7 @@
 #include "FileHandler.h"
 //#include "Sound.h"
 #include "ScriptEngine.h"
+#include "swig/lua/LuaScriptEngine.h"
 #include "MediaManager.h"
 #include "System.h"
 #include "WorldEntity.h"
@@ -163,6 +164,9 @@ bool System::init(int argc, char *argv[]) {
   m_script_engine = std::auto_ptr<ScriptEngine>(new ScriptEngine());
   m_script_engine->init();
 
+  m_lua_script_engine = std::auto_ptr<LuaScriptEngine>(new LuaScriptEngine());
+  m_lua_script_engine->init();
+
   // Pass client name and version when creating a connection
   m_client = std::auto_ptr<Client>(new Client(this, PACKAGE_VERSION));
   if (!m_client->init()) {
@@ -170,6 +174,7 @@ bool System::init(int argc, char *argv[]) {
 
     m_client.reset(0);
     m_script_engine.reset(0);
+    m_lua_script_engine.reset(0);
 
     return false;
   }
@@ -206,6 +211,7 @@ bool System::init(int argc, char *argv[]) {
 
   m_client->registerCommands(m_console.get());
   m_script_engine->registerCommands(m_console.get());
+  m_lua_script_engine->registerCommands(m_console.get());
   m_action_handler->registerCommands(m_console.get());
   m_file_handler->registerCommands(m_console.get());
   m_calendar->registerCommands(m_console.get());
@@ -348,6 +354,8 @@ bool System::init(int argc, char *argv[]) {
 
 int System::reinit() {
   // Restart these engines
+  m_lua_script_engine->shutdown();
+  m_lua_script_engine->init();
   m_script_engine->shutdown();
   m_script_engine->init();
   m_action_handler->shutdown();
@@ -397,6 +405,7 @@ void System::shutdown() {
 
   Bindings::shutdown();
 
+  m_lua_script_engine.reset(0);
   m_script_engine.reset(0);
 
   m_file_handler.reset(0);
