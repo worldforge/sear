@@ -1,3 +1,8 @@
+2009-07-17  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, scripts/Makefile.am, scripts/gui/Makefile.am: Install 
+	  gui lua scripts.
+
 2009-07-13  Simon Goodall  <simon@worldforge.org>
 
 	* scripts/gui/*.lua: Initial implementations of GUI components
