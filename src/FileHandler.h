@@ -1,8 +1,6 @@
 // This file may be redistributed and modified only under the terms of
 // the GNU General Public License (See COPYING for details).
-// Copyright (C) 2001 - 2006 Simon Goodall
-
-// $Id: FileHandler.h,v 1.16 2007-05-26 18:54:45 simon Exp $
+// Copyright (C) 2001 - 2009 Simon Goodall
 
 #ifndef SEAR_FILEHANDLER_H
 #define SEAR_FILEHANDLER_H 1
@@ -75,9 +73,6 @@ public:
   * Make a directory with the given name
   */
   bool mkdir(const std::string &dirname) const;
-
-  void addFileVariable(const std::string &var, const std::string &path);
-
 
   void insertFilePath(const std::string &var, const std::string &path);
   void appendFilePath(const std::string &var, const std::string &path);

@@ -36,6 +36,7 @@ extern "C" {
 #include "src/ActionHandler.h"
 #include "src/client.h"
 #include "src/System.h"
+#include "src/FileHandler.h"
 
 %}
 
@@ -66,6 +67,11 @@ void disconnect();
 %include "interfaces/ConsoleObject.h"
 %include "src/ActionHandler.h"
 %include "src/client.h"
+
+# Allow string refs to be used
+%apply std::string& INOUT {std::string& str};
+%include "src/FileHandler.h"
+
 %include "src/System.h"
 %include "Eris/Localserver.h"
 

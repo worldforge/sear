@@ -1,5 +1,11 @@
 2009-07-17  Simon Goodall  <simon@worldforge.org>
 
+	* src/FileHandler.h: Remove unimplemented method.
+
+	* swig/lua/Sear.i: Export FileHandler class.
+
+2009-07-17  Simon Goodall  <simon@worldforge.org>
+
 	* scripts/gui/util.lua: Added simple util script.
 
 2009-07-17  Simon Goodall  <simon@worldforge.org>
