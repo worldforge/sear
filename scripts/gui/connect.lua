@@ -4,29 +4,25 @@
 -- Copyright (C) 2007 - 2009 Simon Goodall
 
 -- Implementation of the Connect Window in LUA
---
--- TODO:
--- More robust logic!
--- Fixed width text fields
-
--- TODO: This should just register the window!
 
 -- Create table to store all reference in.
 -- This avoids copying when referenced within functions
 -- Required for win var. Unsure about rest
-self = {}
+local self = {};
 
 -- Take refs to main objects
 self.system = Sear.System_instance()
 self.workarea = self.system:getWorkarea()
 
+-- Create window object.
+self.win = Sear.LogicWindow("Connect Window");
 
-self.win = Sear.LogicWindow("Login Window");
-col = self.win:getBaseColor();
+-- Set transparency
+local col = self.win:getBaseColor();
 col.a = 128;
 self.win:setBaseColor(col);
-
 self.win:setOpaque(true);
+
 
 self.serverListModel = Sear.ServerListModel();
 
@@ -45,12 +41,14 @@ self.scrollArea1:setHeight(200);
 
 self.vbox1:pack(self.scrollArea1);
 
-self.serverField = Guichan.TextField("                ");
+local textSize = 30;
+
+self.serverField = Guichan.TextField(pad("", textSize, " "));
 self.vbox1:pack(self.serverField);
 
 -- Little function to create a button
 function createButton(hbox, name, eventId, al)
-  btn = Guichan.Button(name);
+  local btn = Guichan.Button(name);
   btn:setFocusable(false);
   btn:setActionEventId(eventId);
   btn:addActionListener(al);
@@ -71,30 +69,45 @@ self.win:resizeToContent();
 
 self.selected = -1;
 
+-- Logic callback function.
+-- Update the server list
 function logic_cb()
-  newSelected = self.servers:getSelected();
+
+  local newSelected = self.servers:getSelected();
+
   if (newSelected ~= self.selected) then
 
     self.selected = newSelected;
 
-    sl = self.serverListModel.m_meta:getServerList();
+    local sl = self.serverListModel.m_meta:getServerList();
     if (self.selected >= 0) then 
       if (self.selected < self.serverListModel:getNumberOfElements()) then
-        e = self.serverListModel:getElementDataAt(self.selected);
-        str = e.hostname.." "..e.port;
+        local e = self.serverListModel:getElementDataAt(self.selected);
+        local str = e.hostname.." "..e.port;
         self.serverField:setText(str);
       end
     end
   end
+  if (newSelected < 0) then
+    self.connectBtn:setEnabled(false);
+  else
+    self.connectBtn:setEnabled(true);
+  end
 end
 
-self.win:LogicCB(logic_cb);
+
+-- Action Handler callback
 function action_cb(event)
-  close = false;
+  local close = false;
   if (event == "connect") then 
-    cmd = "/connect "..self.serverField:getText();
-    self.system:runCommand(cmd);
-    close = true;
+    local server = self.serverField:getText();
+    if (server == "") then
+      local alert = Sear.Alert("No server specified");
+    else 
+      local cmd = "/connect "..server;
+      self.system:runCommand(cmd);
+      close = true;
+    end
   elseif (event == "refresh") then
     self.serverListModel.m_meta:runCommand("refresh_server_list", "");
   elseif (event == "close") then
@@ -107,7 +120,10 @@ function action_cb(event)
   end
 end
 
+-- Register callback function and store slot object
+self.logicSlot = self.win:LogicCB(logic_cb);
+
 -- Register callback
-self.al:ActionCB(action_cb);
+self.actionSlot = self.al:ActionCB(action_cb);
 
 return self.win;

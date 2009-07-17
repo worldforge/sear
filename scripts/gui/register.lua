@@ -1,11 +1,17 @@
 -- Register GUI classes and action handlers
 --
 
-system = Sear.System_instance();
-workarea = system:getWorkarea();
+local system = Sear.System_instance();
+local workarea = system:getWorkarea();
 
 -- TODO: Obtain from sys call?
-scriptPath = "/home/sg/src/sear-tmp/sear/scripts/gui/";
+
+
+local scriptPath = "${SEAR_INSTALL}/scripts/gui/";
+local scriptPath = system:getFileHandler():expandString(scriptPath);
+
+-- Install utils
+dofile(scriptPath.."util.lua");
 
 -- Create and register windows
 workarea:registerWindow("connect", dofile(scriptPath.."connect.lua"));
@@ -15,10 +21,8 @@ workarea:registerWindow("character", dofile(scriptPath.."character.lua"));
 -- TODO: De-register windows on cleanup?
 
 
-
-
-
-ac = system:getActionHandler();
+-- Hook up action handler events
+local ac = system:getActionHandler();
 
 ac:addHandler("connected", "/workarea_close connect");
 ac:addHandler("connected", "/workarea_open login");

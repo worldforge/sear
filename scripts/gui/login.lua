@@ -4,107 +4,104 @@
 -- Copyright (C) 2007 - 2009 Simon Goodall
 
 -- Implementation of the Login Window in LUA
---
--- TODO:
--- More robust logic!
--- Fixed width text fields
 
--- TODO: This should just register the window!
-
+local self = {};
 
 -- Take refs to main objects
-system = Sear.System_instance()
-workarea = system:getWorkarea()
+local system = Sear.System_instance()
+local workarea = system:getWorkarea()
 
-win = Sear.LogicWindow("Login Window");
-col = win:getBaseColor();
+local textSize = 10;
+
+self.win = Sear.LogicWindow("Login Window");
+col = self.win:getBaseColor();
 col.a = 128;
-win:setBaseColor(col);
+self.win:setBaseColor(col);
 
-al = Sear.ActionListenerSigC();
+self.al = Sear.ActionListenerSigC();
 
-vbox = Sear.VBox(6);
+self.vbox = Sear.VBox(6);
 
-hbox_user = Sear.HBox(6);
-l1 = Guichan.Label("User Name");
-hbox_user:pack(l1);
-t1 = Guichan.TextField("          ");
-hbox_user:pack(t1);
-t1:setText("");
-vbox:pack(hbox_user);
+self.hbox_user = Sear.HBox(6);
+self.l1 = Guichan.Label(pad("User Name", textSize, " "));
+self.hbox_user:pack(self.l1);
+self.t1 = Guichan.TextField(pad("", textSize, " "));
+self.hbox_user:pack(self.t1);
+self.t1:setText("");
+self.vbox:pack(self.hbox_user);
 
-hbox_pwd = Sear.HBox(6);
-l2 = Guichan.Label("Password");
-hbox_pwd:pack(l2);
-t2 = Sear.PasswordField("          ", al, Guichan.ActionEvent(win, "login"));
-hbox_pwd:pack(t2);
-t2:setText("");
-vbox:pack(hbox_pwd);
-
-
-hbox_pwd2 = Sear.HBox(6);
-l3 = Guichan.Label("");
-hbox_pwd2:pack(l3);
-t3 = Sear.PasswordField("          ", al, Guichan.ActionEvent(win, "login"));
-hbox_pwd2:pack(t3);
-t3:setText("");
-vbox:pack(hbox_pwd2);
+self.hbox_pwd = Sear.HBox(6);
+self.l2 = Guichan.Label(pad("Password", textSize, " "));
+self.hbox_pwd:pack(self.l2);
+self.t2 = Sear.PasswordField(pad("", textSize, " "), al, Guichan.ActionEvent(win, "login"));
+self.hbox_pwd:pack(self.t2);
+self.t2:setText("");
+self.vbox:pack(self.hbox_pwd);
 
 
-hbox_name = Sear.HBox(6);
-l4 = Guichan.Label("Name");
-hbox_name:pack(l4);
-t4 = Guichan.TextField("          ");
-hbox_name:pack(t4);
-t4:setText("");
-vbox:pack(hbox_name);
-
-check = Guichan.CheckBox("New Account");
-check:setActionEventId("check");
-check:addActionListener(al);
-vbox:pack(check);
-
-hbox3 = Sear.HBox(6)
-btn = Guichan.Button("Login");
-hbox3:pack(btn);
-btn:setActionEventId("login");
-btn:addActionListener(al);
-
-btn_close = Guichan.Button("Close");
-hbox3:pack(btn_close);
-btn_close:setActionEventId("close");
-btn_close:addActionListener(al);
+self.hbox_pwd2 = Sear.HBox(6);
+self.l3 = Guichan.Label(pad("", textSize, " "));
+self.hbox_pwd2:pack(self.l3);
+self.t3 = Sear.PasswordField(pad("", textSize, " "), al, Guichan.ActionEvent(win, "login"));
+self.hbox_pwd2:pack(self.t3);
+self.t3:setText("");
+self.vbox:pack(self.hbox_pwd2);
 
 
-vbox:pack(hbox3);
+self.hbox_name = Sear.HBox(6);
+self.l4 = Guichan.Label(pad("Name", textSize, " "));
+self.hbox_name:pack(self.l4);
+self.t4 = Guichan.TextField(pad("", textSize, " "));
+self.hbox_name:pack(self.t4);
+self.t4:setText("");
+self.vbox:pack(self.hbox_name);
 
-hbox_end = Sear.HBox();
-hbox_end:pack(vbox, 6);
-vbox_end = Sear.VBox();
-vbox_end:pack(hbox_end, 6);
+self.check = Guichan.CheckBox("New Account");
+self.check:setActionEventId("check");
+self.check:addActionListener(self.al);
+self.vbox:pack(self.check);
 
-win:add(vbox_end);
+self.hbox3 = Sear.HBox(6)
+self.btn = Guichan.Button("Login");
+self.hbox3:pack(self.btn);
+self.btn:setActionEventId("login");
+self.btn:addActionListener(self.al);
 
-win:resizeToContent();
+self.btn_close = Guichan.Button("Close");
+self.hbox3:pack(self.btn_close);
+self.btn_close:setActionEventId("close");
+self.btn_close:addActionListener(self.al);
+
+
+self.vbox:pack(self.hbox3);
+
+self.hbox_end = Sear.HBox();
+self.hbox_end:pack(self.vbox, 6);
+self.vbox_end = Sear.VBox();
+self.vbox_end:pack(self.hbox_end, 6);
+
+self.win:add(self.vbox_end);
+
+self.win:resizeToContent();
 
 function action_cb(str)
   if (str == "close") then 
-    workarea:removeLater(win);
+    workarea:removeLater(self.win);
   elseif (str == "check") then
-    visible = check:isSelected();
-    l3:setVisible(visible);
-    t3:setVisible(visible);
-    l4:setVisible(visible);
-    t4:setVisible(visible);
-    t3:setEnabled(visible);
-    t4:setEnabled(visible);
-    if (check:isSelected()) then
-      btn:setCaption("Create");
+    local visible = self.check:isSelected();
+    self.l3:setVisible(visible);
+    self.t3:setVisible(visible);
+    self.l4:setVisible(visible);
+    self.t4:setVisible(visible);
+    self.t3:setEnabled(visible);
+    self.t4:setEnabled(visible);
+    if (self.check:isSelected()) then
+      self.btn:setCaption("Create");
     else
-      btn:setCaption("Login");
+      self.btn:setCaption("Login");
     end
   elseif (str == "login") then
-    if (check:isSelected()) then
+    if (self.check:isSelected()) then
 
     -- TODO: Check passwords match
     -- Quote strings
@@ -125,17 +122,13 @@ end
 
 -- Register logic function
 -- (Only do if required)
--- win:LogicCB(logic_cb);
-
-
+ self.logicSlot = self.win:LogicCB(logic_cb);
 
 -- Register callback
-al:ActionCB(action_cb);
+self.actionSlot = self.al:ActionCB(action_cb);
 
 -- Trigger GUI updates
 action_cb("check");
 
+return self.win;
 
-return win;
-
---workarea:registerWindow("login", win);
