@@ -1,3 +1,8 @@
+2009-10-27  Simon Goodall  <simon@worldforge.org>
+
+	* configure.ac, README, macos/guichan.m4: Require Guichan 0.8.2. Use
+	  pkgconfig to find guichan.
+
 2009-07-17  Simon Goodall  <simon@worldforge.org>
 
 	* scripts/gui/character.lua, scripts/gui/connect.lua,

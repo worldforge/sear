@@ -254,6 +254,16 @@ PKG_CHECK_MODULES(
     AC_MSG_WARN([Couldn't find Avahi. Avahi support will be disabled.])
   ]
 )
+GUICHAN_VERSION=0.8.2
+PKG_CHECK_MODULES(GUICHAN, guichan-0.8 >= $GUICHAN_VERSION guichan_opengl-0.8 guichan_sdl-0.8,
+      [
+              CPPFLAGS="$CPPFLAGS $GUICHAN_CFLAGS"
+              SEAR_LIBS="$SEAR_LIBS $GUICHAN_LIBS"
+      ],
+      AC_MSG_ERROR(Couldn't find guichan. Please go to http://guichan.sourceforge.net/ and download at least $GUICHAN_VERSION.)
+)
+AC_SUBST(GUICHAN_VERSION)
+
 
 #check for lua
 PKG_CHECK_MODULES(LUA, lua5.1 >= 5.1,
@@ -294,9 +304,9 @@ if test $cross_compiling == no; then
   ], "-lGL")
 
   #AC_CHECK_LIB(guichan, gcnGuichanVersion, SEAR_LIBS="$SEAR_LIBS -lguichan_sdl -lguichan_opengl -lguichan",AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.5.0.]))
-  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
-  SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
-  CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
+#  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
+ # SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
+  #CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
 
   AC_LANG_RESTORE
  else
@@ -312,9 +322,9 @@ if test $cross_compiling == no; then
 #     AC_MSG_ERROR([Could not find lib Guichan! Please go to http://guichan.sourceforge.net/ and download at least 0.4.0.])
 #   fi
 
-  FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
-  SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
-  CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
+  #FIND_GUICHAN(, [AC_MSG_ERROR([guichan not found.  Please go to http://guichan.sourceforge.net/ and download at least 0.8.0.])])
+  #SEAR_LIBS="$GUICHAN_LIBS $SEAR_LIBS"
+  #CPPFLAGS="$CPPFLAGS $GUICHAN_INCLUDES"
 
 
    AC_CHECK_HEADER(GL/gl.h,
