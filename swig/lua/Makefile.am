@@ -1,9 +1,9 @@
 SUFFIXES: .cxx .i .lo .la .cpp .o  .obj
 
 .i.cxx:
-	${SWIG} -Wall -DGCN_CORE_DECLSPEC -lua -c++ -I$(CPPFLAGS) -I$(top_srcdir) -o $@ $<
+	${SWIG} -Wall -DGCN_CORE_DECLSPEC -lua -c++ -I$(CPPFLAGS) -I$(top_srcdir) -I${srcdir} -o $@ $<
 
-INCLUDES = -I${top_srcdir} 
+INCLUDES = -I${top_srcdir}
 
 
 noinst_LIBRARIES = libluaSear.a
