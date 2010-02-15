@@ -11,7 +11,7 @@
 
 #include <wfmath/quaternion.h>
 #include <wfmath/point.h>
-#include <Eris/Entity.h>
+#include <Eris/ViewEntity.h>
 #include <Eris/EntityRef.h>
 #include <Eris/Types.h>
 #include "common/types.h"
@@ -30,7 +30,7 @@ namespace Sear {
 
 typedef std::pair<std::string, unsigned int> message;
 
-class WorldEntity : public Eris::Entity {
+class WorldEntity : public Eris::ViewEntity {
 public:
   WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view);
   virtual ~WorldEntity() {}

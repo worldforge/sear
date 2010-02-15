@@ -77,7 +77,7 @@ static const WFMath::Point<3> point_zero = WFMath::Point<3>(0.0f,0.0f,0.0f);
 namespace Sear {
 
 WorldEntity::WorldEntity(const std::string &id, Eris::TypeInfo *ty, Eris::View *view):
-   Eris::Entity(id, ty, view),
+   Eris::ViewEntity(id, ty, view),
    m_status(1.0),
    m_screenCoordRequest(0),
    m_has_local_orient(false),
