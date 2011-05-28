@@ -6,7 +6,7 @@
 #include "TerrainModHandler.h"
 
 #include <Eris/Entity.h>
-#include <Eris/TerrainMod.h>
+#include <Eris/TerrainModObserver.h>
 #include <Eris/View.h>
 
 #include <Mercator/TerrainMod.h>
@@ -76,7 +76,7 @@ void TerrainModHandler::setView(View *view) {
 
 void TerrainModHandler::onEntityCreated(Entity *e) {
  
-  TerrainMod *tm = createTerrainMod(e);
+  TerrainModObserver *tm = createTerrainMod(e);
   if (tm != 0) {
     onEventModChanged(tm);
   }
@@ -114,7 +114,7 @@ void TerrainModHandler::onAttrChanged(const Atlas::Message::Element& attributeVa
   // TODO
 
   // Create TM if required
-  TerrainMod *tm = createTerrainMod(e);
+  TerrainModObserver *tm = createTerrainMod(e);
 
   // Fire of changed signal
   // --- TM should do this?
@@ -123,7 +123,7 @@ void TerrainModHandler::onAttrChanged(const Atlas::Message::Element& attributeVa
  // }
 }
 
-TerrainMod *TerrainModHandler::createTerrainMod(Entity *e) {
+TerrainModObserver *TerrainModHandler::createTerrainMod(Entity *e) {
   TerrainModMap::iterator I = m_modMap.find(e->getId());
   if (I != m_modMap.end()) {
     // Already added...
@@ -131,7 +131,7 @@ TerrainMod *TerrainModHandler::createTerrainMod(Entity *e) {
   }
 
   // Else create a new mod
-  TerrainMod *tm = new TerrainMod(e);
+  TerrainModObserver *tm = new TerrainModObserver(e);
 
   if (tm->init(true)) {
     // Hook up changed signals
@@ -147,14 +147,14 @@ TerrainMod *TerrainModHandler::createTerrainMod(Entity *e) {
   }
 }
 
-void TerrainModHandler::onEventModChanged(TerrainMod *tm) {
+void TerrainModHandler::onEventModChanged(TerrainModObserver *tm) {
 
   // Perhaps we need an extra EventModAdded signal?1
 //  TerrainModAdded.emit(tm->getEntity(), tm->getMod());
   TerrainModChanged.emit(tm->getEntity(), tm->getMod());
 }
 
-void TerrainModHandler::onEventModDeleted(TerrainMod *tm) {
+void TerrainModHandler::onEventModDeleted(TerrainModObserver *tm) {
 
   TerrainModDeleted.emit(tm->getEntity(), tm->getMod());
 } 

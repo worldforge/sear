@@ -19,7 +19,7 @@ namespace Mercator {
 namespace Eris {
   class Entity;
   class View;
-  class TerrainMod;
+  class TerrainModObserver;
 
 class TerrainModHandler {
 public:
@@ -50,15 +50,15 @@ public:
 private:
   void onAttrChanged(const Atlas::Message::Element& attributeValue, Entity*);
 
-  void onEventModChanged(TerrainMod *);
-  void onEventModDeleted(TerrainMod *);
+  void onEventModChanged(TerrainModObserver *);
+  void onEventModDeleted(TerrainModObserver *);
 
   bool m_initialised;
 
-  TerrainMod *createTerrainMod(Entity *e);
+  TerrainModObserver *createTerrainMod(Entity *e);
 
   std::map<Entity*, Entity::AttrChangedSlot> m_slots;
-  typedef std::map<std::string, TerrainMod*> TerrainModMap;
+  typedef std::map<std::string, TerrainModObserver*> TerrainModMap;
   TerrainModMap m_modMap;
 };
 

@@ -490,7 +490,7 @@ static void onTerrainModChanged(Eris::Entity *e, Mercator::TerrainMod *mod, Terr
   if (mod != 0) {
     tr->m_terrain.removeMod(mod);
     // TODO: This returns a ptr too?
-    tr->m_terrain.addMod(*mod);
+    tr->m_terrain.addMod(mod);
   }
 }
 

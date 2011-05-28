@@ -42,8 +42,7 @@
 #include <Eris/Response.h>
 #include <Eris/Router.h>
 #include <Eris/Task.h>
-#include <Eris/TerrainMod.h>
-#include <Eris/TerrainMod_impl.h>
+#include <Eris/TerrainModObserver.h>
 #include <Eris/TimedEventService.h>
 #include <Eris/Timeout.h>
 #include <Eris/TypeBoundRedispatch.h>
@@ -91,8 +90,7 @@
 %include <Eris/Response.h>
 %include <Eris/Router.h>
 %include <Eris/Task.h>
-%include <Eris/TerrainMod.h>
-%include <Eris/TerrainMod_impl.h>
+%include <Eris/TerrainModObserver.h>
 %include <Eris/TimedEventService.h>
 %include <Eris/Timeout.h>
 %include <Eris/TypeBoundRedispatch.h>
