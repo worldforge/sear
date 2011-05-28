@@ -9,6 +9,8 @@
 
 #include "src/WorldEntity.h"
 
+#include <cassert>
+
 namespace Sear {
 
   /** Apply rule to choose an entity mapping for the given entity.

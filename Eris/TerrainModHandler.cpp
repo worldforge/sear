@@ -11,6 +11,8 @@
 
 #include <Mercator/TerrainMod.h>
 
+#include <cassert>
+
 // Loop through the entity tree triggering the created method.
 static void checkEntities(Eris::Entity *e, Eris::TerrainModHandler *tmh) {
   if (e != 0) {

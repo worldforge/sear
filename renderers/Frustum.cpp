@@ -11,6 +11,8 @@
 
 #include <wfmath/ball.h>
 
+#include <cmath>
+
 #ifdef DEBUG
   static const bool debug = true;
 #else

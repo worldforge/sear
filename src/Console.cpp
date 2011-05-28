@@ -21,6 +21,7 @@
 #endif
 
 #include <fstream>
+#include <cassert>
 
 namespace Sear {
 	

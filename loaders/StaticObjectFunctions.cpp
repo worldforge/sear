@@ -8,6 +8,8 @@
 
 #include "StaticObjectFunctions.h"
 
+#include <cassert>
+
 #ifdef DEBUG
   static const bool debug = true;
 #else

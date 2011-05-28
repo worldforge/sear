@@ -28,6 +28,9 @@
 
 #include "Weather.h"
 
+#include <cassert>
+#include <cmath>
+
 static const bool debug = false;
 
 static const std::string SECTION_weather = "weather";

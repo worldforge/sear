@@ -29,6 +29,8 @@ glTexEnv <--to tell GL how to map the texture
 #include "ParticleSystem.h"
 #include "DynamicObject.h"
 
+#include <cassert>
+
 namespace Sear {
 
 WFMath::MTRand twister;
